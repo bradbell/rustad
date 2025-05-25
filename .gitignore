@@ -2,6 +2,11 @@
 /target/
 # compiled informatiopn about Cargo.toml
 /Cargo.lock
+# bin/git_commit.sh log file
+/git_commit.log
 # vim swap files
 *.swp
+# temporary files
+temp
+temp.*
 
