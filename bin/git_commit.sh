@@ -25,7 +25,7 @@ echo_eval() {
 # -----------------------------------------------------------------------------
 if [ $# != 0 ]
 then
-   echo 'usage: bin/git_commit.sh: does not expect arugments'
+   echo 'usage: bin/git_commit.sh: does not expect arguments'
    exit 1
 fi
 if [ "$0" != 'bin/git_commit.sh' ]

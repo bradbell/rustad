@@ -10,11 +10,11 @@ set -e -u
 #
 # bin/check_all.sh [--skip_external_links]
 # is used by new_release.sh to check the stable branch
-# correpsonding to this release (unless skipped by new_release.sh flags).
+# corresponding to this release (unless skipped by new_release.sh flags).
 #
 # bin/check_all.sh [--skip_external_links]
 # is used by new_release to skip checking external links.
-# new_release.sh skips this when testng before the new release (tag)  exists.
+# new_release.sh skips this when testing before the new release (tag)  exists.
 # -----------------------------------------------------------------------------
 year='' # Year for this stable version
 release='' # first release for each year starts with 0
@@ -118,11 +118,11 @@ else
    tag=$year.0.$release
 fi
 #
-# tag_commited
-tag_commited='no'
+# tag_committed
+tag_committed='no'
 if git tag --list | grep "$tag" > /dev/null
 then
-   tag_commited='yes'
+   tag_committed='yes'
 fi
 #
 # stable_branch
@@ -168,7 +168,7 @@ do
 done
 #
 # run_xrst.sh
-if [ "$tag_commited" == 'yes' ]
+if [ "$tag_committed" == 'yes' ]
 then
    echo_eval bin/run_xrst.sh --external_links
 else
@@ -188,7 +188,7 @@ fi
 # ----------------------------------------------------------------------------
 if ! git show-ref $stable_branch > /dev/null
 then
-   echo "bin/new_release: neither local or remvoe $stable_branch exists."
+   echo "bin/new_release: neither local or remove $stable_branch exists."
    echo 'Use the following to create it ?'
    echo "   git branch $stable_branch"
    exit 1
@@ -246,7 +246,7 @@ fi
 # check_all.sh
 if [ "$skip_stable_check_all" == 'no' ]
 then
-   if [ "$tag_commited" == 'yes' ]
+   if [ "$tag_committed" == 'yes' ]
    then
       echo_eval bin/check_all.sh --suppress_spell_warnings
    else
@@ -285,7 +285,7 @@ then
 fi
 #
 # push tag
-if [ "$tag_commited" == 'no' ]
+if [ "$tag_committed" == 'no' ]
 then
    read -p 'commit release or abort [c/a] ?' response
    if [ "$response" == 'a' ]
