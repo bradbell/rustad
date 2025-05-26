@@ -16,6 +16,14 @@ then
    exit 1
 fi
 #
+# typos
+if ! which typos > /dev/null
+then
+   echo 'Install typos using: cargo install typos-cli'
+   exit 1
+fi
+echo_eval typos
+#
 # sed
 source bin/grep_and_sed.sh
 #
