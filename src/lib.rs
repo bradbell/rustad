@@ -2,13 +2,21 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
+/// The version number as year.month.day
+///
+/// # Example
+/// ```
+/// let version = &*rustad::VERSION;
+///
+/// assert_eq!(version, "2025.5.26");
+/// ```
 pub static VERSION: std::sync::LazyLock<String> =
-   std::sync::LazyLock::new( || "2025.5.25".to_string() );
+   std::sync::LazyLock::new( || "2025.5.26".to_string() );
 
 
 /// Adds two numbers
 ///
-/// # Examples
+/// # Example
 ///
 /// ```
 /// let left  = 5;
@@ -22,18 +30,4 @@ pub fn add(left: u64, right: u64) -> u64 {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_1() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-
-   #[test]
-   fn test_2() {
-      let version = &*VERSION;
-        assert_eq!(version, "2025.5.25");
-   }
-}
+mod test;
