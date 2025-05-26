@@ -6,6 +6,9 @@ use rustad;
 
 #[test]
 fn test_add() {
-    let version = &*rustad::VERSION;
-    assert_eq!(version, "2025.5.26");
+    let left  = 5;
+    let right = 6;
+    let answer = rustad::add(left, right);
+
+    assert_eq!(11, answer);
 }
