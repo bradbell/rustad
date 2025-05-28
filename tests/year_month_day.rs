@@ -5,7 +5,7 @@
 use rustad;
 
 #[test]
-fn test_version() {
-    let version = &*rustad::VERSION;
-    assert_eq!(version, "2025.5.26");
+fn test_year_month_day() {
+    let year_month_day = &*rustad::YEAR_MONTH_DAY;
+    assert_eq!(year_month_day, "2025.5.28");
 }

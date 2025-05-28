@@ -55,7 +55,7 @@ index_page_name=''
 # In addition, all occurrences of stable-yyyy and release-yyyy are updated.
 version_file_list='
    src/lib.rs
-   tests/version.rs
+   tests/year_month_day.rs
 '
 # All the occurrences of the version in the files above are checked to see
 # that they agree.

@@ -2,16 +2,16 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
-/// The version number as year.month.day
+// YEAR_MONTH_DAY
+/// The date corresponding to this version of the software as year.month.day
 ///
 /// # Example
 /// ```
-/// let version = &*rustad::VERSION;
-///
-/// assert_eq!(version, "2025.5.26");
+/// let version = &*rustad::YEAR_MONTH_DAY;
+/// assert_eq!(version, "2025.5.28");
 /// ```
-pub static VERSION: std::sync::LazyLock<String> =
-   std::sync::LazyLock::new( || "2025.5.26".to_string() );
+pub static YEAR_MONTH_DAY: std::sync::LazyLock<String> =
+   std::sync::LazyLock::new( || "2025.5.28".to_string() );
 
 
 /// Adds two numbers
