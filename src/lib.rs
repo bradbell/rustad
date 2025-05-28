@@ -17,13 +17,8 @@ pub static YEAR_MONTH_DAY: std::sync::LazyLock<String> =
 /// Adds two numbers
 ///
 /// # Example
-///
 /// ```
-/// let left  = 5;
-/// let right = 6;
-/// let answer = rustad::add(left, right);
-///
-/// assert_eq!(11, answer);
+#[doc = include_str!("../examples/add.rs")]
 /// ```
 pub fn add(left: u64, right: u64) -> u64 {
     left + right

@@ -41,7 +41,7 @@ done
 echo
 echo_eval cargo doc
 echo
-echo_eval cargo test
+echo_eval cargo test --all-targets
 #
 echo "check_all.sh OK"
 exit 0
