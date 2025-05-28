@@ -37,11 +37,11 @@ do
    echo_eval $check
 done
 #
-# cargo doc, test
+# cargo doc
 echo
 echo_eval cargo doc
 echo
-echo_eval cargo test --all-targets
+echo_eval bin/cargo_test.sh
 #
 echo "check_all.sh OK"
 exit 0
