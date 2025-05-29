@@ -2,6 +2,15 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
+pub struct OpInfo {
+    pub name : String,
+}
+
+pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
+   std::sync::LazyLock::new( || vec![ OpInfo { name : "add".to_string() } ] );
+pub const ADD_OP: usize = 0;
+
+
 // YEAR_MONTH_DAY
 /// The date corresponding to this version of the software as year.month.day
 ///

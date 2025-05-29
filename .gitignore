@@ -1,5 +1,8 @@
 # cargo builds
 /target/
+# cache git changes here
+/new/
+/new.*/
 # compiled informatiopn about Cargo.toml
 /Cargo.lock
 # bin/git_commit.sh log file
