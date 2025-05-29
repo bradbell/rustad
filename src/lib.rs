@@ -19,8 +19,8 @@ pub const ADD_OP: usize = 0;
 /// let version = &*rustad::YEAR_MONTH_DAY;
 /// assert_eq!(version, "2025.5.28");
 /// ```
-pub static YEAR_MONTH_DAY: std::sync::LazyLock<String> =
-   std::sync::LazyLock::new( || "2025.5.28".to_string() );
+const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
+   std::sync::LazyLock::new( || "2025.5.28" );
 
 
 /// Adds two numbers
