@@ -2,13 +2,22 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
+#[derive(Clone)]
 pub struct OpInfo {
     pub name : String,
 }
+pub const ADD_OP:    usize = 0;
+pub const NUMBER_OP: usize = ADD_OP + 1;
+
+fn op_info_vec() -> Vec<OpInfo> {
+    let mut result = vec![ OpInfo{ name : "".to_string() } ; NUMBER_OP ];
+    result[ADD_OP] = OpInfo{ name : "add".to_string() };
+    result
+}
+
 
 pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
-   std::sync::LazyLock::new( || vec![ OpInfo { name : "add".to_string() } ] );
-pub const ADD_OP: usize = 0;
+   std::sync::LazyLock::new( || op_info_vec() );
 
 
 // YEAR_MONTH_DAY
@@ -17,10 +26,10 @@ pub const ADD_OP: usize = 0;
 /// # Example
 /// ```
 /// let version = &*rustad::YEAR_MONTH_DAY;
-/// assert_eq!(version, "2025.5.28");
+/// assert_eq!(version, "2025.5.29");
 /// ```
-const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
-   std::sync::LazyLock::new( || "2025.5.28" );
+pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
+   std::sync::LazyLock::new( || "2025.5.29" );
 
 
 /// Adds two numbers
