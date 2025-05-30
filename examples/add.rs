@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
-use rustad;
+use rustad::OP_INFO_VEC;
+use rustad::ADD_OP;
 
 /// add Example
 fn add_example() {
@@ -10,7 +11,7 @@ fn add_example() {
     let left    = 0;
     let right   = 1;
     let result  = 2;
-    let fun     = rustad::OP_INFO_VEC[rustad::ADD_OP].fun;
+    let fun     = OP_INFO_VEC[ADD_OP].fun;
     vec[left]  = 4.0;
     vec[right] = 5.0;
     fun(&mut vec, left, right, result);

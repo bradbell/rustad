@@ -2,6 +2,17 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
+// YEAR_MONTH_DAY
+/// The date corresponding to this version of the software as year.month.day
+///
+/// # Example
+/// ```
+/// let version = &*rustad::YEAR_MONTH_DAY;
+/// assert_eq!(version, "2025.5.30");
+/// ```
+pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
+   std::sync::LazyLock::new( || "2025.5.30" );
+
 // OpInfo
 #[derive(Clone)]
 pub struct OpInfo {
@@ -31,15 +42,3 @@ fn op_info_vec() -> Vec<OpInfo> {
 }
 pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
    std::sync::LazyLock::new( || op_info_vec() );
-
-
-// YEAR_MONTH_DAY
-/// The date corresponding to this version of the software as year.month.day
-///
-/// # Example
-/// ```
-/// let version = &*rustad::YEAR_MONTH_DAY;
-/// assert_eq!(version, "2025.5.30");
-/// ```
-pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
-   std::sync::LazyLock::new( || "2025.5.30" );
