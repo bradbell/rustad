@@ -6,9 +6,13 @@ use rustad;
 
 #[test]
 fn test_add() {
-    let left  = 5;
-    let right = 6;
-    let answer = rustad::add(left, right);
-
-    assert_eq!(11, answer);
+    let mut vec : Vec<f64> = vec![f64::NAN; 3];
+    let left    = 0;
+    let right   = 1;
+    let result  = 2;
+    let fun     = rustad::OP_INFO_VEC[rustad::ADD_OP].fun;
+    vec[left]  = 4.0;
+    vec[right] = 5.0;
+    fun(&mut vec, left, right, result);
+    assert_eq!(vec[result], 9.0);
 }
