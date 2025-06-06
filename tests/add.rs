@@ -10,12 +10,11 @@ fn test_add() {
     let mut vec : Vec<f64>   = vec![f64::NAN; 3];
     let left    : usize      = 0;
     let right   : usize      = 1;
-    let result  : usize      = 2;
+    let res     : usize      = 2;
     let arg     : Vec<usize> = vec![left, right];
-    let res     : Vec<usize> = vec![result];
     let fun     = OP_INFO_VEC[ADD_OP].fun;
     vec[left]   = 4.0;
     vec[right]  = 5.0;
-    fun(&mut vec, &arg, &res);
-    assert_eq!(vec[result], 9.0);
+    fun(&mut vec, &arg, res);
+    assert_eq!(vec[res], 9.0);
 }
