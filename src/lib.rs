@@ -52,16 +52,20 @@ pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
 //
 // TapeInfo
 pub struct TapeInfo {
-    pub op_vec:     Vec<Index>,
-    pub op2arg_vec: Vec<Index>,
-    pub arg_vec:    Vec<Index>,
-    pub con_vec:    Vec<Float>,
+    pub tape_id    : Index,
+    pub n_var      : Index,
+    pub op_vec     : Vec<Index>,
+    pub op2arg     : Vec<Index>,
+    pub arg_vec    : Vec<Index>,
+    pub con_vec    : Vec<Float>,
 }
 impl TapeInfo {
-    pub fn new( ) -> Self {
+    pub fn new() -> Self {
         Self {
+            tape_id    : 1,
+            n_var      : 0,
             op_vec     : Vec::new() ,
-            op2arg_vec : Vec::new() ,
+            op2arg     : Vec::new() ,
             arg_vec    : Vec::new() ,
             con_vec    : Vec::new() ,
         }
@@ -72,4 +76,46 @@ impl TapeInfo {
 thread_local! {
     pub static THIS_THREADS_TAPE: std::cell::RefCell<TapeInfo> =
         std::cell::RefCell::new( TapeInfo::new() );
+}
+//
+// AD
+struct AD {
+    pub tape_id   : Index,
+    pub var_index : Index,
+    pub value     : Float,
+}
+impl From<Float> for AD {
+    fn from(val : Float) -> Self {
+        Self {
+            tape_id   : 0,
+            var_index : 0,
+            value     : val,
+        }
+    }
+}
+impl std::ops::Add for AD {
+    type Output = AD;
+    fn add(self, rhs : AD) -> AD
+    {   let mut tape_id   = 0;
+        let mut var_index = 0;
+        let value         = self.value + rhs.value;
+        THIS_THREADS_TAPE.with_borrow_mut( |tape| {
+            let var_self = tape.tape_id == self.tape_id;
+            let var_rhs  = tape.tape_id == rhs.tape_id;
+            if var_self && var_rhs {
+                tape_id   = self.tape_id;
+                var_index = tape.n_var;
+                tape.n_var += 1;
+                tape.op_vec.push(ADD_OP);
+                tape.op2arg.push( tape.arg_vec.len() );
+                tape.arg_vec.push( self.var_index );
+                tape.arg_vec.push( rhs.var_index );
+            }
+        } );
+        AD {
+            tape_id   : 0,
+            var_index : 0,
+            value     : value ,
+        }
+    }
 }
