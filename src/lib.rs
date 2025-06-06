@@ -26,9 +26,9 @@ pub struct OpInfo {
     pub fun : fn(&mut Vec<Float>, &[Index], Index),
 }
 
-// ADD_OP, NUMBER_OP
-pub const ADD_OP:    Index = 0;
-pub const NUMBER_OP: Index = ADD_OP + 1;
+// ADD_VV_OP, NUMBER_OP
+pub const ADD_VV_OP:    Index = 0;
+pub const NUMBER_OP: Index = ADD_VV_OP + 1;
 
 //
 // OP_INFO_VEC
@@ -42,9 +42,9 @@ fn add_op_fun(
     vec[ res ] = vec[ arg[0] ] + vec[ arg[1] ];
 }
 fn op_info_vec() -> Vec<OpInfo> {
-    let empty      = OpInfo{ name: "".to_string(), fun : panic_op_fun };
-    let mut result = vec![empty ; NUMBER_OP ];
-    result[ADD_OP] = OpInfo{ name : "add".to_string() , fun : add_op_fun };
+    let empty         = OpInfo{ name: "".to_string(), fun : panic_op_fun };
+    let mut result    = vec![empty ; NUMBER_OP ];
+    result[ADD_VV_OP] = OpInfo{ name : "add".to_string() , fun : add_op_fun };
     result
 }
 pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
@@ -62,7 +62,7 @@ pub struct TapeInfo {
 impl TapeInfo {
     pub fn new() -> Self {
         Self {
-            tape_id    : 1,
+            tape_id    : 0,
             n_var      : 0,
             op_vec     : Vec::new() ,
             op2arg     : Vec::new() ,
@@ -85,37 +85,38 @@ struct AD {
     pub value     : Float,
 }
 impl From<Float> for AD {
-    fn from(val : Float) -> Self {
+    fn from(this_value : Float) -> Self {
         Self {
             tape_id   : 0,
             var_index : 0,
-            value     : val,
+            value     : this_value,
         }
     }
 }
 impl std::ops::Add for AD {
     type Output = AD;
     fn add(self, rhs : AD) -> AD
-    {   let mut tape_id   = 0;
-        let mut var_index = 0;
-        let value         = self.value + rhs.value;
+    {   let mut this_var_index = 0;
+        let mut this_tape_id   = 0;
+        let this_value         = self.value + rhs.value;
         THIS_THREADS_TAPE.with_borrow_mut( |tape| {
-            let var_self = tape.tape_id == self.tape_id;
-            let var_rhs  = tape.tape_id == rhs.tape_id;
-            if var_self && var_rhs {
-                tape_id   = self.tape_id;
-                var_index = tape.n_var;
+            let tape_id  = tape.tape_id;
+            let var_self = self.tape_id == tape_id;
+            let var_rhs  = rhs.tape_id  == tape_id;
+            if tape_id > 0 && var_self && var_rhs {
+                this_tape_id   = tape_id;
+                this_var_index = tape.n_var;
                 tape.n_var += 1;
-                tape.op_vec.push(ADD_OP);
+                tape.op_vec.push(ADD_VV_OP);
                 tape.op2arg.push( tape.arg_vec.len() );
                 tape.arg_vec.push( self.var_index );
                 tape.arg_vec.push( rhs.var_index );
             }
         } );
         AD {
-            tape_id   : 0,
-            var_index : 0,
-            value     : value ,
+            tape_id   : this_tape_id,
+            var_index : this_var_index,
+            value     : this_value,
         }
     }
 }
