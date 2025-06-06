@@ -13,25 +13,31 @@
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
    std::sync::LazyLock::new( || "2025.6.6" );
 
+// Index
+pub type Index = usize;
+//
+// Float
+pub type Float = f64;
+
 // OpInfo
 #[derive(Clone)]
 pub struct OpInfo {
     pub name : String,
-    pub fun : fn(&mut Vec<f64>, &[usize], usize),
+    pub fun : fn(&mut Vec<Float>, &[Index], Index),
 }
 
 // ADD_OP, NUMBER_OP
-pub const ADD_OP:    usize = 0;
-pub const NUMBER_OP: usize = ADD_OP + 1;
+pub const ADD_OP:    Index = 0;
+pub const NUMBER_OP: Index = ADD_OP + 1;
 
 //
 // OP_INFO_VEC
 fn panic_op_fun(
-    _vec: &mut Vec<f64>, _arg: &[usize], _res: usize) {
+    _vec: &mut Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
 }
 fn add_op_fun(
-    vec: &mut Vec<f64>, arg: &[usize], res: usize) {
+    vec: &mut Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
     vec[ res ] = vec[ arg[0] ] + vec[ arg[1] ];
 }
@@ -46,10 +52,10 @@ pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
 //
 // TapeInfo
 pub struct TapeInfo {
-    pub op_vec:     Vec<usize>,
-    pub op2arg_vec: Vec<usize>,
-    pub arg_vec:    Vec<usize>,
-    pub con_vec:    Vec<f64>,
+    pub op_vec:     Vec<Index>,
+    pub op2arg_vec: Vec<Index>,
+    pub arg_vec:    Vec<Index>,
+    pub con_vec:    Vec<Float>,
 }
 impl TapeInfo {
     pub fn new( ) -> Self {

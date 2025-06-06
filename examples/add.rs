@@ -4,14 +4,15 @@
 
 use rustad::OP_INFO_VEC;
 use rustad::ADD_OP;
+use rustad::Index;
 
 /// add Example
 fn add_example() {
     let mut vec : Vec<f64>   = vec![f64::NAN; 3];
-    let left    : usize      = 0;
-    let right   : usize      = 1;
-    let res     : usize      = 2;
-    let arg     : Vec<usize> = vec![left, right];
+    let left    : Index      = 0;
+    let right   : Index      = 1;
+    let res     : Index      = 2;
+    let arg     : Vec<Index> = vec![left, right];
     let fun     = OP_INFO_VEC[ADD_OP].fun;
     vec[left]   = 4.0;
     vec[right]  = 5.0;
