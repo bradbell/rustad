@@ -43,3 +43,27 @@ fn op_info_vec() -> Vec<OpInfo> {
 }
 pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
    std::sync::LazyLock::new( || op_info_vec() );
+//
+// TapeInfo
+pub struct TapeInfo {
+    pub op_vec:     Vec<usize>,
+    pub op2arg_vec: Vec<usize>,
+    pub arg_vec:    Vec<usize>,
+    pub con_vec:    Vec<f64>,
+}
+impl TapeInfo {
+    pub fn new( ) -> Self {
+        Self {
+            op_vec     : Vec::new() ,
+            op2arg_vec : Vec::new() ,
+            arg_vec    : Vec::new() ,
+            con_vec    : Vec::new() ,
+        }
+    }
+}
+//
+// THIS_THREADS_TAPE
+thread_local! {
+    pub static THIS_THREADS_TAPE: std::cell::RefCell<TapeInfo> =
+        std::cell::RefCell::new( TapeInfo::new() );
+}
