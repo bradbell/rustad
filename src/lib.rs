@@ -52,22 +52,26 @@ pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
 //
 // TapeInfo
 pub struct TapeInfo {
-    pub tape_id    : Index,
-    pub n_var      : Index,
-    pub op_vec     : Vec<Index>,
-    pub op2arg     : Vec<Index>,
-    pub arg_vec    : Vec<Index>,
-    pub con_vec    : Vec<Float>,
+    pub tape_id        : Index,
+    pub recording      : bool,
+    pub n_independent  : Index,
+    pub n_var          : Index,
+    pub op_vec         : Vec<Index>,
+    pub op2arg         : Vec<Index>,
+    pub arg_vec        : Vec<Index>,
+    pub con_vec        : Vec<Float>,
 }
 impl TapeInfo {
     pub fn new() -> Self {
         Self {
-            tape_id    : 0,
-            n_var      : 0,
-            op_vec     : Vec::new() ,
-            op2arg     : Vec::new() ,
-            arg_vec    : Vec::new() ,
-            con_vec    : Vec::new() ,
+            tape_id       : 0,
+            recording     : false,
+            n_independent : 0,
+            n_var         : 0,
+            op_vec        : Vec::new() ,
+            op2arg        : Vec::new() ,
+            arg_vec       : Vec::new() ,
+            con_vec       : Vec::new() ,
         }
     }
 }
