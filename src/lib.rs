@@ -66,9 +66,9 @@ impl TapeInfo {
     }
 }
 //
-// THERADS_RECORDER
+// THIS_THREAD_RECORDER
 thread_local! {
-    pub static THERADS_RECORDER: std::cell::RefCell<TapeInfo> =
+    pub static THIS_THREAD_RECORDER: std::cell::RefCell<TapeInfo> =
         std::cell::RefCell::new( TapeInfo::new() );
 }
 //
@@ -115,8 +115,8 @@ impl ADFun {
 // independent
 pub fn independent( x : &[Float] ) -> Vec<AD> {
     let mut new_tape_id = 0;
-    THERADS_RECORDER.with_borrow_mut( |tape| {
-        assert!( ! tape.recording , "indepndent: tape is alredy recording");
+    THIS_THREAD_RECORDER.with_borrow_mut( |tape| {
+        assert!( ! tape.recording , "indepndent: tape is already recording");
         assert_eq!( tape.op_vec.len(), 0 );
         assert_eq!( tape.op2arg.len(), 0 );
         assert_eq!( tape.arg_vec.len(), 0 );
@@ -130,15 +130,15 @@ pub fn independent( x : &[Float] ) -> Vec<AD> {
     } );
     let mut result : Vec<AD> = Vec::new();
     for j in 0 .. x.len() {
-        result[j] = AD { tape_id : new_tape_id, var_index = j, value = x[j] };
+        result[j] = AD { tape_id : new_tape_id, var_index : j, value : x[j] };
     }
-    result;
+    result
 }
 //
 // dependent
 pub fn dependent( y : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
-    THERADS_RECORDER.with_borrow_mut( |tape| {
+    THIS_THREAD_RECORDER.with_borrow_mut( |tape| {
         assert!( tape.recording , "indepndent: tape is not recording");
         tape.recording = false;
         std::mem::swap( &mut result.n_independent, &mut tape.n_independent );
