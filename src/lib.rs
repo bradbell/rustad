@@ -52,9 +52,9 @@ pub struct TapeInfo {
     pub con_vec        : Vec<Float>,
 }
 impl TapeInfo {
-    pub fn new(tape_id : Index) -> Self {
+    pub fn new() -> Self {
         Self {
-            tape_id       : tape_id,
+            tape_id       : 0,
             recording     : false,
             n_independent : 0,
             n_var         : 0,
@@ -69,11 +69,11 @@ impl TapeInfo {
 // THERADS_RECORDER
 thread_local! {
     pub static THERADS_RECORDER: std::cell::RefCell<TapeInfo> =
-        std::cell::RefCell::new( TapeInfo::new(0) );
+        std::cell::RefCell::new( TapeInfo::new() );
 }
 //
 // AD
-struct AD {
+pub struct AD {
     pub tape_id   : Index,
     pub var_index : Index,
     pub value     : Float,
@@ -84,6 +84,30 @@ impl From<Float> for AD {
             tape_id   : 0,
             var_index : 0,
             value     : this_value,
+        }
+    }
+}
+//
+// ADFun
+pub struct ADFun {
+    pub n_independent  : Index,
+    pub n_var          : Index,
+    pub dependent      : Vec<Index>,
+    pub op_vec         : Vec<Index>,
+    pub op2arg         : Vec<Index>,
+    pub arg_vec        : Vec<Index>,
+    pub con_vec        : Vec<Float>,
+}
+impl ADFun {
+    pub fn new() -> Self {
+        Self {
+            n_independent : 0,
+            n_var         : 0,
+            op_vec        : Vec::new() ,
+            op2arg        : Vec::new() ,
+            arg_vec       : Vec::new() ,
+            con_vec       : Vec::new() ,
+            dependent     : Vec::new() ,
         }
     }
 }
@@ -101,6 +125,23 @@ pub fn independent( x : &[Float] ) {
         tape.n_independent  = x.len();
         tape.n_var          = x.len();
     } );
+}
+//
+// dependent
+pub fn dependent( y : &[AD] ) -> ADFun {
+    let mut result = ADFun::new();
+    THERADS_RECORDER.with_borrow_mut( |tape| {
+        std::mem::swap( &mut result.n_independent, &mut tape.n_independent );
+        std::mem::swap( &mut result.n_var,         &mut tape.n_var );
+        std::mem::swap( &mut result.op_vec,        &mut tape.op_vec );
+        std::mem::swap( &mut result.op2arg,        &mut tape.op2arg );
+        std::mem::swap( &mut result.arg_vec,       &mut tape.arg_vec );
+        std::mem::swap( &mut result.con_vec,       &mut tape.con_vec );
+    } );
+    for i in 1 .. y.len() {
+        result.dependent.push( y[i].var_index );
+    }
+    result
 }
 //
 // add_op
