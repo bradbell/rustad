@@ -26,9 +26,10 @@ pub struct OpInfo {
     pub fun : fn(&mut Vec<Float>, &[Index], Index),
 }
 
-// ADD_VV_OP, NUMBER_OP
-pub const ADD_VV_OP:    Index = 0;
-pub const NUMBER_OP: Index = ADD_VV_OP + 1;
+// operators
+pub const ADD_VC_OP:    Index = 0;
+pub const ADD_VV_OP:    Index = ADD_VC_OP + 1;
+pub const NUMBER_OP:    Index = ADD_VV_OP + 1;
 
 //
 // OP_INFO_VEC
@@ -105,16 +106,44 @@ impl std::ops::Add for AD {
         let this_value         = self.value + rhs.value;
         THIS_THREADS_TAPE.with_borrow_mut( |tape| {
             let tape_id  = tape.tape_id;
-            let var_self = self.tape_id == tape_id;
-            let var_rhs  = rhs.tape_id  == tape_id;
-            if tape_id > 0 && var_self && var_rhs {
-                this_tape_id   = tape_id;
-                this_var_index = tape.n_var;
-                tape.n_var += 1;
-                tape.op_vec.push(ADD_VV_OP);
-                tape.op2arg.push( tape.arg_vec.len() );
-                tape.arg_vec.push( self.var_index );
-                tape.arg_vec.push( rhs.var_index );
+            if tape.recording {
+                let var_self = self.tape_id == tape_id;
+                let var_rhs  = rhs.tape_id  == tape_id;
+                if var_self || var_rhs {
+                    this_tape_id   = tape_id;
+                    if var_self && var_rhs {
+                        this_var_index = tape.n_var;
+                        tape.n_var += 1;
+                        tape.op_vec.push(ADD_VV_OP);
+                        tape.op2arg.push( tape.arg_vec.len() );
+                        tape.arg_vec.push( self.var_index );
+                        tape.arg_vec.push( rhs.var_index );
+                    } else if var_self {
+                        if rhs.value == 0.0 {
+                            this_var_index = self.var_index;
+                        } else {
+                            this_var_index = tape.n_var;
+                            tape.n_var += 1;
+                            tape.op_vec.push(ADD_VC_OP);
+                            tape.op2arg.push( tape.arg_vec.len() );
+                            tape.arg_vec.push( self.var_index );
+                            tape.arg_vec.push( tape.con_vec.len() );
+                            tape.con_vec.push( rhs.value );
+                        }
+                    } else {
+                        if self.value == 0.0 {
+                            this_var_index = rhs.var_index;
+                        } else {
+                            this_var_index = tape.n_var;
+                            tape.n_var += 1;
+                            tape.op_vec.push(ADD_VC_OP);
+                            tape.op2arg.push( tape.arg_vec.len() );
+                            tape.arg_vec.push( rhs.var_index );
+                            tape.arg_vec.push( tape.con_vec.len() );
+                            tape.con_vec.push( self.value );
+                        }
+                    }
+                }
             }
         } );
         AD {
@@ -123,4 +152,19 @@ impl std::ops::Add for AD {
             value     : this_value,
         }
     }
+}
+//
+// independent
+pub fn independent( x : &[Float] ) {
+    THIS_THREADS_TAPE.with_borrow_mut( |tape| {
+        assert!( tape.recording );
+        assert_eq!( tape.op_vec.len(), 0 );
+        assert_eq!( tape.op2arg.len(), 0 );
+        assert_eq!( tape.arg_vec.len(), 0 );
+        assert_eq!( tape.con_vec.len(), 0 );
+        tape.tape_id       += 1;
+        tape.recording      = true;
+        tape.n_independent  = x.len();
+        tape.n_var          = x.len();
+    } );
 }
