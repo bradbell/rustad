@@ -110,6 +110,27 @@ impl ADFun {
             dependent     : Vec::new() ,
         }
     }
+    pub fn forward(&self, x : &[Float] ) -> Vec<Float> {
+        let op_info_vec = &*OP_INFO_VEC;
+        let mut var_vec = vec![ Float::NAN; self.n_var ];
+        for j in 0 .. self.n_independent {
+            var_vec[j] = x[j];
+        }
+        for i_op in 0 .. self.op_vec.len() {
+            let op    = self.op_vec[i_op];
+            let start = self.op2arg[i_op];
+            let end   = self.op2arg[i_op + 1];
+            let arg   = &self.arg_vec[start .. end];
+            let res   = self.n_independent + i_op;
+            let fun   = op_info_vec[op].fun;
+            fun(&mut var_vec, &self.con_vec, &arg, res );
+        }
+        let mut y : Vec<Float> = Vec::new();
+        for i in 0 .. self.dependent.len() {
+            y.push( var_vec[ self.dependent[i] ] );
+        }
+        y
+    }
 }
 //
 // independent
@@ -139,6 +160,7 @@ pub fn independent( x : &[Float] ) -> Vec<AD> {
 pub fn dependent( y : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
     THIS_THREAD_RECORDER.with_borrow_mut( |tape| {
+        tape.op2arg.push( tape.arg_vec.len() );
         assert!( tape.recording , "indepndent: tape is not recording");
         tape.recording = false;
         std::mem::swap( &mut result.n_independent, &mut tape.n_independent );
