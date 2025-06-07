@@ -23,7 +23,7 @@ pub type Float = f64;
 #[derive(Clone)]
 pub struct OpInfo {
     pub name : String,
-    pub fun : fn(&mut Vec<Float>, &[Index], Index),
+    pub fun : fn(&mut Vec<Float>, &Vec<Float>, &[Index], Index),
 }
 
 // operators
@@ -32,24 +32,11 @@ pub const ADD_VV_OP:    Index = ADD_VC_OP + 1;
 pub const NUMBER_OP:    Index = ADD_VV_OP + 1;
 
 //
-// OP_INFO_VEC
-fn panic_op_fun(
-    _vec: &mut Vec<Float>, _arg: &[Index], _res: Index) {
+// panic_eval_fn
+fn panic_eval_fn(
+    _vec: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
 }
-fn add_op_fun(
-    vec: &mut Vec<Float>, arg: &[Index], res: Index) {
-    assert_eq!( arg.len(), 2);
-    vec[ res ] = vec[ arg[0] ] + vec[ arg[1] ];
-}
-fn op_info_vec() -> Vec<OpInfo> {
-    let empty         = OpInfo{ name: "".to_string(), fun : panic_op_fun };
-    let mut result    = vec![empty ; NUMBER_OP ];
-    result[ADD_VV_OP] = OpInfo{ name : "add".to_string() , fun : add_op_fun };
-    result
-}
-pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
-   std::sync::LazyLock::new( || op_info_vec() );
 //
 // TapeInfo
 pub struct TapeInfo {
@@ -99,6 +86,20 @@ impl From<Float> for AD {
     }
 }
 //
+// eval_add_vv_fn
+fn eval_add_vv_fn(
+    vec: &mut Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
+    assert_eq!( arg.len(), 2);
+    vec[ res ] = vec[ arg[0] ] + vec[ arg[1] ];
+}
+//
+// eval_add_vc_fn
+fn eval_add_vc_fn(
+    vec: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
+    assert_eq!( arg.len(), 2);
+    vec[ res ] = vec[ arg[0] ] + con[ arg[1] ];
+}
+//
 // std::ops::ADD for AD
 fn record_add(tape : &mut TapeInfo, lhs : &AD, rhs : &AD) -> (Index, Index) {
     let mut new_tape_id   = 0;
@@ -144,20 +145,6 @@ fn record_add(tape : &mut TapeInfo, lhs : &AD, rhs : &AD) -> (Index, Index) {
     }
     (new_tape_id, new_var_index)
 }
-impl std::ops::Add for AD {
-    type Output = AD;
-    fn add(self, rhs : AD) -> AD
-    {   let new_value                     = self.value + rhs.value;
-        let ( new_tape_id, new_var_index) = THIS_THREADS_TAPE.with_borrow_mut(
-            |tape| record_add(tape, &self, &rhs)
-        );
-        AD {
-            tape_id   : new_tape_id,
-            var_index : new_var_index,
-            value     : new_value,
-        }
-    }
-}
 //
 // independent
 pub fn independent( x : &[Float] ) {
@@ -173,3 +160,19 @@ pub fn independent( x : &[Float] ) {
         tape.n_var          = x.len();
     } );
 }
+//
+// add_op
+mod add_op;
+//
+// OP_INFO_VEC
+fn op_info_vec() -> Vec<OpInfo> {
+    let empty         = OpInfo{ name: "".to_string(), fun : panic_eval_fn };
+    let mut result    = vec![empty ; NUMBER_OP ];
+    result[ADD_VC_OP] =
+        OpInfo{ name : "add_vc".to_string() , fun : add_op::eval_add_vc_fn };
+    result[ADD_VV_OP] =
+        OpInfo{ name : "add_vv".to_string() , fun : add_op::eval_add_vv_fn };
+    result
+}
+pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
+   std::sync::LazyLock::new( || op_info_vec() );
