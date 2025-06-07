@@ -18,12 +18,14 @@ pub type Index = usize;
 //
 // Float
 pub type Float = f64;
-
+//
 // OpInfo
 #[derive(Clone)]
 pub struct OpInfo {
     pub name : String,
-    pub fun : fn(&mut Vec<Float>, &Vec<Float>, &[Index], Index),
+    pub fun : fn(
+        _var: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+    ),
 }
 
 // operators
