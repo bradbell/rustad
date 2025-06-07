@@ -52,9 +52,9 @@ pub struct TapeInfo {
     pub con_vec        : Vec<Float>,
 }
 impl TapeInfo {
-    pub fn new() -> Self {
+    pub fn new(tape_id : Index) -> Self {
         Self {
-            tape_id       : 0,
+            tape_id       : tape_id,
             recording     : false,
             n_independent : 0,
             n_var         : 0,
@@ -69,7 +69,7 @@ impl TapeInfo {
 // THERADS_RECORDER
 thread_local! {
     pub static THERADS_RECORDER: std::cell::RefCell<TapeInfo> =
-        std::cell::RefCell::new( TapeInfo::new() );
+        std::cell::RefCell::new( TapeInfo::new(0) );
 }
 //
 // AD
