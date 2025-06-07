@@ -64,9 +64,9 @@ impl TapeInfo {
     }
 }
 //
-// THIS_THREADS_TAPE
+// THERADS_RECORDER
 thread_local! {
-    pub static THIS_THREADS_TAPE: std::cell::RefCell<TapeInfo> =
+    pub static THERADS_RECORDER: std::cell::RefCell<TapeInfo> =
         std::cell::RefCell::new( TapeInfo::new() );
 }
 //
@@ -148,7 +148,7 @@ fn record_add(tape : &mut TapeInfo, lhs : &AD, rhs : &AD) -> (Index, Index) {
 //
 // independent
 pub fn independent( x : &[Float] ) {
-    THIS_THREADS_TAPE.with_borrow_mut( |tape| {
+    THERADS_RECORDER.with_borrow_mut( |tape| {
         assert!( tape.recording );
         assert_eq!( tape.op_vec.len(), 0 );
         assert_eq!( tape.op2arg.len(), 0 );

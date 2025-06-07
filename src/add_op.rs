@@ -8,7 +8,7 @@ use crate::TapeInfo;
 use crate::AD;
 use crate::ADD_VC_OP;
 use crate::ADD_VV_OP;
-use crate::THIS_THREADS_TAPE;
+use crate::THERADS_RECORDER;
 //
 // eval_add_vv_fn
 pub fn eval_add_vv_fn(
@@ -73,7 +73,7 @@ impl std::ops::Add for AD {
     type Output = AD;
     fn add(self, rhs : AD) -> AD
     {   let new_value                     = self.value + rhs.value;
-        let ( new_tape_id, new_var_index) = THIS_THREADS_TAPE.with_borrow_mut(
+        let ( new_tape_id, new_var_index) = THERADS_RECORDER.with_borrow_mut(
             |tape| record_add(tape, &self, &rhs)
         );
         AD {
