@@ -113,9 +113,10 @@ impl ADFun {
 }
 //
 // independent
-pub fn independent( x : &[Float] ) {
+pub fn independent( x : &[Float] ) -> Vec<AD> {
+    let mut new_tape_id = 0;
     THERADS_RECORDER.with_borrow_mut( |tape| {
-        assert!( tape.recording );
+        assert!( ! tape.recording , "indepndent: tape is alredy recording");
         assert_eq!( tape.op_vec.len(), 0 );
         assert_eq!( tape.op2arg.len(), 0 );
         assert_eq!( tape.arg_vec.len(), 0 );
@@ -124,13 +125,22 @@ pub fn independent( x : &[Float] ) {
         tape.recording      = true;
         tape.n_independent  = x.len();
         tape.n_var          = x.len();
+        //
+        new_tape_id         = tape.tape_id;
     } );
+    let mut result : Vec<AD> = Vec::new();
+    for j in 0 .. x.len() {
+        result[j] = AD { tape_id : new_tape_id, var_index = j, value = x[j] };
+    }
+    result;
 }
 //
 // dependent
 pub fn dependent( y : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
     THERADS_RECORDER.with_borrow_mut( |tape| {
+        assert!( tape.recording , "indepndent: tape is not recording");
+        tape.recording = false;
         std::mem::swap( &mut result.n_independent, &mut tape.n_independent );
         std::mem::swap( &mut result.n_var,         &mut tape.n_var );
         std::mem::swap( &mut result.op_vec,        &mut tape.op_vec );
@@ -138,7 +148,7 @@ pub fn dependent( y : &[AD] ) -> ADFun {
         std::mem::swap( &mut result.arg_vec,       &mut tape.arg_vec );
         std::mem::swap( &mut result.con_vec,       &mut tape.con_vec );
     } );
-    for i in 1 .. y.len() {
+    for i in 0 .. y.len() {
         result.dependent.push( y[i].var_index );
     }
     result
