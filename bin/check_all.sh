@@ -41,6 +41,8 @@ done
 echo
 echo_eval cargo doc
 echo
+echo_eval cargo run --release
+echo
 echo_eval bin/cargo_test.sh
 #
 echo "check_all.sh OK"
