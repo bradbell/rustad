@@ -7,7 +7,7 @@
 ///
 /// # Example
 /// ```
-/// let version = &*rustad::YEAR_MONTH_DAY;
+/// let version = *rustad::YEAR_MONTH_DAY;
 /// assert_eq!(version, "2025.6.7");
 /// ```
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
@@ -73,6 +73,7 @@ thread_local! {
 }
 //
 // AD
+#[derive(Copy, Clone)]
 pub struct AD {
     pub tape_id   : Index,
     pub var_index : Index,
@@ -151,7 +152,9 @@ pub fn independent( x : &[Float] ) -> Vec<AD> {
     } );
     let mut result : Vec<AD> = Vec::new();
     for j in 0 .. x.len() {
-        result[j] = AD { tape_id : new_tape_id, var_index : j, value : x[j] };
+        result.push(
+             AD { tape_id : new_tape_id, var_index : j, value : x[j] }
+        );
     }
     result
 }

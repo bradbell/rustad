@@ -73,8 +73,9 @@ impl std::ops::Add for AD {
     type Output = AD;
     fn add(self, rhs : AD) -> AD
     {   let new_value                     = self.value + rhs.value;
-        let ( new_tape_id, new_var_index) = THIS_THREAD_RECORDER.with_borrow_mut(
-            |tape| record_add(tape, &self, &rhs)
+        let ( new_tape_id, new_var_index) =
+            THIS_THREAD_RECORDER.with_borrow_mut(
+                |tape| record_add(tape, &self, &rhs)
         );
         AD {
             tape_id   : new_tape_id,

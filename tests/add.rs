@@ -2,22 +2,17 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
-use rustad::OP_INFO_VEC;
-use rustad::ADD_VV_OP;
-use rustad::Index;
 use rustad::Float;
 
 #[test]
 fn test_add() {
-    let mut var : Vec<Float> = vec![f64::NAN; 3];
-    let con     : Vec<Float> = Vec::new();
-    let left    : Index      = 0;
-    let right   : Index      = 1;
-    let res     : Index      = 2;
-    let arg     : Vec<Index> = vec![left, right];
-    let fun     = OP_INFO_VEC[ADD_VV_OP].fun;
-    var[left]   = 4.0;
-    var[right]  = 5.0;
-    fun(&mut var, &con, &arg, res);
-    assert_eq!(var[res], 9.0);
+    let x : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
+    let ax   = rustad::independent(&x);
+    let ay_0 = ax[0] + ax[1];
+    let ay_1 = ax[1] + ax[2];
+    let ay = vec! [ ay_0, ay_1 ];
+    let f = rustad::dependent(&ay);
+    let y = f.forward(&x);
+    assert_eq!( y[0], x[0] + x[1] );
+    assert_eq!( y[1], x[1] + x[2] );
 }
