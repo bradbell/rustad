@@ -7,11 +7,11 @@
 ///
 /// # Example
 /// ```
-/// let version = *rustad::YEAR_MONTH_DAY;
-/// assert_eq!(version, "2025.6.7");
+/// let date = *rustad::YEAR_MONTH_DAY;
+/// assert_eq!(date, "2025.6.8");
 /// ```
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
-   std::sync::LazyLock::new( || "2025.6.7" );
+   std::sync::LazyLock::new( || "2025.6.8" );
 
 // Index
 pub type Index = usize;
