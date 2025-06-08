@@ -24,7 +24,7 @@ pub fn eval_add_vc_fn(
     vec[ res ] = vec[ arg[0] ] + con[ arg[1] ];
 }
 //
-// std::ops::ADD for AD
+// std::ops::Add for AD
 fn record_add(tape : &mut TapeInfo, lhs : &AD, rhs : &AD) -> (Index, Index) {
     let mut new_tape_id   = 0;
     let mut new_var_index = 0;
@@ -69,10 +69,13 @@ fn record_add(tape : &mut TapeInfo, lhs : &AD, rhs : &AD) -> (Index, Index) {
     }
     (new_tape_id, new_var_index)
 }
-impl std::ops::Add for AD {
+//
+// AD + AD
+impl std::ops::Add<AD> for AD {
     type Output = AD;
-    fn add(self, rhs : AD) -> AD
-    {   let new_value                     = self.value + rhs.value;
+    //
+    fn add(self, rhs : AD) -> AD {
+        let new_value                     = self.value + rhs.value;
         let ( new_tape_id, new_var_index) =
             THIS_THREAD_RECORDER.with_borrow_mut(
                 |tape| record_add(tape, &self, &rhs)
@@ -82,5 +85,21 @@ impl std::ops::Add for AD {
             var_index : new_var_index,
             value     : new_value,
         }
+    }
+}
+//
+// Float + AD
+impl std::ops::Add<AD> for Float {
+    type Output = AD;
+    fn add(self, rhs : AD) -> AD {
+        AD::from(self) + rhs
+    }
+}
+//
+// Float + AD
+impl std::ops::Add<Float> for AD {
+    type Output = AD;
+    fn add(self, rhs : Float) -> AD {
+        self + AD::from(rhs)
     }
 }

@@ -7,8 +7,8 @@ use rustad::ADD_VV_OP;
 use rustad::Index;
 use rustad::Float;
 
-/// add Example
-fn add_example() {
+/// add_ad_ad
+fn add_ad_ad() {
     let x : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
     let ax   = rustad::independent(&x);
     let ay_0 = ax[0] + ax[1];
@@ -20,6 +20,21 @@ fn add_example() {
     assert_eq!( y[1], x[1] + x[2] );
 }
 
+/// add_ad_float
+fn add_ad_float() {
+    let x : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
+    let ax   = rustad::independent(&x);
+    let ay_0 = ax[0] + 5.0;
+    let ay_1 = 5.0 + ax[2];
+    let ay = vec! [ ay_0, ay_1 ];
+    let f = rustad::dependent(&ay);
+    let y = f.forward(&x);
+    assert_eq!( y[0], x[0] + 5.0 );
+    assert_eq!( y[1], 5.0 + x[2] );
+}
+
+#[test]
 fn main() {
-    add_example();
+    add_ad_ad();
+    add_ad_float();
 }

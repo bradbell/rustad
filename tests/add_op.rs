@@ -22,8 +22,8 @@ fn test_add_vv() {
 fn test_add_vc() {
     let x : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
     let ax   = rustad::independent(&x);
-    let ay_0 = ax[0] + AD::from(5.0);
-    let ay_1 = AD::from(5.0) + ax[2];
+    let ay_0 = ax[0] + 5.0;
+    let ay_1 = 5.0 + ax[2];
     let ay = vec! [ ay_0, ay_1 ];
     let f = rustad::dependent(&ay);
     let y = f.forward(&x);
