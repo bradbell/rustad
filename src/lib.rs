@@ -5,9 +5,10 @@
 // utility
 pub mod utility;
 //
-// operator
-pub mod operators;
-use operators::*;
+// ADD_VV_OP, ADD_VC_OP, ...
+// define all the operator indices
+pub mod op_index;
+use op_index::*;
 
 // YEAR_MONTH_DAY
 /// is the date corresponding to this version of the software as

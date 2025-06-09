@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
 use rustad;
-use rustad::operators::*;
+use rustad::op_index::*;
 
 #[test]
 fn test_op_info() {
