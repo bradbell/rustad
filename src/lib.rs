@@ -7,6 +7,7 @@ pub mod utility;
 //
 // ADD_VV_OP, ADD_VC_OP, ...
 // define all the operator indices
+#[doc(hidden)]
 pub mod op_index;
 use op_index::*;
 
@@ -22,21 +23,24 @@ use op_index::*;
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
    std::sync::LazyLock::new( || "2025.6.9" );
 //
-/// This is the type used for indexing vectors in the tape.
+/// Type used for indexing vectors in the tape.
 /// It must be able to represent the total number of
 /// operators, constants, and arguments to operators.
 pub type Index = usize;
 //
-/// This the type used for floating AD point operations.
+/// Floating point Type used for AD operations.
 pub type Float = f64;
+//
+/// Type used for fuunctions that evaluate zero order forward mode
+pub type ForwardZeroFn = fn(
+        _var: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+);
 //
 // OpInfo
 #[derive(Clone)]
 pub struct OpInfo {
     pub name : String,
-    pub fun : fn(
-        _var: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
-    ),
+    pub fun : ForwardZeroFn,
 }
 
 //

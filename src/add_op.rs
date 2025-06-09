@@ -12,16 +12,16 @@ use crate::THIS_THREAD_RECORDER;
 //
 // eval_add_vv_fn
 pub fn eval_add_vv_fn(
-    vec: &mut Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
+    var: &mut Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
-    vec[ res ] = vec[ arg[0] ] + vec[ arg[1] ];
+    var[ res ] = var[ arg[0] ] + var[ arg[1] ];
 }
 //
 // eval_add_vc_fn
 pub fn eval_add_vc_fn(
-    vec: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
+    var: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
-    vec[ res ] = vec[ arg[0] ] + con[ arg[1] ];
+    var[ res ] = var[ arg[0] ] + con[ arg[1] ];
 }
 //
 // std::ops::Add for AD

@@ -39,11 +39,12 @@ done
 #
 # cargo doc
 echo
-echo_eval cargo doc
+echo_eval bin/doc_hidden.sh
 echo
 echo_eval cargo run --release
 echo
 echo_eval bin/cargo_test.sh
+echo
 #
 echo "check_all.sh OK"
 exit 0
