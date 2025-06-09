@@ -2,9 +2,6 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
-use rustad::OP_INFO_VEC;
-use rustad::ADD_VV_OP;
-use rustad::Index;
 use rustad::Float;
 
 /// add_ad_ad

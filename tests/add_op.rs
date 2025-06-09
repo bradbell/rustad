@@ -3,7 +3,6 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
 use rustad::Float;
-use rustad::AD;
 
 #[test]
 fn test_add_vv() {

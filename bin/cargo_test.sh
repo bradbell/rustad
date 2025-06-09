@@ -28,14 +28,19 @@ s| *Running *|\\n|
 s|running [0-9]* tests*\\n||
 s|; 0 measured.*||
 EOF
-#
-echo "cargo test --all-targets >& temp.out"
-if cargo test --all-targets >& temp.out
+if ! cargo test --doc
 then
-   echo_eval sed -f temp.sed temp.out
-   echo 'cargo_test.sh: OK'
-   exit 0
+   echo 'cargo test --doc: Error'
+   exit 1
 fi
-cat temp.out
-echo 'cargo_test.sh: Error'
-exit 1
+echo 'cargo test --doc: OK'
+#
+if ! cargo test --all-targets >& temp.out
+then
+   cat temp.out
+   echo 'cargo test --all-targets: Error'
+   exit 1
+fi
+sed -f temp.sed temp.out
+echo 'cargo test --all-targets: Ok'
+exit 0

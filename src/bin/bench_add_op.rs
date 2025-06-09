@@ -17,9 +17,9 @@ fn time_add_vv() {
 }
 
 fn main() {
-    let min_seconds = 0.5;
-    let seconds     = rustad::average_time( time_add_vv, min_seconds );
-    let nanos       = (seconds * 1e9 + 0.5) as u64;
-    let duration    = std::time::Duration::from_nanos(nanos);
+    let total_seconds = 0.5;
+    let seconds  = rustad::utility::avg_seconds( time_add_vv, total_seconds );
+    let nanos    = (seconds * 1e9 + 0.5) as u64;
+    let duration = std::time::Duration::from_nanos(nanos);
     println!( "time per time_add_vv = {:?}", duration);
-} 
+}

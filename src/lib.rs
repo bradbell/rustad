@@ -2,8 +2,12 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
+// utility
+pub mod utility;
+
 // YEAR_MONTH_DAY
-/// The date corresponding to this version of the software as year.month.day
+/// is the date corresponding to this version of the software as
+/// *year*.*month*.*day* .
 ///
 /// # Example
 /// ```
@@ -13,23 +17,6 @@
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
    std::sync::LazyLock::new( || "2025.6.8" );
 //
-// average_time
-pub fn average_time( fun : fn() , min_seconds : f64 ) -> f64 {
-    let mut repeat : usize = 1;
-    let mut duration  = 0.0;
-    while duration < min_seconds {
-        let start = std::time::Instant::now();
-        for _i in 0 .. repeat {
-            fun();
-        }
-        repeat *= 2;
-        duration = ( start.elapsed().as_nanos() as f64) / 1e9;
-    }
-    repeat = repeat / 2;
-    duration / (repeat as f64)
-}
-
-
 // Index
 pub type Index = usize;
 //
