@@ -21,10 +21,12 @@ use operators::*;
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
    std::sync::LazyLock::new( || "2025.6.9" );
 //
-// Index
+/// This is the type used for indexing vectors in the tape.
+/// It must be able to represent the total number of
+/// operators, constants, and arguments to operators.
 pub type Index = usize;
 //
-// Float
+/// This the type used for floating AD point operations.
 pub type Float = f64;
 //
 // OpInfo
