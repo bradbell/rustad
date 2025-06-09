@@ -1,9 +1,13 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
-
+//
 // utility
 pub mod utility;
+//
+// operator
+pub mod operators;
+use operators::*;
 
 // YEAR_MONTH_DAY
 /// is the date corresponding to this version of the software as
@@ -12,10 +16,10 @@ pub mod utility;
 /// # Example
 /// ```
 /// let date = *rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2025.6.8");
+/// assert_eq!(date, "2025.6.9");
 /// ```
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
-   std::sync::LazyLock::new( || "2025.6.8" );
+   std::sync::LazyLock::new( || "2025.6.9" );
 //
 // Index
 pub type Index = usize;
@@ -31,11 +35,6 @@ pub struct OpInfo {
         _var: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
     ),
 }
-
-// operators
-pub const ADD_VC_OP:    Index = 0;
-pub const ADD_VV_OP:    Index = ADD_VC_OP + 1;
-pub const NUMBER_OP:    Index = ADD_VV_OP + 1;
 
 //
 // panic_eval_fn
