@@ -18,7 +18,7 @@ do
    mv $file $file.bak
    sed -e "/$pattern/d" $file.bak > $file
 done
-cargo doc
+cargo doc --document-private-items
 for file in $list
 do
    mv $file.bak $file

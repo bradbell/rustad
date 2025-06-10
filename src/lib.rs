@@ -1,16 +1,7 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
-//
-// utility
-pub mod utility;
-//
-// ADD_VV_OP, ADD_VC_OP, ...
-// define all the operator indices
-#[doc(hidden)]
-pub mod op_index;
-use op_index::*;
-
+// ----------------------------------------------------------------------------
 // YEAR_MONTH_DAY
 /// is the date corresponding to this version of the software as
 /// *year*.*month*.*day* .
@@ -22,19 +13,37 @@ use op_index::*;
 /// ```
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
    std::sync::LazyLock::new( || "2025.6.9" );
+// ----------------------------------------------------------------------------
 //
+// utility
+pub mod utility;
+//
+// ADD_VV_OP, ADD_VC_OP, ...
+// define all the operator indices
+#[doc(hidden)]
+pub mod op_index;
+use op_index::*;
+// ----------------------------------------------------------------------------
+// Index
 /// Type used for indexing vectors in the tape.
 /// It must be able to represent the total number of
 /// operators, constants, and arguments to operators.
 pub type Index = usize;
 //
+// Float
 /// Floating point Type used for AD operations.
 pub type Float = f64;
 //
+// ForwardZeroFn
 /// Type used for fuunctions that evaluate zero order forward mode
 pub type ForwardZeroFn = fn(
         _var: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
+// ----------------------------------------------------------------------------
+//
+// AD
+pub mod ad;
+use ad::AD;
 //
 // OpInfo
 #[derive(Clone)]
@@ -80,23 +89,6 @@ impl TapeInfo {
 thread_local! {
     pub static THIS_THREAD_RECORDER: std::cell::RefCell<TapeInfo> =
         std::cell::RefCell::new( TapeInfo::new() );
-}
-//
-// AD
-#[derive(Copy, Clone)]
-pub struct AD {
-    pub tape_id   : Index,
-    pub var_index : Index,
-    pub value     : Float,
-}
-impl From<Float> for AD {
-    fn from(this_value : Float) -> Self {
-        Self {
-            tape_id   : 0,
-            var_index : 0,
-            value     : this_value,
-        }
-    }
 }
 //
 // ADFun
