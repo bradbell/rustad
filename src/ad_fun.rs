@@ -34,34 +34,34 @@ pub struct ADFun {
     /// The dimension of its range spase is reange.len().
     pub(crate) range          : Vec<Index>,
     //
-    // op_vec
+    // op_all
     /// This maps an operators index in the recording of the function
     /// to its [operator_id](crate::operator_id) .
-    pub(crate) op_vec         : Vec<Index>,
+    pub(crate) op_all         : Vec<Index>,
     //
     // op2arg
     /// This maps an operators index in the function to its
-    /// the index of its first argument in arg_vec.
+    /// the index of its first argument in arg_all.
     pub(crate) op2arg         : Vec<Index>,
     //
-    // arg_vec
+    // arg_all
     /// This contains the arguments for all the opereators in the recording.
-    pub(crate) arg_vec        : Vec<Index>,
+    pub(crate) arg_all        : Vec<Index>,
     //
-    // con_vec
+    // con_all
     /// This contains the value of all the constants needed
     /// to evaluate the function.
-    pub(crate) con_vec        : Vec<Float>,
+    pub(crate) con_all        : Vec<Float>,
 }
 impl ADFun {
     pub fn new() -> Self {
         Self {
             n_domain      : 0,
             n_var         : 0,
-            op_vec        : Vec::new() ,
+            op_all        : Vec::new() ,
             op2arg        : Vec::new() ,
-            arg_vec       : Vec::new() ,
-            con_vec       : Vec::new() ,
+            arg_all       : Vec::new() ,
+            con_all       : Vec::new() ,
             range         : Vec::new() ,
         }
     }
@@ -71,14 +71,14 @@ impl ADFun {
         for j in 0 .. self.n_domain {
             var_vec[j] = x[j];
         }
-        for i_op in 0 .. self.op_vec.len() {
-            let op    = self.op_vec[i_op];
+        for i_op in 0 .. self.op_all.len() {
+            let op    = self.op_all[i_op];
             let start = self.op2arg[i_op];
             let end   = self.op2arg[i_op + 1];
-            let arg   = &self.arg_vec[start .. end];
+            let arg   = &self.arg_all[start .. end];
             let res   = self.n_domain + i_op;
             let fun   = op_info_vec[op].fun;
-            fun(&mut var_vec, &self.con_vec, &arg, res );
+            fun(&mut var_vec, &self.con_all, &arg, res );
         }
         let mut y : Vec<Float> = Vec::new();
         for i in 0 .. self.range.len() {
@@ -93,10 +93,10 @@ pub fn domain( x : &[Float] ) -> Vec<AD> {
     let mut new_tape_id = 0;
     THIS_THREAD_TAPE.with_borrow_mut( |tape| {
         assert!( ! tape.recording , "indepndent: tape is already recording");
-        assert_eq!( tape.op_vec.len(), 0 );
+        assert_eq!( tape.op_all.len(), 0 );
         assert_eq!( tape.op2arg.len(), 0 );
-        assert_eq!( tape.arg_vec.len(), 0 );
-        assert_eq!( tape.con_vec.len(), 0 );
+        assert_eq!( tape.arg_all.len(), 0 );
+        assert_eq!( tape.con_all.len(), 0 );
         tape.tape_id       += 1;
         tape.recording      = true;
         tape.n_domain       = x.len();
@@ -117,15 +117,15 @@ pub fn domain( x : &[Float] ) -> Vec<AD> {
 pub fn range( y : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
     THIS_THREAD_TAPE.with_borrow_mut( |tape| {
-        tape.op2arg.push( tape.arg_vec.len() );
+        tape.op2arg.push( tape.arg_all.len() );
         assert!( tape.recording , "indepndent: tape is not recording");
         tape.recording = false;
         std::mem::swap( &mut result.n_domain, &mut tape.n_domain );
         std::mem::swap( &mut result.n_var,         &mut tape.n_var );
-        std::mem::swap( &mut result.op_vec,        &mut tape.op_vec );
+        std::mem::swap( &mut result.op_all,        &mut tape.op_all );
         std::mem::swap( &mut result.op2arg,        &mut tape.op2arg );
-        std::mem::swap( &mut result.arg_vec,       &mut tape.arg_vec );
-        std::mem::swap( &mut result.con_vec,       &mut tape.con_vec );
+        std::mem::swap( &mut result.arg_all,       &mut tape.arg_all );
+        std::mem::swap( &mut result.con_all,       &mut tape.con_all );
     } );
     for i in 0 .. y.len() {
         result.range.push( y[i].var_index );

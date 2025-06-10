@@ -101,21 +101,21 @@ fn record_add(tape : &mut TapeInfo, lhs : &AD, rhs : &AD) -> (Index, Index) {
             if var_lhs && var_rhs {
                 new_var_index = tape.n_var;
                 tape.n_var   += 1;
-                tape.op_vec.push(ADD_VV_OP);
-                tape.op2arg.push( tape.arg_vec.len() );
-                tape.arg_vec.push( lhs.var_index );
-                tape.arg_vec.push( rhs.var_index );
+                tape.op_all.push(ADD_VV_OP);
+                tape.op2arg.push( tape.arg_all.len() );
+                tape.arg_all.push( lhs.var_index );
+                tape.arg_all.push( rhs.var_index );
             } else if var_lhs {
                 if rhs.value == 0.0 {
                     new_var_index = lhs.var_index;
                 } else {
                     new_var_index = tape.n_var;
                     tape.n_var   += 1;
-                    tape.op_vec.push(ADD_VC_OP);
-                    tape.op2arg.push( tape.arg_vec.len() );
-                    tape.arg_vec.push( lhs.var_index );
-                    tape.arg_vec.push( tape.con_vec.len() );
-                    tape.con_vec.push( rhs.value );
+                    tape.op_all.push(ADD_VC_OP);
+                    tape.op2arg.push( tape.arg_all.len() );
+                    tape.arg_all.push( lhs.var_index );
+                    tape.arg_all.push( tape.con_all.len() );
+                    tape.con_all.push( rhs.value );
                 }
             } else {
                 if lhs.value == 0.0 {
@@ -123,11 +123,11 @@ fn record_add(tape : &mut TapeInfo, lhs : &AD, rhs : &AD) -> (Index, Index) {
                 } else {
                     new_var_index = tape.n_var;
                     tape.n_var   += 1;
-                    tape.op_vec.push(ADD_VC_OP);
-                    tape.op2arg.push( tape.arg_vec.len() );
-                    tape.arg_vec.push( rhs.var_index );
-                    tape.arg_vec.push( tape.con_vec.len() );
-                    tape.con_vec.push( lhs.value );
+                    tape.op_all.push(ADD_VC_OP);
+                    tape.op2arg.push( tape.arg_all.len() );
+                    tape.arg_all.push( rhs.var_index );
+                    tape.arg_all.push( tape.con_all.len() );
+                    tape.con_all.push( lhs.value );
                 }
             }
         }

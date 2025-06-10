@@ -64,10 +64,10 @@ pub struct TapeInfo {
     pub recording      : bool,
     pub n_domain       : Index,
     pub n_var          : Index,
-    pub op_vec         : Vec<Index>,
+    pub op_all         : Vec<Index>,
     pub op2arg         : Vec<Index>,
-    pub arg_vec        : Vec<Index>,
-    pub con_vec        : Vec<Float>,
+    pub arg_all        : Vec<Index>,
+    pub con_all        : Vec<Float>,
 }
 impl TapeInfo {
     pub fn new() -> Self {
@@ -76,10 +76,10 @@ impl TapeInfo {
             recording     : false,
             n_domain      : 0,
             n_var         : 0,
-            op_vec        : Vec::new() ,
+            op_all        : Vec::new() ,
             op2arg        : Vec::new() ,
-            arg_vec       : Vec::new() ,
-            con_vec       : Vec::new() ,
+            arg_all       : Vec::new() ,
+            con_all       : Vec::new() ,
         }
     }
 }
