@@ -6,11 +6,12 @@
 use crate::Index;
 use crate::Float;
 //
-/// AD acts like the Float type,
-/// can record functions and store them in an [ADFun](crate::ADFun) object.
+/// AD acts like the Float type, can record functions and store
+/// it in an [ADFun](crate::ad_fun::ADFun) object.
 ///
 /// # variable
-/// An AD object is a variable if it one of the [domain](crate::domain)
+/// An AD object is a variable if it one of the
+/// [domain](crate::ad_fun::domain)
 /// variables or its value depends on the value of a domain variable.
 ///
 /// # constant

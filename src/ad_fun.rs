@@ -3,6 +3,8 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
+//! ADFun objects
+//
 use crate::Index;
 use crate::Float;
 use crate::OP_INFO_VEC;
@@ -10,14 +12,33 @@ use crate::AD;
 use crate::THIS_THREAD_TAPE;
 //
 // ADFun
+/// A [domain] call is used to start a recording function.
+/// A [range] call is used to stop recording and create an ADFun object
+/// that can evaluate the function and its derivatives.
+/// The recording is a single assignment representation of the function; i.e.,
+/// a variable is only assigned once.
 pub struct ADFun {
-    pub n_domain       : Index,
-    pub n_var          : Index,
-    pub range          : Vec<Index>,
-    pub op_vec         : Vec<Index>,
-    pub op2arg         : Vec<Index>,
-    pub arg_vec        : Vec<Index>,
-    pub con_vec        : Vec<Float>,
+    //
+    // n_domain
+    /// The dimension of the domain space for this function.
+    /// The domain variables have index 0 .. n_domain-1.
+    pub(crate) n_domain       : Index,
+    /// The total number of variables in this function.
+    //
+    // n_var
+    /// The total number of variables in the recording.
+    pub(crate) n_var          : Index,
+    //
+    // range
+    /// The variable index for each of the range variables in this function.
+    /// The dimension of its range spase is reange.len().
+    pub(crate) range          : Vec<Index>,
+    pub(crate) op_vec         : Vec<Index>,
+    ///
+    ///
+    pub(crate) op2arg         : Vec<Index>,
+    pub(crate) arg_vec        : Vec<Index>,
+    pub(crate) con_vec        : Vec<Float>,
 }
 impl ADFun {
     pub fn new() -> Self {
