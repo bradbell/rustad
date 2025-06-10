@@ -33,11 +33,24 @@ pub struct ADFun {
     /// The variable index for each of the range variables in this function.
     /// The dimension of its range spase is reange.len().
     pub(crate) range          : Vec<Index>,
+    //
+    // op_vec
+    /// This maps an operators index in the recording of the function
+    /// to its [operator_id](crate::operator_id) .
     pub(crate) op_vec         : Vec<Index>,
-    ///
-    ///
+    //
+    // op2arg
+    /// This maps an operators index in the function to its
+    /// the index of its first argument in arg_vec.
     pub(crate) op2arg         : Vec<Index>,
+    //
+    // arg_vec
+    /// This contains the arguments for all the opereators in the recording.
     pub(crate) arg_vec        : Vec<Index>,
+    //
+    // con_vec
+    /// This contains the value of all the constants needed
+    /// to evaluate the function.
     pub(crate) con_vec        : Vec<Float>,
 }
 impl ADFun {
