@@ -2,15 +2,16 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
-//! This module defines the operator indices as public usize constants
+//! This module defines the operator indices as
+//! `pub(crate) usize` constants.
 
 
-// set_operator_indices
-macro_rules! set_operator_indices {
+// set_operator_ids
+macro_rules! set_operator_ids {
     //
     // first match
     ( $( #[$doc:meta] $name:ident),*,) => {
-        set_operator_indices!(
+        set_operator_ids!(
             @ 0usize,
             $( #[$doc] $name, )*
         );
@@ -23,8 +24,8 @@ macro_rules! set_operator_indices {
         $( #[$docs:meta] $names:ident, )*
     ) => {
         #[$doc]
-        pub const $name : usize = $index;
-        set_operator_indices!(
+        pub(crate) const $name : usize = $index;
+        set_operator_ids!(
             @ $index + 1usize,
             $( #[$docs] $names, )*
         );
@@ -35,7 +36,7 @@ macro_rules! set_operator_indices {
 }
 
 // Public usize constants for each operator.
-set_operator_indices!(
+set_operator_ids!(
     /// variable + variable
     ADD_VV_OP,
     /// variable + constant

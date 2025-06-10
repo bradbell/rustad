@@ -20,8 +20,8 @@ pub mod utility;
 //
 // ADD_VV_OP, ADD_VC_OP, ...
 // define all the operator indices
-pub(crate) mod op_index;
-use op_index::*;
+pub(crate) mod operator_id;
+use operator_id::*;
 // ----------------------------------------------------------------------------
 // Index
 /// Type used for indexing vectors in the tape.
