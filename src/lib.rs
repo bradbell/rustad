@@ -20,8 +20,7 @@ pub mod utility;
 //
 // ADD_VV_OP, ADD_VC_OP, ...
 // define all the operator indices
-#[doc(hidden)]
-pub mod op_index;
+pub(crate) mod op_index;
 use op_index::*;
 // ----------------------------------------------------------------------------
 // Index
@@ -85,9 +84,9 @@ impl TapeInfo {
     }
 }
 //
-// THIS_THREAD_RECORDER
+// THIS_THREAD_TAPE
 thread_local! {
-    pub static THIS_THREAD_RECORDER: std::cell::RefCell<TapeInfo> =
+    pub static THIS_THREAD_TAPE: std::cell::RefCell<TapeInfo> =
         std::cell::RefCell::new( TapeInfo::new() );
 }
 //
@@ -139,7 +138,7 @@ impl ADFun {
 // domain
 pub fn domain( x : &[Float] ) -> Vec<AD> {
     let mut new_tape_id = 0;
-    THIS_THREAD_RECORDER.with_borrow_mut( |tape| {
+    THIS_THREAD_TAPE.with_borrow_mut( |tape| {
         assert!( ! tape.recording , "indepndent: tape is already recording");
         assert_eq!( tape.op_vec.len(), 0 );
         assert_eq!( tape.op2arg.len(), 0 );
@@ -164,7 +163,7 @@ pub fn domain( x : &[Float] ) -> Vec<AD> {
 // range
 pub fn range( y : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
-    THIS_THREAD_RECORDER.with_borrow_mut( |tape| {
+    THIS_THREAD_TAPE.with_borrow_mut( |tape| {
         tape.op2arg.push( tape.arg_vec.len() );
         assert!( tape.recording , "indepndent: tape is not recording");
         tape.recording = false;
@@ -196,3 +195,10 @@ fn op_info_vec() -> Vec<OpInfo> {
 }
 pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
    std::sync::LazyLock::new( || op_info_vec() );
+
+#[test]
+fn test_op_info() {
+    let op_info_vec = &*OP_INFO_VEC;
+    assert_eq!( "add_vc", op_info_vec[ADD_VC_OP].name );
+    assert_eq!( "add_vv", op_info_vec[ADD_VV_OP].name );
+}

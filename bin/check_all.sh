@@ -39,7 +39,7 @@ done
 #
 # cargo doc
 echo
-echo_eval bin/doc_hidden.sh
+echo_eval cargo doc --document-private-items
 echo
 echo_eval cargo run --release
 echo

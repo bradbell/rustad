@@ -6,23 +6,33 @@
 use crate::Index;
 use crate::Float;
 //
-/// The AD type acts like the Float type.
-/// It has the addition capability to recoerd functions and
-/// store it in an [ADFun](crate::ADFun) object.
+/// AD acts like the Float type,
+/// can record functions and store them in an [ADFun](crate::ADFun) object.
 ///
 /// # variable
-/// An AD object is a variable if the following two conditions hold:
-/// 1. [This threads recorder](crate::THIS_THREAD_RECORDER)
-///    is currently recording
-/// 2. The threads recorder and the AD object have the same *tape_id*
+/// An AD object is a variable if it one of the [domain](crate::domain)
+/// variables or its value depends on the value of a domain variable.
 ///
 /// # constant
 /// If an AD object is not a variable it is referred to as a constant.
 #[derive(Copy, Clone)]
 pub struct AD {
-    pub tape_id   : Index,
-    pub var_index : Index,
-    pub value     : Float,
+    //
+    // tape_id
+    ///
+    /// An AD object is a variable if the following two conditions hold:
+    /// 1. [THIS_THREAD_TAPE](crate::THIS_THREAD_TAPE)
+    ///    is currently recording.
+    /// 2. This threads tape and the AD object have the same *tape_id* .
+    pub(crate) tape_id   : Index,
+    //
+    // var_index
+    /// If this AD object is a variable, var_index is its index in the tape.
+    pub(crate) var_index : Index,
+    //
+    // value
+    /// This is the value of this AD variable or constant.
+    pub(crate) value     : Float,
 }
 impl From<Float> for AD {
     fn from(this_value : Float) -> Self {

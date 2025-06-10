@@ -10,7 +10,7 @@ use crate::TapeInfo;
 use crate::AD;
 use crate::ADD_VC_OP;
 use crate::ADD_VV_OP;
-use crate::THIS_THREAD_RECORDER;
+use crate::THIS_THREAD_TAPE;
 // ---------------------------------------------------------------------------
 // eval_add_vc_fn
 /// Stores the result of a zero order variable + constant
@@ -141,7 +141,7 @@ impl std::ops::Add<AD> for AD {
     fn add(self, rhs : AD) -> AD {
         let new_value                     = self.value + rhs.value;
         let ( new_tape_id, new_var_index) =
-            THIS_THREAD_RECORDER.with_borrow_mut(
+            THIS_THREAD_TAPE.with_borrow_mut(
                 |tape| record_add(tape, &self, &rhs)
         );
         AD {
