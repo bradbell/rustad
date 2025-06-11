@@ -3,6 +3,8 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
+//! AD an automatic differentiation floating point type
+//
 use crate::Index;
 use crate::Float;
 //

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! The module defines the functions that store and compute for add operators.
+//! functions that store and compute for AD add operators.
 //
 use crate::Float;
 use crate::Index;

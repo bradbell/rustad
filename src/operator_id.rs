@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
-
-//! This module defines the operator indices as
-//! `pub(crate) usize` constants.
-
-
+//
+//! Define operator identifiers as `pub(crate) usize` constants.
+//
 // set_operator_ids
 macro_rules! set_operator_ids {
     //
@@ -41,6 +39,6 @@ set_operator_ids!(
     ADD_VV_OP,
     /// variable + constant
     ADD_VC_OP,
-    /// number of operators
+    /// number of operator identifiers
     NUMBER_OP,
 );

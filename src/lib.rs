@@ -2,6 +2,9 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ----------------------------------------------------------------------------
+//
+//! The rustad Automatic Differentiation Package
+//
 // YEAR_MONTH_DAY
 /// is the date corresponding to this version of the software as
 /// *year*.*month*.*day* .
@@ -86,7 +89,8 @@ impl TapeInfo {
 //
 // THIS_THREAD_TAPE
 thread_local! {
-    pub static THIS_THREAD_TAPE: std::cell::RefCell<TapeInfo> =
+    /// Thread local storage used to record functions
+    pub(crate) static THIS_THREAD_TAPE: std::cell::RefCell<TapeInfo> =
         std::cell::RefCell::new( TapeInfo::new() );
 }
 //

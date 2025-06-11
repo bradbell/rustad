@@ -112,8 +112,7 @@ impl ADFun {
 //
 // domain
 /// Calling this function starts a new recording.
-/// There must not currently be a recording in process using
-/// [THIS_THREAD_TAPE] .
+/// There must not currently be a recording in process on the current thread.
 ///
 /// # x
 /// This vector determines the number of domain (independent) variables
@@ -148,8 +147,7 @@ pub fn domain( x : &[Float] ) -> Vec<AD> {
 //
 // range
 /// Calling thjis function stops a recordng.
-/// There must currently be a recording in process using
-/// [THIS_THREAD_TAPE] .
+/// There must currently be a recording in process on the current thread.
 ///
 /// # ay
 /// This is the vector of range space variables.
