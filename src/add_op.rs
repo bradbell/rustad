@@ -6,7 +6,7 @@
 //
 use crate::Float;
 use crate::Index;
-use crate::ad_tape::TapeInfo;
+use crate::ad_tape::Tape;
 use crate::AD;
 use crate::ADD_VC_OP;
 use crate::ADD_VV_OP;
@@ -90,7 +90,7 @@ pub(crate) fn eval_add_vv_fn(
 /// # record_add
 /// The return value is the ( *tape_id* , *var_index* ) fields for the AD
 /// object corresponding to the summation.
-fn record_add(tape : &mut TapeInfo, lhs : &AD, rhs : &AD) -> (Index, Index) {
+fn record_add(tape : &mut Tape, lhs : &AD, rhs : &AD) -> (Index, Index) {
     let mut new_tape_id   = 0;
     let mut new_var_index = 0;
     if tape.recording {
