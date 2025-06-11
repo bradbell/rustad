@@ -6,11 +6,11 @@
 //
 use crate::Float;
 use crate::Index;
-use crate::TapeInfo;
+use crate::ad_tape::TapeInfo;
 use crate::AD;
 use crate::ADD_VC_OP;
 use crate::ADD_VV_OP;
-use crate::THIS_THREAD_TAPE;
+use crate::ad_tape::THIS_THREAD_TAPE;
 // ---------------------------------------------------------------------------
 // eval_add_vc_fn
 /// Stores the result of a zero order variable + constant

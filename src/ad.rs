@@ -11,6 +11,9 @@ use crate::Float;
 #[cfg(doc)]
 use crate::function::{ADFun, ad_domain};
 //
+#[cfg(doc)]
+use crate::ad_tape::THIS_THREAD_TAPE;
+//
 /// AD acts like the Float. It also can record functions and store
 /// them in [ADFun] objects.
 ///
@@ -26,8 +29,7 @@ pub struct AD {
     // tape_id
     ///
     /// An AD object is a variable if the following two conditions hold:
-    /// 1. [THIS_THREAD_TAPE](crate::THIS_THREAD_TAPE)
-    ///    is currently recording.
+    /// 1. [THIS_THREAD_TAPE] is currently recording.
     /// 2. This threads tape and the AD object have the same *tape_id* .
     pub(crate) tape_id   : Index,
     //

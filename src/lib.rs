@@ -21,11 +21,11 @@ pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
 // utility
 pub mod utility;
 //
-// ADD_VV_OP, ADD_VC_OP, ...
-// define all the operator indices
+// operator_id
+// ADD_VC_OP, ADD_VV_OP, ... , NUMBER_OP
 pub(crate) mod operator_id;
 use operator_id::*;
-// ----------------------------------------------------------------------------
+//
 // Index
 /// Type used for indexing vectors in the tape.
 /// It must be able to represent the total number of
@@ -41,11 +41,13 @@ pub type Float = f64;
 pub type ForwardZeroFn = fn(
         _var: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
-// ----------------------------------------------------------------------------
 //
 // AD
 pub mod ad;
 use ad::AD;
+//
+// ad_tape
+pub(crate) mod ad_tape;
 //
 // OpInfo
 #[derive(Clone)]
@@ -53,45 +55,11 @@ pub struct OpInfo {
     pub name : String,
     pub fun : ForwardZeroFn,
 }
-
 //
 // panic_eval_fn
 fn panic_eval_fn(
     _vec: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
-}
-//
-// TapeInfo
-pub struct TapeInfo {
-    pub tape_id        : Index,
-    pub recording      : bool,
-    pub n_domain       : Index,
-    pub n_var          : Index,
-    pub op_all         : Vec<Index>,
-    pub op2arg         : Vec<Index>,
-    pub arg_all        : Vec<Index>,
-    pub con_all        : Vec<Float>,
-}
-impl TapeInfo {
-    pub fn new() -> Self {
-        Self {
-            tape_id       : 0,
-            recording     : false,
-            n_domain      : 0,
-            n_var         : 0,
-            op_all        : Vec::new() ,
-            op2arg        : Vec::new() ,
-            arg_all       : Vec::new() ,
-            con_all       : Vec::new() ,
-        }
-    }
-}
-//
-// THIS_THREAD_TAPE
-thread_local! {
-    /// Thread local storage used to record functions
-    pub(crate) static THIS_THREAD_TAPE: std::cell::RefCell<TapeInfo> =
-        std::cell::RefCell::new( TapeInfo::new() );
 }
 //
 // function

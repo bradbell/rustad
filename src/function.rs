@@ -9,7 +9,7 @@ use crate::Index;
 use crate::Float;
 use crate::OP_INFO_VEC;
 use crate::AD;
-use crate::THIS_THREAD_TAPE;
+use crate::ad_tape::THIS_THREAD_TAPE;
 //
 // ADFun
 /// An [ad_domain] call is used to start a recording an operatioin sequence.
