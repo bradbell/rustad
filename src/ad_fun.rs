@@ -12,11 +12,11 @@ use crate::AD;
 use crate::THIS_THREAD_TAPE;
 //
 // ADFun
-/// A [domain] call is used to start a recording function.
+/// A [domain] call is used to start a recording an operatioin sequence.
 /// A [range] call is used to stop recording and create an ADFun object
 /// that can evaluate the function and its derivatives.
-/// The recording is a single assignment representation of the function; i.e.,
-/// a variable is only assigned once.
+/// The operation sequence is a single assignment representation of
+/// the function; i.e., a variable is only assigned once.
 pub struct ADFun {
     //
     // n_domain
@@ -26,7 +26,7 @@ pub struct ADFun {
     /// The total number of variables in this function.
     //
     // n_var
-    /// The total number of variables in the recording.
+    /// The total number of variables in the operation sequence.
     pub(crate) n_var          : Index,
     //
     // range
@@ -35,17 +35,18 @@ pub struct ADFun {
     pub(crate) range          : Vec<Index>,
     //
     // op_all
-    /// This maps an operators index in the recording of the function
+    /// This maps an operators index in the operation sequence
     /// to its [operator_id](crate::operator_id) .
     pub(crate) op_all         : Vec<Index>,
     //
     // op2arg
-    /// This maps an operators index in the function to its
+    /// This maps an operators index in the operation sequence to its
     /// the index of its first argument in arg_all.
     pub(crate) op2arg         : Vec<Index>,
     //
     // arg_all
-    /// This contains the arguments for all the opereators in the recording.
+    /// This contains the arguments for all the opereators in the
+    /// operatioon sequence.
     pub(crate) arg_all        : Vec<Index>,
     //
     // con_all
@@ -54,6 +55,16 @@ pub struct ADFun {
     pub(crate) con_all        : Vec<Float>,
 }
 impl ADFun {
+    //
+    // new
+    /// This creates an empty operation sequence; i.e,
+    /// its domain and range vectors have length zero.
+    /// # Example
+    /// ```
+    /// let f = rustad::ad_fun::ADFun::new();
+    /// assert_eq!( f.domain_len(), 0 );
+    /// assert_eq!( f.range_len(), 0 );
+    /// ```
     pub fn new() -> Self {
         Self {
             n_domain      : 0,
@@ -65,6 +76,17 @@ impl ADFun {
             range         : Vec::new() ,
         }
     }
+    //
+    // domain_len
+    /// dimension of domain space
+    pub fn domain_len(&self) -> Index { self.n_domain }
+    //
+    // range_len
+    /// dimension of range space
+    pub fn range_len(&self) -> Index { self.range.len() }
+    //
+    // forward
+    /// zero order forward mode; i.e.,  function values
     pub fn forward(&self, x : &[Float] ) -> Vec<Float> {
         let op_info_vec = &*OP_INFO_VEC;
         let mut var_vec = vec![ Float::NAN; self.n_var ];
@@ -89,6 +111,17 @@ impl ADFun {
 }
 //
 // domain
+/// Calling this function starts a new recording.
+/// There must not currently be a recording in process using
+/// [THIS_THREAD_TAPE] .
+///
+/// # x
+/// This vector determines the number of domain (independent) variables
+/// and their value during the recording.
+///
+/// # domain
+/// The return value is the vector of domain space variables.
+/// It has the same length and values as x.
 pub fn domain( x : &[Float] ) -> Vec<AD> {
     let mut new_tape_id = 0;
     THIS_THREAD_TAPE.with_borrow_mut( |tape| {
@@ -114,7 +147,18 @@ pub fn domain( x : &[Float] ) -> Vec<AD> {
 }
 //
 // range
-pub fn range( y : &[AD] ) -> ADFun {
+/// Calling thjis function stops a recordng.
+/// There must currently be a recording in process using
+/// [THIS_THREAD_TAPE] .
+///
+/// # ay
+/// This is the vector of range space variables.
+///
+/// # range
+/// The returreturn value is an ADFun that contains the sequence of operations
+/// that determine the range space variables as a function of the
+/// domain space variables.
+pub fn range( ay : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
     THIS_THREAD_TAPE.with_borrow_mut( |tape| {
         tape.op2arg.push( tape.arg_all.len() );
@@ -127,8 +171,8 @@ pub fn range( y : &[AD] ) -> ADFun {
         std::mem::swap( &mut result.arg_all,       &mut tape.arg_all );
         std::mem::swap( &mut result.con_all,       &mut tape.con_all );
     } );
-    for i in 0 .. y.len() {
-        result.range.push( y[i].var_index );
+    for i in 0 .. ay.len() {
+        result.range.push( ay[i].var_index );
     }
     result
 }
