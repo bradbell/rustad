@@ -12,8 +12,8 @@ use crate::AD;
 use crate::THIS_THREAD_TAPE;
 //
 // ADFun
-/// A [domain] call is used to start a recording an operatioin sequence.
-/// A [range] call is used to stop recording and create an ADFun object
+/// A [ad_domain] call is used to start a recording an operatioin sequence.
+/// A [ad_fun] call is used to stop recording and create an ADFun object
 /// that can evaluate the function and its derivatives.
 /// The operation sequence is a single assignment representation of
 /// the function; i.e., a variable is only assigned once.
@@ -62,8 +62,8 @@ impl ADFun {
     /// # Example
     /// ```
     /// let f = rustad::function::ADFun::new();
-    /// assert_eq!( f.domain_len(), 0 );
-    /// assert_eq!( f.range_len(), 0 );
+    /// assert_eq!( f.len_domain(), 0 );
+    /// assert_eq!( f.len_range(), 0 );
     /// ```
     pub fn new() -> Self {
         Self {
@@ -77,13 +77,13 @@ impl ADFun {
         }
     }
     //
-    // domain_len
+    // len_domain
     /// dimension of domain space
-    pub fn domain_len(&self) -> Index { self.n_domain }
+    pub fn len_domain(&self) -> Index { self.n_domain }
     //
-    // range_len
+    // len_range
     /// dimension of range space
-    pub fn range_len(&self) -> Index { self.range.len() }
+    pub fn len_range(&self) -> Index { self.range.len() }
     //
     // forward
     /// zero order forward mode; i.e.,  function values
@@ -110,18 +110,20 @@ impl ADFun {
     }
 }
 //
-// domain
-/// Calling this function starts a new recording.
+// ad_domain
+/// Calling `ad_domain` function starts a new recording.
+///
+/// # Recording
 /// There must not currently be a recording in process on the current thread.
 ///
 /// # x
 /// This vector determines the number of domain (independent) variables
 /// and their value during the recording.
 ///
-/// # domain
+/// # ad_domain
 /// The return value is the vector of domain space variables.
 /// It has the same length and values as x.
-pub fn domain( x : &[Float] ) -> Vec<AD> {
+pub fn ad_domain( x : &[Float] ) -> Vec<AD> {
     let mut new_tape_id = 0;
     THIS_THREAD_TAPE.with_borrow_mut( |tape| {
         assert!( ! tape.recording , "indepndent: tape is already recording");
@@ -145,18 +147,20 @@ pub fn domain( x : &[Float] ) -> Vec<AD> {
     result
 }
 //
-// range
-/// Calling thjis function stops a recordng.
+// ad_fun
+/// Calling `ad_fun` stops a recordng.
+///
+/// # Recording
 /// There must currently be a recording in process on the current thread.
 ///
 /// # ay
-/// This is the vector of range space variables.
+/// This is an AD vector of range space variables.
 ///
-/// # range
-/// The returreturn value is an ADFun that contains the sequence of operations
-/// that determine the range space variables as a function of the
+/// # ad_fun
+/// The return value is an ADFun containing the sequence of operations
+/// that compute the range space variables as a function of the
 /// domain space variables.
-pub fn range( ay : &[AD] ) -> ADFun {
+pub fn ad_fun( ay : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
     THIS_THREAD_TAPE.with_borrow_mut( |tape| {
         tape.op2arg.push( tape.arg_all.len() );

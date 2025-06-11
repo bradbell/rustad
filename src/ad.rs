@@ -13,7 +13,7 @@ use crate::Float;
 ///
 /// # variable
 /// An AD object is a variable if it one of the
-/// [domain](crate::function::domain)
+/// [ad_domain](crate::function::ad_domain)
 /// variables or its value depends on the value of a domain variable.
 ///
 /// # constant
