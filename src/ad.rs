@@ -8,13 +8,15 @@
 use crate::Index;
 use crate::Float;
 //
-/// AD acts like the Float type, can record functions and store
-/// it in an [ADFun](crate::function::ADFun) object.
+#[cfg(doc)]
+use crate::function::{ADFun, ad_domain};
+//
+/// AD acts like the Float. It also can record functions and store
+/// thme in [ADFun] obects.
 ///
 /// # variable
-/// An AD object is a variable if it one of the
-/// [ad_domain](crate::function::ad_domain)
-/// variables or its value depends on the value of a domain variable.
+/// An AD object is a variable if it one of the [ad_domain] variables 
+/// or its value depends on the value of a domain variable.
 ///
 /// # constant
 /// If an AD object is not a variable it is referred to as a constant.
@@ -37,7 +39,9 @@ pub struct AD {
     /// This is the value of this AD variable or constant.
     pub(crate) value     : Float,
 }
+//
 impl From<Float> for AD {
+    /// Convert a Float to an AD constant
     fn from(this_value : Float) -> Self {
         Self {
             tape_id   : 0,
