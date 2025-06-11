@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! functions that store and compute for AD add operators.
+//! Store and compute for AD add operators.
 //
 use crate::Float;
 use crate::Index;
@@ -36,7 +36,7 @@ use crate::THIS_THREAD_TAPE;
 /// <pre>
 ///     var[res] = var[lhs] + con[rhs]
 /// </pre>
-pub fn eval_add_vc_fn(
+pub(crate) fn eval_add_vc_fn(
     var: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
     var[ res ] = var[ arg[0] ] + con[ arg[1] ];
@@ -63,7 +63,7 @@ pub fn eval_add_vc_fn(
 /// <pre>
 ///     var[res] = var[lhs] + var[rhs]
 /// </pre>
-pub fn eval_add_vv_fn(
+pub(crate) fn eval_add_vv_fn(
     var: &mut Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
     var[ res ] = var[ arg[0] ] + var[ arg[1] ];
@@ -138,6 +138,7 @@ fn record_add(tape : &mut TapeInfo, lhs : &AD, rhs : &AD) -> (Index, Index) {
 impl std::ops::Add<AD> for AD {
     type Output = AD;
     //
+    /// compute AD + AD
     fn add(self, rhs : AD) -> AD {
         let new_value                     = self.value + rhs.value;
         let ( new_tape_id, new_var_index) =
@@ -152,17 +153,19 @@ impl std::ops::Add<AD> for AD {
     }
 }
 //
-// Float + AD
 impl std::ops::Add<AD> for Float {
     type Output = AD;
+    //
+    /// compute Float + AD
     fn add(self, rhs : AD) -> AD {
         AD::from(self) + rhs
     }
 }
 //
-// Float + AD
 impl std::ops::Add<Float> for AD {
     type Output = AD;
+    //
+    /// compute AD + Float
     fn add(self, rhs : Float) -> AD {
         self + AD::from(rhs)
     }

@@ -12,10 +12,10 @@ use crate::Float;
 use crate::function::{ADFun, ad_domain};
 //
 /// AD acts like the Float. It also can record functions and store
-/// thme in [ADFun] obects.
+/// them in [ADFun] objects.
 ///
 /// # variable
-/// An AD object is a variable if it one of the [ad_domain] variables 
+/// An AD object is a variable if it one of the [ad_domain] variables
 /// or its value depends on the value of a domain variable.
 ///
 /// # constant

@@ -12,8 +12,8 @@ use crate::AD;
 use crate::THIS_THREAD_TAPE;
 //
 // ADFun
-/// A [ad_domain] call is used to start a recording an operatioin sequence.
-/// A [ad_fun] call is used to stop recording and create an ADFun object
+/// An [ad_domain] call is used to start a recording an operatioin sequence.
+/// An [ad_fun] call is used to stop recording and create an ADFun object
 /// that can evaluate the function and its derivatives.
 /// The operation sequence is a single assignment representation of
 /// the function; i.e., a variable is only assigned once.
