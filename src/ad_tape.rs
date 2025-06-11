@@ -5,6 +5,7 @@
 //
 use crate::Index;
 use crate::Float;
+use std::sync::Mutex;
 //
 // TapeInfo
 pub struct TapeInfo {
@@ -31,6 +32,11 @@ impl TapeInfo {
         }
     }
 }
+//
+// NEXT_TAPE_ID
+/// The tape_id values that have been used are 1 .. NEXT_TAPE_ID
+/// (0 is not used for a recording).
+pub(crate) static NEXT_TAPE_ID : Mutex<Index> = Mutex::new(1);
 //
 // THIS_THREAD_TAPE
 thread_local! {

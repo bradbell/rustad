@@ -10,6 +10,7 @@ use crate::Float;
 use crate::OP_INFO_VEC;
 use crate::AD;
 use crate::ad_tape::THIS_THREAD_TAPE;
+use crate::ad_tape::NEXT_TAPE_ID;
 //
 // ADFun
 /// An [ad_domain] call is used to start a recording an operatioin sequence.
@@ -124,19 +125,27 @@ impl ADFun {
 /// The return value is the vector of domain space variables.
 /// It has the same length and values as x.
 pub fn ad_domain( x : &[Float] ) -> Vec<AD> {
-    let mut new_tape_id = 0;
+    //
+    // new_tape_id
+    let new_tape_id : Index;
+    {   let mut next_tape_id = NEXT_TAPE_ID.lock().unwrap();
+        //
+        // The rest pf this block has a lock, so it is fast and can't fail.
+        new_tape_id   = *next_tape_id;
+        *next_tape_id = new_tape_id + 1;
+    }
     THIS_THREAD_TAPE.with_borrow_mut( |tape| {
+        assert_ne!( new_tape_id, 0);
         assert!( ! tape.recording , "indepndent: tape is already recording");
         assert_eq!( tape.op_all.len(), 0 );
         assert_eq!( tape.op2arg.len(), 0 );
         assert_eq!( tape.arg_all.len(), 0 );
         assert_eq!( tape.con_all.len(), 0 );
-        tape.tape_id       += 1;
+        tape.tape_id        = new_tape_id;
         tape.recording      = true;
         tape.n_domain       = x.len();
         tape.n_var          = x.len();
         //
-        new_tape_id         = tape.tape_id;
     } );
     let mut result : Vec<AD> = Vec::new();
     for j in 0 .. x.len() {
