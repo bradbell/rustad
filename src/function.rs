@@ -61,7 +61,7 @@ impl ADFun {
     /// its domain and range vectors have length zero.
     /// # Example
     /// ```
-    /// let f = rustad::ad_fun::ADFun::new();
+    /// let f = rustad::function::ADFun::new();
     /// assert_eq!( f.domain_len(), 0 );
     /// assert_eq!( f.range_len(), 0 );
     /// ```
