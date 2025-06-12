@@ -12,6 +12,9 @@ use crate::AD;
 use crate::ad_tape::THIS_THREAD_TAPE;
 use crate::ad_tape::NEXT_TAPE_ID;
 //
+#[cfg(doc)]
+use crate::operators;
+//
 // ADFun
 /// An [ad_domain] call is used to start a recording an operation sequence.
 /// An [ad_fun] call is used to stop recording move the operation sequence
@@ -38,7 +41,7 @@ pub struct ADFun {
     //
     // op_all
     /// This maps an operators index in the operation sequence
-    /// to its [operator_id](crate::operator_id) .
+    /// to its [operators::id]
     pub(crate) op_all         : Vec<Index>,
     //
     // op2arg

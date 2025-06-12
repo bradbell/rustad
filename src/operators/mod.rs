@@ -6,10 +6,13 @@
 //
 use crate::Float;
 use crate::Index;
-use crate::operator_id::NUMBER_OP;
+use id::NUMBER_OP;
+//
+// id
+pub mod id;
 //
 #[cfg(test)]
-use crate::operator_id::{ADD_VC_OP, ADD_VV_OP};
+use id::{ADD_VC_OP, ADD_VV_OP};
 //
 // add
 pub mod add;

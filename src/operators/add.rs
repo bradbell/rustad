@@ -10,13 +10,13 @@ use crate::Float;
 use crate::Index;
 use crate::ad_tape::THIS_THREAD_TAPE;
 use crate::ad_tape::Tape;
-use crate::operator_id::ADD_VC_OP;
-use crate::operator_id::ADD_VV_OP;
 use crate::operators::OpInfo;
+use crate::operators::id::ADD_VC_OP;
+use crate::operators::id::ADD_VV_OP;
 // END_SORT_THIS_LINE_MINUS_1
 //
 #[cfg(doc)]
-use crate::operator_id;
+use crate::operators;
 //
 // ---------------------------------------------------------------------------
 // forward_0_add_vc_fn
@@ -80,7 +80,7 @@ fn forward_0_add_vv_fn(
 /// Set the operator information for all the add operators.
 ///
 /// # op_info_vec
-/// is a map from [operator_id] to operator information.
+/// is a map from [operators::id] to operator information.
 pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
     op_info_vec[ADD_VC_OP] =
         OpInfo{ name : "add_vc".to_string() , forward_0 : forward_0_add_vc_fn };

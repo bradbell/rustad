@@ -21,10 +21,6 @@ pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
 // utility
 pub mod utility;
 //
-// operator_id
-// ADD_VC_OP, ADD_VV_OP, ... , NUMBER_OP
-pub(crate) mod operator_id;
-//
 // Index
 /// Type used for indexing vectors in the tape.
 /// It must be able to represent the total number of
