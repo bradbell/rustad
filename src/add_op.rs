@@ -19,7 +19,7 @@ use crate::ad_tape::Tape;
 use crate::operator_id;
 //
 // ---------------------------------------------------------------------------
-// eval_add_vc_fn
+// forward_0_add_vc_fn
 /// Stores the result of a zero order variable + constant
 /// operation in the tape.
 ///
@@ -43,13 +43,13 @@ use crate::operator_id;
 /// <pre>
 ///     var[res] = var[lhs] + con[rhs]
 /// </pre>
-fn eval_add_vc_fn(
+fn forward_0_add_vc_fn(
     var: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
     var[ res ] = var[ arg[0] ] + con[ arg[1] ];
 }
 // ---------------------------------------------------------------------------
-// eval_add_vv_fn
+// forward_0_add_vv_fn
 /// Stores the result of a zero order variable + variable
 /// operation in the tape.
 ///
@@ -70,7 +70,7 @@ fn eval_add_vc_fn(
 /// <pre>
 ///     var[res] = var[lhs] + var[rhs]
 /// </pre>
-fn eval_add_vv_fn(
+fn forward_0_add_vv_fn(
     var: &mut Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
     var[ res ] = var[ arg[0] ] + var[ arg[1] ];
@@ -83,9 +83,9 @@ fn eval_add_vv_fn(
 /// is a map from [operator_id] to operator information.
 pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
     op_info_vec[ADD_VC_OP] =
-        OpInfo{ name : "add_vc".to_string() , fun : eval_add_vc_fn };
+        OpInfo{ name : "add_vc".to_string() , forward_0 : forward_0_add_vc_fn };
     op_info_vec[ADD_VV_OP] =
-        OpInfo{ name : "add_vv".to_string() , fun : eval_add_vv_fn };
+        OpInfo{ name : "add_vv".to_string() , forward_0 : forward_0_add_vv_fn };
 }
 // ---------------------------------------------------------------------------
 // record_add

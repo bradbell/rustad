@@ -54,11 +54,11 @@ pub(crate) mod ad_tape;
 #[derive(Clone)]
 pub struct OpInfo {
     pub name : String,
-    pub fun : ForwardZeroFn,
+    pub forward_0 : ForwardZeroFn,
 }
 //
-// panic_eval_fn
-fn panic_eval_fn(
+// panic_fn
+fn panic_fn(
     _vec: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
 }
@@ -71,7 +71,7 @@ mod add_op;
 //
 // OP_INFO_VEC
 fn op_info_vec() -> Vec<OpInfo> {
-    let empty         = OpInfo{ name: "".to_string(), fun : panic_eval_fn };
+    let empty         = OpInfo{ name: "".to_string(), forward_0 : panic_fn };
     let mut result    = vec![empty ; NUMBER_OP ];
     add_op::set_op_info(&mut result);
     result

@@ -106,13 +106,13 @@ impl ADFun {
             var_vec[j] = domain[j];
         }
         for op_index in 0 .. self.op_all.len() {
-            let op_id = self.op_all[op_index];
-            let start = self.op2arg[op_index];
-            let end   = self.op2arg[op_index + 1];
-            let arg   = &self.arg_all[start .. end];
-            let res   = self.n_domain + op_index;
-            let fun   = op_info_vec[op_id].fun;
-            fun(&mut var_vec, &self.con_all, &arg, res );
+            let op_id     = self.op_all[op_index];
+            let start     = self.op2arg[op_index];
+            let end       = self.op2arg[op_index + 1];
+            let arg       = &self.arg_all[start .. end];
+            let res       = self.n_domain + op_index;
+            let forward_0 = op_info_vec[op_id].forward_0;
+            forward_0(&mut var_vec, &self.con_all, &arg, res );
             if trace {
                 let name = &op_info_vec[op_id].name;
                 println!(
