@@ -12,10 +12,10 @@
 /// # Example
 /// ```
 /// let date = *rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2025.6.11");
+/// assert_eq!(date, "2025.6.12");
 /// ```
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
-   std::sync::LazyLock::new( || "2025.6.11" );
+   std::sync::LazyLock::new( || "2025.6.12" );
 // ----------------------------------------------------------------------------
 //
 // utility
@@ -66,14 +66,14 @@ fn panic_fn(
 // function
 pub mod function;
 //
-// add_op
-mod add_op;
+// operators
+mod operators;
 //
 // OP_INFO_VEC
 fn op_info_vec() -> Vec<OpInfo> {
     let empty         = OpInfo{ name: "".to_string(), forward_0 : panic_fn };
     let mut result    = vec![empty ; NUMBER_OP ];
-    add_op::set_op_info(&mut result);
+    operators::add::set_op_info(&mut result);
     result
 }
 pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
