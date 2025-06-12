@@ -88,20 +88,26 @@ impl ADFun {
     //
     // forward
     /// zero order forward mode; i.e.,  function values
-    pub fn forward(&self, x : &[Float] ) -> Vec<Float> {
+    pub fn forward(&self, x : &[Float] , trace : bool) -> Vec<Float> {
         let op_info_vec = &*OP_INFO_VEC;
         let mut var_vec = vec![ Float::NAN; self.n_var ];
         for j in 0 .. self.n_domain {
             var_vec[j] = x[j];
         }
-        for i_op in 0 .. self.op_all.len() {
-            let op    = self.op_all[i_op];
-            let start = self.op2arg[i_op];
-            let end   = self.op2arg[i_op + 1];
+        for op_index in 0 .. self.op_all.len() {
+            let op_id = self.op_all[op_index];
+            let start = self.op2arg[op_index];
+            let end   = self.op2arg[op_index + 1];
             let arg   = &self.arg_all[start .. end];
-            let res   = self.n_domain + i_op;
-            let fun   = op_info_vec[op].fun;
+            let res   = self.n_domain + op_index;
+            let fun   = op_info_vec[op_id].fun;
             fun(&mut var_vec, &self.con_all, &arg, res );
+            if trace {
+                let name = &op_info_vec[op_id].name;
+                println!(
+                    "{:?}, {:?}, {:?}, {:?}", res, name, arg, var_vec[res]
+                );
+            }
         }
         let mut y : Vec<Float> = Vec::new();
         for i in 0 .. self.range.len() {

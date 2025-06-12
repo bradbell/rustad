@@ -8,12 +8,13 @@ use rustad::function;
 /// add_ad_ad
 fn add_ad_ad() {
     let x : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
-    let ax   = function::ad_domain(&x);
-    let ay_0 = ax[0] + ax[1];
-    let ay_1 = ax[1] + ax[2];
-    let ay   = vec! [ ay_0, ay_1 ];
-    let f    = function::ad_fun(&ay);
-    let y    = f.forward(&x);
+    let ax     = function::ad_domain(&x);
+    let ay_0   = ax[0] + ax[1];
+    let ay_1   = ax[1] + ax[2];
+    let ay     = vec! [ ay_0, ay_1 ];
+    let f      = function::ad_fun(&ay);
+    let trace  = false;
+    let y      = f.forward(&x, trace);
     assert_eq!( y[0], x[0] + x[1] );
     assert_eq!( y[1], x[1] + x[2] );
 }
@@ -21,12 +22,13 @@ fn add_ad_ad() {
 /// add_ad_float
 fn add_ad_float() {
     let x : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
-    let ax   = function::ad_domain(&x);
-    let ay_0 = ax[0] + 5.0;
-    let ay_1 = 5.0 + ax[2];
-    let ay   = vec! [ ay_0, ay_1 ];
-    let f    = function::ad_fun(&ay);
-    let y    = f.forward(&x);
+    let ax    = function::ad_domain(&x);
+    let ay_0  = ax[0] + 5.0;
+    let ay_1  = 5.0 + ax[2];
+    let ay    = vec! [ ay_0, ay_1 ];
+    let f     = function::ad_fun(&ay);
+    let trace = false;
+    let y     = f.forward(&x, trace);
     assert_eq!( y[0], x[0] + 5.0 );
     assert_eq!( y[1], 5.0 + x[2] );
 }
