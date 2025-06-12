@@ -4,6 +4,39 @@
 //
 //! operations for specific operators
 //
+//
+/// This macro implements the Float op AD and AD op Float cases
+/// by folding them into the AD + AD case.
+///
+/// # trait
+/// is the std::ops trait for this operator; e.g., Add .
+///
+/// # op
+/// is the token for this operator; e.g., + .
+///
+macro_rules! fold_binary_operator {
+    ( $trait:ident , $op:tt ) => {
+        //
+        impl std::ops::$trait<AD> for Float {
+            type Output = AD;
+            //
+            #[ doc = concat!(" compute Float ", stringify!($op), " AD") ]
+            fn add(self, rhs : AD) -> AD {
+                AD::from(self) $op rhs
+            }
+        }
+        //
+        impl std::ops::$trait<Float> for AD {
+            type Output = AD;
+            //
+            #[ doc = concat!(" compute AD ", stringify!($op), " Float") ]
+            fn add(self, rhs : Float) -> AD {
+                self $op AD::from(rhs)
+            }
+        }
+    }
+}
+//
 use crate::Float;
 use crate::Index;
 use id::NUMBER_OP;

@@ -8,6 +8,7 @@ version = "0.0.0"
 edition = "2024"
 
 [dependencies]
+paste = "1.0.15"
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--cfg", "docsrs"]

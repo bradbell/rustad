@@ -132,21 +132,5 @@ impl std::ops::Add<AD> for AD {
         }
     }
 }
-//
-impl std::ops::Add<AD> for Float {
-    type Output = AD;
-    //
-    /// compute Float + AD
-    fn add(self, rhs : AD) -> AD {
-        AD::from(self) + rhs
-    }
-}
-//
-impl std::ops::Add<Float> for AD {
-    type Output = AD;
-    //
-    /// compute AD + Float
-    fn add(self, rhs : Float) -> AD {
-        self + AD::from(rhs)
-    }
-}
+
+fold_binary_operator!( Add, + );
