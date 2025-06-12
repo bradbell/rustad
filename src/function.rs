@@ -7,13 +7,13 @@
 //
 use crate::Index;
 use crate::Float;
-use crate::operators::OP_INFO_VEC;
+use crate::operator::OP_INFO_VEC;
 use crate::AD;
 use crate::ad_tape::THIS_THREAD_TAPE;
 use crate::ad_tape::NEXT_TAPE_ID;
 //
 #[cfg(doc)]
-use crate::operators;
+use crate::operator;
 //
 // ADFun
 /// An [ad_domain] call is used to start a recording an operation sequence.
@@ -40,12 +40,12 @@ pub struct ADFun {
     pub(crate) range_index    : Vec<Index>,
     //
     // op_all
-    /// This maps an operators index in the operation sequence
-    /// to its [operators::id]
+    /// This maps an operator's index in the operation sequence
+    /// to its [operator::id]
     pub(crate) op_all         : Vec<Index>,
     //
     // op2arg
-    /// This maps an operators index in the operation sequence to its
+    /// This maps an operator's index in the operation sequence to its
     /// the index of its first argument in arg_all.
     pub(crate) op2arg         : Vec<Index>,
     //

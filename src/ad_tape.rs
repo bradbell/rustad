@@ -10,7 +10,7 @@ use crate::Float;
 use std::sync::Mutex;
 //
 #[cfg(doc)]
-use crate::operators;
+use crate::operator;
 //
 // Tape
 /// is the type used to represent one tape; i.e., o
@@ -37,7 +37,7 @@ pub(crate) struct Tape {
     //
     // op_all
     /// For each index in the operation sequence, op_all\[index\]
-    /// is the corresponding [operators::id] .
+    /// is the corresponding [operator::id] .
     pub op_all         : Vec<Index>,
     //
     // op2arg

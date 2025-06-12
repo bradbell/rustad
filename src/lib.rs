@@ -24,7 +24,7 @@ pub mod utility;
 // Index
 /// Type used for indexing vectors in the tape.
 /// It must be able to represent the total number of
-/// operators, constants, and arguments to operators.
+/// tape ids, operator indices, constants, and arguments to operators.
 pub type Index = usize;
 //
 // Float
@@ -38,8 +38,8 @@ use ad::AD;
 // ad_tape
 pub(crate) mod ad_tape;
 //
-// operators
-pub(crate) mod operators;
+// operator
+pub(crate) mod operator;
 //
 // function
 pub mod function;
