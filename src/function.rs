@@ -86,9 +86,19 @@ impl ADFun {
     /// dimension of range space
     pub fn len_range(&self) -> Index { self.range.len() }
     //
-    // forward
-    /// zero order forward mode; i.e.,  function values
-    pub fn forward(&self, x : &[Float] , trace : bool) -> Vec<Float> {
+    // range_zero
+    /// zero order forward mode function evaluation.
+    ///
+    /// # x
+    /// specifies the domain space variable values
+    ///
+    /// # trace
+    /// if true, a trace of the operatiopn sequence is printed on stdout.
+    ///
+    /// # range_zero
+    /// is the zero order range vector corresponding to x; i.e.,
+    /// the function value.
+    pub fn range_zero(&self, x : &[Float] , trace : bool) -> Vec<Float> {
         let op_info_vec = &*OP_INFO_VEC;
         let mut var_vec = vec![ Float::NAN; self.n_var ];
         for j in 0 .. self.n_domain {

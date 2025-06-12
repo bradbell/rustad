@@ -37,7 +37,8 @@ pub type Index = usize;
 pub type Float = f64;
 //
 // ForwardZeroFn
-/// Type used for fuunctions that evaluate zero order forward mode
+/// Type for fuunctions that evaluate zero order forward mode for one
+/// operator in the operation sequence.
 pub type ForwardZeroFn = fn(
         _var: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
