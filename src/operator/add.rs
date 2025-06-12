@@ -30,8 +30,7 @@ fn forward_0_add_vc_fn(
 }
 // ---------------------------------------------------------------------------
 // forward_0_add_vv_fn
-/// The is a [ForwardZeroBinary] evaluattor where
-/// the both the left and right argument are variables.
+/// [ForwardZeroBinary] where op is +, left is variable, right is variable.
 fn forward_0_add_vv_fn(
     var: &mut Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);

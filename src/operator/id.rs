@@ -4,7 +4,7 @@
 //
 //! Define operator identifiers as `pub(crate) usize` constants.
 //
-// set_operator_ids
+/// Set all the opeerator identifier values
 macro_rules! set_operator_ids {
     //
     // first match

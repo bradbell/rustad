@@ -57,17 +57,16 @@ pub type ForwardZero = fn(
 pub type ForwardZeroBinary = fn(
         _var: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
-
-
-
 //
 // panic_fn
+/// default [ForwardZero] function that will panic if it does not get replaced.
 fn panic_fn(
     _vec: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
 }
 //
 // OpInfo
+/// information connected to each operator id.
 #[derive(Clone)]
 pub struct OpInfo {
     pub name      : String,
