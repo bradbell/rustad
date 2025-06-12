@@ -17,12 +17,49 @@ use id::{ADD_VC_OP, ADD_VV_OP};
 // add
 pub mod add;
 //
-// ForwardZeroFn
-/// Type for fuunctions that evaluate zero order forward mode for one
-/// operator in the operation sequence.
-pub type ForwardZeroFn = fn(
+// ForwardZero
+/// Evaluate zero order forward mode for operation in the operation sequence.
+pub type ForwardZero = fn(
         _var: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
+//
+// ForwardZeroBinary
+/// This is a [ForwardZero] with the following extra conditions:
+///
+/// # op
+/// we use the notation *op* for this operator's symbol; e.g. + for addition.
+///
+/// # arg
+/// is a slice of size two.  We use the notation
+/// <pre>
+///     lhs = arg[0]
+///     rhs = arg[1]
+/// </pre>
+///
+/// # res
+/// is the index in *var* where the result for this operator is placed.
+///
+/// # var
+/// is the vector of the zero order values for all the variables.
+/// If both left and right are variables:
+/// <pre>
+///     var[res] = var[lhs] op var[rhs]
+/// </pre>
+/// If left is a variable and the right is a constant:
+/// <pre>
+///     var[res] = var[lhs] op con[rhs]
+/// </pre>
+/// If left is a constant and the right is a variable:
+/// <pre>
+///     var[res] = con[lhs] op left[rhs]
+/// </pre>
+#[cfg(doc)]
+pub type ForwardZeroBinary = fn(
+        _var: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+);
+
+
+
 //
 // panic_fn
 fn panic_fn(
@@ -33,8 +70,8 @@ fn panic_fn(
 // OpInfo
 #[derive(Clone)]
 pub struct OpInfo {
-    pub name : String,
-    pub forward_0 : ForwardZeroFn,
+    pub name      : String,
+    pub forward_0 : ForwardZero,
 }
 //
 // OP_INFO_VEC

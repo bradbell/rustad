@@ -17,32 +17,12 @@ use crate::operator::id::ADD_VV_OP;
 //
 #[cfg(doc)]
 use crate::operator;
+#[cfg(doc)]
+use crate::operator::ForwardZeroBinary;
 //
 // ---------------------------------------------------------------------------
 // forward_0_add_vc_fn
-/// Stores the result of a zero order variable + constant
-/// operation in the tape.
-///
-/// # con
-/// is the vector of constants in the tape.
-///
-/// # arg
-/// is a slice of size two containing the arguments for this addition.
-/// We use the notation
-/// <pre>
-///     lhs = arg[0]
-///     rhs = arg[1]
-/// </pre>
-///
-/// # res
-/// is the index in *var* where the result for this addition is placed.
-///
-/// # var
-/// is the vector of the zero order values for all the variables.
-/// It is changed in the following way
-/// <pre>
-///     var[res] = var[lhs] + con[rhs]
-/// </pre>
+/// [ForwardZeroBinary] were op is +, left is variable, right is constant.
 fn forward_0_add_vc_fn(
     var: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
@@ -50,26 +30,8 @@ fn forward_0_add_vc_fn(
 }
 // ---------------------------------------------------------------------------
 // forward_0_add_vv_fn
-/// Stores the result of a zero order variable + variable
-/// operation in the tape.
-///
-/// # arg
-/// is a slice of size two containing the arguments for this addition.
-/// We use the notation
-/// <pre>
-///     lhs = arg[0]
-///     rhs = arg[1]
-/// </pre>
-///
-/// # res
-/// is the index in *var* where the result for this addition is placed.
-///
-/// # var
-/// is the vector of the zero order values for all the variables.
-/// It is changed in the following way
-/// <pre>
-///     var[res] = var[lhs] + var[rhs]
-/// </pre>
+/// The is a [ForwardZeroBinary] evaluattor where
+/// the both the left and right argument are variables.
 fn forward_0_add_vv_fn(
     var: &mut Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
