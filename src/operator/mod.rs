@@ -74,13 +74,17 @@ pub struct OpInfo {
     pub forward_0 : ForwardZero,
 }
 //
-// OP_INFO_VEC
+// op_info_vec
+/// set the value of OP_INFO_VEC
 fn op_info_vec() -> Vec<OpInfo> {
     let empty         = OpInfo{ name: "".to_string(), forward_0 : panic_fn };
     let mut result    = vec![empty ; NUMBER_OP ];
     add::set_op_info(&mut result);
     result
 }
+//
+// OP_INFO_VEC
+/// mapping from each operator [id] to it's [OpInfo]
 pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
    std::sync::LazyLock::new( || op_info_vec() );
 
