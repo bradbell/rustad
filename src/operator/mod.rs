@@ -17,21 +17,23 @@
 macro_rules! fold_binary_operator {
     ( $trait:ident , $op:tt ) => {
         //
-        impl std::ops::$trait<AD> for Float {
-            type Output = AD;
-            //
-            #[ doc = concat!(" compute Float ", stringify!($op), " AD") ]
-            fn add(self, rhs : AD) -> AD {
-                AD::from(self) $op rhs
+        paste::paste! {
+            impl std::ops::$trait<AD> for Float {
+                type Output = AD;
+                //
+                #[ doc = concat!(" compute Float ", stringify!($op), " AD") ]
+                fn [< $trait:lower >] (self, rhs : AD) -> AD {
+                    AD::from(self) $op rhs
+                }
             }
-        }
-        //
-        impl std::ops::$trait<Float> for AD {
-            type Output = AD;
             //
-            #[ doc = concat!(" compute AD ", stringify!($op), " Float") ]
-            fn add(self, rhs : Float) -> AD {
-                self $op AD::from(rhs)
+            impl std::ops::$trait<Float> for AD {
+                type Output = AD;
+                //
+                #[ doc = concat!(" compute AD ", stringify!($op), " Float") ]
+                fn [< $trait:lower >] (self, rhs : Float) -> AD {
+                    self $op AD::from(rhs)
+                }
             }
         }
     }
