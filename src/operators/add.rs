@@ -6,13 +6,13 @@
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
 use crate::AD;
-use crate::ADD_VC_OP;
-use crate::ADD_VV_OP;
 use crate::Float;
 use crate::Index;
-use crate::OpInfo;
 use crate::ad_tape::THIS_THREAD_TAPE;
 use crate::ad_tape::Tape;
+use crate::operator_id::ADD_VC_OP;
+use crate::operator_id::ADD_VV_OP;
+use crate::operators::OpInfo;
 // END_SORT_THIS_LINE_MINUS_1
 //
 #[cfg(doc)]

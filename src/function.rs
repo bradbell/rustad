@@ -7,7 +7,7 @@
 //
 use crate::Index;
 use crate::Float;
-use crate::OP_INFO_VEC;
+use crate::operators::OP_INFO_VEC;
 use crate::AD;
 use crate::ad_tape::THIS_THREAD_TAPE;
 use crate::ad_tape::NEXT_TAPE_ID;
