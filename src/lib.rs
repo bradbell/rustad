@@ -73,10 +73,7 @@ mod add_op;
 fn op_info_vec() -> Vec<OpInfo> {
     let empty         = OpInfo{ name: "".to_string(), fun : panic_eval_fn };
     let mut result    = vec![empty ; NUMBER_OP ];
-    result[ADD_VC_OP] =
-        OpInfo{ name : "add_vc".to_string() , fun : add_op::eval_add_vc_fn };
-    result[ADD_VV_OP] =
-        OpInfo{ name : "add_vv".to_string() , fun : add_op::eval_add_vv_fn };
+    add_op::set_op_info(&mut result);
     result
 }
 pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =

@@ -4,13 +4,20 @@
 //
 //! Store and compute for AD add operators.
 //
-use crate::Float;
-use crate::Index;
-use crate::ad_tape::Tape;
+// BEGIN_SORT_THIS_LINE_PLUS_1
 use crate::AD;
 use crate::ADD_VC_OP;
 use crate::ADD_VV_OP;
+use crate::Float;
+use crate::Index;
+use crate::OpInfo;
 use crate::ad_tape::THIS_THREAD_TAPE;
+use crate::ad_tape::Tape;
+// END_SORT_THIS_LINE_MINUS_1
+//
+#[cfg(doc)]
+use crate::operator_id;
+//
 // ---------------------------------------------------------------------------
 // eval_add_vc_fn
 /// Stores the result of a zero order variable + constant
@@ -67,6 +74,18 @@ pub(crate) fn eval_add_vv_fn(
     var: &mut Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
     var[ res ] = var[ arg[0] ] + var[ arg[1] ];
+}
+// ---------------------------------------------------------------------------
+// set_op_info
+/// Set the operator information for all the add operators.
+///
+/// # op_info_vec
+/// is a map from [operator_id] to operator information.
+pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
+    op_info_vec[ADD_VC_OP] =
+        OpInfo{ name : "add_vc".to_string() , fun : eval_add_vc_fn };
+    op_info_vec[ADD_VV_OP] =
+        OpInfo{ name : "add_vv".to_string() , fun : eval_add_vv_fn };
 }
 // ---------------------------------------------------------------------------
 // record_add
