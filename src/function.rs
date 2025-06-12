@@ -30,10 +30,10 @@ pub struct ADFun {
     /// The total number of variables in the operation sequence.
     pub(crate) n_var          : Index,
     //
-    // range
+    // range_index
     /// The variable index for each of the range variables in this function.
-    /// The dimension of its range spase is reange.len().
-    pub(crate) range          : Vec<Index>,
+    /// The dimension of its range spase is range_index.len().
+    pub(crate) range_index    : Vec<Index>,
     //
     // op_all
     /// This maps an operators index in the operation sequence
@@ -74,7 +74,7 @@ impl ADFun {
             op2arg        : Vec::new() ,
             arg_all       : Vec::new() ,
             con_all       : Vec::new() ,
-            range         : Vec::new() ,
+            range_index   : Vec::new() ,
         }
     }
     //
@@ -84,7 +84,7 @@ impl ADFun {
     //
     // len_range
     /// dimension of range space
-    pub fn len_range(&self) -> Index { self.range.len() }
+    pub fn len_range(&self) -> Index { self.range_index.len() }
     //
     // range_zero
     /// zero order forward mode function evaluation.
@@ -120,8 +120,8 @@ impl ADFun {
             }
         }
         let mut y : Vec<Float> = Vec::new();
-        for i in 0 .. self.range.len() {
-            y.push( var_vec[ self.range[i] ] );
+        for i in 0 .. self.range_index.len() {
+            y.push( var_vec[ self.range_index[i] ] );
         }
         y
     }
@@ -199,7 +199,7 @@ pub fn ad_fun( ay : &[AD] ) -> ADFun {
         std::mem::swap( &mut result.con_all,       &mut tape.con_all );
     } );
     for i in 0 .. ay.len() {
-        result.range.push( ay[i].var_index );
+        result.range_index.push( ay[i].var_index );
     }
     result
 }
