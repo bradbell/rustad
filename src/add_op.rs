@@ -43,7 +43,7 @@ use crate::operator_id;
 /// <pre>
 ///     var[res] = var[lhs] + con[rhs]
 /// </pre>
-pub(crate) fn eval_add_vc_fn(
+fn eval_add_vc_fn(
     var: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
     var[ res ] = var[ arg[0] ] + con[ arg[1] ];
@@ -70,7 +70,7 @@ pub(crate) fn eval_add_vc_fn(
 /// <pre>
 ///     var[res] = var[lhs] + var[rhs]
 /// </pre>
-pub(crate) fn eval_add_vv_fn(
+fn eval_add_vv_fn(
     var: &mut Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
     var[ res ] = var[ arg[0] ] + var[ arg[1] ];
