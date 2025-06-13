@@ -35,10 +35,12 @@ macro_rules! set_operator_ids {
 
 // Public usize constants for each operator.
 set_operator_ids!(
-    /// variable + variable
-    ADD_VV_OP,
+    /// constant + variable
+    ADD_CV_OP,
     /// variable + constant
     ADD_VC_OP,
+    /// variable + variable
+    ADD_VV_OP,
     /// number of operator identifiers
     NUMBER_OP,
 );

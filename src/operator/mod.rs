@@ -91,7 +91,7 @@ use id::NUMBER_OP;
 pub mod id;
 //
 #[cfg(test)]
-use id::{ADD_VC_OP, ADD_VV_OP};
+use id::{ ADD_CV_OP, ADD_VC_OP, ADD_VV_OP };
 //
 // add
 pub mod add;
@@ -169,6 +169,7 @@ pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
 #[test]
 fn test_op_info() {
     let op_info_vec = &*OP_INFO_VEC;
+    assert_eq!( "add_cv", op_info_vec[ADD_CV_OP].name );
     assert_eq!( "add_vc", op_info_vec[ADD_VC_OP].name );
     assert_eq!( "add_vv", op_info_vec[ADD_VV_OP].name );
 }

@@ -11,8 +11,7 @@ use crate::Index;
 use crate::ad_tape::THIS_THREAD_TAPE;
 use crate::ad_tape::Tape;
 use crate::operator::OpInfo;
-use crate::operator::id::ADD_VC_OP;
-use crate::operator::id::ADD_VV_OP;
+use crate::operator::id::{ADD_CV_OP, ADD_VC_OP, ADD_VV_OP};
 // END_SORT_THIS_LINE_MINUS_1
 //
 #[cfg(doc)]
@@ -20,6 +19,14 @@ use crate::operator;
 #[cfg(doc)]
 use crate::operator::ForwardZeroBinary;
 //
+// ---------------------------------------------------------------------------
+// forward_0_add_cv_fn
+/// [ForwardZeroBinary] were op is +, left is variable, right is constant.
+fn forward_0_add_cv_fn(
+    var: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
+    assert_eq!( arg.len(), 2);
+    var[ res ] = con[ arg[0] ] + var[ arg[1] ];
+}
 // ---------------------------------------------------------------------------
 // forward_0_add_vc_fn
 /// [ForwardZeroBinary] were op is +, left is variable, right is constant.
@@ -43,6 +50,8 @@ fn forward_0_add_vv_fn(
 /// # op_info_vec
 /// is a map from [operator::id] to operator information.
 pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
+    op_info_vec[ADD_CV_OP] =
+        OpInfo{ name : "add_cv".to_string() , forward_0 : forward_0_add_cv_fn };
     op_info_vec[ADD_VC_OP] =
         OpInfo{ name : "add_vc".to_string() , forward_0 : forward_0_add_vc_fn };
     op_info_vec[ADD_VV_OP] =
@@ -103,10 +112,10 @@ fn record_add(tape : &mut Tape, lhs : &AD, rhs : &AD) -> (Index, Index) {
                 } else {
                     new_var_index = tape.n_var;
                     tape.n_var   += 1;
-                    tape.id_all.push(ADD_VC_OP);
+                    tape.id_all.push(ADD_CV_OP);
                     tape.op2arg.push( tape.arg_all.len() );
-                    tape.arg_all.push( rhs.var_index );
                     tape.arg_all.push( tape.con_all.len() );
+                    tape.arg_all.push( rhs.var_index );
                     tape.con_all.push( lhs.value );
                 }
             }
