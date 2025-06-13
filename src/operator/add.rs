@@ -114,23 +114,4 @@ fn record_add(tape : &mut Tape, lhs : &AD, rhs : &AD) -> (Index, Index) {
     }
     (new_tape_id, new_var_index)
 }
-// ---------------------------------------------------------------------------
-impl std::ops::Add<AD> for AD {
-    type Output = AD;
-    //
-    /// compute AD + AD
-    fn add(self, rhs : AD) -> AD {
-        let new_value                     = self.value + rhs.value;
-        let ( new_tape_id, new_var_index) =
-            THIS_THREAD_TAPE.with_borrow_mut(
-                |tape| record_add(tape, &self, &rhs)
-        );
-        AD {
-            tape_id   : new_tape_id,
-            var_index : new_var_index,
-            value     : new_value,
-        }
-    }
-}
-
-fold_binary_operator!( Add, + );
+impl_binary_operator!( Add, + );

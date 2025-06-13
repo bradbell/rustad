@@ -4,34 +4,83 @@
 //
 //! operations for specific operators
 //
+#[cfg(doc)]
+use crate::ad_tape::Tape;
 //
-/// This macro implements the Float op AD and AD op Float cases
-/// by folding them into the AD + AD case.
-///
-/// # trait
+#[cfg(doc)]
+use crate::ad::AD;
+//
+//
+/// This macro implements the the following operations:
+/// <pre>
+///     AD    op AD
+///     Float op AD
+///     AD    op Float
+/// </pre>
+/// # Trait
 /// is the std::ops trait for this operator; e.g., Add .
 ///
 /// # op
 /// is the token for this operator; e.g., + .
 ///
-macro_rules! fold_binary_operator {
-    ( $trait:ident , $op:tt ) => {
+/// # record_*trait*
+/// The function record_*trait* must be defined locally where
+/// *trait* is a lower case version of Trait and it supports:
+/// <pre>
+///     (new_tape_id, new_var_id) = record_trait(tape, &lhs, &rhs)
+/// </pre>
+///
+/// ## tape
+/// is the [Tape] where this operation will be placed or found.
+///
+/// ## lhs
+/// is the left side [AD] operand for this operation.
+///
+/// ## rhs
+/// is the right side [AD] operand for this operation.
+///
+/// ## new_tape_id
+/// is the tape_id for the *tape* . If it is zero,
+/// the result is a constant and was not recorded.
+///
+/// ## new_var_id
+/// is the variableindex for the result of this operatrion.
+///
+macro_rules! impl_binary_operator {
+    ( $Trait:ident , $op:tt ) => {
         //
         paste::paste! {
-            impl std::ops::$trait<AD> for Float {
+            impl std::ops::Add<AD> for AD {
+                type Output = AD;
+                //
+                #[ doc = concat!(" compute AD ", stringify!($op), " AD") ]
+                fn [< $Trait:lower >] (self, rhs : AD) -> AD {
+                    let new_value = self.value $op rhs.value;
+                    let ( new_tape_id, new_var_index) =
+                    THIS_THREAD_TAPE.with_borrow_mut(
+                        |tape| [< record_ $Trait:lower >] (tape, &self, &rhs)
+                    );
+                    AD {
+                        tape_id   : new_tape_id,
+                        var_index : new_var_index,
+                        value     : new_value,
+                    }
+                }
+            }
+            impl std::ops::$Trait<AD> for Float {
                 type Output = AD;
                 //
                 #[ doc = concat!(" compute Float ", stringify!($op), " AD") ]
-                fn [< $trait:lower >] (self, rhs : AD) -> AD {
+                fn [< $Trait:lower >] (self, rhs : AD) -> AD {
                     AD::from(self) $op rhs
                 }
             }
             //
-            impl std::ops::$trait<Float> for AD {
+            impl std::ops::$Trait<Float> for AD {
                 type Output = AD;
                 //
                 #[ doc = concat!(" compute AD ", stringify!($op), " Float") ]
-                fn [< $trait:lower >] (self, rhs : Float) -> AD {
+                fn [< $Trait:lower >] (self, rhs : Float) -> AD {
                     self $op AD::from(rhs)
                 }
             }
