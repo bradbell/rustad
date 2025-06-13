@@ -24,6 +24,25 @@ fn test_add_vv() {
     assert_eq!( dy[1], dx[1] + dx[2] );
 }
 
+fn test_mul_vv() {
+    let x  : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
+    let dx : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
+    let ax      = function::ad_domain(&x);
+    let ay_0    = ax[0] * ax[1];
+    let ay_1    = ax[1] * ax[2];
+    let ay      = vec! [ ay_0, ay_1 ];
+    let f       = function::ad_fun(&ay);
+    let trace   = false;
+    let (y, v0) = f.forward_zero(&x, trace);
+    let dy      = f.forward_one(&dx, &v0, trace);
+    //
+    assert_eq!( y[0], x[0] * x[1] );
+    assert_eq!( y[1], x[1] * x[2] );
+    //
+    assert_eq!( dy[0], dx[0] * x[1] + x[0] * dx[1] );
+    assert_eq!( dy[1], dx[1] * x[2] + x[1] * dx[2] );
+}
+
 fn bench( name : &String, test_case : fn() ) {
     let total_seconds = 0.25;
     let seconds  = rustad::utility::avg_seconds( test_case, total_seconds );
@@ -34,4 +53,5 @@ fn bench( name : &String, test_case : fn() ) {
 
 fn main() {
     bench( &"test_add_vv".to_string() , test_add_vv );
+    bench( &"test_mul_vv".to_string() , test_mul_vv );
 }
