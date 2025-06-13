@@ -16,19 +16,22 @@ use crate::ad_tape::NEXT_TAPE_ID;
 use crate::operator;
 //
 // ADFun
+/// This object can evaluate an operation sequence amd its derivatives.
+///
+/// # Operation sequence
+/// An operation sequence is a single assignment representation of
+/// the function; i.e., a variable is only assigned once.
+///
+/// # Constructor
 /// An [ad_domain] call is used to start a recording an operation sequence.
 /// An [ad_fun] call is used to stop recording move the operation sequence
 /// to an new ADFun object.
-/// This object can evaluate the function and its derivatives.
-/// The operation sequence is a single assignment representation of
-/// the function; i.e., a variable is only assigned once.
 pub struct ADFun {
     //
     // n_domain
     /// The dimension of the domain space for this function.
     /// The domain variables have index 0 .. n_domain-1.
     pub(crate) n_domain       : Index,
-    /// The total number of variables in this function.
     //
     // n_var
     /// The total number of variables in the operation sequence.
@@ -93,20 +96,34 @@ impl ADFun {
     // forward_zero
     /// zero order forward mode function evaluation.
     ///
-    /// # domain
+    /// # Syntax
     /// specifies the domain space variable values
+    /// <pre>
+    ///     (range, var_zero) = f.forward(domain, trace)
+    /// </pre>
+    ///
+    /// # f
+    /// is is this ADFun object.
     ///
     /// # trace
     /// if true, a trace of the operatiopn sequence is printed on stdout.
     ///
-    /// # forward_zero
-    /// The return valueis the range vector corresponding to domain; i.e.,
-    /// the function value.
-    pub fn forward_zero(&self, domain : &[Float] , trace : bool) -> Vec<Float> {
+    /// # range
+    /// The first return value is the range vector corresponding to domain;
+    /// i.e., the function value correspdong the operation sequence.
+    ///
+    /// # var_zero
+    /// The second return value is the value for all the variables
+    /// in the operation sequence. This is needed to compute derivatives.
+    pub fn forward_zero(
+        &self,
+        domain : &[Float],
+        trace  : bool
+    ) -> ( Vec<Float> , Vec<Float> ) {
         let op_info_vec = &*OP_INFO_VEC;
-        let mut var_vec = vec![ Float::NAN; self.n_var ];
+        let mut var_zero = vec![ Float::NAN; self.n_var ];
         for j in 0 .. self.n_domain {
-            var_vec[j] = domain[j];
+            var_zero[j] = domain[j];
         }
         for op_index in 0 .. self.id_all.len() {
             let op_id     = self.id_all[op_index];
@@ -115,19 +132,19 @@ impl ADFun {
             let arg       = &self.arg_all[start .. end];
             let res       = self.n_domain + op_index;
             let forward_0 = op_info_vec[op_id].forward_0;
-            forward_0(&mut var_vec, &self.con_all, &arg, res );
+            forward_0(&mut var_zero, &self.con_all, &arg, res );
             if trace {
                 let name = &op_info_vec[op_id].name;
                 println!(
-                    "{:?}, {:?}, {:?}, {:?}", res, name, arg, var_vec[res]
+                    "{:?}, {:?}, {:?}, {:?}", res, name, arg, var_zero[res]
                 );
             }
         }
         let mut range : Vec<Float> = Vec::new();
         for i in 0 .. self.range_index.len() {
-            range.push( var_vec[ self.range_index[i] ] );
+            range.push( var_zero[ self.range_index[i] ] );
         }
-        range
+        ( range, var_zero )
     }
 }
 //

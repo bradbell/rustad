@@ -14,7 +14,7 @@ fn test_add_vv() {
     let ay     = vec! [ ay_0, ay_1 ];
     let f      = function::ad_fun(&ay);
     let trace  = false;
-    let y      = f.forward_zero(&x, trace);
+    let (y, _v0) = f.forward_zero(&x, trace);
     assert_eq!( y[0], x[0] + x[1] );
     assert_eq!( y[1], x[1] + x[2] );
 }
@@ -27,7 +27,7 @@ fn test_add_vc() {
     let ay     = vec! [ ay_0 ];
     let f      = function::ad_fun(&ay);
     let trace  = false;
-    let y      = f.forward_zero(&x, trace);
+    let (y, _v0) = f.forward_zero(&x, trace);
     assert_eq!( y[0], x[0] + 5.0 );
 }
 
@@ -39,6 +39,6 @@ fn test_add_cv() {
     let ay     = vec! [ ay_0 ];
     let f      = function::ad_fun(&ay);
     let trace  = false;
-    let y      = f.forward_zero(&x, trace);
+    let (y, _v0) = f.forward_zero(&x, trace);
     assert_eq!( y[0], 5.0 + x[1] );
 }
