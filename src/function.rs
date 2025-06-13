@@ -99,7 +99,7 @@ impl ADFun {
     /// # Syntax
     /// specifies the domain space variable values
     /// <pre>
-    ///     (range_zero, var_zero) = f.forward(domain, trace)
+    ///     (range_zero, var_zero) = f.forward(domain_zero, trace)
     /// </pre>
     ///
     /// # f
@@ -109,7 +109,8 @@ impl ADFun {
     /// if true, a trace of the operatiopn sequence is printed on stdout.
     ///
     /// # range_zero
-    /// The first return value is the range vector corresponding to domain;
+    /// The first return value is the range vector corresponding to
+    /// domain_zero;
     /// i.e., the function value correspdong the operation sequence.
     ///
     /// # var_zero
@@ -117,21 +118,26 @@ impl ADFun {
     /// in the operation sequence. This is needed to compute derivatives.
     pub fn forward_zero(
         &self,
-        domain : &[Float],
-        trace  : bool
+        domain_zero : &[Float],
+        trace       : bool
     ) -> ( Vec<Float> , Vec<Float> ) {
+        assert_eq!(
+            domain_zero.len(), self.n_domain,
+            "f.forward_one: domain_zero length does not match f"
+        );
+        //
         let op_info_vec = &*OP_INFO_VEC;
         let mut var_zero = vec![ Float::NAN; self.n_var ];
         for j in 0 .. self.n_domain {
-            var_zero[j] = domain[j];
+            var_zero[j] = domain_zero[j];
         }
         if trace {
             println!( "constant" );
             for j in 0 .. self.con_all.len() {
                 println!( "{:?}, {:?}", j, self.con_all[j] );
             }
-            println!( "domain" );
-            for j in 0 .. domain.len() {
+            println!( "domain_zero" );
+            for j in 0 .. domain_zero.len() {
                 println!( "{:?}, {:?}", j, var_zero[j] );
             }
         }
@@ -164,7 +170,14 @@ impl ADFun {
         var_zero   : &Vec<Float>,
         trace      : bool
     ) -> Vec<Float> {
-        assert_eq!( domain_one.len(),  self.n_domain );
+        assert_eq!(
+            domain_one.len(), self.n_domain,
+            "f.forward_one: domain_one length does not match f"
+        );
+        assert_eq!(
+            var_zero.len(), self.n_var,
+            "f.forward_one: var_zero length does not match f"
+         );
         //
         let op_info_vec = &*OP_INFO_VEC;
         let mut var_one = vec![ Float::NAN; self.n_var ];
@@ -176,7 +189,7 @@ impl ADFun {
             for j in 0 .. self.con_all.len() {
                 println!( "{:?}, {:?}", j, self.con_all[j] );
             }
-            println!( "domain" );
+            println!( "(domain_zero, domain_one)" );
             for j in 0 .. domain_one.len() {
                 println!( "{:?}, ({:?}, {:?})", j, var_zero[j], var_one[j] );
             }
