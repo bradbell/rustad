@@ -134,14 +134,15 @@ impl ADFun {
             var_zero[j] = domain_zero[j];
         }
         if trace {
-            println!( "constant" );
+            println!( "index, constant" );
             for j in 0 .. self.con_all.len() {
                 println!( "{:?}, {:?}", j, self.con_all[j] );
             }
-            println!( "domain_zero" );
+            println!( "index, domain_zero" );
             for j in 0 .. domain_zero.len() {
                 println!( "{:?}, {:?}", j, var_zero[j] );
             }
+            println!( "res. name, arg,. var_zero" );
         }
         for op_index in 0 .. self.id_all.len() {
             let op_id     = self.id_all[op_index];
@@ -213,14 +214,15 @@ impl ADFun {
             var_one[j] = domain_one[j];
         }
         if trace {
-            println!( "constant" );
+            println!( "index, constant" );
             for j in 0 .. self.con_all.len() {
                 println!( "{:?}, {:?}", j, self.con_all[j] );
             }
-            println!( "(domain_zero, domain_one)" );
+            println!( "index, domain_zero, domain_one" );
             for j in 0 .. domain_one.len() {
-                println!( "{:?}, ({:?}, {:?})", j, var_zero[j], var_one[j] );
+                println!( "{:?}, [{:?}, {:?}]", j, var_zero[j], var_one[j] );
             }
+            println!( "res, name, arg, var_zero[res]. var_one[res]" )
         }
         for op_index in 0 .. self.id_all.len() {
             let op_id     = self.id_all[op_index];
@@ -233,7 +235,7 @@ impl ADFun {
             if trace {
                 let name = &op_info_vec[op_id].name;
                 println!(
-                    "{:?}, {:?}, {:?}, ({:?}, {:?})",
+                    "{:?}, {:?}, {:?}, [{:?}, {:?}]",
                     res, name, arg, var_zero[res], var_one[res]
                 );
             }
