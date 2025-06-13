@@ -9,44 +9,59 @@ use crate::ad_tape::Tape;
 //
 #[cfg(doc)]
 use crate::ad::AD;
+#[cfg(doc)]
+use crate::ad_tape::THIS_THREAD_TAPE;
 //
-//
-/// This macro implements the the following operations:
+// impl_binary_operator
+/// This macro implements the the following binary operations:
 /// <pre>
 ///     AD    op AD
 ///     Float op AD
 ///     AD    op Float
 /// </pre>
+/// This include storing the operation in the [THIS_THREAD_TAPE] .
+///
 /// # Trait
 /// is the std::ops trait for this operator; e.g., Add .
 ///
 /// # op
 /// is the token for this operator; e.g., + .
 ///
-/// # record_*trait*
-/// The function record_*trait* must be defined locally where
-/// *trait* is a lower case version of Trait and it supports:
-/// <pre>
-///     (new_tape_id, new_var_id) = record_trait(tape, &lhs, &rhs)
-/// </pre>
-///
-/// ## tape
-/// is the [Tape] where this operation will be placed or found.
-///
-/// ## lhs
-/// is the left side [AD] operand for this operation.
-///
-/// ## rhs
-/// is the right side [AD] operand for this operation.
-///
-/// ## new_tape_id
-/// is the tape_id for the *tape* . If it is zero,
-/// the result is a constant and was not recorded.
-///
-/// ## new_var_id
-/// is the variableindex for the result of this operatrion.
-///
 macro_rules! impl_binary_operator { ($Trait:ident, $op:tt) => {paste::paste! {
+    //
+    #[ doc = concat!(" record an ", stringify!($Trait), " operation ") ]
+    fn [< record_ $Trait:lower >] (tape: &mut Tape, lhs: &AD, rhs: &AD) ->
+    (Index, Index) {
+        let mut new_tape_id   = 0;
+        let mut new_var_index = 0;
+        if tape.recording {
+            let var_lhs    = lhs.tape_id == tape.tape_id;
+            let var_rhs    = rhs.tape_id == tape.tape_id;
+            if var_lhs || var_rhs {
+                new_tape_id   = tape.tape_id;
+                new_var_index = tape.n_var;
+                tape.n_var   += 1;
+                tape.op2arg.push( tape.arg_all.len() );
+                if var_lhs && var_rhs {
+                    tape.id_all.push( [< $Trait:upper _VV_OP >] );
+                    tape.arg_all.push( lhs.var_index );
+                    tape.arg_all.push( rhs.var_index );
+                } else if var_lhs {
+                    tape.id_all.push( [< $Trait:upper _VC_OP >] );
+                    tape.arg_all.push( lhs.var_index );
+                    tape.arg_all.push( tape.con_all.len() );
+                    tape.con_all.push( rhs.value );
+                } else {
+                    tape.id_all.push( [< $Trait:upper _CV_OP >] );
+                    tape.arg_all.push( tape.con_all.len() );
+                    tape.con_all.push( lhs.value );
+                    tape.arg_all.push( rhs.var_index );
+                }
+            }
+        }
+        (new_tape_id, new_var_index)
+    }
+    //
     impl std::ops::Add<AD> for AD {
         type Output = AD;
         //
@@ -64,6 +79,7 @@ macro_rules! impl_binary_operator { ($Trait:ident, $op:tt) => {paste::paste! {
             }
         }
     }
+    //
     impl std::ops::$Trait<AD> for Float {
         type Output = AD;
         //
