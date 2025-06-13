@@ -23,25 +23,25 @@ use crate::operator::ForwardZeroBinary;
 // forward_0_add_cv_fn
 /// [ForwardZeroBinary] were op is +, left is constant, right is variable.
 fn forward_0_add_cv_fn(
-    var: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
+    var_zero: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
-    var[ res ] = con[ arg[0] ] + var[ arg[1] ];
+    var_zero[ res ] = con[ arg[0] ] + var_zero[ arg[1] ];
 }
-// ---------------------------------------------------------------------------
+//
 // forward_0_add_vc_fn
 /// [ForwardZeroBinary] were op is +, left is variable, right is constant.
 fn forward_0_add_vc_fn(
-    var: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
+    var_zero: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
-    var[ res ] = var[ arg[0] ] + con[ arg[1] ];
+    var_zero[ res ] = var_zero[ arg[0] ] + con[ arg[1] ];
 }
-// ---------------------------------------------------------------------------
+//
 // forward_0_add_vv_fn
 /// [ForwardZeroBinary] where op is +, left is variable, right is variable.
 fn forward_0_add_vv_fn(
-    var: &mut Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
+    var_zero: &mut Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
-    var[ res ] = var[ arg[0] ] + var[ arg[1] ];
+    var_zero[ res ] = var_zero[ arg[0] ] + var_zero[ arg[1] ];
 }
 // ---------------------------------------------------------------------------
 // set_op_info
