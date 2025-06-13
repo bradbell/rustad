@@ -68,6 +68,32 @@ fn forward_1_add_vv_fn(var_one: &mut Vec<Float>,
     assert_eq!( arg.len(), 2);
     var_one[ res ] = var_one[ arg[0] ] + var_one[ arg[1] ];
 }
+//
+// ---------------------------------------------------------------------------
+// reverse_1_add_cv_fn
+/// [ForwardOneBinary]  were op is +, left is constant, right is variable.
+fn reverse_1_add_cv_fn(rev_one: &mut Vec<Float>,
+    _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
+    assert_eq!( arg.len(), 2);
+    rev_one[ arg[1] ] += rev_one[ res ];
+}
+//
+// reverse_1_add_vc_fn
+/// [ForwardOneBinary]  were op is +, left is variable, right is constant.
+fn reverse_1_add_vc_fn(rev_one: &mut Vec<Float>,
+    _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
+    assert_eq!( arg.len(), 2);
+    rev_one[ arg[0] ] += rev_one[ res ];
+}
+//
+// reverse_1_add_vv_fn
+/// [ForwardOneBinary]  where op is +, left is variable, right is variable.
+fn reverse_1_add_vv_fn(rev_one: &mut Vec<Float>,
+    _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
+    assert_eq!( arg.len(), 2);
+    rev_one[ arg[0] ] += rev_one[ res ];
+    rev_one[ arg[1] ] += rev_one[ res ];
+}
 // ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the add operators.
@@ -79,16 +105,19 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         name      : "add_cv".to_string() ,
         forward_0 : forward_0_add_cv_fn,
         forward_1 : forward_1_add_cv_fn,
+        reverse_1 : reverse_1_add_cv_fn,
      };
     op_info_vec[ADD_VC_OP] = OpInfo{
         name      : "add_vc".to_string(),
         forward_0 : forward_0_add_vc_fn,
         forward_1 : forward_1_add_vc_fn,
+        reverse_1 : reverse_1_add_vc_fn,
     };
     op_info_vec[ADD_VV_OP] = OpInfo{
         name      : "add_vv".to_string(),
         forward_0 : forward_0_add_vv_fn,
         forward_1 : forward_1_add_vv_fn,
+        reverse_1 : reverse_1_add_vv_fn,
     };
 }
 impl_binary_operator!( Add, + );

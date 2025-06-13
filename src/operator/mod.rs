@@ -133,6 +133,12 @@ pub type ForwardZero = fn(_var_zero: &mut Vec<Float>,
 pub type ForwardOne = fn(_var_one: &mut Vec<Float>,
     _var_zero: &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
+//
+// ReverseOne
+/// Evaluate first order reverse for one operation in the operation sequence.
+pub type ReverseOne = fn(_rev_one: &mut Vec<Float>,
+    _var_zero: &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+);
 // ---------------------------------------------------------------------------
 //
 // ForwardZeroBinary
@@ -209,6 +215,49 @@ pub type ForwardZeroBinary = fn(_var_zero: &mut Vec<Float>,
 pub type ForwardOneBinary = fn(_var_one: &mut Vec<Float>,
     _var_zero : &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
+//
+// ReverseOneBinary
+/// This is a [ReverseOne] with the following extra conditions:
+///
+/// # op
+/// we use the notation *op* for this operator's symbol; e.g. + for addition.
+///
+/// # arg
+/// is a slice of size two.  We use the notation
+/// <pre>
+///     lhs = arg[0]
+///     rhs = arg[1]
+/// </pre>
+///
+/// # res
+/// is the index in *var_one* where the result for this operator is placed.
+///
+/// # var_zero
+/// is the vector of the zero order values for all the variables.
+/// If both left and right are variables:
+/// <pre>
+///     var_zero[res] = var_zero[lhs] op var_zero[rhs]
+/// </pre>
+/// If left is a variable and the right is a constant:
+/// <pre>
+///     var_zero[res] = var_zero[lhs] op con[rhs]
+/// </pre>
+/// If left is a constant and the right is a variable:
+/// <pre>
+///     var_zero[res] = con[lhs] op var_zero[rhs]
+/// </pre>
+///
+/// # rev_one
+/// Reverse mode computes derivatives of a weighted sum of the
+/// range components.
+/// On input *rev_one* contains the derivative w.r.t. the variables
+/// up to and including *res* .
+/// Upon return, the variable with index *res* has been removed by
+/// expressing it as a function of the variables with lower indices.
+#[cfg(doc)]
+pub type ReverseOneBinary = fn(_var_one: &mut Vec<Float>,
+    _var_zero : &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+);
 // ---------------------------------------------------------------------------
 //
 // panic_zero
@@ -219,7 +268,8 @@ fn panic_zero( _var_zero: &mut Vec<Float>,
 }
 //
 // panic_one
-/// default [ForwardOne] function that will panic if it does not get replaced.
+/// default [ForwardOne] or [ReverseOne] function that will panic
+/// if it does not get replaced.
 fn panic_one( _var_one: &mut Vec<Float>,
     _var_zero : &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
@@ -233,6 +283,7 @@ pub struct OpInfo {
     pub name      : String,
     pub forward_0 : ForwardZero,
     pub forward_1 : ForwardOne,
+    pub reverse_1 : ReverseOne,
 }
 //
 // op_info_vec
@@ -242,6 +293,7 @@ fn op_info_vec() -> Vec<OpInfo> {
         name: "".to_string(),
         forward_0 : panic_zero,
         forward_1 : panic_one,
+        reverse_1 : panic_one,
     };
     let mut result    = vec![empty ; NUMBER_OP ];
     add::set_op_info(&mut result);

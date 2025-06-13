@@ -70,6 +70,31 @@ fn forward_1_mul_vv_fn(var_one: &mut Vec<Float>,
     var_one[ res ] += var_one[ arg[0] ] * var_zero[ arg[1] ];
 }
 // ---------------------------------------------------------------------------
+// reverse_1_mul_cv_fn
+/// ForwardOneBinary were op is *, left is constant, right is variable.
+fn reverse_1_mul_cv_fn(rev_one: &mut Vec<Float>,
+    _var_zero: &Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
+    assert_eq!( arg.len(), 2);
+    rev_one[ arg[1] ] += rev_one[res] * con[ arg[0] ];
+}
+//
+// reverse_1_mul_vc_fn
+/// ForwardOneBinary were op is *, left is variable, right is constant.
+fn reverse_1_mul_vc_fn(rev_one: &mut Vec<Float>,
+    _var_zero: &Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
+    assert_eq!( arg.len(), 2);
+    rev_one[ arg[0] ] += rev_one[res] * con[ arg[0] ];
+}
+//
+// reverse_1_mul_vv_fn
+/// ForwardZeroBinary where op is *, left is variable, right is variable.
+fn reverse_1_mul_vv_fn(rev_one: &mut Vec<Float>,
+    var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
+    assert_eq!( arg.len(), 2);
+    rev_one[ arg[0] ] += rev_one[res] * var_zero[ arg[1] ];
+    rev_one[ arg[1] ] += rev_one[res] * var_zero[ arg[0] ];
+}
+// ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the mul operators.
 ///
@@ -80,16 +105,19 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         name      : "mul_cv".to_string() ,
         forward_0 : forward_0_mul_cv_fn,
         forward_1 : forward_1_mul_cv_fn,
+        reverse_1 : reverse_1_mul_cv_fn,
      };
     op_info_vec[MUL_VC_OP] = OpInfo{
         name      : "mul_vc".to_string(),
         forward_0 : forward_0_mul_vc_fn,
         forward_1 : forward_1_mul_vc_fn,
+        reverse_1 : reverse_1_mul_vc_fn,
     };
     op_info_vec[MUL_VV_OP] = OpInfo{
         name      : "mul_vv".to_string(),
         forward_0 : forward_0_mul_vv_fn,
         forward_1 : forward_1_mul_vv_fn,
+        reverse_1 : reverse_1_mul_vv_fn,
     };
 }
 impl_binary_operator!( Mul, * );

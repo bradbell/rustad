@@ -62,6 +62,7 @@ pub struct ADFun {
     /// to evaluate the function.
     pub(crate) con_all        : Vec<Float>,
 }
+// ---------------------------------------------------------------------------
 impl ADFun {
     //
     // new
@@ -93,6 +94,7 @@ impl ADFun {
     /// dimension of range space
     pub fn len_range(&self) -> Index { self.range_index.len() }
     //
+    // -----------------------------------------------------------------------
     // forward_zero
     /// zero order forward mode function evaluation.
     ///
@@ -125,7 +127,7 @@ impl ADFun {
     ) -> ( Vec<Float> , Vec<Float> ) {
         assert_eq!(
             domain_zero.len(), self.n_domain,
-            "f.forward_one: domain_zero length does not match f"
+            "f.forward_zero: domain_zero length does not match f"
         );
         //
         let op_info_vec = &*OP_INFO_VEC;
@@ -165,7 +167,7 @@ impl ADFun {
         }
         ( range_zero, var_zero )
     }
-    //
+    // -----------------------------------------------------------------------
     // forward_one
     /// first order forward mode function evaluation.
     ///
@@ -245,6 +247,85 @@ impl ADFun {
             range_one.push( var_one[ self.range_index[i] ] );
         }
         range_one
+    }
+    // -------------------------------------------------------------------
+    // reverse_one
+    /// first order reverse mode function evaluation.
+    ///
+    /// # Syntax
+    /// <pre>
+    ///     domain_one = f.reverse_one(range_one, var_zero, trace)
+    /// </pre>
+    ///
+    /// # f
+    /// is is this ADFun object.
+    ///
+    /// # ramge_one
+    /// specifies the gradient of the scalar function of range variables.
+    ///
+    /// # var_zero
+    /// is the value for all the variables in the operation sequence.
+    /// This is returned at the end of a [forward_zero](ADFun::forward_zero)
+    /// computation.
+    ///
+    /// # trace
+    /// if true, a trace of the operatiopn sequence is printed on stdout.
+    ///
+    /// # domain_one
+    /// The return value is the derivative of the scalar function
+    /// with respect to the domain variables.
+    pub fn reverse_one(
+        &self,
+        range_one  : &[Float],
+        var_zero   : &Vec<Float>,
+        trace      : bool
+    ) -> Vec<Float> {
+        assert_eq!(
+            range_one.len(), self.range_index.len(),
+            "f.reverse_one: range_one length does not match f"
+        );
+        assert_eq!(
+            var_zero.len(), self.n_var,
+            "f.reverse_one: var_zero length does not match f"
+         );
+        //
+        let op_info_vec = &*OP_INFO_VEC;
+        let mut rev_one = vec![ Float::NAN; self.n_var ];
+        for j in 0 .. self.range_index.len() {
+            rev_one[j] = range_one[j];
+        }
+        if trace {
+            println!( "index, constant" );
+            for j in 0 .. self.con_all.len() {
+                println!( "{:?}, {:?}", j, self.con_all[j] );
+            }
+            println!( "index, range_zero, range_one" );
+            for j in 0 .. range_one.len() {
+                println!( "{:?}, [{:?}, {:?}]", j, var_zero[j], rev_one[j] );
+            }
+            println!( "res, name, arg, var_zero[res]. rev_one[res]" )
+        }
+        for op_index in ( 0 .. self.id_all.len() ).rev() {
+            let op_id     = self.id_all[op_index];
+            let start     = self.op2arg[op_index];
+            let end       = self.op2arg[op_index + 1];
+            let arg       = &self.arg_all[start .. end];
+            let res       = self.n_domain + op_index;
+            let reverse_1 = op_info_vec[op_id].reverse_1;
+            reverse_1(&mut rev_one, var_zero, &self.con_all, &arg, res );
+            if trace {
+                let name = &op_info_vec[op_id].name;
+                println!(
+                    "{:?}, {:?}, {:?}, [{:?}, {:?}]",
+                    res, name, arg, var_zero[res], rev_one[res]
+                );
+            }
+        }
+        let mut domain_one : Vec<Float> = Vec::new();
+        for j in 0 .. self.n_domain {
+            domain_one.push( rev_one[j] );
+        }
+        domain_one
     }
 }
 //
