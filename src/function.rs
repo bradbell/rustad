@@ -250,7 +250,7 @@ impl ADFun {
     }
     // -------------------------------------------------------------------
     // reverse_one
-    /// first order reverse mode function evaluation.
+    /// first order reverse mode evaluation of partial dervatives.
     ///
     /// # Syntax
     /// <pre>
@@ -261,7 +261,7 @@ impl ADFun {
     /// is is this ADFun object.
     ///
     /// # ramge_one
-    /// specifies the gradient of the scalar function of range variables.
+    /// specifies the partials of as scalar function of range variables.
     ///
     /// # var_zero
     /// is the value for all the variables in the operation sequence.
@@ -272,7 +272,7 @@ impl ADFun {
     /// if true, a trace of the operatiopn sequence is printed on stdout.
     ///
     /// # domain_one
-    /// The return value is the derivative of the scalar function
+    /// The return value is the partials of the scalar function
     /// with respect to the domain variables.
     pub fn reverse_one(
         &self,
@@ -290,9 +290,9 @@ impl ADFun {
          );
         //
         let op_info_vec = &*OP_INFO_VEC;
-        let mut rev_one = vec![ Float::NAN; self.n_var ];
+        let mut partial = vec![0.0; self.n_var ];
         for j in 0 .. self.range_index.len() {
-            rev_one[j] = range_one[j];
+            partial[ self.range_index[j] ] += range_one[j];
         }
         if trace {
             println!( "index, constant" );
@@ -301,9 +301,9 @@ impl ADFun {
             }
             println!( "index, range_zero, range_one" );
             for j in 0 .. range_one.len() {
-                println!( "{:?}, [{:?}, {:?}]", j, var_zero[j], rev_one[j] );
+                println!( "{:?}, [{:?}, {:?}]", j, var_zero[j], partial[j] );
             }
-            println!( "res, name, arg, var_zero[res]. rev_one[res]" )
+            println!( "res, name, arg, var_zero[res]. partial[res]" )
         }
         for op_index in ( 0 .. self.id_all.len() ).rev() {
             let op_id     = self.id_all[op_index];
@@ -312,18 +312,18 @@ impl ADFun {
             let arg       = &self.arg_all[start .. end];
             let res       = self.n_domain + op_index;
             let reverse_1 = op_info_vec[op_id].reverse_1;
-            reverse_1(&mut rev_one, var_zero, &self.con_all, &arg, res );
+            reverse_1(&mut partial, var_zero, &self.con_all, &arg, res );
             if trace {
                 let name = &op_info_vec[op_id].name;
                 println!(
                     "{:?}, {:?}, {:?}, [{:?}, {:?}]",
-                    res, name, arg, var_zero[res], rev_one[res]
+                    res, name, arg, var_zero[res], partial[res]
                 );
             }
         }
         let mut domain_one : Vec<Float> = Vec::new();
         for j in 0 .. self.n_domain {
-            domain_one.push( rev_one[j] );
+            domain_one.push( partial[j] );
         }
         domain_one
     }

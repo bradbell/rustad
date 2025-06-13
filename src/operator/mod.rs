@@ -136,7 +136,7 @@ pub type ForwardOne = fn(_var_one: &mut Vec<Float>,
 //
 // ReverseOne
 /// Evaluate first order reverse for one operation in the operation sequence.
-pub type ReverseOne = fn(_rev_one: &mut Vec<Float>,
+pub type ReverseOne = fn(_partial: &mut Vec<Float>,
     _var_zero: &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
 // ---------------------------------------------------------------------------
@@ -247,10 +247,10 @@ pub type ForwardOneBinary = fn(_var_one: &mut Vec<Float>,
 ///     var_zero[res] = con[lhs] op var_zero[rhs]
 /// </pre>
 ///
-/// # rev_one
-/// Reverse mode computes derivatives of a weighted sum of the
-/// range components.
-/// On input *rev_one* contains the derivative w.r.t. the variables
+/// # partial
+/// Reverse mode computes the partial derivatives of a scalar function of the
+/// range vector.
+/// On input *partial* contains the derivative w.r.t. the variables
 /// up to and including *res* .
 /// Upon return, the variable with index *res* has been removed by
 /// expressing it as a function of the variables with lower indices.

@@ -72,27 +72,27 @@ fn forward_1_add_vv_fn(var_one: &mut Vec<Float>,
 // ---------------------------------------------------------------------------
 // reverse_1_add_cv_fn
 /// [ForwardOneBinary]  were op is +, left is constant, right is variable.
-fn reverse_1_add_cv_fn(rev_one: &mut Vec<Float>,
+fn reverse_1_add_cv_fn(partial: &mut Vec<Float>,
     _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
-    rev_one[ arg[1] ] += rev_one[ res ];
+    partial[ arg[1] ] += partial[ res ];
 }
 //
 // reverse_1_add_vc_fn
 /// [ForwardOneBinary]  were op is +, left is variable, right is constant.
-fn reverse_1_add_vc_fn(rev_one: &mut Vec<Float>,
+fn reverse_1_add_vc_fn(partial: &mut Vec<Float>,
     _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
-    rev_one[ arg[0] ] += rev_one[ res ];
+    partial[ arg[0] ] += partial[ res ];
 }
 //
 // reverse_1_add_vv_fn
 /// [ForwardOneBinary]  where op is +, left is variable, right is variable.
-fn reverse_1_add_vv_fn(rev_one: &mut Vec<Float>,
+fn reverse_1_add_vv_fn(partial: &mut Vec<Float>,
     _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
-    rev_one[ arg[0] ] += rev_one[ res ];
-    rev_one[ arg[1] ] += rev_one[ res ];
+    partial[ arg[0] ] += partial[ res ];
+    partial[ arg[1] ] += partial[ res ];
 }
 // ---------------------------------------------------------------------------
 // set_op_info

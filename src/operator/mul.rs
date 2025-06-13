@@ -72,27 +72,27 @@ fn forward_1_mul_vv_fn(var_one: &mut Vec<Float>,
 // ---------------------------------------------------------------------------
 // reverse_1_mul_cv_fn
 /// ForwardOneBinary were op is *, left is constant, right is variable.
-fn reverse_1_mul_cv_fn(rev_one: &mut Vec<Float>,
+fn reverse_1_mul_cv_fn(partial: &mut Vec<Float>,
     _var_zero: &Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
-    rev_one[ arg[1] ] += rev_one[res] * con[ arg[0] ];
+    partial[ arg[1] ] += partial[res] * con[ arg[0] ];
 }
 //
 // reverse_1_mul_vc_fn
 /// ForwardOneBinary were op is *, left is variable, right is constant.
-fn reverse_1_mul_vc_fn(rev_one: &mut Vec<Float>,
+fn reverse_1_mul_vc_fn(partial: &mut Vec<Float>,
     _var_zero: &Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
-    rev_one[ arg[0] ] += rev_one[res] * con[ arg[0] ];
+    partial[ arg[0] ] += partial[res] * con[ arg[0] ];
 }
 //
 // reverse_1_mul_vv_fn
 /// ForwardZeroBinary where op is *, left is variable, right is variable.
-fn reverse_1_mul_vv_fn(rev_one: &mut Vec<Float>,
+fn reverse_1_mul_vv_fn(partial: &mut Vec<Float>,
     var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
-    rev_one[ arg[0] ] += rev_one[res] * var_zero[ arg[1] ];
-    rev_one[ arg[1] ] += rev_one[res] * var_zero[ arg[0] ];
+    partial[ arg[0] ] += partial[res] * var_zero[ arg[1] ];
+    partial[ arg[1] ] += partial[res] * var_zero[ arg[0] ];
 }
 // ---------------------------------------------------------------------------
 // set_op_info
