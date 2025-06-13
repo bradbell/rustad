@@ -62,7 +62,7 @@ macro_rules! impl_binary_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         (new_tape_id, new_var_index)
     }
     //
-    impl std::ops::Add<AD> for AD {
+    impl std::ops::$Trait<AD> for AD {
         type Output = AD;
         //
         #[ doc = concat!(" compute AD ", stringify!($op), " AD") ]
@@ -109,8 +109,9 @@ pub mod id;
 #[cfg(test)]
 use id::{ ADD_CV_OP, ADD_VC_OP, ADD_VV_OP };
 //
-// add
+// operatorsd
 pub mod add;
+pub mod mul;
 //
 // ForwardZero
 /// Evaluate zero order forward mode for operation in the operation sequence.
@@ -174,6 +175,7 @@ fn op_info_vec() -> Vec<OpInfo> {
     let empty         = OpInfo{ name: "".to_string(), forward_0 : panic_fn };
     let mut result    = vec![empty ; NUMBER_OP ];
     add::set_op_info(&mut result);
+    mul::set_op_info(&mut result);
     result
 }
 //

@@ -41,6 +41,12 @@ set_operator_ids!(
     ADD_VC_OP,
     /// variable + variable
     ADD_VV_OP,
+    /// constant * variable
+    MUL_CV_OP,
+    /// variable * constant
+    MUL_VC_OP,
+    /// variable * variable
+    MUL_VV_OP,
     /// number of operator identifiers
     NUMBER_OP,
 );
