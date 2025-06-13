@@ -43,6 +43,31 @@ fn forward_0_add_vv_fn(
     assert_eq!( arg.len(), 2);
     var_zero[ res ] = var_zero[ arg[0] ] + var_zero[ arg[1] ];
 }
+//
+// ---------------------------------------------------------------------------
+// forward_1_add_cv_fn
+/// ForwardOneBinary were op is +, left is constant, right is variable.
+fn forward_1_add_cv_fn(var_one: &mut Vec<Float>,
+    _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
+    assert_eq!( arg.len(), 2);
+    var_one[ res ] = var_one[ arg[1] ];
+}
+//
+// forward_1_add_vc_fn
+/// ForwardOneBinary were op is +, left is variable, right is constant.
+fn forward_1_add_vc_fn(var_one: &mut Vec<Float>,
+    _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
+    assert_eq!( arg.len(), 2);
+    var_one[ res ] = var_one[ arg[0] ];
+}
+//
+// forward_1_add_vv_fn
+/// ForwardZeroBinary where op is +, left is variable, right is variable.
+fn forward_1_add_vv_fn(var_one: &mut Vec<Float>,
+    _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
+    assert_eq!( arg.len(), 2);
+    var_one[ res ] = var_one[ arg[0] ] + var_one[ arg[1] ];
+}
 // ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the add operators.
@@ -50,11 +75,20 @@ fn forward_0_add_vv_fn(
 /// # op_info_vec
 /// is a map from [operator::id] to operator information.
 pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
-    op_info_vec[ADD_CV_OP] =
-        OpInfo{ name : "add_cv".to_string() , forward_0 : forward_0_add_cv_fn };
-    op_info_vec[ADD_VC_OP] =
-        OpInfo{ name : "add_vc".to_string() , forward_0 : forward_0_add_vc_fn };
-    op_info_vec[ADD_VV_OP] =
-        OpInfo{ name : "add_vv".to_string() , forward_0 : forward_0_add_vv_fn };
+    op_info_vec[ADD_CV_OP] = OpInfo{
+        name      : "add_cv".to_string() ,
+        forward_0 : forward_0_add_cv_fn,
+        forward_1 : forward_1_add_cv_fn,
+     };
+    op_info_vec[ADD_VC_OP] = OpInfo{
+        name      : "add_vc".to_string(),
+        forward_0 : forward_0_add_vc_fn,
+        forward_1 : forward_1_add_vc_fn,
+    };
+    op_info_vec[ADD_VV_OP] = OpInfo{
+        name      : "add_vv".to_string(),
+        forward_0 : forward_0_add_vv_fn,
+        forward_1 : forward_1_add_vv_fn,
+    };
 }
 impl_binary_operator!( Add, + );

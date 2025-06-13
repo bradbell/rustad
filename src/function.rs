@@ -99,7 +99,7 @@ impl ADFun {
     /// # Syntax
     /// specifies the domain space variable values
     /// <pre>
-    ///     (range, var_zero) = f.forward(domain, trace)
+    ///     (range_zero, var_zero) = f.forward(domain, trace)
     /// </pre>
     ///
     /// # f
@@ -108,7 +108,7 @@ impl ADFun {
     /// # trace
     /// if true, a trace of the operatiopn sequence is printed on stdout.
     ///
-    /// # range
+    /// # range_zero
     /// The first return value is the range vector corresponding to domain;
     /// i.e., the function value correspdong the operation sequence.
     ///
@@ -125,6 +125,16 @@ impl ADFun {
         for j in 0 .. self.n_domain {
             var_zero[j] = domain[j];
         }
+        if trace {
+            println!( "constant" );
+            for j in 0 .. self.con_all.len() {
+                println!( "{:?}, {:?}", j, self.con_all[j] );
+            }
+            println!( "domain" );
+            for j in 0 .. domain.len() {
+                println!( "{:?}, {:?}", j, var_zero[j] );
+            }
+        }
         for op_index in 0 .. self.id_all.len() {
             let op_id     = self.id_all[op_index];
             let start     = self.op2arg[op_index];
@@ -140,11 +150,58 @@ impl ADFun {
                 );
             }
         }
-        let mut range : Vec<Float> = Vec::new();
+        let mut range_zero : Vec<Float> = Vec::new();
         for i in 0 .. self.range_index.len() {
-            range.push( var_zero[ self.range_index[i] ] );
+            range_zero.push( var_zero[ self.range_index[i] ] );
         }
-        ( range, var_zero )
+        ( range_zero, var_zero )
+    }
+    //
+    // forward_one
+    pub fn forward_one(
+        &self,
+        domain_one : &[Float],
+        var_zero   : &Vec<Float>,
+        trace      : bool
+    ) -> Vec<Float> {
+        assert_eq!( domain_one.len(),  self.n_domain );
+        //
+        let op_info_vec = &*OP_INFO_VEC;
+        let mut var_one = vec![ Float::NAN; self.n_var ];
+        for j in 0 .. self.n_domain {
+            var_one[j] = domain_one[j];
+        }
+        if trace {
+            println!( "constant" );
+            for j in 0 .. self.con_all.len() {
+                println!( "{:?}, {:?}", j, self.con_all[j] );
+            }
+            println!( "domain" );
+            for j in 0 .. domain_one.len() {
+                println!( "{:?}, ({:?}, {:?})", j, var_zero[j], var_one[j] );
+            }
+        }
+        for op_index in 0 .. self.id_all.len() {
+            let op_id     = self.id_all[op_index];
+            let start     = self.op2arg[op_index];
+            let end       = self.op2arg[op_index + 1];
+            let arg       = &self.arg_all[start .. end];
+            let res       = self.n_domain + op_index;
+            let forward_1 = op_info_vec[op_id].forward_1;
+            forward_1(&mut var_one, var_zero, &self.con_all, &arg, res );
+            if trace {
+                let name = &op_info_vec[op_id].name;
+                println!(
+                    "{:?}, {:?}, {:?}, ({:?}, {:?})",
+                    res, name, arg, var_zero[res], var_one[res]
+                );
+            }
+        }
+        let mut range_one : Vec<Float> = Vec::new();
+        for i in 0 .. self.range_index.len() {
+            range_one.push( var_one[ self.range_index[i] ] );
+        }
+        range_one
     }
 }
 //

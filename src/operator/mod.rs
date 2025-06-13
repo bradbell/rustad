@@ -108,7 +108,14 @@ use id::NUMBER_OP;
 pub mod id;
 //
 #[cfg(test)]
-use id::{ ADD_CV_OP, ADD_VC_OP, ADD_VV_OP };
+use id::{
+    ADD_CV_OP,
+    ADD_VC_OP,
+    ADD_VV_OP,
+    MUL_CV_OP,
+    MUL_VC_OP,
+    MUL_VV_OP,
+};
 //
 // operatorsd
 pub mod add;
@@ -116,9 +123,15 @@ pub mod mul;
 // ---------------------------------------------------------------------------
 //
 // ForwardZero
-/// Evaluate zero order forward mode for operation in the operation sequence.
-pub type ForwardZero = fn(
-        _var_zero: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+/// Evaluate zero order forward for one operation in the operation sequence.
+pub type ForwardZero = fn(_var_zero: &mut Vec<Float>,
+    _con: &Vec<Float>, _arg: &[Index], _res: Index
+);
+//
+// ForwardOne
+/// Evaluate first order forward for one operation in the operation sequence.
+pub type ForwardOne = fn(_var_one: &mut Vec<Float>,
+    _var_zero: &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
 // ---------------------------------------------------------------------------
 //
@@ -164,6 +177,13 @@ fn panic_zero( _var_zero: &mut Vec<Float>,
     _con: &Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
 }
+//
+// panic_one
+/// default [ForwardOne] function that will panic if it does not get replaced.
+fn panic_one( _var_one: &mut Vec<Float>,
+    _var_zero : &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index) {
+    panic!();
+}
 // ---------------------------------------------------------------------------
 //
 // OpInfo
@@ -172,12 +192,17 @@ fn panic_zero( _var_zero: &mut Vec<Float>,
 pub struct OpInfo {
     pub name      : String,
     pub forward_0 : ForwardZero,
+    pub forward_1 : ForwardOne,
 }
 //
 // op_info_vec
 /// set the value of OP_INFO_VEC
 fn op_info_vec() -> Vec<OpInfo> {
-    let empty         = OpInfo{ name: "".to_string(), forward_0 : panic_zero };
+    let empty         = OpInfo{
+        name: "".to_string(),
+        forward_0 : panic_zero,
+        forward_1 : panic_one,
+    };
     let mut result    = vec![empty ; NUMBER_OP ];
     add::set_op_info(&mut result);
     mul::set_op_info(&mut result);
@@ -195,4 +220,8 @@ fn test_op_info() {
     assert_eq!( "add_cv", op_info_vec[ADD_CV_OP].name );
     assert_eq!( "add_vc", op_info_vec[ADD_VC_OP].name );
     assert_eq!( "add_vv", op_info_vec[ADD_VV_OP].name );
+    //
+    assert_eq!( "mul_cv", op_info_vec[MUL_CV_OP].name );
+    assert_eq!( "mul_vc", op_info_vec[MUL_VC_OP].name );
+    assert_eq!( "mul_vv", op_info_vec[MUL_VV_OP].name );
 }
