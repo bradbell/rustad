@@ -81,7 +81,7 @@ fn record_add(tape : &mut Tape, lhs : &AD, rhs : &AD) -> (Index, Index) {
             if var_lhs && var_rhs {
                 new_var_index = tape.n_var;
                 tape.n_var   += 1;
-                tape.op_all.push(ADD_VV_OP);
+                tape.id_all.push(ADD_VV_OP);
                 tape.op2arg.push( tape.arg_all.len() );
                 tape.arg_all.push( lhs.var_index );
                 tape.arg_all.push( rhs.var_index );
@@ -91,7 +91,7 @@ fn record_add(tape : &mut Tape, lhs : &AD, rhs : &AD) -> (Index, Index) {
                 } else {
                     new_var_index = tape.n_var;
                     tape.n_var   += 1;
-                    tape.op_all.push(ADD_VC_OP);
+                    tape.id_all.push(ADD_VC_OP);
                     tape.op2arg.push( tape.arg_all.len() );
                     tape.arg_all.push( lhs.var_index );
                     tape.arg_all.push( tape.con_all.len() );
@@ -103,7 +103,7 @@ fn record_add(tape : &mut Tape, lhs : &AD, rhs : &AD) -> (Index, Index) {
                 } else {
                     new_var_index = tape.n_var;
                     tape.n_var   += 1;
-                    tape.op_all.push(ADD_VC_OP);
+                    tape.id_all.push(ADD_VC_OP);
                     tape.op2arg.push( tape.arg_all.len() );
                     tape.arg_all.push( rhs.var_index );
                     tape.arg_all.push( tape.con_all.len() );

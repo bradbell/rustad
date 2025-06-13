@@ -35,10 +35,10 @@ pub(crate) struct Tape {
     /// is the number of variables currently in the recording.
     pub n_var          : Index,
     //
-    // op_all
-    /// For each index in the operation sequence, op_all\[index\]
+    // id_all
+    /// For each index in the operation sequence, id_all\[index\]
     /// is the corresponding [operator::id] .
-    pub op_all         : Vec<Index>,
+    pub id_all         : Vec<Index>,
     //
     // op2arg
     /// For each index in the operation sequence, op2arg\[index\]
@@ -67,7 +67,7 @@ impl Tape {
             recording     : false,
             n_domain      : 0,
             n_var         : 0,
-            op_all        : Vec::new() ,
+            id_all        : Vec::new() ,
             op2arg        : Vec::new() ,
             arg_all       : Vec::new() ,
             con_all       : Vec::new() ,

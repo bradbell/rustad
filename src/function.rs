@@ -39,10 +39,10 @@ pub struct ADFun {
     /// The dimension of its range spase is range_index.len().
     pub(crate) range_index    : Vec<Index>,
     //
-    // op_all
+    // id_all
     /// This maps an operator's index in the operation sequence
     /// to its [operator::id]
-    pub(crate) op_all         : Vec<Index>,
+    pub(crate) id_all         : Vec<Index>,
     //
     // op2arg
     /// This maps an operator's index in the operation sequence to its
@@ -74,7 +74,7 @@ impl ADFun {
         Self {
             n_domain      : 0,
             n_var         : 0,
-            op_all        : Vec::new() ,
+            id_all        : Vec::new() ,
             op2arg        : Vec::new() ,
             arg_all       : Vec::new() ,
             con_all       : Vec::new() ,
@@ -108,8 +108,8 @@ impl ADFun {
         for j in 0 .. self.n_domain {
             var_vec[j] = domain[j];
         }
-        for op_index in 0 .. self.op_all.len() {
-            let op_id     = self.op_all[op_index];
+        for op_index in 0 .. self.id_all.len() {
+            let op_id     = self.id_all[op_index];
             let start     = self.op2arg[op_index];
             let end       = self.op2arg[op_index + 1];
             let arg       = &self.arg_all[start .. end];
@@ -157,7 +157,7 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
     THIS_THREAD_TAPE.with_borrow_mut( |tape| {
         assert_ne!( new_tape_id, 0);
         assert!( ! tape.recording , "indepndent: tape is already recording");
-        assert_eq!( tape.op_all.len(), 0 );
+        assert_eq!( tape.id_all.len(), 0 );
         assert_eq!( tape.op2arg.len(), 0 );
         assert_eq!( tape.arg_all.len(), 0 );
         assert_eq!( tape.con_all.len(), 0 );
@@ -197,7 +197,7 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
         tape.recording = false;
         std::mem::swap( &mut result.n_domain, &mut tape.n_domain );
         std::mem::swap( &mut result.n_var,         &mut tape.n_var );
-        std::mem::swap( &mut result.op_all,        &mut tape.op_all );
+        std::mem::swap( &mut result.id_all,        &mut tape.id_all );
         std::mem::swap( &mut result.op2arg,        &mut tape.op2arg );
         std::mem::swap( &mut result.arg_all,       &mut tape.arg_all );
         std::mem::swap( &mut result.con_all,       &mut tape.con_all );
