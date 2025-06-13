@@ -11,7 +11,7 @@ use crate::ad_tape::Tape;
 use crate::ad::AD;
 #[cfg(doc)]
 use crate::ad_tape::THIS_THREAD_TAPE;
-//
+// ---------------------------------------------------------------------------
 // impl_binary_operator
 /// This macro implements the the following binary operations:
 /// <pre>
@@ -98,6 +98,7 @@ macro_rules! impl_binary_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         }
     }
 } } }
+// ---------------------------------------------------------------------------
 //
 use crate::Float;
 use crate::Index;
@@ -112,12 +113,14 @@ use id::{ ADD_CV_OP, ADD_VC_OP, ADD_VV_OP };
 // operatorsd
 pub mod add;
 pub mod mul;
+// ---------------------------------------------------------------------------
 //
 // ForwardZero
 /// Evaluate zero order forward mode for operation in the operation sequence.
 pub type ForwardZero = fn(
-        _var: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+        _var_zero: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
+// ---------------------------------------------------------------------------
 //
 // ForwardZeroBinary
 /// This is a [ForwardZero] with the following extra conditions:
@@ -133,33 +136,35 @@ pub type ForwardZero = fn(
 /// </pre>
 ///
 /// # res
-/// is the index in *var* where the result for this operator is placed.
+/// is the index in *var_zero* where the result for this operator is placed.
 ///
-/// # var
+/// # var_zero
 /// is the vector of the zero order values for all the variables.
 /// If both left and right are variables:
 /// <pre>
-///     var[res] = var[lhs] op var[rhs]
+///     var_zero[res] = var_zero[lhs] op var_zero[rhs]
 /// </pre>
 /// If left is a variable and the right is a constant:
 /// <pre>
-///     var[res] = var[lhs] op con[rhs]
+///     var_zero[res] = var_zero[lhs] op con[rhs]
 /// </pre>
 /// If left is a constant and the right is a variable:
 /// <pre>
-///     var[res] = con[lhs] op left[rhs]
+///     var_zero[res] = con[lhs] op var_zero[rhs]
 /// </pre>
 #[cfg(doc)]
-pub type ForwardZeroBinary = fn(
-        _var: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+pub type ForwardZeroBinary = fn(_var_zero:
+    &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
+// ---------------------------------------------------------------------------
 //
-// panic_fn
+// panic_zero
 /// default [ForwardZero] function that will panic if it does not get replaced.
-fn panic_fn(
-    _vec: &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index) {
+fn panic_zero( _var_zero: &mut Vec<Float>,
+    _con: &Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
 }
+// ---------------------------------------------------------------------------
 //
 // OpInfo
 /// information connected to each operator id.
@@ -172,7 +177,7 @@ pub struct OpInfo {
 // op_info_vec
 /// set the value of OP_INFO_VEC
 fn op_info_vec() -> Vec<OpInfo> {
-    let empty         = OpInfo{ name: "".to_string(), forward_0 : panic_fn };
+    let empty         = OpInfo{ name: "".to_string(), forward_0 : panic_zero };
     let mut result    = vec![empty ; NUMBER_OP ];
     add::set_op_info(&mut result);
     mul::set_op_info(&mut result);
