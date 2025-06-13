@@ -13,7 +13,7 @@ fn time_add_vv() {
     let ay     = vec! [ ay_0, ay_1 ];
     let f      = function::ad_fun(&ay);
     let trace  = false;
-    let y      = f.range_zero(&x, trace);
+    let y      = f.forward_zero(&x, trace);
     assert_eq!( y[0], x[0] + x[1] );
     assert_eq!( y[1], x[1] + x[2] );
 }
