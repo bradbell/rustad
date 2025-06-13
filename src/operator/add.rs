@@ -17,7 +17,7 @@ use crate::operator::id::{ADD_CV_OP, ADD_VC_OP, ADD_VV_OP};
 #[cfg(doc)]
 use crate::operator;
 #[cfg(doc)]
-use crate::operator::ForwardZeroBinary;
+use crate::operator::{ForwardZeroBinary, ForwardOneBinary};
 //
 // ---------------------------------------------------------------------------
 // forward_0_add_cv_fn
@@ -46,7 +46,7 @@ fn forward_0_add_vv_fn(
 //
 // ---------------------------------------------------------------------------
 // forward_1_add_cv_fn
-/// ForwardOneBinary were op is +, left is constant, right is variable.
+/// [ForwardOneBinary]  were op is +, left is constant, right is variable.
 fn forward_1_add_cv_fn(var_one: &mut Vec<Float>,
     _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
@@ -54,7 +54,7 @@ fn forward_1_add_cv_fn(var_one: &mut Vec<Float>,
 }
 //
 // forward_1_add_vc_fn
-/// ForwardOneBinary were op is +, left is variable, right is constant.
+/// [ForwardOneBinary]  were op is +, left is variable, right is constant.
 fn forward_1_add_vc_fn(var_one: &mut Vec<Float>,
     _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);
@@ -62,7 +62,7 @@ fn forward_1_add_vc_fn(var_one: &mut Vec<Float>,
 }
 //
 // forward_1_add_vv_fn
-/// ForwardZeroBinary where op is +, left is variable, right is variable.
+/// [ForwardOneBinary]  where op is +, left is variable, right is variable.
 fn forward_1_add_vv_fn(var_one: &mut Vec<Float>,
     _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
     assert_eq!( arg.len(), 2);

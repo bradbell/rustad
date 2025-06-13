@@ -166,8 +166,48 @@ pub type ForwardOne = fn(_var_one: &mut Vec<Float>,
 ///     var_zero[res] = con[lhs] op var_zero[rhs]
 /// </pre>
 #[cfg(doc)]
-pub type ForwardZeroBinary = fn(_var_zero:
-    &mut Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+pub type ForwardZeroBinary = fn(_var_zero: &mut Vec<Float>,
+    _con: &Vec<Float>, _arg: &[Index], _res: Index
+);
+//
+// ForwardOneBinary
+/// This is a [ForwardOne] with the following extra conditions:
+///
+/// # op
+/// we use the notation *op* for this operator's symbol; e.g. + for addition.
+///
+/// # arg
+/// is a slice of size two.  We use the notation
+/// <pre>
+///     lhs = arg[0]
+///     rhs = arg[1]
+/// </pre>
+///
+/// # res
+/// is the index in *var_one* where the result for this operator is placed.
+///
+/// # var_zero
+/// is the vector of the zero order values for all the variables.
+/// If both left and right are variables:
+/// <pre>
+///     var_zero[res] = var_zero[lhs] op var_zero[rhs]
+/// </pre>
+/// If left is a variable and the right is a constant:
+/// <pre>
+///     var_zero[res] = var_zero[lhs] op con[rhs]
+/// </pre>
+/// If left is a constant and the right is a variable:
+/// <pre>
+///     var_zero[res] = con[lhs] op var_zero[rhs]
+/// </pre>
+///
+/// # var_one
+/// is the vector of directional derivatives.
+/// The directional deriative var_one\[res\] is computed using the
+/// its value of var_one\[i\] for indices *i* less tham *res* .
+#[cfg(doc)]
+pub type ForwardOneBinary = fn(_var_one: &mut Vec<Float>,
+    _var_zero : &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
 // ---------------------------------------------------------------------------
 //

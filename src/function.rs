@@ -97,13 +97,15 @@ impl ADFun {
     /// zero order forward mode function evaluation.
     ///
     /// # Syntax
-    /// specifies the domain space variable values
     /// <pre>
     ///     (range_zero, var_zero) = f.forward(domain_zero, trace)
     /// </pre>
     ///
     /// # f
     /// is is this ADFun object.
+    ///
+    /// # domain_zero
+    /// specifies the domain space variable values.
     ///
     /// # trace
     /// if true, a trace of the operatiopn sequence is printed on stdout.
@@ -164,6 +166,32 @@ impl ADFun {
     }
     //
     // forward_one
+    /// first order forward mode function evaluation.
+    ///
+    /// # Syntax
+    /// <pre>
+    ///     range_one = f.forward(domain_one, var_zero, trace)
+    /// </pre>
+    ///
+    /// # f
+    /// is is this ADFun object.
+    ///
+    /// # domain_one
+    /// specifies the directional deriva=tive for domain space variables.
+    ///
+    /// # var_zero
+    /// is the value for all the variables in the operation sequence.
+    /// This is returned at the end of a [forward_zero](ADFun::forward_zero)
+    /// computation.
+    ///
+    /// # trace
+    /// if true, a trace of the operatiopn sequence is printed on stdout.
+    ///
+    /// # range_one
+    /// The return value is the range vector corresponding to
+    /// domain_one and var_zero;
+    /// i.e., the directional derivative for the fuctioon
+    /// corresponding to the operation sequence.
     pub fn forward_one(
         &self,
         domain_one : &[Float],
