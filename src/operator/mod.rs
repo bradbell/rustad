@@ -46,47 +46,42 @@ use crate::ad::AD;
 /// ## new_var_id
 /// is the variableindex for the result of this operatrion.
 ///
-macro_rules! impl_binary_operator {
-    ( $Trait:ident , $op:tt ) => {
+macro_rules! impl_binary_operator { ($Trait:ident, $op:tt) => {paste::paste! {
+    impl std::ops::Add<AD> for AD {
+        type Output = AD;
         //
-        paste::paste! {
-            impl std::ops::Add<AD> for AD {
-                type Output = AD;
-                //
-                #[ doc = concat!(" compute AD ", stringify!($op), " AD") ]
-                fn [< $Trait:lower >] (self, rhs : AD) -> AD {
-                    let new_value = self.value $op rhs.value;
-                    let ( new_tape_id, new_var_index) =
-                    THIS_THREAD_TAPE.with_borrow_mut(
-                        |tape| [< record_ $Trait:lower >] (tape, &self, &rhs)
-                    );
-                    AD {
-                        tape_id   : new_tape_id,
-                        var_index : new_var_index,
-                        value     : new_value,
-                    }
-                }
-            }
-            impl std::ops::$Trait<AD> for Float {
-                type Output = AD;
-                //
-                #[ doc = concat!(" compute Float ", stringify!($op), " AD") ]
-                fn [< $Trait:lower >] (self, rhs : AD) -> AD {
-                    AD::from(self) $op rhs
-                }
-            }
-            //
-            impl std::ops::$Trait<Float> for AD {
-                type Output = AD;
-                //
-                #[ doc = concat!(" compute AD ", stringify!($op), " Float") ]
-                fn [< $Trait:lower >] (self, rhs : Float) -> AD {
-                    self $op AD::from(rhs)
-                }
+        #[ doc = concat!(" compute AD ", stringify!($op), " AD") ]
+        fn [< $Trait:lower >] (self, rhs : AD) -> AD {
+            let new_value = self.value $op rhs.value;
+            let ( new_tape_id, new_var_index) =
+            THIS_THREAD_TAPE.with_borrow_mut(
+                |tape| [< record_ $Trait:lower >] (tape, &self, &rhs)
+            );
+            AD {
+                tape_id   : new_tape_id,
+                var_index : new_var_index,
+                value     : new_value,
             }
         }
     }
-}
+    impl std::ops::$Trait<AD> for Float {
+        type Output = AD;
+        //
+        #[ doc = concat!(" compute Float ", stringify!($op), " AD") ]
+        fn [< $Trait:lower >] (self, rhs : AD) -> AD {
+            AD::from(self) $op rhs
+        }
+    }
+    //
+    impl std::ops::$Trait<Float> for AD {
+        type Output = AD;
+        //
+        #[ doc = concat!(" compute AD ", stringify!($op), " Float") ]
+        fn [< $Trait:lower >] (self, rhs : Float) -> AD {
+            self $op AD::from(rhs)
+        }
+    }
+} } }
 //
 use crate::Float;
 use crate::Index;
