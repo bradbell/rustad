@@ -12,10 +12,10 @@
 /// # Example
 /// ```
 /// let date = *rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2025.6.13");
+/// assert_eq!(date, "2025.6.14");
 /// ```
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
-   std::sync::LazyLock::new( || "2025.6.13" );
+   std::sync::LazyLock::new( || "2025.6.14" );
 // ----------------------------------------------------------------------------
 //
 // utility
@@ -33,7 +33,7 @@ pub type Float = f64;
 //
 // AD
 pub mod ad;
-use ad::AD;
+pub use ad::AD;
 //
 // ad_tape
 pub(crate) mod ad_tape;

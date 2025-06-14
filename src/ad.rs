@@ -42,6 +42,7 @@ pub struct AD {
     pub(crate) value     : Float,
 }
 //
+/// Converting from a Float to an AD creates a constamt with the same value
 impl From<Float> for AD {
     /// Convert a Float to an AD constant
     fn from(this_value : Float) -> Self {
@@ -50,5 +51,21 @@ impl From<Float> for AD {
             var_index : 0,
             value     : this_value,
         }
+    }
+}
+//
+/// Display will only show the value and ignore the variable information.
+///
+/// # Example
+/// ```
+/// use rustad::{AD, Float};
+/// let x = rustad::AD::from( rustad::Float::from(3) );
+/// let s = format!( "{x}" );
+/// assert_eq!(s, "3");
+///```
+impl std::fmt::Display for AD {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        // only display value
+        write!(f, "{}", self.value)
     }
 }
