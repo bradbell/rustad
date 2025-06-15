@@ -5,14 +5,16 @@
 //
 //! AD an automatic differentiation floating point type
 //
-use crate::Index;
-use crate::Float;
+use crate::{Index, Float};
 //
 #[cfg(doc)]
 use crate::function::{ADFun, ad_domain};
 //
 #[cfg(doc)]
 use crate::ad_tape::THIS_THREAD_TAPE;
+//
+// ad::NAN
+pub const NAN : AD = AD{ tape_id : 0, var_index : 0, value : Float::NAN };
 //
 /// AD acts like the Float. It also can record functions and store
 /// them in [ADFun] objects.

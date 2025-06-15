@@ -4,11 +4,12 @@
 //
 //! operations for specific operators
 //
+// AD
+use crate::AD;
+//
 #[cfg(doc)]
 use crate::ad_tape::Tape;
 //
-#[cfg(doc)]
-use crate::ad::AD;
 #[cfg(doc)]
 use crate::ad_tape::THIS_THREAD_TAPE;
 // ---------------------------------------------------------------------------
@@ -125,6 +126,12 @@ pub mod mul;
 // ForwardZero
 /// Evaluate zero order forward for one operation in the operation sequence.
 pub type ForwardZero = fn(_var_zero: &mut Vec<Float>,
+    _con: &Vec<Float>, _arg: &[Index], _res: Index
+);
+//
+// ADForwardZero
+/// Evaluate zero order forward for one operation in the operation sequence.
+pub type ADForwardZero = fn(_var_zero: &mut Vec<AD>,
     _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
@@ -274,16 +281,25 @@ fn panic_one( _var_one: &mut Vec<Float>,
     _var_zero : &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
 }
+//
+// ad_panic_zero
+/// default [ADForwardZero] function, will panic if it does not get replaced.
+fn ad_panic_zero( _var_zero: &mut Vec<AD>,
+    _con: &Vec<Float>, _arg: &[Index], _res: Index) {
+    panic!();
+}
+//
 // ---------------------------------------------------------------------------
 //
 // OpInfo
 /// information connected to each operator id.
 #[derive(Clone)]
 pub struct OpInfo {
-    pub name      : String,
-    pub forward_0 : ForwardZero,
-    pub forward_1 : ForwardOne,
-    pub reverse_1 : ReverseOne,
+    pub name         : String,
+    pub forward_0    : ForwardZero,
+    pub forward_1    : ForwardOne,
+    pub reverse_1    : ReverseOne,
+    pub ad_forward_0 : ADForwardZero,
 }
 //
 // op_info_vec
@@ -291,9 +307,10 @@ pub struct OpInfo {
 fn op_info_vec() -> Vec<OpInfo> {
     let empty         = OpInfo{
         name: "".to_string(),
-        forward_0 : panic_zero,
-        forward_1 : panic_one,
-        reverse_1 : panic_one,
+        forward_0    : panic_zero,
+        forward_1    : panic_one,
+        reverse_1    : panic_one,
+        ad_forward_0 : ad_panic_zero,
     };
     let mut result    = vec![empty ; NUMBER_OP ];
     add::set_op_info(&mut result);
