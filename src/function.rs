@@ -139,11 +139,11 @@ impl ADFun {
             println!( "Begin Trace: forward_zero" );
             println!( "index, constant" );
             for j in 0 .. self.con_all.len() {
-                println!( "{:?}, {:?}", j, self.con_all[j] );
+                println!( "{}, {}", j, self.con_all[j] );
             }
             println!( "index, domain_zero" );
             for j in 0 .. domain_zero.len() {
-                println!( "{:?}, {:?}", j, var_zero[j] );
+                println!( "{}, {}", j, var_zero[j] );
             }
             println!( "res. name, arg,. var_zero" );
         }
@@ -158,7 +158,7 @@ impl ADFun {
             if trace {
                 let name = &op_info_vec[op_id].name;
                 println!(
-                    "{:?}, {:?}, {:?}, {:?}", res, name, arg, var_zero[res]
+                    "{}, {}, {:?}, {}", res, name, arg, var_zero[res]
                 );
             }
         }
@@ -223,11 +223,11 @@ impl ADFun {
             println!( "Begin Trace: forward_one" );
             println!( "index, constant" );
             for j in 0 .. self.con_all.len() {
-                println!( "{:?}, {:?}", j, self.con_all[j] );
+                println!( "{}, {}", j, self.con_all[j] );
             }
             println!( "index, domain_zero, domain_one" );
             for j in 0 .. domain_one.len() {
-                println!( "{:?}, [{:?}, {:?}]", j, var_zero[j], var_one[j] );
+                println!( "{}, [{}, {}]", j, var_zero[j], var_one[j] );
             }
             println!( "res, name, arg, var_zero[res]. var_one[res]" );
         }
@@ -242,7 +242,7 @@ impl ADFun {
             if trace {
                 let name = &op_info_vec[op_id].name;
                 println!(
-                    "{:?}, {:?}, {:?}, [{:?}, {:?}]",
+                    "{}, {}, {:?}, [{}, {}]",
                     res, name, arg, var_zero[res], var_one[res]
                 );
             }
@@ -306,11 +306,11 @@ impl ADFun {
             println!( "Begin Trace: reverse_one" );
             println!( "index, constant" );
             for j in 0 .. self.con_all.len() {
-                println!( "{:?}, {:?}", j, self.con_all[j] );
+                println!( "{}, {}", j, self.con_all[j] );
             }
             println!( "index, range_zero, range_one" );
             for j in 0 .. range_one.len() {
-                println!( "{:?}, [{:?}, {:?}]", j, var_zero[j], partial[j] );
+                println!( "{}, [{}, {}]", j, var_zero[j], partial[j] );
             }
             println!( "res, name, arg, var_zero[res]. partial[res]" );
         }
@@ -325,7 +325,7 @@ impl ADFun {
             if trace {
                 let name = &op_info_vec[op_id].name;
                 println!(
-                    "{:?}, {:?}, {:?}, [{:?}, {:?}]",
+                    "{}, {}, {:?}, [{}, {}]",
                     res, name, arg, var_zero[res], partial[res]
                 );
             }
