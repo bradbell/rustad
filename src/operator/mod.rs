@@ -129,12 +129,6 @@ pub type ForwardZero = fn(_var_zero: &mut Vec<Float>,
     _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
-// ADForwardZero
-/// Evaluate zero order forward for one operation in the operation sequence.
-pub type ADForwardZero = fn(_var_zero: &mut Vec<AD>,
-    _con: &Vec<Float>, _arg: &[Index], _res: Index
-);
-//
 // ForwardOne
 /// Evaluate first order forward for one operation in the operation sequence.
 pub type ForwardOne = fn(_var_one: &mut Vec<Float>,
@@ -145,6 +139,18 @@ pub type ForwardOne = fn(_var_one: &mut Vec<Float>,
 /// Evaluate first order reverse for one operation in the operation sequence.
 pub type ReverseOne = fn(_partial: &mut Vec<Float>,
     _var_zero: &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+);
+//
+// ADForwardZero
+/// Evaluate zero order forward for one operation in the operation sequence.
+pub type ADForwardZero = fn(_var_zero: &mut Vec<AD>,
+    _con: &Vec<Float>, _arg: &[Index], _res: Index
+);
+//
+// ADForwardOne
+/// Evaluate first order forward for one operation in the operation sequence.
+pub type ADForwardOne = fn(_var_one: &mut Vec<AD>,
+    _var_zero: &Vec<AD>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
 // ---------------------------------------------------------------------------
 //
@@ -289,6 +295,14 @@ fn ad_panic_zero( _var_zero: &mut Vec<AD>,
     panic!();
 }
 //
+// ad_panic_one
+/// default [ADForwardOne] or ADReverseOne function that will panic
+/// if it does not get replaced.
+fn ad_panic_one( _var_one: &mut Vec<AD>,
+    _var_zero : &Vec<AD>, _con: &Vec<Float>, _arg: &[Index], _res: Index) {
+    panic!();
+}
+//
 // ---------------------------------------------------------------------------
 //
 // OpInfo
@@ -300,6 +314,7 @@ pub struct OpInfo {
     pub forward_1    : ForwardOne,
     pub reverse_1    : ReverseOne,
     pub ad_forward_0 : ADForwardZero,
+    pub ad_forward_1 : ADForwardOne,
 }
 //
 // op_info_vec
@@ -311,6 +326,7 @@ fn op_info_vec() -> Vec<OpInfo> {
         forward_1    : panic_one,
         reverse_1    : panic_one,
         ad_forward_0 : ad_panic_zero,
+        ad_forward_1 : ad_panic_one,
     };
     let mut result    = vec![empty ; NUMBER_OP ];
     add::set_op_info(&mut result);

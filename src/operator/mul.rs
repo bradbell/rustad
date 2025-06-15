@@ -107,6 +107,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         forward_1    : forward_1_mul_cv_fn,
         reverse_1    : reverse_1_mul_cv_fn,
         ad_forward_0 : super::ad_panic_zero,
+        ad_forward_1 : super::ad_panic_one,
      };
     op_info_vec[MUL_VC_OP] = OpInfo{
         name         : "mul_vc".to_string(),
@@ -114,6 +115,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         forward_1    : forward_1_mul_vc_fn,
         reverse_1    : reverse_1_mul_vc_fn,
         ad_forward_0 : super::ad_panic_zero,
+        ad_forward_1 : super::ad_panic_one,
     };
     op_info_vec[MUL_VV_OP] = OpInfo{
         name         : "mul_vv".to_string(),
@@ -121,6 +123,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         forward_1    : forward_1_mul_vv_fn,
         reverse_1    : reverse_1_mul_vv_fn,
         ad_forward_0 : super::ad_panic_zero,
+        ad_forward_1 : super::ad_panic_one,
     };
 }
 impl_binary_operator!( Mul, * );

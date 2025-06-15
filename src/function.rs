@@ -15,14 +15,16 @@ use crate::operator;
 //
 // -----------------------------------------------------------------------
 // forward_zero
-/// Zero order forward mode function evaluation using Float or AD.
+/// Zero order forward mode evaluation; see the
+/// [Float][ADFun::forward_zero] and [AD](ADFun::ad_forward_zero) prototypes.
+/// This documentation is for the functions created by `forward_zero!` .
+/// Using this macro is unspecified.
 ///
 /// # Syntax
 /// <pre>
 ///     (range_zero, var_zero) = f.forward_zero(domain_zero, trace)
 ///     (range_zero, var_zero) = f.ad_forward(domain_zero, trace)
 /// </pre>
-/// see [ADFun::forward_zero] and [ADFun::ad_forward_zero]
 ///
 /// # f
 /// is is this ADFun object.
@@ -41,14 +43,18 @@ use crate::operator;
 /// # var_zero
 /// The second return value is the value for all the variables
 /// in the operation sequence. This is needed to compute derivatives.
+#[macro_export]
 macro_rules! forward_zero {
-
     (Float) => { forward_zero!(forward, Float); };
     (AD)    => { forward_zero!(ad_forward, AD); };
     //
     ( $prefix:ident, $float_type:ident ) => { paste::paste! {
 
-        #[doc = concat!(" Zero order forward using ", stringify!($type_name) )]
+        #[doc = concat!(
+            " Zero order forward using ",
+            stringify!($float_type),
+            " see [ forward_zero! ] for documentation",
+        )]
         pub fn [< $prefix _zero >] (
             &self,
             domain_zero : &[$float_type],
@@ -104,6 +110,111 @@ macro_rules! forward_zero {
 
     } }
 }
+// -----------------------------------------------------------------------
+// forward_one
+/// First order forward mode evaluation; see the
+/// [Float][ADFun::forward_one] and [AD](ADFun::ad_forward_one) prototypes.
+/// This documentation is for the functions created by `forward_one!` .
+/// Using this macro is unspecified.
+///
+/// # Syntax
+/// <pre>
+///     range_one = f.forward(domain_one, var_zero, trace)
+///     range_one = f.ad_forward(domain_one, var_zero, trace)
+/// </pre>
+///
+/// # f
+/// is is this ADFun object.
+///
+/// # domain_one
+/// specifies the directional deriva=tive for domain space variables.
+///
+/// # var_zero
+/// is the value for all the variables in the operation sequence.
+/// This is returned at the end of a [forward_zero](ADFun::forward_zero)
+/// computation.
+///
+/// # trace
+/// if true, a trace of the operatiopn sequence is printed on stdout.
+///
+/// # range_one
+/// The return value is the range vector corresponding to
+/// domain_one and var_zero;
+/// i.e., the directional derivative for the fuctioon
+/// corresponding to the operation sequence.
+#[macro_export]
+macro_rules! forward_one {
+    (Float) => { forward_one!(forward, Float); };
+    (AD)    => { forward_one!(ad_forward, AD); };
+    //
+    ( $prefix:ident, $float_type:ident ) => { paste::paste! {
+
+        #[doc = concat!(
+            " First order forward using ",
+            stringify!($float_type),
+            " see [ forward_one! ] for documentation",
+        )]
+        pub fn [< $prefix _one >] (
+            &self,
+            domain_one : &[$float_type],
+            var_zero   : &Vec<$float_type>,
+            trace      : bool
+        ) -> Vec<$float_type> {
+            assert_eq!(
+                domain_one.len(), self.n_domain,
+                "f.forward_one: domain_one length does not match f"
+            );
+            assert_eq!(
+                var_zero.len(), self.n_var,
+                "f.forward_one: var_zero length does not match f"
+             );
+            //
+            let op_info_vec = &*OP_INFO_VEC;
+            let nan          = $float_type::from( Float::NAN );
+            let mut var_one = vec![ nan; self.n_var ];
+            for j in 0 .. self.n_domain {
+                var_one[j] = domain_one[j];
+            }
+            if trace {
+                println!( "Begin Trace: forward_one" );
+                println!( "index, constant" );
+                for j in 0 .. self.con_all.len() {
+                    println!( "{}, {}", j, self.con_all[j] );
+                }
+                println!( "index, domain_zero, domain_one" );
+                for j in 0 .. domain_one.len() {
+                    println!( "{}, [{}, {}]", j, var_zero[j], var_one[j] );
+                }
+                println!( "res, name, arg, var_zero[res]. var_one[res]" );
+            }
+            for op_index in 0 .. self.id_all.len() {
+                let op_id     = self.id_all[op_index];
+                let start     = self.op2arg[op_index];
+                let end       = self.op2arg[op_index + 1];
+                let arg       = &self.arg_all[start .. end];
+                let res       = self.n_domain + op_index;
+                let forward_1 = op_info_vec[op_id].[< $prefix _1 >];
+                forward_1(&mut var_one, var_zero, &self.con_all, &arg, res );
+                if trace {
+                    let name = &op_info_vec[op_id].name;
+                    println!(
+                        "{}, {}, {:?}, [{}, {}]",
+                        res, name, arg, var_zero[res], var_one[res]
+                    );
+                }
+            }
+            if trace {
+                println!( "End Trace: forward_one" );
+            }
+            let mut range_one : Vec<$float_type> = Vec::new();
+            for i in 0 .. self.range_index.len() {
+                range_one.push( var_one[ self.range_index[i] ] );
+            }
+            range_one
+        }
+    } }
+}
+// -----------------------------------------------------------------------
 //
 // ADFun
 /// This object can evaluate an operation sequence amd its derivatives.
@@ -184,93 +295,18 @@ impl ADFun {
     /// dimension of range space
     pub fn len_range(&self) -> Index { self.range_index.len() }
     //
+    // forward_zero
     forward_zero!(Float);
+    //
+    // ad_forward_zero
     forward_zero!(AD);
-    // -----------------------------------------------------------------------
+    //
     // forward_one
-    /// first order forward mode function evaluation.
-    ///
-    /// # Syntax
-    /// <pre>
-    ///     range_one = f.forward(domain_one, var_zero, trace)
-    /// </pre>
-    ///
-    /// # f
-    /// is is this ADFun object.
-    ///
-    /// # domain_one
-    /// specifies the directional deriva=tive for domain space variables.
-    ///
-    /// # var_zero
-    /// is the value for all the variables in the operation sequence.
-    /// This is returned at the end of a [forward_zero](ADFun::forward_zero)
-    /// computation.
-    ///
-    /// # trace
-    /// if true, a trace of the operatiopn sequence is printed on stdout.
-    ///
-    /// # range_one
-    /// The return value is the range vector corresponding to
-    /// domain_one and var_zero;
-    /// i.e., the directional derivative for the fuctioon
-    /// corresponding to the operation sequence.
-    pub fn forward_one(
-        &self,
-        domain_one : &[Float],
-        var_zero   : &Vec<Float>,
-        trace      : bool
-    ) -> Vec<Float> {
-        assert_eq!(
-            domain_one.len(), self.n_domain,
-            "f.forward_one: domain_one length does not match f"
-        );
-        assert_eq!(
-            var_zero.len(), self.n_var,
-            "f.forward_one: var_zero length does not match f"
-         );
-        //
-        let op_info_vec = &*OP_INFO_VEC;
-        let mut var_one = vec![ Float::NAN; self.n_var ];
-        for j in 0 .. self.n_domain {
-            var_one[j] = domain_one[j];
-        }
-        if trace {
-            println!( "Begin Trace: forward_one" );
-            println!( "index, constant" );
-            for j in 0 .. self.con_all.len() {
-                println!( "{}, {}", j, self.con_all[j] );
-            }
-            println!( "index, domain_zero, domain_one" );
-            for j in 0 .. domain_one.len() {
-                println!( "{}, [{}, {}]", j, var_zero[j], var_one[j] );
-            }
-            println!( "res, name, arg, var_zero[res]. var_one[res]" );
-        }
-        for op_index in 0 .. self.id_all.len() {
-            let op_id     = self.id_all[op_index];
-            let start     = self.op2arg[op_index];
-            let end       = self.op2arg[op_index + 1];
-            let arg       = &self.arg_all[start .. end];
-            let res       = self.n_domain + op_index;
-            let forward_1 = op_info_vec[op_id].forward_1;
-            forward_1(&mut var_one, var_zero, &self.con_all, &arg, res );
-            if trace {
-                let name = &op_info_vec[op_id].name;
-                println!(
-                    "{}, {}, {:?}, [{}, {}]",
-                    res, name, arg, var_zero[res], var_one[res]
-                );
-            }
-        }
-        if trace {
-            println!( "End Trace: forward_one" );
-        }
-        let mut range_one : Vec<Float> = Vec::new();
-        for i in 0 .. self.range_index.len() {
-            range_one.push( var_one[ self.range_index[i] ] );
-        }
-        range_one
-    }
+    forward_one!(Float);
+    //
+    // ad_forward_one
+    forward_one!(AD);
+    //
     // -------------------------------------------------------------------
     // reverse_one
     /// first order reverse mode evaluation of partial dervatives.
