@@ -136,6 +136,7 @@ impl ADFun {
             var_zero[j] = domain_zero[j];
         }
         if trace {
+            println!( "Begin Trace: forward_zero" );
             println!( "index, constant" );
             for j in 0 .. self.con_all.len() {
                 println!( "{:?}, {:?}", j, self.con_all[j] );
@@ -160,6 +161,9 @@ impl ADFun {
                     "{:?}, {:?}, {:?}, {:?}", res, name, arg, var_zero[res]
                 );
             }
+        }
+        if trace {
+            println!( "End Trace: forward_zero" );
         }
         let mut range_zero : Vec<Float> = Vec::new();
         for i in 0 .. self.range_index.len() {
@@ -216,6 +220,7 @@ impl ADFun {
             var_one[j] = domain_one[j];
         }
         if trace {
+            println!( "Begin Trace: forward_one" );
             println!( "index, constant" );
             for j in 0 .. self.con_all.len() {
                 println!( "{:?}, {:?}", j, self.con_all[j] );
@@ -224,7 +229,7 @@ impl ADFun {
             for j in 0 .. domain_one.len() {
                 println!( "{:?}, [{:?}, {:?}]", j, var_zero[j], var_one[j] );
             }
-            println!( "res, name, arg, var_zero[res]. var_one[res]" )
+            println!( "res, name, arg, var_zero[res]. var_one[res]" );
         }
         for op_index in 0 .. self.id_all.len() {
             let op_id     = self.id_all[op_index];
@@ -241,6 +246,9 @@ impl ADFun {
                     res, name, arg, var_zero[res], var_one[res]
                 );
             }
+        }
+        if trace {
+            println!( "End Trace: forward_one" );
         }
         let mut range_one : Vec<Float> = Vec::new();
         for i in 0 .. self.range_index.len() {
@@ -295,6 +303,7 @@ impl ADFun {
             partial[ self.range_index[j] ] += range_one[j];
         }
         if trace {
+            println!( "Begin Trace: reverse_one" );
             println!( "index, constant" );
             for j in 0 .. self.con_all.len() {
                 println!( "{:?}, {:?}", j, self.con_all[j] );
@@ -303,7 +312,7 @@ impl ADFun {
             for j in 0 .. range_one.len() {
                 println!( "{:?}, [{:?}, {:?}]", j, var_zero[j], partial[j] );
             }
-            println!( "res, name, arg, var_zero[res]. partial[res]" )
+            println!( "res, name, arg, var_zero[res]. partial[res]" );
         }
         for op_index in ( 0 .. self.id_all.len() ).rev() {
             let op_id     = self.id_all[op_index];
@@ -321,6 +330,9 @@ impl ADFun {
                 );
             }
         }
+        if trace {
+            println!( "End Trace: reverse_one" );
+        }
         let mut domain_one : Vec<Float> = Vec::new();
         for j in 0 .. self.n_domain {
             domain_one.push( partial[j] );
@@ -330,7 +342,7 @@ impl ADFun {
 }
 //
 // ad_domain
-/// Calling `ad_domain` function starts a new recording.
+/// Calling `ad_domain` starts a new recording ([ad_fun] stops the recording).
 ///
 /// # Recording
 /// There must not currently be a recording in process on the current thread.
@@ -340,8 +352,10 @@ impl ADFun {
 /// and their value during the recording.
 ///
 /// # ad_domain
-/// The return value is the vector of domain space variables.
-/// It has the same length and values as domain.
+/// The return is a vector of variables 
+/// with the same length and values as domain.
+/// Dependencies with respect to these variables will be recorded on
+/// the tape for this thread.
 pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
     //
     // new_tape_id
@@ -375,7 +389,8 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
 }
 //
 // ad_fun
-/// Calling `ad_fun` stops a recordng and moves it to an ADFun object..
+/// Calling `ad_fun` stops a recordng and moves it to an ADFun object
+/// ([ad_domain] starts a recording).
 ///
 /// # Recording
 /// There must currently be a recording in process on the current thread.
@@ -385,8 +400,9 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
 ///
 /// # ad_fun
 /// The return value is an ADFun containing the sequence of operations
-/// that compute the range space variables as a function of the
-/// domain space variables.
+/// that computed ad_range as a function of [ad_domain].
+/// It can compute the range space variables and derivarives
+/// as a function of the domain space variables.
 pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
     THIS_THREAD_TAPE.with_borrow_mut( |tape| {
