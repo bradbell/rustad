@@ -36,7 +36,7 @@ macro_rules! binary_op_forward_0 {
             stringify!( $op_symbol ), " variable"
         ) ]
         fn [< $Float_type:lower  _forward_0_ $op_name  _cv >] (
-            var_zero: &mut Vec<Float>,
+            var_zero: &mut Vec<$Float_type>,
             con:           &Vec<Float>,
             arg:           &[Index],
             res:           Index) {
@@ -48,7 +48,7 @@ macro_rules! binary_op_forward_0 {
             stringify!( $op_symbol ), " constant"
         ) ]
         fn [< $Float_type:lower  _forward_0_ $op_name  _vc >] (
-            var_zero: &mut Vec<Float>,
+            var_zero: &mut Vec<$Float_type>,
             con:           &Vec<Float>,
             arg:           &[Index],
             res:           Index) {
@@ -60,7 +60,7 @@ macro_rules! binary_op_forward_0 {
             stringify!( $op_symbol ), " variable"
         ) ]
         fn [< $Float_type:lower  _forward_0_ $op_name  _vv >] (
-            var_zero: &mut Vec<Float>,
+            var_zero: &mut Vec<$Float_type>,
             _con:          &Vec<Float>,
             arg:           &[Index],
             res:           Index) {

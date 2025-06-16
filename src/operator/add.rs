@@ -34,7 +34,7 @@ macro_rules! forward_1_add {
         fn [< $Float_type:lower _forward_1_add_cv >](
             var_one:   &mut Vec<$Float_type>,
             _var_zero: &Vec<$Float_type>,
-            _con:      &Vec<$Float_type>,
+            _con:      &Vec<Float>,
             arg:       &[Index],
             res:       Index) {
             debug_assert!( arg.len() == 2);
@@ -47,7 +47,7 @@ macro_rules! forward_1_add {
         fn [< $Float_type:lower _forward_1_add_vc >](
             var_one:   &mut Vec<$Float_type>,
             _var_zero: &Vec<$Float_type>,
-            _con:      &Vec<$Float_type>,
+            _con:      &Vec<Float>,
             arg:       &[Index],
             res:       Index) {
             debug_assert!( arg.len() == 2);
@@ -60,7 +60,7 @@ macro_rules! forward_1_add {
         fn [< $Float_type:lower  _forward_1_add_vv >](
             var_one:   &mut Vec<$Float_type>,
             _var_zero: &Vec<$Float_type>,
-            _con:      &Vec<$Float_type>,
+            _con:      &Vec<Float>,
             arg:       &[Index],
             res:       Index) {
             debug_assert!( arg.len() == 2);
