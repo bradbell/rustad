@@ -70,30 +70,52 @@ macro_rules! forward_1_add {
 }
 forward_1_add!(Float);
 // ---------------------------------------------------------------------------
-// reverse_1_add_cv_fn
-/// [ForwardOneBinary]  were op is +, left is constant, right is variable.
-fn reverse_1_add_cv_fn(partial: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
-    assert_eq!( arg.len(), 2);
-    partial[ arg[1] ] += partial[ res ];
+macro_rules! reverse_1_add {
+    ($Float_type:ident) => { paste::paste! {
+
+        #[doc = concat!(
+            " ", stringify!($Float_type),
+            " zero order reverse  constant + variable"
+        ) ]
+        fn [< $Float_type:lower _reverse_1_add_cv >](
+            partial:   &mut Vec<$Float_type>,
+            _var_zero: &Vec<$Float_type>,
+            _con:      &Vec<Float>,
+            arg:       &[Index],
+            res:       Index) {
+            debug_assert!( arg.len() == 2);
+            partial[ arg[1] ] = partial[ arg[1] ] + partial[ res ];
+        }
+        #[doc = concat!(
+            " ", stringify!($Float_type),
+            " zero order reverse  variable + constant"
+        ) ]
+        fn [< $Float_type:lower _reverse_1_add_vc >](
+            partial:   &mut Vec<$Float_type>,
+            _var_zero: &Vec<$Float_type>,
+            _con:      &Vec<Float>,
+            arg:       &[Index],
+            res:       Index) {
+            debug_assert!( arg.len() == 2);
+            partial[ arg[0] ] = partial[ arg[0] ] + partial[ res ];
+        }
+        #[doc = concat!(
+            " ", stringify!($Float_type),
+            " zero order reverse  variable + variable"
+        ) ]
+        fn [< $Float_type:lower  _reverse_1_add_vv >](
+            partial:   &mut Vec<$Float_type>,
+            _var_zero: &Vec<$Float_type>,
+            _con:      &Vec<Float>,
+            arg:       &[Index],
+            res:       Index) {
+            debug_assert!( arg.len() == 2);
+            partial[ arg[0] ] = partial[ arg[0] ] + partial[ res ];
+            partial[ arg[1] ] = partial[ arg[1] ] + partial[ res ];
+        }
+    } };
 }
-//
-// reverse_1_add_vc_fn
-/// [ForwardOneBinary]  were op is +, left is variable, right is constant.
-fn reverse_1_add_vc_fn(partial: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
-    assert_eq!( arg.len(), 2);
-    partial[ arg[0] ] += partial[ res ];
-}
-//
-// reverse_1_add_vv_fn
-/// [ForwardOneBinary]  where op is +, left is variable, right is variable.
-fn reverse_1_add_vv_fn(partial: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
-    assert_eq!( arg.len(), 2);
-    partial[ arg[0] ] += partial[ res ];
-    partial[ arg[1] ] += partial[ res ];
-}
+reverse_1_add!(Float);
 // ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the add operators.
@@ -105,7 +127,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         name         : "add_cv".to_string() ,
         forward_0    : float_forward_0_add_cv as super::ForwardZero,
         forward_1    : float_forward_1_add_cv as super::ForwardOne,
-        reverse_1    : reverse_1_add_cv_fn,
+        reverse_1    : float_reverse_1_add_cv as super::ReverseOne,
         ad_forward_0 : super::ad_panic_zero,
         ad_forward_1 : super::ad_panic_one,
         ad_reverse_1 : super::ad_panic_one,
@@ -114,7 +136,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         name         : "add_vc".to_string(),
         forward_0    : float_forward_0_add_vc as super::ForwardZero,
         forward_1    : float_forward_1_add_vc as super::ForwardOne,
-        reverse_1    : reverse_1_add_vc_fn,
+        reverse_1    : float_reverse_1_add_vc as super::ReverseOne,
         ad_forward_0 : super::ad_panic_zero,
         ad_forward_1 : super::ad_panic_one,
         ad_reverse_1 : super::ad_panic_one,
@@ -123,7 +145,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         name         : "add_vv".to_string(),
         forward_0    : float_forward_0_add_vv as super::ForwardZero,
         forward_1    : float_forward_1_add_vv as super::ForwardOne,
-        reverse_1    : reverse_1_add_vv_fn,
+        reverse_1    : float_reverse_1_add_vv as super::ReverseOne,
         ad_forward_0 : super::ad_panic_zero,
         ad_forward_1 : super::ad_panic_one,
         ad_reverse_1 : super::ad_panic_one,
