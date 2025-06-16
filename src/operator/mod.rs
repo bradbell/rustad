@@ -13,14 +13,21 @@ use crate::ad_tape::Tape;
 #[cfg(doc)]
 use crate::ad_tape::THIS_THREAD_TAPE;
 // ---------------------------------------------------------------------------
-/// The macro call binary_op_forward_0($Float_type, $op_name, $op_symbol)
-/// defines the following [ForwardZero] functions:
-///
-/// ${float_type}_forward_0_${op_name}_cv
-/// ${float_type}_forward_0_${op_name}_vc
-/// ${float_type}_forward_0_${op_name}_vv
-///
-/// where $float_type is a lower case version of $Float_type
+/// The macro call
+/// <pre>
+///     binary_op_forward_0($Float_type, $op_name, $op_symbol)
+/// </pre>
+/// where `$Float_type` is `Float` or `AD` ,
+/// `$op_name` is add , sub , mul , or div  ,
+/// `$op_symbol` is the operator; e.g. + for add.
+/// This defines the following functions:
+/// <pre>
+///     ${float_type}_forward_0_${op_name}_cv
+///     ${float_type}_forward_0_${op_name}_vc
+///     ${float_type}_forward_0_${op_name}_vv
+/// </pre>
+/// where `$float_type` is the lower case version of `$Float_type` and
+/// v (c) means the corresponding operand is a variable (constant) .
 macro_rules! binary_op_forward_0 {
     ($Float_type:ident, $op_name:ident, $op_symbol:tt) => { paste::paste! {
 

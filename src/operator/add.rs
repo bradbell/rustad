@@ -24,30 +24,51 @@ use crate::operator::{ForwardZeroBinary, ForwardOneBinary};
 // float_forward_0_add_vv
 binary_op_forward_0!(Float, add, +);
 // ---------------------------------------------------------------------------
-// forward_1_add_cv_fn
-/// [ForwardOneBinary]  were op is +, left is constant, right is variable.
-fn forward_1_add_cv_fn(var_one: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
-    assert_eq!( arg.len(), 2);
-    var_one[ res ] = var_one[ arg[1] ];
+macro_rules! forward_1_add {
+    ($Float_type:ident) => { paste::paste! {
+
+        #[doc = concat!(
+            " ", stringify!($Float_type),
+            " zero order forward  constant + variable"
+        ) ]
+        fn [< $Float_type:lower _forward_1_add_cv >](
+            var_one:   &mut Vec<$Float_type>,
+            _var_zero: &Vec<$Float_type>,
+            _con:      &Vec<$Float_type>,
+            arg:       &[Index],
+            res:       Index) {
+            debug_assert!( arg.len() == 2);
+            var_one[ res ] = var_one[ arg[1] ];
+        }
+        #[doc = concat!(
+            " ", stringify!($Float_type),
+            " zero order forward  variable + constant"
+        ) ]
+        fn [< $Float_type:lower _forward_1_add_vc >](
+            var_one:   &mut Vec<$Float_type>,
+            _var_zero: &Vec<$Float_type>,
+            _con:      &Vec<$Float_type>,
+            arg:       &[Index],
+            res:       Index) {
+            debug_assert!( arg.len() == 2);
+            var_one[ res ] = var_one[ arg[0] ];
+        }
+        #[doc = concat!(
+            " ", stringify!($Float_type),
+            " zero order forward  variable + variable"
+        ) ]
+        fn [< $Float_type:lower  _forward_1_add_vv >](
+            var_one:   &mut Vec<$Float_type>,
+            _var_zero: &Vec<$Float_type>,
+            _con:      &Vec<$Float_type>,
+            arg:       &[Index],
+            res:       Index) {
+            debug_assert!( arg.len() == 2);
+            var_one[ res ] = var_one[ arg[0] ] + var_one[ arg[1] ];
+        }
+    } };
 }
-//
-// forward_1_add_vc_fn
-/// [ForwardOneBinary]  were op is +, left is variable, right is constant.
-fn forward_1_add_vc_fn(var_one: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
-    assert_eq!( arg.len(), 2);
-    var_one[ res ] = var_one[ arg[0] ];
-}
-//
-// forward_1_add_vv_fn
-/// [ForwardOneBinary]  where op is +, left is variable, right is variable.
-fn forward_1_add_vv_fn(var_one: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
-    assert_eq!( arg.len(), 2);
-    var_one[ res ] = var_one[ arg[0] ] + var_one[ arg[1] ];
-}
-//
+forward_1_add!(Float);
 // ---------------------------------------------------------------------------
 // reverse_1_add_cv_fn
 /// [ForwardOneBinary]  were op is +, left is constant, right is variable.
@@ -83,7 +104,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
     op_info_vec[ADD_CV_OP] = OpInfo{
         name         : "add_cv".to_string() ,
         forward_0    : float_forward_0_add_cv as super::ForwardZero,
-        forward_1    : forward_1_add_cv_fn,
+        forward_1    : float_forward_1_add_cv as super::ForwardOne,
         reverse_1    : reverse_1_add_cv_fn,
         ad_forward_0 : super::ad_panic_zero,
         ad_forward_1 : super::ad_panic_one,
@@ -92,7 +113,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
     op_info_vec[ADD_VC_OP] = OpInfo{
         name         : "add_vc".to_string(),
         forward_0    : float_forward_0_add_vc as super::ForwardZero,
-        forward_1    : forward_1_add_vc_fn,
+        forward_1    : float_forward_1_add_vc as super::ForwardOne,
         reverse_1    : reverse_1_add_vc_fn,
         ad_forward_0 : super::ad_panic_zero,
         ad_forward_1 : super::ad_panic_one,
@@ -101,7 +122,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
     op_info_vec[ADD_VV_OP] = OpInfo{
         name         : "add_vv".to_string(),
         forward_0    : float_forward_0_add_vv as super::ForwardZero,
-        forward_1    : forward_1_add_vv_fn,
+        forward_1    : float_forward_1_add_vv as super::ForwardOne,
         reverse_1    : reverse_1_add_vv_fn,
         ad_forward_0 : super::ad_panic_zero,
         ad_forward_1 : super::ad_panic_one,
