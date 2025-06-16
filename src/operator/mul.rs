@@ -155,4 +155,6 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         ad_reverse_1 : ad_reverse_1_mul_vv,
     };
 }
-impl_binary_operator!( Mul, * );
+//
+// AD * AD, Float * AD, AD * Float
+crate::ad::binary_ad_operator!( Mul, * );
