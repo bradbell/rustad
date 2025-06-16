@@ -23,6 +23,7 @@ use crate::operator::ForwardZeroBinary;
 // float_forward_0_mul_vc
 // float_forward_0_mul_vv
 binary_op_forward_0!(Float, mul, *);
+binary_op_forward_0!(AD, mul, *);
 // ---------------------------------------------------------------------------
 macro_rules! forward_1_mul {
     ($Float_type:ident) => { paste::paste! {
@@ -70,6 +71,7 @@ macro_rules! forward_1_mul {
     } };
 }
 forward_1_mul!(Float);
+forward_1_mul!(AD);
 // ---------------------------------------------------------------------------
 macro_rules! reverse_1_mul {
     ($Float_type:ident) => { paste::paste! {
@@ -117,6 +119,7 @@ macro_rules! reverse_1_mul {
     } };
 }
 reverse_1_mul!(Float);
+reverse_1_mul!(AD);
 // ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the mul operators.
@@ -129,27 +132,27 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         forward_0    : float_forward_0_mul_cv,
         forward_1    : float_forward_1_mul_cv,
         reverse_1    : float_reverse_1_mul_cv,
-        ad_forward_0 : super::ad_panic_zero,
-        ad_forward_1 : super::ad_panic_one,
-        ad_reverse_1 : super::ad_panic_one,
+        ad_forward_0 : ad_forward_0_mul_cv,
+        ad_forward_1 : ad_forward_1_mul_cv,
+        ad_reverse_1 : ad_reverse_1_mul_cv,
      };
     op_info_vec[MUL_VC_OP] = OpInfo{
         name         : "mul_vc".to_string(),
         forward_0    : float_forward_0_mul_vc,
         forward_1    : float_forward_1_mul_vc,
         reverse_1    : float_reverse_1_mul_vc,
-        ad_forward_0 : super::ad_panic_zero,
-        ad_forward_1 : super::ad_panic_one,
-        ad_reverse_1 : super::ad_panic_one,
+        ad_forward_0 : ad_forward_0_mul_vc,
+        ad_forward_1 : ad_forward_1_mul_vc,
+        ad_reverse_1 : ad_reverse_1_mul_vc,
     };
     op_info_vec[MUL_VV_OP] = OpInfo{
         name         : "mul_vv".to_string(),
         forward_0    : float_forward_0_mul_vv,
         forward_1    : float_forward_1_mul_vv,
         reverse_1    : float_reverse_1_mul_vv,
-        ad_forward_0 : super::ad_panic_zero,
-        ad_forward_1 : super::ad_panic_one,
-        ad_reverse_1 : super::ad_panic_one,
+        ad_forward_0 : ad_forward_0_mul_vv,
+        ad_forward_1 : ad_forward_1_mul_vv,
+        ad_reverse_1 : ad_reverse_1_mul_vv,
     };
 }
 impl_binary_operator!( Mul, * );
