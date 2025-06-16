@@ -19,31 +19,10 @@ use crate::operator;
 #[cfg(doc)]
 use crate::operator::ForwardZeroBinary;
 //
-// ---------------------------------------------------------------------------
-// forward_0_mul_cv_fn
-/// [ForwardZeroBinary] were op is *, left is constant, right is variable.
-fn forward_0_mul_cv_fn(
-    var_zero: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
-    assert_eq!( arg.len(), 2);
-    var_zero[ res ] = con[ arg[0] ] * var_zero[ arg[1] ];
-}
-//
-// forward_0_mul_vc_fn
-/// [ForwardZeroBinary] were op is *, left is variable, right is constant.
-fn forward_0_mul_vc_fn(
-    var_zero: &mut Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
-    assert_eq!( arg.len(), 2);
-    var_zero[ res ] = var_zero[ arg[0] ] * con[ arg[1] ];
-}
-//
-// forward_0_mul_vv_fn
-/// [ForwardZeroBinary] where op is *, left is variable, right is variable.
-fn forward_0_mul_vv_fn(
-    var_zero: &mut Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
-    assert_eq!( arg.len(), 2);
-    var_zero[ res ] = var_zero[ arg[0] ] * var_zero[ arg[1] ];
-}
-//
+// float_forward_0_mul_cv
+// float_forward_0_mul_vc
+// float_forward_0_mul_vv
+binary_op_forward_0!(Float, mul, *);
 // ---------------------------------------------------------------------------
 // forward_1_mul_cv_fn
 /// ForwardOneBinary were op is *, left is constant, right is variable.
@@ -103,7 +82,7 @@ fn reverse_1_mul_vv_fn(partial: &mut Vec<Float>,
 pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
     op_info_vec[MUL_CV_OP] = OpInfo{
         name         : "mul_cv".to_string() ,
-        forward_0    : forward_0_mul_cv_fn,
+        forward_0    : float_forward_0_mul_cv,
         forward_1    : forward_1_mul_cv_fn,
         reverse_1    : reverse_1_mul_cv_fn,
         ad_forward_0 : super::ad_panic_zero,
@@ -112,7 +91,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
      };
     op_info_vec[MUL_VC_OP] = OpInfo{
         name         : "mul_vc".to_string(),
-        forward_0    : forward_0_mul_vc_fn,
+        forward_0    : float_forward_0_mul_vc,
         forward_1    : forward_1_mul_vc_fn,
         reverse_1    : reverse_1_mul_vc_fn,
         ad_forward_0 : super::ad_panic_zero,
@@ -121,7 +100,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
     };
     op_info_vec[MUL_VV_OP] = OpInfo{
         name         : "mul_vv".to_string(),
-        forward_0    : forward_0_mul_vv_fn,
+        forward_0    : float_forward_0_mul_vv,
         forward_1    : forward_1_mul_vv_fn,
         reverse_1    : reverse_1_mul_vv_fn,
         ad_forward_0 : super::ad_panic_zero,

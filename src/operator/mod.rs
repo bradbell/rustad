@@ -13,6 +13,56 @@ use crate::ad_tape::Tape;
 #[cfg(doc)]
 use crate::ad_tape::THIS_THREAD_TAPE;
 // ---------------------------------------------------------------------------
+/// The macro call binary_op_forward_0($Float_type, $op_name, $op_symbol)
+/// defines the following [ForwardZero] functions:
+///
+/// ${float_type}_forward_0_${op_name}_cv
+/// ${float_type}_forward_0_${op_name}_vc
+/// ${float_type}_forward_0_${op_name}_vv
+///
+/// where $float_type is a lower case version of $Float_type
+macro_rules! binary_op_forward_0 {
+    ($Float_type:ident, $op_name:ident, $op_symbol:tt) => { paste::paste! {
+
+        #[doc = concat!(
+            " ", stringify!( $Float_type ), " zero order forward constant ",
+            stringify!( $op_symbol ), " variable"
+        ) ]
+        fn [< $Float_type:lower  _forward_0_ $op_name  _cv >] (
+            var_zero: &mut Vec<Float>,
+            con:           &Vec<Float>,
+            arg:           &[Index],
+            res:           Index) {
+            assert_eq!( arg.len(), 2);
+            var_zero[ res ] = con[ arg[0] ] $op_symbol var_zero[ arg[1] ];
+        }
+        #[doc = concat!(
+            " ", stringify!( $Float_type ), " zero order forward variable ",
+            stringify!( $op_symbol ), " constant"
+        ) ]
+        fn [< $Float_type:lower  _forward_0_ $op_name  _vc >] (
+            var_zero: &mut Vec<Float>,
+            con:           &Vec<Float>,
+            arg:           &[Index],
+            res:           Index) {
+            assert_eq!( arg.len(), 2);
+            var_zero[ res ] = var_zero[ arg[0] ] $op_symbol con[ arg[1] ];
+        }
+        #[doc = concat!(
+            " ", stringify!( $Float_type ), " zero order forward variable ",
+            stringify!( $op_symbol ), " variable"
+        ) ]
+        fn [< $Float_type:lower  _forward_0_ $op_name  _vv >] (
+            var_zero: &mut Vec<Float>,
+            _con:          &Vec<Float>,
+            arg:           &[Index],
+            res:           Index) {
+            assert_eq!( arg.len(), 2);
+            var_zero[ res ] = var_zero[ arg[0] ] $op_symbol var_zero[ arg[1] ];
+        }
+    } };
+}
+// ---------------------------------------------------------------------------
 // impl_binary_operator
 /// This macro implements the the following binary operations:
 /// <pre>
