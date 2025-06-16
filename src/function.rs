@@ -23,7 +23,7 @@ use crate::operator;
 /// # Syntax
 /// <pre>
 ///     (range_zero, var_zero) = f.forward_zero(domain_zero, trace)
-///     (range_zero, var_zero) = f.ad_forward(domain_zero, trace)
+///     (range_zero, var_zero) = f.ad_forward_zero(domain_zero, trace)
 /// </pre>
 ///
 /// # f
@@ -36,8 +36,7 @@ use crate::operator;
 /// if true, a trace of the operatiopn sequence is printed on stdout.
 ///
 /// # range_zero
-/// The first return value is the range vector corresponding to
-/// domain_zero;
+/// The first return value is the range vector corresponding to domain_zero;
 /// i.e., the function value correspdong the operation sequence.
 ///
 /// # var_zero
@@ -119,8 +118,8 @@ macro_rules! forward_zero {
 ///
 /// # Syntax
 /// <pre>
-///     range_one = f.forward(domain_one, var_zero, trace)
-///     range_one = f.ad_forward(domain_one, var_zero, trace)
+///     range_one = f.forward_one(domain_one, var_zero, trace)
+///     range_one = f.ad_forward_one(domain_one, var_zero, trace)
 /// </pre>
 ///
 /// # f
@@ -211,6 +210,110 @@ macro_rules! forward_one {
                 range_one.push( var_one[ self.range_index[i] ] );
             }
             range_one
+        }
+    } }
+}
+// -------------------------------------------------------------------
+// reverse_one
+/// First order reverse mode evaluation; see the
+/// [Float][ADFun::reverse_one] and [AD](ADFun::ad_reverse_one) prototypes.
+/// This documentation is for the functions created by `reverse_one!` .
+/// Using this macro is unspecified.
+///
+/// # Syntax
+/// <pre>
+///     domain_one = f.reverse_one(range_one, var_zero, trace)
+///     domain_one = f.reverse_one(range_one, var_zero, trace)
+/// </pre>
+///
+/// # f
+/// is is this ADFun object.
+///
+/// # ramge_one
+/// specifies the partials of as scalar function of range variables.
+///
+/// # var_zero
+/// is the value for all the variables in the operation sequence.
+/// This is returned at the end of a [forward_zero](ADFun::forward_zero)
+/// computation.
+///
+/// # trace
+/// if true, a trace of the operatiopn sequence is printed on stdout.
+///
+/// # domain_one
+/// The return value is the partials of the scalar function
+/// with respect to the domain variables.
+#[macro_export]
+macro_rules! reverse_one {
+    (Float) => { reverse_one!(reverse, Float); };
+    (AD)    => { reverse_one!(ad_reverse, AD); };
+    //
+    ( $prefix:ident, $float_type:ident ) => { paste::paste! {
+
+        #[doc = concat!(
+            " Zero order reverse using ",
+            stringify!($float_type),
+            " see [ reverse_one! ] for documentation",
+        )]
+        pub fn [< $prefix _one >] (
+            &self,
+            range_one  : &[$float_type],
+            var_zero   : &Vec<$float_type>,
+            trace      : bool
+        ) -> Vec<$float_type> {
+            assert_eq!(
+                range_one.len(), self.range_index.len(),
+                "f.reverse_one: range_one length does not match f"
+            );
+            assert_eq!(
+                var_zero.len(), self.n_var,
+                "f.reverse_one: var_zero length does not match f"
+             );
+            //
+            let op_info_vec = &*OP_INFO_VEC;
+            let zero        = $float_type::from( Float::from(0.0) );
+            let mut partial = vec![zero; self.n_var ];
+            for j in 0 .. self.range_index.len() {
+                // 2DO: change this to += ones it is implemented for AD
+                partial[ self.range_index[j] ] =
+                    partial[ self.range_index[j] ] + range_one[j];
+            }
+            if trace {
+                println!( "Begin Trace: reverse_one" );
+                println!( "index, constant" );
+                for j in 0 .. self.con_all.len() {
+                    println!( "{}, {}", j, self.con_all[j] );
+                }
+                println!( "index, range_zero, range_one" );
+                for j in 0 .. range_one.len() {
+                    println!( "{}, [{}, {}]", j, var_zero[j], partial[j] );
+                }
+                println!( "res, name, arg, var_zero[res]. partial[res]" );
+            }
+            for op_index in ( 0 .. self.id_all.len() ).rev() {
+                let op_id     = self.id_all[op_index];
+                let start     = self.op2arg[op_index];
+                let end       = self.op2arg[op_index + 1];
+                let arg       = &self.arg_all[start .. end];
+                let res       = self.n_domain + op_index;
+                let reverse_1 = op_info_vec[op_id].[< $prefix _1 >];
+                reverse_1(&mut partial, var_zero, &self.con_all, &arg, res );
+                if trace {
+                    let name = &op_info_vec[op_id].name;
+                    println!(
+                        "{}, {}, {:?}, [{}, {}]",
+                        res, name, arg, var_zero[res], partial[res]
+                    );
+                }
+            }
+            if trace {
+                println!( "End Trace: reverse_one" );
+            }
+            let mut domain_one : Vec<$float_type> = Vec::new();
+            for j in 0 .. self.n_domain {
+                domain_one.push( partial[j] );
+            }
+            domain_one
         }
     } }
 }
@@ -307,89 +410,11 @@ impl ADFun {
     // ad_forward_one
     forward_one!(AD);
     //
-    // -------------------------------------------------------------------
     // reverse_one
-    /// first order reverse mode evaluation of partial dervatives.
-    ///
-    /// # Syntax
-    /// <pre>
-    ///     domain_one = f.reverse_one(range_one, var_zero, trace)
-    /// </pre>
-    ///
-    /// # f
-    /// is is this ADFun object.
-    ///
-    /// # ramge_one
-    /// specifies the partials of as scalar function of range variables.
-    ///
-    /// # var_zero
-    /// is the value for all the variables in the operation sequence.
-    /// This is returned at the end of a [forward_zero](ADFun::forward_zero)
-    /// computation.
-    ///
-    /// # trace
-    /// if true, a trace of the operatiopn sequence is printed on stdout.
-    ///
-    /// # domain_one
-    /// The return value is the partials of the scalar function
-    /// with respect to the domain variables.
-    pub fn reverse_one(
-        &self,
-        range_one  : &[Float],
-        var_zero   : &Vec<Float>,
-        trace      : bool
-    ) -> Vec<Float> {
-        assert_eq!(
-            range_one.len(), self.range_index.len(),
-            "f.reverse_one: range_one length does not match f"
-        );
-        assert_eq!(
-            var_zero.len(), self.n_var,
-            "f.reverse_one: var_zero length does not match f"
-         );
-        //
-        let op_info_vec = &*OP_INFO_VEC;
-        let mut partial = vec![0.0; self.n_var ];
-        for j in 0 .. self.range_index.len() {
-            partial[ self.range_index[j] ] += range_one[j];
-        }
-        if trace {
-            println!( "Begin Trace: reverse_one" );
-            println!( "index, constant" );
-            for j in 0 .. self.con_all.len() {
-                println!( "{}, {}", j, self.con_all[j] );
-            }
-            println!( "index, range_zero, range_one" );
-            for j in 0 .. range_one.len() {
-                println!( "{}, [{}, {}]", j, var_zero[j], partial[j] );
-            }
-            println!( "res, name, arg, var_zero[res]. partial[res]" );
-        }
-        for op_index in ( 0 .. self.id_all.len() ).rev() {
-            let op_id     = self.id_all[op_index];
-            let start     = self.op2arg[op_index];
-            let end       = self.op2arg[op_index + 1];
-            let arg       = &self.arg_all[start .. end];
-            let res       = self.n_domain + op_index;
-            let reverse_1 = op_info_vec[op_id].reverse_1;
-            reverse_1(&mut partial, var_zero, &self.con_all, &arg, res );
-            if trace {
-                let name = &op_info_vec[op_id].name;
-                println!(
-                    "{}, {}, {:?}, [{}, {}]",
-                    res, name, arg, var_zero[res], partial[res]
-                );
-            }
-        }
-        if trace {
-            println!( "End Trace: reverse_one" );
-        }
-        let mut domain_one : Vec<Float> = Vec::new();
-        for j in 0 .. self.n_domain {
-            domain_one.push( partial[j] );
-        }
-        domain_one
-    }
+    reverse_one!(Float);
+    //
+    // ad_reverse_one
+    reverse_one!(AD);
 }
 //
 // ad_domain
