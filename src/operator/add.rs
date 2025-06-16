@@ -125,27 +125,27 @@ reverse_1_add!(Float);
 pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
     op_info_vec[ADD_CV_OP] = OpInfo{
         name         : "add_cv".to_string() ,
-        forward_0    : float_forward_0_add_cv as super::ForwardZero,
-        forward_1    : float_forward_1_add_cv as super::ForwardOne,
-        reverse_1    : float_reverse_1_add_cv as super::ReverseOne,
+        forward_0    : float_forward_0_add_cv,
+        forward_1    : float_forward_1_add_cv,
+        reverse_1    : float_reverse_1_add_cv,
         ad_forward_0 : super::ad_panic_zero,
         ad_forward_1 : super::ad_panic_one,
         ad_reverse_1 : super::ad_panic_one,
      };
     op_info_vec[ADD_VC_OP] = OpInfo{
         name         : "add_vc".to_string(),
-        forward_0    : float_forward_0_add_vc as super::ForwardZero,
-        forward_1    : float_forward_1_add_vc as super::ForwardOne,
-        reverse_1    : float_reverse_1_add_vc as super::ReverseOne,
+        forward_0    : float_forward_0_add_vc,
+        forward_1    : float_forward_1_add_vc,
+        reverse_1    : float_reverse_1_add_vc,
         ad_forward_0 : super::ad_panic_zero,
         ad_forward_1 : super::ad_panic_one,
         ad_reverse_1 : super::ad_panic_one,
     };
     op_info_vec[ADD_VV_OP] = OpInfo{
         name         : "add_vv".to_string(),
-        forward_0    : float_forward_0_add_vv as super::ForwardZero,
-        forward_1    : float_forward_1_add_vv as super::ForwardOne,
-        reverse_1    : float_reverse_1_add_vv as super::ReverseOne,
+        forward_0    : float_forward_0_add_vv,
+        forward_1    : float_forward_1_add_vv,
+        reverse_1    : float_reverse_1_add_vv,
         ad_forward_0 : super::ad_panic_zero,
         ad_forward_1 : super::ad_panic_one,
         ad_reverse_1 : super::ad_panic_one,
