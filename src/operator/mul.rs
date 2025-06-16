@@ -71,30 +71,52 @@ macro_rules! forward_1_mul {
 }
 forward_1_mul!(Float);
 // ---------------------------------------------------------------------------
-// reverse_1_mul_cv_fn
-/// ForwardOneBinary were op is *, left is constant, right is variable.
-fn reverse_1_mul_cv_fn(partial: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
-    assert_eq!( arg.len(), 2);
-    partial[ arg[1] ] += partial[res] * con[ arg[0] ];
+macro_rules! reverse_1_mul {
+    ($Float_type:ident) => { paste::paste! {
+
+        #[doc = concat!(
+            " ", stringify!($Float_type),
+            " zero order reverse  constant * variable"
+        ) ]
+        fn [< $Float_type:lower _reverse_1_mul_cv >](
+            partial:   &mut Vec<$Float_type>,
+            _var_zero: &Vec<$Float_type>,
+            con:       &Vec<Float>,
+            arg:       &[Index],
+            res:       Index) {
+            debug_assert!( arg.len() == 2);
+            partial[arg[1]] = partial[arg[1]] + partial[res] * con[arg[0]];
+        }
+        #[doc = concat!(
+            " ", stringify!($Float_type),
+            " zero order reverse  variable * constant"
+        ) ]
+        fn [< $Float_type:lower _reverse_1_mul_vc >](
+            partial:   &mut Vec<$Float_type>,
+            _var_zero: &Vec<$Float_type>,
+            con:       &Vec<Float>,
+            arg:       &[Index],
+            res:       Index) {
+            debug_assert!( arg.len() == 2);
+            partial[arg[0]] = partial[arg[0]] + partial[res] * con[arg[1]];
+        }
+        #[doc = concat!(
+            " ", stringify!($Float_type),
+            " zero order reverse  variable * variable"
+        ) ]
+        fn [< $Float_type:lower  _reverse_1_mul_vv >](
+            partial:   &mut Vec<$Float_type>,
+            var_zero:  &Vec<$Float_type>,
+            _con:      &Vec<Float>,
+            arg:       &[Index],
+            res:       Index) {
+            debug_assert!( arg.len() == 2);
+            partial[arg[0]] = partial[arg[0]] + partial[res] * var_zero[arg[1]];
+            partial[arg[1]] = partial[arg[1]] + partial[res] * var_zero[arg[0]];
+        }
+    } };
 }
-//
-// reverse_1_mul_vc_fn
-/// ForwardOneBinary were op is *, left is variable, right is constant.
-fn reverse_1_mul_vc_fn(partial: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, con: &Vec<Float>, arg: &[Index], res: Index) {
-    assert_eq!( arg.len(), 2);
-    partial[ arg[0] ] += partial[res] * con[ arg[0] ];
-}
-//
-// reverse_1_mul_vv_fn
-/// ForwardZeroBinary where op is *, left is variable, right is variable.
-fn reverse_1_mul_vv_fn(partial: &mut Vec<Float>,
-    var_zero: &Vec<Float>, _con: &Vec<Float>, arg: &[Index], res: Index) {
-    assert_eq!( arg.len(), 2);
-    partial[ arg[0] ] += partial[res] * var_zero[ arg[1] ];
-    partial[ arg[1] ] += partial[res] * var_zero[ arg[0] ];
-}
+reverse_1_mul!(Float);
 // ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the mul operators.
@@ -106,7 +128,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         name         : "mul_cv".to_string() ,
         forward_0    : float_forward_0_mul_cv,
         forward_1    : float_forward_1_mul_cv,
-        reverse_1    : reverse_1_mul_cv_fn,
+        reverse_1    : float_reverse_1_mul_cv,
         ad_forward_0 : super::ad_panic_zero,
         ad_forward_1 : super::ad_panic_one,
         ad_reverse_1 : super::ad_panic_one,
@@ -115,7 +137,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         name         : "mul_vc".to_string(),
         forward_0    : float_forward_0_mul_vc,
         forward_1    : float_forward_1_mul_vc,
-        reverse_1    : reverse_1_mul_vc_fn,
+        reverse_1    : float_reverse_1_mul_vc,
         ad_forward_0 : super::ad_panic_zero,
         ad_forward_1 : super::ad_panic_one,
         ad_reverse_1 : super::ad_panic_one,
@@ -124,7 +146,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         name         : "mul_vv".to_string(),
         forward_0    : float_forward_0_mul_vv,
         forward_1    : float_forward_1_mul_vv,
-        reverse_1    : reverse_1_mul_vv_fn,
+        reverse_1    : float_reverse_1_mul_vv,
         ad_forward_0 : super::ad_panic_zero,
         ad_forward_1 : super::ad_panic_one,
         ad_reverse_1 : super::ad_panic_one,
