@@ -19,9 +19,9 @@ use crate::operator;
 #[cfg(doc)]
 use crate::operator::ForwardZeroBinary;
 //
-// float_forward_0_mul_cv
-// float_forward_0_mul_vc
-// float_forward_0_mul_vv
+// float_forward_0_mul_cv, ad_forward_0_mul_cv
+// float_forward_0_mul_vc, ad_forward_0_mul_vc
+// float_forward_0_mul_vv, ad_forward_0_mul_vv
 binary_op_forward_0!(Float, mul, *);
 binary_op_forward_0!(AD, mul, *);
 // ---------------------------------------------------------------------------

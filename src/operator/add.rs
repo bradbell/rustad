@@ -19,10 +19,11 @@ use crate::operator;
 #[cfg(doc)]
 use crate::operator::{ForwardZeroBinary, ForwardOneBinary};
 //
-// float_forward_0_add_cv
-// float_forward_0_add_vc
-// float_forward_0_add_vv
+// float_forward_0_add_cv, ad_forward_0_add_cv
+// float_forward_0_add_vc, ad_forward_0_add_vc
+// float_forward_0_add_vv, ad_forward_0_add_vv
 binary_op_forward_0!(Float, add, +);
+binary_op_forward_0!(AD, add, +);
 // ---------------------------------------------------------------------------
 macro_rules! forward_1_add {
     ($Float_type:ident) => { paste::paste! {
@@ -69,6 +70,7 @@ macro_rules! forward_1_add {
     } };
 }
 forward_1_add!(Float);
+forward_1_add!(AD);
 // ---------------------------------------------------------------------------
 macro_rules! reverse_1_add {
     ($Float_type:ident) => { paste::paste! {
@@ -116,6 +118,7 @@ macro_rules! reverse_1_add {
     } };
 }
 reverse_1_add!(Float);
+reverse_1_add!(AD);
 // ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the add operators.
@@ -128,27 +131,27 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         forward_0    : float_forward_0_add_cv,
         forward_1    : float_forward_1_add_cv,
         reverse_1    : float_reverse_1_add_cv,
-        ad_forward_0 : super::ad_panic_zero,
-        ad_forward_1 : super::ad_panic_one,
-        ad_reverse_1 : super::ad_panic_one,
+        ad_forward_0 : ad_forward_0_add_cv,
+        ad_forward_1 : ad_forward_1_add_cv,
+        ad_reverse_1 : ad_reverse_1_add_cv,
      };
     op_info_vec[ADD_VC_OP] = OpInfo{
         name         : "add_vc".to_string(),
         forward_0    : float_forward_0_add_vc,
         forward_1    : float_forward_1_add_vc,
         reverse_1    : float_reverse_1_add_vc,
-        ad_forward_0 : super::ad_panic_zero,
-        ad_forward_1 : super::ad_panic_one,
-        ad_reverse_1 : super::ad_panic_one,
+        ad_forward_0 : ad_forward_0_add_vc,
+        ad_forward_1 : ad_forward_1_add_vc,
+        ad_reverse_1 : ad_reverse_1_add_vc,
     };
     op_info_vec[ADD_VV_OP] = OpInfo{
         name         : "add_vv".to_string(),
         forward_0    : float_forward_0_add_vv,
         forward_1    : float_forward_1_add_vv,
         reverse_1    : float_reverse_1_add_vv,
-        ad_forward_0 : super::ad_panic_zero,
-        ad_forward_1 : super::ad_panic_one,
-        ad_reverse_1 : super::ad_panic_one,
+        ad_forward_0 : ad_forward_0_add_vv,
+        ad_forward_1 : ad_forward_1_add_vv,
+        ad_reverse_1 : ad_reverse_1_add_vv,
     };
 }
 impl_binary_operator!( Add, + );
