@@ -22,7 +22,7 @@ use crate::ad_tape::THIS_THREAD_TAPE;
 ///
 /// # constant
 /// If an AD object is not a variable it is referred to as a constant.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct AD {
     //
     // tape_id
@@ -41,15 +41,19 @@ pub struct AD {
     pub(crate) value     : Float,
 }
 //
+// -------------------------------------------------------------------------
+// From<Float>
 /// Converting from a Float to an AD creates a constamt with the same value
-impl From<Float> for AD {
-    /// Convert a Float to an AD constant
-    fn from(this_value : Float) -> Self {
-        Self {
-            tape_id   : 0,
-            var_index : 0,
-            value     : this_value,
-        }
+impl From<f64> for AD {
+    /// Convert a f64 to an AD constant
+    fn from(this_value : f64) -> AD {
+        AD {tape_id: 0, var_index: 0, value: Float::from(this_value), }
+    }
+}
+impl From<f32> for AD {
+    /// Convert a f32 to an AD constant
+    fn from(this_value : f32) -> AD {
+        AD {tape_id: 0, var_index: 0, value: Float::from(this_value), }
     }
 }
 //
@@ -71,6 +75,18 @@ impl std::fmt::Display for AD {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         // only display value
         write!(f, "{}", self.value)
+    }
+}
+//
+// PartialEq
+/// Two AD object are equal if their Float values are equal.
+/// ```
+/// use rustad::{AD, Float};
+/// assert_eq!( AD::from( Float::from(3.0) ), AD::from( Float::from(3) ) );
+///```
+impl PartialEq for AD {
+    fn eq(&self, other: &Self) -> bool {
+        self.value == other.value
     }
 }
 // ---------------------------------------------------------------------------
@@ -162,3 +178,26 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
 } } }
 //
 pub(crate) use binary_ad_operator;
+// -------------------------------------------------------------------------
+// advec
+/// Create a vector with AD elements.
+///```
+/// use rustad::{Float, AD, advec};
+/// fn check(avec : &Vec<AD> ) -> bool {
+///     avec.len() == 4
+/// }
+/// let avec = advec![ 1f32, 2f64, 3f32, 4f64 ];
+/// assert!( check(&avec) );
+/// ```
+#[macro_export]
+macro_rules! advec {
+    ( $( $x:expr ),* ) => {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push( rustad::ad::AD::from( $x ) );
+            )*
+            temp_vec
+        }
+    };
+}
