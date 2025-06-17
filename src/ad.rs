@@ -18,7 +18,7 @@ use crate::ad_tape::THIS_THREAD_TAPE;
 ///
 /// # variable
 /// An AD object is a variable if it one of the [ad_domain] variables
-/// or its value depends on the value of a domain variable.
+/// or its value depends on the value of the domain variable.
 ///
 /// # constant
 /// If an AD object is not a variable it is referred to as a constant.
@@ -42,20 +42,46 @@ pub struct AD {
 }
 //
 // -------------------------------------------------------------------------
-// From<Float>
-/// Converting from a Float to an AD creates a constamt with the same value
 impl From<f64> for AD {
-    /// Convert a f64 to an AD constant
+    /// Convert from f64 to an AD constant
     fn from(this_value : f64) -> AD {
         AD {tape_id: 0, var_index: 0, value: Float::from(this_value), }
     }
 }
 impl From<f32> for AD {
-    /// Convert a f32 to an AD constant
+    /// Convert from f32 to an AD constant
     fn from(this_value : f32) -> AD {
         AD {tape_id: 0, var_index: 0, value: Float::from(this_value), }
     }
 }
+macro_rules! impl_ad_from_integer {
+    ($integer:tt) => { paste::paste!{
+        impl From< [< i $integer >] > for AD {
+            #[doc = concat!(
+                " Convert from i", stringify!($integer), " to an AD constant"
+            ) ]
+            fn from(from_value : [< i $integer >] ) -> AD {
+                let float_value = from_value as Float;
+                AD {tape_id: 0, var_index: 0, value: float_value, }
+            }
+        }
+        impl From< [< u $integer >] > for AD {
+            #[doc = concat!(
+                " Convert from u", stringify!($integer), " to an AD constant"
+            ) ]
+            fn from(from_value : [< u $integer >] ) -> AD {
+                let float_value = from_value as Float;
+                AD {tape_id: 0, var_index: 0, value: float_value, }
+            }
+        }
+    } }
+}
+impl_ad_from_integer!(8);
+impl_ad_from_integer!(16);
+impl_ad_from_integer!(32);
+impl_ad_from_integer!(64);
+impl_ad_from_integer!(128);
+// -------------------------------------------------------------------------
 //
 /// Converting from an AD to a Float
 pub fn float_from_ad(ad : AD) -> Float {
@@ -183,11 +209,12 @@ pub(crate) use binary_ad_operator;
 /// Create a vector with AD elements.
 ///```
 /// use rustad::{Float, AD, advec};
-/// fn check(avec : &Vec<AD> ) -> bool {
-///     avec.len() == 4
+/// fn check(avec : &Vec<AD> ) {
+///     assert_eq!( avec.len() , 4 );
+///     assert_eq!( avec[3], AD::from(4) );
 /// }
-/// let avec = advec![ 1f32, 2f64, 3f32, 4f64 ];
-/// assert!( check(&avec) );
+/// let avec = advec![ 1f32, 2f64, 3u128, 4i8 ];
+/// check(&avec);
 /// ```
 #[macro_export]
 macro_rules! advec {

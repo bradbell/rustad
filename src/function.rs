@@ -123,10 +123,10 @@ macro_rules! forward_zero {
 /// </pre>
 ///
 /// # f
-/// is is this ADFun object.
+/// is is this [ADFun] object.
 ///
 /// # domain_one
-/// specifies the directional deriva=tive for domain space variables.
+/// specifies the directional derivative for domain space variables.
 ///
 /// # var_zero
 /// is the value for all the variables in the operation sequence.
