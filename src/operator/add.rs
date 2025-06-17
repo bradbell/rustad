@@ -157,3 +157,6 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
 //
 // AD + AD, Float + AD, AD + Float
 crate::ad::binary_ad_operator!( Add, + );
+//
+// AD += AD, AD += Float
+crate::ad::binary_ad_assign_op!( Add, += );

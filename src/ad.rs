@@ -204,6 +204,74 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
 } } }
 //
 pub(crate) use binary_ad_operator;
+// ---------------------------------------------------------------------------
+// binary_ad_assign_op
+/// This macro implements the the following binary assignment operations:
+/// <pre>
+///     AD op= AD
+///     AD op= Float
+/// </pre>
+/// This include storing the operation in the [THIS_THREAD_TAPE] .
+///
+/// # Name
+/// is the std::ops trait for this operator without the Assign;
+/// e.g., Add .
+///
+/// # symbol
+/// is the token for this operator; e.g., += .
+///
+macro_rules! binary_ad_assign_op { ($Name:ident, $symbol:tt) => {paste::paste! {
+    //
+    #[ doc = concat!(" record an ", stringify!($symbol), " operation ") ]
+    fn [< record_ $Name:lower _assign>]
+    (tape: &mut Tape, lhs: &mut AD, rhs: &AD) {
+        if tape.recording {
+            let var_lhs    = lhs.tape_id == tape.tape_id;
+            let var_rhs    = rhs.tape_id == tape.tape_id;
+            if var_lhs || var_rhs {
+                tape.op2arg.push( tape.arg_all.len() );
+                if var_lhs && var_rhs {
+                    tape.id_all.push( [< $Name:upper _VV_OP >] );
+                    tape.arg_all.push( lhs.var_index );
+                    tape.arg_all.push( rhs.var_index );
+                } else if var_lhs {
+                    tape.id_all.push( [< $Name:upper _VC_OP >] );
+                    tape.arg_all.push( lhs.var_index );
+                    tape.arg_all.push( tape.con_all.len() );
+                    tape.con_all.push( rhs.value );
+                } else {
+                    tape.id_all.push( [< $Name:upper _CV_OP >] );
+                    tape.arg_all.push( tape.con_all.len() );
+                    tape.con_all.push( lhs.value );
+                    tape.arg_all.push( rhs.var_index );
+                }
+                lhs.tape_id   = tape.tape_id;
+                lhs.var_index = tape.n_var;
+                tape.n_var   += 1;
+            }
+        }
+    }
+    //
+    impl std::ops::[< $Name Assign >]<AD> for AD {
+        #[ doc = concat!(" compute AD ", stringify!($symbol), " AD") ]
+        fn [< $Name:lower _assign >] (&mut self, rhs : AD) {
+            THIS_THREAD_TAPE.with_borrow_mut(
+                |tape| [< record_ $Name:lower _assign >] (tape, self, &rhs)
+            );
+            let _ = self.value $symbol rhs.value;
+        }
+    }
+    //
+    impl std::ops::[< $Name Assign >] <Float> for AD {
+        #[ doc = concat!(" compute AD ", stringify!($symbol), " Float") ]
+        fn [< $Name:lower _assign >] (&mut self, rhs : Float) {
+            let _ = *self $symbol AD::from(rhs);
+        }
+    }
+} } }
+//
+// make this macro visible in the entire crate
+pub(crate) use binary_ad_assign_op;
 // -------------------------------------------------------------------------
 // advec
 /// Create a vector with AD elements.
