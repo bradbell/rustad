@@ -12,6 +12,24 @@ use crate::ad_tape::Tape;
 //
 #[cfg(doc)]
 use crate::ad_tape::THIS_THREAD_TAPE;
+//
+use crate::Float;
+use crate::Index;
+use id::NUMBER_OP;
+//
+// id
+pub mod id;
+//
+#[cfg(test)]
+use id::{
+    ADD_CV_OP,
+    ADD_VC_OP,
+    ADD_VV_OP,
+    MUL_CV_OP,
+    MUL_VC_OP,
+    MUL_VV_OP,
+};
+//
 // ---------------------------------------------------------------------------
 /// Implement zero order forward for binary operators.
 /// <pre>
@@ -71,26 +89,10 @@ macro_rules! binary_op_forward_0 {
 }
 // ---------------------------------------------------------------------------
 //
-use crate::Float;
-use crate::Index;
-use id::NUMBER_OP;
-//
-// id
-pub mod id;
-//
-#[cfg(test)]
-use id::{
-    ADD_CV_OP,
-    ADD_VC_OP,
-    ADD_VV_OP,
-    MUL_CV_OP,
-    MUL_VC_OP,
-    MUL_VV_OP,
-};
-//
-// operatorsd
+// operators
 pub mod add;
 pub mod mul;
+pub mod call;
 // ---------------------------------------------------------------------------
 //
 // ForwardZero
