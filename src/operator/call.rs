@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! Operator that calls an ADFun (Under Construction)
+//! Operator that calls an ADFun (Under Construction):  [parent module](super)
 //
 // operator id:
 //  CALL_OP

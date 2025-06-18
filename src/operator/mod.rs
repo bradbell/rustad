@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! operations for specific operators
+//! Operations for specific operators: [parent module](super)
 //
 // AD
 use crate::AD;
@@ -13,7 +13,7 @@ use crate::ad_tape::Tape;
 #[cfg(doc)]
 use crate::ad_tape::THIS_THREAD_TAPE;
 // ---------------------------------------------------------------------------
-/// The macro call
+/// Implement zero order forward for binary operators.
 /// <pre>
 ///     binary_op_forward_0($Float_type, $op_name, $op_symbol)
 /// </pre>
@@ -282,7 +282,7 @@ fn ad_panic_one( _var_one: &mut Vec<AD>,
 // ---------------------------------------------------------------------------
 //
 // OpInfo
-/// information connected to each operator id.
+/// information connected to each operator id
 #[derive(Clone)]
 pub struct OpInfo {
     pub name         : String,

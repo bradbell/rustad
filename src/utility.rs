@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! Some utilities that are not specific to implementing this package
+//! Some utilities not specific to implementing the rustd package
+//! [parent module](super)
 //
 // avg_seconds
 /// Compute the average time required to execute a function.

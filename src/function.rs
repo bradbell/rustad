@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! ADFun objects
+//! ADFun objects: [parent module](super)
 //
 use crate::{Index, Float, AD};
 use crate::operator::OP_INFO_VEC;
@@ -15,33 +15,42 @@ use crate::operator;
 //
 // -----------------------------------------------------------------------
 // forward_zero
-/// Zero order forward mode evaluation; see the
-/// [Float][ADFun::forward_zero] and [AD](ADFun::ad_forward_zero) prototypes.
-/// This documentation is for the functions created by `forward_zero!` .
-/// Using this macro is unspecified.
+/// Zero order forward mode evaluation: [source module](crate::function)
 ///
-/// # Syntax
+/// # Documentation for the functions created by forward_zero!
+///
+/// ## Syntax
 /// <pre>
 ///     (range_zero, var_zero) = f.forward_zero(domain_zero, trace)
 ///     (range_zero, var_zero) = f.ad_forward_zero(domain_zero, trace)
 /// </pre>
+/// See [Float][ADFun::forward_zero] and
+/// [AD](ADFun::ad_forward_zero) prototypes.
 ///
-/// # f
+/// ## f
 /// is is this ADFun object.
 ///
-/// # domain_zero
+/// ## domain_zero
 /// specifies the domain space variable values.
 ///
-/// # trace
+/// ## trace
 /// if true, a trace of the operatiopn sequence is printed on stdout.
 ///
-/// # range_zero
+/// ## range_zero
 /// The first return value is the range vector corresponding to domain_zero;
 /// i.e., the function value correspdong the operation sequence.
 ///
-/// # var_zero
+/// ## var_zero
 /// The second return value is the value for all the variables
 /// in the operation sequence. This is needed to compute derivatives.
+///
+/// # Documentation for forward_zero!
+/// This macro is not intended to be used outside the rustad crate.
+/// It only has the following use cases:
+/// <pre>
+///     forward_zero!(Float);
+///     forward_zero!(AD);
+/// </pre>
 #[macro_export]
 macro_rules! forward_zero {
     (Float) => { forward_zero!(forward, Float); };
@@ -111,36 +120,45 @@ macro_rules! forward_zero {
 }
 // -----------------------------------------------------------------------
 // forward_one
-/// First order forward mode evaluation; see the
-/// [Float][ADFun::forward_one] and [AD](ADFun::ad_forward_one) prototypes.
-/// This documentation is for the functions created by `forward_one!` .
-/// Using this macro is unspecified.
+/// First order forward mode evaluation; [source module](crate::function)
 ///
-/// # Syntax
+/// # Documentation for the functions created by forward_zero!
+///
+/// ## Syntax
 /// <pre>
 ///     range_one = f.forward_one(domain_one, var_zero, trace)
 ///     range_one = f.ad_forward_one(domain_one, var_zero, trace)
 /// </pre>
+/// See [Float][ADFun::forward_one] and
+/// [AD](ADFun::ad_forward_one) prototypes.
 ///
-/// # f
+/// ## f
 /// is is this [ADFun] object.
 ///
 /// # domain_one
 /// specifies the directional derivative for domain space variables.
 ///
-/// # var_zero
+/// ## var_zero
 /// is the value for all the variables in the operation sequence.
 /// This is returned at the end of a [forward_zero](ADFun::forward_zero)
 /// computation.
 ///
-/// # trace
+/// ## trace
 /// if true, a trace of the operatiopn sequence is printed on stdout.
 ///
-/// # range_one
+/// ## range_one
 /// The return value is the range vector corresponding to
 /// domain_one and var_zero;
 /// i.e., the directional derivative for the fuctioon
 /// corresponding to the operation sequence.
+///
+/// # Documentation for forward_one!
+/// This macro is not intended to be used outside the rustad crate.
+/// It only has the following use cases:
+/// <pre>
+///     forward_one!(Float);
+///     forward_one!(AD);
+/// </pre>
 #[macro_export]
 macro_rules! forward_one {
     (Float) => { forward_one!(forward, Float); };
@@ -215,34 +233,44 @@ macro_rules! forward_one {
 }
 // -------------------------------------------------------------------
 // reverse_one
-/// First order reverse mode evaluation; see the
-/// [Float][ADFun::reverse_one] and [AD](ADFun::ad_reverse_one) prototypes.
-/// This documentation is for the functions created by `reverse_one!` .
-/// Using this macro is unspecified.
+/// First order reverse mode evaluation: [source module](crate::function)
 ///
-/// # Syntax
+/// # Documentation for the functions created by reverse_one!
+///
+/// ## Syntax
 /// <pre>
 ///     domain_one = f.reverse_one(range_one, var_zero, trace)
 ///     domain_one = f.reverse_one(range_one, var_zero, trace)
 /// </pre>
+/// See [Float][ADFun::reverse_one] and
+/// [AD](ADFun::ad_reverse_one) prototypes.
 ///
-/// # f
+/// ## f
 /// is is this ADFun object.
 ///
-/// # ramge_one
+/// ## ramge_one
 /// specifies the partials of as scalar function of range variables.
 ///
-/// # var_zero
+/// ## var_zero
 /// is the value for all the variables in the operation sequence.
 /// This is returned at the end of a [forward_zero](ADFun::forward_zero)
 /// computation.
 ///
-/// # trace
+/// ## trace
 /// if true, a trace of the operatiopn sequence is printed on stdout.
 ///
-/// # domain_one
+/// ## domain_one
 /// The return value is the partials of the scalar function
 /// with respect to the domain variables.
+/// in the operation sequence. This is needed to compute derivatives.
+///
+/// # Documentation for reverse_one!
+/// This macro is not intended to be used outside the rustad crate.
+/// It only has the following use cases:
+/// <pre>
+///     reverse_one!(Float);
+///     reverse_one!(AD);
+/// </pre>
 #[macro_export]
 macro_rules! reverse_one {
     (Float) => { reverse_one!(reverse, Float); };

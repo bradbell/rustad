@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! Define operator identifiers as `pub(crate) usize` constants.
+//! Define operator identifiers as `pub(crate) usize` constants:
+//! [parent module](super)
 //
 /// Sets all the opeerator identifier values
 macro_rules! set_operator_ids {

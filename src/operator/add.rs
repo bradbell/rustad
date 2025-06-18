@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! Store and compute for AD add operator.
+//! Store and compute for AD add operator:  [parent module](super)
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
 use crate::AD;

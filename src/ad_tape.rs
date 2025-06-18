@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! Define tape objects
+//! Define tape objects: [parent module](super)
 //
 use crate::Index;
 use crate::Float;

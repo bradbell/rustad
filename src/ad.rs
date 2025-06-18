@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! AD an automatic differentiation floating point type
+//! AD an automatic differentiation floating point type: [parent module](super)
 //
 use crate::{Index, Float};
 //
@@ -54,6 +54,7 @@ impl From<f32> for AD {
         AD {tape_id: 0, var_index: 0, value: Float::from(this_value), }
     }
 }
+/// This maacro implements conversion from integer types to AD
 macro_rules! impl_ad_from_integer {
     ($integer:tt) => { paste::paste!{
         impl From< [< i $integer >] > for AD {
@@ -274,7 +275,7 @@ macro_rules! binary_ad_assign_op { ($Name:ident, $symbol:tt) => {paste::paste! {
 pub(crate) use binary_ad_assign_op;
 // -------------------------------------------------------------------------
 // advec
-/// Create a vector with AD elements.
+/// Create a vector with AD elements: [source module](crate::ad)
 ///```
 /// use rustad::{Float, AD, advec};
 /// fn check(avec : &Vec<AD> ) {
