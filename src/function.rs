@@ -67,7 +67,8 @@ macro_rules! forward_zero {
             &self,
             domain_zero : &[$float_type],
             trace       : bool
-        ) -> ( Vec<$float_type> , Vec<$float_type> ) {
+        ) -> ( Vec<$float_type> , Vec<$float_type> )
+        {
             assert_eq!(
                 domain_zero.len(), self.n_domain,
                 "f.forward_zero: domain_zero length does not match f"
@@ -176,7 +177,8 @@ macro_rules! forward_one {
             domain_one : &[$float_type],
             var_zero   : &Vec<$float_type>,
             trace      : bool
-        ) -> Vec<$float_type> {
+        ) -> Vec<$float_type>
+        {
             assert_eq!(
                 domain_one.len(), self.n_domain,
                 "f.forward_one: domain_one length does not match f"
@@ -288,7 +290,8 @@ macro_rules! reverse_one {
             range_one  : &[$float_type],
             var_zero   : &Vec<$float_type>,
             trace      : bool
-        ) -> Vec<$float_type> {
+        ) -> Vec<$float_type>
+        {
             assert_eq!(
                 range_one.len(), self.range_index.len(),
                 "f.reverse_one: range_one length does not match f"

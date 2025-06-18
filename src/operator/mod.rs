@@ -57,7 +57,8 @@ macro_rules! binary_op_forward_0 {
             var_zero: &mut Vec<$Float_type>,
             con:           &Vec<Float>,
             arg:           &[Index],
-            res:           Index) {
+            res:           Index)
+        {
             assert_eq!( arg.len(), 2);
             var_zero[ res ] = con[ arg[0] ] $op_symbol var_zero[ arg[1] ];
         }
@@ -69,7 +70,8 @@ macro_rules! binary_op_forward_0 {
             var_zero: &mut Vec<$Float_type>,
             con:           &Vec<Float>,
             arg:           &[Index],
-            res:           Index) {
+            res:           Index)
+        {
             assert_eq!( arg.len(), 2);
             var_zero[ res ] = var_zero[ arg[0] ] $op_symbol con[ arg[1] ];
         }
@@ -81,7 +83,8 @@ macro_rules! binary_op_forward_0 {
             var_zero: &mut Vec<$Float_type>,
             _con:          &Vec<Float>,
             arg:           &[Index],
-            res:           Index) {
+            res:           Index)
+        {
             assert_eq!( arg.len(), 2);
             var_zero[ res ] = var_zero[ arg[0] ] $op_symbol var_zero[ arg[1] ];
         }

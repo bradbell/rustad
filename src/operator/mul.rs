@@ -49,7 +49,8 @@ macro_rules! forward_1_mul {
             _var_zero: &Vec<$Float_type>,
             con:       &Vec<Float>,
             arg:       &[Index],
-            res:       Index) {
+            res:       Index)
+        {
             debug_assert!( arg.len() == 2);
             var_one[ res ] = con[ arg[0] ] * var_one[ arg[1] ];
         }
@@ -62,7 +63,8 @@ macro_rules! forward_1_mul {
             _var_zero: &Vec<$Float_type>,
             con:       &Vec<Float>,
             arg:       &[Index],
-            res:       Index) {
+            res:       Index)
+        {
             debug_assert!( arg.len() == 2);
             var_one[ res ] = var_one[ arg[0] ] * con[ arg[1] ];
         }
@@ -75,7 +77,8 @@ macro_rules! forward_1_mul {
             var_zero:  &Vec<$Float_type>,
             _con:      &Vec<Float>,
             arg:       &[Index],
-            res:       Index) {
+            res:       Index)
+        {
             debug_assert!( arg.len() == 2);
             var_one[ res ] = var_zero[ arg[0] ] * var_one[ arg[1] ]
                            + var_one[ arg[0] ] * var_zero[ arg[1] ];
@@ -102,7 +105,8 @@ macro_rules! reverse_1_mul {
             _var_zero: &Vec<$Float_type>,
             con:       &Vec<Float>,
             arg:       &[Index],
-            res:       Index) {
+            res:       Index)
+        {
             debug_assert!( arg.len() == 2);
             partial[arg[1]] = partial[arg[1]] + partial[res] * con[arg[0]];
         }
@@ -115,7 +119,8 @@ macro_rules! reverse_1_mul {
             _var_zero: &Vec<$Float_type>,
             con:       &Vec<Float>,
             arg:       &[Index],
-            res:       Index) {
+            res:       Index)
+        {
             debug_assert!( arg.len() == 2);
             partial[arg[0]] = partial[arg[0]] + partial[res] * con[arg[1]];
         }
@@ -128,7 +133,8 @@ macro_rules! reverse_1_mul {
             var_zero:  &Vec<$Float_type>,
             _con:      &Vec<Float>,
             arg:       &[Index],
-            res:       Index) {
+            res:       Index)
+        {
             debug_assert!( arg.len() == 2);
             partial[arg[0]] = partial[arg[0]] + partial[res] * var_zero[arg[1]];
             partial[arg[1]] = partial[arg[1]] + partial[res] * var_zero[arg[0]];

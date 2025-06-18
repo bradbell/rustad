@@ -49,7 +49,8 @@ macro_rules! forward_1_add {
             _var_zero: &Vec<$Float_type>,
             _con:      &Vec<Float>,
             arg:       &[Index],
-            res:       Index) {
+            res:       Index)
+        {
             debug_assert!( arg.len() == 2);
             var_one[ res ] = var_one[ arg[1] ];
         }
@@ -62,7 +63,8 @@ macro_rules! forward_1_add {
             _var_zero: &Vec<$Float_type>,
             _con:      &Vec<Float>,
             arg:       &[Index],
-            res:       Index) {
+            res:       Index)
+        {
             debug_assert!( arg.len() == 2);
             var_one[ res ] = var_one[ arg[0] ];
         }
@@ -75,7 +77,8 @@ macro_rules! forward_1_add {
             _var_zero: &Vec<$Float_type>,
             _con:      &Vec<Float>,
             arg:       &[Index],
-            res:       Index) {
+            res:       Index)
+        {
             debug_assert!( arg.len() == 2);
             var_one[ res ] = var_one[ arg[0] ] + var_one[ arg[1] ];
         }
@@ -101,7 +104,8 @@ macro_rules! reverse_1_add {
             _var_zero: &Vec<$Float_type>,
             _con:      &Vec<Float>,
             arg:       &[Index],
-            res:       Index) {
+            res:       Index)
+        {
             debug_assert!( arg.len() == 2);
             partial[ arg[1] ] = partial[ arg[1] ] + partial[ res ];
         }
@@ -114,7 +118,8 @@ macro_rules! reverse_1_add {
             _var_zero: &Vec<$Float_type>,
             _con:      &Vec<Float>,
             arg:       &[Index],
-            res:       Index) {
+            res:       Index)
+        {
             debug_assert!( arg.len() == 2);
             partial[ arg[0] ] = partial[ arg[0] ] + partial[ res ];
         }
@@ -127,7 +132,8 @@ macro_rules! reverse_1_add {
             _var_zero: &Vec<$Float_type>,
             _con:      &Vec<Float>,
             arg:       &[Index],
-            res:       Index) {
+            res:       Index)
+        {
             debug_assert!( arg.len() == 2);
             partial[ arg[0] ] = partial[ arg[0] ] + partial[ res ];
             partial[ arg[1] ] = partial[ arg[1] ] + partial[ res ];
