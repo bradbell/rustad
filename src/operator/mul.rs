@@ -2,7 +2,14 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! Store and compute for AD mul operator: [parent module](super)
+//! Store and compute for AD mul operation: [parent module](super)
+//!
+//! # Operator Id
+//! MUL_CV_OP, MUL_VC_OP, or MUL_VV_OP
+//!
+//! # Operator Arguments
+//! 1. arg\[0\]:  Variable or constant index of left operand.
+//! 2. arg\[1\]:  Variable or constant index of left operand.
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
 use crate::AD;
@@ -29,6 +36,7 @@ binary_op_forward_0!(AD, mul, *);
 // float_forward_1_mul_cv, ad_forward_1_mul_cv
 // float_forward_1_mul_vc, ad_forward_1_mul_vc
 // float_forward_1_mul_vv, ad_forward_1_mul_vv
+/// Implements first order forward for multiplication operator
 macro_rules! forward_1_mul {
     ($Float_type:ident) => { paste::paste! {
 
@@ -81,6 +89,7 @@ forward_1_mul!(AD);
 // float_reverse_1_mul_cv, ad_reverse_1_mul_cv
 // float_reverse_1_mul_vc, ad_reverse_1_mul_vc
 // float_reverse_1_mul_vv, ad_reverse_1_mul_vv
+/// Implements first order reverse for multiplication operator
 macro_rules! reverse_1_mul {
     ($Float_type:ident) => { paste::paste! {
 

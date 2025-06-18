@@ -2,7 +2,14 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! Store and compute for AD add operator:  [parent module](super)
+//! Store and compute for AD add operation:  [parent module](super)
+//!
+//! # Operator Id
+//! ADD_CV_OP, ADD_VC_OP, or ADD_VV_OP
+//!
+//! # Operator Arguments
+//! 1. arg\[0\]:  Variable or constant index of left operand.
+//! 2. arg\[1\]:  Variable or constant index of left operand.
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
 use crate::AD;
@@ -29,6 +36,7 @@ binary_op_forward_0!(AD, add, +);
 // float_forward_1_add_cv, ad_forward_1_add_cv
 // float_forward_1_add_vc, ad_forward_1_add_vc
 // float_forward_1_add_vv, ad_forward_1_add_vv
+/// Implements first order forward for add operator
 macro_rules! forward_1_add {
     ($Float_type:ident) => { paste::paste! {
 
@@ -80,6 +88,7 @@ forward_1_add!(AD);
 // float_reverse_1_add_cv, ad_reverse_1_add_cv
 // float_reverse_1_add_vc, ad_reverse_1_add_vc
 // float_reverse_1_add_vv, ad_reverse_1_add_vv
+/// Implements first order reverse for add operator
 macro_rules! reverse_1_add {
     ($Float_type:ident) => { paste::paste! {
 
