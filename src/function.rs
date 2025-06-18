@@ -251,7 +251,7 @@ macro_rules! reverse_one {
     ( $prefix:ident, $float_type:ident ) => { paste::paste! {
 
         #[doc = concat!(
-            " Zero order reverse using ",
+            " First order reverse using ",
             stringify!($float_type),
             " see [ reverse_one! ] for documentation",
         )]

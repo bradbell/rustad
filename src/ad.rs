@@ -222,7 +222,7 @@ pub(crate) use binary_ad_operator;
 ///
 macro_rules! binary_ad_assign_op { ($Name:ident, $symbol:tt) => {paste::paste! {
     //
-    #[ doc = concat!(" record an ", stringify!($symbol), " operation ") ]
+    #[ doc = concat!(" record an ", stringify!($Name), "Assign operation ") ]
     fn [< record_ $Name:lower _assign>]
     (tape: &mut Tape, lhs: &mut AD, rhs: &AD) {
         if tape.recording {

@@ -25,12 +25,16 @@ use crate::operator::ForwardZeroBinary;
 binary_op_forward_0!(Float, mul, *);
 binary_op_forward_0!(AD, mul, *);
 // ---------------------------------------------------------------------------
+//
+// float_forward_1_mul_cv, ad_forward_1_mul_cv
+// float_forward_1_mul_vc, ad_forward_1_mul_vc
+// float_forward_1_mul_vv, ad_forward_1_mul_vv
 macro_rules! forward_1_mul {
     ($Float_type:ident) => { paste::paste! {
 
         #[doc = concat!(
             " ", stringify!($Float_type),
-            " zero order forward  constant * variable"
+            " first order forward  constant * variable"
         ) ]
         fn [< $Float_type:lower _forward_1_mul_cv >](
             var_one:   &mut Vec<$Float_type>,
@@ -43,7 +47,7 @@ macro_rules! forward_1_mul {
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
-            " zero order forward  variable * constant"
+            " first order forward  variable * constant"
         ) ]
         fn [< $Float_type:lower _forward_1_mul_vc >](
             var_one:   &mut Vec<$Float_type>,
@@ -56,7 +60,7 @@ macro_rules! forward_1_mul {
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
-            " zero order forward  variable * variable"
+            " first order forward  variable * variable"
         ) ]
         fn [< $Float_type:lower  _forward_1_mul_vv >](
             var_one:   &mut Vec<$Float_type>,
@@ -73,12 +77,16 @@ macro_rules! forward_1_mul {
 forward_1_mul!(Float);
 forward_1_mul!(AD);
 // ---------------------------------------------------------------------------
+//
+// float_reverse_1_mul_cv, ad_reverse_1_mul_cv
+// float_reverse_1_mul_vc, ad_reverse_1_mul_vc
+// float_reverse_1_mul_vv, ad_reverse_1_mul_vv
 macro_rules! reverse_1_mul {
     ($Float_type:ident) => { paste::paste! {
 
         #[doc = concat!(
             " ", stringify!($Float_type),
-            " zero order reverse  constant * variable"
+            " first order reverse  constant * variable"
         ) ]
         fn [< $Float_type:lower _reverse_1_mul_cv >](
             partial:   &mut Vec<$Float_type>,
@@ -91,7 +99,7 @@ macro_rules! reverse_1_mul {
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
-            " zero order reverse  variable * constant"
+            " first order reverse  variable * constant"
         ) ]
         fn [< $Float_type:lower _reverse_1_mul_vc >](
             partial:   &mut Vec<$Float_type>,
@@ -104,7 +112,7 @@ macro_rules! reverse_1_mul {
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
-            " zero order reverse  variable * variable"
+            " first order reverse  variable * variable"
         ) ]
         fn [< $Float_type:lower  _reverse_1_mul_vv >](
             partial:   &mut Vec<$Float_type>,
