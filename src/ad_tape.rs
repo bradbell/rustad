@@ -55,6 +55,11 @@ pub(crate) struct Tape {
     /// is a vector containing the constant values used by the
     /// operation sequence
     pub con_all        : Vec<Float>,
+    //
+    // flag_all
+    /// is a vector containing boolean flags that are part of some
+    /// operator definitions.
+    pub flag_all       : Vec<bool>,
 }
 impl Tape {
     //
@@ -71,6 +76,7 @@ impl Tape {
             op2arg        : Vec::new() ,
             arg_all       : Vec::new() ,
             con_all       : Vec::new() ,
+            flag_all      : Vec::new() ,
         }
     }
 }

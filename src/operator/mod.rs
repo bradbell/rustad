@@ -20,16 +20,6 @@ use id::NUMBER_OP;
 // id
 pub mod id;
 //
-#[cfg(test)]
-use id::{
-    ADD_CV_OP,
-    ADD_VC_OP,
-    ADD_VV_OP,
-    MUL_CV_OP,
-    MUL_VC_OP,
-    MUL_VV_OP,
-};
-//
 // ---------------------------------------------------------------------------
 /// Implement zero order forward for binary operators.
 /// <pre>
@@ -56,6 +46,7 @@ macro_rules! binary_op_forward_0 {
         fn [< $Float_type:lower  _forward_0_ $op_name  _cv >] (
             var_zero: &mut Vec<$Float_type>,
             con:           &Vec<Float>,
+            _flag_all:     &Vec<bool>,
             arg:           &[Index],
             res:           Index)
         {
@@ -69,6 +60,7 @@ macro_rules! binary_op_forward_0 {
         fn [< $Float_type:lower  _forward_0_ $op_name  _vc >] (
             var_zero: &mut Vec<$Float_type>,
             con:           &Vec<Float>,
+            _flag_all:     &Vec<bool>,
             arg:           &[Index],
             res:           Index)
         {
@@ -82,6 +74,7 @@ macro_rules! binary_op_forward_0 {
         fn [< $Float_type:lower  _forward_0_ $op_name  _vv >] (
             var_zero: &mut Vec<$Float_type>,
             _con:          &Vec<Float>,
+            _flag_all:     &Vec<bool>,
             arg:           &[Index],
             res:           Index)
         {
@@ -101,7 +94,7 @@ pub mod call;
 // ForwardZero
 /// Evaluate zero order forward for one operation in the operation sequence.
 pub type ForwardZero = fn(_var_zero: &mut Vec<Float>,
-    _con: &Vec<Float>, _arg: &[Index], _res: Index
+    _con: &Vec<Float>, _flag_all : &Vec<bool>,_arg: &[Index], _res: Index
 );
 //
 // ForwardOne
@@ -119,7 +112,7 @@ pub type ReverseOne = fn(_partial: &mut Vec<Float>,
 // ADForwardZero
 /// Evaluate zero order forward for one operation in the operation sequence.
 pub type ADForwardZero = fn(_var_zero: &mut Vec<AD>,
-    _con: &Vec<Float>, _arg: &[Index], _res: Index
+    _con: &Vec<Float>, __flag_all : &Vec<bool>, arg: &[Index], _res: Index
 );
 //
 // ADForwardOne
@@ -257,7 +250,7 @@ pub type ReverseOneBinary = fn(_var_one: &mut Vec<Float>,
 // panic_zero
 /// default [ForwardZero] function that will panic if it does not get replaced.
 fn panic_zero( _var_zero: &mut Vec<Float>,
-    _con: &Vec<Float>, _arg: &[Index], _res: Index) {
+    _con: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: Index) {
     panic!();
 }
 //
@@ -272,7 +265,7 @@ fn panic_one( _var_one: &mut Vec<Float>,
 // ad_panic_zero
 /// default [ADForwardZero] function, will panic if it does not get replaced.
 fn ad_panic_zero( _var_zero: &mut Vec<AD>,
-    _con: &Vec<Float>, _arg: &[Index], _res: Index) {
+    _con: &Vec<Float>, _flag_all : &Vec<bool>, _arg: &[Index], _res: Index) {
     panic!();
 }
 //
@@ -313,6 +306,7 @@ fn op_info_vec() -> Vec<OpInfo> {
     };
     let mut result    = vec![empty ; NUMBER_OP ];
     add::set_op_info(&mut result);
+    call::set_op_info(&mut result);
     mul::set_op_info(&mut result);
     result
 }
@@ -325,11 +319,13 @@ pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
 #[test]
 fn test_op_info() {
     let op_info_vec = &*OP_INFO_VEC;
-    assert_eq!( "add_cv", op_info_vec[ADD_CV_OP].name );
-    assert_eq!( "add_vc", op_info_vec[ADD_VC_OP].name );
-    assert_eq!( "add_vv", op_info_vec[ADD_VV_OP].name );
+    assert_eq!( "add_cv", op_info_vec[id::ADD_CV_OP].name );
+    assert_eq!( "add_vc", op_info_vec[id::ADD_VC_OP].name );
+    assert_eq!( "add_vv", op_info_vec[id::ADD_VV_OP].name );
     //
-    assert_eq!( "mul_cv", op_info_vec[MUL_CV_OP].name );
-    assert_eq!( "mul_vc", op_info_vec[MUL_VC_OP].name );
-    assert_eq!( "mul_vv", op_info_vec[MUL_VV_OP].name );
+    assert_eq!( "call",   op_info_vec[id::CALL_OP].name );
+    //
+    assert_eq!( "mul_cv", op_info_vec[id::MUL_CV_OP].name );
+    assert_eq!( "mul_vc", op_info_vec[id::MUL_VC_OP].name );
+    assert_eq!( "mul_vv", op_info_vec[id::MUL_VV_OP].name );
 }

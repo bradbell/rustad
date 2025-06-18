@@ -28,17 +28,18 @@
 //! | n_arg-1  | true (false) if last call argument is a variable (constant) |
 //!
 //
-/*
 use crate::{Index, Float};
 use crate::function::ADFun;
+use crate::operator::id::CALL_OP;
+use crate::operator::OpInfo;
 //
 // float_forward_0_call
 /// Float zero order forward for call operator
 fn float_forward_0_call(
     var_zero:    &mut Vec<Float>,
     con:         &Vec<Float>,
+    flag_all:    &Vec<bool>,
     arg:         &[Index],
-    is_var_all:  &Vec<bool>,
     res:         Index)
 {   //
     // call_index, n_arg, n_res
@@ -49,13 +50,13 @@ fn float_forward_0_call(
     // is_arg_var, is_res_var
     let mut begin   = arg[3];
     let mut end     = begin + n_arg;
-    let is_arg_var  = is_var_all[begin .. end];
+    let is_arg_var  = &flag_all[begin .. end];
     begin           = end;
     end             = begin + n_res;
-    let is_res_var  = is_var_all[begin .. end];
+    let is_res_var  = &flag_all[begin .. end];
     //
     // call_domain_zero
-    let call_domain_zero : Vec<Float> = Vec::new();
+    let mut call_domain_zero : Vec<Float> = Vec::new();
     for i_arg in 0 .. n_arg {
         if is_arg_var[i_arg] {
             call_domain_zero.push( var_zero[ arg[i_arg + 4] ] );
@@ -64,16 +65,16 @@ fn float_forward_0_call(
         }
     }
     //
-    // call_raange_zero
-    let call_range_zero = THIS_TREAD_ADFUN_VEC.with_borrow( |adfun_vec| {
+    // call_range_zero
+    let call_range_zero = THIS_THREAD_CHECKPOINT_VEC.with_borrow( |adfun_vec| {
         let trace = false;
-        (range_zero, call_var_zero) =
-            adfun_vec[call_index].float_forward_0(call_domain_zero, trace);
-        range_zero;
+        let (range_zero, _call_var_zero) =
+            adfun_vec[call_index].forward_zero(&call_domain_zero, trace);
+        range_zero
     } );
     //
     // var_zero
-    let j_res = 0;
+    let mut j_res = 0;
     for i_res in 0 .. n_res {
         if is_res_var[i_res] {
             var_zero[res + j_res] = call_range_zero[i_res];
@@ -85,7 +86,7 @@ fn float_forward_0_call(
 // set_op_info
 /// Set the operator information for call.
  pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
-    op_info_vec[ADD_CV_OP] = OpInfo{
+    op_info_vec[CALL_OP] = OpInfo{
         name         : "call".to_string() ,
         forward_0    : float_forward_0_call,
         forward_1    : super::panic_one,
@@ -95,4 +96,11 @@ fn float_forward_0_call(
         ad_reverse_1 : super::ad_panic_one,
      };
 }
-*/
+//
+thread_local! {
+    // THIS_THREAD_CHECKPOINT_VEC
+    /// is thread local storage holding a vector of checkpoint functions.
+    pub(crate) static THIS_THREAD_CHECKPOINT_VEC:
+        std::cell::RefCell< Vec<ADFun> > =
+            std::cell::RefCell::new( Vec::new() );
+}

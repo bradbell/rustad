@@ -99,7 +99,9 @@ macro_rules! forward_zero {
                 let arg       = &self.arg_all[start .. end];
                 let res       = self.n_domain + op_index;
                 let forward_0 = op_info_vec[op_id].[< $prefix _0 >];
-                forward_0(&mut var_zero, &self.con_all, &arg, res );
+                forward_0(&mut var_zero,
+                    &self.con_all, &self.flag_all, &arg, res
+                );
                 if trace {
                     let name = &op_info_vec[op_id].name;
                     println!(
@@ -396,6 +398,9 @@ pub struct ADFun {
     /// This contains the value of all the constants needed
     /// to evaluate the function.
     pub(crate) con_all        : Vec<Float>,
+    // flag_all
+    /// This contains boolean flags that are part of some operator definitions.
+    pub(crate) flag_all       : Vec<bool>,
 }
 // ---------------------------------------------------------------------------
 impl ADFun {
@@ -417,6 +422,7 @@ impl ADFun {
             op2arg        : Vec::new() ,
             arg_all       : Vec::new() ,
             con_all       : Vec::new() ,
+            flag_all      : Vec::new() ,
             range_index   : Vec::new() ,
         }
     }
@@ -480,6 +486,7 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
         assert_eq!( tape.op2arg.len(), 0 );
         assert_eq!( tape.arg_all.len(), 0 );
         assert_eq!( tape.con_all.len(), 0 );
+        assert_eq!( tape.flag_all.len(), 0 );
         tape.tape_id        = new_tape_id;
         tape.recording      = true;
         tape.n_domain       = domain.len();
@@ -522,6 +529,7 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
         std::mem::swap( &mut result.op2arg,        &mut tape.op2arg );
         std::mem::swap( &mut result.arg_all,       &mut tape.arg_all );
         std::mem::swap( &mut result.con_all,       &mut tape.con_all );
+        std::mem::swap( &mut result.flag_all,      &mut tape.flag_all );
     } );
     for i in 0 .. ad_range.len() {
         result.range_index.push( ad_range[i].var_index );
