@@ -29,7 +29,7 @@
 //!
 //
 use crate::{Index, Float};
-use crate::function::ADFun;
+use crate::function::THIS_THREAD_ADFUN_VEC;
 use crate::operator::id::CALL_OP;
 use crate::operator::OpInfo;
 //
@@ -66,7 +66,7 @@ fn float_forward_0_call(
     }
     //
     // call_range_zero
-    let call_range_zero = THIS_THREAD_CHECKPOINT_VEC.with_borrow( |adfun_vec| {
+    let call_range_zero = THIS_THREAD_ADFUN_VEC.with_borrow( |adfun_vec| {
         let trace = false;
         let (range_zero, _call_var_zero) =
             adfun_vec[call_index].forward_zero(&call_domain_zero, trace);
@@ -95,12 +95,4 @@ fn float_forward_0_call(
         ad_forward_1 : super::ad_panic_one,
         ad_reverse_1 : super::ad_panic_one,
      };
-}
-//
-thread_local! {
-    // THIS_THREAD_CHECKPOINT_VEC
-    /// is thread local storage holding a vector of checkpoint functions.
-    pub(crate) static THIS_THREAD_CHECKPOINT_VEC:
-        std::cell::RefCell< Vec<ADFun> > =
-            std::cell::RefCell::new( Vec::new() );
 }

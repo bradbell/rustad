@@ -536,3 +536,38 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
     }
     result
 }
+//
+thread_local! {
+    //
+    // THIS_THREAD_ADFUN_VEC
+    /// thread local storage holding a vector of ADFun objects.
+    pub(crate) static THIS_THREAD_ADFUN_VEC:
+        std::cell::RefCell< Vec<ADFun> > =
+            std::cell::RefCell::new( Vec::new() );
+    //
+    // THIS_THREAD_ADFUN_MAP
+    /// thread local storage mapping names to index in THIS_THREAD_ADFUN_VEC
+    pub(crate) static THIS_THREAD_ADFUN_MAP:
+        std::cell::RefCell< std::collections::HashMap<String, Index> > =
+            std::cell::RefCell::new( std::collections::HashMap::new() );
+}
+//
+// store_checkpoint
+pub fn store_checkpoint(fun: ADFun, name: String) {
+    //
+    // index, THIS_THREAD_ADFUN_VEC
+    let index = THIS_THREAD_ADFUN_VEC.with_borrow_mut( |vec| {
+        let index = vec.len();
+        vec.push( fun );
+        index
+    } );
+    //
+    // THIS_THREAD_ADFUN_MAP
+    THIS_THREAD_ADFUN_MAP.with_borrow_mut( |map| {
+        assert!(
+            ! map.contains_key(&name),
+            "store_checkpoint: name {name} was used before on this thread"
+        );
+        map.insert(name, index);
+    } );
+}
