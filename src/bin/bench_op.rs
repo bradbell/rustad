@@ -5,7 +5,6 @@
 use rustad::Float;
 use rustad::AD;
 use rustad::function;
-use rustad::float_from_ad;
 
 fn vec_float2ad(vec : &Vec<Float> ) -> Vec<AD> {
     let mut result = Vec::new();
@@ -87,15 +86,15 @@ fn test_ad_mul_vv() {
     let ad_dy         = f.ad_forward_one(&ad_dx, &ad_v0, trace);
     let ad_rx         = f.ad_reverse_one(&ad_ry, &ad_v0, trace);
     //
-    assert_eq!( float_from_ad(ad_y[0]) , x[0] * x[1] );
-    assert_eq!( float_from_ad(ad_y[1]) , x[1] * x[2] );
+    assert_eq!( ad_y[0].to_float(), x[0] * x[1] );
+    assert_eq!( ad_y[1].to_float() , x[1] * x[2] );
     //
-    assert_eq!( float_from_ad(ad_dy[0]) , dx[0] * x[1] + x[0] * dx[1] );
-    assert_eq!( float_from_ad(ad_dy[1]) , dx[1] * x[2] + x[1] * dx[2] );
+    assert_eq!( ad_dy[0].to_float() , dx[0] * x[1] + x[0] * dx[1] );
+    assert_eq!( ad_dy[1].to_float() , dx[1] * x[2] + x[1] * dx[2] );
     //
-    assert_eq!( float_from_ad(ad_rx[0]) , ry[0] * x[1] );
-    assert_eq!( float_from_ad(ad_rx[1]) , ry[0] * x[0] + ry[1] * x[2] );
-    assert_eq!( float_from_ad(ad_rx[2]) , ry[1] * x[1] );
+    assert_eq!( ad_rx[0].to_float() , ry[0] * x[1] );
+    assert_eq!( ad_rx[1].to_float() , ry[0] * x[0] + ry[1] * x[2] );
+    assert_eq!( ad_rx[2].to_float() , ry[1] * x[1] );
 }
 
 fn bench( name : &String, test_case : fn() ) {

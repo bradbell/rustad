@@ -40,6 +40,11 @@ pub struct AD {
     /// This is the value of this AD variable or constant.
     pub(crate) value     : Float,
 }
+// -------------------------------------------------------------------------
+impl AD {
+    /// Extract value from an object (dependencies are lost)
+    pub fn to_float(&self) -> Float { self.value }
+}
 //
 // -------------------------------------------------------------------------
 impl From<f64> for AD {
@@ -83,11 +88,6 @@ impl_ad_from_integer!(32);
 impl_ad_from_integer!(64);
 impl_ad_from_integer!(128);
 // -------------------------------------------------------------------------
-//
-/// Converting from an AD to a Float
-pub fn float_from_ad(ad : AD) -> Float {
-    ad.value
-}
 //
 /// Display will only show the value and ignore the variable information.
 ///

@@ -34,7 +34,6 @@ pub type Float = f64;
 // AD
 pub mod ad;
 pub use ad::AD;
-pub use ad::float_from_ad;
 //
 // ad_tape
 pub(crate) mod ad_tape;
