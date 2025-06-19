@@ -553,7 +553,7 @@ thread_local! {
 }
 //
 // store_checkpoint
-/// Stores checkpoint funcitons for this thread.
+/// Stores checkpoint functions for this thread.
 ///
 /// Need to implement dependency analysis so that we can evaluate
 /// the checkpoin function using forward_zero and the fill in

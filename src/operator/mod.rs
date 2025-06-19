@@ -8,10 +8,10 @@
 use crate::AD;
 //
 #[cfg(doc)]
-use crate::ad_tape::Tape;
+use crate::ad_tape::{Tape, THIS_THREAD_TAPE};
 //
 #[cfg(doc)]
-use crate::ad_tape::THIS_THREAD_TAPE;
+use crate::function::ADFun;
 //
 use crate::Float;
 use crate::Index;
@@ -283,12 +283,26 @@ fn ad_panic_one( _var_one: &mut Vec<AD>,
 /// information connected to each operator id
 #[derive(Clone)]
 pub struct OpInfo {
+    //
+    /// name the user sees for this operator
     pub name         : String,
+    //
+    /// evaluates this operator during [ADFun::forward_zero]
     pub forward_0    : ForwardZero,
+    //
+    /// evaluates this operator during [ADFun::forward_one]
     pub forward_1    : ForwardOne,
+    //
+    /// evaluates this operator during [ADFun::reverse_one]
     pub reverse_1    : ReverseOne,
+    //
+    /// evaluates this operator during [ADFun::ad_forward_zero]
     pub ad_forward_0 : ADForwardZero,
+    //
+    /// evaluates this operator during [ADFun::ad_forward_one]
     pub ad_forward_1 : ADForwardOne,
+    //
+    /// evaluates this operator during [ADFun::ad_reverse_one]
     pub ad_reverse_1 : ADReverseOne,
 }
 //
@@ -296,7 +310,7 @@ pub struct OpInfo {
 /// set the value of OP_INFO_VEC
 fn op_info_vec() -> Vec<OpInfo> {
     let empty         = OpInfo{
-        name: "".to_string(),
+        name         : "".to_string(),
         forward_0    : panic_zero,
         forward_1    : panic_one,
         reverse_1    : panic_one,
