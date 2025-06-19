@@ -398,6 +398,7 @@ pub struct ADFun {
     /// This contains the value of all the constants needed
     /// to evaluate the function.
     pub(crate) con_all        : Vec<Float>,
+    //
     // flag_all
     /// This contains boolean flags that are part of some operator definitions.
     pub(crate) flag_all       : Vec<bool>,
@@ -452,6 +453,124 @@ impl ADFun {
     //
     // ad_reverse_one
     reverse_one!(AD);
+    //
+    // -----------------------------------------------------------------------
+    // dependency
+    /// Computes the dependency pattern for the function in this ADFun.
+    ///
+    /// The the return value is vector of pairs of (row, column)
+    /// where row (column) is non-negative and
+    /// less than the range (domain) dimension for the function.
+    /// If a pair (i, j) does not appear, the range component
+    /// with index i does not depend on the domain component with index j.
+    /// Note that this can be used as a sparsity pattern for the Jacobian
+    /// of the function.
+    ///```
+    /// use rustad::{Float, AD, function};
+    /// let x       : Vec<Float> = vec![1.0, 2.0, 3.0];
+    /// let ax      = function::ad_domain(&x);
+    /// let mut ay  : Vec<AD> = Vec::new();
+    /// for j in 0 .. x.len() {
+    ///     ay.push( ax[j] * ax[j] );
+    /// }
+    /// let f           = function::ad_fun(&ay);
+    /// let trace       = false;
+    /// let mut pattern = f.dependency(trace);
+    /// pattern.sort_by( |x, y| x.partial_cmp(y).unwrap() );
+    /// assert_eq!( pattern.len(), 3 );
+    /// assert_eq!( pattern[0], (0,0) );
+    /// assert_eq!( pattern[1], (1,1) );
+    /// assert_eq!( pattern[2], (2,2) );
+    ///```
+    pub fn dependency(&self, trace : bool) -> Vec<(Index, Index)>
+    {   //
+        // op_info_vec
+        let op_info_vec = &*OP_INFO_VEC;
+        //
+        // n_domain, n_var, flag_all, arg_all, op2arg, n_range
+        let n_domain     = self.n_domain;
+        let n_var        = self.n_var;
+        let flag_all     = &self.flag_all;
+        let arg_all      = &self.arg_all;
+        let op2arg       = &self.op2arg;
+        let range_index  = &self.range_index;
+        let n_range      = range_index.len();
+        //
+        // done
+        let mut done : Vec<Index> = vec![n_var; n_var];
+        //
+        // result, arg_var_index, var_index_stack
+        let mut result          : Vec<(Index, Index)> = Vec::new();
+        let mut arg_var_index   : Vec<Index> = Vec::new();
+        let mut var_index_stack : Vec<Index> = Vec::new();
+        //
+        if trace {
+            println!( "n_domain = {}, n_range = {}", n_domain, n_range );
+        }
+        //
+        // row
+        // determine the variables that range index row depends on
+        for row in 0 .. n_range {
+            //
+            // var_index
+            let mut var_index = self.range_index[row];
+            if trace {
+                println!( "row {} var_index {}", row, var_index );
+            }
+            //
+            // var_index_stack
+            // use resize instead of new stack to reduce memory allocation
+            var_index_stack.resize(0, 0);
+            var_index_stack.push( var_index );
+            while var_index_stack.len() > 0 {
+                //
+                // var_index
+                var_index = var_index_stack.pop().unwrap();
+                //
+                if done[var_index] != row {
+                    done[var_index] = row;
+                    if trace {
+                        println!( "    var_index = {}", var_index );
+                    }
+                    if var_index < n_domain {
+                        //
+                        // result
+                        // var_index is a domain variable index
+                        result.push( (row, var_index) );
+                    } else {
+                        //
+                        // op_index
+                        // the operator that creates this variable
+                        let op_index         = var_index - n_domain;
+                        //
+                        // arv_var_index_fn
+                        let op_id            = self.id_all[op_index];
+                        let op_info          = &op_info_vec[op_id];
+                        let arg_var_index_fn = op_info.arg_var_index;
+                        //
+                        // arg
+                        let begin = op2arg[op_index];
+                        let end   = op2arg[op_index + 1];
+                        let arg   = &arg_all[begin .. end];
+                        //
+                        // arg_var_index
+                        // the variables that are arguments to this operator
+                        arg_var_index_fn(&mut arg_var_index, &flag_all, arg);
+                        //
+                        // var_index_stack
+                        for i in 0 .. arg_var_index.len() {
+                            var_index_stack.push( arg_var_index[i] );
+                        }
+                    }
+                }
+            }
+        }
+        if trace {
+            println!( "n_dependency = {}", result.len() );
+        }
+        result
+    }
+    // -----------------------------------------------------------------------
 }
 //
 // ad_domain

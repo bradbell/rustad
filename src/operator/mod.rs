@@ -126,6 +126,13 @@ pub type ADForwardOne = fn(_var_one: &mut Vec<AD>,
 pub type ADReverseOne = fn(_var_one: &mut Vec<AD>,
     _var_zero: &Vec<AD>, _con: &Vec<Float>, _arg: &[Index], _res: Index
 );
+//
+// ArbVarIndex
+/// Determine variable indices that are arguments to this operator.
+/// Passing in arg_var_index avoids reallocating memory for each call.
+pub type ArbVarIndex = fn(
+    _arg_var_index: &mut Vec<Index>, _flag_all : &Vec<bool>, _arg: &[Index]
+);
 // ---------------------------------------------------------------------------
 //
 // ForwardZeroBinary
@@ -248,14 +255,14 @@ pub type ReverseOneBinary = fn(_var_one: &mut Vec<Float>,
 // ---------------------------------------------------------------------------
 //
 // panic_zero
-/// default [ForwardZero] function that will panic if it does not get replaced.
+/// default [ForwardZero] function, will panic if it does not get replaced.
 fn panic_zero( _var_zero: &mut Vec<Float>,
     _con: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: Index) {
     panic!();
 }
 //
 // panic_one
-/// default [ForwardOne] or [ReverseOne] function that will panic
+/// default [ForwardOne] or [ReverseOne] function, will panic
 /// if it does not get replaced.
 fn panic_one( _var_one: &mut Vec<Float>,
     _var_zero : &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index) {
@@ -270,13 +277,49 @@ fn ad_panic_zero( _var_zero: &mut Vec<AD>,
 }
 //
 // ad_panic_one
-/// default [ADForwardOne] or [ADReverseOne] function that will panic
+/// default [ADForwardOne] or [ADReverseOne] function, will panic
 /// if it does not get replaced.
 fn ad_panic_one( _var_one: &mut Vec<AD>,
     _var_zero : &Vec<AD>, _con: &Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
 }
 //
+// panic_arg_var_index
+/// default [ArbVarIndex] function,  will panic if it does not get replaced.
+fn panic_arg_var_index(
+    _arg_var_index: &mut Vec<Index>, _flag_all: &Vec<bool>, _arg: &[Index]
+) {
+    panic!();
+}
+// ---------------------------------------------------------------------------
+//
+//  arg_var_index_binary_cv
+/// The arg_var_index function for constant op variable cases.
+fn arg_var_index_binary_cv(
+    arg_var_index: &mut Vec<Index>, _flag_all: &Vec<bool>, arg: &[Index]
+) {
+    arg_var_index.resize(1, 0);
+    arg_var_index[0] = arg[1];
+}
+//
+//  arg_var_index_binary_vc
+/// The arg_var_index function for variable op constant cases.
+fn arg_var_index_binary_vc(
+    arg_var_index: &mut Vec<Index>, _flag_all: &Vec<bool>, arg: &[Index]
+) {
+    arg_var_index.resize(1, 0);
+    arg_var_index[0] = arg[0];
+}
+//
+//  arg_var_index_binary_vv
+/// The arg_var_index function for variable op variable cases.
+fn arg_var_index_binary_vv(
+    arg_var_index: &mut Vec<Index>, _flag_all: &Vec<bool>, arg: &[Index]
+) {
+    arg_var_index.resize(2, 0);
+    arg_var_index[0] = arg[0];
+    arg_var_index[1] = arg[1];
+}
 // ---------------------------------------------------------------------------
 //
 // OpInfo
@@ -285,38 +328,42 @@ fn ad_panic_one( _var_one: &mut Vec<AD>,
 pub struct OpInfo {
     //
     /// name the user sees for this operator
-    pub name         : String,
+    pub name           : String,
     //
-    /// evaluates this operator during [ADFun::forward_zero]
-    pub forward_0    : ForwardZero,
+    /// evaluates this operator during [ADFun  ::forward_zero]
+    pub forward_0      : ForwardZero,
     //
-    /// evaluates this operator during [ADFun::forward_one]
-    pub forward_1    : ForwardOne,
+    /// evaluates this operator during [ADFun  ::forward_one]
+    pub forward_1      : ForwardOne,
     //
-    /// evaluates this operator during [ADFun::reverse_one]
-    pub reverse_1    : ReverseOne,
+    /// evaluates this operator during [ADFun  ::reverse_one]
+    pub reverse_1      : ReverseOne,
     //
-    /// evaluates this operator during [ADFun::ad_forward_zero]
-    pub ad_forward_0 : ADForwardZero,
+    /// evaluates this operator during [ADFun  ::ad_forward_zero]
+    pub ad_forward_0   : ADForwardZero,
     //
-    /// evaluates this operator during [ADFun::ad_forward_one]
-    pub ad_forward_1 : ADForwardOne,
+    /// evaluates this operator during [ADFun  ::ad_forward_one]
+    pub ad_forward_1   : ADForwardOne,
     //
-    /// evaluates this operator during [ADFun::ad_reverse_one]
-    pub ad_reverse_1 : ADReverseOne,
+    /// evaluates this operator during [ADFun  ::ad_reverse_one]
+    pub ad_reverse_1   : ADReverseOne,
+    //
+    /// determines the operator arguments that are variable indices
+    pub arg_var_index  : ArbVarIndex,
 }
 //
 // op_info_vec
 /// set the value of OP_INFO_VEC
 fn op_info_vec() -> Vec<OpInfo> {
     let empty         = OpInfo{
-        name         : "".to_string(),
-        forward_0    : panic_zero,
-        forward_1    : panic_one,
-        reverse_1    : panic_one,
-        ad_forward_0 : ad_panic_zero,
-        ad_forward_1 : ad_panic_one,
-        ad_reverse_1 : ad_panic_one,
+        name           : "".to_string(),
+        forward_0      : panic_zero,
+        forward_1      : panic_one,
+        reverse_1      : panic_one,
+        ad_forward_0   : ad_panic_zero,
+        ad_forward_1   : ad_panic_one,
+        ad_reverse_1   : ad_panic_one,
+        arg_var_index  : panic_arg_var_index,
     };
     let mut result    = vec![empty ; NUMBER_OP ];
     add::set_op_info(&mut result);

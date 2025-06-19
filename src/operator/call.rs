@@ -86,16 +86,42 @@ fn float_forward_0_call(
     }
 }
 //
+// arg_var_index_call
+/// vector of variable indices that are arguments to this call operator
+fn arg_var_index_call(
+    arg_var_index : &mut Vec<Index>, flag_all : &Vec<bool>, arg: &[Index]
+
+) {
+    //
+    // call_n_arg
+    let call_n_arg = arg[1];
+    //
+    // is_var
+    let begin   = arg[3];
+    let end     = begin + call_n_arg;
+    let is_var  = &flag_all[begin .. end];
+    //
+    // arg_var_index
+    arg_var_index.resize(0, 0);
+    for call_i_arg in 0 .. call_n_arg {
+        if is_var[call_i_arg] {
+            arg_var_index.push( arg[4 + call_i_arg] );
+        }
+    }
+    assert_ne!( arg_var_index.len() , 0 );
+}
+//
 // set_op_info
 /// Set the operator information for call.
  pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
     op_info_vec[CALL_OP] = OpInfo{
-        name         : "call".to_string() ,
-        forward_0    : float_forward_0_call,
-        forward_1    : super::panic_one,
-        reverse_1    : super::panic_one,
-        ad_forward_0 : super::ad_panic_zero,
-        ad_forward_1 : super::ad_panic_one,
-        ad_reverse_1 : super::ad_panic_one,
+        name           : "call".to_string() ,
+        forward_0      : float_forward_0_call,
+        forward_1      : super::panic_one,
+        reverse_1      : super::panic_one,
+        ad_forward_0   : super::ad_panic_zero,
+        ad_forward_1   : super::ad_panic_one,
+        ad_reverse_1   : super::ad_panic_one,
+        arg_var_index  : arg_var_index_call,
      };
 }
