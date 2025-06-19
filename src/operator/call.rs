@@ -12,7 +12,7 @@
 //! | -------  | ------- |
 //! | 0        | Index that identifies the ADFun object being called |
 //! | 1        | Number of arguments to the function being called (n_arg) |
-//! | 2        | Number of results for the function being called  |
+//! | 2        | Number of results for the function being called  (n_res) |
 //! | 3        | Index of the first boolean for this operator |
 //! | 4        | Variable or constant index for first argument to call |
 //! | 5        | Variable or constant index for second argument to call |
@@ -26,6 +26,9 @@
 //! | 1        | true (false) if second call argument is a variable (constant) |
 //! | ...      | ... |
 //! | n_arg-1  | true (false) if last call argument is a variable (constant) |
+//! | n_arg    | true (false) if first result is a variable (constant) |
+//! | n_arg+1  | true (false) if second result is a variable (constant) |
+//! | n_arg+n_res-1 | true (false) if last result is a variable (constant) |
 //!
 //
 use crate::{Index, Float};
