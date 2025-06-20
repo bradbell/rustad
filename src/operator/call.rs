@@ -32,7 +32,7 @@
 //!
 //
 use crate::{Index, Float};
-use crate::function::THIS_THREAD_ADFUN_VEC;
+use crate::function::THIS_THREAD_CHECKPOINT_VEC;
 use crate::operator::id::CALL_OP;
 use crate::operator::OpInfo;
 //
@@ -69,10 +69,12 @@ fn float_forward_0_call(
     }
     //
     // call_range_zero
-    let call_range_zero = THIS_THREAD_ADFUN_VEC.with_borrow( |adfun_vec| {
-        let trace = false;
+    let call_range_zero = THIS_THREAD_CHECKPOINT_VEC.with_borrow( |vec| {
+        let checkpoint_info = &vec[call_index];
+        let adfun           = &checkpoint_info.adfun;
+        let trace           = false;
         let (range_zero, _call_var_zero) =
-            adfun_vec[call_index].forward_zero(&call_domain_zero, trace);
+            adfun.forward_zero(&call_domain_zero, trace);
         range_zero
     } );
     //

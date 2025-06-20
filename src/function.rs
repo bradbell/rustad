@@ -458,8 +458,20 @@ impl ADFun {
     // dependency
     /// Computes the dependency pattern for the function in this ADFun.
     ///
-    /// The the return value is vector of pairs of (row, column)
-    /// where row (column) is non-negative and
+    /// <pre>
+    ///     pattern = dependency(trace)
+    /// </pre>
+    ///
+    /// # trace
+    /// If trace is true, a trace of the dependency calculation
+    /// is printed on standard output.
+    /// Note that in the trace, the cases where *var_index* is less
+    /// that the number of domain variables will end up in the pattern
+    /// with the corresponding row.
+    ///
+    /// # pattermn
+    /// The the return value *pattern* is vector of (row, column) pairs.
+    /// Each row (column) is non-negative and
     /// less than the range (domain) dimension for the function.
     /// If a pair (i, j) does not appear, the range component
     /// with index i does not depend on the domain component with index j.
@@ -655,13 +667,18 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
     }
     result
 }
+pub(crate) struct CheckpointInfo {
+    // pub name         : String,
+    pub adfun        : ADFun,
+    // pub dependency   : Vec<(Index, Index)>,
+}
 //
 thread_local! {
     //
-    // THIS_THREAD_ADFUN_VEC
-    /// thread local storage holding a vector of ADFun objects.
-    pub(crate) static THIS_THREAD_ADFUN_VEC:
-        std::cell::RefCell< Vec<ADFun> > =
+    // THIS_THREAD_CHECKOINT_VEC
+    /// thread local storage holding a vector of CheckpointInfo objects.
+    pub(crate) static THIS_THREAD_CHECKPOINT_VEC:
+        std::cell::RefCell< Vec<CheckpointInfo> > =
             std::cell::RefCell::new( Vec::new() );
     //
     // THIS_THREAD_ADFUN_MAP
@@ -673,16 +690,19 @@ thread_local! {
 //
 // store_checkpoint
 /// Stores checkpoint functions for this thread.
-///
-/// Need to implement dependency analysis so that we can evaluate
-/// the checkpoin function using forward_zero and the fill in
-/// the variable information.
 pub fn store_checkpoint(fun: ADFun, name: String) {
     //
     // index, THIS_THREAD_ADFUN_VEC
-    let index = THIS_THREAD_ADFUN_VEC.with_borrow_mut( |vec| {
-        let index = vec.len();
-        vec.push( fun );
+    let index = THIS_THREAD_CHECKPOINT_VEC.with_borrow_mut( |vec| {
+        let index           = vec.len();
+        // let trace           = false;
+        // let pattern         = fun.dependency(trace);
+        let checkpoint_info = CheckpointInfo {
+            // name       : name.clone(),
+            adfun      : fun,
+            // dependency : pattern,
+        };
+        vec.push( checkpoint_info );
         index
     } );
     //
