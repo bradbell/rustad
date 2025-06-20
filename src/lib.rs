@@ -12,10 +12,10 @@
 /// # Example
 /// ```
 /// let date = *rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2025.6.19");
+/// assert_eq!(date, "2025.6.20");
 /// ```
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
-   std::sync::LazyLock::new( || "2025.6.19" );
+   std::sync::LazyLock::new( || "2025.6.20" );
 // ----------------------------------------------------------------------------
 //
 // utility
