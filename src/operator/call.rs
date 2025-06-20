@@ -32,7 +32,7 @@
 //!
 //
 use crate::{Index, Float};
-use crate::function::THIS_THREAD_CHECKPOINT_VEC;
+use crate::checkpoint::THIS_THREAD_CHECKPOINT_VEC;
 use crate::operator::id::CALL_OP;
 use crate::operator::OpInfo;
 //

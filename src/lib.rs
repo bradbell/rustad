@@ -35,11 +35,14 @@ pub type Float = f64;
 pub mod ad;
 pub use ad::AD;
 //
-// ad_tape
-pub(crate) mod ad_tape;
-//
 // operator
 pub(crate) mod operator;
 //
+// ad_tape
+pub(crate) mod ad_tape;
+//
 // function
 pub mod function;
+//
+// checkpoint
+pub mod checkpoint;
