@@ -282,30 +282,31 @@ pub type ReverseOneBinary = fn(_var_one: &mut Vec<Float>,
 // panic_zero
 /// default [ForwardZero] function, will panic if it does not get replaced.
 fn panic_zero( _var_zero: &mut Vec<Float>,
-    _con: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: Index) {
+    _con_all: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: Index)
+{
     panic!();
 }
 //
 // panic_one
 /// default [ForwardOne] or [ReverseOne] function, will panic
 /// if it does not get replaced.
-fn panic_one( _var_one: &mut Vec<Float>,
-    _var_zero : &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index) {
+fn panic_one( _var_one: &mut Vec<Float>, _var_zero : &Vec<Float>,
+    _con_all: &Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
 }
 //
 // ad_panic_zero
 /// default [ADForwardZero] function, will panic if it does not get replaced.
 fn ad_panic_zero( _var_zero: &mut Vec<AD>,
-    _con: &Vec<Float>, _flag_all : &Vec<bool>, _arg: &[Index], _res: Index) {
+    _con_all: &Vec<Float>, _flag_all : &Vec<bool>, _arg: &[Index], _res: Index) {
     panic!();
 }
 //
 // ad_panic_one
 /// default [ADForwardOne] or [ADReverseOne] function, will panic
 /// if it does not get replaced.
-fn ad_panic_one( _var_one: &mut Vec<AD>,
-    _var_zero : &Vec<AD>, _con: &Vec<Float>, _arg: &[Index], _res: Index) {
+fn ad_panic_one( _var_one: &mut Vec<AD>, _var_zero : &Vec<AD>,
+    _con_all: &Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
 }
 //
@@ -405,13 +406,14 @@ pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
 #[test]
 fn test_op_info() {
     let op_info_vec = &*OP_INFO_VEC;
-    assert_eq!( "add_cv", op_info_vec[id::ADD_CV_OP].name );
-    assert_eq!( "add_vc", op_info_vec[id::ADD_VC_OP].name );
-    assert_eq!( "add_vv", op_info_vec[id::ADD_VV_OP].name );
+    assert_eq!( "add_cv",   op_info_vec[id::ADD_CV_OP].name );
+    assert_eq!( "add_vc",   op_info_vec[id::ADD_VC_OP].name );
+    assert_eq!( "add_vv",   op_info_vec[id::ADD_VV_OP].name );
     //
-    assert_eq!( "call",   op_info_vec[id::CALL_OP].name );
+    assert_eq!( "call",     op_info_vec[id::CALL_OP].name );
+    assert_eq!( "call_res", op_info_vec[id::CALL_RES_OP].name );
     //
-    assert_eq!( "mul_cv", op_info_vec[id::MUL_CV_OP].name );
-    assert_eq!( "mul_vc", op_info_vec[id::MUL_VC_OP].name );
-    assert_eq!( "mul_vv", op_info_vec[id::MUL_VV_OP].name );
+    assert_eq!( "mul_cv",   op_info_vec[id::MUL_CV_OP].name );
+    assert_eq!( "mul_vc",   op_info_vec[id::MUL_VC_OP].name );
+    assert_eq!( "mul_vv",   op_info_vec[id::MUL_VV_OP].name );
 }

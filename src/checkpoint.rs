@@ -45,7 +45,7 @@ use crate::{Index, Float};
 use crate::function::ADFun;
 use crate::ad::AD;
 use crate::ad_tape::{Tape, THIS_THREAD_TAPE};
-use crate::operator::id::{CALL_OP};
+use crate::operator::id::{CALL_OP, CALL_RES_OP};
 //
 // CheckpointInfo
 /// Information used to splice a checkpoint function call into a recording.
@@ -57,7 +57,7 @@ pub(crate) struct CheckpointInfo {
     pub fun_index    : Index,
     //
     // name
-    /// ia a name, that is meaningful to the user,  used to identify
+    /// ia a name, that is meaningful to the user, used to identify
     /// this checkpoint function.
     pub name         : String,
     //
@@ -269,12 +269,25 @@ fn use_checkpoint_info(
         for i in 0 .. call_n_res {
             tape.flag_all.push( is_var_range[i] );
         }
+        //
+        // ad_range, n_var_res
+        let mut n_var_res = 0;
         for i in 0 .. call_n_res {
             if is_var_range[i] {
                 ad_range[i].tape_id   = tape.tape_id;
-                ad_range[i].var_index = tape.n_var;
-                tape.n_var += 1;
+                ad_range[i].var_index = tape.n_var + n_var_res;
+                n_var_res += 1;
             }
+        }
+        assert_ne!( n_var_res, 0);
+        //
+        // tape.n_var
+        tape.n_var += n_var_res;
+        //
+        // tape.id_all, tape.op2arg
+        for _i in 0 .. (n_var_res - 1) {
+            tape.id_all.push( CALL_RES_OP );
+            tape.op2arg.push( tape.arg_all.len() );
         }
     }
     ad_range

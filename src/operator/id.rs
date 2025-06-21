@@ -44,6 +44,8 @@ set_operator_ids!(
     ADD_VV_OP,
     /// Call a chckpoint function
     CALL_OP,
+    /// Place holder for results of call operator
+    CALL_RES_OP,
     /// constant * variable
     MUL_CV_OP,
     /// variable * constant

@@ -80,16 +80,20 @@ macro_rules! forward_zero {
                 var_zero[j] = domain_zero[j];
             }
             if trace {
-                println!( "Begin Trace: forward_zero" );
+                println!( "Begin Trace: forward_zero: n_var = {}", self.n_var);
+                println!( "index, flag" );
+                for j in 0 .. self.flag_all.len() {
+                    println!( "{}, {}", j, self.flag_all[j] );
+                }
                 println!( "index, constant" );
                 for j in 0 .. self.con_all.len() {
                     println!( "{}, {}", j, self.con_all[j] );
                 }
-                println!( "index, domain_zero" );
+                println!( "var_index, domain_zero" );
                 for j in 0 .. domain_zero.len() {
                     println!( "{}, {}", j, var_zero[j] );
                 }
-                println!( "res. name, arg,. var_zero" );
+                println!( "var_index, var, op, arg" );
             }
             for op_index in 0 .. self.id_all.len() {
                 let op_id     = self.id_all[op_index];
@@ -104,11 +108,15 @@ macro_rules! forward_zero {
                 if trace {
                     let name = &op_info_vec[op_id].name;
                     println!(
-                        "{}, {}, {:?}, {}", res, name, arg, var_zero[res]
+                            "{}, {}, {}, {:?}", res, var_zero[res], name, arg
                     );
                 }
             }
             if trace {
+                println!( "range_index, var_index" );
+                for i in 0 .. self.range_index.len() {
+                    println!( "{}, {}", i, self.range_index[i] );
+                }
                 println!( "End Trace: forward_zero" );
             }
             let mut range_zero : Vec<$float_type> = Vec::new();
@@ -196,16 +204,20 @@ macro_rules! forward_one {
                 var_one[j] = domain_one[j];
             }
             if trace {
-                println!( "Begin Trace: forward_one" );
+                println!( "Begin Trace: forward_zero: n_var = {}", self.n_var);
+                println!( "index, flag" );
+                for j in 0 .. self.flag_all.len() {
+                    println!( "{}, {}", j, self.flag_all[j] );
+                }
                 println!( "index, constant" );
                 for j in 0 .. self.con_all.len() {
                     println!( "{}, {}", j, self.con_all[j] );
                 }
-                println!( "index, domain_zero, domain_one" );
+                println!( "var_index, domain_zero, domain_one" );
                 for j in 0 .. domain_one.len() {
                     println!( "{}, [{}, {}]", j, var_zero[j], var_one[j] );
                 }
-                println!( "res, name, arg, var_zero[res]. var_one[res]" );
+                println!( "var_index, var, op, arg" );
             }
             for op_index in 0 .. self.id_all.len() {
                 let op_id     = self.id_all[op_index];
@@ -218,12 +230,16 @@ macro_rules! forward_one {
                 if trace {
                     let name = &op_info_vec[op_id].name;
                     println!(
-                        "{}, {}, {:?}, [{}, {}]",
-                        res, name, arg, var_zero[res], var_one[res]
+                        "{}, [{}, {}], {}, {:?}",
+                        res, var_zero[res], var_one[res], name, arg
                     );
                 }
             }
             if trace {
+                println!( "range_index, var_index" );
+                for i in 0 .. self.range_index.len() {
+                    println!( "{}, {}", i, self.range_index[i] );
+                }
                 println!( "End Trace: forward_one" );
             }
             let mut range_one : Vec<$float_type> = Vec::new();
@@ -311,16 +327,20 @@ macro_rules! reverse_one {
                     partial[ self.range_index[j] ] + range_one[j];
             }
             if trace {
-                println!( "Begin Trace: reverse_one" );
+                println!( "Begin Trace: forward_zero: n_var = {}", self.n_var);
+                println!( "index, flag" );
+                for j in 0 .. self.flag_all.len() {
+                    println!( "{}, {}", j, self.flag_all[j] );
+                }
                 println!( "index, constant" );
                 for j in 0 .. self.con_all.len() {
                     println!( "{}, {}", j, self.con_all[j] );
                 }
-                println!( "index, range_zero, range_one" );
+                println!( "var_index, range_zero, range_one" );
                 for j in 0 .. range_one.len() {
                     println!( "{}, [{}, {}]", j, var_zero[j], partial[j] );
                 }
-                println!( "res, name, arg, var_zero[res]. partial[res]" );
+                println!( "var_index, var, op, arg" );
             }
             for op_index in ( 0 .. self.id_all.len() ).rev() {
                 let op_id     = self.id_all[op_index];
@@ -333,12 +353,16 @@ macro_rules! reverse_one {
                 if trace {
                     let name = &op_info_vec[op_id].name;
                     println!(
-                        "{}, {}, {:?}, [{}, {}]",
-                        res, name, arg, var_zero[res], partial[res]
+                        "{}, [{}, {}], {}, {:?}",
+                        res, var_zero[res], partial[res], name, arg
                     );
                 }
             }
             if trace {
+                println!( "range_index, var_index" );
+                for i in 0 .. self.range_index.len() {
+                    println!( "{}, {}", i, self.range_index[i] );
+                }
                 println!( "End Trace: reverse_one" );
             }
             let mut domain_one : Vec<$float_type> = Vec::new();
@@ -654,6 +678,9 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
         // tape.recording
         assert!( tape.recording , "indepndent: tape is not recording");
         tape.recording = false;
+        //
+        assert_eq!( tape.n_var , tape.n_domain + tape.id_all.len() );
+        assert_eq!( tape.op2arg.len() , tape.id_all.len() );
         //
         // tape.op2arg
         // end marker for arguments to the last operation

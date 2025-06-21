@@ -32,7 +32,7 @@ fn simple() {
     //
     // w
     // w = g(u)
-    let trace   = false;
+    let trace   = true;
     let (w, _)  = g.forward_zero(&u, trace);
     assert_eq!( w[0], u[0] + u[0] + u[1] );
     assert_eq!( w[1], (u[0] + u[1]) * u[1] );

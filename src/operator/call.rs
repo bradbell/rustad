@@ -7,7 +7,7 @@
 //! # Operator Id
 //!  CALL_OP
 //!
-//! # Operator Arguments:
+//! # Operator Arguments
 //! | Index    | Meaning |
 //! | -------  | ------- |
 //! | 0        | Index that identifies the ADFun object being called |
@@ -19,7 +19,7 @@
 //! | ...      | ... |
 //! | 3+n_arg  | Variable or constant index for last argument to call |
 //!
-//! # Operator Booleans:
+//! # Operator Booleans
 //! | Index    | Meaning |
 //! | -------- | ------- |
 //! | 0        | true (false) if first call argument is a variable (constant) |
@@ -30,14 +30,30 @@
 //! | n_arg+1  | true (false) if second result is a variable (constant) |
 //! | n_arg+n_res-1 | true (false) if last result is a variable (constant) |
 //!
+//! # Operator Results
+//! We use n_var_res for the number of results that are variables.
+//! There are n_var_res - 1 CALL_RES_OP operators directly after each CALL_OP
+//! operator in the sequence of operations. These are place holders so that
+//! there is a direct correpondence between variable and operator indices.
 //
 use crate::{Index, Float};
 use crate::checkpoint::THIS_THREAD_CHECKPOINT_VEC;
-use crate::operator::id::CALL_OP;
+use crate::operator::id::{CALL_OP, CALL_RES_OP};
 use crate::operator::OpInfo;
+use crate::ad::AD;
 //
 #[cfg(doc)]
 use crate::operator;
+#[cfg(doc)]
+use crate::operator::{
+    ForwardZero,
+    ForwardOne,
+    ReverseOne,
+    ADForwardZero,
+    ADForwardOne,
+    ADReverseOne,
+    ArgVarIndex,
+};
 //
 // float_forward_0_call
 /// Float zero order forward for call operator
@@ -91,9 +107,9 @@ fn float_forward_0_call(
     }
 }
 //
-// arg_var_index_call
+// call_arg_var_index
 /// vector of variable indices that are arguments to this call operator
-fn arg_var_index_call(
+fn call_arg_var_index(
     arg_var_index : &mut Vec<Index>, flag_all : &Vec<bool>, arg: &[Index]
 
 ) {
@@ -131,6 +147,48 @@ fn arg_var_index_call(
         ad_forward_0   : super::ad_panic_zero,
         ad_forward_1   : super::ad_panic_one,
         ad_reverse_1   : super::ad_panic_one,
-        arg_var_index  : arg_var_index_call,
+        arg_var_index  : call_arg_var_index,
      };
+    op_info_vec[CALL_RES_OP] = OpInfo{
+        name           : "call_res".to_string() ,
+        forward_0      : no_op_zero,
+        forward_1      : no_op_one,
+        reverse_1      : no_op_one,
+        ad_forward_0   : ad_no_op_zero,
+        ad_forward_1   : ad_no_op_one,
+        ad_reverse_1   : ad_no_op_one,
+        arg_var_index  : no_op_arg_var_index,
+     };
+}
+// ---------------------------------------------------------------------------
+//
+// no_op_zero
+/// [ForwardZero] function
+fn no_op_zero( _var_zero: &mut Vec<Float>,
+    _con_all: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: Index)
+{ }
+//
+// no_op_one
+/// [ForwardOne] or [ReverseOne] function
+fn no_op_one( _var_one: &mut Vec<Float>, _var_zero : &Vec<Float>,
+    _con_all: &Vec<Float>, _arg: &[Index], _res: Index)
+{ }
+//
+// ad_no_op_zero
+/// [ADForwardZero]
+fn ad_no_op_zero( _var_zero: &mut Vec<AD>,
+    _con_all: &Vec<Float>, _flag_all : &Vec<bool>, _arg: &[Index], _res: Index)
+{ }
+//
+// ad_no_op_one
+/// [ADForwardOne] or [ADReverseOne] function
+fn ad_no_op_one( _var_one: &mut Vec<AD>, _var_zero : &Vec<AD>,
+    _con_all: &Vec<Float>, _arg: &[Index], _res: Index)
+{ }
+//
+// no_op_arg_var_index
+/// [ArgVarIndex] function
+fn no_op_arg_var_index(
+    arg_var_index: &mut Vec<Index>, _flag_all: &Vec<bool>, _arg: &[Index]) {
+    arg_var_index.resize(0, 0);
 }
