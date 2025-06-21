@@ -3,30 +3,40 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This module can be used to checkpoint a section of AD computation.
+//! This module can be used to checkpoint a section of AD computation:
+//! //! ADFun objects: 
 //!
 //! # Example
-//!```
-//! use rustad::{Float, AD};
-//! use rustad::function;
-//! use rustad::checkpoint::{store_checkpoint, use_checkpoint};
-//! let  x : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
-//! let mut ax = function::ad_domain(&x);
-//! let mut ay = vec![ ax[0] + ax[1], ax[1] * ax[2] ];
+//! ```
+//! //
+//! // f
 //! // f(x) = [x0 + x1, x1 * x2]
-//! let f      = function::ad_fun(&ay);
-//! let name   = "f".to_string();
+//! let  x : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
+//! let ax      = function::ad_domain(&x);
+//! let ay      = vec![ ax[0] + ax[1], ax[1] * ax[2] ];
+//! let f       = function::ad_fun(&ay);
+//! //
+//! // f
+//! // store as a checkpoint function
+//! let name    = "f".to_string();
 //! store_checkpoint(f, &name);
-//! let  u : Vec<Float> = vec![ 4.0, 5.0];
-//! let au    = function::ad_domain(&u);
-//! let ax    = vec![ au[0], au[0] + au[1], au[1] ];
-//! let ay    = use_checkpoint(&name, &ax);
-//! // g(u)   = [ x0(u) + x1(u),     x1(u)     * x2(2) ]
-//! //        = [ u0    + (u0 + u1), (u0 + u1) * u1 ]
-//! let g     = function::ad_fun(&ay);
-//! let trace = false;
-//! let v     = g.forward_zero(&u, trace);
-//!```
+//! //
+//! // g
+//! // g(u) = f( u0, u0 + u1, u1)
+//! //      = [ u0 + u0 + u1 , (u0 + u1) * u1 ]
+//! let  u : Vec<Float>  = vec![ 4.0, 5.0];
+//! let au      = function::ad_domain(&u);
+//! let ax      = vec![ au[0], au[0] + au[1], au[1] ];
+//! let ay      = use_checkpoint(&name, &ax);
+//! let g       = function::ad_fun(&ay);
+//! //
+//! // w
+//! // w = g(u)
+//! let trace   = false;
+//! let (w, _)  = g.forward_zero(&u, trace);
+//! assert_eq!( w[0], u[0] + u[0] + u[1] );
+//! assert_eq!( w[1], (u[0] + u[1]) * u[1] );
+//! ```
 //
 use crate::{Index, Float};
 use crate::function::ADFun;
@@ -34,10 +44,29 @@ use crate::ad::AD;
 use crate::ad_tape::{Tape, THIS_THREAD_TAPE};
 use crate::operator::id::{CALL_OP};
 //
+// CheckpointInfo
+/// Information used to splice a checkpoint funcion call into a recording.
 pub(crate) struct CheckpointInfo {
+    //
+    // fun_index
+    /// is the index of this checkpoint funciton in the vector of all
+    /// checkpoint functions.
     pub fun_index    : Index,
+    //
+    // name
+    /// ia a name, that is meaningful to the user,  used to identify
+    /// this checkpoint function. 
     pub name         : String,
+    //
+    // adfun
+    /// ia the [ADFun] object that is used to evaluate this chekcpoing funciton
+    /// and its derivative.
     pub adfun        : ADFun,
+    //
+    // dependency
+    /// is the dependency pattern as vector of pairs of non-negative integers.
+    /// If (i,j) is not in dependency, then the i-th component of the range
+    /// does not depend on the j-th component of the domain.
     pub dependency   : Vec<(Index, Index)>,
 }
 //
@@ -50,17 +79,29 @@ thread_local! {
             std::cell::RefCell::new( Vec::new() );
     //
     // THIS_THREAD_CHECKPOINT_MAP
-    /// thread local storage mapping names to index in THIS_THREAD_ADFUN_VEC
+    /// thread local storage that maps names to index in 
+    /// THIS_THREAD_CHECKPONT_VEC
     pub(crate) static THIS_THREAD_CHECKPOINT_MAP:
         std::cell::RefCell< std::collections::HashMap<String, Index> > =
             std::cell::RefCell::new( std::collections::HashMap::new() );
 }
 //
 // store_checkpoint
-/// Stores checkpoint functions for this thread.
-pub fn store_checkpoint(fun: ADFun, name: &String) {
+/// Stores checkpoint a checkpoint functions for this thread.
+///
+/// # fun
+/// is the [ADFun] object that it used to compute checkpoint funcion and
+/// derivative values. 
+///
+/// # name
+/// is a name the the user chooese for this function.
+/// This name must not appear in a previous call the store_checkpoint
+/// on this thread.
+pub fn store_checkpoint(
+    fun:  ADFun, 
+    name: &String) {
     //
-    // fun_index, THIS_THREAD_ADFUN_VEC
+    // fun_index, THIS_THREAD_CHECKPONT_VEC
     let fun_index = THIS_THREAD_CHECKPOINT_VEC.with_borrow_mut( |vec| {
         let index           = vec.len();
         let trace           = false;
@@ -86,8 +127,26 @@ pub fn store_checkpoint(fun: ADFun, name: &String) {
 }
 //
 // use_checkpoint
-/// Make a call (by name) to a checkpoint function and possibly record it.
-pub fn use_checkpoint(name : &String, ad_domain : &Vec<AD>) -> Vec<AD> {
+/// Make a call, by namem, to a checkpoint function.
+/// If the tape for this thread is recording, include its call in the
+/// tape as a checkpoint.
+///
+/// <pre>
+///     ad_range = use_checkoint(name, ad_domain)
+/// </pre>
+///
+/// # name
+/// is the name that was used to stor the checkpoint funciton.
+///
+/// # ad_domain
+/// is the value of the domain varibles for the fuction being called.
+///
+/// # ad_range
+/// the return is the values of the range vaiables corresponding to the
+/// domain variable values.
+pub fn use_checkpoint(
+    name : &String, 
+    ad_domain : &Vec<AD>) -> Vec<AD> {
     //
     // fun_index
     let fun_index = THIS_THREAD_CHECKPOINT_MAP.with_borrow( |map| {
@@ -113,7 +172,8 @@ pub fn use_checkpoint(name : &String, ad_domain : &Vec<AD>) -> Vec<AD> {
 }
 //
 // use_checkpoint_info
-/// Make a call (by info) to a checkpoint function and possibly record it.
+/// Make a call (by info) to a checkpoint function and record it,
+/// if the tapes thread is currently recording.
 fn use_checkpoint_info(
     tape : &mut Tape, check_point_info : &CheckpointInfo, ad_domain : &Vec<AD>
 ) -> Vec<AD> {
