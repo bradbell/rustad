@@ -12,6 +12,9 @@
 //! use rustad::function;
 //! use rustad::checkpoint::{store_checkpoint, use_checkpoint};
 //! //
+//! // trace
+//! let trace   = false;
+//! //
 //! // f
 //! // f(x) = [x0 + x1, x1 * x2]
 //! let  x : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
@@ -30,12 +33,11 @@
 //! let  u : Vec<Float>  = vec![ 4.0, 5.0];
 //! let au      = function::ad_domain(&u);
 //! let ax      = vec![ au[0], au[0] + au[1], au[1] ];
-//! let ay      = use_checkpoint(&name, &ax);
+//! let ay      = use_checkpoint(&name, &ax, trace);
 //! let g       = function::ad_fun(&ay);
 //! //
 //! // w
 //! // w = g(u)
-//! let trace   = false;
 //! let (w, _)  = g.forward_zero(&u, trace);
 //! assert_eq!( w[0], u[0] + u[0] + u[1] );
 //! assert_eq!( w[1], (u[0] + u[1]) * u[1] );
@@ -140,12 +142,18 @@ pub fn store_checkpoint(
 /// * ad_domain :
 /// The value of the domain variables for the function bning called.
 ///
+/// * trace :
+/// If this is true (false), a Float evaluation of the
+/// checkpoint function corresponding to *ad_domain* is traced.
+///
 /// * return :
 /// The values of the range variables that correspond to the
 /// domain variable values.
 pub fn use_checkpoint(
-    name : &String,
-    ad_domain : &Vec<AD>) -> Vec<AD> {
+    name      : &String,
+    ad_domain : &Vec<AD>,
+    trace     : bool,
+) -> Vec<AD> {
     //
     // fun_index
     let fun_index = THIS_THREAD_CHECKPOINT_MAP.with_borrow( |map| {
@@ -163,7 +171,7 @@ pub fn use_checkpoint(
         let check_point_info = &vec[fun_index];
         assert_eq!( fun_index, check_point_info.fun_index );
         let ad_range_zero = THIS_THREAD_TAPE.with_borrow_mut( |tape|
-            use_checkpoint_info(tape, check_point_info, ad_domain)
+            use_checkpoint_info(tape, check_point_info, ad_domain, trace)
         );
         ad_range_zero
     } );
@@ -185,11 +193,18 @@ pub fn use_checkpoint(
 /// * ad_domain :
 /// The value of the checkpoint function domain variables.
 ///
+/// * trace :
+/// If this is true (false), a Float evaluation of the
+/// checkpoint function corresponding to *ad_domain* is traced.
+///
 /// * return :
 /// The values of the range variables that correspond to the
 /// domain variable values.
 fn use_checkpoint_info(
-    tape : &mut Tape, check_point_info : &CheckpointInfo, ad_domain : &Vec<AD>
+    tape             : &mut Tape,
+    check_point_info : &CheckpointInfo,
+    ad_domain        : &Vec<AD>,
+    trace            : bool,
 ) -> Vec<AD> {
     //
     // name, adfun, dependency
@@ -215,7 +230,6 @@ fn use_checkpoint_info(
     }
     //
     // range_zero
-    let trace = false;
     let (range_zero, _var_zero) = adfun.forward_zero(&domain_zero, trace);
     //
     // ad_range

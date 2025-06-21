@@ -126,7 +126,12 @@ macro_rules! forward_zero {
             }
             let mut range_zero : Vec<$float_type> = Vec::new();
             for i in 0 .. self.range_is_var.len() {
-                range_zero.push( var_zero[ self.range2tape_index[i] ] );
+                if self.range_is_var[i] {
+                    range_zero.push( var_zero[ self.range2tape_index[i] ] );
+                } else {
+                    let constant = self.con_all[ self.range2tape_index[i] ];
+                    range_zero.push( $float_type::from(constant) );
+                }
             }
             ( range_zero, var_zero )
         }
