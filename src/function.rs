@@ -245,9 +245,14 @@ macro_rules! forward_one {
                 }
             }
             if trace {
-                println!( "range_index, var_index" );
+                println!( "range_index, var_index, con_index" );
                 for i in 0 .. self.range_is_var.len() {
-                    println!( "{}, {}", i, self.range2tape_index[i] );
+                    let index = self.range2tape_index[i];
+                    if self.range_is_var[i] {
+                        println!( "{}, {}, ----", i, index);
+                    } else {
+                        println!( "{}, ---- ,{}", i, index);
+                    }
                 }
                 println!( "End Trace: forward_one" );
             }
@@ -366,9 +371,14 @@ macro_rules! reverse_one {
                 }
             }
             if trace {
-                println!( "range_index, var_index" );
+                println!( "range_index, var_index, con_index" );
                 for i in 0 .. self.range_is_var.len() {
-                    println!( "{}, {}", i, self.range2tape_index[i] );
+                    let index = self.range2tape_index[i];
+                    if self.range_is_var[i] {
+                        println!( "{}, {}, ----", i, index);
+                    } else {
+                        println!( "{}, ---- ,{}", i, index);
+                    }
                 }
                 println!( "End Trace: reverse_one" );
             }
