@@ -4,6 +4,29 @@
 // ---------------------------------------------------------------------------
 //
 //! This module can be used to checkpoint a section of AD computation.
+//!
+//! # Example
+//!```
+//! use rustad::{Float, AD};
+//! use rustad::function;
+//! use rustad::checkpoint::{store_checkpoint, use_checkpoint};
+//! let  x : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
+//! let mut ax = function::ad_domain(&x);
+//! let mut ay = vec![ ax[0] + ax[1], ax[1] * ax[2] ];
+//! // f(x) = [x0 + x1, x1 * x2]
+//! let f      = function::ad_fun(&ay);
+//! let name   = "f".to_string();
+//! store_checkpoint(f, &name);
+//! let  u : Vec<Float> = vec![ 4.0, 5.0];
+//! let au    = function::ad_domain(&u);
+//! let ax    = vec![ au[0], au[0] + au[1], au[1] ];
+//! let ay    = use_checkpoint(&name, &ax);
+//! // g(u)   = [ x0(u) + x1(u),     x1(u)     * x2(2) ]
+//! //        = [ u0    + (u0 + u1), (u0 + u1) * u1 ]
+//! let g     = function::ad_fun(&ay);
+//! let trace = false;
+//! let v     = g.forward_zero(&u, trace);
+//!```
 //
 use crate::{Index, Float};
 use crate::function::ADFun;
@@ -35,7 +58,7 @@ thread_local! {
 //
 // store_checkpoint
 /// Stores checkpoint functions for this thread.
-pub fn store_checkpoint(fun: ADFun, name: String) {
+pub fn store_checkpoint(fun: ADFun, name: &String) {
     //
     // fun_index, THIS_THREAD_ADFUN_VEC
     let fun_index = THIS_THREAD_CHECKPOINT_VEC.with_borrow_mut( |vec| {
@@ -55,10 +78,10 @@ pub fn store_checkpoint(fun: ADFun, name: String) {
     // THIS_THREAD_CHECKPOINT_MAP
     THIS_THREAD_CHECKPOINT_MAP.with_borrow_mut( |map| {
         assert!(
-            ! map.contains_key(&name),
+            ! map.contains_key(name),
             "store_checkpoint: name {name} was used before on this thread"
         );
-        map.insert(name, fun_index);
+        map.insert(name.clone(), fun_index);
     } );
 }
 //
@@ -155,15 +178,14 @@ fn use_checkpoint_info(
         tape.arg_all.push( call_n_res );          // arg[2]
         tape.arg_all.push( tape.flag_all.len() ); // arg[3]
         for j in 0 .. call_n_arg {
-            if is_var_domain[j] {
-                ad_range[j].tape_id   = tape.tape_id;
-                ad_range[j].var_index = tape.n_var;
-                tape.arg_all.push( tape.n_var );         // arg[4 + j]
-                tape.n_var += 1;
+            let index = if is_var_domain[j] {
+                ad_domain[j].var_index
             } else {
-                tape.arg_all.push( tape.con_all.len() ); // arg[4 + j]
+                let con_index = tape.con_all.len();
                 tape.con_all.push( ad_domain[j].value );
-            }
+                con_index
+            };
+            tape.arg_all.push( index ); // arg[4+j]
         }
         //
         // tape.flag_all
@@ -172,6 +194,13 @@ fn use_checkpoint_info(
         }
         for i in 0 .. call_n_res {
             tape.flag_all.push( is_var_range[i] );
+        }
+        for i in 0 .. call_n_res {
+            if is_var_range[i] {
+                ad_range[i].tape_id   = tape.tape_id;
+                ad_range[i].var_index = tape.n_var;
+                tape.n_var += 1;
+            }
         }
     }
     ad_range

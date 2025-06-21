@@ -25,6 +25,9 @@ fn test_add_vv() {
     //
     assert_eq!( dy[0], dx[0] + dx[1] );
     assert_eq!( dy[1], dx[1] + dx[2] );
+    //
+    assert_eq!( rx[0], ry[0] );
+    assert_eq!( rx[1], ry[0] + ry[1] );
 }
 
 #[test]
