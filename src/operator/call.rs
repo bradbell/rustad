@@ -36,6 +36,9 @@ use crate::checkpoint::THIS_THREAD_CHECKPOINT_VEC;
 use crate::operator::id::CALL_OP;
 use crate::operator::OpInfo;
 //
+#[cfg(doc)]
+use crate::operator;
+//
 // float_forward_0_call
 /// Float zero order forward for call operator
 fn float_forward_0_call(
@@ -115,6 +118,10 @@ fn arg_var_index_call(
 //
 // set_op_info
 /// Set the operator information for call.
+///
+/// * op_info_vec :
+/// The map from [operator::id] to operator information.
+/// The map results for CALL_OP are set.
  pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
     op_info_vec[CALL_OP] = OpInfo{
         name           : "call".to_string() ,

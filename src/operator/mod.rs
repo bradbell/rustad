@@ -93,44 +93,69 @@ pub mod call;
 //
 // ForwardZero
 /// Evaluate zero order forward for one operation in the operation sequence.
+///
+/// * var_zero :
+/// The vector of zero order variable values.
+///
+/// * con :
+/// The vector of all the constant values used by operators.
+///
+/// * flag_all :
+/// The vector of all the boolean values used by operators.
+///
+/// * arg :
+/// The sub-vector of arguments for this operator.
+///
+/// * res :
+/// The variable index corresponding to the first result for this operator.
 pub type ForwardZero = fn(_var_zero: &mut Vec<Float>,
-    _con: &Vec<Float>, _flag_all : &Vec<bool>,_arg: &[Index], _res: Index
+    _con_all: &Vec<Float>, _flag_all : &Vec<bool>,_arg: &[Index], _res: Index
 );
 //
 // ForwardOne
 /// Evaluate first order forward for one operation in the operation sequence.
 pub type ForwardOne = fn(_var_one: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+    _var_zero: &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
 // ReverseOne
 /// Evaluate first order reverse for one operation in the operation sequence.
 pub type ReverseOne = fn(_partial: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+    _var_zero: &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
 // ADForwardZero
 /// Evaluate zero order forward for one operation in the operation sequence.
 pub type ADForwardZero = fn(_var_zero: &mut Vec<AD>,
-    _con: &Vec<Float>, __flag_all : &Vec<bool>, arg: &[Index], _res: Index
+    _con_all: &Vec<Float>, __flag_all : &Vec<bool>, arg: &[Index], _res: Index
 );
 //
 // ADForwardOne
 /// Evaluate first order reverse for one operation in the operation sequence.
 pub type ADForwardOne = fn(_var_one: &mut Vec<AD>,
-    _var_zero: &Vec<AD>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+    _var_zero: &Vec<AD>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
 // ADReverseOne
 /// Evaluate first order reverse for one operation in the operation sequence.
 pub type ADReverseOne = fn(_var_one: &mut Vec<AD>,
-    _var_zero: &Vec<AD>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+    _var_zero: &Vec<AD>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
-// ArbVarIndex
+// ArgVarIndex
 /// Determine variable indices that are arguments to this operator.
+///
+/// * arg_var_index :
 /// Passing in arg_var_index avoids reallocating memory for each call.
-pub type ArbVarIndex = fn(
+///
+///
+/// * flag_all :
+/// The vector of all the boolean values used by operators.
+///
+/// * arg :
+/// The subvector of arguments for this operator.
+///
+pub type ArgVarIndex = fn(
     _arg_var_index: &mut Vec<Index>, _flag_all : &Vec<bool>, _arg: &[Index]
 );
 // ---------------------------------------------------------------------------
@@ -138,20 +163,20 @@ pub type ArbVarIndex = fn(
 // ForwardZeroBinary
 /// This is a [ForwardZero] with the following extra conditions:
 ///
-/// # op
+/// * op :
 /// we use the notation *op* for this operator's symbol; e.g. + for addition.
 ///
-/// # arg
+/// * arg :
 /// is a slice of size two.  We use the notation
 /// <pre>
 ///     lhs = arg[0]
 ///     rhs = arg[1]
 /// </pre>
 ///
-/// # res
+/// * res :
 /// is the index in *var_zero* where the result for this operator is placed.
 ///
-/// # var_zero
+/// * var_zero :
 /// is the vector of the zero order values for all the variables.
 /// If both left and right are variables:
 /// <pre>
@@ -167,26 +192,26 @@ pub type ArbVarIndex = fn(
 /// </pre>
 #[cfg(doc)]
 pub type ForwardZeroBinary = fn(_var_zero: &mut Vec<Float>,
-    _con: &Vec<Float>, _arg: &[Index], _res: Index
+    _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
 // ForwardOneBinary
 /// This is a [ForwardOne] with the following extra conditions:
 ///
-/// # op
+/// * op :
 /// we use the notation *op* for this operator's symbol; e.g. + for addition.
 ///
-/// # arg
+/// * arg :
 /// is a slice of size two.  We use the notation
 /// <pre>
 ///     lhs = arg[0]
 ///     rhs = arg[1]
 /// </pre>
 ///
-/// # res
+/// * res :
 /// is the index in *var_one* where the result for this operator is placed.
 ///
-/// # var_zero
+/// * var_zero :
 /// is the vector of the zero order values for all the variables.
 /// If both left and right are variables:
 /// <pre>
@@ -201,32 +226,32 @@ pub type ForwardZeroBinary = fn(_var_zero: &mut Vec<Float>,
 ///     var_zero[res] = con[lhs] op var_zero[rhs]
 /// </pre>
 ///
-/// # var_one
+/// * var_one :
 /// is the vector of directional derivatives.
 /// The directional deriative var_one\[res\] is computed using the
 /// its value of var_one\[i\] for indices *i* less tham *res* .
 #[cfg(doc)]
 pub type ForwardOneBinary = fn(_var_one: &mut Vec<Float>,
-    _var_zero : &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+    _var_zero : &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
 // ReverseOneBinary
 /// This is a [ReverseOne] with the following extra conditions:
 ///
-/// # op
+/// * op :
 /// we use the notation *op* for this operator's symbol; e.g. + for addition.
 ///
-/// # arg
+/// * arg :
 /// is a slice of size two.  We use the notation
 /// <pre>
 ///     lhs = arg[0]
 ///     rhs = arg[1]
 /// </pre>
 ///
-/// # res
+/// * res :
 /// is the index in *var_one* where the result for this operator is placed.
 ///
-/// # var_zero
+/// * var_zero :
 /// is the vector of the zero order values for all the variables.
 /// If both left and right are variables:
 /// <pre>
@@ -241,7 +266,7 @@ pub type ForwardOneBinary = fn(_var_one: &mut Vec<Float>,
 ///     var_zero[res] = con[lhs] op var_zero[rhs]
 /// </pre>
 ///
-/// # partial
+/// * partial :
 /// Reverse mode computes the partial derivatives of a scalar function of the
 /// range vector.
 /// On input *partial* contains the derivative w.r.t. the variables
@@ -250,7 +275,7 @@ pub type ForwardOneBinary = fn(_var_one: &mut Vec<Float>,
 /// expressing it as a function of the variables with lower indices.
 #[cfg(doc)]
 pub type ReverseOneBinary = fn(_var_one: &mut Vec<Float>,
-    _var_zero : &Vec<Float>, _con: &Vec<Float>, _arg: &[Index], _res: Index
+    _var_zero : &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 // ---------------------------------------------------------------------------
 //
@@ -285,7 +310,7 @@ fn ad_panic_one( _var_one: &mut Vec<AD>,
 }
 //
 // panic_arg_var_index
-/// default [ArbVarIndex] function,  will panic if it does not get replaced.
+/// default [ArgVarIndex] function,  will panic if it does not get replaced.
 fn panic_arg_var_index(
     _arg_var_index: &mut Vec<Index>, _flag_all: &Vec<bool>, _arg: &[Index]
 ) {
@@ -349,7 +374,7 @@ pub struct OpInfo {
     pub ad_reverse_1   : ADReverseOne,
     //
     /// determines the operator arguments that are variable indices
-    pub arg_var_index  : ArbVarIndex,
+    pub arg_var_index  : ArgVarIndex,
 }
 //
 // op_info_vec

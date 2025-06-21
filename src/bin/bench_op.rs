@@ -5,6 +5,7 @@
 use rustad::Float;
 use rustad::AD;
 use rustad::function;
+use rustad::utility::avg_seconds_to_execute;
 
 fn vec_float2ad(vec : &Vec<Float> ) -> Vec<AD> {
     let mut result = Vec::new();
@@ -99,7 +100,7 @@ fn test_ad_mul_vv() {
 
 fn bench( name : &String, test_case : fn() ) {
     let total_seconds = 0.25;
-    let seconds  = rustad::utility::avg_seconds( test_case, total_seconds );
+    let seconds  = avg_seconds_to_execute( test_case, total_seconds );
     let nanos    = (seconds * 1e9 + 0.5) as u64;
     let duration = std::time::Duration::from_nanos(nanos);
     println!( "time per {:?} = {:?}", name, duration);

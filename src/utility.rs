@@ -5,22 +5,23 @@
 //! Some utilities not specific to implementing the rustd package
 //! [parent module](super)
 //
-// avg_seconds
+// avg_seconds_to_execute
 /// Compute the average time required to execute a function.
 ///
-/// # fun
-/// is the function that we are executing.
+/// * fun :
+/// The function that we are executing.
 ///
-/// # total_seconds
+/// * total_seconds :
 /// The execution will be repeated until the total execution time is at least
 /// *total_seconds* .
 ///
-/// # avg_seconds
+/// # return :
 /// The return value is the total execution time, in seconds,
 /// divided by the number of repeats; i.e, the average per call to *fun* .
 ///
 /// # Example
 /// ```
+/// use rustad::utility::avg_seconds_to_execute;
 /// let faster = || { println!( "faster: ");
 /// };
 /// let slower = || {
@@ -29,11 +30,11 @@
 ///     println!( "slower: {},", sum);
 /// };
 /// let total_seconds = 0.5;
-/// let s1            = rustad::utility::avg_seconds(faster, total_seconds);
-/// let s2            = rustad::utility::avg_seconds(slower, total_seconds);
+/// let s1 = avg_seconds_to_execute(faster, total_seconds);
+/// let s2 = avg_seconds_to_execute(slower, total_seconds);
 /// assert!( s1 < s2 / 2.0 );
 /// ```
-pub fn avg_seconds( fun : fn() , total_seconds : f64 ) -> f64 {
+pub fn avg_seconds_to_execute( fun : fn() , total_seconds : f64 ) -> f64 {
     let mut repeat : usize = 1;
     let mut duration  = 0.0;
     while duration < total_seconds {
