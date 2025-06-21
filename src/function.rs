@@ -113,14 +113,19 @@ macro_rules! forward_zero {
                 }
             }
             if trace {
-                println!( "range_index, var_index" );
-                for i in 0 .. self.range2tape_index.len() {
-                    println!( "{}, {}", i, self.range2tape_index[i] );
+                println!( "range_index, var_index, con_index" );
+                for i in 0 .. self.range_is_var.len() {
+                    let index = self.range2tape_index[i];
+                    if self.range_is_var[i] {
+                        println!( "{}, {}, ----", i, index);
+                    } else {
+                        println!( "{}, ---- ,{}", i, index);
+                    }
                 }
                 println!( "End Trace: forward_zero" );
             }
             let mut range_zero : Vec<$float_type> = Vec::new();
-            for i in 0 .. self.range2tape_index.len() {
+            for i in 0 .. self.range_is_var.len() {
                 range_zero.push( var_zero[ self.range2tape_index[i] ] );
             }
             ( range_zero, var_zero )
@@ -236,13 +241,13 @@ macro_rules! forward_one {
             }
             if trace {
                 println!( "range_index, var_index" );
-                for i in 0 .. self.range2tape_index.len() {
+                for i in 0 .. self.range_is_var.len() {
                     println!( "{}, {}", i, self.range2tape_index[i] );
                 }
                 println!( "End Trace: forward_one" );
             }
             let mut range_one : Vec<$float_type> = Vec::new();
-            for i in 0 .. self.range2tape_index.len() {
+            for i in 0 .. self.range_is_var.len() {
                 range_one.push( var_one[ self.range2tape_index[i] ] );
             }
             range_one
@@ -309,7 +314,7 @@ macro_rules! reverse_one {
         ) -> Vec<$float_type>
         {
             assert_eq!(
-                range_one.len(), self.range2tape_index.len(),
+                range_one.len(), self.range_is_var.len(),
                 "f.reverse_one: range_one length does not match f"
             );
             assert_eq!(
@@ -320,7 +325,7 @@ macro_rules! reverse_one {
             let op_info_vec = &*OP_INFO_VEC;
             let zero        = $float_type::from( Float::from(0.0) );
             let mut partial = vec![zero; self.n_var ];
-            for j in 0 .. self.range2tape_index.len() {
+            for j in 0 .. self.range_is_var.len() {
                 partial[ self.range2tape_index[j] ] += range_one[j];
             }
             if trace {
@@ -357,7 +362,7 @@ macro_rules! reverse_one {
             }
             if trace {
                 println!( "range_index, var_index" );
-                for i in 0 .. self.range2tape_index.len() {
+                for i in 0 .. self.range_is_var.len() {
                     println!( "{}, {}", i, self.range2tape_index[i] );
                 }
                 println!( "End Trace: reverse_one" );
@@ -394,9 +399,16 @@ pub struct ADFun {
     /// The total number of variables in the operation sequence.
     pub(crate) n_var          : Index,
     //
+    // range_is_var
+    /// The length of this vector is the dimension of the range space.
+    /// If range_is_var\[i\] is true (false), the i-th range space component
+    /// is a variable (constant).
+    pub(crate) range_is_var        : Vec<bool>,
+    //
     // range2tape_index
-    /// The variable index for each of the range variables in this function.
-    /// The dimension of its range spase is range2tape_index.len().
+    /// The length of this vector is also the dimension of the range space.
+    /// If range_is_var\[i\] is true (false), range2tape_indx\[i\] is the
+    /// variable (constant) index for the i-th component of the range space.
     pub(crate) range2tape_index    : Vec<Index>,
     //
     // id_all
@@ -437,14 +449,15 @@ impl ADFun {
     /// ```
     pub fn new() -> Self {
         Self {
-            n_domain      : 0,
-            n_var         : 0,
-            id_all        : Vec::new() ,
-            op2arg        : Vec::new() ,
-            arg_all       : Vec::new() ,
-            con_all       : Vec::new() ,
-            flag_all      : Vec::new() ,
-            range2tape_index   : Vec::new() ,
+            n_domain         : 0,
+            n_var            : 0,
+            id_all           : Vec::new() ,
+            op2arg           : Vec::new() ,
+            arg_all          : Vec::new() ,
+            con_all          : Vec::new() ,
+            flag_all         : Vec::new() ,
+            range_is_var     : Vec::new() ,
+            range2tape_index : Vec::new() ,
         }
     }
     //
@@ -454,7 +467,7 @@ impl ADFun {
     //
     // range_len
     /// dimension of range space
-    pub fn range_len(&self) -> Index { self.range2tape_index.len() }
+    pub fn range_len(&self) -> Index { self.range_is_var.len() }
     //
     // forward_zero
     forward_zero!(Float);
@@ -519,14 +532,16 @@ impl ADFun {
         // op_info_vec
         let op_info_vec = &*OP_INFO_VEC;
         //
-        // n_domain, n_var, flag_all, arg_all, op2arg, n_range
-        let n_domain     = self.n_domain;
-        let n_var        = self.n_var;
-        let flag_all     = &self.flag_all;
-        let arg_all      = &self.arg_all;
-        let op2arg       = &self.op2arg;
+        // n_domain, n_var, flag_all, arg_all, op2arg,
+        // range_is_var, range2tape_index, n_range
+        let n_domain          = self.n_domain;
+        let n_var             = self.n_var;
+        let flag_all          = &self.flag_all;
+        let arg_all           = &self.arg_all;
+        let op2arg            = &self.op2arg;
+        let range_is_var      = &self.range_is_var;
         let range2tape_index  = &self.range2tape_index;
-        let n_range      = range2tape_index.len();
+        let n_range           = range_is_var.len();
         //
         // done
         let mut done : Vec<Index> = vec![n_var; n_var];
@@ -542,10 +557,10 @@ impl ADFun {
         //
         // row
         // determine the variables that range index row depends on
-        for row in 0 .. n_range {
+        for row in 0 .. n_range { if range_is_var[row] {
             //
             // var_index
-            let mut var_index = self.range2tape_index[row];
+            let mut var_index = range2tape_index[row];
             if trace {
                 println!( "row {} var_index {}", row, var_index );
             }
@@ -596,7 +611,7 @@ impl ADFun {
                     }
                 }
             }
-        }
+        } }
         if trace {
             println!( "n_dependency = {}", result.len() );
         }
@@ -670,7 +685,7 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
 /// as a function of the domain space variables.
 pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
-    THIS_THREAD_TAPE.with_borrow_mut( |tape| {
+    let tape_id : Index = THIS_THREAD_TAPE.with_borrow_mut( |tape| {
         //
         // tape.recording
         assert!( tape.recording , "indepndent: tape is not recording");
@@ -683,19 +698,26 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
         // end marker for arguments to the last operation
         tape.op2arg.push( tape.arg_all.len() );
         //
-        std::mem::swap( &mut result.n_domain, &mut tape.n_domain );
+        std::mem::swap( &mut result.n_domain,      &mut tape.n_domain );
         std::mem::swap( &mut result.n_var,         &mut tape.n_var );
         std::mem::swap( &mut result.id_all,        &mut tape.id_all );
         std::mem::swap( &mut result.op2arg,        &mut tape.op2arg );
         std::mem::swap( &mut result.arg_all,       &mut tape.arg_all );
         std::mem::swap( &mut result.con_all,       &mut tape.con_all );
         std::mem::swap( &mut result.flag_all,      &mut tape.flag_all );
+        tape.tape_id
     } );
     //
-    // range2tape_index
-    // 2DO handle case where ad_range[i] is a constant (need to test CALL_OP).
+    // range_is_var, range2tape_index
     for i in 0 .. ad_range.len() {
-        result.range2tape_index.push( ad_range[i].var_index );
+        if ad_range[i].tape_id == tape_id {
+            result.range_is_var.push( true );
+            result.range2tape_index.push( ad_range[i].var_index );
+        } else {
+            result.range_is_var.push( false );
+            result.range2tape_index.push( result.con_all.len()  );
+            result.con_all.push( ad_range[i].value );
+        }
     }
     result
 }
