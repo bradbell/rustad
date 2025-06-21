@@ -4,10 +4,13 @@
 // ---------------------------------------------------------------------------
 //
 //! This module can be used to checkpoint a section of AD computation:
-//! //! ADFun objects: 
+//! //! ADFun objects:
 //!
 //! # Example
 //! ```
+//! use rustad::Float;
+//! use rustad::function;
+//! use rustad::checkpoint::{store_checkpoint, use_checkpoint};
 //! //
 //! // f
 //! // f(x) = [x0 + x1, x1 * x2]
@@ -45,21 +48,21 @@ use crate::ad_tape::{Tape, THIS_THREAD_TAPE};
 use crate::operator::id::{CALL_OP};
 //
 // CheckpointInfo
-/// Information used to splice a checkpoint funcion call into a recording.
+/// Information used to splice a checkpoint function call into a recording.
 pub(crate) struct CheckpointInfo {
     //
     // fun_index
-    /// is the index of this checkpoint funciton in the vector of all
+    /// is the index of this checkpoint function in the vector of all
     /// checkpoint functions.
     pub fun_index    : Index,
     //
     // name
     /// ia a name, that is meaningful to the user,  used to identify
-    /// this checkpoint function. 
+    /// this checkpoint function.
     pub name         : String,
     //
     // adfun
-    /// ia the [ADFun] object that is used to evaluate this chekcpoing funciton
+    /// ia the [ADFun] object that is used to evaluate this chekcpoing unciton
     /// and its derivative.
     pub adfun        : ADFun,
     //
@@ -79,7 +82,7 @@ thread_local! {
             std::cell::RefCell::new( Vec::new() );
     //
     // THIS_THREAD_CHECKPOINT_MAP
-    /// thread local storage that maps names to index in 
+    /// thread local storage that maps names to index in
     /// THIS_THREAD_CHECKPONT_VEC
     pub(crate) static THIS_THREAD_CHECKPOINT_MAP:
         std::cell::RefCell< std::collections::HashMap<String, Index> > =
@@ -87,18 +90,17 @@ thread_local! {
 }
 //
 // store_checkpoint
-/// Stores checkpoint a checkpoint functions for this thread.
+/// Converts an ADFun object to a checkpoint functions for this thread.
 ///
-/// # fun
-/// is the [ADFun] object that it used to compute checkpoint funcion and
-/// derivative values. 
+/// * fun :
+/// The ADFun object that it converted to a checkpoint function.
 ///
-/// # name
-/// is a name the the user chooese for this function.
-/// This name must not appear in a previous call the store_checkpoint
+/// * name :
+/// The name the user chooses for this checkpoint function.
+/// This name must not appear in a previous `store_checkpoint` call
 /// on this thread.
 pub fn store_checkpoint(
-    fun:  ADFun, 
+    fun:  ADFun,
     name: &String) {
     //
     // fun_index, THIS_THREAD_CHECKPONT_VEC
@@ -127,25 +129,22 @@ pub fn store_checkpoint(
 }
 //
 // use_checkpoint
-/// Make a call, by namem, to a checkpoint function.
-/// If the tape for this thread is recording, include its call in the
-/// tape as a checkpoint.
+/// Makes a call, by name, to a checkpoint function.
 ///
-/// <pre>
-///     ad_range = use_checkoint(name, ad_domain)
-/// </pre>
+/// If the tape for this thread is recording, include the call
+/// as a checkpoint in the tape.
 ///
-/// # name
-/// is the name that was used to stor the checkpoint funciton.
+/// * name :
+/// The name that was used to store the checkpoint function.
 ///
-/// # ad_domain
-/// is the value of the domain varibles for the fuction being called.
+/// * ad_domain :
+/// The value of the domain variables for the function bning called.
 ///
-/// # ad_range
-/// the return is the values of the range vaiables corresponding to the
+/// * return :
+/// The values of the range variables that correspond to the
 /// domain variable values.
 pub fn use_checkpoint(
-    name : &String, 
+    name : &String,
     ad_domain : &Vec<AD>) -> Vec<AD> {
     //
     // fun_index
@@ -172,8 +171,23 @@ pub fn use_checkpoint(
 }
 //
 // use_checkpoint_info
-/// Make a call (by info) to a checkpoint function and record it,
-/// if the tapes thread is currently recording.
+/// Make a call, by CheckpointInfo, to a checkpoint function.
+///
+/// If the tape for this thread is recording, include the call
+/// as a checkpoint in the tape.
+///
+/// * tape :
+/// The tape that records operations on this thread.
+///
+/// * check_point_info :
+/// The information for this checkpoint.
+///
+/// * ad_domain :
+/// The value of the checkpoint function domain variables.
+///
+/// * return :
+/// The values of the range variables that correspond to the
+/// domain variable values.
 fn use_checkpoint_info(
     tape : &mut Tape, check_point_info : &CheckpointInfo, ad_domain : &Vec<AD>
 ) -> Vec<AD> {
