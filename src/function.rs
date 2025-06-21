@@ -114,14 +114,14 @@ macro_rules! forward_zero {
             }
             if trace {
                 println!( "range_index, var_index" );
-                for i in 0 .. self.range_index.len() {
-                    println!( "{}, {}", i, self.range_index[i] );
+                for i in 0 .. self.range2tape_index.len() {
+                    println!( "{}, {}", i, self.range2tape_index[i] );
                 }
                 println!( "End Trace: forward_zero" );
             }
             let mut range_zero : Vec<$float_type> = Vec::new();
-            for i in 0 .. self.range_index.len() {
-                range_zero.push( var_zero[ self.range_index[i] ] );
+            for i in 0 .. self.range2tape_index.len() {
+                range_zero.push( var_zero[ self.range2tape_index[i] ] );
             }
             ( range_zero, var_zero )
         }
@@ -236,14 +236,14 @@ macro_rules! forward_one {
             }
             if trace {
                 println!( "range_index, var_index" );
-                for i in 0 .. self.range_index.len() {
-                    println!( "{}, {}", i, self.range_index[i] );
+                for i in 0 .. self.range2tape_index.len() {
+                    println!( "{}, {}", i, self.range2tape_index[i] );
                 }
                 println!( "End Trace: forward_one" );
             }
             let mut range_one : Vec<$float_type> = Vec::new();
-            for i in 0 .. self.range_index.len() {
-                range_one.push( var_one[ self.range_index[i] ] );
+            for i in 0 .. self.range2tape_index.len() {
+                range_one.push( var_one[ self.range2tape_index[i] ] );
             }
             range_one
         }
@@ -309,7 +309,7 @@ macro_rules! reverse_one {
         ) -> Vec<$float_type>
         {
             assert_eq!(
-                range_one.len(), self.range_index.len(),
+                range_one.len(), self.range2tape_index.len(),
                 "f.reverse_one: range_one length does not match f"
             );
             assert_eq!(
@@ -320,10 +320,8 @@ macro_rules! reverse_one {
             let op_info_vec = &*OP_INFO_VEC;
             let zero        = $float_type::from( Float::from(0.0) );
             let mut partial = vec![zero; self.n_var ];
-            for j in 0 .. self.range_index.len() {
-                // 2DO: change this to += ones it is implemented for AD
-                partial[ self.range_index[j] ] =
-                    partial[ self.range_index[j] ] + range_one[j];
+            for j in 0 .. self.range2tape_index.len() {
+                partial[ self.range2tape_index[j] ] += range_one[j];
             }
             if trace {
                 println!( "Begin Trace: forward_zero: n_var = {}", self.n_var);
@@ -359,8 +357,8 @@ macro_rules! reverse_one {
             }
             if trace {
                 println!( "range_index, var_index" );
-                for i in 0 .. self.range_index.len() {
-                    println!( "{}, {}", i, self.range_index[i] );
+                for i in 0 .. self.range2tape_index.len() {
+                    println!( "{}, {}", i, self.range2tape_index[i] );
                 }
                 println!( "End Trace: reverse_one" );
             }
@@ -396,10 +394,10 @@ pub struct ADFun {
     /// The total number of variables in the operation sequence.
     pub(crate) n_var          : Index,
     //
-    // range_index
+    // range2tape_index
     /// The variable index for each of the range variables in this function.
-    /// The dimension of its range spase is range_index.len().
-    pub(crate) range_index    : Vec<Index>,
+    /// The dimension of its range spase is range2tape_index.len().
+    pub(crate) range2tape_index    : Vec<Index>,
     //
     // id_all
     /// This maps an operator's index in the operation sequence
@@ -446,7 +444,7 @@ impl ADFun {
             arg_all       : Vec::new() ,
             con_all       : Vec::new() ,
             flag_all      : Vec::new() ,
-            range_index   : Vec::new() ,
+            range2tape_index   : Vec::new() ,
         }
     }
     //
@@ -456,7 +454,7 @@ impl ADFun {
     //
     // range_len
     /// dimension of range space
-    pub fn range_len(&self) -> Index { self.range_index.len() }
+    pub fn range_len(&self) -> Index { self.range2tape_index.len() }
     //
     // forward_zero
     forward_zero!(Float);
@@ -527,8 +525,8 @@ impl ADFun {
         let flag_all     = &self.flag_all;
         let arg_all      = &self.arg_all;
         let op2arg       = &self.op2arg;
-        let range_index  = &self.range_index;
-        let n_range      = range_index.len();
+        let range2tape_index  = &self.range2tape_index;
+        let n_range      = range2tape_index.len();
         //
         // done
         let mut done : Vec<Index> = vec![n_var; n_var];
@@ -547,7 +545,7 @@ impl ADFun {
         for row in 0 .. n_range {
             //
             // var_index
-            let mut var_index = self.range_index[row];
+            let mut var_index = self.range2tape_index[row];
             if trace {
                 println!( "row {} var_index {}", row, var_index );
             }
@@ -694,10 +692,10 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
         std::mem::swap( &mut result.flag_all,      &mut tape.flag_all );
     } );
     //
-    // range_index
+    // range2tape_index
     // 2DO handle case where ad_range[i] is a constant (need to test CALL_OP).
     for i in 0 .. ad_range.len() {
-        result.range_index.push( ad_range[i].var_index );
+        result.range2tape_index.push( ad_range[i].var_index );
     }
     result
 }
