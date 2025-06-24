@@ -60,7 +60,13 @@ value_from_ag!(f32, u32);
 value_from_ag!(f64, u16);
 value_from_ag!(f64, u32);
 // -------------------------------------------------------------------------
-/// Display will only show the value and ignore the variable information.
+/// These functions implement Display for AG<f1, u2>.
+///
+/// * f1 :
+/// is the value type for this AG object; i.e., f32 or f64
+///
+/// * u2 :
+/// is the index type for this AG object; i.e., u16 or u32
 ///
 /// # Example
 /// ```
@@ -69,11 +75,12 @@ value_from_ag!(f64, u32);
 /// let s = format!( "{x}" );
 /// assert_eq!(s, "3");
 ///```
+pub fn doc_display_value() { }
 macro_rules! display_value { ($f1:ident , $u2:ident ) => {
     impl std::fmt::Display for AG<$f1, $u2> {
         #[doc = concat!(
             "Display value in an AG\\<", stringify!($f1),
-            ", " , stringify!($u2) , "\\> object"
+            ", " , stringify!($u2) , "\\> object; see [doc_display_value]"
         ) ]
         fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
             write!(f, "{}", self.value)
@@ -88,18 +95,26 @@ display_value!(f64, u32);
 // -------------------------------------------------------------------------
 // PartialEq
 //
-/// Two AG object are equal if their values are equal.
+/// These functions implement x == y were x and y are AG<f1, u2> objects.
+///
+/// * f1 :
+/// is the value type for these two AG objects; i.e., f32 or f64
+///
+/// * u2 :
+/// is the index type for these two AG objects; i.e., u16 or u32
+///
 /// ```
 /// use rustad::ag::AG;
 /// let x : AG<f32, u32> = AG::from(3.0);
 /// let y : AG<f32, u32> = AG::from(3);
 /// assert_eq!(x, y);
 ///```
+pub fn doc_equality_operator() { }
 macro_rules! equality_operator { ($f1:ident , $u2:ident ) => {
     impl PartialEq for AG<$f1, $u2> {
         #[doc = concat!(
             "AG\\<", stringify!($f1), ", " , stringify!($u2) , "\\>",
-            " equality operator == "
+            " equality operator; see [doc_equality_operator] "
         ) ]
         fn eq(&self, other: &Self) -> bool {
             self.value == other.value
