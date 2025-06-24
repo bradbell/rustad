@@ -9,4 +9,8 @@ fn from_and_to() {
     let ax  : AG<f64, u32> = AG::from( 3.0f32 );
     let x  = ax.to_value();
     assert_eq!( x, 3.0f64 );
+    //
+    let ax  : AG<f32, u64> = AG::from( 3.0f64 );
+    let x  = ax.to_value();
+    assert_eq!( x, 3.0f32 );
 }
