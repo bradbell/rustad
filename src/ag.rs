@@ -55,6 +55,32 @@ value_from_ag!(f32, u64);
 value_from_ag!(f64, u32);
 value_from_ag!(f64, u64);
 // -------------------------------------------------------------------------
+/// Display will only show the value and ignore the variable information.
+///
+/// # Example
+/// ```
+/// use rustad::{AD, Float};
+/// let x = rustad::AD::from( rustad::Float::from(3) );
+/// let s = format!( "{x}" );
+/// assert_eq!(s, "3");
+///```
+macro_rules! display_value { ($f1:ident , $u2:ident ) => {
+    impl std::fmt::Display for AG<$f1, $u2> {
+        #[doc = concat!(
+            "Display value in an AG\\<", stringify!($f1),
+            ", " , stringify!($u2) , "\\> object"
+        ) ]
+        fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+            write!(f, "{}", self.value)
+        }
+    }
+} }
+//
+display_value!(f32, u32);
+display_value!(f32, u64);
+display_value!(f64, u32);
+display_value!(f64, u64);
+// -------------------------------------------------------------------------
 /*
 //
 use crate::{Index, Float};
