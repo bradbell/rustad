@@ -5,6 +5,7 @@
 //
 //! AG a generic automatic differentiation floating point type:
 //! [parent module](super)
+#[derive(Debug)]
 pub struct AG<F, U> {
     //
     // tape_id
@@ -64,7 +65,6 @@ value_from_ag!(f64, u64);
 /// # Example
 /// ```
 /// use rustad::ag::AG;
-/// use rustad::{AD, Float};
 /// let x : AG<f64, u32> = AG::from(3);
 /// let s = format!( "{x}" );
 /// assert_eq!(s, "3");
@@ -85,6 +85,32 @@ display_value!(f32, u32);
 display_value!(f32, u64);
 display_value!(f64, u32);
 display_value!(f64, u64);
+// -------------------------------------------------------------------------
+// PartialEq
+//
+/// Two AG object are equal if their values are equal.
+/// ```
+/// use rustad::ag::AG;
+/// let x : AG<f32, u64> = AG::from(3.0);
+/// let y : AG<f32, u64> = AG::from(3);
+/// assert_eq!(x, y);
+///```
+macro_rules! equality_operator { ($f1:ident , $u2:ident ) => {
+    impl PartialEq for AG<$f1, $u2> {
+        #[doc = concat!(
+            "AG\\<", stringify!($f1), ", " , stringify!($u2) , "\\>",
+            " equality operator == "
+        ) ]
+        fn eq(&self, other: &Self) -> bool {
+            self.value == other.value
+        }
+    }
+} }
+//
+equality_operator!(f32, u32);
+equality_operator!(f32, u64);
+equality_operator!(f64, u32);
+equality_operator!(f64, u64);
 // -------------------------------------------------------------------------
 /*
 //
