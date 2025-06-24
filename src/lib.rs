@@ -31,6 +31,9 @@ pub type Index = usize;
 /// Floating point Type used for AD operations.
 pub type Float = f64;
 //
+// AG
+pub mod ag;
+//
 // AD
 pub mod ad;
 pub use ad::AD;

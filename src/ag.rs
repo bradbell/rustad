@@ -3,7 +3,60 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! AD an automatic differentiation floating point type: [parent module](super)
+//! AG a generic automatic differentiation floating point type:
+//! [parent module](super)
+pub struct AG<F, U> {
+    //
+    // tape_id
+    pub tape_id   : U,
+    pub var_index : U,
+    pub value     : F,
+}
+// -------------------------------------------------------------------------
+// Convert from values to AG types
+//
+macro_rules! ag_from_value { ($f1:ident , $u2:ident , $t3:ident) => {
+        impl From<$t3> for AG<$f1, $u2> {
+        #[doc = concat!(
+            " Convert from ", stringify!($t3),
+            " to an AG\\<", stringify!($f1),
+            ",", stringify!($u2),  "\\> constant"
+        ) ]
+        fn from(fvalue : $t3) -> Self { Self
+            {tape_id: 0 as $u2, var_index: 0 as $u2, value: fvalue as $f1, }
+        }
+    }
+} }
+//
+ag_from_value!(f32, u32, f32);
+ag_from_value!(f32, u64, f32);
+ag_from_value!(f32, u32, f64);
+ag_from_value!(f32, u64, f64);
+//
+ag_from_value!(f64, u32, f32);
+ag_from_value!(f64, u64, f32);
+ag_from_value!(f64, u32, f64);
+ag_from_value!(f64, u64, f64);
+// -------------------------------------------------------------------------
+macro_rules! value_from_ag { ($f1:ident) => {
+    impl AG<$f1, u32> {
+        #[doc = concat!(
+            "Extract value from an AG\\<", stringify!($f1), "\\> object"
+        ) ]
+        pub fn to_value(&self) -> $f1 { self.value }
+    }
+    impl AG<$f1, u64> {
+        #[doc = concat!(
+            "Extract value from an AG\\<", stringify!($f1), "\\> object"
+        ) ]
+        pub fn to_value(&self) -> $f1 { self.value }
+    }
+} }
+//
+value_from_ag!(f64);
+value_from_ag!(f32);
+// -------------------------------------------------------------------------
+/*
 //
 use crate::{Index, Float};
 //
@@ -297,3 +350,4 @@ macro_rules! advec {
         }
     };
 }
+*/
