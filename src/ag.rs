@@ -29,19 +29,19 @@ macro_rules! ag_from_value { ($f1:ident , $u2:ident , $t3:ident) => {
     }
 } }
 //
+ag_from_value!(f32, u16, f32);
 ag_from_value!(f32, u32, f32);
-ag_from_value!(f32, u64, f32);
+ag_from_value!(f32, u16, f64);
 ag_from_value!(f32, u32, f64);
-ag_from_value!(f32, u64, f64);
+ag_from_value!(f32, u16, isize);
 ag_from_value!(f32, u32, isize);
-ag_from_value!(f32, u64, isize);
 //
+ag_from_value!(f64, u16, f32);
 ag_from_value!(f64, u32, f32);
-ag_from_value!(f64, u64, f32);
+ag_from_value!(f64, u16, f64);
 ag_from_value!(f64, u32, f64);
-ag_from_value!(f64, u64, f64);
+ag_from_value!(f64, u16, isize);
 ag_from_value!(f64, u32, isize);
-ag_from_value!(f64, u64, isize);
 // -------------------------------------------------------------------------
 // Extract values from AG types
 //
@@ -55,17 +55,17 @@ macro_rules! value_from_ag { ($f1:ident , $u2:ident ) => {
     }
 } }
 //
+value_from_ag!(f32, u16);
 value_from_ag!(f32, u32);
-value_from_ag!(f32, u64);
+value_from_ag!(f64, u16);
 value_from_ag!(f64, u32);
-value_from_ag!(f64, u64);
 // -------------------------------------------------------------------------
 /// Display will only show the value and ignore the variable information.
 ///
 /// # Example
 /// ```
 /// use rustad::ag::AG;
-/// let x : AG<f64, u32> = AG::from(3);
+/// let x : AG<f64, u16> = AG::from(3);
 /// let s = format!( "{x}" );
 /// assert_eq!(s, "3");
 ///```
@@ -81,18 +81,18 @@ macro_rules! display_value { ($f1:ident , $u2:ident ) => {
     }
 } }
 //
+display_value!(f32, u16);
 display_value!(f32, u32);
-display_value!(f32, u64);
+display_value!(f64, u16);
 display_value!(f64, u32);
-display_value!(f64, u64);
 // -------------------------------------------------------------------------
 // PartialEq
 //
 /// Two AG object are equal if their values are equal.
 /// ```
 /// use rustad::ag::AG;
-/// let x : AG<f32, u64> = AG::from(3.0);
-/// let y : AG<f32, u64> = AG::from(3);
+/// let x : AG<f32, u32> = AG::from(3.0);
+/// let y : AG<f32, u32> = AG::from(3);
 /// assert_eq!(x, y);
 ///```
 macro_rules! equality_operator { ($f1:ident , $u2:ident ) => {
@@ -107,10 +107,10 @@ macro_rules! equality_operator { ($f1:ident , $u2:ident ) => {
     }
 } }
 //
+equality_operator!(f32, u16);
 equality_operator!(f32, u32);
-equality_operator!(f32, u64);
+equality_operator!(f64, u16);
 equality_operator!(f64, u32);
-equality_operator!(f64, u64);
 // -------------------------------------------------------------------------
 /*
 //
