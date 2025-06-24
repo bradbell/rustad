@@ -32,11 +32,15 @@ ag_from_value!(f32, u32, f32);
 ag_from_value!(f32, u64, f32);
 ag_from_value!(f32, u32, f64);
 ag_from_value!(f32, u64, f64);
+ag_from_value!(f32, u32, isize);
+ag_from_value!(f32, u64, isize);
 //
 ag_from_value!(f64, u32, f32);
 ag_from_value!(f64, u64, f32);
 ag_from_value!(f64, u32, f64);
 ag_from_value!(f64, u64, f64);
+ag_from_value!(f64, u32, isize);
+ag_from_value!(f64, u64, isize);
 // -------------------------------------------------------------------------
 // Extract values from AG types
 //
@@ -59,8 +63,9 @@ value_from_ag!(f64, u64);
 ///
 /// # Example
 /// ```
+/// use rustad::ag::AG;
 /// use rustad::{AD, Float};
-/// let x = rustad::AD::from( rustad::Float::from(3) );
+/// let x : AG<f64, u32> = AG::from(3);
 /// let s = format!( "{x}" );
 /// assert_eq!(s, "3");
 ///```
