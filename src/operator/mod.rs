@@ -48,7 +48,7 @@ macro_rules! binary_op_forward_0 {
             con:           &Vec<Float>,
             _flag_all:     &Vec<bool>,
             arg:           &[Index],
-            res:           Index)
+            res:           usize)
         {
             assert_eq!( arg.len(), 2);
             var_zero[ res ] = con[ arg[0] ] $op_symbol var_zero[ arg[1] ];
@@ -62,7 +62,7 @@ macro_rules! binary_op_forward_0 {
             con:           &Vec<Float>,
             _flag_all:     &Vec<bool>,
             arg:           &[Index],
-            res:           Index)
+            res:           usize)
         {
             assert_eq!( arg.len(), 2);
             var_zero[ res ] = var_zero[ arg[0] ] $op_symbol con[ arg[1] ];
@@ -76,7 +76,7 @@ macro_rules! binary_op_forward_0 {
             _con:          &Vec<Float>,
             _flag_all:     &Vec<bool>,
             arg:           &[Index],
-            res:           Index)
+            res:           usize)
         {
             assert_eq!( arg.len(), 2);
             var_zero[ res ] = var_zero[ arg[0] ] $op_symbol var_zero[ arg[1] ];
@@ -109,37 +109,37 @@ pub mod call;
 /// * res :
 /// The variable index corresponding to the first result for this operator.
 pub type ForwardZero = fn(_var_zero: &mut Vec<Float>,
-    _con_all: &Vec<Float>, _flag_all : &Vec<bool>,_arg: &[Index], _res: Index
+    _con_all: &Vec<Float>, _flag_all : &Vec<bool>,_arg: &[Index], _res: usize
 );
 //
 // ForwardOne
 /// Evaluate first order forward for one operation in the operation sequence.
 pub type ForwardOne = fn(_var_one: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
+    _var_zero: &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
 );
 //
 // ReverseOne
 /// Evaluate first order reverse for one operation in the operation sequence.
 pub type ReverseOne = fn(_partial: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
+    _var_zero: &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
 );
 //
 // ADForwardZero
 /// Evaluate zero order forward for one operation in the operation sequence.
 pub type ADForwardZero = fn(_var_zero: &mut Vec<AD>,
-    _con_all: &Vec<Float>, __flag_all : &Vec<bool>, arg: &[Index], _res: Index
+    _con_all: &Vec<Float>, __flag_all : &Vec<bool>, arg: &[Index], _res: usize
 );
 //
 // ADForwardOne
 /// Evaluate first order reverse for one operation in the operation sequence.
 pub type ADForwardOne = fn(_var_one: &mut Vec<AD>,
-    _var_zero: &Vec<AD>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
+    _var_zero: &Vec<AD>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
 );
 //
 // ADReverseOne
 /// Evaluate first order reverse for one operation in the operation sequence.
 pub type ADReverseOne = fn(_var_one: &mut Vec<AD>,
-    _var_zero: &Vec<AD>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
+    _var_zero: &Vec<AD>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
 );
 //
 // ArgVarIndex
@@ -192,7 +192,7 @@ pub type ArgVarIndex = fn(
 /// </pre>
 #[cfg(doc)]
 pub type ForwardZeroBinary = fn(_var_zero: &mut Vec<Float>,
-    _con_all: &Vec<Float>, _arg: &[Index], _res: Index
+    _con_all: &Vec<Float>, _arg: &[Index], _res: usize
 );
 //
 // ForwardOneBinary
@@ -232,7 +232,7 @@ pub type ForwardZeroBinary = fn(_var_zero: &mut Vec<Float>,
 /// its value of var_one\[i\] for indices *i* less tham *res* .
 #[cfg(doc)]
 pub type ForwardOneBinary = fn(_var_one: &mut Vec<Float>,
-    _var_zero : &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
+    _var_zero : &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
 );
 //
 // ReverseOneBinary
@@ -275,14 +275,14 @@ pub type ForwardOneBinary = fn(_var_one: &mut Vec<Float>,
 /// expressing it as a function of the variables with lower indices.
 #[cfg(doc)]
 pub type ReverseOneBinary = fn(_var_one: &mut Vec<Float>,
-    _var_zero : &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
+    _var_zero : &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
 );
 // ---------------------------------------------------------------------------
 //
 // panic_zero
 /// default [ForwardZero] function, will panic if it does not get replaced.
 fn panic_zero( _var_zero: &mut Vec<Float>,
-    _con_all: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: Index)
+    _con_all: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: usize)
 {
     panic!();
 }
@@ -291,14 +291,14 @@ fn panic_zero( _var_zero: &mut Vec<Float>,
 /// default [ForwardOne] or [ReverseOne] function, will panic
 /// if it does not get replaced.
 fn panic_one( _var_one: &mut Vec<Float>, _var_zero : &Vec<Float>,
-    _con_all: &Vec<Float>, _arg: &[Index], _res: Index) {
+    _con_all: &Vec<Float>, _arg: &[Index], _res: usize) {
     panic!();
 }
 //
 // ad_panic_zero
 /// default [ADForwardZero] function, will panic if it does not get replaced.
 fn ad_panic_zero( _var_zero: &mut Vec<AD>,
-    _con_all: &Vec<Float>, _flag_all : &Vec<bool>, _arg: &[Index], _res: Index) {
+    _con_all: &Vec<Float>, _flag_all : &Vec<bool>, _arg: &[Index], _res: usize) {
     panic!();
 }
 //
@@ -306,7 +306,7 @@ fn ad_panic_zero( _var_zero: &mut Vec<AD>,
 /// default [ADForwardOne] or [ADReverseOne] function, will panic
 /// if it does not get replaced.
 fn ad_panic_one( _var_one: &mut Vec<AD>, _var_zero : &Vec<AD>,
-    _con_all: &Vec<Float>, _arg: &[Index], _res: Index) {
+    _con_all: &Vec<Float>, _arg: &[Index], _res: usize) {
     panic!();
 }
 //

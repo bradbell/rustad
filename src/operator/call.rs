@@ -62,7 +62,7 @@ fn float_forward_0_call(
     con:         &Vec<Float>,
     flag_all:    &Vec<bool>,
     arg:         &[Index],
-    res:         Index)
+    res:         usize)
 {   //
     // call_index, n_arg, n_res
     let call_index  = arg[0];
@@ -165,25 +165,25 @@ fn call_arg_var_index(
 // no_op_zero
 /// [ForwardZero] function
 fn no_op_zero( _var_zero: &mut Vec<Float>,
-    _con_all: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: Index)
+    _con_all: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: usize)
 { }
 //
 // no_op_one
 /// [ForwardOne] or [ReverseOne] function
 fn no_op_one( _var_one: &mut Vec<Float>, _var_zero : &Vec<Float>,
-    _con_all: &Vec<Float>, _arg: &[Index], _res: Index)
+    _con_all: &Vec<Float>, _arg: &[Index], _res: usize)
 { }
 //
 // ad_no_op_zero
 /// [ADForwardZero]
 fn ad_no_op_zero( _var_zero: &mut Vec<AD>,
-    _con_all: &Vec<Float>, _flag_all : &Vec<bool>, _arg: &[Index], _res: Index)
+    _con_all: &Vec<Float>, _flag_all : &Vec<bool>, _arg: &[Index], _res: usize)
 { }
 //
 // ad_no_op_one
 /// [ADForwardOne] or [ADReverseOne] function
 fn ad_no_op_one( _var_one: &mut Vec<AD>, _var_zero : &Vec<AD>,
-    _con_all: &Vec<Float>, _arg: &[Index], _res: Index)
+    _con_all: &Vec<Float>, _arg: &[Index], _res: usize)
 { }
 //
 // no_op_arg_var_index
