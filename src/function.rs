@@ -96,9 +96,9 @@ macro_rules! forward_zero {
                 println!( "var_index, var, op, arg" );
             }
             for op_index in 0 .. self.id_all.len() {
-                let op_id     = self.id_all[op_index];
-                let start     = self.op2arg[op_index];
-                let end       = self.op2arg[op_index + 1];
+                let op_id     = self.id_all[op_index] as usize;
+                let start     = self.op2arg[op_index] as usize;
+                let end       = self.op2arg[op_index + 1] as usize;
                 let arg       = &self.arg_all[start .. end];
                 let res       = self.n_domain + op_index;
                 let forward_0 = op_info_vec[op_id].[< $prefix _0 >];
@@ -115,7 +115,7 @@ macro_rules! forward_zero {
             if trace {
                 println!( "range_index, var_index, con_index" );
                 for i in 0 .. self.range_is_var.len() {
-                    let index = self.range2tape_index[i];
+                    let index = self.range2tape_index[i] as usize;
                     if self.range_is_var[i] {
                         println!( "{}, {}, ----", i, index);
                     } else {
@@ -126,10 +126,11 @@ macro_rules! forward_zero {
             }
             let mut range_zero : Vec<$float_type> = Vec::new();
             for i in 0 .. self.range_is_var.len() {
+                let index = self.range2tape_index[i] as usize;
                 if self.range_is_var[i] {
-                    range_zero.push( var_zero[ self.range2tape_index[i] ] );
+                    range_zero.push( var_zero[index] );
                 } else {
-                    let constant = self.con_all[ self.range2tape_index[i] ];
+                    let constant = self.con_all[index];
                     range_zero.push( $float_type::from(constant) );
                 }
             }
@@ -229,9 +230,9 @@ macro_rules! forward_one {
                 println!( "var_index, var, op, arg" );
             }
             for op_index in 0 .. self.id_all.len() {
-                let op_id     = self.id_all[op_index];
-                let start     = self.op2arg[op_index];
-                let end       = self.op2arg[op_index + 1];
+                let op_id     = self.id_all[op_index] as usize;
+                let start     = self.op2arg[op_index] as usize;
+                let end       = self.op2arg[op_index + 1] as usize;
                 let arg       = &self.arg_all[start .. end];
                 let res       = self.n_domain + op_index;
                 let forward_1 = op_info_vec[op_id].[< $prefix _1 >];
@@ -247,7 +248,7 @@ macro_rules! forward_one {
             if trace {
                 println!( "range_index, var_index, con_index" );
                 for i in 0 .. self.range_is_var.len() {
-                    let index = self.range2tape_index[i];
+                    let index = self.range2tape_index[i] as usize;
                     if self.range_is_var[i] {
                         println!( "{}, {}, ----", i, index);
                     } else {
@@ -258,7 +259,8 @@ macro_rules! forward_one {
             }
             let mut range_one : Vec<$float_type> = Vec::new();
             for i in 0 .. self.range_is_var.len() {
-                range_one.push( var_one[ self.range2tape_index[i] ] );
+                let index = self.range2tape_index[i] as usize;
+                range_one.push( var_one[index] );
             }
             range_one
         }
@@ -336,7 +338,8 @@ macro_rules! reverse_one {
             let zero        = $float_type::from( Float::from(0.0) );
             let mut partial = vec![zero; self.n_var ];
             for j in 0 .. self.range_is_var.len() {
-                partial[ self.range2tape_index[j] ] += range_one[j];
+                let index       = self.range2tape_index[j] as usize;
+                partial[index] += range_one[j];
             }
             if trace {
                 println!( "Begin Trace: forward_zero: n_var = {}", self.n_var);
@@ -355,9 +358,9 @@ macro_rules! reverse_one {
                 println!( "var_index, var, op, arg" );
             }
             for op_index in ( 0 .. self.id_all.len() ).rev() {
-                let op_id     = self.id_all[op_index];
-                let start     = self.op2arg[op_index];
-                let end       = self.op2arg[op_index + 1];
+                let op_id     = self.id_all[op_index] as usize;
+                let start     = self.op2arg[op_index] as usize;
+                let end       = self.op2arg[op_index + 1] as usize;
                 let arg       = &self.arg_all[start .. end];
                 let res       = self.n_domain + op_index;
                 let reverse_1 = op_info_vec[op_id].[< $prefix _1 >];
@@ -373,7 +376,7 @@ macro_rules! reverse_one {
             if trace {
                 println!( "range_index, var_index, con_index" );
                 for i in 0 .. self.range_is_var.len() {
-                    let index = self.range2tape_index[i];
+                    let index = self.range2tape_index[i] as usize;
                     if self.range_is_var[i] {
                         println!( "{}, {}, ----", i, index);
                     } else {
@@ -408,11 +411,11 @@ pub struct ADFun {
     // n_domain
     /// The dimension of the domain space for this function.
     /// The domain variables have index 0 .. n_domain-1.
-    pub(crate) n_domain       : Index,
+    pub(crate) n_domain       : usize,
     //
     // n_var
     /// The total number of variables in the operation sequence.
-    pub(crate) n_var          : Index,
+    pub(crate) n_var          : usize,
     //
     // range_is_var
     /// The length of this vector is the dimension of the range space.
@@ -429,7 +432,7 @@ pub struct ADFun {
     // id_all
     /// This maps an operator's index in the operation sequence
     /// to its [operator::id]
-    pub(crate) id_all         : Vec<Index>,
+    pub(crate) id_all         : Vec<u8>,
     //
     // op2arg
     /// This maps an operator's index in the operation sequence to its
@@ -478,11 +481,11 @@ impl ADFun {
     //
     // domain_len
     /// dimension of domain space
-    pub fn domain_len(&self) -> Index { self.n_domain }
+    pub fn domain_len(&self) -> usize { self.n_domain }
     //
     // range_len
     /// dimension of range space
-    pub fn range_len(&self) -> Index { self.range_is_var.len() }
+    pub fn range_len(&self) -> usize { self.range_is_var.len() }
     //
     // forward_zero
     forward_zero!(Float);
@@ -559,7 +562,7 @@ impl ADFun {
         let n_range           = range_is_var.len();
         //
         // done
-        let mut done : Vec<Index> = vec![n_var; n_var];
+        let mut done : Vec<Index> = vec![n_var as Index; n_var];
         //
         // result, arg_var_index, var_index_stack
         let mut result          : Vec<(Index, Index)> = Vec::new();
@@ -575,7 +578,7 @@ impl ADFun {
         for row in 0 .. n_range { if range_is_var[row] {
             //
             // var_index
-            let mut var_index = range2tape_index[row];
+            let mut var_index = range2tape_index[row] as usize;
             if trace {
                 println!( "row {} var_index {}", row, var_index );
             }
@@ -583,14 +586,14 @@ impl ADFun {
             // var_index_stack
             // use resize instead of new stack to reduce memory allocation
             var_index_stack.resize(0, 0);
-            var_index_stack.push( var_index );
+            var_index_stack.push( var_index as Index );
             while var_index_stack.len() > 0 {
                 //
                 // var_index
-                var_index = var_index_stack.pop().unwrap();
+                var_index = var_index_stack.pop().unwrap() as usize;
                 //
-                if done[var_index] != row {
-                    done[var_index] = row;
+                if done[var_index] as usize != row {
+                    done[var_index] = row as Index;
                     if trace {
                         println!( "    var_index = {}", var_index );
                     }
@@ -598,7 +601,7 @@ impl ADFun {
                         //
                         // result
                         // var_index is a domain variable index
-                        result.push( (row, var_index) );
+                        result.push( (row as Index, var_index as Index) );
                     } else {
                         //
                         // op_index
@@ -606,13 +609,13 @@ impl ADFun {
                         let op_index         = var_index - n_domain;
                         //
                         // arv_var_index_fn
-                        let op_id            = self.id_all[op_index];
+                        let op_id            = self.id_all[op_index] as usize;
                         let op_info          = &op_info_vec[op_id];
                         let arg_var_index_fn = op_info.arg_var_index;
                         //
                         // arg
-                        let begin = op2arg[op_index];
-                        let end   = op2arg[op_index + 1];
+                        let begin = op2arg[op_index] as usize;
+                        let end   = op2arg[op_index + 1] as usize;
                         let arg   = &arg_all[begin .. end];
                         //
                         // arg_var_index
@@ -653,7 +656,7 @@ impl ADFun {
 pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
     //
     // new_tape_id
-    let new_tape_id : Index;
+    let new_tape_id : usize;
     {   let mut next_tape_id = NEXT_TAPE_ID.lock().unwrap();
         //
         // The rest of this block has a lock, so it is fast and can't fail.
@@ -676,9 +679,11 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
     } );
     let mut result : Vec<AD> = Vec::new();
     for j in 0 .. domain.len() {
-        result.push(
-             AD { tape_id : new_tape_id, var_index : j, value : domain[j] }
-        );
+        result.push( AD {
+            tape_id   : new_tape_id as Index,
+            var_index : j as Index,
+            value     : domain[j],
+        } );
     }
     result
 }
@@ -700,7 +705,7 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
 /// as a function of the domain space variables.
 pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
-    let tape_id : Index = THIS_THREAD_TAPE.with_borrow_mut( |tape| {
+    let tape_id : usize = THIS_THREAD_TAPE.with_borrow_mut( |tape| {
         //
         // tape.recording
         assert!( tape.recording , "indepndent: tape is not recording");
@@ -708,10 +713,11 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
         //
         assert_eq!( tape.n_var , tape.n_domain + tape.id_all.len() );
         assert_eq!( tape.op2arg.len() , tape.id_all.len() );
+        assert!( tape.arg_all.len() < Index::MAX as usize );
         //
         // tape.op2arg
         // end marker for arguments to the last operation
-        tape.op2arg.push( tape.arg_all.len() );
+        tape.op2arg.push( tape.arg_all.len() as Index);
         //
         std::mem::swap( &mut result.n_domain,      &mut tape.n_domain );
         std::mem::swap( &mut result.n_var,         &mut tape.n_var );
@@ -725,12 +731,12 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
     //
     // range_is_var, range2tape_index
     for i in 0 .. ad_range.len() {
-        if ad_range[i].tape_id == tape_id {
+        if ad_range[i].tape_id as usize == tape_id {
             result.range_is_var.push( true );
             result.range2tape_index.push( ad_range[i].var_index );
         } else {
             result.range_is_var.push( false );
-            result.range2tape_index.push( result.con_all.len()  );
+            result.range2tape_index.push( result.con_all.len() as Index );
             result.con_all.push( ad_range[i].value );
         }
     }

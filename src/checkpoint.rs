@@ -56,7 +56,7 @@ pub(crate) struct CheckpointInfo {
     // fun_index
     /// is the index of this checkpoint function in the vector of all
     /// checkpoint functions.
-    pub fun_index    : Index,
+    pub fun_index    : usize,
     //
     // name
     /// ia a name, that is meaningful to the user, used to identify
@@ -87,7 +87,7 @@ thread_local! {
     /// thread local storage that maps names to index in
     /// THIS_THREAD_CHECKPONT_VEC
     pub(crate) static THIS_THREAD_CHECKPOINT_MAP:
-        std::cell::RefCell< std::collections::HashMap<String, Index> > =
+        std::cell::RefCell< std::collections::HashMap<String, usize> > =
             std::cell::RefCell::new( std::collections::HashMap::new() );
 }
 //
@@ -244,36 +244,36 @@ fn use_checkpoint_info(
         // is_var_domain
         let mut is_var_domain : Vec<bool> = Vec::new();
         for j in 0 .. call_n_arg {
-            is_var_domain.push( tape.tape_id == ad_domain[j].tape_id );
+            is_var_domain.push(tape.tape_id == ad_domain[j].tape_id as usize);
         }
         //
         // is_var_range
         let mut is_var_range = vec![false; call_n_res];
         for k in 0 .. dependency.len() {
             let (i,j) = dependency[k];
-            if is_var_domain[j] {
-                is_var_range[i] = true;
+            if is_var_domain[j as usize] {
+                is_var_range[i as usize] = true;
             }
         }
         //
         // tape.id_all, tape.op2arg
         tape.id_all.push( CALL_OP );
-        tape.op2arg.push( tape.arg_all.len() );
+        tape.op2arg.push( tape.arg_all.len() as Index );
         //
         // tape.arg_all, tape.con_all
-        tape.arg_all.push( fun_index );           // arg[0]
-        tape.arg_all.push( call_n_arg );          // arg[1]
-        tape.arg_all.push( call_n_res );          // arg[2]
-        tape.arg_all.push( tape.flag_all.len() ); // arg[3]
+        tape.arg_all.push( fun_index as Index );           // arg[0]
+        tape.arg_all.push( call_n_arg as Index );          // arg[1]
+        tape.arg_all.push( call_n_res as Index );          // arg[2]
+        tape.arg_all.push( tape.flag_all.len() as Index ); // arg[3]
         for j in 0 .. call_n_arg {
             let index = if is_var_domain[j] {
-                ad_domain[j].var_index
+                ad_domain[j].var_index as usize
             } else {
                 let con_index = tape.con_all.len();
                 tape.con_all.push( ad_domain[j].value );
                 con_index
             };
-            tape.arg_all.push( index ); // arg[4+j]
+            tape.arg_all.push( index as Index ); // arg[4+j]
         }
         //
         // tape.flag_all
@@ -288,8 +288,8 @@ fn use_checkpoint_info(
         let mut n_var_res = 0;
         for i in 0 .. call_n_res {
             if is_var_range[i] {
-                ad_range[i].tape_id   = tape.tape_id;
-                ad_range[i].var_index = tape.n_var + n_var_res;
+                ad_range[i].tape_id   = tape.tape_id as Index;
+                ad_range[i].var_index = (tape.n_var + n_var_res) as Index;
                 n_var_res += 1;
             }
         }
@@ -301,7 +301,7 @@ fn use_checkpoint_info(
         // tape.id_all, tape.op2arg
         for _i in 0 .. (n_var_res - 1) {
             tape.id_all.push( CALL_RES_OP );
-            tape.op2arg.push( tape.arg_all.len() );
+            tape.op2arg.push( tape.arg_all.len() as Index );
         }
     }
     ad_range

@@ -25,20 +25,20 @@ pub(crate) struct Tape {
     //
     // tape_id
     /// a different tape_id is chosen for each recording.
-    pub tape_id        : Index,
+    pub tape_id        : usize,
     //
     // n_domain
     /// is the dimension of the domain space for the operation being recorded.
-    pub n_domain       : Index,
+    pub n_domain       : usize,
     //
     // n_var
     /// is the number of variables currently in the recording.
-    pub n_var          : Index,
+    pub n_var          : usize,
     //
     // id_all
     /// For each index in the operation sequence, id_all\[index\]
     /// is the corresponding [operator::id] .
-    pub id_all         : Vec<Index>,
+    pub id_all         : Vec<u8>,
     //
     // op2arg
     /// For each index in the operation sequence, op2arg\[index\]
@@ -84,7 +84,7 @@ impl Tape {
 // NEXT_TAPE_ID
 /// The tape_id values that have been used are 1 .. NEXT_TAPE_ID
 /// (0 is not used for a recording).
-pub(crate) static NEXT_TAPE_ID : Mutex<Index> = Mutex::new(1);
+pub(crate) static NEXT_TAPE_ID : Mutex<usize> = Mutex::new(1);
 //
 thread_local! {
     //

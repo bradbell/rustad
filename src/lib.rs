@@ -25,7 +25,7 @@ pub mod utility;
 /// Type used for indexing vectors in the tape.
 /// It must be able to represent the total number of
 /// tape ids, operator indices, constants, and arguments to operators.
-pub type Index = usize;
+pub type Index = u32;
 //
 // Float
 /// Floating point Type used for AD operations.

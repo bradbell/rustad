@@ -49,10 +49,10 @@ macro_rules! forward_1_mul {
             _var_zero: &Vec<$Float_type>,
             con:       &Vec<Float>,
             arg:       &[Index],
-            res:       Index)
+            res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            var_one[ res ] = con[ arg[0] ] * var_one[ arg[1] ];
+            var_one[ res ] = con[arg[0] as usize] * var_one[arg[1] as usize];
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
@@ -63,10 +63,10 @@ macro_rules! forward_1_mul {
             _var_zero: &Vec<$Float_type>,
             con:       &Vec<Float>,
             arg:       &[Index],
-            res:       Index)
+            res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            var_one[ res ] = var_one[ arg[0] ] * con[ arg[1] ];
+            var_one[ res ] = var_one[arg[0] as usize] * con[arg[1] as usize];
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
@@ -77,11 +77,12 @@ macro_rules! forward_1_mul {
             var_zero:  &Vec<$Float_type>,
             _con:      &Vec<Float>,
             arg:       &[Index],
-            res:       Index)
+            res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            var_one[ res ] = var_zero[ arg[0] ] * var_one[ arg[1] ]
-                           + var_one[ arg[0] ] * var_zero[ arg[1] ];
+            var_one[ res ] =
+                var_zero[arg[0] as usize] * var_one[arg[1] as usize]
+                + var_one[arg[0] as usize] * var_zero[arg[1] as usize];
         }
     } };
 }
@@ -105,10 +106,11 @@ macro_rules! reverse_1_mul {
             _var_zero: &Vec<$Float_type>,
             con:       &Vec<Float>,
             arg:       &[Index],
-            res:       Index)
+            res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            partial[arg[1]] = partial[arg[1]] + partial[res] * con[arg[0]];
+            partial[arg[1] as usize] =
+                partial[arg[1] as usize] + partial[res] * con[arg[0] as usize];
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
@@ -119,10 +121,11 @@ macro_rules! reverse_1_mul {
             _var_zero: &Vec<$Float_type>,
             con:       &Vec<Float>,
             arg:       &[Index],
-            res:       Index)
+            res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            partial[arg[0]] = partial[arg[0]] + partial[res] * con[arg[1]];
+            partial[arg[0] as usize] =
+                partial[arg[0] as usize] + partial[res] * con[arg[1] as usize];
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
@@ -133,11 +136,14 @@ macro_rules! reverse_1_mul {
             var_zero:  &Vec<$Float_type>,
             _con:      &Vec<Float>,
             arg:       &[Index],
-            res:       Index)
+            res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            partial[arg[0]] = partial[arg[0]] + partial[res] * var_zero[arg[1]];
-            partial[arg[1]] = partial[arg[1]] + partial[res] * var_zero[arg[0]];
+            partial[arg[0] as usize] = partial[arg[0] as usize]
+                + partial[res] * var_zero[arg[1] as usize];
+            //
+            partial[arg[1] as usize] = partial[arg[1] as usize]
+                + partial[res] * var_zero[arg[0] as usize];
         }
     } };
 }
@@ -150,7 +156,7 @@ reverse_1_mul!(AD);
 /// # op_info_vec
 /// is a map from [operator::id] to operator information.
 pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
-    op_info_vec[MUL_CV_OP] = OpInfo{
+    op_info_vec[MUL_CV_OP as usize] = OpInfo{
         name           : "mul_cv".to_string() ,
         forward_0      : float_forward_0_mul_cv,
         forward_1      : float_forward_1_mul_cv,
@@ -160,7 +166,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         ad_reverse_1   : ad_reverse_1_mul_cv,
         arg_var_index  : super::arg_var_index_binary_cv,
      };
-    op_info_vec[MUL_VC_OP] = OpInfo{
+    op_info_vec[MUL_VC_OP as usize] = OpInfo{
         name           : "mul_vc".to_string(),
         forward_0      : float_forward_0_mul_vc,
         forward_1      : float_forward_1_mul_vc,
@@ -170,7 +176,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         ad_reverse_1   : ad_reverse_1_mul_vc,
         arg_var_index  : super::arg_var_index_binary_vc,
     };
-    op_info_vec[MUL_VV_OP] = OpInfo{
+    op_info_vec[MUL_VV_OP as usize] = OpInfo{
         name           : "mul_vv".to_string(),
         forward_0      : float_forward_0_mul_vv,
         forward_1      : float_forward_1_mul_vv,
