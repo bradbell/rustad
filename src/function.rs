@@ -679,9 +679,11 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
     } );
     let mut result : Vec<AD> = Vec::new();
     for j in 0 .. domain.len() {
-        result.push(
-             AD { tape_id : new_tape_id, var_index : j, value : domain[j] }
-        );
+        result.push( AD {
+            tape_id   : new_tape_id as Index,
+            var_index : j as Index,
+            value     : domain[j],
+        } );
     }
     result
 }
@@ -703,7 +705,7 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
 /// as a function of the domain space variables.
 pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
-    let tape_id : Index = THIS_THREAD_TAPE.with_borrow_mut( |tape| {
+    let tape_id : usize = THIS_THREAD_TAPE.with_borrow_mut( |tape| {
         //
         // tape.recording
         assert!( tape.recording , "indepndent: tape is not recording");
@@ -711,6 +713,7 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
         //
         assert_eq!( tape.n_var , tape.n_domain + tape.id_all.len() );
         assert_eq!( tape.op2arg.len() , tape.id_all.len() );
+        assert!( tape.arg_all.len() < Index::MAX as usize );
         //
         // tape.op2arg
         // end marker for arguments to the last operation
@@ -728,12 +731,12 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
     //
     // range_is_var, range2tape_index
     for i in 0 .. ad_range.len() {
-        if ad_range[i].tape_id == tape_id {
+        if ad_range[i].tape_id as usize == tape_id {
             result.range_is_var.push( true );
             result.range2tape_index.push( ad_range[i].var_index );
         } else {
             result.range_is_var.push( false );
-            result.range2tape_index.push( result.con_all.len()  );
+            result.range2tape_index.push( result.con_all.len() as Index );
             result.con_all.push( ad_range[i].value );
         }
     }
