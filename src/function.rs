@@ -656,7 +656,7 @@ impl ADFun {
 pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
     //
     // new_tape_id
-    let new_tape_id : Index;
+    let new_tape_id : usize;
     {   let mut next_tape_id = NEXT_TAPE_ID.lock().unwrap();
         //
         // The rest of this block has a lock, so it is fast and can't fail.

@@ -140,8 +140,8 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         let mut new_tape_id   = 0;
         let mut new_var_index = 0;
         if tape.recording {
-            let var_lhs    = lhs.tape_id == tape.tape_id;
-            let var_rhs    = rhs.tape_id == tape.tape_id;
+            let var_lhs    = lhs.tape_id as usize == tape.tape_id;
+            let var_rhs    = rhs.tape_id as usize == tape.tape_id;
             if var_lhs || var_rhs {
                 new_tape_id   = tape.tape_id;
                 new_var_index = tape.n_var;
@@ -164,7 +164,7 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
                 }
             }
         }
-        (new_tape_id, new_var_index)
+        (new_tape_id as Index, new_var_index as Index)
     }
     //
     impl std::ops::$Trait<AD> for AD {
@@ -227,8 +227,8 @@ macro_rules! binary_ad_assign_op { ($Name:ident, $symbol:tt) => {paste::paste! {
     fn [< record_ $Name:lower _assign>]
     (tape: &mut Tape, lhs: &mut AD, rhs: &AD) {
         if tape.recording {
-            let var_lhs    = lhs.tape_id == tape.tape_id;
-            let var_rhs    = rhs.tape_id == tape.tape_id;
+            let var_lhs    = lhs.tape_id as usize == tape.tape_id;
+            let var_rhs    = rhs.tape_id as usize == tape.tape_id;
             if var_lhs || var_rhs {
                 tape.op2arg.push( tape.arg_all.len() as Index);
                 if var_lhs && var_rhs {
@@ -246,8 +246,8 @@ macro_rules! binary_ad_assign_op { ($Name:ident, $symbol:tt) => {paste::paste! {
                     tape.con_all.push( lhs.value );
                     tape.arg_all.push( rhs.var_index );
                 }
-                lhs.tape_id   = tape.tape_id;
-                lhs.var_index = tape.n_var;
+                lhs.tape_id   = tape.tape_id as Index;
+                lhs.var_index = tape.n_var as Index;
                 tape.n_var   += 1;
             }
         }
