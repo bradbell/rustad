@@ -39,6 +39,8 @@ macro_rules! set_operator_ids {
 }
 
 // Public u8 constants for each operator.
+// See test at end mod.rs that check that every operator has a different name.
+// This ensures that the number of operators is less that u8::MAX.
 set_operator_ids!(
     /// constant + variable
     ADD_CV_OP,

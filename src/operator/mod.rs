@@ -403,6 +403,8 @@ fn op_info_vec() -> Vec<OpInfo> {
 pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
    std::sync::LazyLock::new( || op_info_vec() );
 
+// Test that all operators have the proper name.
+// This test is referenced as at the end of this file (see id.rs)
 #[test]
 fn test_op_info() {
     let op_info_vec = &*OP_INFO_VEC;
