@@ -9,23 +9,27 @@
 macro_rules! set_operator_ids {
     //
     // first match
-    ( $( #[$doc:meta] $name:ident),*,) => {
+    (   #[$doc:meta] $name:ident,
+        $( #[$docs:meta] $names:ident, )*
+    ) => {
+        #[$doc]
+        pub(crate) const $name : usize = 0;
         set_operator_ids!(
-            @ 0usize,
-            $( #[$doc] $name, )*
+            @ $name,
+            $( #[$docs] $names, )*
         );
     };
     //
     // recursive match
     (
-        @ $index:expr,
+        @ $previous:ident,
         #[$doc:meta] $name:ident,
         $( #[$docs:meta] $names:ident, )*
     ) => {
         #[$doc]
-        pub(crate) const $name : usize = $index;
+        pub(crate) const $name : usize = $previous + 1usize;
         set_operator_ids!(
-            @ $index + 1usize,
+            @ $name,
             $( #[$docs] $names, )*
         );
     };
