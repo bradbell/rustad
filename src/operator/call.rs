@@ -65,12 +65,12 @@ fn float_forward_0_call(
     res:         usize)
 {   //
     // call_index, n_arg, n_res
-    let call_index  = arg[0];
-    let n_arg       = arg[1];
-    let n_res       = arg[2];
+    let call_index  = arg[0] as usize;
+    let n_arg       = arg[1] as usize;
+    let n_res       = arg[2] as usize;
     //
     // is_arg_var, is_res_var
-    let mut begin   = arg[3];
+    let mut begin   = arg[3] as usize;
     let mut end     = begin + n_arg;
     let is_arg_var  = &flag_all[begin .. end];
     begin           = end;
@@ -81,9 +81,9 @@ fn float_forward_0_call(
     let mut call_domain_zero : Vec<Float> = Vec::new();
     for i_arg in 0 .. n_arg {
         if is_arg_var[i_arg] {
-            call_domain_zero.push( var_zero[ arg[i_arg + 4] ] );
+            call_domain_zero.push( var_zero[ arg[i_arg + 4] as usize ] );
         } else {
-            call_domain_zero.push( con[ arg[i_arg + 4] ] );
+            call_domain_zero.push( con[ arg[i_arg + 4] as usize ] );
         }
     }
     //
@@ -115,10 +115,10 @@ fn call_arg_var_index(
 ) {
     //
     // call_n_arg
-    let call_n_arg = arg[1];
+    let call_n_arg = arg[1] as usize;
     //
     // is_var
-    let begin   = arg[3];
+    let begin   = arg[3] as usize;
     let end     = begin + call_n_arg;
     let is_var  = &flag_all[begin .. end];
     //
@@ -126,7 +126,7 @@ fn call_arg_var_index(
     arg_var_index.resize(0, 0);
     for call_i_arg in 0 .. call_n_arg {
         if is_var[call_i_arg] {
-            arg_var_index.push( arg[4 + call_i_arg] );
+            arg_var_index.push( arg[4 + call_i_arg] as usize );
         }
     }
     assert_ne!( arg_var_index.len() , 0 );
