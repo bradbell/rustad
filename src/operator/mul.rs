@@ -52,7 +52,7 @@ macro_rules! forward_1_mul {
             res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            var_one[ res ] = con[ arg[0] ] * var_one[ arg[1] ];
+            var_one[ res ] = con[arg[0] as usize] * var_one[arg[1] as usize];
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
@@ -66,7 +66,7 @@ macro_rules! forward_1_mul {
             res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            var_one[ res ] = var_one[ arg[0] ] * con[ arg[1] ];
+            var_one[ res ] = var_one[arg[0] as usize] * con[arg[1] as usize];
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
@@ -80,8 +80,9 @@ macro_rules! forward_1_mul {
             res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            var_one[ res ] = var_zero[ arg[0] ] * var_one[ arg[1] ]
-                           + var_one[ arg[0] ] * var_zero[ arg[1] ];
+            var_one[ res ] =
+                var_zero[arg[0] as usize] * var_one[arg[1] as usize]
+                + var_one[arg[0] as usize] * var_zero[arg[1] as usize];
         }
     } };
 }
@@ -108,7 +109,8 @@ macro_rules! reverse_1_mul {
             res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            partial[arg[1]] = partial[arg[1]] + partial[res] * con[arg[0]];
+            partial[arg[1] as usize] =
+                partial[arg[1] as usize] + partial[res] * con[arg[0] as usize];
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
@@ -122,7 +124,8 @@ macro_rules! reverse_1_mul {
             res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            partial[arg[0]] = partial[arg[0]] + partial[res] * con[arg[1]];
+            partial[arg[0] as usize] =
+                partial[arg[0] as usize] + partial[res] * con[arg[1] as usize];
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
@@ -136,8 +139,11 @@ macro_rules! reverse_1_mul {
             res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            partial[arg[0]] = partial[arg[0]] + partial[res] * var_zero[arg[1]];
-            partial[arg[1]] = partial[arg[1]] + partial[res] * var_zero[arg[0]];
+            partial[arg[0] as usize] = partial[arg[0] as usize]
+                + partial[res] * var_zero[arg[1] as usize];
+            //
+            partial[arg[1] as usize] = partial[arg[1] as usize]
+                + partial[res] * var_zero[arg[0] as usize];
         }
     } };
 }

@@ -52,7 +52,7 @@ macro_rules! forward_1_add {
             res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            var_one[ res ] = var_one[ arg[1] ];
+            var_one[ res ] = var_one[arg[1] as usize];
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
@@ -66,7 +66,7 @@ macro_rules! forward_1_add {
             res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            var_one[ res ] = var_one[ arg[0] ];
+            var_one[ res ] = var_one[arg[0] as usize];
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
@@ -80,7 +80,8 @@ macro_rules! forward_1_add {
             res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            var_one[ res ] = var_one[ arg[0] ] + var_one[ arg[1] ];
+            var_one[ res ] =
+                var_one[arg[0] as usize] + var_one[arg[1] as usize];
         }
     } };
 }
@@ -107,7 +108,8 @@ macro_rules! reverse_1_add {
             res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            partial[ arg[1] ] = partial[ arg[1] ] + partial[ res ];
+            partial[arg[1] as usize] =
+                partial[arg[1] as usize] + partial[ res ];
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
@@ -121,7 +123,8 @@ macro_rules! reverse_1_add {
             res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            partial[ arg[0] ] = partial[ arg[0] ] + partial[ res ];
+            partial[arg[0] as usize] =
+                partial[arg[0] as usize] + partial[ res ];
         }
         #[doc = concat!(
             " ", stringify!($Float_type),
@@ -135,8 +138,11 @@ macro_rules! reverse_1_add {
             res:       usize)
         {
             debug_assert!( arg.len() == 2);
-            partial[ arg[0] ] = partial[ arg[0] ] + partial[ res ];
-            partial[ arg[1] ] = partial[ arg[1] ] + partial[ res ];
+            partial[arg[0] as usize] =
+                partial[arg[0] as usize] + partial[ res ];
+            //
+            partial[arg[1] as usize] =
+                partial[arg[1] as usize] + partial[ res ];
         }
     } };
 }
