@@ -562,7 +562,7 @@ impl ADFun {
         let n_range           = range_is_var.len();
         //
         // done
-        let mut done : Vec<Index> = vec![n_var; n_var];
+        let mut done : Vec<Index> = vec![n_var as Index; n_var];
         //
         // result, arg_var_index, var_index_stack
         let mut result          : Vec<(Index, Index)> = Vec::new();
@@ -586,14 +586,14 @@ impl ADFun {
             // var_index_stack
             // use resize instead of new stack to reduce memory allocation
             var_index_stack.resize(0, 0);
-            var_index_stack.push( var_index );
+            var_index_stack.push( var_index as Index );
             while var_index_stack.len() > 0 {
                 //
                 // var_index
-                var_index = var_index_stack.pop().unwrap();
+                var_index = var_index_stack.pop().unwrap() as usize;
                 //
-                if done[var_index] != row {
-                    done[var_index] = row;
+                if done[var_index] as usize != row {
+                    done[var_index] = row as Index;
                     if trace {
                         println!( "    var_index = {}", var_index );
                     }
@@ -601,7 +601,7 @@ impl ADFun {
                         //
                         // result
                         // var_index is a domain variable index
-                        result.push( (row, var_index) );
+                        result.push( (row as Index, var_index as Index) );
                     } else {
                         //
                         // op_index
@@ -614,8 +614,8 @@ impl ADFun {
                         let arg_var_index_fn = op_info.arg_var_index;
                         //
                         // arg
-                        let begin = op2arg[op_index];
-                        let end   = op2arg[op_index + 1];
+                        let begin = op2arg[op_index] as usize;
+                        let end   = op2arg[op_index + 1] as usize;
                         let arg   = &arg_all[begin .. end];
                         //
                         // arg_var_index
