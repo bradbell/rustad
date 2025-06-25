@@ -146,7 +146,7 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
                 new_tape_id   = tape.tape_id;
                 new_var_index = tape.n_var;
                 tape.n_var   += 1;
-                tape.op2arg.push( tape.arg_all.len() );
+                tape.op2arg.push( tape.arg_all.len() as Index);
                 if var_lhs && var_rhs {
                     tape.id_all.push( [< $Trait:upper _VV_OP >] );
                     tape.arg_all.push( lhs.var_index );
@@ -154,11 +154,11 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
                 } else if var_lhs {
                     tape.id_all.push( [< $Trait:upper _VC_OP >] );
                     tape.arg_all.push( lhs.var_index );
-                    tape.arg_all.push( tape.con_all.len() );
+                    tape.arg_all.push( tape.con_all.len() as Index);
                     tape.con_all.push( rhs.value );
                 } else {
                     tape.id_all.push( [< $Trait:upper _CV_OP >] );
-                    tape.arg_all.push( tape.con_all.len() );
+                    tape.arg_all.push( tape.con_all.len() as Index);
                     tape.con_all.push( lhs.value );
                     tape.arg_all.push( rhs.var_index );
                 }
@@ -230,7 +230,7 @@ macro_rules! binary_ad_assign_op { ($Name:ident, $symbol:tt) => {paste::paste! {
             let var_lhs    = lhs.tape_id == tape.tape_id;
             let var_rhs    = rhs.tape_id == tape.tape_id;
             if var_lhs || var_rhs {
-                tape.op2arg.push( tape.arg_all.len() );
+                tape.op2arg.push( tape.arg_all.len() as Index);
                 if var_lhs && var_rhs {
                     tape.id_all.push( [< $Name:upper _VV_OP >] );
                     tape.arg_all.push( lhs.var_index );
@@ -238,11 +238,11 @@ macro_rules! binary_ad_assign_op { ($Name:ident, $symbol:tt) => {paste::paste! {
                 } else if var_lhs {
                     tape.id_all.push( [< $Name:upper _VC_OP >] );
                     tape.arg_all.push( lhs.var_index );
-                    tape.arg_all.push( tape.con_all.len() );
+                    tape.arg_all.push( tape.con_all.len() as Index);
                     tape.con_all.push( rhs.value );
                 } else {
                     tape.id_all.push( [< $Name:upper _CV_OP >] );
-                    tape.arg_all.push( tape.con_all.len() );
+                    tape.arg_all.push( tape.con_all.len() as Index);
                     tape.con_all.push( lhs.value );
                     tape.arg_all.push( rhs.var_index );
                 }

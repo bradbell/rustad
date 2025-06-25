@@ -115,7 +115,7 @@ macro_rules! forward_zero {
             if trace {
                 println!( "range_index, var_index, con_index" );
                 for i in 0 .. self.range_is_var.len() {
-                    let index = self.range2tape_index[i];
+                    let index = self.range2tape_index[i] as usize;
                     if self.range_is_var[i] {
                         println!( "{}, {}, ----", i, index);
                     } else {
@@ -126,10 +126,11 @@ macro_rules! forward_zero {
             }
             let mut range_zero : Vec<$float_type> = Vec::new();
             for i in 0 .. self.range_is_var.len() {
+                let index = self.range2tape_index[i] as usize;
                 if self.range_is_var[i] {
-                    range_zero.push( var_zero[ self.range2tape_index[i] ] );
+                    range_zero.push( var_zero[index] );
                 } else {
-                    let constant = self.con_all[ self.range2tape_index[i] ];
+                    let constant = self.con_all[index];
                     range_zero.push( $float_type::from(constant) );
                 }
             }
@@ -247,7 +248,7 @@ macro_rules! forward_one {
             if trace {
                 println!( "range_index, var_index, con_index" );
                 for i in 0 .. self.range_is_var.len() {
-                    let index = self.range2tape_index[i];
+                    let index = self.range2tape_index[i] as usize;
                     if self.range_is_var[i] {
                         println!( "{}, {}, ----", i, index);
                     } else {
@@ -258,7 +259,8 @@ macro_rules! forward_one {
             }
             let mut range_one : Vec<$float_type> = Vec::new();
             for i in 0 .. self.range_is_var.len() {
-                range_one.push( var_one[ self.range2tape_index[i] ] );
+                let index = self.range2tape_index[i] as usize;
+                range_one.push( var_one[index] );
             }
             range_one
         }
@@ -336,7 +338,8 @@ macro_rules! reverse_one {
             let zero        = $float_type::from( Float::from(0.0) );
             let mut partial = vec![zero; self.n_var ];
             for j in 0 .. self.range_is_var.len() {
-                partial[ self.range2tape_index[j] ] += range_one[j];
+                let index       = self.range2tape_index[j] as usize;
+                partial[index] += range_one[j];
             }
             if trace {
                 println!( "Begin Trace: forward_zero: n_var = {}", self.n_var);
@@ -373,7 +376,7 @@ macro_rules! reverse_one {
             if trace {
                 println!( "range_index, var_index, con_index" );
                 for i in 0 .. self.range_is_var.len() {
-                    let index = self.range2tape_index[i];
+                    let index = self.range2tape_index[i] as usize;
                     if self.range_is_var[i] {
                         println!( "{}, {}, ----", i, index);
                     } else {
@@ -575,7 +578,7 @@ impl ADFun {
         for row in 0 .. n_range { if range_is_var[row] {
             //
             // var_index
-            let mut var_index = range2tape_index[row];
+            let mut var_index = range2tape_index[row] as usize;
             if trace {
                 println!( "row {} var_index {}", row, var_index );
             }
@@ -711,7 +714,7 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
         //
         // tape.op2arg
         // end marker for arguments to the last operation
-        tape.op2arg.push( tape.arg_all.len() );
+        tape.op2arg.push( tape.arg_all.len() as Index);
         //
         std::mem::swap( &mut result.n_domain,      &mut tape.n_domain );
         std::mem::swap( &mut result.n_var,         &mut tape.n_var );

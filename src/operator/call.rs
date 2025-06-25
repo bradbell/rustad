@@ -126,7 +126,7 @@ fn call_arg_var_index(
     arg_var_index.resize(0, 0);
     for call_i_arg in 0 .. call_n_arg {
         if is_var[call_i_arg] {
-            arg_var_index.push( arg[4 + call_i_arg] as usize );
+            arg_var_index.push( arg[4 + call_i_arg]  );
         }
     }
     assert_ne!( arg_var_index.len() , 0 );
