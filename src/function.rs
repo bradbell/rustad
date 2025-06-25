@@ -97,8 +97,8 @@ macro_rules! forward_zero {
             }
             for op_index in 0 .. self.id_all.len() {
                 let op_id     = self.id_all[op_index] as usize;
-                let start     = self.op2arg[op_index];
-                let end       = self.op2arg[op_index + 1];
+                let start     = self.op2arg[op_index] as usize;
+                let end       = self.op2arg[op_index + 1] as usize;
                 let arg       = &self.arg_all[start .. end];
                 let res       = self.n_domain + op_index;
                 let forward_0 = op_info_vec[op_id].[< $prefix _0 >];
@@ -230,8 +230,8 @@ macro_rules! forward_one {
             }
             for op_index in 0 .. self.id_all.len() {
                 let op_id     = self.id_all[op_index] as usize;
-                let start     = self.op2arg[op_index];
-                let end       = self.op2arg[op_index + 1];
+                let start     = self.op2arg[op_index] as usize;
+                let end       = self.op2arg[op_index + 1] as usize;
                 let arg       = &self.arg_all[start .. end];
                 let res       = self.n_domain + op_index;
                 let forward_1 = op_info_vec[op_id].[< $prefix _1 >];
@@ -356,8 +356,8 @@ macro_rules! reverse_one {
             }
             for op_index in ( 0 .. self.id_all.len() ).rev() {
                 let op_id     = self.id_all[op_index] as usize;
-                let start     = self.op2arg[op_index];
-                let end       = self.op2arg[op_index + 1];
+                let start     = self.op2arg[op_index] as usize;
+                let end       = self.op2arg[op_index + 1] as usize;
                 let arg       = &self.arg_all[start .. end];
                 let res       = self.n_domain + op_index;
                 let reverse_1 = op_info_vec[op_id].[< $prefix _1 >];
