@@ -48,10 +48,11 @@ macro_rules! binary_op_forward_0 {
             con:           &Vec<Float>,
             _flag_all:     &Vec<bool>,
             arg:           &[Index],
-            res:           usize)
+            res:           Index)
         {
             assert_eq!( arg.len(), 2);
-            var_zero[ res ] = con[ arg[0] ] $op_symbol var_zero[ arg[1] ];
+            var_zero[ res ] =
+                con[arg[0] as usize] $op_symbol var_zero[arg[1] as usize];
         }
         #[doc = concat!(
             " ", stringify!( $Float_type ), " zero order forward variable ",
@@ -62,10 +63,11 @@ macro_rules! binary_op_forward_0 {
             con:           &Vec<Float>,
             _flag_all:     &Vec<bool>,
             arg:           &[Index],
-            res:           usize)
+            res:           Index)
         {
             assert_eq!( arg.len(), 2);
-            var_zero[ res ] = var_zero[ arg[0] ] $op_symbol con[ arg[1] ];
+            var_zero[ res ] =
+                var_zero[arg[0] as usize] $op_symbol con[arg[1] as usize];
         }
         #[doc = concat!(
             " ", stringify!( $Float_type ), " zero order forward variable ",
@@ -76,10 +78,11 @@ macro_rules! binary_op_forward_0 {
             _con:          &Vec<Float>,
             _flag_all:     &Vec<bool>,
             arg:           &[Index],
-            res:           usize)
+            res:           Index)
         {
             assert_eq!( arg.len(), 2);
-            var_zero[ res ] = var_zero[ arg[0] ] $op_symbol var_zero[ arg[1] ];
+            var_zero[ res ] =
+                var_zero[arg[0] as usize] $op_symbol var_zero[arg[1] as usize];
         }
     } };
 }
@@ -109,37 +112,37 @@ pub mod call;
 /// * res :
 /// The variable index corresponding to the first result for this operator.
 pub type ForwardZero = fn(_var_zero: &mut Vec<Float>,
-    _con_all: &Vec<Float>, _flag_all : &Vec<bool>,_arg: &[Index], _res: usize
+    _con_all: &Vec<Float>, _flag_all : &Vec<bool>,_arg: &[Index], _res: Index
 );
 //
 // ForwardOne
 /// Evaluate first order forward for one operation in the operation sequence.
 pub type ForwardOne = fn(_var_one: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
+    _var_zero: &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
 // ReverseOne
 /// Evaluate first order reverse for one operation in the operation sequence.
 pub type ReverseOne = fn(_partial: &mut Vec<Float>,
-    _var_zero: &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
+    _var_zero: &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
 // ADForwardZero
 /// Evaluate zero order forward for one operation in the operation sequence.
 pub type ADForwardZero = fn(_var_zero: &mut Vec<AD>,
-    _con_all: &Vec<Float>, __flag_all : &Vec<bool>, arg: &[Index], _res: usize
+    _con_all: &Vec<Float>, __flag_all : &Vec<bool>, arg: &[Index], _res: Index
 );
 //
 // ADForwardOne
 /// Evaluate first order reverse for one operation in the operation sequence.
 pub type ADForwardOne = fn(_var_one: &mut Vec<AD>,
-    _var_zero: &Vec<AD>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
+    _var_zero: &Vec<AD>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
 // ADReverseOne
 /// Evaluate first order reverse for one operation in the operation sequence.
 pub type ADReverseOne = fn(_var_one: &mut Vec<AD>,
-    _var_zero: &Vec<AD>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
+    _var_zero: &Vec<AD>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
 // ArgVarIndex
@@ -192,7 +195,7 @@ pub type ArgVarIndex = fn(
 /// </pre>
 #[cfg(doc)]
 pub type ForwardZeroBinary = fn(_var_zero: &mut Vec<Float>,
-    _con_all: &Vec<Float>, _arg: &[Index], _res: usize
+    _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
 // ForwardOneBinary
@@ -232,7 +235,7 @@ pub type ForwardZeroBinary = fn(_var_zero: &mut Vec<Float>,
 /// its value of var_one\[i\] for indices *i* less tham *res* .
 #[cfg(doc)]
 pub type ForwardOneBinary = fn(_var_one: &mut Vec<Float>,
-    _var_zero : &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
+    _var_zero : &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 //
 // ReverseOneBinary
@@ -275,14 +278,14 @@ pub type ForwardOneBinary = fn(_var_one: &mut Vec<Float>,
 /// expressing it as a function of the variables with lower indices.
 #[cfg(doc)]
 pub type ReverseOneBinary = fn(_var_one: &mut Vec<Float>,
-    _var_zero : &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
+    _var_zero : &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: Index
 );
 // ---------------------------------------------------------------------------
 //
 // panic_zero
 /// default [ForwardZero] function, will panic if it does not get replaced.
 fn panic_zero( _var_zero: &mut Vec<Float>,
-    _con_all: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: usize)
+    _con_all: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: Index)
 {
     panic!();
 }
@@ -291,14 +294,14 @@ fn panic_zero( _var_zero: &mut Vec<Float>,
 /// default [ForwardOne] or [ReverseOne] function, will panic
 /// if it does not get replaced.
 fn panic_one( _var_one: &mut Vec<Float>, _var_zero : &Vec<Float>,
-    _con_all: &Vec<Float>, _arg: &[Index], _res: usize) {
+    _con_all: &Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
 }
 //
 // ad_panic_zero
 /// default [ADForwardZero] function, will panic if it does not get replaced.
 fn ad_panic_zero( _var_zero: &mut Vec<AD>,
-    _con_all: &Vec<Float>, _flag_all : &Vec<bool>, _arg: &[Index], _res: usize) {
+    _con_all: &Vec<Float>, _flag_all : &Vec<bool>, _arg: &[Index], _res: Index) {
     panic!();
 }
 //
@@ -306,7 +309,7 @@ fn ad_panic_zero( _var_zero: &mut Vec<AD>,
 /// default [ADForwardOne] or [ADReverseOne] function, will panic
 /// if it does not get replaced.
 fn ad_panic_one( _var_one: &mut Vec<AD>, _var_zero : &Vec<AD>,
-    _con_all: &Vec<Float>, _arg: &[Index], _res: usize) {
+    _con_all: &Vec<Float>, _arg: &[Index], _res: Index) {
     panic!();
 }
 //
