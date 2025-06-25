@@ -38,7 +38,7 @@ pub(crate) struct Tape {
     // id_all
     /// For each index in the operation sequence, id_all\[index\]
     /// is the corresponding [operator::id] .
-    pub id_all         : Vec<Index>,
+    pub id_all         : Vec<u8>,
     //
     // op2arg
     /// For each index in the operation sequence, op2arg\[index\]

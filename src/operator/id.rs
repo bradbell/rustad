@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! Define operator identifiers as `pub(crate) usize` constants:
+//! Define operator identifiers as `pub(crate) u8` constants:
 //! [parent module](super)
 //
 /// Sets all the opeerator identifier values
@@ -13,7 +13,7 @@ macro_rules! set_operator_ids {
         $( #[$docs:meta] $names:ident, )*
     ) => {
         #[$doc]
-        pub(crate) const $name : usize = 0;
+        pub(crate) const $name : u8 = 0;
         set_operator_ids!(
             @ $name,
             $( #[$docs] $names, )*
@@ -27,7 +27,7 @@ macro_rules! set_operator_ids {
         $( #[$docs:meta] $names:ident, )*
     ) => {
         #[$doc]
-        pub(crate) const $name : usize = $previous + 1usize;
+        pub(crate) const $name : u8 = $previous + 1u8;
         set_operator_ids!(
             @ $name,
             $( #[$docs] $names, )*
@@ -38,7 +38,7 @@ macro_rules! set_operator_ids {
     (@ $index:expr,) => { }
 }
 
-// Public usize constants for each operator.
+// Public u8 constants for each operator.
 set_operator_ids!(
     /// constant + variable
     ADD_CV_OP,

@@ -139,7 +139,7 @@ fn call_arg_var_index(
 /// The map from [operator::id] to operator information.
 /// The map results for CALL_OP are set.
  pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
-    op_info_vec[CALL_OP] = OpInfo{
+    op_info_vec[CALL_OP as usize] = OpInfo{
         name           : "call".to_string() ,
         forward_0      : float_forward_0_call,
         forward_1      : super::panic_one,
@@ -149,7 +149,7 @@ fn call_arg_var_index(
         ad_reverse_1   : super::ad_panic_one,
         arg_var_index  : call_arg_var_index,
      };
-    op_info_vec[CALL_RES_OP] = OpInfo{
+    op_info_vec[CALL_RES_OP as usize] = OpInfo{
         name           : "call_res".to_string() ,
         forward_0      : no_op_zero,
         forward_1      : no_op_one,

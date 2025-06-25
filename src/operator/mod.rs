@@ -391,7 +391,7 @@ fn op_info_vec() -> Vec<OpInfo> {
         ad_reverse_1   : ad_panic_one,
         arg_var_index  : panic_arg_var_index,
     };
-    let mut result    = vec![empty ; NUMBER_OP ];
+    let mut result    = vec![empty ; NUMBER_OP as usize];
     add::set_op_info(&mut result);
     call::set_op_info(&mut result);
     mul::set_op_info(&mut result);
@@ -406,14 +406,14 @@ pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
 #[test]
 fn test_op_info() {
     let op_info_vec = &*OP_INFO_VEC;
-    assert_eq!( "add_cv",   op_info_vec[id::ADD_CV_OP].name );
-    assert_eq!( "add_vc",   op_info_vec[id::ADD_VC_OP].name );
-    assert_eq!( "add_vv",   op_info_vec[id::ADD_VV_OP].name );
+    assert_eq!( "add_cv",   op_info_vec[id::ADD_CV_OP as usize].name );
+    assert_eq!( "add_vc",   op_info_vec[id::ADD_VC_OP as usize].name );
+    assert_eq!( "add_vv",   op_info_vec[id::ADD_VV_OP as usize].name );
     //
-    assert_eq!( "call",     op_info_vec[id::CALL_OP].name );
-    assert_eq!( "call_res", op_info_vec[id::CALL_RES_OP].name );
+    assert_eq!( "call",     op_info_vec[id::CALL_OP as usize].name );
+    assert_eq!( "call_res", op_info_vec[id::CALL_RES_OP as usize].name );
     //
-    assert_eq!( "mul_cv",   op_info_vec[id::MUL_CV_OP].name );
-    assert_eq!( "mul_vc",   op_info_vec[id::MUL_VC_OP].name );
-    assert_eq!( "mul_vv",   op_info_vec[id::MUL_VV_OP].name );
+    assert_eq!( "mul_cv",   op_info_vec[id::MUL_CV_OP as usize].name );
+    assert_eq!( "mul_vc",   op_info_vec[id::MUL_VC_OP as usize].name );
+    assert_eq!( "mul_vv",   op_info_vec[id::MUL_VV_OP as usize].name );
 }

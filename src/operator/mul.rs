@@ -150,7 +150,7 @@ reverse_1_mul!(AD);
 /// # op_info_vec
 /// is a map from [operator::id] to operator information.
 pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
-    op_info_vec[MUL_CV_OP] = OpInfo{
+    op_info_vec[MUL_CV_OP as usize] = OpInfo{
         name           : "mul_cv".to_string() ,
         forward_0      : float_forward_0_mul_cv,
         forward_1      : float_forward_1_mul_cv,
@@ -160,7 +160,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         ad_reverse_1   : ad_reverse_1_mul_cv,
         arg_var_index  : super::arg_var_index_binary_cv,
      };
-    op_info_vec[MUL_VC_OP] = OpInfo{
+    op_info_vec[MUL_VC_OP as usize] = OpInfo{
         name           : "mul_vc".to_string(),
         forward_0      : float_forward_0_mul_vc,
         forward_1      : float_forward_1_mul_vc,
@@ -170,7 +170,7 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
         ad_reverse_1   : ad_reverse_1_mul_vc,
         arg_var_index  : super::arg_var_index_binary_vc,
     };
-    op_info_vec[MUL_VV_OP] = OpInfo{
+    op_info_vec[MUL_VV_OP as usize] = OpInfo{
         name           : "mul_vv".to_string(),
         forward_0      : float_forward_0_mul_vv,
         forward_1      : float_forward_1_mul_vv,

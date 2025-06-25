@@ -96,7 +96,7 @@ macro_rules! forward_zero {
                 println!( "var_index, var, op, arg" );
             }
             for op_index in 0 .. self.id_all.len() {
-                let op_id     = self.id_all[op_index];
+                let op_id     = self.id_all[op_index] as usize;
                 let start     = self.op2arg[op_index];
                 let end       = self.op2arg[op_index + 1];
                 let arg       = &self.arg_all[start .. end];
@@ -229,7 +229,7 @@ macro_rules! forward_one {
                 println!( "var_index, var, op, arg" );
             }
             for op_index in 0 .. self.id_all.len() {
-                let op_id     = self.id_all[op_index];
+                let op_id     = self.id_all[op_index] as usize;
                 let start     = self.op2arg[op_index];
                 let end       = self.op2arg[op_index + 1];
                 let arg       = &self.arg_all[start .. end];
@@ -355,7 +355,7 @@ macro_rules! reverse_one {
                 println!( "var_index, var, op, arg" );
             }
             for op_index in ( 0 .. self.id_all.len() ).rev() {
-                let op_id     = self.id_all[op_index];
+                let op_id     = self.id_all[op_index] as usize;
                 let start     = self.op2arg[op_index];
                 let end       = self.op2arg[op_index + 1];
                 let arg       = &self.arg_all[start .. end];
@@ -429,7 +429,7 @@ pub struct ADFun {
     // id_all
     /// This maps an operator's index in the operation sequence
     /// to its [operator::id]
-    pub(crate) id_all         : Vec<Index>,
+    pub(crate) id_all         : Vec<u8>,
     //
     // op2arg
     /// This maps an operator's index in the operation sequence to its
@@ -606,7 +606,7 @@ impl ADFun {
                         let op_index         = var_index - n_domain;
                         //
                         // arv_var_index_fn
-                        let op_id            = self.id_all[op_index];
+                        let op_id            = self.id_all[op_index] as usize;
                         let op_info          = &op_info_vec[op_id];
                         let arg_var_index_fn = op_info.arg_var_index;
                         //
