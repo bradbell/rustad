@@ -408,11 +408,11 @@ pub struct ADFun {
     // n_domain
     /// The dimension of the domain space for this function.
     /// The domain variables have index 0 .. n_domain-1.
-    pub(crate) n_domain       : Index,
+    pub(crate) n_domain       : usize,
     //
     // n_var
     /// The total number of variables in the operation sequence.
-    pub(crate) n_var          : Index,
+    pub(crate) n_var          : usize,
     //
     // range_is_var
     /// The length of this vector is the dimension of the range space.
@@ -478,11 +478,11 @@ impl ADFun {
     //
     // domain_len
     /// dimension of domain space
-    pub fn domain_len(&self) -> Index { self.n_domain }
+    pub fn domain_len(&self) -> usize { self.n_domain }
     //
     // range_len
     /// dimension of range space
-    pub fn range_len(&self) -> Index { self.range_is_var.len() }
+    pub fn range_len(&self) -> usize { self.range_is_var.len() }
     //
     // forward_zero
     forward_zero!(Float);
