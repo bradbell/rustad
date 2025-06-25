@@ -714,6 +714,7 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
         assert_eq!( tape.n_var , tape.n_domain + tape.id_all.len() );
         assert_eq!( tape.op2arg.len() , tape.id_all.len() );
         assert!( tape.arg_all.len() < Index::MAX as usize );
+        assert!( tape.tape_id < Index::MAX as usize );
         //
         // tape.op2arg
         // end marker for arguments to the last operation
