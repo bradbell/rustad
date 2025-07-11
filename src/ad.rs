@@ -94,27 +94,28 @@ ad_from_value!(f64, u64, f64);
 ad_from_value!(f64, u32, isize);
 ad_from_value!(f64, u64, isize);
 // -------------------------------------------------------------------------
+// GAD<F, U>::to_value
+//
 impl<F : Clone, U> GAD<F, U> {
-    /// Extract value from a  AD object (dependencies are lost)
+    /// Extract value from a  AD object, variable information is lost
     pub fn to_value(&self) -> F { self.value.clone() }
 }
 // -------------------------------------------------------------------------
-//
-/// Display will only show the value and ignore the variable information.
+/// Display only shows the value and ignores the variable information.
 ///
 /// # Example
 /// ```
-/// use rustad::{AD, Float};
-/// let x = rustad::AD::from( rustad::Float::from(3) );
+/// use rustad::ad::GAD;
+/// let x : GAD<f64, u32> = GAD::from(3);
 /// let s = format!( "{x}" );
 /// assert_eq!(s, "3");
 ///```
-impl std::fmt::Display for AD {
+impl<F : std::fmt::Display, U> std::fmt::Display for GAD<F, U> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        // only display value
         write!(f, "{}", self.value)
     }
 }
+// -------------------------------------------------------------------------
 //
 // PartialEq
 /// Two AD object are equal if their Float values are equal.
