@@ -12,81 +12,92 @@ use crate::function::{ADFun, ad_domain};
 //
 #[cfg(doc)]
 use crate::ad_tape::THIS_THREAD_TAPE;
+// ---------------------------------------------------------------------------
+// GAD
 //
-/// AD acts like the Float. It also can record functions and store
-/// them in [ADFun] objects.
+/// Generic AD, acts like F but in addition can record
+/// a function evaluation.
 ///
-/// # variable
+/// The recording is used to create an [ADFun] object.
+///
+/// * F : is the floating point type used for computations.
+///
+/// * U : is the unsigned integer type used for indices in the tape.
+///
+/// * variable :
 /// An AD object is a variable if it one of the [ad_domain] variables
 /// or its value depends on the value of the domain variable.
 ///
-/// # constant
+/// * constant :
 /// If an AD object is not a variable it is referred to as a constant.
+///
 #[derive(Copy, Clone, Debug)]
-pub struct AD {
+pub struct GAD<F, U> {
     //
     // tape_id
     ///
     /// An AD object is a variable if the following two conditions hold:
-    /// 1. [THIS_THREAD_TAPE] is currently recording.
+    /// 1. This threads tape is currently recording.
     /// 2. This threads tape and the AD object have the same *tape_id* .
-    pub(crate) tape_id   : Index,
+    pub(crate) tape_id   : U,
     //
     // var_index
-    /// If this AD object is a variable, var_index is its index in the tape.
-    pub(crate) var_index : Index,
+    /// If this AD object is a variable, *var_index* is its index in the tape.
+    pub(crate) var_index : U,
     //
     // value
-    /// This is the value of this AD variable or constant.
-    pub(crate) value     : Float,
-}
-// -------------------------------------------------------------------------
-impl AD {
-    /// Extract value from an object (dependencies are lost)
-    pub fn to_float(&self) -> Float { self.value }
+    /// is the value of this AD variable or constant.
+    pub(crate) value     : F,
 }
 //
+// AD
+/// AD is a specific GAD type.
+pub type AD = GAD<Float, Index>;
 // -------------------------------------------------------------------------
-impl From<f64> for AD {
-    /// Convert from f64 to an AD constant
-    fn from(this_value : f64) -> AD {
-        AD {tape_id: 0, var_index: 0, value: Float::from(this_value), }
-    }
-}
-impl From<f32> for AD {
-    /// Convert from f32 to an AD constant
-    fn from(this_value : f32) -> AD {
-        AD {tape_id: 0, var_index: 0, value: Float::from(this_value), }
-    }
-}
-/// This maacro implements conversion from integer types to AD
-macro_rules! impl_ad_from_integer {
-    ($integer:tt) => { paste::paste!{
-        impl From< [< i $integer >] > for AD {
-            #[doc = concat!(
-                " Convert from i", stringify!($integer), " to an AD constant"
-            ) ]
-            fn from(from_value : [< i $integer >] ) -> AD {
-                let float_value = from_value as Float;
-                AD {tape_id: 0, var_index: 0, value: float_value, }
-            }
+// ad_from_value!
+//
+/// Convert from a value to a GAD<F, U> type
+///
+/// * f1 : is the GAD floating point type F.
+/// * u2 : is the GAD tape index type U.
+/// * t3 : is the type being converted to GAD<F, U>.
+///
+/// Syntax
+/// <pre>
+///     let avalue : GAD&lt;F, U&gt; = GAD::from(value)
+/// </pre>
+///
+macro_rules! ad_from_value { ($f1:ident , $u2:ident , $t3:ident) => {
+        impl From<$t3> for GAD<$f1, $u2> {
+        #[doc = concat!(
+            " Convert from ", stringify!($t3),
+            " to an GAD\\<", stringify!($f1),
+            ", ", stringify!($u2),  "\\> constant"
+        ) ]
+        fn from(fvalue : $t3) -> Self { Self
+            {tape_id: 0 as $u2, var_index: 0 as $u2, value: fvalue as $f1, }
         }
-        impl From< [< u $integer >] > for AD {
-            #[doc = concat!(
-                " Convert from u", stringify!($integer), " to an AD constant"
-            ) ]
-            fn from(from_value : [< u $integer >] ) -> AD {
-                let float_value = from_value as Float;
-                AD {tape_id: 0, var_index: 0, value: float_value, }
-            }
-        }
-    } }
+    }
+} }
+//
+ad_from_value!(f32, u32, f32);
+ad_from_value!(f32, u64, f32);
+ad_from_value!(f32, u32, f64);
+ad_from_value!(f32, u64, f64);
+ad_from_value!(f32, u32, isize);
+ad_from_value!(f32, u64, isize);
+//
+ad_from_value!(f64, u32, f32);
+ad_from_value!(f64, u64, f32);
+ad_from_value!(f64, u32, f64);
+ad_from_value!(f64, u64, f64);
+ad_from_value!(f64, u32, isize);
+ad_from_value!(f64, u64, isize);
+// -------------------------------------------------------------------------
+impl<F : Clone, U> GAD<F, U> {
+    /// Extract value from a  AD object (dependencies are lost)
+    pub fn to_value(&self) -> F { self.value.clone() }
 }
-impl_ad_from_integer!(8);
-impl_ad_from_integer!(16);
-impl_ad_from_integer!(32);
-impl_ad_from_integer!(64);
-impl_ad_from_integer!(128);
 // -------------------------------------------------------------------------
 //
 /// Display will only show the value and ignore the variable information.
@@ -279,10 +290,10 @@ pub(crate) use binary_ad_assign_op;
 ///```
 /// use rustad::{Float, AD, advec};
 /// fn check(avec : &Vec<AD> ) {
-///     assert_eq!( avec.len() , 4 );
-///     assert_eq!( avec[3], AD::from(4) );
+///     assert_eq!( avec.len() , 3 );
+///     assert_eq!( avec[2], AD::from(3.0) );
 /// }
-/// let avec = advec![ 1f32, 2f64, 3u128, 4i8 ];
+/// let avec = advec![ 1f32, 2f64, 3isize ];
 /// check(&avec);
 /// ```
 #[macro_export]
