@@ -15,7 +15,7 @@
 use crate::AD;
 use crate::Float;
 use crate::Index;
-use crate::ad_tape::THIS_THREAD_TAPE;
+use crate::ad_tape::THIS_THREAD_TAPE_F64_U32;
 use crate::ad_tape::Tape;
 use crate::operator::OpInfo;
 use crate::operator::id::{MUL_CV_OP, MUL_VC_OP, MUL_VV_OP};

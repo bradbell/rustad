@@ -11,7 +11,7 @@ use crate::{Index, Float};
 use crate::function::{ADFun, ad_domain};
 //
 #[cfg(doc)]
-use crate::ad_tape::THIS_THREAD_TAPE;
+use crate::ad_tape::THIS_THREAD_TAPE_F64_U32;
 // ---------------------------------------------------------------------------
 // GAD
 //
@@ -216,7 +216,7 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         fn [< $Trait:lower >] (self, rhs : AD) -> AD {
             let new_value = self.value $op rhs.value;
             let ( new_tape_id, new_var_index) =
-            THIS_THREAD_TAPE.with_borrow_mut(
+            THIS_THREAD_TAPE_F64_U32.with_borrow_mut(
                 |tape| [< record_ $Trait:lower >] (tape, &self, &rhs)
             );
             AD {
@@ -254,7 +254,7 @@ pub(crate) use binary_ad_operator;
 ///     AD op= AD
 ///     AD op= Float
 /// </pre>
-/// This include storing the operation in the [THIS_THREAD_TAPE] .
+/// This include storing the operation in the [THIS_THREAD_TAPE_F64_U32] .
 ///
 /// # Name
 /// is the std::ops trait for this operator without the Assign;
@@ -298,7 +298,7 @@ macro_rules! binary_ad_assign_op { ($Name:ident, $symbol:tt) => {paste::paste! {
     impl std::ops::[< $Name Assign >]<AD> for AD {
         #[ doc = concat!(" compute AD ", stringify!($symbol), " AD") ]
         fn [< $Name:lower _assign >] (&mut self, rhs : AD) {
-            THIS_THREAD_TAPE.with_borrow_mut(
+            THIS_THREAD_TAPE_F64_U32.with_borrow_mut(
                 |tape| [< record_ $Name:lower _assign >] (tape, self, &rhs)
             );
             let _ = self.value $symbol rhs.value;

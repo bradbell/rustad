@@ -8,7 +8,7 @@
 use crate::AD;
 //
 #[cfg(doc)]
-use crate::ad_tape::{Tape, THIS_THREAD_TAPE};
+use crate::ad_tape::{Tape, THIS_THREAD_TAPE_F64_U32};
 //
 #[cfg(doc)]
 use crate::function::ADFun;

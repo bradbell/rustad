@@ -11,11 +11,11 @@ use std::sync::Mutex;
 //
 #[cfg(doc)]
 use crate::operator;
-//
-// Tape
-/// is the type used to represent one tape; i.e., o
-/// one operation sequence recording
-pub(crate) struct Tape {
+// ---------------------------------------------------------------------------
+// GTape
+///
+/// GTape<F, U> is the type used to record a GAD<F, U> function evaluation
+pub(crate) struct GTape<F, U> {
     //
     // recording
     /// if false (true) a recording is currently in progress on this tape.
@@ -41,27 +41,34 @@ pub(crate) struct Tape {
     pub id_all         : Vec<u8>,
     //
     // op2arg
-    /// For each index in the operation sequence, op2arg\[index\]
+    /// For each op_index in the operation sequence, op2arg\[op_index\]
     /// is the index in arg_all of the first argument for the operator.
-    pub op2arg         : Vec<Index>,
+    pub op2arg         : Vec<U>,
     //
     // arg_all
-    /// For each index in the operation sequence,
+    /// For each op_index in the operation sequence,
     /// the arguments for the operator are a slice of arg_all
     /// starting at op2arg\[index\] .
-    pub arg_all        : Vec<Index>,
+    pub arg_all        : Vec<U>,
     //
     // con_all
     /// is a vector containing the constant values used by the
     /// operation sequence
-    pub con_all        : Vec<Float>,
+    pub con_all        : Vec<F>,
     //
     // flag_all
     /// is a vector containing boolean flags that are part of some
     /// operator definitions.
     pub flag_all       : Vec<bool>,
 }
-impl Tape {
+//
+// Tape
+/// Tape is the GTape that corresponds to AD
+pub type Tape = GTape<Float, Index>;
+// ---------------------------------------------------------------------------
+// GTape::new
+//
+impl<F, U> GTape<F, U> {
     //
     // Tape::new
     /// Sets recording to false, all the Index values to zero,
@@ -80,16 +87,35 @@ impl Tape {
         }
     }
 }
-//
+// ---------------------------------------------------------------------------
 // NEXT_TAPE_ID
 /// The tape_id values that have been used are 1 .. NEXT_TAPE_ID
 /// (0 is not used for a recording).
 pub(crate) static NEXT_TAPE_ID : Mutex<usize> = Mutex::new(1);
+// ---------------------------------------------------------------------------
+// this_thread_tape!
 //
-thread_local! {
-    //
-    // THIS_THREAD_TAPE
-    /// is thread local storage used to record one operation sequence
-    pub(crate) static THIS_THREAD_TAPE: std::cell::RefCell<Tape> =
-        std::cell::RefCell::new( Tape::new() );
-}
+/// Create the tape for the current thread.
+///
+/// * f1 : is the floating point type for calculating values.
+/// we use F1 to denote the upper case version of f1.
+/// * u2 : is the unsigned integer type for indices in the tape.
+/// we use U2 to denote the upper case version of u2.
+///
+/// THIS_THREAD_TAPE_F1_U2 :
+/// is the name of the tape created by this macro call.
+///
+macro_rules! this_thread_tape { ($f1:ident, $u2:ident) => { paste::paste! {
+    thread_local! {
+        #[doc = concat!(
+            "The thread local tape where ",
+            "GAD<", stringify!( $f1 ), ",", stringify!( $u2 ), "> " ,
+            "operations are stored"
+        ) ]
+        pub(crate) static
+        [< THIS_THREAD_TAPE_ $f1:upper _ $u2:upper >] :
+            std::cell::RefCell< GTape<$f1, $u2> > =
+                std::cell::RefCell::new( GTape::new() );
+    }
+} } }
+this_thread_tape!(f64, u32);
