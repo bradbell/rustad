@@ -96,6 +96,15 @@ ad_from_value!(f64, u64, isize);
 // -------------------------------------------------------------------------
 // GAD<F, U>::to_value
 //
+/// Convert from a GAD to its value
+///
+/// # Example
+/// ```
+/// use rustad::ad::GAD;
+/// let ax : GAD<f64, u32> = GAD::from(4.0);
+/// let x = ax.to_value();
+/// assert_eq!(x, 4.0);
+/// ```
 impl<F : Clone, U> GAD<F, U> {
     /// Extract value from a  AD object, variable information is lost
     pub fn to_value(&self) -> F { self.value.clone() }
@@ -106,8 +115,8 @@ impl<F : Clone, U> GAD<F, U> {
 /// # Example
 /// ```
 /// use rustad::ad::GAD;
-/// let x : GAD<f64, u32> = GAD::from(3);
-/// let s = format!( "{x}" );
+/// let ax : GAD<f64, u32> = GAD::from(3);
+/// let s = format!( "{ax}" );
 /// assert_eq!(s, "3");
 ///```
 impl<F : std::fmt::Display, U> std::fmt::Display for GAD<F, U> {
