@@ -25,6 +25,8 @@ use crate::operator::id::{ADD_CV_OP, ADD_VC_OP, ADD_VV_OP};
 use crate::operator;
 #[cfg(doc)]
 use crate::operator::{ForwardZeroBinary, ForwardOneBinary};
+#[cfg(doc)]
+use crate::ad::doc_binary_ad_operator;
 //
 // float_forward_0_add_cv, ad_forward_0_add_cv
 // float_forward_0_add_vc, ad_forward_0_add_vc

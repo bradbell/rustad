@@ -110,6 +110,8 @@ impl<F : Clone, U> GAD<F, U> {
     pub fn to_value(&self) -> F { self.value.clone() }
 }
 // -------------------------------------------------------------------------
+// Display
+//
 /// Display only shows the value and ignores the variable information.
 ///
 /// # Example
@@ -125,37 +127,56 @@ impl<F : std::fmt::Display, U> std::fmt::Display for GAD<F, U> {
     }
 }
 // -------------------------------------------------------------------------
-//
 // PartialEq
-/// Two AD object are equal if their Float values are equal.
+//
+/// Two GAD object are equal if their  values are equal.
+///
+///
+/// # Example
 /// ```
-/// use rustad::{AD, Float};
-/// assert_eq!( AD::from( Float::from(3.0) ), AD::from( Float::from(3) ) );
+/// use rustad::ad::GAD;
+/// let ax : GAD<f32, u64> = GAD::from(3.0);
+/// let ay : GAD<f32, u64> = GAD::from(3);
+/// assert_eq!(ax, ay);
 ///```
-impl PartialEq for AD {
+impl<F : std::cmp::PartialEq, U> PartialEq for GAD<F, U> {
     fn eq(&self, other: &Self) -> bool {
         self.value == other.value
     }
 }
 // ---------------------------------------------------------------------------
-// binary_AD_operator
-/// This macro implements the the following binary operations:
-/// <pre>
-///     AD    op AD
-///     Float op AD
-///     AD    op Float
-/// </pre>
-/// This include storing the operation in the [THIS_THREAD_TAPE] .
+// binary_ad_operator!
+//
+/// Binary AD operators
 ///
-/// # Trait
+/// | Left      | Operator | Right     |
+/// |-----------|----------|-----------|
+/// | AD        | +, *     | AD        |
+/// | F         | +, *     | AD        |
+/// | AD        | +, *     | F         |
+///
+pub fn doc_binary_ad_operator() { }
+//
+/// This macro implements the the following binary operations:
+///
+/// | Left        | Operator| Right       |
+/// |-------------|---------|-------------|
+/// | AD          | op      | AD          |
+/// | f1          | op      | AD          |
+/// | AD          | op      | f1          |
+///
+///
+/// This include storing the operation in the tape for this thread and AD type.
+///
+/// * Traig
 /// is the std::ops trait for this operator; e.g., Add .
 ///
-/// # op
+/// * op
 /// is the token for this operator; e.g., + .
 ///
 macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
     //
-    #[ doc = concat!(" record an ", stringify!($Trait), " operation ") ]
+    #[ doc = " see [doc_binary_ad_operator]" ]
     fn [< record_ $Trait:lower >] (tape: &mut Tape, lhs: &AD, rhs: &AD) ->
     (Index, Index) {
         let mut new_tape_id   = 0;
