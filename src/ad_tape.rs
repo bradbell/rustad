@@ -5,6 +5,9 @@
 //
 //! Define tape objects: [parent module](super)
 //
+use std::cell::RefCell;
+use std::thread::LocalKey;
+//
 use crate::Index;
 use crate::Float;
 use std::sync::Mutex;
@@ -91,31 +94,37 @@ impl<F, U> GTape<F, U> {
 // NEXT_TAPE_ID
 /// The tape_id values that have been used are 1 .. NEXT_TAPE_ID
 /// (0 is not used for a recording).
-pub(crate) static NEXT_TAPE_ID : Mutex<usize> = Mutex::new(1);
+pub (crate) static NEXT_TAPE_ID : Mutex<usize> = Mutex::new(1);
 // ---------------------------------------------------------------------------
-// this_thread_tape!
+// this_thread_tape
 //
-/// Create the tape for the current thread.
-///
-/// * f1 : is the floating point type for calculating values.
-/// we use F1 to denote the upper case version of f1.
-/// * u2 : is the unsigned integer type for indices in the tape.
-/// we use U2 to denote the upper case version of u2.
-///
-/// THIS_THREAD_TAPE_F1_U2 :
-/// is the name of the tape created by this macro call.
-///
-macro_rules! this_thread_tape { ($f1:ident, $u2:ident) => { paste::paste! {
-    thread_local! {
-        #[doc = concat!(
-            "The thread local tape where ",
-            "GAD<", stringify!( $f1 ), ",", stringify!( $u2 ), "> " ,
-            "operations are stored"
-        ) ]
-        pub(crate) static
-        [< THIS_THREAD_TAPE_ $f1:upper _ $u2:upper >] :
-            std::cell::RefCell< GTape<$f1, $u2> > =
-                std::cell::RefCell::new( GTape::new() );
+pub (crate) trait ThisThreadTape<U : 'static>: Sized + 'static {
+    fn get() -> &'static LocalKey< RefCell< GTape<Self, U> > >;
+}
+//
+impl ThisThreadTape<u32> for f64 {
+    fn get() -> &'static LocalKey< RefCell< GTape<f64, u32> > > {
+        thread_local! {
+            pub(crate) static THIS_THREAD_TAPE :
+                RefCell< GTape<f64, u32> > = RefCell::new( GTape::new() );
+
+        }
+        &THIS_THREAD_TAPE
     }
-} } }
-this_thread_tape!(f64, u32);
+}
+/// Get reference to static that is this threads tape.
+///
+/// * F : is the floating point type used for value calculations.
+/// * U : is the unsigned integer type use for indices in the tape.
+///
+/// Syntax
+/// <pre>
+///     local_key = &LocalKey&lt; RefCell&lt; GTape&lt;F, U&gt; &gt; &gt; =
+///         this_thread_tape();
+///     local_key.with_borrow_mut( |tape| { ... } );
+/// </pre>
+///
+pub(crate) fn this_thread_tape<F : ThisThreadTape<U>, U : 'static>(
+) ->  &'static LocalKey< RefCell< GTape<F,U> > > {
+    < F as ThisThreadTape<U> >::get()
+}

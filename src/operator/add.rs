@@ -11,12 +11,14 @@
 //! 1. arg\[0\]:  Variable or constant index of left operand.
 //! 2. arg\[1\]:  Variable or constant index of left operand.
 //
+use std::cell::RefCell;
+use std::thread::LocalKey;
+//
 // BEGIN_SORT_THIS_LINE_PLUS_1
 use crate::AD;
 use crate::Float;
 use crate::Index;
-use crate::ad_tape::THIS_THREAD_TAPE_F64_U32;
-use crate::ad_tape::Tape;
+use crate::ad_tape::{Tape, GTape, this_thread_tape};
 use crate::operator::OpInfo;
 use crate::operator::id::{ADD_CV_OP, ADD_VC_OP, ADD_VV_OP};
 // END_SORT_THIS_LINE_MINUS_1

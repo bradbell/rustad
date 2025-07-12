@@ -43,10 +43,13 @@
 //! assert_eq!( w[1], (u[0] + u[1]) * u[1] );
 //! ```
 //
+use std::thread::LocalKey;
+use std::cell::RefCell;
+//
 use crate::{Index, Float};
 use crate::function::ADFun;
 use crate::ad::AD;
-use crate::ad_tape::{Tape, THIS_THREAD_TAPE_F64_U32};
+use crate::ad_tape::{Tape, GTape, this_thread_tape};
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 //
 // CheckpointInfo
@@ -170,7 +173,9 @@ pub fn use_checkpoint(
     let ad_range = THIS_THREAD_CHECKPOINT_VEC.with_borrow( |vec| {
         let check_point_info = &vec[fun_index];
         assert_eq!( fun_index, check_point_info.fun_index );
-        let ad_range_zero = THIS_THREAD_TAPE_F64_U32.with_borrow_mut( |tape|
+        let local_key : &LocalKey< RefCell< GTape<f64, u32> > > =
+            this_thread_tape();
+        let ad_range_zero = local_key.with_borrow_mut( |tape|
             use_checkpoint_info(tape, check_point_info, ad_domain, trace)
         );
         ad_range_zero
