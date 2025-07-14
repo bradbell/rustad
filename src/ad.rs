@@ -152,55 +152,62 @@ impl<F : std::cmp::PartialEq, U> PartialEq for GAD<F, U> {
 // because it is not a local type.
 macro_rules! binary_ad_operator_case{
     ($f1:ident, $u2:ident, $t3:ident, $o4:tt) => { paste::paste! {
+        #[doc =
+            "see [doc_binary_ad_operator](crate::ad::doc_binary_ad_operator)"
+        ]
         impl std::ops::$t3< GAD<$f1,$u2> > for $f1
         where
         GAD<$f1,$u2> : std::ops::$t3<Output = GAD<$f1,$u2> > ,
         {   type Output = GAD<$f1,$u2>;
             //
-            #[ doc = concat!(
-                " compute GAD<", stringify!($f1), ", ", stringify!($u2), "> ",
-                stringify!($o4), " ", stringify!($f1)
+#[ doc = concat!(
+        " compute GAD<", stringify!($f1), ", ", stringify!($u2), "> ",
+        stringify!($o4), " ", stringify!($f1)
             ) ]
             fn [< $t3:lower >] (self, rhs : GAD<$f1,$u2>) -> GAD<$f1,$u2> {
                 GAD::from(self) $o4 rhs
             }
         }
     }
-} }
+    } }
 pub(crate) use binary_ad_operator_case;
 //
 // binary_ad_operator!
 //
-/// Binary AD operators
+/// Binary GAD<F,U> operators
+///
+/// * F : is the floating point type used for value calculations.
+/// * U : is the unsigned integer type used for tape indices.
 ///
 /// | Left      | Operator | Right     |
 /// |-----------|----------|-----------|
-/// | AD        | +, *     | AD        |
-/// | F         | +, *     | AD        |
-/// | AD        | +, *     | F         |
+/// | GAD<F,U>  | +, *     | GAD<F,U>  |
+/// | F         | +, *     | GAD<F,U>  |
+/// | GAD<F,U>  | +, *     | F         |
+///
+/// # Example
+/// ```
+/// use rustad::ad::GAD;
+/// let ax : GAD<f32, u32> = GAD::from(3.0);
+/// let ay : GAD<f32, u32> = GAD::from(4.0);
+/// let az = ax + ay;
+/// assert_eq!(GAD::from(7.0), az);
+///```
 ///
 pub fn doc_binary_ad_operator() { }
 //
-/// This macro implements the the following binary operations:
-///
-/// | Left        | Operator| Right       |
-/// |-------------|---------|-------------|
-/// | AD          | op      | AD          |
-/// | f1          | op      | AD          |
-/// | AD          | op      | f1          |
-///
-///
+/// This macro implements the the GAD<F, U> binary operators.
 /// This include storing the operation in the tape for this thread and AD type.
+/// See [doc_binary_ad_operator].
 ///
-/// * Traig
+/// * Traig :
 /// is the std::ops trait for this operator; e.g., Add .
 ///
-/// * op
+/// * op :
 /// is the token for this operator; e.g., + .
 ///
 macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
     //
-    #[ doc = " see [doc_binary_ad_operator]" ]
     fn [< record_ $Trait:lower >]<F,U> (
         tape: &mut GTape<F,U> ,
         lhs: &GAD<F,U>        ,
@@ -241,6 +248,7 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         ( GenericAs::gas(new_tape_id), GenericAs::gas(new_var_index) )
     }
     //
+    #[doc = "see [doc_binary_ad_operator](crate::ad::doc_binary_ad_operator)"]
     impl<F,U> std::ops::$Trait< GAD<F,U> > for GAD<F,U>
     where
     F     : Copy + std::ops::$Trait<Output = F>  + ThisThreadTape<U> ,
@@ -248,7 +256,6 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
     usize : GenericAs<U>
     {   type Output = Self;
         //
-        #[ doc = concat!(" compute AD ", stringify!($op), " AD") ]
         fn [< $Trait:lower >] (self, rhs : Self) -> Self {
             let new_value = self.value $op rhs.value;
             let local_key :
@@ -265,6 +272,7 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         }
     }
     //
+    #[doc = "see [doc_binary_ad_operator](crate::ad::doc_binary_ad_operator)"]
     impl<F,U> std::ops::$Trait<F> for GAD<F,U>
     where
     GAD<F,U> : From<F> ,
