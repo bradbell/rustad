@@ -18,6 +18,9 @@ pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
    std::sync::LazyLock::new( || "2025.7.11" );
 // ----------------------------------------------------------------------------
 //
+// gas
+pub mod gas;
+//
 // utility
 pub mod utility;
 //
@@ -25,7 +28,7 @@ pub mod utility;
 /// Type used for indexing vectors in the tape.
 /// It must be able to represent the total number of
 /// tape ids, operator indices, constants, and arguments to operators.
-pub type Index = u32;
+pub type Index = u64;
 //
 // Float
 /// Floating point Type used for AD operations.

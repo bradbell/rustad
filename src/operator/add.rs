@@ -15,10 +15,11 @@ use std::cell::RefCell;
 use std::thread::LocalKey;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
-use crate::AD;
 use crate::Float;
 use crate::Index;
-use crate::ad_tape::{Tape, GTape, this_thread_tape};
+use crate::ad::{GAD, AD};
+use crate::ad_tape::{Tape, GTape, ThisThreadTape, this_thread_tape};
+use crate::gas::GenericAs;
 use crate::operator::OpInfo;
 use crate::operator::id::{ADD_CV_OP, ADD_VC_OP, ADD_VV_OP};
 // END_SORT_THIS_LINE_MINUS_1

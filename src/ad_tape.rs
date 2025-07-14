@@ -102,11 +102,11 @@ pub (crate) trait ThisThreadTape<U : 'static>: Sized + 'static {
     fn get() -> &'static LocalKey< RefCell< GTape<Self, U> > >;
 }
 //
-impl ThisThreadTape<u32> for f64 {
-    fn get() -> &'static LocalKey< RefCell< GTape<f64, u32> > > {
+impl ThisThreadTape<Index> for Float {
+    fn get() -> &'static LocalKey< RefCell< GTape<Float, Index> > > {
         thread_local! {
             pub(crate) static THIS_THREAD_TAPE :
-                RefCell< GTape<f64, u32> > = RefCell::new( GTape::new() );
+                RefCell< GTape<Float, Index> > = RefCell::new( GTape::new() );
 
         }
         &THIS_THREAD_TAPE

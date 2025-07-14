@@ -666,7 +666,7 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
         new_tape_id   = *next_tape_id;
         *next_tape_id = new_tape_id + 1;
     }
-    let local_key : &LocalKey< RefCell< GTape<f64, u32> > > =
+    let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
         this_thread_tape();
     local_key.with_borrow_mut( |tape| {
         assert_ne!( new_tape_id, 0);
@@ -710,7 +710,7 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
 /// as a function of the domain space variables.
 pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
-    let local_key : &LocalKey< RefCell< GTape<f64, u32> > > =
+    let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
         this_thread_tape();
     let tape_id : usize = local_key.with_borrow_mut( |tape| {
         //

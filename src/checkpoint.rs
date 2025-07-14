@@ -173,7 +173,7 @@ pub fn use_checkpoint(
     let ad_range = THIS_THREAD_CHECKPOINT_VEC.with_borrow( |vec| {
         let check_point_info = &vec[fun_index];
         assert_eq!( fun_index, check_point_info.fun_index );
-        let local_key : &LocalKey< RefCell< GTape<f64, u32> > > =
+        let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
             this_thread_tape();
         let ad_range_zero = local_key.with_borrow_mut( |tape|
             use_checkpoint_info(tape, check_point_info, ad_domain, trace)
