@@ -153,6 +153,8 @@ impl<F : std::cmp::PartialEq, U> PartialEq for GAD<F, U> {
 macro_rules! binary_ad_operator_case{
     ($f1:ident, $u2:ident, $t3:ident, $o4:tt) => { paste::paste! {
         impl std::ops::$t3< GAD<$f1,$u2> > for $f1
+        where
+        GAD<$f1,$u2> : std::ops::$t3<Output = GAD<$f1,$u2> > ,
         {   type Output = GAD<$f1,$u2>;
             //
             #[ doc = concat!(
@@ -277,7 +279,10 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         }
     }
     //
-    crate::ad::binary_ad_operator_case!(Float, Index, $Trait, $op);
+    crate::ad::binary_ad_operator_case!(f32, u32, $Trait, $op);
+    crate::ad::binary_ad_operator_case!(f32, u64, $Trait, $op);
+    crate::ad::binary_ad_operator_case!(f64, u32, $Trait, $op);
+    crate::ad::binary_ad_operator_case!(f64, u64, $Trait, $op);
 } } }
 //
 pub(crate) use binary_ad_operator;

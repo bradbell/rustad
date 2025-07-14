@@ -102,16 +102,23 @@ pub (crate) trait ThisThreadTape<U : 'static>: Sized + 'static {
     fn get() -> &'static LocalKey< RefCell< GTape<Self, U> > >;
 }
 //
-impl ThisThreadTape<Index> for Float {
-    fn get() -> &'static LocalKey< RefCell< GTape<Float, Index> > > {
-        thread_local! {
-            pub(crate) static THIS_THREAD_TAPE :
-                RefCell< GTape<Float, Index> > = RefCell::new( GTape::new() );
+macro_rules! impl_this_thread_tape{ ($f1:ident, $u2:ident) => {
+    impl ThisThreadTape<$u2> for $f1 {
+        fn get() -> &'static LocalKey< RefCell< GTape<$f1, $u2> > > {
+            thread_local! {
+                pub(crate) static THIS_THREAD_TAPE :
+                    RefCell< GTape<$f1, $u2> > = RefCell::new( GTape::new() );
 
+            }
+            &THIS_THREAD_TAPE
         }
-        &THIS_THREAD_TAPE
     }
-}
+} }
+impl_this_thread_tape!(f32, u32);
+impl_this_thread_tape!(f32, u64);
+impl_this_thread_tape!(f64, u32);
+impl_this_thread_tape!(f64, u64);
+//
 /// Get reference to static that is this threads tape.
 ///
 /// * F : is the floating point type used for value calculations.
