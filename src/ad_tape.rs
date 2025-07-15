@@ -103,7 +103,16 @@ pub (crate) trait ThisThreadTape<U : 'static>: Sized + 'static {
     fn get() -> &'static LocalKey< RefCell< GTape<Self, U> > >;
 }
 //
+/// Create the tape for this thread.
+///
+/// * f1 : is the floating point type used for values calculations.
+/// * u2 : is the unsigned integer type used for tape indices.
+///
 macro_rules! impl_this_thread_tape{ ($f1:ident, $u2:ident) => {
+    #[doc = concat!(
+        "This threads tape for recording ",
+        "GAD<" , stringify!($f1), ", ", stringify!($u2), "> operations"
+    ) ]
     impl ThisThreadTape<$u2> for $f1 {
         fn get() -> &'static LocalKey< RefCell< GTape<$f1, $u2> > > {
             thread_local! {

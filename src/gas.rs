@@ -7,8 +7,8 @@
 //! : [parent module](super)
 //
 /// Generic as function for converting types like `as` would.
-/// So far implemented for the following types:
 ///
+/// So far implemented for the following types:
 /// * usize <-> u32
 /// * usize <-> u64
 ///

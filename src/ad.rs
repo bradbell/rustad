@@ -150,12 +150,18 @@ impl<F : std::cmp::PartialEq, U> PartialEq for GAD<F, U> {
     }
 }
 // ---------------------------------------------------------------------------
-// binary_ad_operatror_case
+// binary_ad_op_float
 //
-// If you try to make the cases in this macro below generic,
-// you get a message saying that $f1 must be covered
+// If you try to make this implementation generic,
+// you get a message saying that f1 must be covered
 // because it is not a local type.
-macro_rules! binary_ad_operator_case{
+//
+/// Implement one binary GAD<f2,u2> operator where rhs is floating point type
+///
+/// * f1 : the floating point type used for value calculations.
+/// * u2 : the unsigned integer type used for tape indices.
+///
+macro_rules! binary_ad_op_float{
     ($f1:ident, $u2:ident, $t3:ident, $o4:tt) => { paste::paste! {
         #[doc =
             "see [doc_binary_ad_operator](crate::ad::doc_binary_ad_operator)"
@@ -165,9 +171,9 @@ macro_rules! binary_ad_operator_case{
         GAD<$f1,$u2> : std::ops::$t3<Output = GAD<$f1,$u2> > ,
         {   type Output = GAD<$f1,$u2>;
             //
-#[ doc = concat!(
-        " compute GAD<", stringify!($f1), ", ", stringify!($u2), "> ",
-        stringify!($o4), " ", stringify!($f1)
+            #[ doc = concat!(
+                " compute GAD<", stringify!($f1), ", ", stringify!($u2), "> ",
+                stringify!($o4), " ", stringify!($f1)
             ) ]
             fn [< $t3:lower >] (self, rhs : GAD<$f1,$u2>) -> GAD<$f1,$u2> {
                 GAD::from(self) $o4 rhs
@@ -175,7 +181,7 @@ macro_rules! binary_ad_operator_case{
         }
     }
     } }
-pub(crate) use binary_ad_operator_case;
+pub(crate) use binary_ad_op_float;
 // ---------------------------------------------------------------------------
 // binary_ad_operator!
 //
@@ -202,6 +208,7 @@ pub(crate) use binary_ad_operator_case;
 pub fn doc_binary_ad_operator() { }
 //
 /// This macro implements the the GAD<F, U> binary operators.
+///
 /// This include storing the operation in the tape for this thread and AD type.
 /// See [doc_binary_ad_operator].
 ///
@@ -292,10 +299,10 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         }
     }
     //
-    crate::ad::binary_ad_operator_case!(f32, u32, $Trait, $op);
-    crate::ad::binary_ad_operator_case!(f32, u64, $Trait, $op);
-    crate::ad::binary_ad_operator_case!(f64, u32, $Trait, $op);
-    crate::ad::binary_ad_operator_case!(f64, u64, $Trait, $op);
+    crate::ad::binary_ad_op_float!(f32, u32, $Trait, $op);
+    crate::ad::binary_ad_op_float!(f32, u64, $Trait, $op);
+    crate::ad::binary_ad_op_float!(f64, u32, $Trait, $op);
+    crate::ad::binary_ad_op_float!(f64, u64, $Trait, $op);
 } } }
 //
 pub(crate) use binary_ad_operator;
@@ -320,6 +327,7 @@ pub(crate) use binary_ad_operator;
 pub fn doc_binary_ad_assign_op() { }
 //
 /// This macro implements the the GAD<F, U> compound assignment operators.
+///
 /// This include storing the operation in the tape for this thread and AD type.
 /// See [doc_binary_ad_assign_op].
 ///
