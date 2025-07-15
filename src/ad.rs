@@ -171,7 +171,7 @@ macro_rules! binary_ad_operator_case{
     }
     } }
 pub(crate) use binary_ad_operator_case;
-//
+// ---------------------------------------------------------------------------
 // binary_ad_operator!
 //
 /// Binary GAD<F,U> operators
@@ -200,7 +200,7 @@ pub fn doc_binary_ad_operator() { }
 /// This include storing the operation in the tape for this thread and AD type.
 /// See [doc_binary_ad_operator].
 ///
-/// * Traig :
+/// * Trait :
 /// is the std::ops trait for this operator; e.g., Add .
 ///
 /// * op :
@@ -295,20 +295,34 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
 //
 pub(crate) use binary_ad_operator;
 // ---------------------------------------------------------------------------
-// binary_ad_assign_op
-/// This macro implements the following binary assignment operations:
-/// <pre>
-///     AD op= AD
-///     AD op= Float
-/// </pre>
-/// This include storing the operation in the [this_thread_tape] .
+// binary_ad_assign_op!
+//
+/// Compound Assignment GAD<F,U> operators
 ///
-/// # Name
-/// is the std::ops trait for this operator without the Assign;
-/// e.g., Add .
+/// | Left      | Operator | Right     |
+/// |-----------|----------|-----------|
+/// | GAD<F,U>  | +=, *=   | GAD<F,U>  |
+/// | GAD<F,U>  | +=, *=   | F         |
 ///
-/// # symbol
-/// is the token for this operator; e.g., += .
+/// # Example
+/// ```
+/// use rustad::ad::GAD;
+/// let ax     : GAD<f32, u64> = GAD::from(3.0);
+/// let mut ay : GAD<f32, u64> = GAD::from(4.0);
+/// ay += ax;
+/// assert_eq!(GAD::from(7.0), ay);
+///```
+pub fn doc_binary_ad_assign_op() { }
+//
+/// This macro implements the the GAD<F, U> compound assignment operators.
+/// This include storing the operation in the tape for this thread and AD type.
+/// See [doc_binary_ad_assign_op].
+///
+/// * Name :
+/// is the operator name for this compound assignment; e.g., Add .
+///
+/// * op :
+/// is the token for this compound assignment; e.g., += .
 ///
 macro_rules! binary_ad_assign_op {
     ($Name:ident, $op:tt) => {paste::paste! {
