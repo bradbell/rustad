@@ -310,57 +310,78 @@ pub(crate) use binary_ad_operator;
 /// # symbol
 /// is the token for this operator; e.g., += .
 ///
-macro_rules! binary_ad_assign_op { ($Name:ident, $symbol:tt) => {paste::paste! {
-    //
-    #[ doc = concat!(" record an ", stringify!($Name), "Assign operation ") ]
-    fn [< record_ $Name:lower _assign>]
-    (tape: &mut Tape, lhs: &mut AD, rhs: &AD) {
-        if tape.recording {
-            let var_lhs    = lhs.tape_id as usize == tape.tape_id;
-            let var_rhs    = rhs.tape_id as usize == tape.tape_id;
-            if var_lhs || var_rhs {
-                tape.op2arg.push( tape.arg_all.len() as Index);
-                if var_lhs && var_rhs {
-                    tape.id_all.push( [< $Name:upper _VV_OP >] );
-                    tape.arg_all.push( lhs.var_index );
-                    tape.arg_all.push( rhs.var_index );
-                } else if var_lhs {
-                    tape.id_all.push( [< $Name:upper _VC_OP >] );
-                    tape.arg_all.push( lhs.var_index );
-                    tape.arg_all.push( tape.con_all.len() as Index);
-                    tape.con_all.push( rhs.value );
-                } else {
-                    tape.id_all.push( [< $Name:upper _CV_OP >] );
-                    tape.arg_all.push( tape.con_all.len() as Index);
-                    tape.con_all.push( lhs.value );
-                    tape.arg_all.push( rhs.var_index );
+macro_rules! binary_ad_assign_op {
+    ($Name:ident, $op:tt) => {paste::paste! {
+        crate::ad::binary_ad_assign_op!( $Name, $op, [< $Name Assign >] );
+    } };
+    ($Name:ident, $op:tt, $Trait:ident) => {paste::paste! {
+        //
+        fn [< record_ $Trait:snake >]<F,U> (
+            tape: &mut GTape<F,U> ,
+            lhs: &mut GAD<F,U>    ,
+            rhs: &GAD<F,U>        )
+        where
+            F     : Copy,
+            U     : GenericAs<usize> + Copy,
+            usize : GenericAs<U> ,
+        {
+            if tape.recording {
+                let var_lhs    = GenericAs::gas(lhs.tape_id) == tape.tape_id;
+                let var_rhs    = GenericAs::gas(rhs.tape_id) == tape.tape_id;
+                if var_lhs || var_rhs {
+                    tape.op2arg.push( GenericAs::gas(tape.arg_all.len()) );
+                    if var_lhs && var_rhs {
+                        tape.id_all.push( [< $Name:upper _VV_OP >] );
+                        tape.arg_all.push( lhs.var_index );
+                        tape.arg_all.push( rhs.var_index );
+                    } else if var_lhs {
+                        tape.id_all.push( [< $Name:upper _VC_OP >] );
+                        tape.arg_all.push( lhs.var_index );
+                        tape.arg_all.push( GenericAs::gas(tape.con_all.len()) );
+                        tape.con_all.push( rhs.value );
+                    } else {
+                        tape.id_all.push( [< $Name:upper _CV_OP >] );
+                        tape.arg_all.push( GenericAs::gas(tape.con_all.len()) );
+                        tape.con_all.push( lhs.value );
+                        tape.arg_all.push( rhs.var_index );
+                    }
+                    lhs.tape_id   = GenericAs::gas(tape.tape_id);
+                    lhs.var_index = GenericAs::gas(tape.n_var);
+                    tape.n_var   += 1;
                 }
-                lhs.tape_id   = tape.tape_id as Index;
-                lhs.var_index = tape.n_var as Index;
-                tape.n_var   += 1;
             }
         }
-    }
-    //
-    impl std::ops::[< $Name Assign >]<AD> for AD {
-        #[ doc = concat!(" compute AD ", stringify!($symbol), " AD") ]
-        fn [< $Name:lower _assign >] (&mut self, rhs : AD) {
-            let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
-                    this_thread_tape();
-            local_key.with_borrow_mut(
-                |tape| [< record_ $Name:lower _assign >] (tape, self, &rhs)
-            );
-            let _ = self.value $symbol rhs.value;
+        //
+        impl<F,U> std::ops::$Trait<GAD<F,U>> for GAD<F,U>
+        where
+            GAD<F,U> : From<F> ,
+            F        : ThisThreadTape<U> + std::ops::$Trait + Copy,
+            U        : 'static + GenericAs<usize> + Copy,
+            usize    : GenericAs<U> ,
+        {
+            fn [< $Trait:snake >] (&mut self, rhs : GAD<F,U>) {
+                let local_key : &LocalKey< RefCell< GTape<F,U> > > =
+                        this_thread_tape();
+                local_key.with_borrow_mut(
+                    |tape| [< record_ $Trait:snake >] (tape, self, &rhs)
+                );
+                let _ = self.value $op rhs.value;
+            }
         }
-    }
-    //
-    impl std::ops::[< $Name Assign >] <Float> for AD {
-        #[ doc = concat!(" compute AD ", stringify!($symbol), " Float") ]
-        fn [< $Name:lower _assign >] (&mut self, rhs : Float) {
-            let _ = *self $symbol AD::from(rhs);
+        //
+        impl<F,U> std::ops::$Trait<F> for GAD<F,U>
+        where
+            GAD<F,U> : From<F> ,
+            F        : ThisThreadTape<U> + std::ops::$Trait + Copy,
+            U        : 'static + GenericAs<usize> + Copy,
+            usize    : GenericAs<U> ,
+        {
+            fn [< $Trait:snake >] (&mut self, rhs : F) {
+                let _ = *self $op GAD::from(rhs);
+            }
         }
-    }
-} } }
+    } };
+}
 //
 // make this macro visible in the entire crate
 pub(crate) use binary_ad_assign_op;

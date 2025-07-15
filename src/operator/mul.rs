@@ -18,7 +18,7 @@ use std::thread::LocalKey;
 use crate::Float;
 use crate::Index;
 use crate::ad::{GAD, AD};
-use crate::ad_tape::{Tape, GTape, ThisThreadTape, this_thread_tape};
+use crate::ad_tape::{GTape, ThisThreadTape, this_thread_tape};
 use crate::gas::GenericAs;
 use crate::operator::OpInfo;
 use crate::operator::id::{MUL_CV_OP, MUL_VC_OP, MUL_VV_OP};
@@ -197,4 +197,4 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
 crate::ad::binary_ad_operator!( Mul, * );
 //
 // AD *= AD, AD *= Float
-crate::ad::binary_ad_assign_op!( Mul, * );
+crate::ad::binary_ad_assign_op!( Mul, *= );

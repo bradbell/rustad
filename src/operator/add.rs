@@ -18,7 +18,7 @@ use std::thread::LocalKey;
 use crate::Float;
 use crate::Index;
 use crate::ad::{GAD, AD};
-use crate::ad_tape::{Tape, GTape, ThisThreadTape, this_thread_tape};
+use crate::ad_tape::{GTape, ThisThreadTape, this_thread_tape};
 use crate::gas::GenericAs;
 use crate::operator::OpInfo;
 use crate::operator::id::{ADD_CV_OP, ADD_VC_OP, ADD_VV_OP};
