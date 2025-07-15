@@ -63,10 +63,14 @@ pub type AD = GAD<Float, Index>;
 /// * u2 : is the GAD tape index type U.
 /// * t3 : is the type being converted to GAD<F, U>.
 ///
-/// Syntax
-/// <pre>
-///     let avalue : GAD&lt;F, U&gt; = GAD::from(value)
-/// </pre>
+/// # Example
+/// ```
+/// // ad_from_value!(f32, u32, f32) makes the following work:
+/// use rustad::ad::GAD;
+/// let value  : f32          = 3.0;
+/// let avalue : GAD<f32,u32> = GAD::from(value);
+/// assert_eq!(avalue.to_value(), value);
+/// ```
 ///
 macro_rules! ad_from_value { ($f1:ident , $u2:ident , $t3:ident) => {
         impl From<$t3> for GAD<$f1, $u2> {

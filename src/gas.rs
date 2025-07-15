@@ -10,6 +10,7 @@
 /// So far implemented for the following types:
 ///
 /// * usize <-> u32
+/// * usize <-> u64
 ///
 /// # Example
 /// ```
@@ -26,6 +27,11 @@ pub trait GenericAs<T> {
     fn gas(self : Self) -> T;
 }
 //
+/// Implement gas returning F as T for one (F, T) type pair.
+///
+/// * F : is the from type
+/// * T : is the to type
+///
 macro_rules! generic_as{ ($F:ident, $T:ident) => {
     impl GenericAs<$T> for $F {
         fn gas(self : Self) -> $T {
