@@ -400,26 +400,37 @@ macro_rules! binary_ad_assign_op {
 // make this macro visible in the entire crate
 pub(crate) use binary_ad_assign_op;
 // -------------------------------------------------------------------------
-// advec
-/// Create a vector with AD elements: [source module](crate::ad)
+// gadvec!
+//
+/// Create a vector with GAD<F,U> elements
+///
+/// * F :
+/// is the floating point type used for value calculations.
+///
+/// * U :
+/// is the unsigned integer type used for indices in the tape.
+///
+/// * E :
+/// is one of the elements. It must have a type that can be converted
+/// using GAD::from.
+///
 ///```
-/// use rustad::{Float, AD, advec};
-/// fn check(avec : &Vec<AD> ) {
-///     assert_eq!( avec.len() , 3 );
-///     assert_eq!( avec[2], AD::from(3.0) );
-/// }
-/// let avec = advec![ 1f32, 2f64, 3isize ];
-/// check(&avec);
+/// use rustad::ad::GAD;
+/// let avec = rustad::gadvec![ f64, u64, 1f32, 2f64, 3isize ];
+/// assert_eq!( avec.len(), 3);
+/// assert_eq!( avec[0], GAD::from(1) );
+/// assert_eq!( avec[1], GAD::from(2) );
+/// assert_eq!( avec[2], GAD::from(3) );
 /// ```
 #[macro_export]
-macro_rules! advec {
-    ( $( $x:expr ),* ) => {
+macro_rules! gadvec {
+    ( $F:ident,  $U:ident,  $( $E:expr ),* ) => {
         {
-            let mut temp_vec = Vec::new();
+            let mut avec : Vec< rustad::ad::GAD<$F,$U> > = Vec::new();
             $(
-                temp_vec.push( rustad::ad::AD::from( $x ) );
+                avec.push( rustad::ad::GAD::from( $E ) );
             )*
-            temp_vec
+            avec
         }
     };
 }

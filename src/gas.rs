@@ -4,6 +4,7 @@
 // ---------------------------------------------------------------------------
 //
 //! Define the GenericAs trait wutih a generic as function
+//! [parent module](super)
 //
 /// Generic as function for converting types like `as` would.
 /// So far implemented for the following types:

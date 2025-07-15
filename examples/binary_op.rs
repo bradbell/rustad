@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
-use rustad::{Float, AD, advec};
+use rustad::{Float, Index, AD, gadvec};
 use rustad::function;
 
 /// example_mul
@@ -34,12 +34,12 @@ fn example_mul() {
 /// ad_example_mul
 fn ad_example_mul() {
     let x   : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
-    let adx : Vec<AD> = advec![ 4.0, 5.0, 6.0 ];
-    let ary : Vec<AD> = advec![ 7.0, 8.0 ];
+    let adx : Vec<AD> = gadvec![ Float, Index, 4.0, 5.0, 6.0 ];
+    let ary : Vec<AD> = gadvec![ Float, Index, 7.0, 8.0 ];
     let ax         = function::ad_domain(&x);
     let ay_0       = ax[0] * ax[1];
     let ay_1       = ax[1] * ax[2];
-    let ay         = advec! [ ay_0, ay_1 ];
+    let ay         = gadvec![ Float, Index, ay_0, ay_1 ];
     let f          = function::ad_fun(&ay);
     let trace      = false;
     let (ay, av0 ) = f.ad_forward_zero(&ax, trace);
