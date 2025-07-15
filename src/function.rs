@@ -3,7 +3,8 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! ADFun objects: [parent module](super)
+//! AD function objects
+//! : [parent module](super)
 //
 use std::cell::RefCell;
 use std::thread::LocalKey;

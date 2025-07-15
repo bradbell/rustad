@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! Operations for specific operators: [parent module](super)
+//! Operations for specific operators
+//! : [parent module](super)
 //
 // AD
 use crate::AD;

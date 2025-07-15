@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! Store and compute for AD add operation:  [parent module](super)
+//! Store and compute for AD add operation
+//! : [parent module](super)
 //!
 //! # Operator Id
 //! ADD_CV_OP, ADD_VC_OP, or ADD_VV_OP

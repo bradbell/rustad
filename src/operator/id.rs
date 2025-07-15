@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! Define operator identifiers as `pub(crate) u8` constants:
-//! [parent module](super)
+//! Define operator identifiers as `pub(crate) u8` constants
+//! : [parent module](super)
 //
 /// Sets all the opeerator identifier values
 macro_rules! set_operator_ids {

@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
 //! Some utilities not specific to implementing the rustd package
-//! [parent module](super)
+//! : [parent module](super)
 //
 // avg_seconds_to_execute
 /// Compute the average time required to execute a function.

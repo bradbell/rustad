@@ -3,8 +3,8 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! Define the GenericAs trait wutih a generic as function
-//! [parent module](super)
+//! Define the GenericAs trait that acts like the `as` keyword
+//! : [parent module](super)
 //
 /// Generic as function for converting types like `as` would.
 /// So far implemented for the following types:

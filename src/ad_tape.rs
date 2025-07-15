@@ -3,7 +3,8 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! Define tape objects: [parent module](super)
+//! Define tape objects
+//! : [parent module](super)
 //
 use std::cell::RefCell;
 use std::thread::LocalKey;

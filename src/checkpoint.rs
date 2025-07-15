@@ -3,8 +3,8 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This module can be used to checkpoint a section of AD computation:
-//! //! ADFun objects:
+//! This module can be used to checkpoint a section of AD computation
+//! : [parent module](super)
 //!
 //! # Example
 //! ```
