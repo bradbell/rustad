@@ -41,7 +41,7 @@ use crate::{Index, Float};
 use crate::checkpoint::THIS_THREAD_CHECKPOINT_VEC;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 use crate::operator::OpInfo;
-use crate::ad::AD;
+use crate::AD;
 //
 #[cfg(doc)]
 use crate::operator;

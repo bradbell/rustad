@@ -36,7 +36,7 @@ pub type Float = f64;
 //
 // AD
 pub mod ad;
-pub use ad::AD;
+pub type AD = ad::GAD<Float,Index>;
 //
 // operator
 pub(crate) mod operator;

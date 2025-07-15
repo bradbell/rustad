@@ -16,9 +16,10 @@ use std::cell::RefCell;
 use std::thread::LocalKey;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
+use crate::AD;
 use crate::Float;
 use crate::Index;
-use crate::ad::{GAD, AD};
+use crate::ad::GAD;
 use crate::ad_tape::{GTape, ThisThreadTape, this_thread_tape};
 use crate::gas::GenericAs;
 use crate::operator::OpInfo;

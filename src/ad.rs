@@ -6,8 +6,6 @@
 //! AD an automatic differentiation floating point type
 //! : [parent module](super)
 //
-use crate::{Index, Float};
-//
 #[cfg(doc)]
 use crate::function::{ADFun, ad_domain};
 //
@@ -50,10 +48,6 @@ pub struct GAD<F, U> {
     /// is the value of this AD variable or constant.
     pub(crate) value     : F,
 }
-//
-// AD
-/// AD is a specific GAD type.
-pub type AD = GAD<Float, Index>;
 // -------------------------------------------------------------------------
 // ad_from_value!
 //
@@ -293,7 +287,7 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
     usize    : GenericAs<U>
     {   type Output = Self;
         //
-        #[ doc = concat!(" compute AD ", stringify!($op), " Float") ]
+        #[ doc = concat!(" compute GAD<F,U> ", stringify!($op), " F") ]
         fn [< $Trait:lower >] (self, rhs : F) -> Self {
             self $op GAD::from(rhs)
         }
