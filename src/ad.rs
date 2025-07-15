@@ -105,9 +105,9 @@ ad_from_value!(f64, u64, isize);
 /// let x = ax.to_value();
 /// assert_eq!(x, 4.0);
 /// ```
-impl<F : Clone, U> GAD<F, U> {
+impl<F : Copy, U> GAD<F, U> {
     /// Extract value from a  AD object, variable information is lost
-    pub fn to_value(&self) -> F { self.value.clone() }
+    pub fn to_value(&self) -> F { self.value }
 }
 // -------------------------------------------------------------------------
 // Display
