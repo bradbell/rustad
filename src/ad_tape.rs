@@ -19,6 +19,13 @@ use crate::operator;
 // GTape
 ///
 /// GTape<F, U> is the type used to record a GAD<F, U> function evaluation
+///
+/// * F : is the floating point type use for value calculations.
+///
+/// * U :
+/// is the unsigned integer type used indices in the tape.
+/// It must be able to represent the maximum:
+/// tape id, operator index, constant index, operator argument index.
 pub(crate) struct GTape<F, U> {
     //
     // recording
