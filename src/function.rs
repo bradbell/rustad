@@ -401,7 +401,7 @@ macro_rules! reverse_one {
 }
 pub (crate) use reverse_one;
 // -----------------------------------------------------------------------
-// ADFun
+// GADFun
 //
 /// This can evaluate an operation sequence function and its derivatives.
 ///
@@ -413,16 +413,21 @@ pub (crate) use reverse_one;
 /// An [ad_domain] call is used to start recording an operation sequence.
 /// An [ad_fun] call is used to stop recording move the operation sequence
 /// to an new ADFun object.
-pub struct ADFun {
+pub struct GADFun<F,U> {
     //
     // n_domain
     /// The dimension of the domain space for this function.
     /// The domain variables have index 0 .. n_domain-1.
-    pub(crate) n_domain       : usize,
+    pub(crate) n_domain            : usize,
     //
     // n_var
     /// The total number of variables in the operation sequence.
-    pub(crate) n_var          : usize,
+    pub(crate) n_var               : usize,
+    //
+    // id_all
+    /// This maps an operator's index in the operation sequence
+    /// to its [operator::id]
+    pub(crate) id_all              : Vec<u8>,
     //
     // range_is_var
     /// The length of this vector is the dimension of the range space.
@@ -430,45 +435,47 @@ pub struct ADFun {
     /// is a variable (constant).
     pub(crate) range_is_var        : Vec<bool>,
     //
+    // flag_all
+    /// This contains boolean flags that are part of some operator definitions.
+    pub(crate) flag_all            : Vec<bool>,
+    //
     // range2tape_index
     /// The length of this vector is also the dimension of the range space.
     /// If range_is_var\[i\] is true (false), range2tape_indx\[i\] is the
     /// variable (constant) index for the i-th component of the range space.
-    pub(crate) range2tape_index    : Vec<Index>,
-    //
-    // id_all
-    /// This maps an operator's index in the operation sequence
-    /// to its [operator::id]
-    pub(crate) id_all         : Vec<u8>,
+    pub(crate) range2tape_index    : Vec<U>,
     //
     // op2arg
     /// This maps an operator's index in the operation sequence to its
     /// the index of its first argument in arg_all.
-    pub(crate) op2arg         : Vec<Index>,
+    pub(crate) op2arg              : Vec<U>,
     //
     // arg_all
     /// This contains the arguments for all the opereators in the
     /// operatioon sequence.
-    pub(crate) arg_all        : Vec<Index>,
+    pub(crate) arg_all             : Vec<U>,
     //
     // con_all
     /// This contains the value of all the constants needed
     /// to evaluate the function.
-    pub(crate) con_all        : Vec<Float>,
-    //
-    // flag_all
-    /// This contains boolean flags that are part of some operator definitions.
-    pub(crate) flag_all       : Vec<bool>,
+    pub(crate) con_all             : Vec<F>,
 }
+//
+// ADFun
+pub type ADFun = GADFun<Float, Index>;
+//
 // ---------------------------------------------------------------------------
-impl ADFun {
+impl<F,U> GADFun<F,U> {
     //
     // new
-    /// This creates an empty operation sequence; i.e,
+    /// This creates an empty operation sequence.
+    ///
+    /// To be more specific,
     /// its domain and range vectors have length zero.
     /// # Example
     /// ```
-    /// let f = rustad::function::ADFun::new();
+    /// use rustad::function::GADFun;
+    /// let f : GADFun<f32,u32> = GADFun::new();
     /// assert_eq!( f.domain_len(), 0 );
     /// assert_eq!( f.range_len(), 0 );
     /// ```
@@ -477,12 +484,12 @@ impl ADFun {
             n_domain         : 0,
             n_var            : 0,
             id_all           : Vec::new() ,
+            range_is_var     : Vec::new() ,
+            flag_all         : Vec::new() ,
+            range2tape_index : Vec::new() ,
             op2arg           : Vec::new() ,
             arg_all          : Vec::new() ,
             con_all          : Vec::new() ,
-            flag_all         : Vec::new() ,
-            range_is_var     : Vec::new() ,
-            range2tape_index : Vec::new() ,
         }
     }
     //
@@ -493,6 +500,9 @@ impl ADFun {
     // range_len
     /// dimension of range space
     pub fn range_len(&self) -> usize { self.range_is_var.len() }
+}
+//
+impl ADFun {
     //
     // forward_zero
     forward_zero!(Float);
