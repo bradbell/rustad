@@ -60,18 +60,18 @@ macro_rules! forward_zero {
     (Float) => { forward_zero!(forward, Float); };
     (AD)    => { forward_zero!(ad_forward, AD); };
     //
-    ( $prefix:ident, $float_type:ident ) => { paste::paste! {
+    ( $prefix:ident, $eval_type:ident ) => { paste::paste! {
 
         #[doc = concat!(
             " ADFun zero order forward using ",
-            stringify!($float_type),
+            stringify!($eval_type),
             " computations; see [ doc_forward_zero ]",
         )]
         pub fn [< $prefix _zero >] (
             &self,
-            domain_zero : &[$float_type],
+            domain_zero : &[$eval_type],
             trace       : bool
-        ) -> ( Vec<$float_type> , Vec<$float_type> )
+        ) -> ( Vec<$eval_type> , Vec<$eval_type> )
         {
             assert_eq!(
                 domain_zero.len(), self.n_domain,
@@ -79,7 +79,7 @@ macro_rules! forward_zero {
             );
             //
             let op_info_vec = &*OP_INFO_VEC;
-            let nan          = $float_type::from( Float::NAN );
+            let nan          = $eval_type::from( Float::NAN );
             let mut var_zero = vec![ nan; self.n_var ];
             for j in 0 .. self.n_domain {
                 var_zero[j] = domain_zero[j];
@@ -129,14 +129,14 @@ macro_rules! forward_zero {
                 }
                 println!( "End Trace: forward_zero" );
             }
-            let mut range_zero : Vec<$float_type> = Vec::new();
+            let mut range_zero : Vec<$eval_type> = Vec::new();
             for i in 0 .. self.range_is_var.len() {
                 let index = self.range2tape_index[i] as usize;
                 if self.range_is_var[i] {
                     range_zero.push( var_zero[index] );
                 } else {
                     let constant = self.con_all[index];
-                    range_zero.push( $float_type::from(constant) );
+                    range_zero.push( $eval_type::from(constant) );
                 }
             }
             ( range_zero, var_zero )
@@ -190,19 +190,19 @@ macro_rules! forward_one {
     (Float) => { forward_one!(forward, Float); };
     (AD)    => { forward_one!(ad_forward, AD); };
     //
-    ( $prefix:ident, $float_type:ident ) => { paste::paste! {
+    ( $prefix:ident, $eval_type:ident ) => { paste::paste! {
 
         #[doc = concat!(
             " ADFun firsat order forward using ",
-            stringify!($float_type),
+            stringify!($eval_type),
             " computations; see [ doc_forward_one ]",
         )]
         pub fn [< $prefix _one >] (
             &self,
-            domain_one : &[$float_type],
-            var_zero   : &Vec<$float_type>,
+            domain_one : &[$eval_type],
+            var_zero   : &Vec<$eval_type>,
             trace      : bool
-        ) -> Vec<$float_type>
+        ) -> Vec<$eval_type>
         {
             assert_eq!(
                 domain_one.len(), self.n_domain,
@@ -214,7 +214,7 @@ macro_rules! forward_one {
              );
             //
             let op_info_vec = &*OP_INFO_VEC;
-            let nan          = $float_type::from( Float::NAN );
+            let nan          = $eval_type::from( Float::NAN );
             let mut var_one = vec![ nan; self.n_var ];
             for j in 0 .. self.n_domain {
                 var_one[j] = domain_one[j];
@@ -263,7 +263,7 @@ macro_rules! forward_one {
                 }
                 println!( "End Trace: forward_one" );
             }
-            let mut range_one : Vec<$float_type> = Vec::new();
+            let mut range_one : Vec<$eval_type> = Vec::new();
             for i in 0 .. self.range_is_var.len() {
                 let index = self.range2tape_index[i] as usize;
                 range_one.push( var_one[index] );
@@ -317,19 +317,19 @@ macro_rules! reverse_one {
     (Float) => { reverse_one!(reverse, Float); };
     (AD)    => { reverse_one!(ad_reverse, AD); };
     //
-    ( $prefix:ident, $float_type:ident ) => { paste::paste! {
+    ( $prefix:ident, $eval_type:ident ) => { paste::paste! {
 
         #[doc = concat!(
             " First order reverse using ",
-            stringify!($float_type),
+            stringify!($eval_type),
             " computations; see [ doc_reverse_one ]",
         )]
         pub fn [< $prefix _one >] (
             &self,
-            range_one  : &[$float_type],
-            var_zero   : &Vec<$float_type>,
+            range_one  : &[$eval_type],
+            var_zero   : &Vec<$eval_type>,
             trace      : bool
-        ) -> Vec<$float_type>
+        ) -> Vec<$eval_type>
         {
             assert_eq!(
                 range_one.len(), self.range_is_var.len(),
@@ -341,7 +341,7 @@ macro_rules! reverse_one {
              );
             //
             let op_info_vec = &*OP_INFO_VEC;
-            let zero        = $float_type::from( Float::from(0.0) );
+            let zero        = $eval_type::from( Float::from(0.0) );
             let mut partial = vec![zero; self.n_var ];
             for j in 0 .. self.range_is_var.len() {
                 let index       = self.range2tape_index[j] as usize;
@@ -391,7 +391,7 @@ macro_rules! reverse_one {
                 }
                 println!( "End Trace: reverse_one" );
             }
-            let mut domain_one : Vec<$float_type> = Vec::new();
+            let mut domain_one : Vec<$eval_type> = Vec::new();
             for j in 0 .. self.n_domain {
                 domain_one.push( partial[j] );
             }
