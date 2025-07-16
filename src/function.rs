@@ -18,43 +18,44 @@ use crate::operator;
 //
 // -----------------------------------------------------------------------
 // forward_zero
-/// Zero order forward mode evaluation: [source module](crate::function)
+/// Zero order forward mode evaluation; i.e., function values.
 ///
-/// # Documentation for the functions created by forward_zero!
-///
-/// ## Syntax
-/// <pre>
+/// * Syntax :
+/// ```text
 ///     (range_zero, var_zero) = f.forward_zero(domain_zero, trace)
 ///     (range_zero, var_zero) = f.ad_forward_zero(domain_zero, trace)
-/// </pre>
+/// ```
 /// See [Float][ADFun::forward_zero] and
 /// [AD](ADFun::ad_forward_zero) prototypes.
 ///
-/// ## f
-/// is is this ADFun object.
+/// * f :
+/// is is this [ADFun] object.
 ///
-/// ## domain_zero
+/// * domain_zero :
 /// specifies the domain space variable values.
 ///
-/// ## trace
+/// * trace :
 /// if true, a trace of the operatiopn sequence is printed on stdout.
 ///
-/// ## range_zero
+/// * range_zero :
 /// The first return value is the range vector corresponding to domain_zero;
 /// i.e., the function value correspdong the operation sequence.
 ///
-/// ## var_zero
+/// * var_zero :
 /// The second return value is the value for all the variables
-/// in the operation sequence. This is needed to compute derivatives.
+/// in the operation sequence.
+/// This is used as an input when computing derivatives.
 ///
-/// # Documentation for forward_zero!
-/// This macro is not intended to be used outside the rustad crate.
-/// It only has the following use cases:
-/// <pre>
+pub fn doc_forward_zero() { }
+//
+/// Create the forward_zero member functions.
+///
+/// This macro only has the following two use cases:
+/// ```text
 ///     forward_zero!(Float);
 ///     forward_zero!(AD);
-/// </pre>
-#[macro_export]
+/// ```
+/// See [ doc_forward_zero ]
 macro_rules! forward_zero {
     (Float) => { forward_zero!(forward, Float); };
     (AD)    => { forward_zero!(ad_forward, AD); };
@@ -62,9 +63,9 @@ macro_rules! forward_zero {
     ( $prefix:ident, $float_type:ident ) => { paste::paste! {
 
         #[doc = concat!(
-            " Zero order forward using ",
+            " ADFun zero order forward using ",
             stringify!($float_type),
-            " see [ forward_zero! ] for documentation",
+            " computations; see [ doc_forward_zero ]",
         )]
         pub fn [< $prefix _zero >] (
             &self,
@@ -142,48 +143,49 @@ macro_rules! forward_zero {
         }
     } }
 }
+pub(crate) use forward_zero;
 // -----------------------------------------------------------------------
 // forward_one
-/// First order forward mode evaluation; [source module](crate::function)
+//
+/// First order forward mode evaluation; i.e., directional derivatives.
 ///
-/// # Documentation for the functions created by forward_zero!
-///
-/// ## Syntax
-/// <pre>
+/// * Syntax :
+/// ```text
 ///     range_one = f.forward_one(domain_one, var_zero, trace)
 ///     range_one = f.ad_forward_one(domain_one, var_zero, trace)
-/// </pre>
+/// ```
 /// See [Float][ADFun::forward_one] and
 /// [AD](ADFun::ad_forward_one) prototypes.
 ///
-/// ## f
+/// * f :
 /// is is this [ADFun] object.
 ///
-/// # domain_one
-/// specifies the directional derivative for domain space variables.
+/// * domain_one :
+/// specifies the domain space direction along which the directional
+/// derivative is evaluated.
 ///
-/// ## var_zero
+/// * var_zero :
 /// is the value for all the variables in the operation sequence.
-/// This is returned at the end of a [forward_zero](ADFun::forward_zero)
+/// This was returned at the end of a [forward_zero](ADFun::forward_zero)
 /// computation.
 ///
-/// ## trace
+/// * trace :
 /// if true, a trace of the operatiopn sequence is printed on stdout.
 ///
-/// ## range_one
+/// * range_one :
 /// The return value is the range vector corresponding to
 /// domain_one and var_zero;
 /// i.e., the directional derivative for the fuctioon
 /// corresponding to the operation sequence.
 ///
-/// # Documentation for forward_one!
-/// This macro is not intended to be used outside the rustad crate.
-/// It only has the following use cases:
-/// <pre>
+pub fn doc_forward_one() { }
+///
+/// This macro has the following use cases:
+/// ```text
 ///     forward_one!(Float);
 ///     forward_one!(AD);
-/// </pre>
-#[macro_export]
+/// ```
+/// See [ doc_forward_one ]
 macro_rules! forward_one {
     (Float) => { forward_one!(forward, Float); };
     (AD)    => { forward_one!(ad_forward, AD); };
@@ -191,9 +193,9 @@ macro_rules! forward_one {
     ( $prefix:ident, $float_type:ident ) => { paste::paste! {
 
         #[doc = concat!(
-            " First order forward using ",
+            " ADFun firsat order forward using ",
             stringify!($float_type),
-            " see [ forward_one! ] for documentation",
+            " computations; see [ doc_forward_one ]",
         )]
         pub fn [< $prefix _one >] (
             &self,
@@ -270,47 +272,47 @@ macro_rules! forward_one {
         }
     } }
 }
+pub(crate) use forward_one;
 // -------------------------------------------------------------------
 // reverse_one
-/// First order reverse mode evaluation: [source module](crate::function)
+//
+/// First order reverse mode evaluation;
+/// i.e., gradient of weighted range vector.
 ///
-/// # Documentation for the functions created by reverse_one!
-///
-/// ## Syntax
-/// <pre>
+/// * Syntax :
+/// ```text
 ///     domain_one = f.reverse_one(range_one, var_zero, trace)
 ///     domain_one = f.reverse_one(range_one, var_zero, trace)
-/// </pre>
+/// ```
 /// See [Float][ADFun::reverse_one] and
 /// [AD](ADFun::ad_reverse_one) prototypes.
 ///
-/// ## f
+/// * f :
 /// is is this ADFun object.
 ///
-/// ## ramge_one
-/// specifies the partials of as scalar function of range variables.
+/// * ramge_one :
+/// specifies the partials of the range weighted function; i.e. gradient.
 ///
-/// ## var_zero
+/// * var_zero :
 /// is the value for all the variables in the operation sequence.
 /// This is returned at the end of a [forward_zero](ADFun::forward_zero)
 /// computation.
 ///
-/// ## trace
+/// * trace :
 /// if true, a trace of the operatiopn sequence is printed on stdout.
 ///
-/// ## domain_one
-/// The return value is the partials of the scalar function
+/// * domain_one :
+/// The return value is the gradiemt of the range weighted function
 /// with respect to the domain variables.
-/// in the operation sequence. This is needed to compute derivatives.
 ///
-/// # Documentation for reverse_one!
-/// This macro is not intended to be used outside the rustad crate.
-/// It only has the following use cases:
-/// <pre>
+pub fn doc_reverse_one() { }
+///
+/// This macro has the following use cases:
+/// ```text
 ///     reverse_one!(Float);
 ///     reverse_one!(AD);
-/// </pre>
-#[macro_export]
+/// ```
+/// See [ doc_reverse_one ]
 macro_rules! reverse_one {
     (Float) => { reverse_one!(reverse, Float); };
     (AD)    => { reverse_one!(ad_reverse, AD); };
@@ -320,7 +322,7 @@ macro_rules! reverse_one {
         #[doc = concat!(
             " First order reverse using ",
             stringify!($float_type),
-            " see [ reverse_one! ] for documentation",
+            " computations; see [ doc_reverse_one ]",
         )]
         pub fn [< $prefix _one >] (
             &self,
@@ -397,17 +399,18 @@ macro_rules! reverse_one {
         }
     } }
 }
+pub (crate) use reverse_one;
 // -----------------------------------------------------------------------
-//
 // ADFun
-/// This object can evaluate an operation sequence amd its derivatives.
+//
+/// This can evaluate an operation sequence function and its derivatives.
 ///
-/// # Operation sequence
+/// * Operation sequence :
 /// An operation sequence is a single assignment representation of
-/// the function; i.e., a variable is only assigned once.
+/// the function; i.e., each variable is only assigned once.
 ///
-/// # Constructor
-/// An [ad_domain] call is used to start a recording an operation sequence.
+/// * Constructor :
+/// An [ad_domain] call is used to start recording an operation sequence.
 /// An [ad_fun] call is used to stop recording move the operation sequence
 /// to an new ADFun object.
 pub struct ADFun {
@@ -513,18 +516,19 @@ impl ADFun {
     // dependency
     /// Computes the dependency pattern for the function in this ADFun.
     ///
-    /// <pre>
+    /// * Syntax :
+    /// ```text
     ///     pattern = dependency(trace)
-    /// </pre>
+    /// ```
     ///
-    /// # trace
+    /// * trace :
     /// If trace is true, a trace of the dependency calculation
     /// is printed on standard output.
     /// Note that in the trace, the cases where *var_index* is less
     /// that the number of domain variables will end up in the pattern
     /// with the corresponding row.
     ///
-    /// # pattermn
+    /// * pattern :
     /// The the return value *pattern* is vector of (row, column) pairs.
     /// Each row (column) is non-negative and
     /// less than the range (domain) dimension for the function.
@@ -639,24 +643,26 @@ impl ADFun {
         }
         result
     }
-    // -----------------------------------------------------------------------
 }
-//
+// ----------------------------------------------------------------------------
 // ad_domain
-/// Calling `ad_domain` starts a new recording ([ad_fun] stops the recording).
+//
+/// This starts recording a new operation sequence.
 ///
-/// # Recording
-/// There must not currently be a recording in process on the current thread.
+/// * Recording :
+/// There must not currently be a recording in process on the current thread
+/// when ad_domain is called. The recording is stopped when [ad_fun] is called.
 ///
-/// # domain
+/// * domain :
 /// This vector determines the number of domain (independent) variables
 /// and their value during the recording.
 ///
-/// # ad_domain
+/// * ad_domain :
 /// The return is a vector of variables
 /// with the same length and values as domain.
 /// Dependencies with respect to these variables will be recorded on
 /// the tape for this thread.
+///
 pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
     //
     // new_tape_id
@@ -693,22 +699,24 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
     }
     result
 }
-//
+// ----------------------------------------------------------------------------
 // ad_fun
-/// Calling `ad_fun` stops a recordng and moves it to an ADFun object
-/// ([ad_domain] starts a recording).
+//
+/// Stops a recordng and moves it to an ADFun object.
 ///
-/// # Recording
-/// There must currently be a recording in process on the current thread.
+/// * Recording :
+/// There must currently be a recording in process on the current thread
+/// ( started by [ad_domain] ).
 ///
-/// # ad_range
+/// * ad_range :
 /// This is an AD vector of range space variables.
 ///
-/// # ad_fun
+/// * ad_fun :
 /// The return value is an ADFun containing the sequence of operations
 /// that computed ad_range as a function of [ad_domain].
 /// It can compute the range space variables and derivarives
 /// as a function of the domain space variables.
+///
 pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
     let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
