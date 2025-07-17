@@ -428,3 +428,15 @@ fn test_op_info() {
     assert_eq!( "mul_vc",   op_info_vec[id::MUL_VC_OP as usize].name );
     assert_eq!( "mul_vv",   op_info_vec[id::MUL_VV_OP as usize].name );
 }
+//
+pub(crate) trait GetForwardZero<T> {
+    fn get(self : &Self) -> T;
+}
+impl GetForwardZero< FloatForwardZero > for OpInfo {
+    fn get(self : &Self) -> FloatForwardZero
+    {   self.forward_0 }
+}
+impl GetForwardZero< ADForwardZero > for OpInfo {
+    fn get(self : &Self) -> ADForwardZero
+    {   self.ad_forward_0 }
+}
