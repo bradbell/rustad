@@ -47,9 +47,9 @@ use crate::AD;
 use crate::operator;
 #[cfg(doc)]
 use crate::operator::{
-    ForwardZero,
-    ForwardOne,
-    ReverseOne,
+    FloatForwardZero,
+    FloatForwardOne,
+    FloatReverseOne,
     ADForwardZero,
     ADForwardOne,
     ADReverseOne,
@@ -164,13 +164,13 @@ fn call_arg_var_index(
 // ---------------------------------------------------------------------------
 //
 // no_op_zero
-/// [ForwardZero] function
+/// [FloatForwardZero] function
 fn no_op_zero( _var_zero: &mut Vec<Float>,
     _con_all: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: usize)
 { }
 //
 // no_op_one
-/// [ForwardOne] or [ReverseOne] function
+/// [FloatForwardOne] or [FloatReverseOne] function
 fn no_op_one( _var_one: &mut Vec<Float>, _var_zero : &Vec<Float>,
     _con_all: &Vec<Float>, _arg: &[Index], _res: usize)
 { }
