@@ -23,6 +23,7 @@ use crate::ad::GAD;
 use crate::ad_tape::{GTape, ThisThreadTape, this_thread_tape};
 use crate::gas::GenericAs;
 use crate::operator::OpInfo;
+use crate::operator::binary_op_forward_0;
 use crate::operator::id::{ADD_CV_OP, ADD_VC_OP, ADD_VV_OP};
 // END_SORT_THIS_LINE_MINUS_1
 //
