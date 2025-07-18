@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
-//! Define traits that are used by public functions.
+//! Define traits that are used by the public rustad API.
 //! : [parent module](super)
 //
 use crate::{Float, Index, AD};
@@ -16,7 +16,7 @@ use crate::operator::{OpInfo, ForwardZero};
 ///
 /// # Example
 /// ```
-/// use rustad::gas::GenericAs;
+/// use rustad::ptrait::GenericAs;
 /// fn use_gas<T> (f : usize) -> T where usize : GenericAs<T> {
 ///     GenericAs::gas(f)
 /// }

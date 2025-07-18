@@ -9,7 +9,7 @@
 use std::cell::RefCell;
 use std::thread::LocalKey;
 //
-use crate::gas::{GetForwardZero, GenericAs};
+use crate::ptrait::{GetForwardZero, GenericAs};
 use crate::{Index, Float, AD};
 use crate::operator::{
     OpInfo,
