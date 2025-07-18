@@ -34,11 +34,10 @@ use crate::operator::{ForwardZeroBinary, ForwardOneBinary};
 #[cfg(doc)]
 use crate::ad::doc_binary_ad_operator;
 //
-// float_forward_0_add_cv, ad_forward_0_add_cv
-// float_forward_0_add_vc, ad_forward_0_add_vc
-// float_forward_0_add_vv, ad_forward_0_add_vv
-binary_op_forward_0!(Float, add, +);
-binary_op_forward_0!(AD, add, +);
+// forward_0_add_cv<F, U, E>
+// forward_0_add_vc<F, U, E>
+// forward_0_add_vv<F, U, E>
+binary_op_forward_0!(Add, +);
 // ---------------------------------------------------------------------------
 //
 // float_forward_1_add_cv, ad_forward_1_add_cv
@@ -166,30 +165,30 @@ reverse_1_add!(AD);
 pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
     op_info_vec[ADD_CV_OP as usize] = OpInfo{
         name           : "add_cv".to_string() ,
-        forward_0      : float_forward_0_add_cv,
+        forward_0      : forward_0_add_cv,
         forward_1      : float_forward_1_add_cv,
         reverse_1      : float_reverse_1_add_cv,
-        ad_forward_0   : ad_forward_0_add_cv,
+        ad_forward_0   : forward_0_add_cv,
         ad_forward_1   : ad_forward_1_add_cv,
         ad_reverse_1   : ad_reverse_1_add_cv,
         arg_var_index  : super::arg_var_index_binary_cv,
      };
     op_info_vec[ADD_VC_OP as usize] = OpInfo{
         name           : "add_vc".to_string(),
-        forward_0      : float_forward_0_add_vc,
+        forward_0      : forward_0_add_vc,
         forward_1      : float_forward_1_add_vc,
         reverse_1      : float_reverse_1_add_vc,
-        ad_forward_0   : ad_forward_0_add_vc,
+        ad_forward_0   : forward_0_add_vc,
         ad_forward_1   : ad_forward_1_add_vc,
         ad_reverse_1   : ad_reverse_1_add_vc,
         arg_var_index  : super::arg_var_index_binary_vc,
     };
     op_info_vec[ADD_VV_OP as usize] = OpInfo{
         name           : "add_vv".to_string(),
-        forward_0      : float_forward_0_add_vv,
+        forward_0      : forward_0_add_vv,
         forward_1      : float_forward_1_add_vv,
         reverse_1      : float_reverse_1_add_vv,
-        ad_forward_0   : ad_forward_0_add_vv,
+        ad_forward_0   : forward_0_add_vv,
         ad_forward_1   : ad_forward_1_add_vv,
         ad_reverse_1   : ad_reverse_1_add_vv,
         arg_var_index  : super::arg_var_index_binary_vv,

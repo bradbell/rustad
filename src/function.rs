@@ -13,8 +13,7 @@ use crate::{Index, Float, AD};
 use crate::operator::{
     OP_INFO_VEC,
     GetForwardZero,
-    FloatForwardZero,
-    ADForwardZero,
+    ForwardZero,
 };
 use crate::ad_tape::{NEXT_TAPE_ID, GTape, this_thread_tape};
 //
@@ -111,7 +110,7 @@ macro_rules! forward_zero {
                 let end       = self.op2arg[op_index + 1] as usize;
                 let arg       = &self.arg_all[start .. end];
                 let res       = self.n_domain + op_index;
-                let forward_0 : [< $EvalType ForwardZero >] =
+                let forward_0 : ForwardZero<Float, Index, $EvalType>  =
                     GetForwardZero::get( &op_info_vec[op_id] );
                 forward_0(&mut var_zero,
                     &self.con_all, &self.flag_all, &arg, res

@@ -30,69 +30,81 @@ pub mod call;
 // ---------------------------------------------------------------------------
 /// Implement zero order forward for binary operators.
 ///
-/// * Syntax
-/// ```text
-///     binary_op_forward_0($Float_type, $op_name, $op_symbol)
-/// ```
-/// * Float_type : is `Float` or `AD` ,
-/// * op_name:  is add , sub , mul , or div  ,
-/// * $op_symbol : is the operator; e.g. + for add.
+/// * F      : is the value type for this operation sequence.
+/// * U      : is the index type for this operation sequence.
+/// * E      : is the evaluation type, either F or GAD<F,U>.
+/// * Trait  :  is Add , Sub , Mul , or Div  ,
+/// * op     : is the operator; e.g. + for add.
 ///
 /// This defines the following functions:
 /// ```text
-///     {float_type}_forward_0_{op_name}_cv
-///     {float_type}_forward_0_{op_name}_vc
-///     {float_type}_forward_0_{op_name}_vv
+///     forward_0_{op_name}_cv<F, U, E>
+///     forward_0_{op_name}_vc<F, U, E>
+///     forward_0_{op_name}_vv<F, U, E>
 /// ```
-/// where float_type is the lower case version of Float_type, and
+/// where {op_name} is a lower case version of Trait and
 /// v (c) means the corresponding operand is a variable (constant) .
 macro_rules! binary_op_forward_0 {
-    ($Float_type:ident, $op_name:ident, $op_symbol:tt) => { paste::paste! {
+    ($Trait:ident, $op:tt) => { paste::paste! {
 
         #[doc = concat!(
-            " ", stringify!( $Float_type ), " zero order forward constant ",
-            stringify!( $op_symbol ), " variable"
+            " E zero order forward constant ",
+            stringify!( $op ), " variable where E = F or GAD<F,U>"
         ) ]
-        fn [< $Float_type:lower  _forward_0_ $op_name  _cv >] (
-            var_zero: &mut Vec<$Float_type>,
-            con:           &Vec<Float>,
+        fn [< forward_0_ $Trait:lower  _cv >]<F, U, E> (
+            var_zero: &mut Vec<E>,
+            con:           &Vec<F>,
             _flag_all:     &Vec<bool>,
-            arg:           &[Index],
+            arg:           &[U],
             res:           usize)
+        where
+            F : Copy + std::ops::$Trait<E, Output = E> ,
+            U : Copy + GenericAs<usize> ,
+            E : Copy ,
         {
             assert_eq!( arg.len(), 2);
-            var_zero[ res ] =
-                con[arg[0] as usize] $op_symbol var_zero[arg[1] as usize];
+            let lhs : usize = GenericAs::gas( arg[0] );
+            let rhs : usize = GenericAs::gas( arg[1] );
+            var_zero[ res ] = con[lhs] $op var_zero[rhs];
         }
         #[doc = concat!(
-            " ", stringify!( $Float_type ), " zero order forward variable ",
-            stringify!( $op_symbol ), " constant"
+            " E zero order forward variable ",
+            stringify!( $op ), " constant whee E = F or GAD<F,U>"
         ) ]
-        fn [< $Float_type:lower  _forward_0_ $op_name  _vc >] (
-            var_zero: &mut Vec<$Float_type>,
-            con:           &Vec<Float>,
+        fn [< forward_0_ $Trait:lower  _vc >]<F, U, E> (
+            var_zero: &mut Vec<E>,
+            con:           &Vec<F>,
             _flag_all:     &Vec<bool>,
-            arg:           &[Index],
+            arg:           &[U],
             res:           usize)
+        where
+            F : Copy ,
+            U : Copy + GenericAs<usize> ,
+            E : Copy + std::ops::$Trait<F, Output = E> ,
         {
             assert_eq!( arg.len(), 2);
-            var_zero[ res ] =
-                var_zero[arg[0] as usize] $op_symbol con[arg[1] as usize];
+            let lhs : usize = GenericAs::gas( arg[0] );
+            let rhs : usize = GenericAs::gas( arg[1] );
+            var_zero[ res ] = var_zero[lhs] $op con[rhs];
         }
         #[doc = concat!(
-            " ", stringify!( $Float_type ), " zero order forward variable ",
-            stringify!( $op_symbol ), " variable"
+            " E zero order forward variable ",
+            stringify!( $op ), " variable where E = F or GAD<F,U>"
         ) ]
-        fn [< $Float_type:lower  _forward_0_ $op_name  _vv >] (
-            var_zero: &mut Vec<$Float_type>,
-            _con:          &Vec<Float>,
+        fn [< forward_0_ $Trait:lower  _vv >]<F, U, E> (
+            var_zero: &mut Vec<E>,
+            _con:          &Vec<F>,
             _flag_all:     &Vec<bool>,
-            arg:           &[Index],
+            arg:           &[U],
             res:           usize)
+        where
+            U : Copy + GenericAs<usize> ,
+            E : Copy + std::ops::$Trait<E, Output = E> ,
         {
             assert_eq!( arg.len(), 2);
-            var_zero[ res ] =
-                var_zero[arg[0] as usize] $op_symbol var_zero[arg[1] as usize];
+            let lhs : usize = GenericAs::gas( arg[0] );
+            let rhs : usize = GenericAs::gas( arg[1] );
+            var_zero[ res ] = var_zero[lhs] $op var_zero[rhs];
         }
     } };
 }
@@ -128,23 +140,13 @@ pub fn doc_common_arguments() {}
 /// for the results of this operator.
 ///
 /// * Other Arguments :  see [doc_common_arguments]
-#[cfg(doc)]
-pub fn doc_forward_zero_fn() {}
-macro_rules! forward_zero_fn{ ($EvalType:ident) => { paste::paste! {
-    #[doc = concat!(
-        " ", stringify!($EvalType), " Evaluation of zero order forward mode",
-        "; see [doc_forward_zero_fn]"
-    ) ]
-    pub type [< $EvalType ForwardZero >] = fn(
-        _var_zero : &mut Vec<$EvalType> ,
-        _con_all  : &Vec<Float>         ,
-        _flag_all : &Vec<bool>          ,
-        _arg      : &[Index]            ,
-        _res      : usize               ,
-    );
-} } }
-forward_zero_fn!(Float);
-forward_zero_fn!(AD);
+pub type ForwardZero<F, U, E> = fn(
+    _var_zero : &mut Vec<E> ,
+    _con_all  : &Vec<F>     ,
+    _flag_all : &Vec<bool>  ,
+    _arg      : &[U]        ,
+    _res      : usize       ,
+);
 //
 // forward_one_fn
 /// Evaluation of first order forward mode; see [doc_common_arguments]
@@ -217,7 +219,7 @@ pub type ArgVarIndex = fn(
 );
 //
 // ForwardZeroBinary
-/// This is a [FloatForwardZero] with the following extra conditions:
+/// This is a [ForwardZero] with E = F and the following extra conditions:
 ///
 /// * op :
 /// we use the notation *op* for this operator's symbol; e.g. + for addition.
@@ -287,7 +289,7 @@ pub type ReverseOneBinary = fn(_var_one: &mut Vec<Float>,
 // Default evaluations
 //
 // panic_zero
-/// default [FloatForwardZero] function, will panic
+/// default [ForwardZero] with E = F, will panic
 fn panic_zero( _var_zero: &mut Vec<Float>,
     _con_all: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: usize)
 {
@@ -303,7 +305,7 @@ fn panic_one( _var_one: &mut Vec<Float>, _var_zero : &Vec<Float>,
 }
 //
 // ad_panic_zero
-/// default [ADForwardZero] function, will panic
+/// default [ForwardZero] with E = AD, will panic
 fn ad_panic_zero( _var_zero: &mut Vec<AD>,
     _con_all: &Vec<Float>, _flag_all : &Vec<bool>, _arg: &[Index], _res: usize) {
     panic!();
@@ -364,7 +366,7 @@ pub struct OpInfo {
     pub name           : String,
     //
     /// evaluates this operator during [ADFun::forward_zero]
-    pub forward_0      : FloatForwardZero,
+    pub forward_0      : ForwardZero<Float, Index, Float>,
     //
     /// evaluates this operator during [ADFun::forward_one]
     pub forward_1      : FloatForwardOne,
@@ -373,7 +375,7 @@ pub struct OpInfo {
     pub reverse_1      : FloatReverseOne,
     //
     /// evaluates this operator during [ADFun::ad_forward_zero]
-    pub ad_forward_0   : ADForwardZero,
+    pub ad_forward_0   : ForwardZero<Float, Index, AD>,
     //
     /// evaluates this operator during [ADFun::ad_forward_one]
     pub ad_forward_1   : ADForwardOne,
@@ -432,11 +434,11 @@ fn test_op_info() {
 pub(crate) trait GetForwardZero<T> {
     fn get(self : &Self) -> T;
 }
-impl GetForwardZero< FloatForwardZero > for OpInfo {
-    fn get(self : &Self) -> FloatForwardZero
+impl GetForwardZero< ForwardZero<Float, Index, Float> > for OpInfo {
+    fn get(self : &Self) -> ForwardZero<Float, Index, Float>
     {   self.forward_0 }
 }
-impl GetForwardZero< ADForwardZero > for OpInfo {
-    fn get(self : &Self) -> ADForwardZero
+impl GetForwardZero< ForwardZero<Float, Index, AD> > for OpInfo {
+    fn get(self : &Self) -> ForwardZero<Float, Index, AD>
     {   self.ad_forward_0 }
 }
