@@ -526,8 +526,10 @@ impl ADFun {
     //
     // ad_reverse_one
     reverse_one!(AD);
-    //
-    // -----------------------------------------------------------------------
+}
+// ---------------------------------------------------------------------------
+// ADFun::dependency
+impl ADFun {
     // dependency
     /// Computes the dependency pattern for the function in this ADFun.
     ///
