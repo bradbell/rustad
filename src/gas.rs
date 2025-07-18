@@ -10,9 +10,9 @@ use crate::operator::{OpInfo, ForwardZero};
 // ---------------------------------------------------------------------------
 /// Generic as function for converting types like `as` would.
 ///
-/// So far implemented for the following types:
-/// * usize <-> u32
-/// * usize <-> u64
+/// * usize :
+/// conversion to and from usize is implement for the following types:
+/// u8, u16, u32, u64
 ///
 /// # Example
 /// ```
@@ -42,11 +42,15 @@ macro_rules! generic_as{ ($F:ident, $T:ident) => {
     }
 } }
 //
-generic_as!(usize, u32);
-generic_as!(u32, usize);
-//
 generic_as!(usize, u64);
+generic_as!(usize, u32);
+generic_as!(usize, u16);
+generic_as!(usize, u8);
+//
 generic_as!(u64, usize);
+generic_as!(u32, usize);
+generic_as!(u16, usize);
+generic_as!(u8, usize);
 //
 // ----------------------------------------------------------------------------
 pub trait GetForwardZero<T> {

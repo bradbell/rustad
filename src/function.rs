@@ -9,7 +9,7 @@
 use std::cell::RefCell;
 use std::thread::LocalKey;
 //
-use crate::gas::GetForwardZero;
+use crate::gas::{GetForwardZero, GenericAs};
 use crate::{Index, Float, AD};
 use crate::operator::{
     OpInfo,
@@ -289,6 +289,14 @@ pub (crate) use reverse_one;
 /// An [ad_domain] call is used to start recording an operation sequence.
 /// An [ad_fun] call is used to stop recording move the operation sequence
 /// to an new ADFun object.
+///
+/// * F :
+/// is the floating point type used for value calculations when this
+/// operation sequence was recorded.
+///
+/// * U :
+/// is the unsigned integer type used for indices in the recording.
+///
 pub struct GADFun<F,U> {
     //
     // n_domain
@@ -393,19 +401,20 @@ impl ADFun {
     reverse_one!(AD);
 }
 // ----------------------------------------------------------------------------
-// ADFun::forward_zero
-impl ADFun {
+// GADFun::forward_zero
+impl<F,U> GADFun<F,U> {
     /// Zero order forward mode evaluation; i.e., function values.
     ///
     /// * Syntax :
     /// ```text
     ///     (range_zero, var_zero) = f.forward_zero(domain_zero, trace)
     /// ```
+    ///
     /// * f :
-    /// is is this [ADFun] object.
+    /// is is this [ADFun<F,U>](ADFun) object.
     ///
     /// * E :
-    /// is either Float or AD and is the type used to evaluate the function.
+    /// is either F or GAD<F,U> and is the type used to evaluate the function.
     ///
     /// * domain_zero :
     /// specifies the domain space variable values.
@@ -427,8 +436,10 @@ impl ADFun {
         trace       : bool
     ) -> ( Vec<E> , Vec<E> )
     where
-        E      : Copy + From<Float> + std::fmt::Display ,
-        OpInfo : GetForwardZero< ForwardZero<Float, Index, E> > ,
+        F      : Copy + From<F> + std::fmt::Display + From<f32>,
+        E      : Copy + From<F> + std::fmt::Display ,
+        U      : Copy + std::fmt::Debug + std::fmt::Display + GenericAs<usize> ,
+        OpInfo : GetForwardZero< ForwardZero<F, U, E> > ,
     {
         assert_eq!(
             domain_zero.len(), self.n_domain,
@@ -436,7 +447,7 @@ impl ADFun {
         );
         //
         let op_info_vec = &*OP_INFO_VEC;
-        let nan          = E::from( Float::NAN );
+        let nan          = E::from( F::from(f32::NAN ) );
         let mut var_zero = vec![ nan; self.n_var ];
         for j in 0 .. self.n_domain {
             var_zero[j] = domain_zero[j];
@@ -458,12 +469,12 @@ impl ADFun {
             println!( "var_index, var, op, arg" );
         }
         for op_index in 0 .. self.id_all.len() {
-            let op_id     = self.id_all[op_index] as usize;
-            let start     = self.op2arg[op_index] as usize;
-            let end       = self.op2arg[op_index + 1] as usize;
-            let arg       = &self.arg_all[start .. end];
-            let res       = self.n_domain + op_index;
-            let forward_0 : ForwardZero<Float, Index, E>  =
+            let op_id : usize  = GenericAs::gas( self.id_all[op_index] );
+            let start : usize  = GenericAs::gas( self.op2arg[op_index] );
+            let end   : usize  = GenericAs::gas( self.op2arg[op_index + 1] );
+            let arg            = &self.arg_all[start .. end];
+            let res            = self.n_domain + op_index;
+            let forward_0 : ForwardZero<F, U, E>  =
                 GetForwardZero::get( &op_info_vec[op_id] );
             forward_0(&mut var_zero,
                 &self.con_all, &self.flag_all, &arg, res
@@ -478,7 +489,7 @@ impl ADFun {
         if trace {
             println!( "range_index, var_index, con_index" );
             for i in 0 .. self.range_is_var.len() {
-                let index = self.range2tape_index[i] as usize;
+                let index : usize = GenericAs::gas( self.range2tape_index[i] );
                 if self.range_is_var[i] {
                     println!( "{}, {}, ----", i, index);
                 } else {
@@ -489,7 +500,7 @@ impl ADFun {
         }
         let mut range_zero : Vec<E> = Vec::new();
         for i in 0 .. self.range_is_var.len() {
-            let index = self.range2tape_index[i] as usize;
+            let index : usize = GenericAs::gas( self.range2tape_index[i] );
             if self.range_is_var[i] {
                 range_zero.push( var_zero[index] );
             } else {
