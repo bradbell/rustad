@@ -2,10 +2,12 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
-//
-//! Define the GenericAs trait that acts like the `as` keyword
+//! Define traits that are used by public functions.
 //! : [parent module](super)
 //
+use crate::{Float, Index, AD};
+use crate::operator::{OpInfo, ForwardZero};
+// ---------------------------------------------------------------------------
 /// Generic as function for converting types like `as` would.
 ///
 /// So far implemented for the following types:
@@ -46,3 +48,15 @@ generic_as!(u32, usize);
 generic_as!(usize, u64);
 generic_as!(u64, usize);
 //
+// ----------------------------------------------------------------------------
+pub trait GetForwardZero<T> {
+    fn get(self : &Self) -> T;
+}
+impl GetForwardZero< ForwardZero<Float, Index, Float> > for OpInfo {
+    fn get(self : &Self) -> ForwardZero<Float, Index, Float>
+    {   self.forward_0 }
+}
+impl GetForwardZero< ForwardZero<Float, Index, AD> > for OpInfo {
+    fn get(self : &Self) -> ForwardZero<Float, Index, AD>
+    {   self.ad_forward_0 }
+}

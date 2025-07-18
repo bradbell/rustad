@@ -374,7 +374,7 @@ pub struct OpInfo {
     /// evaluates this operator during [ADFun::reverse_one]
     pub reverse_1      : FloatReverseOne,
     //
-    /// evaluates this operator during [ADFun::ad_forward_zero]
+    /// evaluates this operator during [ADFun::forward_zero]
     pub ad_forward_0   : ForwardZero<Float, Index, AD>,
     //
     /// evaluates this operator during [ADFun::ad_forward_one]
@@ -429,16 +429,4 @@ fn test_op_info() {
     assert_eq!( "mul_cv",   op_info_vec[id::MUL_CV_OP as usize].name );
     assert_eq!( "mul_vc",   op_info_vec[id::MUL_VC_OP as usize].name );
     assert_eq!( "mul_vv",   op_info_vec[id::MUL_VV_OP as usize].name );
-}
-//
-pub(crate) trait GetForwardZero<T> {
-    fn get(self : &Self) -> T;
-}
-impl GetForwardZero< ForwardZero<Float, Index, Float> > for OpInfo {
-    fn get(self : &Self) -> ForwardZero<Float, Index, Float>
-    {   self.forward_0 }
-}
-impl GetForwardZero< ForwardZero<Float, Index, AD> > for OpInfo {
-    fn get(self : &Self) -> ForwardZero<Float, Index, AD>
-    {   self.ad_forward_0 }
 }

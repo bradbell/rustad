@@ -83,7 +83,7 @@ fn test_ad_mul_vv() {
     //
     let trace   = false;
     //
-    let (ad_y, ad_v0) = f.ad_forward_zero(&ad_x, trace);
+    let (ad_y, ad_v0) = f.forward_zero(&ad_x, trace);
     let ad_dy         = f.ad_forward_one(&ad_dx, &ad_v0, trace);
     let ad_rx         = f.ad_reverse_one(&ad_ry, &ad_v0, trace);
     //
