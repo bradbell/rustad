@@ -112,11 +112,11 @@ macro_rules! forward_one {
                 println!( "var_index, var, op, arg" );
             }
             for op_index in 0 .. self.id_all.len() {
-                let op_id     = self.id_all[op_index] as usize;
-                let start     = self.op2arg[op_index] as usize;
-                let end       = self.op2arg[op_index + 1] as usize;
-                let arg       = &self.arg_all[start .. end];
-                let res       = self.n_domain + op_index;
+                let op_id : usize = GenericAs::gas( self.id_all[op_index] );
+                let start : usize = GenericAs::gas( self.op2arg[op_index] );
+                let end   : usize = GenericAs::gas( self.op2arg[op_index + 1] );
+                let arg           = &self.arg_all[start .. end];
+                let res           = self.n_domain + op_index;
                 let forward_1 = op_info_vec[op_id].[< $prefix _1 >];
                 forward_1(&mut var_one, var_zero, &self.con_all, &arg, res );
                 if trace {
@@ -130,7 +130,8 @@ macro_rules! forward_one {
             if trace {
                 println!( "range_index, var_index, con_index" );
                 for i in 0 .. self.range_is_var.len() {
-                    let index = self.range2tape_index[i] as usize;
+                    let index : usize =
+                        GenericAs::gas( self.range2tape_index[i] );
                     if self.range_is_var[i] {
                         println!( "{}, {}, ----", i, index);
                     } else {
@@ -141,7 +142,7 @@ macro_rules! forward_one {
             }
             let mut range_one : Vec<$EvalType> = Vec::new();
             for i in 0 .. self.range_is_var.len() {
-                let index = self.range2tape_index[i] as usize;
+                let index : usize = GenericAs::gas( self.range2tape_index[i] );
                 range_one.push( var_one[index] );
             }
             range_one
@@ -220,7 +221,7 @@ macro_rules! reverse_one {
             let zero        = $EvalType::from( Float::from(0.0) );
             let mut partial = vec![zero; self.n_var ];
             for j in 0 .. self.range_is_var.len() {
-                let index       = self.range2tape_index[j] as usize;
+                let index : usize = GenericAs::gas( self.range2tape_index[j] );
                 partial[index] += range_one[j];
             }
             if trace {
@@ -240,11 +241,11 @@ macro_rules! reverse_one {
                 println!( "var_index, var, op, arg" );
             }
             for op_index in ( 0 .. self.id_all.len() ).rev() {
-                let op_id     = self.id_all[op_index] as usize;
-                let start     = self.op2arg[op_index] as usize;
-                let end       = self.op2arg[op_index + 1] as usize;
-                let arg       = &self.arg_all[start .. end];
-                let res       = self.n_domain + op_index;
+                let op_id : usize = GenericAs::gas( self.id_all[op_index] );
+                let start : usize = GenericAs::gas( self.op2arg[op_index] );
+                let end   : usize = GenericAs::gas( self.op2arg[op_index + 1] );
+                let arg           = &self.arg_all[start .. end];
+                let res           = self.n_domain + op_index;
                 let reverse_1 = op_info_vec[op_id].[< $prefix _1 >];
                 reverse_1(&mut partial, var_zero, &self.con_all, &arg, res );
                 if trace {
@@ -258,7 +259,8 @@ macro_rules! reverse_one {
             if trace {
                 println!( "range_index, var_index, con_index" );
                 for i in 0 .. self.range_is_var.len() {
-                    let index = self.range2tape_index[i] as usize;
+                    let index : usize =
+                        GenericAs::gas( self.range2tape_index[i] );
                     if self.range_is_var[i] {
                         println!( "{}, {}, ----", i, index);
                     } else {
@@ -571,7 +573,8 @@ impl ADFun {
         let n_range           = range_is_var.len();
         //
         // done
-        let mut done : Vec<Index> = vec![n_var as Index; n_var];
+        let n_var_as_index : Index = GenericAs::gas(n_var);
+        let mut done : Vec<Index> = vec![n_var_as_index; n_var];
         //
         // result, arg_var_index, var_index_stack
         let mut result          : Vec<(Index, Index)> = Vec::new();
@@ -587,7 +590,7 @@ impl ADFun {
         for row in 0 .. n_range { if range_is_var[row] {
             //
             // var_index
-            let mut var_index = range2tape_index[row] as usize;
+            let mut var_index : usize = GenericAs::gas( range2tape_index[row] );
             if trace {
                 println!( "row {} var_index {}", row, var_index );
             }
@@ -595,14 +598,16 @@ impl ADFun {
             // var_index_stack
             // use resize instead of new stack to reduce memory allocation
             var_index_stack.resize(0, 0);
-            var_index_stack.push( var_index as Index );
+            var_index_stack.push( GenericAs::gas( var_index) );
             while var_index_stack.len() > 0 {
                 //
                 // var_index
-                var_index = var_index_stack.pop().unwrap() as usize;
+                let var_index_as_index = var_index_stack.pop().unwrap();
+                var_index = GenericAs::gas( var_index_as_index );
                 //
-                if done[var_index] as usize != row {
-                    done[var_index] = row as Index;
+                let row_as_index : Index = GenericAs::gas(row);
+                if done[var_index] != row_as_index {
+                    done[var_index] = row_as_index;
                     if trace {
                         println!( "    var_index = {}", var_index );
                     }
@@ -610,7 +615,7 @@ impl ADFun {
                         //
                         // result
                         // var_index is a domain variable index
-                        result.push( (row as Index, var_index as Index) );
+                        result.push( (row_as_index, var_index_as_index) );
                     } else {
                         //
                         // op_index
@@ -618,13 +623,14 @@ impl ADFun {
                         let op_index         = var_index - n_domain;
                         //
                         // arv_var_index_fn
-                        let op_id            = self.id_all[op_index] as usize;
+                        let op_id : usize =
+                            GenericAs::gas( self.id_all[op_index] );
                         let op_info          = &op_info_vec[op_id];
                         let arg_var_index_fn = op_info.arg_var_index;
                         //
                         // arg
-                        let begin = op2arg[op_index] as usize;
-                        let end   = op2arg[op_index + 1] as usize;
+                        let begin : usize = GenericAs::gas( op2arg[op_index] );
+                        let end : usize = GenericAs::gas(op2arg[op_index + 1]);
                         let arg   = &arg_all[begin .. end];
                         //
                         // arg_var_index
@@ -693,8 +699,8 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
     let mut result : Vec<AD> = Vec::new();
     for j in 0 .. domain.len() {
         result.push( AD {
-            tape_id   : new_tape_id as Index,
-            var_index : j as Index,
+            tape_id   : GenericAs::gas( new_tape_id ),
+            var_index : GenericAs::gas( j ),
             value     : domain[j],
         } );
     }
@@ -730,12 +736,12 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
         //
         assert_eq!( tape.n_var , tape.n_domain + tape.id_all.len() );
         assert_eq!( tape.op2arg.len() , tape.id_all.len() );
-        assert!( tape.arg_all.len() < Index::MAX as usize );
-        assert!( tape.tape_id < Index::MAX as usize );
+        assert!( tape.arg_all.len() < GenericAs::gas( Index::MAX ) );
+        assert!( tape.tape_id < GenericAs::gas( Index::MAX ) );
         //
         // tape.op2arg
         // end marker for arguments to the last operation
-        tape.op2arg.push( tape.arg_all.len() as Index);
+        tape.op2arg.push( GenericAs::gas( tape.arg_all.len() ) );
         //
         std::mem::swap( &mut result.n_domain,      &mut tape.n_domain );
         std::mem::swap( &mut result.n_var,         &mut tape.n_var );
@@ -749,12 +755,14 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
     //
     // range_is_var, range2tape_index
     for i in 0 .. ad_range.len() {
-        if ad_range[i].tape_id as usize == tape_id {
+        if GenericAs::gas( ad_range[i].tape_id ) == tape_id {
             result.range_is_var.push( true );
             result.range2tape_index.push( ad_range[i].var_index );
         } else {
             result.range_is_var.push( false );
-            result.range2tape_index.push( result.con_all.len() as Index );
+            result.range2tape_index.push(
+                GenericAs::gas( result.con_all.len()  )
+            );
             result.con_all.push( ad_range[i].value );
         }
     }
