@@ -724,6 +724,11 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
 /// It can compute the range space variables and derivarives
 /// as a function of the domain space variables.
 ///
+/// * Assumptions :
+/// The following assumptions are checked for the tape for this thread:
+///     1. tape.arg_all.len() <= U::Max
+///     2. tape.tape_id       <= U::Max
+///
 pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
     let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
@@ -734,10 +739,17 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
         assert!( tape.recording , "indepndent: tape is not recording");
         tape.recording = false;
         //
+        // check assumptions
         assert_eq!( tape.n_var , tape.n_domain + tape.id_all.len() );
         assert_eq!( tape.op2arg.len() , tape.id_all.len() );
-        assert!( tape.arg_all.len() < GenericAs::gas( Index::MAX ) );
-        assert!( tape.tape_id < GenericAs::gas( Index::MAX ) );
+        match Index::try_from( tape.arg_all.len() ) {
+            Err(_) => panic!( "tape.arg_all.len() > Index::MAX" ),
+            Ok(_)  => (),
+        }
+        match Index::try_from( tape.tape_id ) {
+            Err(_) => panic!( "tape.tape_id > Index::MAX" ),
+            Ok(_)  => (),
+        }
         //
         // tape.op2arg
         // end marker for arguments to the last operation
