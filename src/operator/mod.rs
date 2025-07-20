@@ -9,7 +9,7 @@
 use crate::AD;
 //
 #[cfg(doc)]
-use crate::ad_tape::{Tape};
+use crate::record::{Tape};
 //
 #[cfg(doc)]
 use crate::function::ADFun;

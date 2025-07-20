@@ -16,7 +16,7 @@ use crate::operator::{
     OP_INFO_VEC,
     ForwardZero,
 };
-use crate::ad_tape::{NEXT_TAPE_ID, GTape, this_thread_tape};
+use crate::record::{NEXT_TAPE_ID, GTape, this_thread_tape};
 //
 #[cfg(doc)]
 use crate::operator;

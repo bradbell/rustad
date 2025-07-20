@@ -49,7 +49,7 @@ use std::cell::RefCell;
 use crate::{Index, Float};
 use crate::function::ADFun;
 use crate::AD;
-use crate::ad_tape::{Tape, GTape, this_thread_tape};
+use crate::record::{Tape, GTape, this_thread_tape};
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 //
 // CheckpointInfo

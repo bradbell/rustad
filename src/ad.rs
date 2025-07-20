@@ -10,7 +10,7 @@
 use crate::function::{ADFun, ad_domain};
 //
 #[cfg(doc)]
-use crate::ad_tape::this_thread_tape;
+use crate::record::this_thread_tape;
 // ---------------------------------------------------------------------------
 // GAD
 //
