@@ -16,7 +16,7 @@ use crate::operator::{
     OP_INFO_VEC,
     ForwardZero,
 };
-use crate::record::{NEXT_TAPE_ID, GTape, this_thread_tape};
+use crate::record::{NEXT_TAPE_ID, GTape, ThisThreadTape};
 //
 #[cfg(doc)]
 use crate::operator;
@@ -681,7 +681,7 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
         *next_tape_id = new_tape_id + 1;
     }
     let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
-        this_thread_tape();
+        < Float as ThisThreadTape<Index> >::get();
     local_key.with_borrow_mut( |tape| {
         assert_ne!( new_tape_id, 0);
         assert!( ! tape.recording , "indepndent: tape is already recording");
@@ -732,7 +732,7 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
 pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
     let mut result = ADFun::new();
     let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
-        this_thread_tape();
+        < Float as ThisThreadTape<Index> >::get();
     let tape_id : usize = local_key.with_borrow_mut( |tape| {
         //
         // tape.recording

@@ -10,7 +10,7 @@
 use crate::function::{ADFun, ad_domain};
 //
 #[cfg(doc)]
-use crate::record::this_thread_tape;
+use crate::record::ThisThreadTape;
 // ---------------------------------------------------------------------------
 // GAD
 //
@@ -264,8 +264,8 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         //
         fn [< $Trait:lower >] (self, rhs : Self) -> Self {
             let new_value = self.value $op rhs.value;
-            let local_key :
-                &LocalKey< RefCell< GTape<F, U> > > = this_thread_tape();
+            let local_key : &LocalKey< RefCell< GTape<F, U> > > =
+                < F as ThisThreadTape<U> >::get();
             let ( new_tape_id, new_var_index) =
             local_key.with_borrow_mut(
                 |tape| [< record_ $Trait:lower >] (tape, &self, &rhs)
@@ -382,7 +382,7 @@ macro_rules! binary_ad_assign_op {
         {
             fn [< $Trait:snake >] (&mut self, rhs : GAD<F,U>) {
                 let local_key : &LocalKey< RefCell< GTape<F,U> > > =
-                        this_thread_tape();
+                    < F as ThisThreadTape<U> >::get();
                 local_key.with_borrow_mut(
                     |tape| [< record_ $Trait:snake >] (tape, self, &rhs)
                 );

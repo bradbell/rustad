@@ -104,13 +104,13 @@ impl<F, U> GTape<F, U> {
 /// (0 is not used for a recording).
 pub (crate) static NEXT_TAPE_ID : Mutex<usize> = Mutex::new(1);
 // ---------------------------------------------------------------------------
-// this_thread_tape
+// ThisThreadTape
 //
 pub (crate) trait ThisThreadTape<U : 'static>: Sized + 'static {
     fn get() -> &'static LocalKey< RefCell< GTape<Self, U> > >;
 }
 //
-/// Create the tape for this thread.
+/// Get reference to the tape for this thread.
 ///
 /// * f1 : is the floating point type used for values calculations.
 /// * u2 : is the unsigned integer type used for tape indices.
@@ -135,20 +135,3 @@ impl_this_thread_tape!(f32, u32);
 impl_this_thread_tape!(f32, u64);
 impl_this_thread_tape!(f64, u32);
 impl_this_thread_tape!(f64, u64);
-//
-/// Get reference to static that is this threads tape.
-///
-/// * F : is the floating point type used for value calculations.
-/// * U : is the unsigned integer type use for indices in the tape.
-///
-/// Syntax
-/// <pre>
-///     local_key = &LocalKey&lt; RefCell&lt; GTape&lt;F, U&gt; &gt; &gt; =
-///         this_thread_tape();
-///     local_key.with_borrow_mut( |tape| { ... } );
-/// </pre>
-///
-pub(crate) fn this_thread_tape<F : ThisThreadTape<U>, U : 'static>(
-) ->  &'static LocalKey< RefCell< GTape<F,U> > > {
-    < F as ThisThreadTape<U> >::get()
-}

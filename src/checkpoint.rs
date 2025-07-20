@@ -49,7 +49,7 @@ use std::cell::RefCell;
 use crate::{Index, Float};
 use crate::function::ADFun;
 use crate::AD;
-use crate::record::{Tape, GTape, this_thread_tape};
+use crate::record::{Tape, GTape, ThisThreadTape};
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 //
 // CheckpointInfo
@@ -174,7 +174,7 @@ pub fn use_checkpoint(
         let check_point_info = &vec[fun_index];
         assert_eq!( fun_index, check_point_info.fun_index );
         let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
-            this_thread_tape();
+            < Float as ThisThreadTape<Index> >::get();
         let ad_range_zero = local_key.with_borrow_mut( |tape|
             use_checkpoint_info(tape, check_point_info, ad_domain, trace)
         );
