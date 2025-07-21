@@ -659,6 +659,9 @@ impl ADFun {
 /// There must not currently be a recording in process on the current thread
 /// when ad_domain is called. The recording is stopped when [ad_fun] is called.
 ///
+/// * F : is the floating point type used for values calculations.
+/// * U : is the unsigned integer type used for tape indices.
+///
 /// * domain :
 /// This vector determines the number of domain (independent) variables
 /// and their value during the recording.
@@ -718,6 +721,9 @@ where
 /// * Recording :
 /// There must currently be a recording in process on the current thread
 /// ( started by [ad_domain] ).
+///
+/// * F : is the floating point type used for values calculations.
+/// * U : is the unsigned integer type used for tape indices.
 ///
 /// * ad_range :
 /// This is an AD vector of range space variables.
