@@ -42,7 +42,7 @@ fn ad_example_mul() {
     let ay         = gadvec![ Float, Index, ay_0, ay_1 ];
     let f          = function::ad_fun(&ay);
     let trace      = false;
-    let (ay, av0 ) = f.forward_zero(&ax, trace);
+    let (ay, av0 ) = f.ad_forward_zero(&ax, trace);
     let ady        = f.ad_forward_one(&adx, &av0, trace);
     let arx        = f.ad_reverse_one(&ary, &av0, trace);
     //

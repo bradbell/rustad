@@ -5,9 +5,6 @@
 //! Define traits that are used by the public rustad API.
 //! : [parent module](super)
 //
-use crate::ad::GAD;
-use crate::{Float, Index};
-use crate::operator::{OpInfo, ForwardZero};
 // ---------------------------------------------------------------------------
 /// Generic as function for converting types like `as` would.
 ///
@@ -53,18 +50,6 @@ generic_as!(u32, usize);
 generic_as!(u16, usize);
 generic_as!(u8, usize);
 //
-// ----------------------------------------------------------------------------
-pub trait GetForwardZero<T> {
-    fn get(self : &Self) -> T;
-}
-impl GetForwardZero< ForwardZero<Float, Index, Float> > for OpInfo {
-    fn get(self : &Self) -> ForwardZero<Float, Index, Float>
-    {   self.forward_0 }
-}
-impl GetForwardZero< ForwardZero<Float, Index, GAD<Float,Index> > > for OpInfo {
-    fn get(self : &Self) -> ForwardZero<Float, Index, GAD<Float,Index> >
-    {   self.ad_forward_0 }
-}
 // ----------------------------------------------------------------------------
 use crate::record::ThisThreadTape;
 //
