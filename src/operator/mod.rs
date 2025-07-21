@@ -283,9 +283,9 @@ pub type ReverseOneBinary = fn(_var_one: &mut Vec<Float>,
 // Default evaluations
 //
 // panic_zero
-/// default [ForwardZero] with E = F, will panic
-fn panic_zero( _var_zero: &mut Vec<Float>,
-    _con_all: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: usize)
+/// default [ForwardZero] function, will panic
+fn panic_zero<F,U,E>( _var_zero: &mut Vec<E>,
+    _con_all: &Vec<F>,_flag_all : &Vec<bool>, _arg: &[U], _res: usize)
 {
     panic!();
 }
@@ -293,29 +293,15 @@ fn panic_zero( _var_zero: &mut Vec<Float>,
 // panic_one
 /// default [ForwardOne] or [ReverseOne] function, will panic
 /// if it does not get replaced.
-fn panic_one( _var_one: &mut Vec<Float>, _var_zero : &Vec<Float>,
-    _con_all: &Vec<Float>, _arg: &[Index], _res: usize) {
-    panic!();
-}
-//
-// ad_panic_zero
-/// default [ForwardZero] with E = AD, will panic
-fn ad_panic_zero( _var_zero: &mut Vec<AD>,
-    _con_all: &Vec<Float>, _flag_all : &Vec<bool>, _arg: &[Index], _res: usize) {
-    panic!();
-}
-//
-// ad_panic_one
-/// default [ForwardOne] or [ReverseOne] function, will panic
-fn ad_panic_one( _var_one: &mut Vec<AD>, _var_zero : &Vec<AD>,
-    _con_all: &Vec<Float>, _arg: &[Index], _res: usize) {
+fn panic_one<F,U,E>( _var_one: &mut Vec<E>, _var_zero : &Vec<E>,
+    _con_all: &Vec<F>, _arg: &[U], _res: usize) {
     panic!();
 }
 //
 // panic_arg_var_index
 /// default [ArgVarIndex] function,  will panic
-fn panic_arg_var_index(
-    _arg_var_index: &mut Vec<Index>, _flag_all: &Vec<bool>, _arg: &[Index]
+fn panic_arg_var_index<U>(
+    _arg_var_index: &mut Vec<U>, _flag_all: &Vec<bool>, _arg: &[U]
 ) {
     panic!();
 }
@@ -390,9 +376,9 @@ fn default_op_info_vec() -> Vec<OpInfo> {
         forward_0      : panic_zero,
         forward_1      : panic_one,
         reverse_1      : panic_one,
-        ad_forward_0   : ad_panic_zero,
-        ad_forward_1   : ad_panic_one,
-        ad_reverse_1   : ad_panic_one,
+        ad_forward_0   : panic_zero,
+        ad_forward_1   : panic_one,
+        ad_reverse_1   : panic_one,
         arg_var_index  : panic_arg_var_index,
     };
     let mut result    = vec![empty ; NUMBER_OP as usize];

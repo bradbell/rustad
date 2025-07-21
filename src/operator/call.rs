@@ -142,9 +142,9 @@ fn call_arg_var_index(
         forward_0      : float_forward_0_call,
         forward_1      : super::panic_one,
         reverse_1      : super::panic_one,
-        ad_forward_0   : super::ad_panic_zero,
-        ad_forward_1   : super::ad_panic_one,
-        ad_reverse_1   : super::ad_panic_one,
+        ad_forward_0   : super::panic_zero,
+        ad_forward_1   : super::panic_one,
+        ad_reverse_1   : super::panic_one,
         arg_var_index  : call_arg_var_index,
      };
     op_info_vec[CALL_RES_OP as usize] = OpInfo{
