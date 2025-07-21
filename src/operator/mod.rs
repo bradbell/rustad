@@ -131,8 +131,12 @@ pub(crate) use binary_op_forward_0;
 #[cfg(doc)]
 pub fn doc_common_arguments() {}
 //
-// forward_zero_fn
+// ForwardZero
 /// Evaluation of zero order forward mode.
+///
+/// * F      : floating point type for values in this operation sequence.
+/// * U      : unsigned integer type for indices in this operation sequence.
+/// * E      : is the evaluation type, either F or GAD<F,U>.
 ///
 /// * var_zero :
 /// is the vector of zero order variable values.
@@ -148,8 +152,12 @@ pub type ForwardZero<F, U, E> = fn(
     _res      : usize       ,
 );
 //
-// forward_one_fn
+// ForwardOne
 /// Evaluation of first order forward mode; see [doc_common_arguments]
+///
+/// * F      : floating point type for values in this operation sequence.
+/// * U      : unsigned integer type for indices in this operation sequence.
+/// * E      : is the evaluation type, either F or GAD<F,U>.
 ///
 /// * var_one :
 /// is the directional derivative for each variable.
@@ -157,23 +165,13 @@ pub type ForwardZero<F, U, E> = fn(
 /// for the results of this operator.
 ///
 /// * Other Arguments :  see [doc_common_arguments]
-#[cfg(doc)]
-pub fn doc_forward_one_fn() {}
-macro_rules! forward_one_fn{ ($EvalType:ident) => { paste::paste! {
-    #[doc = concat!(
-        " ", stringify!($EvalType), " Evaluation of first order forward mode",
-        "; see [doc_forward_one_fn]"
-    ) ]
-    pub type [< $EvalType ForwardOne >] = fn(
-        _var_one  : &mut Vec<$EvalType> ,
-        _var_zero : &Vec<$EvalType>     ,
-        _con_all  : &Vec<Float>         ,
-        _arg      : &[Index]            ,
-        _res      : usize               ,
-    );
-} } }
-forward_one_fn!(Float);
-forward_one_fn!(AD);
+pub type ForwardOne<F, U, E> = fn(
+    _var_one  : &mut Vec<E>         ,
+    _var_zero : &Vec<E>             ,
+    _con_all  : &Vec<F>             ,
+    _arg      : &[U]                ,
+    _res      : usize               ,
+);
 //
 // reverse_one_fn
 /// Float evaluation of first order reverse mode.
@@ -254,7 +252,7 @@ pub type ForwardZeroBinary = fn(_var_zero: &mut Vec<Float>,
 );
 //
 // ForwardOneBinary
-/// This is a [FloatForwardOne] with the following extra conditions:
+/// This is a [ForwardOne] with the following extra conditions:
 ///
 /// * var_one :
 /// is the vector of directional derivatives.
@@ -297,7 +295,7 @@ fn panic_zero( _var_zero: &mut Vec<Float>,
 }
 //
 // panic_one
-/// default [FloatForwardOne] or [FloatReverseOne] function, will panic
+/// default [ForwardOne] or [FloatReverseOne] function, will panic
 /// if it does not get replaced.
 fn panic_one( _var_one: &mut Vec<Float>, _var_zero : &Vec<Float>,
     _con_all: &Vec<Float>, _arg: &[Index], _res: usize) {
@@ -312,7 +310,7 @@ fn ad_panic_zero( _var_zero: &mut Vec<AD>,
 }
 //
 // ad_panic_one
-/// default [ADForwardOne] or [ADReverseOne] function, will panic
+/// default [ForwardOne] or [ADReverseOne] function, will panic
 fn ad_panic_one( _var_one: &mut Vec<AD>, _var_zero : &Vec<AD>,
     _con_all: &Vec<Float>, _arg: &[Index], _res: usize) {
     panic!();
@@ -369,7 +367,7 @@ pub struct OpInfo {
     pub forward_0      : ForwardZero<Float, Index, Float>,
     //
     /// evaluates this operator during [ADFun::forward_one]
-    pub forward_1      : FloatForwardOne,
+    pub forward_1      : ForwardOne<Float, Index, Float>,
     //
     /// evaluates this operator during [ADFun::reverse_one]
     pub reverse_1      : FloatReverseOne,
@@ -378,7 +376,7 @@ pub struct OpInfo {
     pub ad_forward_0   : ForwardZero<Float, Index, AD>,
     //
     /// evaluates this operator during [ADFun::ad_forward_one]
-    pub ad_forward_1   : ADForwardOne,
+    pub ad_forward_1   : ForwardOne<Float, Index, AD>,
     //
     /// evaluates this operator during [ADFun::ad_reverse_one]
     pub ad_reverse_1   : ADReverseOne,
