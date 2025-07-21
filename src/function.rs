@@ -9,14 +9,13 @@
 use std::cell::RefCell;
 use std::thread::LocalKey;
 //
+// BEGIN_SORT_THIS_LINE_PLUS_1
+use crate::ad::GAD;
+use crate::operator::{OpInfo, OP_INFO_VEC, ForwardZero};
 use crate::ptrait::{GetForwardZero, GenericAs};
-use crate::{Index, Float, AD};
-use crate::operator::{
-    OpInfo,
-    OP_INFO_VEC,
-    ForwardZero,
-};
 use crate::record::{NEXT_TAPE_ID, GTape, ThisThreadTape};
+use crate::{Index, Float, AD};
+// END_SORT_THIS_LINE_MINUS_1
 //
 #[cfg(doc)]
 use crate::operator;
@@ -729,10 +728,15 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
 ///     1. tape.arg_all.len() <= U::Max
 ///     2. tape.tape_id       <= U::Max
 ///
-pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
-    let mut result = ADFun::new();
-    let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
-        < Float as ThisThreadTape<Index> >::get();
+pub fn ad_fun<F,U>( ad_range : &[ GAD<F,U> ] ) -> GADFun<F,U>
+where
+    F     : Copy + Sized + 'static + ThisThreadTape<U> ,
+    U     : Copy + Sized + 'static + TryFrom<usize> + GenericAs<usize> ,
+    usize : GenericAs<U> ,
+{
+    let mut result : GADFun<F,U> = GADFun::new();
+    let local_key : &LocalKey< RefCell< GTape<F,U> > > =
+        < F as ThisThreadTape<U> >::get();
     let tape_id : usize = local_key.with_borrow_mut( |tape| {
         //
         // tape.recording
@@ -742,12 +746,12 @@ pub fn ad_fun( ad_range : &[AD] ) -> ADFun {
         // check assumptions
         assert_eq!( tape.n_var , tape.n_domain + tape.id_all.len() );
         assert_eq!( tape.op2arg.len() , tape.id_all.len() );
-        match Index::try_from( tape.arg_all.len() ) {
-            Err(_) => panic!( "tape.arg_all.len() > Index::MAX" ),
+        match U::try_from( tape.arg_all.len() ) {
+            Err(_) => panic!( "tape.arg_all.len() > U::MAX" ),
             Ok(_)  => (),
         }
-        match Index::try_from( tape.tape_id ) {
-            Err(_) => panic!( "tape.tape_id > Index::MAX" ),
+        match U::try_from( tape.tape_id ) {
+            Err(_) => panic!( "tape.tape_id > U::MAX" ),
             Ok(_)  => (),
         }
         //
