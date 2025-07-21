@@ -182,23 +182,13 @@ pub type ForwardOne<F, U, E> = fn(
 /// for the arguments for this operator.
 ///
 /// * Other Arguments :  see [doc_common_arguments]
-#[cfg(doc)]
-pub fn doc_reverse_one_fn() {}
-macro_rules! reverse_one_fn{ ($EvalType:ident) => { paste::paste! {
-    #[doc = concat!(
-        " ", stringify!($EvalType), " Evaluation of first order reverse mode",
-        "; see [doc_reverse_one_fn]"
-    ) ]
-    pub type [< $EvalType ReverseOne >] = fn(
-        _partial  : &mut Vec<$EvalType> ,
-        _var_zero : &Vec<$EvalType>     ,
-        _con_all  : &Vec<Float>         ,
-        _arg      : &[Index]            ,
-        _res      : usize               ,
-    );
-} } }
-reverse_one_fn!(Float);
-reverse_one_fn!(AD);
+pub type ReverseOne<F, U, E> = fn(
+    _partial  : &mut Vec<E> ,
+    _var_zero : &Vec<E>     ,
+    _con_all  : &Vec<F>     ,
+    _arg      : &[U]        ,
+    _res      : usize       ,
+);
 //
 // ArgVarIndex
 /// Determine variable indices that are arguments to this operator.
@@ -267,7 +257,7 @@ pub type ForwardOneBinary = fn(_var_one: &mut Vec<Float>,
 );
 //
 // ReverseOneBinary
-/// This is a [FloatReverseOne] with the following extra conditions:
+/// This is a [ReverseOne] with the following extra conditions:
 ///
 /// * partial :
 /// Reverse mode computes the partial derivatives of a scalar function of the
@@ -295,7 +285,7 @@ fn panic_zero( _var_zero: &mut Vec<Float>,
 }
 //
 // panic_one
-/// default [ForwardOne] or [FloatReverseOne] function, will panic
+/// default [ForwardOne] or [ReverseOne] function, will panic
 /// if it does not get replaced.
 fn panic_one( _var_one: &mut Vec<Float>, _var_zero : &Vec<Float>,
     _con_all: &Vec<Float>, _arg: &[Index], _res: usize) {
@@ -310,7 +300,7 @@ fn ad_panic_zero( _var_zero: &mut Vec<AD>,
 }
 //
 // ad_panic_one
-/// default [ForwardOne] or [ADReverseOne] function, will panic
+/// default [ForwardOne] or [ReverseOne] function, will panic
 fn ad_panic_one( _var_one: &mut Vec<AD>, _var_zero : &Vec<AD>,
     _con_all: &Vec<Float>, _arg: &[Index], _res: usize) {
     panic!();
@@ -370,7 +360,7 @@ pub struct OpInfo {
     pub forward_1      : ForwardOne<Float, Index, Float>,
     //
     /// evaluates this operator during [ADFun::reverse_one]
-    pub reverse_1      : FloatReverseOne,
+    pub reverse_1      : ReverseOne<Float, Index, Float>,
     //
     /// evaluates this operator during [ADFun::forward_zero]
     pub ad_forward_0   : ForwardZero<Float, Index, AD>,
@@ -379,7 +369,7 @@ pub struct OpInfo {
     pub ad_forward_1   : ForwardOne<Float, Index, AD>,
     //
     /// evaluates this operator during [ADFun::ad_reverse_one]
-    pub ad_reverse_1   : ADReverseOne,
+    pub ad_reverse_1   : ReverseOne<Float, Index, AD>,
     //
     /// operator arguments that are variable indices;
     /// see [ArgVarIndex]
