@@ -176,6 +176,10 @@ pub type ForwardOne<F, U, E> = fn(
 // reverse_one_fn
 /// Float evaluation of first order reverse mode.
 ///
+/// * F      : floating point type for values in this operation sequence.
+/// * U      : unsigned integer type for indices in this operation sequence.
+/// * E      : is the evaluation type, either F or GAD<F,U>.
+///
 /// * partial :
 /// is the partial, for each variable, of the scalar function.
 /// This is an input for variable indices greater than *res* and an output
@@ -193,6 +197,8 @@ pub type ReverseOne<F, U, E> = fn(
 // ArgVarIndex
 /// Determine variable indices that are arguments to this operator.
 ///
+/// * U : unsigned integer type for indices in this operation sequence.
+///
 /// * arg_var_index :
 /// Passing in arg_var_index avoids reallocating memory for each call.
 ///
@@ -202,8 +208,8 @@ pub type ReverseOne<F, U, E> = fn(
 /// * arg :
 /// The subvector of arguments for this operator.
 ///
-pub type ArgVarIndex = fn(
-    _arg_var_index: &mut Vec<Index>, _flag_all : &Vec<bool>, _arg: &[Index]
+pub type ArgVarIndex<U> = fn(
+    _arg_var_index: &mut Vec<U>, _flag_all : &Vec<bool>, _arg: &[U]
 );
 //
 // ForwardZeroBinary
@@ -373,7 +379,7 @@ pub struct OpInfo {
     //
     /// operator arguments that are variable indices;
     /// see [ArgVarIndex]
-    pub arg_var_index  : ArgVarIndex,
+    pub arg_var_index  : ArgVarIndex<Index>,
 }
 //
 // default_op_info_vec
