@@ -30,8 +30,8 @@ pub mod call;
 // ---------------------------------------------------------------------------
 /// Implement zero order forward for binary operators.
 ///
-/// * F      : is the value type for this operation sequence.
-/// * U      : is the index type for this operation sequence.
+/// * F      : floating point type for values in this operation sequence.
+/// * U      : unsigned integer type for indices in this operation sequence.
 /// * E      : is the evaluation type, either F or GAD<F,U>.
 /// * Trait  :  is Add , Sub , Mul , or Div  ,
 /// * op     : is the operator; e.g. + for add.
