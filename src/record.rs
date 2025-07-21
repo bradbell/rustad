@@ -26,7 +26,7 @@ use crate::operator;
 /// is the unsigned integer type used indices in the tape.
 /// It must be able to represent the maximum:
 /// tape id, operator index, constant index, operator argument index.
-pub(crate) struct GTape<F, U> {
+pub struct GTape<F, U> {
     //
     // recording
     /// if false (true) a recording is currently in progress on this tape.
@@ -106,7 +106,11 @@ pub (crate) static NEXT_TAPE_ID : Mutex<usize> = Mutex::new(1);
 // ---------------------------------------------------------------------------
 // ThisThreadTape
 //
-pub (crate) trait ThisThreadTape<U : 'static>: Sized + 'static {
+pub trait ThisThreadTape<U>
+where
+    Self : Sized + 'static ,
+    U    : Sized + 'static ,
+{
     fn get() -> &'static LocalKey< RefCell< GTape<Self, U> > >;
 }
 //

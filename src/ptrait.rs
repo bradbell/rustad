@@ -64,3 +64,16 @@ impl GetForwardZero< ForwardZero<Float, Index, AD> > for OpInfo {
     fn get(self : &Self) -> ForwardZero<Float, Index, AD>
     {   self.ad_forward_0 }
 }
+// ----------------------------------------------------------------------------
+use crate::record::ThisThreadTape;
+//
+pub trait ThisThreadTapePublic<U> : ThisThreadTape<U>
+where
+    U : Sized + 'static ,
+{}
+//
+impl<F,U> ThisThreadTapePublic<U> for F
+where
+    F : ThisThreadTape<U> ,
+    U : Sized + 'static ,
+{}
