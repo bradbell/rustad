@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
-use rustad::Float;
+use rustad::{AD, Float};
 use rustad::function;
 
 #[test]
@@ -10,7 +10,7 @@ fn test_mul_vv() {
     let x  : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
     let dx : Vec<Float> = vec![ 4.0, 5.0, 6.0 ];
     let ry : Vec<Float> = vec![ 7.0, 8.0 ];
-    let ax        = function::ad_domain(&x);
+    let ax : Vec<AD>    = function::ad_domain(&x);
     let ay_0      = ax[0] * ax[1];
     let ay_1      = ax[1] * ax[2];
     let ay        = vec! [ ay_0, ay_1 ];
@@ -36,7 +36,7 @@ fn test_mul_vc() {
     let x  : Vec<Float> = vec![ 2.0, 3.0 ];
     let dx : Vec<Float> = vec![ 4.0, 5.0 ];
     let ry : Vec<Float> = vec![ 7.0 ];
-    let ax        = function::ad_domain(&x);
+    let ax : Vec<AD>    = function::ad_domain(&x);
     let ay_0      = ax[0] * 5.0;
     let ay        = vec! [ ay_0 ];
     let f         = function::ad_fun(&ay);
@@ -57,7 +57,7 @@ fn test_mul_cv() {
     let x  : Vec<Float> = vec![ 2.0, 3.0 ];
     let dx : Vec<Float> = vec![ 4.0, 5.0 ];
     let ry : Vec<Float> = vec![ 7.0 ];
-    let ax        = function::ad_domain(&x);
+    let ax : Vec<AD>    = function::ad_domain(&x);
     let ay_0      = 5.0 * ax[1];
     let ay        = vec! [ ay_0 ];
     let f         = function::ad_fun(&ay);

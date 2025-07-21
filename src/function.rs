@@ -669,7 +669,12 @@ impl ADFun {
 /// Dependencies with respect to these variables will be recorded on
 /// the tape for this thread.
 ///
-pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
+pub fn ad_domain<F,U>( domain : &[F] ) -> Vec< GAD<F,U> >
+where
+    F     : Copy + Sized + 'static + ThisThreadTape<U> ,
+    U     : Sized + 'static ,
+    usize : Sized + 'static + GenericAs<U> ,
+{
     //
     // new_tape_id
     let new_tape_id : usize;
@@ -679,8 +684,8 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
         new_tape_id   = *next_tape_id;
         *next_tape_id = new_tape_id + 1;
     }
-    let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
-        < Float as ThisThreadTape<Index> >::get();
+    let local_key : &LocalKey< RefCell< GTape<F,U> > > =
+        < F as ThisThreadTape<U> >::get();
     local_key.with_borrow_mut( |tape| {
         assert_ne!( new_tape_id, 0);
         assert!( ! tape.recording , "indepndent: tape is already recording");
@@ -695,9 +700,9 @@ pub fn ad_domain( domain : &[Float] ) -> Vec<AD> {
         tape.n_var          = domain.len();
         //
     } );
-    let mut result : Vec<AD> = Vec::new();
+    let mut result : Vec< GAD<F,U> > = Vec::new();
     for j in 0 .. domain.len() {
-        result.push( AD {
+        result.push(  GAD {
             tape_id   : GenericAs::gas( new_tape_id ),
             var_index : GenericAs::gas( j ),
             value     : domain[j],
