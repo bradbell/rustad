@@ -5,6 +5,10 @@
 //! Store and compute for AD add operation
 //! : [parent module](super)
 //!
+//! * F : Floating point type used for value calculations .
+//! * U : Unsigned integer type used for indices in the Tape .
+//! * E : Evaluation type which is either F, or GAD<F,U> .
+//!
 //! # Operator Id
 //! ADD_CV_OP, ADD_VC_OP, or ADD_VV_OP
 //!
@@ -16,8 +20,6 @@ use std::cell::RefCell;
 use std::thread::LocalKey;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
-use crate::Float;
-use crate::Index;
 use crate::ad::GAD;
 use crate::operator::OpInfo;
 use crate::operator::binary_op_forward_0;
@@ -149,7 +151,18 @@ where
 /// * op_info_vec :
 /// The map from [operator::id] to operator information.
 /// The the map results for ADD_CV_OP, ADD_VC_OP, and ADD_VV_OP are set.
-pub(crate) fn set_op_info( op_info_vec : &mut Vec< OpInfo<Float,Index> > ) {
+pub(crate) fn set_op_info<F,U>( op_info_vec : &mut Vec< OpInfo<F,U> > )
+where
+    usize    : GenericAs<U> ,
+    U        : Copy + 'static + GenericAs<usize> ,
+    F        : Copy + 'static +
+        std::ops::Add<F, Output = F> +
+        std::ops::Add< GAD<F,U>, Output =  GAD<F,U> > +
+        ThisThreadTape<U> ,
+    GAD<F,U> : Copy +
+        std::ops::Add< F, Output = GAD<F,U> > +
+        std::ops::Add< GAD<F,U>, Output =  GAD<F,U> > ,
+{
     op_info_vec[ADD_CV_OP as usize] = OpInfo{
         name           : "add_cv".to_string() ,
         forward_0      : forward_0_add_cv,
