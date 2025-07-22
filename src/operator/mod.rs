@@ -6,6 +6,7 @@
 //! : [parent module](super)
 //
 //
+use crate::ptrait::GenericAs;
 use crate::ad::GAD;
 //
 #[cfg(doc)]
@@ -310,28 +311,37 @@ fn panic_arg_var_index<U>(
 //
 //  arg_var_index_binary_cv
 /// The [ArgVarIndex] function for constant op variable cases.
-fn arg_var_index_binary_cv(
-    arg_var_index: &mut Vec<Index>, _flag_all: &Vec<bool>, arg: &[Index]
-) {
-    arg_var_index.resize(1, 0);
+fn arg_var_index_binary_cv<U>(
+    arg_var_index: &mut Vec<U>, _flag_all: &Vec<bool>, arg: &[U]
+) where
+    U     : Copy ,
+    usize : GenericAs<U> ,
+{
+    arg_var_index.resize( 1, GenericAs::gas(0) );
     arg_var_index[0] = arg[1];
 }
 //
 //  arg_var_index_binary_vc
 /// The [ArgVarIndex] function for variable op constant cases.
-fn arg_var_index_binary_vc(
-    arg_var_index: &mut Vec<Index>, _flag_all: &Vec<bool>, arg: &[Index]
-) {
-    arg_var_index.resize(1, 0);
+fn arg_var_index_binary_vc<U>(
+    arg_var_index: &mut Vec<U>, _flag_all: &Vec<bool>, arg: &[U]
+) where
+    U     : Copy ,
+    usize : GenericAs<U> ,
+{
+    arg_var_index.resize( 1, GenericAs::gas(0) );
     arg_var_index[0] = arg[0];
 }
 //
 //  arg_var_index_binary_vv
 /// The [ArgVarIndex] function for variable op variable cases.
-fn arg_var_index_binary_vv(
-    arg_var_index: &mut Vec<Index>, _flag_all: &Vec<bool>, arg: &[Index]
-) {
-    arg_var_index.resize(2, 0);
+fn arg_var_index_binary_vv<U>(
+    arg_var_index: &mut Vec<U>, _flag_all: &Vec<bool>, arg: &[U]
+) where
+    U     : Copy ,
+    usize : GenericAs<U> ,
+{
+    arg_var_index.resize( 2, GenericAs::gas(0) );
     arg_var_index[0] = arg[0];
     arg_var_index[1] = arg[1];
 }

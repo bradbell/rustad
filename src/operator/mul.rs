@@ -5,6 +5,10 @@
 //! Store and compute for AD mul operation
 //! : [parent module](super)
 //!
+//! * F : Floating point type used for value calculations .
+//! * U : Unsigned integer type used for indices in the Tape .
+//! * E : Evaluation type which is either F, or GAD<F,U> .
+//!
 //! # Operator Id
 //! MUL_CV_OP, MUL_VC_OP, or MUL_VV_OP
 //!
@@ -16,8 +20,6 @@ use std::cell::RefCell;
 use std::thread::LocalKey;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
-use crate::Float;
-use crate::Index;
 use crate::ad::GAD;
 use crate::operator::OpInfo;
 use crate::operator::binary_op_forward_0;
@@ -155,7 +157,22 @@ where
 ///
 /// # op_info_vec
 /// is a map from [operator::id] to operator information.
-pub(crate) fn set_op_info( op_info_vec : &mut Vec< OpInfo<Float,Index> > ) {
+pub(crate) fn set_op_info<F,U>( op_info_vec : &mut Vec< OpInfo<F,U> > )
+where
+    usize    : GenericAs<U> ,
+    U        : Copy + GenericAs<usize> ,
+    F        : Copy +
+        std::ops::Add<F, Output=F> +
+        std::ops::Mul<F, Output=F> +
+        std::ops::Add< GAD<F,U>, Output= GAD<F,U> > +
+        std::ops::Mul< GAD<F,U>, Output= GAD<F,U> > ,
+    GAD<F,U> : Copy +
+        std::ops::Add<F, Output=GAD<F,U> > +
+        std::ops::Mul<F, Output=GAD<F,U> > +
+        std::ops::Add< GAD<F,U>, Output=GAD<F,U> > +
+        std::ops::Mul< GAD<F,U>, Output=GAD<F,U> > ,
+
+{
     op_info_vec[MUL_CV_OP as usize] = OpInfo{
         name           : "mul_cv".to_string() ,
         forward_0      : forward_0_mul_cv,
