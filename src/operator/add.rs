@@ -16,7 +16,6 @@ use std::cell::RefCell;
 use std::thread::LocalKey;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
-use crate::AD;
 use crate::Float;
 use crate::Index;
 use crate::ad::GAD;
@@ -40,121 +39,109 @@ use crate::ad::doc_binary_ad_operator;
 binary_op_forward_0!(Add, +);
 // ---------------------------------------------------------------------------
 //
-// float_forward_1_add_cv, ad_forward_1_add_cv
-// float_forward_1_add_vc, ad_forward_1_add_vc
-// float_forward_1_add_vv, ad_forward_1_add_vv
-/// Implements first order forward for add operator
-macro_rules! forward_1_add {
-    ($Float_type:ident) => { paste::paste! {
-
-        #[doc = concat!(
-            " ", stringify!($Float_type),
-            " first order forward  constant + variable"
-        ) ]
-        fn [< $Float_type:lower _forward_1_add_cv >](
-            var_one:   &mut Vec<$Float_type>,
-            _var_zero: &Vec<$Float_type>,
-            _con:      &Vec<Float>,
-            arg:       &[Index],
-            res:       usize)
-        {
-            debug_assert!( arg.len() == 2);
-            var_one[ res ] = var_one[arg[1] as usize];
-        }
-        #[doc = concat!(
-            " ", stringify!($Float_type),
-            " first order forward  variable + constant"
-        ) ]
-        fn [< $Float_type:lower _forward_1_add_vc >](
-            var_one:   &mut Vec<$Float_type>,
-            _var_zero: &Vec<$Float_type>,
-            _con:      &Vec<Float>,
-            arg:       &[Index],
-            res:       usize)
-        {
-            debug_assert!( arg.len() == 2);
-            var_one[ res ] = var_one[arg[0] as usize];
-        }
-        #[doc = concat!(
-            " ", stringify!($Float_type),
-            " first order forward  variable + variable"
-        ) ]
-        fn [< $Float_type:lower  _forward_1_add_vv >](
-            var_one:   &mut Vec<$Float_type>,
-            _var_zero: &Vec<$Float_type>,
-            _con:      &Vec<Float>,
-            arg:       &[Index],
-            res:       usize)
-        {
-            debug_assert!( arg.len() == 2);
-            var_one[ res ] =
-                var_one[arg[0] as usize] + var_one[arg[1] as usize];
-        }
-    } };
+// forward_1_add_cv
+/// Implements first order forward: constant + variable
+fn forward_1_add_cv <F, U, E>(
+    var_one:   &mut Vec<E>,
+    _var_zero: &Vec<E>,
+    _con:      &Vec<F>,
+    arg:       &[U],
+    res:       usize)
+where
+    U : Copy + GenericAs<usize> ,
+    E : Copy ,
+{
+    debug_assert!( arg.len() == 2);
+    var_one[ res ] = var_one[ GenericAs::gas(arg[1]) ];
 }
-forward_1_add!(Float);
-forward_1_add!(AD);
+//
+// forward_1_add_vc
+/// Implements first order forward: variable + constant
+fn forward_1_add_vc <F, U, E>(
+    var_one:   &mut Vec<E>,
+    _var_zero: &Vec<E>,
+    _con:      &Vec<F>,
+    arg:       &[U],
+    res:       usize)
+where
+    U : Copy + GenericAs<usize> ,
+    E : Copy ,
+{
+    debug_assert!( arg.len() == 2);
+    var_one[ res ] = var_one[ GenericAs::gas(arg[0]) ];
+}
+//
+// forward_1_add_vv
+/// Implements first order forward: variable + variable
+fn forward_1_add_vv <F, U, E>(
+    var_one:   &mut Vec<E>,
+    _var_zero: &Vec<E>,
+    _con:      &Vec<F>,
+    arg:       &[U],
+    res:       usize)
+where
+    U : Copy + GenericAs<usize> ,
+    E : Copy + std::ops::Add<Output = E>,
+{
+    debug_assert!( arg.len() == 2);
+    var_one[ res ] =
+        var_one[ GenericAs::gas(arg[0]) ] + var_one[ GenericAs::gas(arg[1]) ];
+}
 // ---------------------------------------------------------------------------
 //
-// float_reverse_1_add_cv, ad_reverse_1_add_cv
-// float_reverse_1_add_vc, ad_reverse_1_add_vc
-// float_reverse_1_add_vv, ad_reverse_1_add_vv
-/// Implements first order reverse for add operator
-macro_rules! reverse_1_add {
-    ($Float_type:ident) => { paste::paste! {
-
-        #[doc = concat!(
-            " ", stringify!($Float_type),
-            " first order reverse  constant + variable"
-        ) ]
-        fn [< $Float_type:lower _reverse_1_add_cv >](
-            partial:   &mut Vec<$Float_type>,
-            _var_zero: &Vec<$Float_type>,
-            _con:      &Vec<Float>,
-            arg:       &[Index],
-            res:       usize)
-        {
-            debug_assert!( arg.len() == 2);
-            partial[arg[1] as usize] =
-                partial[arg[1] as usize] + partial[ res ];
-        }
-        #[doc = concat!(
-            " ", stringify!($Float_type),
-            " first order reverse  variable + constant"
-        ) ]
-        fn [< $Float_type:lower _reverse_1_add_vc >](
-            partial:   &mut Vec<$Float_type>,
-            _var_zero: &Vec<$Float_type>,
-            _con:      &Vec<Float>,
-            arg:       &[Index],
-            res:       usize)
-        {
-            debug_assert!( arg.len() == 2);
-            partial[arg[0] as usize] =
-                partial[arg[0] as usize] + partial[ res ];
-        }
-        #[doc = concat!(
-            " ", stringify!($Float_type),
-            " first order reverse  variable + variable"
-        ) ]
-        fn [< $Float_type:lower  _reverse_1_add_vv >](
-            partial:   &mut Vec<$Float_type>,
-            _var_zero: &Vec<$Float_type>,
-            _con:      &Vec<Float>,
-            arg:       &[Index],
-            res:       usize)
-        {
-            debug_assert!( arg.len() == 2);
-            partial[arg[0] as usize] =
-                partial[arg[0] as usize] + partial[ res ];
-            //
-            partial[arg[1] as usize] =
-                partial[arg[1] as usize] + partial[ res ];
-        }
-    } };
+// reverse_1_add_cv
+/// Implements first order reverse: constant + variable
+fn reverse_1_add_cv <F, U, E>(
+    partial:   &mut Vec<E>,
+    _var_zero: &Vec<E>,
+    _con:      &Vec<F>,
+    arg:       &[U],
+    res:       usize)
+where
+    U : Copy + GenericAs<usize> ,
+    E : Copy + std::ops::Add<Output = E>,
+{
+    debug_assert!( arg.len() == 2);
+    partial[ GenericAs::gas(arg[1]) ] =
+        partial[ GenericAs::gas(arg[1]) ] + partial[ res ];
 }
-reverse_1_add!(Float);
-reverse_1_add!(AD);
+//
+// reverse_1_add_vc
+/// Implements first order reverse: variable + constant
+fn reverse_1_add_vc <F, U, E>(
+    partial:   &mut Vec<E>,
+    _var_zero: &Vec<E>,
+    _con:      &Vec<F>,
+    arg:       &[U],
+    res:       usize)
+where
+    U : Copy + GenericAs<usize> ,
+    E : Copy + std::ops::Add<Output = E>,
+{
+    debug_assert!( arg.len() == 2);
+    partial[ GenericAs::gas(arg[0]) ] =
+        partial[ GenericAs::gas(arg[0]) ] + partial[ res ];
+}
+//
+// reverse_1_add_vv
+/// Implements first order reverse: variable + variable
+fn reverse_1_add_vv <F, U, E>(
+    partial:   &mut Vec<E>,
+    _var_zero: &Vec<E>,
+    _con:      &Vec<F>,
+    arg:       &[U],
+    res:       usize)
+where
+    U : Copy + GenericAs<usize> ,
+    E : Copy + std::ops::Add<Output = E>,
+{
+    debug_assert!( arg.len() == 2);
+    partial[ GenericAs::gas(arg[0]) ] =
+        partial[ GenericAs::gas(arg[0]) ] + partial[ res ];
+    //
+    partial[ GenericAs::gas(arg[1]) ] =
+        partial[ GenericAs::gas(arg[1]) ] + partial[ res ];
+}
 // ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the add operators.
@@ -166,31 +153,31 @@ pub(crate) fn set_op_info( op_info_vec : &mut Vec< OpInfo<Float,Index> > ) {
     op_info_vec[ADD_CV_OP as usize] = OpInfo{
         name           : "add_cv".to_string() ,
         forward_0      : forward_0_add_cv,
-        forward_1      : float_forward_1_add_cv,
-        reverse_1      : float_reverse_1_add_cv,
+        forward_1      : forward_1_add_cv,
+        reverse_1      : reverse_1_add_cv,
         ad_forward_0   : forward_0_add_cv,
-        ad_forward_1   : ad_forward_1_add_cv,
-        ad_reverse_1   : ad_reverse_1_add_cv,
+        ad_forward_1   : forward_1_add_cv,
+        ad_reverse_1   : reverse_1_add_cv,
         arg_var_index  : super::arg_var_index_binary_cv,
      };
     op_info_vec[ADD_VC_OP as usize] = OpInfo{
         name           : "add_vc".to_string(),
         forward_0      : forward_0_add_vc,
-        forward_1      : float_forward_1_add_vc,
-        reverse_1      : float_reverse_1_add_vc,
+        forward_1      : forward_1_add_vc,
+        reverse_1      : reverse_1_add_vc,
         ad_forward_0   : forward_0_add_vc,
-        ad_forward_1   : ad_forward_1_add_vc,
-        ad_reverse_1   : ad_reverse_1_add_vc,
+        ad_forward_1   : forward_1_add_vc,
+        ad_reverse_1   : reverse_1_add_vc,
         arg_var_index  : super::arg_var_index_binary_vc,
     };
     op_info_vec[ADD_VV_OP as usize] = OpInfo{
         name           : "add_vv".to_string(),
         forward_0      : forward_0_add_vv,
-        forward_1      : float_forward_1_add_vv,
-        reverse_1      : float_reverse_1_add_vv,
+        forward_1      : forward_1_add_vv,
+        reverse_1      : reverse_1_add_vv,
         ad_forward_0   : forward_0_add_vv,
-        ad_forward_1   : ad_forward_1_add_vv,
-        ad_reverse_1   : ad_reverse_1_add_vv,
+        ad_forward_1   : forward_1_add_vv,
+        ad_reverse_1   : reverse_1_add_vv,
         arg_var_index  : super::arg_var_index_binary_vv,
     };
 }
