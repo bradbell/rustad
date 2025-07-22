@@ -162,7 +162,7 @@ reverse_1_add!(AD);
 /// * op_info_vec :
 /// The map from [operator::id] to operator information.
 /// The the map results for ADD_CV_OP, ADD_VC_OP, and ADD_VV_OP are set.
-pub(crate) fn set_op_info( op_info_vec : &mut Vec<OpInfo> ) {
+pub(crate) fn set_op_info( op_info_vec : &mut Vec< OpInfo<Float,Index> > ) {
     op_info_vec[ADD_CV_OP as usize] = OpInfo{
         name           : "add_cv".to_string() ,
         forward_0      : forward_0_add_cv,

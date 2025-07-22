@@ -5,8 +5,8 @@
 //! Operations for specific operators
 //! : [parent module](super)
 //
-// AD
-use crate::AD;
+//
+use crate::ad::GAD;
 //
 #[cfg(doc)]
 use crate::record::{Tape};
@@ -340,37 +340,37 @@ fn arg_var_index_binary_vv(
 //
 /// information connected to each operator id
 #[derive(Clone)]
-pub struct OpInfo {
+pub struct OpInfo<F,U> {
     //
     /// name the user sees for this operator
     pub name           : String,
     //
     /// evaluates this operator during [ADFun::forward_zero]
-    pub forward_0      : ForwardZero<Float, Index, Float>,
+    pub forward_0      : ForwardZero<F, U, F>,
     //
     /// evaluates this operator during [ADFun::forward_one]
-    pub forward_1      : ForwardOne<Float, Index, Float>,
+    pub forward_1      : ForwardOne<F, U, F>,
     //
     /// evaluates this operator during [ADFun::reverse_one]
-    pub reverse_1      : ReverseOne<Float, Index, Float>,
+    pub reverse_1      : ReverseOne<F, U, F>,
     //
     /// evaluates this operator during [ADFun::forward_zero]
-    pub ad_forward_0   : ForwardZero<Float, Index, AD>,
+    pub ad_forward_0   : ForwardZero<F, U, GAD<F,U> >,
     //
     /// evaluates this operator during [ADFun::ad_forward_one]
-    pub ad_forward_1   : ForwardOne<Float, Index, AD>,
+    pub ad_forward_1   : ForwardOne<F, U, GAD<F,U> >,
     //
     /// evaluates this operator during [ADFun::ad_reverse_one]
-    pub ad_reverse_1   : ReverseOne<Float, Index, AD>,
+    pub ad_reverse_1   : ReverseOne<F, U, GAD<F,U> >,
     //
     /// operator arguments that are variable indices;
     /// see [ArgVarIndex]
-    pub arg_var_index  : ArgVarIndex<Index>,
+    pub arg_var_index  : ArgVarIndex<U>,
 }
 //
 // default_op_info_vec
 /// a vector of [OpInfo] where the name is empty and all the functions panic.
-fn default_op_info_vec() -> Vec<OpInfo> {
+fn default_op_info_vec() -> Vec< OpInfo<Float,Index> > {
     let empty         = OpInfo{
         name           : "".to_string(),
         forward_0      : panic_zero,
@@ -391,7 +391,7 @@ fn default_op_info_vec() -> Vec<OpInfo> {
 // OP_INFO_VEC
 /// mapping from each operator [id] to it's [OpInfo],
 /// initialized using [default_op_info_vec] .
-pub static OP_INFO_VEC: std::sync::LazyLock< Vec<OpInfo> > =
+pub static OP_INFO_VEC: std::sync::LazyLock< Vec< OpInfo<Float,Index> > > =
    std::sync::LazyLock::new( || default_op_info_vec() );
 
 // Test that all operators have the proper name.
