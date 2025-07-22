@@ -11,7 +11,7 @@ use std::thread::LocalKey;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
 use crate::ad::GAD;
-use crate::operator::OP_INFO_VEC;
+use crate::operator::GlobalOpInfoVec;
 use crate::ptrait::GenericAs;
 use crate::record::{NEXT_TAPE_ID, GTape, ThisThreadTape};
 use crate::{Index, Float, AD};
@@ -81,7 +81,7 @@ macro_rules! forward_zero {
                 "f.forward_zero: domain_zero length does not match f"
             );
             //
-            let op_info_vec = &*OP_INFO_VEC;
+            let op_info_vec = &*< Float as GlobalOpInfoVec<Index> >::get();
             let nan          = $EvalType::from( Float::NAN );
             let mut var_zero = vec![ nan; self.n_var ];
             for j in 0 .. self.n_domain {
@@ -215,7 +215,7 @@ macro_rules! forward_one {
                 "f.forward_one: var_zero length does not match f"
              );
             //
-            let op_info_vec = &*OP_INFO_VEC;
+            let op_info_vec = &*< Float as GlobalOpInfoVec<Index> >::get();
             let nan          = $EvalType::from( Float::NAN );
             let mut var_one = vec![ nan; self.n_var ];
             for j in 0 .. self.n_domain {
@@ -343,7 +343,7 @@ macro_rules! reverse_one {
                 "f.reverse_one: var_zero length does not match f"
              );
             //
-            let op_info_vec = &*OP_INFO_VEC;
+            let op_info_vec = &*< Float as GlobalOpInfoVec<Index> >::get();
             let zero        = $EvalType::from( Float::from(0.0) );
             let mut partial = vec![zero; self.n_var ];
             for j in 0 .. self.range_is_var.len() {
@@ -580,7 +580,7 @@ impl ADFun {
     pub fn dependency(&self, trace : bool) -> Vec<(Index, Index)>
     {   //
         // op_info_vec
-        let op_info_vec = &*OP_INFO_VEC;
+        let op_info_vec = &*< Float as GlobalOpInfoVec<Index> >::get();
         //
         // n_domain, n_var, flag_all, arg_all, op2arg,
         // range_is_var, range2tape_index, n_range

@@ -104,8 +104,13 @@ impl<F, U> GTape<F, U> {
 /// (0 is not used for a recording).
 pub (crate) static NEXT_TAPE_ID : Mutex<usize> = Mutex::new(1);
 // ---------------------------------------------------------------------------
-// ThisThreadTape
 //
+// ThisThreadTape
+/// ```text
+///     < F as ThisThreadTape >::get()
+/// ```
+/// returns a reference to the tape for recording GAD<F,U> using this thread.
+///
 pub trait ThisThreadTape<U>
 where
     Self : Sized + 'static ,

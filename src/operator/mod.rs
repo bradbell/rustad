@@ -398,17 +398,45 @@ fn default_op_info_vec() -> Vec< OpInfo<Float,Index> > {
     result
 }
 //
-// OP_INFO_VEC
-/// mapping from each operator [id] to it's [OpInfo],
-/// initialized using [default_op_info_vec] .
-pub static OP_INFO_VEC: std::sync::LazyLock< Vec< OpInfo<Float,Index> > > =
-   std::sync::LazyLock::new( || default_op_info_vec() );
-
+// GlobalOpInfoVec
+/// ```text
+///     < F as GlobalOpInfoVec<U> >::get()
+/// ```
+/// returns a reference to
+/// the global operation information for recording GAD<F,U> .
+pub trait GlobalOpInfoVec<U>
+where
+    Self : Sized + 'static ,
+    U    : Sized + 'static ,
+{
+    fn get() -> &'static std::sync::LazyLock< Vec< OpInfo<Self,U> > >;
+}
+/// Get reference to the gloal OpInfo vector.
+///
+/// * f1 : is the floating point type used for value calculations.
+/// * u2 : is the unsigned integer type used for tape indicex
+///
+macro_rules! impl_global_op_info_vec{ ($f1:ident, $u2:ident) => {
+    #[doc = concat!(
+        " Global operator information used when recording ",
+        "GAD<" , stringify!($f1), ", ", stringify!($u2), "> operations"
+    ) ]
+    impl GlobalOpInfoVec<$u2> for $f1 {
+        fn get() -> &'static std::sync::LazyLock< Vec< OpInfo<$f1,$u2> > > {
+            pub static OP_INFO_VEC :
+                std::sync::LazyLock< Vec< OpInfo<$f1,$u2> > > =
+                    std::sync::LazyLock::new( || default_op_info_vec() );
+            &OP_INFO_VEC
+        }
+    }
+} }
+impl_global_op_info_vec!(Float, Index);
+//
 // Test that all operators have the proper name.
 // This test is referenced as at the end of id.rs.
 #[test]
 fn test_op_info() {
-    let op_info_vec = &*OP_INFO_VEC;
+    let op_info_vec = &*< Float as GlobalOpInfoVec<Index> >::get();
     assert_eq!( "add_cv",   op_info_vec[id::ADD_CV_OP as usize].name );
     assert_eq!( "add_vc",   op_info_vec[id::ADD_VC_OP as usize].name );
     assert_eq!( "add_vv",   op_info_vec[id::ADD_VV_OP as usize].name );
