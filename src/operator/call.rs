@@ -37,6 +37,7 @@
 //! operator in the sequence of operations. These are place holders so that
 //! there is a direct correpondence between variable and operator indices.
 //
+use crate::ptrait::GenericAs;
 use crate::{Index, Float};
 use crate::checkpoint::THIS_THREAD_CHECKPOINT_VEC;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
@@ -53,9 +54,9 @@ use crate::operator::{
     ArgVarIndex,
 };
 //
-// float_forward_0_call
+// forward_0_call
 /// Float zero order forward for call operator
-fn float_forward_0_call(
+fn forward_0_call(
     var_zero:    &mut Vec<Float>,
     con:         &Vec<Float>,
     flag_all:    &Vec<bool>,
@@ -63,12 +64,12 @@ fn float_forward_0_call(
     res:         usize)
 {   //
     // call_index, n_arg, n_res
-    let call_index  = arg[0] as usize;
-    let n_arg       = arg[1] as usize;
-    let n_res       = arg[2] as usize;
+    let call_index  = GenericAs::gas(arg[0]);
+    let n_arg       = GenericAs::gas(arg[1]);
+    let n_res       = GenericAs::gas(arg[2]);
     //
     // is_arg_var, is_res_var
-    let mut begin   = arg[3] as usize;
+    let mut begin : usize = GenericAs::gas(arg[3]);
     let mut end     = begin + n_arg;
     let is_arg_var  = &flag_all[begin .. end];
     begin           = end;
@@ -79,9 +80,9 @@ fn float_forward_0_call(
     let mut call_domain_zero : Vec<Float> = Vec::new();
     for i_arg in 0 .. n_arg {
         if is_arg_var[i_arg] {
-            call_domain_zero.push( var_zero[ arg[i_arg + 4] as usize ] );
+            call_domain_zero.push( var_zero[ GenericAs::gas(arg[i_arg + 4]) ] );
         } else {
-            call_domain_zero.push( con[ arg[i_arg + 4] as usize ] );
+            call_domain_zero.push( con[ GenericAs::gas(arg[i_arg + 4]) ] );
         }
     }
     //
@@ -113,10 +114,10 @@ fn call_arg_var_index(
 ) {
     //
     // call_n_arg
-    let call_n_arg = arg[1] as usize;
+    let call_n_arg = GenericAs::gas(arg[1]);
     //
     // is_var
-    let begin   = arg[3] as usize;
+    let begin : usize = GenericAs::gas(arg[3]);
     let end     = begin + call_n_arg;
     let is_var  = &flag_all[begin .. end];
     //
@@ -139,7 +140,7 @@ fn call_arg_var_index(
  pub(crate) fn set_op_info( op_info_vec : &mut Vec< OpInfo<Float,Index> > ) {
     op_info_vec[CALL_OP as usize] = OpInfo{
         name           : "call".to_string() ,
-        forward_0      : float_forward_0_call,
+        forward_0      : forward_0_call,
         forward_1      : super::panic_one,
         reverse_1      : super::panic_one,
         ad_forward_0   : super::panic_zero,
