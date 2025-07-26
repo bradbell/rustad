@@ -55,13 +55,20 @@ use crate::operator::{
 };
 //
 // forward_0_call
-/// Float zero order forward for call operator
-fn forward_0_call(
+/// Float zero order forward for call operator.
+///
+/// Note that checkpoints do not allow for ad_forward because
+/// it would just record the evaluation inside of the checkpoint function.
+fn forward_0_call<F,U>(
     var_zero:    &mut Vec<Float>,
-    con:         &Vec<Float>,
+    con:         &Vec<F>,
     flag_all:    &Vec<bool>,
-    arg:         &[Index],
+    arg:         &[U],
     res:         usize)
+where
+    Float : From<F> ,
+    F     : Copy ,
+    U     : Copy + GenericAs<usize> ,
 {   //
     // call_index, n_arg, n_res
     let call_index  = GenericAs::gas(arg[0]);
@@ -82,7 +89,8 @@ fn forward_0_call(
         if is_arg_var[i_arg] {
             call_domain_zero.push( var_zero[ GenericAs::gas(arg[i_arg + 4]) ] );
         } else {
-            call_domain_zero.push( con[ GenericAs::gas(arg[i_arg + 4]) ] );
+            let c = con[ GenericAs::gas(arg[i_arg + 4]) ];
+            call_domain_zero.push( Float::from(c) );
         }
     }
     //
