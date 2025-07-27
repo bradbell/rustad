@@ -14,7 +14,7 @@ use crate::ad::GAD;
 use crate::operator::GlobalOpInfoVec;
 use crate::ptrait::GenericAs;
 use crate::record::{NEXT_TAPE_ID, GTape, ThisThreadTape};
-use crate::{Index, Float, AD};
+use crate::{Index, Float};
 // END_SORT_THIS_LINE_MINUS_1
 //
 #[cfg(doc)]
@@ -299,21 +299,21 @@ macro_rules! forward_one {
 // reverse_one
 //
 /// First order reverse mode evaluation;
-/// i.e., gradient of weighted range vector.
+/// i.e., gradient of sum of weighted range vector.
 ///
 /// * Syntax :
 /// ```text
 ///     domain_one = f.reverse_one(range_one, var_zero, trace)
 ///     domain_one = f.reverse_one(range_one, var_zero, trace)
 /// ```
-/// See [Float][ADFun::reverse_one] and
-/// [AD](ADFun::ad_reverse_one) prototypes.
+/// See the [GADFun::reverse_one] and
+/// [GADFun::ad_reverse_one] prototypes.
 ///
 /// * f :
-/// is this ADFun object.
+/// is this [GADFun object].
 ///
 /// * ramge_one :
-/// specifies the partials of the range weighted function; i.e. gradient.
+/// specifies the weights in the weighted sum.
 ///
 /// * var_zero :
 /// is the value for all the variables in the operation sequence.
@@ -324,22 +324,26 @@ macro_rules! forward_one {
 /// if true, a trace of the operatiopn sequence is printed on stdout.
 ///
 /// * domain_one :
-/// The return value is the gradiemt of the range weighted function
+/// The return value is the gradiemt of the weighted sum
 /// with respect to the domain variables.
 ///
 pub fn doc_reverse_one() { }
+//
+/// Create the first order reverse mode member functions.
 ///
-/// This macro has the following use cases:
-/// ```text
-///     reverse_one!(Float);
-///     reverse_one!(AD);
-/// ```
+/// * prefix :
+/// is the name of the function without the _one on the end; i.e.,
+/// reverse or ad_reverse.
+///
+/// * EvalType :
+/// is the type used to evaluate first order reverse mode.
+/// It is also the type of the elements of the vectors
+/// *var_zero* , *range_one* and *domain_one* .
+/// If *prefix* is reverse (ad_reverse), this must be F ( GAD<F,U> ) .
+///
 /// See [ doc_reverse_one ]
 macro_rules! reverse_one {
-    (Float) => { reverse_one!(reverse, Float); };
-    (AD)    => { reverse_one!(ad_reverse, AD); };
-    //
-    ( $prefix:ident, $EvalType:ident ) => { paste::paste! {
+    ( $prefix:ident, $EvalType:ty ) => { paste::paste! {
 
         #[doc = concat!(
             " First order reverse using ",
@@ -362,9 +366,10 @@ macro_rules! reverse_one {
                 "f.reverse_one: var_zero length does not match f"
              );
             //
-            let op_info_vec = &*< Float as GlobalOpInfoVec<Index> >::get();
-            let zero        = $EvalType::from( Float::from(0.0) );
-            let mut partial = vec![zero; self.n_var ];
+            let op_info_vec = &*< F as GlobalOpInfoVec<U> >::get();
+            let zero_f : F         = 0f32.into();
+            let zero_e : $EvalType = zero_f.into();
+            let mut partial = vec![zero_e; self.n_var ];
             for j in 0 .. self.range_is_var.len() {
                 let index : usize = GenericAs::gas( self.range2tape_index[j] );
                 partial[index] += range_one[j];
@@ -552,13 +557,19 @@ where
     forward_one!(ad_forward, GAD<F,U>);
 }
 //
-impl ADFun {
+impl<F,U> GADFun<F,U>
+where
+    U       : Copy + 'static + GenericAs<usize> + std::fmt::Debug,
+    GAD<F,U>: From<F> + std::ops::AddAssign ,
+    F       : Copy + From<f32> + GlobalOpInfoVec<U> + std::ops::AddAssign +
+              std::fmt::Display ,
+{
     //
     // reverse_one
-    reverse_one!(Float);
+    reverse_one!(reverse, F);
     //
     // ad_reverse_one
-    reverse_one!(AD);
+    reverse_one!(ad_reverse, GAD<F,U>);
 }
 // ---------------------------------------------------------------------------
 // ADFun::dependency

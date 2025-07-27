@@ -15,6 +15,9 @@ use crate::record::{Tape};
 #[cfg(doc)]
 use crate::function::ADFun;
 //
+#[cfg(doc)]
+use crate::function::{doc_forward_zero, doc_forward_one, doc_reverse_one};
+//
 use crate::Float;
 use crate::Index;
 use id::NUMBER_OP;
@@ -355,22 +358,22 @@ pub struct OpInfo<F,U> {
     /// name the user sees for this operator
     pub name           : String,
     //
-    /// evaluates this operator during [ADFun::forward_zero]
+    /// evaluates this operator during [forward_zero](doc_forward_zero)
     pub forward_0      : ForwardZero<F, U, F>,
     //
-    /// evaluates this operator during [ADFun::forward_one]
+    /// evaluates this operator during [forward_one](doc_forward_one)
     pub forward_1      : ForwardOne<F, U, F>,
     //
-    /// evaluates this operator during [ADFun::reverse_one]
+    /// evaluates this operator during [reverse_one](doc_reverse_one)
     pub reverse_1      : ReverseOne<F, U, F>,
     //
-    /// evaluates this operator during [ADFun::forward_zero]
+    /// evaluates this operator during [ad_forward_zero](doc_forward_zero)
     pub ad_forward_0   : ForwardZero<F, U, GAD<F,U> >,
     //
-    /// evaluates this operator during [ADFun::ad_forward_one]
+    /// evaluates this operator during [ad_forward_one](doc_forward_one)
     pub ad_forward_1   : ForwardOne<F, U, GAD<F,U> >,
     //
-    /// evaluates this operator during [ADFun::ad_reverse_one]
+    /// evaluates this operator during [ad_reverse_one](doc_reverse_one)
     pub ad_reverse_1   : ReverseOne<F, U, GAD<F,U> >,
     //
     /// operator arguments that are variable indices;
