@@ -57,7 +57,7 @@ use crate::operator;
 ///
 pub fn doc_forward_zero() { }
 //
-/// Create the zero order forward mode  member functions.
+/// Create the zero order forward mode member functions.
 ///
 /// * prefix :
 /// is the name of the function without the _zero on the end; i.e.,
@@ -166,11 +166,17 @@ macro_rules! forward_zero {
 ///     range_one = f.forward_one(domain_one, var_zero, trace)
 ///     range_one = f.ad_forward_one(domain_one, var_zero, trace)
 /// ```
-/// See [Float][ADFun::forward_one] and
-/// [AD](ADFun::ad_forward_one) prototypes.
+/// See the [GADFun::forward_one] and
+/// [GADFun::ad_forward_one) prototypes.
+///
+/// * F :
+/// is the floating point type used for value calculations.
+///
+/// * U :
+/// is the floating point type used for index inm the operation sequence.
 ///
 /// * f :
-/// is this [ADFun] object.
+/// is this [GADFun] object.
 ///
 /// * domain_one :
 /// specifies the domain space direction along which the directional
@@ -178,8 +184,7 @@ macro_rules! forward_zero {
 ///
 /// * var_zero :
 /// is the value for all the variables in the operation sequence.
-/// This was returned at the end of a [doc_forward_zero]
-/// computation.
+/// This was returned at the end of a zero order forward mode computation.
 ///
 /// * trace :
 /// if true, a trace of the operatiopn sequence is printed on stdout.
@@ -191,18 +196,22 @@ macro_rules! forward_zero {
 /// corresponding to the operation sequence.
 ///
 pub fn doc_forward_one() { }
+//
+/// Create the first order forward mode member functions.
 ///
-/// This macro has the following use cases:
-/// ```text
-///     forward_one!(Float);
-///     forward_one!(AD);
-/// ```
+/// * prefix :
+/// is the name of the function without the _oneero on the end; i.e.,
+/// forward or ad_forward.
+///
+/// * EvalType :
+/// is the type used to evaluate zero order forward mode.
+/// It is also the type of the elements of the vectors in the return values
+/// *range_one* and *var_one* .
+/// If *prefix* is forward (ad_forward), this must be F ( GAD<F,U> ) .
+///
 /// See [ doc_forward_one ]
 macro_rules! forward_one {
-    (Float) => { forward_one!(forward, Float); };
-    (AD)    => { forward_one!(ad_forward, AD); };
-    //
-    ( $prefix:ident, $EvalType:ident ) => { paste::paste! {
+    ( $prefix:ident, $EvalType:ty ) => { paste::paste! {
 
         #[doc = concat!(
             " ADFun firsat order forward using ",
@@ -225,9 +234,10 @@ macro_rules! forward_one {
                 "f.forward_one: var_zero length does not match f"
              );
             //
-            let op_info_vec = &*< Float as GlobalOpInfoVec<Index> >::get();
-            let nan          = $EvalType::from( Float::NAN );
-            let mut var_one = vec![ nan; self.n_var ];
+            let op_info_vec = &*< F as GlobalOpInfoVec<U> >::get();
+            let nan_f : F          = f32::NAN.into();
+            let nan_e : $EvalType  = nan_f.into();
+            let mut var_one = vec![ nan_e; self.n_var ];
             for j in 0 .. self.n_domain {
                 var_one[j] = domain_one[j];
             }
@@ -534,15 +544,15 @@ where
     //
     // ad_forward_zero
     forward_zero!(ad_forward, GAD<F,U>);
+    //
+    // forward_one
+    forward_one!(forward, F);
+    //
+    // ad_forward_one
+    forward_one!(ad_forward, GAD<F,U>);
 }
 //
 impl ADFun {
-    //
-    // forward_one
-    forward_one!(Float);
-    //
-    // ad_forward_one
-    forward_one!(AD);
     //
     // reverse_one
     reverse_one!(Float);
