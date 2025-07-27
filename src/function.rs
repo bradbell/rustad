@@ -65,8 +65,8 @@ pub fn doc_forward_zero() { }
 ///
 /// * EvalType :
 /// is the type used to evaluate zero order forward mode.
-/// It is also the type of the elements of the vectors in the return values
-/// *range_zero* and *var_zero* .
+/// It is also the type of the elements of the vectors in
+/// *domain_zero* , *range_zero* and *var_zero* .
 /// If *prefix* is forward (ad_forward), this must be F ( GAD<F,U> ) .
 ///
 /// See [ doc_forward_zero ]
@@ -200,13 +200,13 @@ pub fn doc_forward_one() { }
 /// Create the first order forward mode member functions.
 ///
 /// * prefix :
-/// is the name of the function without the _oneero on the end; i.e.,
+/// is the name of the function without the _one on the end; i.e.,
 /// forward or ad_forward.
 ///
 /// * EvalType :
-/// is the type used to evaluate zero order forward mode.
-/// It is also the type of the elements of the vectors in the return values
-/// *range_one* and *var_one* .
+/// is the type used to evaluate first order forward mode.
+/// It is also the type of the elements of the vectors
+/// *var_zero* , *domain_one* , and *range_one* .
 /// If *prefix* is forward (ad_forward), this must be F ( GAD<F,U> ) .
 ///
 /// See [ doc_forward_one ]
