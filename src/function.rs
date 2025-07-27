@@ -28,11 +28,17 @@ use crate::operator;
 ///     (range_zero, var_zero) = f.forward_zero(domain_zero, trace)
 ///     (range_zero, var_zero) = f.ad_forward_zero(domain_zero, trace)
 /// ```
-/// See [Float][ADFun::forward_zero] and
-/// [AD](ADFun::ad_forward_zero) prototypes.
+/// See [GADFun::forward_zero] and
+/// [GADFun::ad_forward_zero] prototypes.
+///
+/// * F :
+/// is the floating point type used for value calculations.
+///
+/// * U :
+/// is the floating point type used for index inm the operation sequence.
 ///
 /// * f :
-/// is is this [ADFun] object.
+/// is this [GADFun] object.
 ///
 /// * domain_zero :
 /// specifies the domain space variable values.
@@ -51,19 +57,19 @@ use crate::operator;
 ///
 pub fn doc_forward_zero() { }
 //
-/// Create the forward_zero member functions.
+/// Create the [doc_forward_zero] member functions.
 ///
 /// This macro only has the following two use cases:
 /// ```text
-///     forward_zero!(Float);
-///     forward_zero!(AD);
+///     forward_zero!(forward_zero);
+///     forward_zero!(ad_forward_zero);
 /// ```
 /// See [ doc_forward_zero ]
 macro_rules! forward_zero {
-    (Float) => { forward_zero!(forward, Float); };
-    (AD)    => { forward_zero!(ad_forward, AD); };
+    (forward_zero)     => { forward_zero!(forward, F); };
+    (ad_forward_zero)  => { forward_zero!(ad_forward, GAD<F,U>); };
     //
-    ( $prefix:ident, $EvalType:ident ) => { paste::paste! {
+    ( $prefix:ident, $EvalType:ty ) => { paste::paste! {
 
         #[doc = concat!(
             " ADFun zero order forward using ",
@@ -81,9 +87,10 @@ macro_rules! forward_zero {
                 "f.forward_zero: domain_zero length does not match f"
             );
             //
-            let op_info_vec = &*< Float as GlobalOpInfoVec<Index> >::get();
-            let nan          = $EvalType::from( Float::NAN );
-            let mut var_zero = vec![ nan; self.n_var ];
+            let op_info_vec = &*< F as GlobalOpInfoVec<U> >::get();
+            let nan_f : F          = f32::NAN.into();
+            let nan_e : $EvalType  = nan_f.into();
+            let mut var_zero = vec![ nan_e; self.n_var ];
             for j in 0 .. self.n_domain {
                 var_zero[j] = domain_zero[j];
             }
@@ -104,9 +111,9 @@ macro_rules! forward_zero {
                 println!( "var_index, var, op, arg" );
             }
             for op_index in 0 .. self.id_all.len() {
-                let op_id     = self.id_all[op_index] as usize;
-                let start     = self.op2arg[op_index] as usize;
-                let end       = self.op2arg[op_index + 1] as usize;
+                let op_id : usize = GenericAs::gas( self.id_all[op_index] );
+                let start : usize = GenericAs::gas( self.op2arg[op_index] );
+                let end   : usize = GenericAs::gas( self.op2arg[op_index + 1] );
                 let arg       = &self.arg_all[start .. end];
                 let res       = self.n_domain + op_index;
                 let forward_0 = op_info_vec[op_id].[< $prefix _0 >];
@@ -123,7 +130,8 @@ macro_rules! forward_zero {
             if trace {
                 println!( "range_index, var_index, con_index" );
                 for i in 0 .. self.range_is_var.len() {
-                    let index = self.range2tape_index[i] as usize;
+                    let index : usize =
+                        GenericAs::gas( self.range2tape_index[i] );
                     if self.range_is_var[i] {
                         println!( "{}, {}, ----", i, index);
                     } else {
@@ -134,12 +142,12 @@ macro_rules! forward_zero {
             }
             let mut range_zero : Vec<$EvalType> = Vec::new();
             for i in 0 .. self.range_is_var.len() {
-                let index = self.range2tape_index[i] as usize;
+                let index : usize = GenericAs::gas( self.range2tape_index[i] );
                 if self.range_is_var[i] {
                     range_zero.push( var_zero[index] );
                 } else {
                     let constant = self.con_all[index];
-                    range_zero.push( $EvalType::from(constant) );
+                    range_zero.push( constant.into() );
                 }
             }
             ( range_zero, var_zero )
@@ -160,7 +168,7 @@ macro_rules! forward_zero {
 /// [AD](ADFun::ad_forward_one) prototypes.
 ///
 /// * f :
-/// is is this [ADFun] object.
+/// is this [ADFun] object.
 ///
 /// * domain_one :
 /// specifies the domain space direction along which the directional
@@ -168,7 +176,7 @@ macro_rules! forward_zero {
 ///
 /// * var_zero :
 /// is the value for all the variables in the operation sequence.
-/// This was returned at the end of a [forward_zero](ADFun::forward_zero)
+/// This was returned at the end of a [doc_forward_zero]
 /// computation.
 ///
 /// * trace :
@@ -291,14 +299,14 @@ pub(crate) use forward_one;
 /// [AD](ADFun::ad_reverse_one) prototypes.
 ///
 /// * f :
-/// is is this ADFun object.
+/// is this ADFun object.
 ///
 /// * ramge_one :
 /// specifies the partials of the range weighted function; i.e. gradient.
 ///
 /// * var_zero :
 /// is the value for all the variables in the operation sequence.
-/// This is returned at the end of a [forward_zero](ADFun::forward_zero)
+/// This is returned at the end of a [doc_forward_zero]
 /// computation.
 ///
 /// * trace :
@@ -514,13 +522,21 @@ impl<F,U> GADFun<F,U> {
     pub fn range_len(&self) -> usize { self.range_is_var.len() }
 }
 //
-impl ADFun {
+impl<F,U> GADFun<F,U>
+where
+    F : Copy + From<f32> + From<F> +  GlobalOpInfoVec<U> + std::fmt::Display ,
+    U : Copy + 'static + std::fmt::Debug + GenericAs<usize>,
+    GAD<F,U>: From<F>,
+{
     //
     // forward_zero
-    forward_zero!(Float);
+    forward_zero!(forward_zero);
     //
     // ad_forward_zero
-    forward_zero!(AD);
+    forward_zero!(ad_forward_zero);
+}
+//
+impl ADFun {
     //
     // forward_one
     forward_one!(Float);
