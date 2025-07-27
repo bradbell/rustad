@@ -57,18 +57,20 @@ use crate::operator;
 ///
 pub fn doc_forward_zero() { }
 //
-/// Create the [doc_forward_zero] member functions.
+/// Create the zero order forward mode  member functions.
 ///
-/// This macro only has the following two use cases:
-/// ```text
-///     forward_zero!(forward_zero);
-///     forward_zero!(ad_forward_zero);
-/// ```
+/// * prefix :
+/// is the name of the function without the _zero on the end; i.e.,
+/// forward or ad_forward.
+///
+/// * EvalType :
+/// is the type used to evaluate zero order forward mode.
+/// It is also the type of the elements of the vectors in the return values
+/// *range_zero* and *var_zero* .
+/// If *prefix* is forward (ad_forward), this must be F ( GAD<F,U> ) .
+///
 /// See [ doc_forward_zero ]
 macro_rules! forward_zero {
-    (forward_zero)     => { forward_zero!(forward, F); };
-    (ad_forward_zero)  => { forward_zero!(ad_forward, GAD<F,U>); };
-    //
     ( $prefix:ident, $EvalType:ty ) => { paste::paste! {
 
         #[doc = concat!(
@@ -530,10 +532,10 @@ where
 {
     //
     // forward_zero
-    forward_zero!(forward_zero);
+    forward_zero!(forward, F);
     //
     // ad_forward_zero
-    forward_zero!(ad_forward_zero);
+    forward_zero!(ad_forward, GAD<F,U>);
 }
 //
 impl ADFun {
