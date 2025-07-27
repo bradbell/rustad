@@ -285,7 +285,6 @@ macro_rules! forward_one {
         }
     } }
 }
-pub(crate) use forward_one;
 // -------------------------------------------------------------------
 // reverse_one
 //
@@ -413,7 +412,6 @@ macro_rules! reverse_one {
         }
     } }
 }
-pub (crate) use reverse_one;
 // -----------------------------------------------------------------------
 // GADFun
 //
