@@ -613,10 +613,11 @@ where
     /// Note that this can be used as a sparsity pattern for the Jacobian
     /// of the function.
     ///```
-    /// use rustad::{Float, AD, function};
+    /// use rustad::{Float, Index, function};
+    /// use rustad::ad::GAD;
     /// let x       : Vec<Float> = vec![1.0, 2.0, 3.0];
     /// let ax      = function::ad_domain(&x);
-    /// let mut ay  : Vec<AD> = Vec::new();
+    /// let mut ay  : Vec< GAD<Float,Index> > = Vec::new();
     /// for j in 0 .. x.len() {
     ///     ay.push( ax[j] * ax[j] );
     /// }
