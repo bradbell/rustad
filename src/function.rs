@@ -646,8 +646,8 @@ where
         let n_range           = range_is_var.len();
         //
         // done
-        let n_var_as_index : U = GenericAs::gas(n_var);
-        let mut done : Vec<U> = vec![n_var_as_index; n_var];
+        let n_var_u : U = GenericAs::gas(n_var);
+        let mut done : Vec<U> = vec![n_var_u; n_var];
         //
         // result, arg_var_index, var_index_stack
         let mut result          : Vec<(U, U)> = Vec::new();
@@ -676,12 +676,12 @@ where
             while var_index_stack.len() > 0 {
                 //
                 // var_index
-                let var_index_as_index = var_index_stack.pop().unwrap();
-                var_index = GenericAs::gas( var_index_as_index );
+                let var_index_u = var_index_stack.pop().unwrap();
+                var_index = GenericAs::gas( var_index_u );
                 //
-                let row_as_index : U = GenericAs::gas(row);
-                if done[var_index] != row_as_index {
-                    done[var_index] = row_as_index;
+                let row_u : U = GenericAs::gas(row);
+                if done[var_index] != row_u {
+                    done[var_index] = row_u;
                     if trace {
                         println!( "    var_index = {}", var_index );
                     }
@@ -689,7 +689,7 @@ where
                         //
                         // result
                         // var_index is a domain variable index
-                        result.push( (row_as_index, var_index_as_index) );
+                        result.push( (row_u, var_index_u) );
                     } else {
                         //
                         // op_index
