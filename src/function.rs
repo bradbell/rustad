@@ -573,14 +573,29 @@ where
 }
 // ---------------------------------------------------------------------------
 // ADFun::dependency
-impl ADFun {
+impl<F,U> GADFun<F,U>
+where
+    F     : GlobalOpInfoVec<U> ,
+    U     : Copy + 'static + GenericAs<usize> + std::cmp::PartialEq,
+    usize : GenericAs<U>,
+
+{
     // dependency
-    /// Computes the dependency pattern for the function in this ADFun.
+    /// Compute dependency pattern for the operation sequence in this GADFun.
     ///
     /// * Syntax :
     /// ```text
-    ///     pattern = dependency(trace)
+    ///     pattern = f.dependency(trace)
     /// ```
+    ///
+    /// * F :
+    /// is the floating point type used for value calculations.
+    ///
+    /// * U :
+    /// is the floating point type used for index inm the operation sequence.
+    ///
+    /// * f :
+    /// is this [GADFun] object.
     ///
     /// * trace :
     /// If trace is true, a trace of the dependency calculation
@@ -614,10 +629,10 @@ impl ADFun {
     /// assert_eq!( pattern[1], (1,1) );
     /// assert_eq!( pattern[2], (2,2) );
     ///```
-    pub fn dependency(&self, trace : bool) -> Vec<(Index, Index)>
+    pub fn dependency(&self, trace : bool) -> Vec<(U, U)>
     {   //
         // op_info_vec
-        let op_info_vec = &*< Float as GlobalOpInfoVec<Index> >::get();
+        let op_info_vec = &*< F as GlobalOpInfoVec<U> >::get();
         //
         // n_domain, n_var, flag_all, arg_all, op2arg,
         // range_is_var, range2tape_index, n_range
@@ -631,13 +646,13 @@ impl ADFun {
         let n_range           = range_is_var.len();
         //
         // done
-        let n_var_as_index : Index = GenericAs::gas(n_var);
-        let mut done : Vec<Index> = vec![n_var_as_index; n_var];
+        let n_var_as_index : U = GenericAs::gas(n_var);
+        let mut done : Vec<U> = vec![n_var_as_index; n_var];
         //
         // result, arg_var_index, var_index_stack
-        let mut result          : Vec<(Index, Index)> = Vec::new();
-        let mut arg_var_index   : Vec<Index> = Vec::new();
-        let mut var_index_stack : Vec<Index> = Vec::new();
+        let mut result          : Vec<(U, U)> = Vec::new();
+        let mut arg_var_index   : Vec<U> = Vec::new();
+        let mut var_index_stack : Vec<U> = Vec::new();
         //
         if trace {
             println!( "n_domain = {}, n_range = {}", n_domain, n_range );
@@ -655,7 +670,8 @@ impl ADFun {
             //
             // var_index_stack
             // use resize instead of new stack to reduce memory allocation
-            var_index_stack.resize(0, 0);
+            let zero_u : U = GenericAs::gas(0);
+            var_index_stack.resize(0, zero_u);
             var_index_stack.push( GenericAs::gas( var_index) );
             while var_index_stack.len() > 0 {
                 //
@@ -663,7 +679,7 @@ impl ADFun {
                 let var_index_as_index = var_index_stack.pop().unwrap();
                 var_index = GenericAs::gas( var_index_as_index );
                 //
-                let row_as_index : Index = GenericAs::gas(row);
+                let row_as_index : U = GenericAs::gas(row);
                 if done[var_index] != row_as_index {
                     done[var_index] = row_as_index;
                     if trace {
