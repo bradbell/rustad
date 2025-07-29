@@ -42,7 +42,6 @@ use crate::{Index, Float};
 use crate::checkpoint::THIS_THREAD_CHECKPOINT_VEC;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 use crate::operator::OpInfo;
-use crate::AD;
 //
 #[cfg(doc)]
 use crate::operator;
@@ -161,36 +160,24 @@ fn call_arg_var_index(
         forward_0      : no_op_zero,
         forward_1      : no_op_one,
         reverse_1      : no_op_one,
-        ad_forward_0   : ad_no_op_zero,
-        ad_forward_1   : ad_no_op_one,
-        ad_reverse_1   : ad_no_op_one,
+        ad_forward_0   : no_op_zero,
+        ad_forward_1   : no_op_one,
+        ad_reverse_1   : no_op_one,
         arg_var_index  : no_op_arg_var_index,
      };
 }
 // ---------------------------------------------------------------------------
 //
 // no_op_zero
-/// [ForwardZero] where E = F
-fn no_op_zero( _var_zero: &mut Vec<Float>,
-    _con_all: &Vec<Float>,_flag_all : &Vec<bool>, _arg: &[Index], _res: usize)
+/// [ForwardZero] function
+fn no_op_zero<F, U, E>( _var_zero: &mut Vec<E>,
+    _con_all: &Vec<F>, _flag_all : &Vec<bool>, _arg: &[U], _res: usize)
 { }
 //
 // no_op_one
 /// [ForwardOne] or [ReverseOne] function
-fn no_op_one( _var_one: &mut Vec<Float>, _var_zero : &Vec<Float>,
-    _con_all: &Vec<Float>, _arg: &[Index], _res: usize)
-{ }
-//
-// ad_no_op_zero
-/// [ForwardZero] were E = AD
-fn ad_no_op_zero( _var_zero: &mut Vec<AD>,
-    _con_all: &Vec<Float>, _flag_all : &Vec<bool>, _arg: &[Index], _res: usize)
-{ }
-//
-// ad_no_op_one
-/// [ForwardOne] or [ReverseOne] function
-fn ad_no_op_one( _var_one: &mut Vec<AD>, _var_zero : &Vec<AD>,
-    _con_all: &Vec<Float>, _arg: &[Index], _res: usize)
+fn no_op_one<F, U, E>( _var_one: &mut Vec<E>, _var_zero : &Vec<E>,
+    _con_all: &Vec<F>, _arg: &[U], _res: usize)
 { }
 //
 // no_op_arg_var_index
