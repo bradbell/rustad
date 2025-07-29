@@ -182,7 +182,12 @@ fn no_op_one<F, U, E>( _var_one: &mut Vec<E>, _var_zero : &Vec<E>,
 //
 // no_op_arg_var_index
 /// [ArgVarIndex] function
-fn no_op_arg_var_index(
-    arg_var_index: &mut Vec<Index>, _flag_all: &Vec<bool>, _arg: &[Index]) {
-    arg_var_index.resize(0, 0);
+fn no_op_arg_var_index<U>(
+    arg_var_index: &mut Vec<U>, _flag_all: &Vec<bool>, _arg: &[U])
+where
+    U     : Copy ,
+    usize : GenericAs<U> ,
+{
+    let zero_u : U = GenericAs::gas(0);
+    arg_var_index.resize(0, zero_u);
 }
