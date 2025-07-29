@@ -115,21 +115,26 @@ where
 //
 // call_arg_var_index
 /// vector of variable indices that are arguments to this call operator
-fn call_arg_var_index(
-    arg_var_index : &mut Vec<Index>, flag_all : &Vec<bool>, arg: &[Index]
+fn call_arg_var_index<U>(
+    arg_var_index : &mut Vec<U>, flag_all : &Vec<bool>, arg: &[U]
 
-) {
+)
+where
+    U     : Copy + GenericAs<usize> ,
+    usize : GenericAs<U> ,
+{
     //
     // call_n_arg
-    let call_n_arg = GenericAs::gas(arg[1]);
+    let call_n_arg : usize = GenericAs::gas(arg[1]);
     //
     // is_var
     let begin : usize = GenericAs::gas(arg[3]);
-    let end     = begin + call_n_arg;
-    let is_var  = &flag_all[begin .. end];
+    let end           = begin + call_n_arg;
+    let is_var        = &flag_all[begin .. end];
     //
     // arg_var_index
-    arg_var_index.resize(0, 0);
+    let zero_u : U = GenericAs::gas(0);
+    arg_var_index.resize(0, zero_u);
     for call_i_arg in 0 .. call_n_arg {
         if is_var[call_i_arg] {
             arg_var_index.push( arg[4 + call_i_arg]  );
