@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This module can be used to checkpoint a section of AD computation
+//! This module can be used to checkpoint a section of {AD computation
 //! : [parent module](super)
 //!
 //! # Example
@@ -47,14 +47,14 @@ use std::thread::LocalKey;
 use std::cell::RefCell;
 //
 use crate::{Index, Float};
-use crate::function::ADFun;
+use crate::function::{GADFun, ADFun};
 use crate::AD;
 use crate::record::{Tape, GTape, ThisThreadTape};
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 //
 // OneCheckpointInfo
 /// Information used to splice a checkpoint function call into a recording.
-pub(crate) struct OneCheckpointInfo {
+pub(crate) struct OneCheckpointInfo<F,U> {
     //
     // fun_index
     /// is the index of this checkpoint function in the vector of all
@@ -69,18 +69,18 @@ pub(crate) struct OneCheckpointInfo {
     // adfun
     /// ia the [ADFun] object that is used to evaluate this chekcpoing unciton
     /// and its derivative.
-    pub adfun        : ADFun,
+    pub adfun        : GADFun<F,U>,
     //
     // dependency
     /// is the dependency pattern as vector of pairs of non-negative integers.
     /// If (i,j) is not in dependency, then the i-th component of the range
     /// does not depend on the j-th component of the domain.
-    pub dependency   : Vec<(Index, Index)>,
+    pub dependency   : Vec<(U, U)>,
 }
 //
 // AllCheckpointInfo
 pub (crate) struct AllCheckpointInfo {
-   pub vec : Vec<OneCheckpointInfo> ,
+   pub vec : Vec< OneCheckpointInfo<Float,Index> > ,
    pub map : std::collections::HashMap<String, usize> ,
 }
 impl AllCheckpointInfo {
@@ -205,7 +205,7 @@ pub fn use_checkpoint(
 /// domain variable values.
 fn use_checkpoint_info(
     tape             : &mut Tape,
-    check_point_info : &OneCheckpointInfo,
+    check_point_info : &OneCheckpointInfo<Float,Index>,
     ad_domain        : &Vec<AD>,
     trace            : bool,
 ) -> Vec<AD> {
