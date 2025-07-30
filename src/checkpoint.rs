@@ -52,9 +52,9 @@ use crate::AD;
 use crate::record::{Tape, GTape, ThisThreadTape};
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 //
-// CheckpointInfo
+// OneCheckpointInfo
 /// Information used to splice a checkpoint function call into a recording.
-pub(crate) struct CheckpointInfo {
+pub(crate) struct OneCheckpointInfo {
     //
     // fun_index
     /// is the index of this checkpoint function in the vector of all
@@ -78,20 +78,26 @@ pub(crate) struct CheckpointInfo {
     pub dependency   : Vec<(Index, Index)>,
 }
 //
+pub (crate) struct AllCheckpointInfo {
+   pub vec : Vec<OneCheckpointInfo> ,
+   pub map : std::collections::HashMap<String, usize> ,
+}
+impl AllCheckpointInfo {
+   pub fn new() -> Self {
+      Self {
+         vec : Vec::new() ,
+         map : std::collections::HashMap::new() ,
+      }
+   }
+}
 thread_local! {
     //
-    // THIS_THREAD_CHECKOINT_VEC
-    /// thread local storage holding a vector of CheckpointInfo objects.
-    pub(crate) static THIS_THREAD_CHECKPOINT_VEC:
-        std::cell::RefCell< Vec<CheckpointInfo> > =
-            std::cell::RefCell::new( Vec::new() );
+    // THIS_THREAD_CHECKPOINT_ALL
+    /// thread local storage holding a vector of OneCheckpointInfo objects.
+    pub(crate) static THIS_THREAD_CHECKPOINT_ALL:
+        std::cell::RefCell<AllCheckpointInfo> =
+            std::cell::RefCell::new( AllCheckpointInfo::new() );
     //
-    // THIS_THREAD_CHECKPOINT_MAP
-    /// thread local storage that maps names to index in
-    /// THIS_THREAD_CHECKPONT_VEC
-    pub(crate) static THIS_THREAD_CHECKPOINT_MAP:
-        std::cell::RefCell< std::collections::HashMap<String, usize> > =
-            std::cell::RefCell::new( std::collections::HashMap::new() );
 }
 //
 // store_checkpoint
@@ -108,28 +114,28 @@ pub fn store_checkpoint(
     fun:  ADFun,
     name: &String) {
     //
-    // fun_index, THIS_THREAD_CHECKPONT_VEC
-    let fun_index = THIS_THREAD_CHECKPOINT_VEC.with_borrow_mut( |vec| {
-        let index           = vec.len();
+    // fun_index, THIS_THREAD_CHECKPOINT_ALL
+    let fun_index = THIS_THREAD_CHECKPOINT_ALL.with_borrow_mut( |all| {
+        let index           = all.vec.len();
         let trace           = false;
         let pattern         = fun.dependency(trace);
-        let checkpoint_info = CheckpointInfo {
+        let checkpoint_info = OneCheckpointInfo {
             fun_index  : index,
             name       : name.clone(),
             adfun      : fun,
             dependency : pattern,
         };
-        vec.push( checkpoint_info );
+        all.vec.push( checkpoint_info );
         index
     } );
     //
-    // THIS_THREAD_CHECKPOINT_MAP
-    THIS_THREAD_CHECKPOINT_MAP.with_borrow_mut( |map| {
+    // THIS_THREAD_CHECKPOINT_ALL
+    THIS_THREAD_CHECKPOINT_ALL.with_borrow_mut( |all| {
         assert!(
-            ! map.contains_key(name),
+            ! all.map.contains_key(name),
             "store_checkpoint: name {name} was used before on this thread"
         );
-        map.insert(name.clone(), fun_index);
+        all.map.insert(name.clone(), fun_index);
     } );
 }
 //
@@ -159,8 +165,8 @@ pub fn use_checkpoint(
 ) -> Vec<AD> {
     //
     // fun_index
-    let fun_index = THIS_THREAD_CHECKPOINT_MAP.with_borrow( |map| {
-        let option_fun_index = map.get(name);
+    let fun_index = THIS_THREAD_CHECKPOINT_ALL.with_borrow( |all| {
+        let option_fun_index = all.map.get(name);
         if option_fun_index == None {
             panic!("use_checkpoint: \
                     name {name} has not been stored as a checkpoint."
@@ -170,8 +176,8 @@ pub fn use_checkpoint(
     } );
     //
     // checkpoint_info
-    let ad_range = THIS_THREAD_CHECKPOINT_VEC.with_borrow( |vec| {
-        let check_point_info = &vec[fun_index];
+    let ad_range = THIS_THREAD_CHECKPOINT_ALL.with_borrow( |all| {
+        let check_point_info = &all.vec[fun_index];
         assert_eq!( fun_index, check_point_info.fun_index );
         let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
             < Float as ThisThreadTape<Index> >::get();
@@ -184,7 +190,7 @@ pub fn use_checkpoint(
 }
 //
 // use_checkpoint_info
-/// Make a call, by CheckpointInfo, to a checkpoint function.
+/// Make a call, by OneCheckpointInfo, to a checkpoint function.
 ///
 /// If the tape for this thread is recording, include the call
 /// as a checkpoint in the tape.
@@ -207,7 +213,7 @@ pub fn use_checkpoint(
 /// domain variable values.
 fn use_checkpoint_info(
     tape             : &mut Tape,
-    check_point_info : &CheckpointInfo,
+    check_point_info : &OneCheckpointInfo,
     ad_domain        : &Vec<AD>,
     trace            : bool,
 ) -> Vec<AD> {
