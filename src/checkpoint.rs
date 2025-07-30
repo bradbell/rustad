@@ -78,6 +78,7 @@ pub(crate) struct OneCheckpointInfo {
     pub dependency   : Vec<(Index, Index)>,
 }
 //
+// AllCheckpointInfo
 pub (crate) struct AllCheckpointInfo {
    pub vec : Vec<OneCheckpointInfo> ,
    pub map : std::collections::HashMap<String, usize> ,
@@ -90,14 +91,14 @@ impl AllCheckpointInfo {
       }
    }
 }
+//
+// THIS_THREAD_CHECKPOINT_ALL
 thread_local! {
     //
-    // THIS_THREAD_CHECKPOINT_ALL
     /// thread local storage holding a vector of OneCheckpointInfo objects.
     pub(crate) static THIS_THREAD_CHECKPOINT_ALL:
         std::cell::RefCell<AllCheckpointInfo> =
             std::cell::RefCell::new( AllCheckpointInfo::new() );
-    //
 }
 //
 // store_checkpoint
@@ -114,8 +115,12 @@ pub fn store_checkpoint(
     fun:  ADFun,
     name: &String) {
     //
-    // fun_index, THIS_THREAD_CHECKPOINT_ALL
-    let fun_index = THIS_THREAD_CHECKPOINT_ALL.with_borrow_mut( |all| {
+    // THIS_THREAD_CHECKPOINT_ALL
+    THIS_THREAD_CHECKPOINT_ALL.with_borrow_mut( |all| {
+        assert!(
+            ! all.map.contains_key(name),
+            "store_checkpoint: name {name} was used before on this thread"
+        );
         let index           = all.vec.len();
         let trace           = false;
         let pattern         = fun.dependency(trace);
@@ -126,16 +131,7 @@ pub fn store_checkpoint(
             dependency : pattern,
         };
         all.vec.push( checkpoint_info );
-        index
-    } );
-    //
-    // THIS_THREAD_CHECKPOINT_ALL
-    THIS_THREAD_CHECKPOINT_ALL.with_borrow_mut( |all| {
-        assert!(
-            ! all.map.contains_key(name),
-            "store_checkpoint: name {name} was used before on this thread"
-        );
-        all.map.insert(name.clone(), fun_index);
+        all.map.insert(name.clone(), index);
     } );
 }
 //
@@ -164,19 +160,15 @@ pub fn use_checkpoint(
     trace     : bool,
 ) -> Vec<AD> {
     //
-    // fun_index
-    let fun_index = THIS_THREAD_CHECKPOINT_ALL.with_borrow( |all| {
+    // THIS_THREAD_CHECKPOINT_ALL
+    let ad_range = THIS_THREAD_CHECKPOINT_ALL.with_borrow( |all| {
         let option_fun_index = all.map.get(name);
         if option_fun_index == None {
             panic!("use_checkpoint: \
                     name {name} has not been stored as a checkpoint."
             );
         }
-        *option_fun_index.unwrap()
-    } );
-    //
-    // checkpoint_info
-    let ad_range = THIS_THREAD_CHECKPOINT_ALL.with_borrow( |all| {
+        let fun_index        = *option_fun_index.unwrap();
         let check_point_info = &all.vec[fun_index];
         assert_eq!( fun_index, check_point_info.fun_index );
         let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
