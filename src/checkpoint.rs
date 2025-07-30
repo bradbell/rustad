@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This module can be used to checkpoint a section of {AD computation
+//! This module can be used to checkpoint a section of AD computation
 //! : [parent module](super)
 //!
 //! # Example
@@ -79,11 +79,11 @@ pub(crate) struct OneCheckpointInfo<F,U> {
 }
 //
 // AllCheckpointInfo
-pub (crate) struct AllCheckpointInfo {
-   pub vec : Vec< OneCheckpointInfo<Float,Index> > ,
+pub (crate) struct AllCheckpointInfo<F,U> {
+   pub vec : Vec< OneCheckpointInfo<F,U> > ,
    pub map : std::collections::HashMap<String, usize> ,
 }
-impl AllCheckpointInfo {
+impl<F,U> AllCheckpointInfo<F,U> {
    pub fn new() -> Self {
       Self {
          vec : Vec::new() ,
@@ -97,7 +97,7 @@ thread_local! {
     //
     /// thread local storage holding a vector of OneCheckpointInfo objects.
     pub(crate) static THIS_THREAD_CHECKPOINT_ALL:
-        std::cell::RefCell<AllCheckpointInfo> =
+        std::cell::RefCell< AllCheckpointInfo<Float,Index> > =
             std::cell::RefCell::new( AllCheckpointInfo::new() );
 }
 //
