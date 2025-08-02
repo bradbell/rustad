@@ -47,7 +47,6 @@ use std::thread::LocalKey;
 use std::cell::RefCell;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
-use crate::AD;
 use crate::ad::GAD;
 use crate::function::GADFun;
 use crate::operator::GlobalOpInfoVec;
@@ -56,7 +55,6 @@ use crate::ptrait::GenericAs;
 use crate::ptrait::ThisThreadCheckpointAllPublic;
 use crate::record::GTape;
 use crate::record::sealed::ThisThreadTape;
-use crate::{Index, Float};
 // END_SORT_THIS_LINE_MINUS_1
 //
 // OneCheckpointInfo
@@ -208,20 +206,30 @@ where
 /// The value of the domain variables for the function bning called.
 ///
 /// * trace :
-/// If this is true (false), a Float evaluation of the
+/// If this is true (false), evaluation of the
 /// checkpoint function corresponding to *ad_domain* is traced.
 ///
 /// * return :
 /// The values of the range variables that correspond to the
 /// domain variable values.
-pub fn use_checkpoint(
+pub fn use_checkpoint<F,U>(
     name      : &String,
-    ad_domain : &Vec<AD>,
+    ad_domain : &Vec< GAD<F,U> >,
     trace     : bool,
-) -> Vec<AD> {
-    //
+) -> Vec< GAD<F,U> >
+where
+    U:        'static + Copy + GenericAs<usize> + std::fmt::Debug,
+    usize:    GenericAs<U> ,
+    GAD<F,U>: From<F>,
+    F:        Copy +
+              From<f32> +
+              std::fmt::Display +
+              sealed::ThisThreadCheckpointAll<U> +
+              GlobalOpInfoVec<U> +
+              ThisThreadTape<U>,
+{   //
     // ad_range
-    let local_key = < Float as sealed::ThisThreadCheckpointAll<Index> >::get();
+    let local_key = < F as sealed::ThisThreadCheckpointAll<U> >::get();
     let ad_range  = local_key.with_borrow( |all| {
         let option_fun_index = all.map.get(name);
         if option_fun_index == None {
@@ -232,8 +240,8 @@ pub fn use_checkpoint(
         let fun_index        = *option_fun_index.unwrap();
         let check_point_info = &all.vec[fun_index];
         assert_eq!( fun_index, check_point_info.fun_index );
-        let local_key : &LocalKey< RefCell< GTape<Float, Index> > > =
-            < Float as ThisThreadTape<Index> >::get();
+        let local_key : &LocalKey< RefCell< GTape<F,U> > > =
+            < F as ThisThreadTape<U> >::get();
         let ad_range_zero = local_key.with_borrow_mut( |tape|
             use_checkpoint_info(tape, check_point_info, ad_domain, trace)
         );
@@ -258,7 +266,7 @@ pub fn use_checkpoint(
 /// The value of the checkpoint function domain variables.
 ///
 /// * trace :
-/// If this is true (false), a Float evaluation of the
+/// If this is true (false), evaluation of the
 /// checkpoint function corresponding to *ad_domain* is traced.
 ///
 /// * return :
