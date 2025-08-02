@@ -216,6 +216,9 @@ pub type ArgVarIndex<U> = fn(
 // ForwardZeroBinary
 /// This is a [ForwardZero] with E = F and the following extra conditions:
 ///
+/// * F      : floating point type for values in this operation sequence.
+/// * U      : unsigned integer type for indices in this operation sequence.
+///
 /// * op :
 /// we use the notation *op* for this operator's symbol; e.g. + for addition.
 ///
@@ -244,8 +247,8 @@ pub type ArgVarIndex<U> = fn(
 ///     var_zero[res] = con[lhs] op var_zero[rhs]
 /// ```
 #[cfg(doc)]
-pub type ForwardZeroBinary = fn(_var_zero: &mut Vec<Float>,
-    _con_all: &Vec<Float>, _arg: &[Index], _res: usize
+pub type ForwardZeroBinary<F,U> = fn(_var_zero: &mut Vec<F>,
+    _con_all: &Vec<F>, _arg: &[U], _res: usize
 );
 //
 // ForwardOneBinary
@@ -259,8 +262,8 @@ pub type ForwardZeroBinary = fn(_var_zero: &mut Vec<Float>,
 /// * Other Arguments : see [ForwardZeroBinary]
 ///
 #[cfg(doc)]
-pub type ForwardOneBinary = fn(_var_one: &mut Vec<Float>,
-    _var_zero : &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
+pub type ForwardOneBinary<F,U> = fn(_var_one: &mut Vec<F>,
+    _var_zero : &Vec<U>, _con_all: &Vec<Float>, _arg: &[U], _res: usize
 );
 //
 // ReverseOneBinary
@@ -277,8 +280,8 @@ pub type ForwardOneBinary = fn(_var_one: &mut Vec<Float>,
 /// * Other Arguments : see [ForwardZeroBinary]
 ///
 #[cfg(doc)]
-pub type ReverseOneBinary = fn(_var_one: &mut Vec<Float>,
-    _var_zero : &Vec<Float>, _con_all: &Vec<Float>, _arg: &[Index], _res: usize
+pub type ReverseOneBinary<F,U> = fn(_var_one: &mut Vec<F>,
+    _var_zero : &Vec<F>, _con_all: &Vec<F>, _arg: &[U], _res: usize
 );
 // ---------------------------------------------------------------------------
 // Default evaluations
