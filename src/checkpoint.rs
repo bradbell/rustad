@@ -48,13 +48,14 @@ use std::cell::RefCell;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
 use crate::AD;
+use crate::ad::GAD;
 use crate::function::GADFun;
 use crate::operator::GlobalOpInfoVec;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 use crate::ptrait::GenericAs;
 use crate::ptrait::ThisThreadCheckpointAllPublic;
+use crate::record::GTape;
 use crate::record::sealed::ThisThreadTape;
-use crate::record::{Tape, GTape};
 use crate::{Index, Float};
 // END_SORT_THIS_LINE_MINUS_1
 //
@@ -263,12 +264,18 @@ pub fn use_checkpoint(
 /// * return :
 /// The values of the range variables that correspond to the
 /// domain variable values.
-fn use_checkpoint_info(
-    tape             : &mut Tape,
-    check_point_info : &OneCheckpointInfo<Float,Index>,
-    ad_domain        : &Vec<AD>,
+fn use_checkpoint_info<F,U>(
+    tape             : &mut GTape<F,U>,
+    check_point_info : &OneCheckpointInfo<F,U>,
+    ad_domain        : &Vec< GAD<F,U> >,
     trace            : bool,
-) -> Vec<AD> {
+) -> Vec< GAD<F,U> >
+where
+    F:         Copy + From<f32> + GlobalOpInfoVec<U> + std::fmt::Display,
+    U:         'static + Copy + GenericAs<usize> + std::fmt::Debug,
+    GAD<F, U>: From<F>,
+    usize:     GenericAs<U>,
+{
     //
     // name, adfun, dependency
     let fun_index  = check_point_info.fun_index;
@@ -287,7 +294,7 @@ fn use_checkpoint_info(
     let call_n_res = adfun.range_len();
     //
     // domain_zero
-    let mut domain_zero : Vec<Float> = Vec::new();
+    let mut domain_zero : Vec<F> = Vec::new();
     for j in 0 .. call_n_arg {
         domain_zero.push( ad_domain[j].value );
     }
@@ -296,9 +303,13 @@ fn use_checkpoint_info(
     let (range_zero, _var_zero) = adfun.forward_zero(&domain_zero, trace);
     //
     // ad_range
-    let mut ad_range : Vec<AD> = Vec::new();
+    let mut ad_range : Vec< GAD<F,U> > = Vec::new();
     for i in 0 .. call_n_res {
-        ad_range.push( AD {tape_id: 0, var_index: 0, value: range_zero[i]} );
+        ad_range.push( GAD {
+            tape_id:    GenericAs::gas(0),
+            var_index:  GenericAs::gas(0),
+            value:      range_zero[i],
+        } );
     }
     //
     //
@@ -306,16 +317,16 @@ fn use_checkpoint_info(
         //
         // is_var_domain
         let mut is_var_domain : Vec<bool> = Vec::new();
-        for j in 0 .. call_n_arg {
-            is_var_domain.push(tape.tape_id == ad_domain[j].tape_id as usize);
-        }
+        for j in 0 .. call_n_arg { is_var_domain.push(
+            tape.tape_id == GenericAs::gas( ad_domain[j].tape_id )
+        ); }
         //
         // is_var_range
         let mut is_var_range = vec![false; call_n_res];
         for k in 0 .. dependency.len() {
             let (i,j) = dependency[k];
-            if is_var_domain[j as usize] {
-                is_var_range[i as usize] = true;
+            if is_var_domain[ GenericAs::gas(j) ] {
+                is_var_range[ GenericAs::gas(i) ] = true;
             }
         }
         //
@@ -330,7 +341,7 @@ fn use_checkpoint_info(
         tape.arg_all.push( GenericAs::gas( tape.flag_all.len() ) ); // arg[3]
         for j in 0 .. call_n_arg {
             let index = if is_var_domain[j] {
-                ad_domain[j].var_index as usize
+                GenericAs::gas( ad_domain[j].var_index )
             } else {
                 let con_index = tape.con_all.len();
                 tape.con_all.push( ad_domain[j].value );

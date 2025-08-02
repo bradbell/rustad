@@ -10,9 +10,6 @@ use crate::ptrait::GenericAs;
 use crate::ad::GAD;
 //
 #[cfg(doc)]
-use crate::record::{Tape};
-//
-#[cfg(doc)]
 use crate::function::ADFun;
 //
 #[cfg(doc)]

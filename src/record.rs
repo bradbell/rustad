@@ -9,8 +9,6 @@
 use std::cell::RefCell;
 use std::thread::LocalKey;
 //
-use crate::Index;
-use crate::Float;
 use std::sync::Mutex;
 //
 #[cfg(doc)]
@@ -72,10 +70,6 @@ pub struct GTape<F, U> {
     /// operator definitions.
     pub flag_all       : Vec<bool>,
 }
-//
-// Tape
-/// Tape is the GTape that corresponds to AD
-pub type Tape = GTape<Float, Index>;
 // ---------------------------------------------------------------------------
 // GTape::new
 //
