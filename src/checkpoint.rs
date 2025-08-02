@@ -49,7 +49,8 @@ use std::cell::RefCell;
 use crate::{Index, Float};
 use crate::function::{GADFun, ADFun};
 use crate::AD;
-use crate::record::{Tape, GTape, ThisThreadTape};
+use crate::record::{Tape, GTape};
+use crate::record::sealed::ThisThreadTape;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 //
 // OneCheckpointInfo

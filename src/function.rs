@@ -13,7 +13,8 @@ use std::thread::LocalKey;
 use crate::ad::GAD;
 use crate::operator::GlobalOpInfoVec;
 use crate::ptrait::GenericAs;
-use crate::record::{NEXT_TAPE_ID, GTape, ThisThreadTape};
+use crate::record::sealed::ThisThreadTape;
+use crate::record::{NEXT_TAPE_ID, GTape};
 use crate::{Index, Float};
 // END_SORT_THIS_LINE_MINUS_1
 //

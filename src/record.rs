@@ -104,19 +104,27 @@ impl<F, U> GTape<F, U> {
 /// (0 is not used for a recording).
 pub (crate) static NEXT_TAPE_ID : Mutex<usize> = Mutex::new(1);
 // ---------------------------------------------------------------------------
-//
-// ThisThreadTape
-/// ```text
-///     < F as ThisThreadTape >::get()
-/// ```
-/// returns a reference to the tape for recording GAD<F,U> using this thread.
-///
-pub trait ThisThreadTape<U>
-where
-    Self : Sized + 'static ,
-    U    : Sized + 'static ,
-{
-    fn get() -> &'static LocalKey< RefCell< GTape<Self, U> > >;
+pub (crate) mod sealed {
+    //! The sub-module sealed is used to seal traits in this package.
+    //! This is not necessary for this case because the super mod is not public.
+    //
+    use super::GTape;
+    use std::cell::RefCell;
+    use std::thread::LocalKey;
+    //
+    // ThisThreadTape
+    /// ```text
+    ///     < F as sealed::ThisThreadTape >::get()
+    /// ```
+    /// returns a reference to tape for recording GAD<F,U> using this thread.
+    ///
+    pub trait ThisThreadTape<U>
+    where
+        Self : Sized + 'static ,
+        U    : Sized + 'static ,
+    {
+        fn get() -> &'static LocalKey< RefCell< GTape<Self, U> > >;
+    }
 }
 //
 /// Get reference to the tape for this thread.
@@ -129,7 +137,7 @@ macro_rules! impl_this_thread_tape{ ($f1:ident, $u2:ident) => {
         "This threads tape for recording ",
         "GAD<" , stringify!($f1), ", ", stringify!($u2), "> operations"
     ) ]
-    impl ThisThreadTape<$u2> for $f1 {
+    impl sealed::ThisThreadTape<$u2> for $f1 {
         fn get() -> &'static LocalKey< RefCell< GTape<$f1, $u2> > > {
             thread_local! {
                 pub(crate) static THIS_THREAD_TAPE :

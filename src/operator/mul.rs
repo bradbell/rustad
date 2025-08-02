@@ -25,7 +25,8 @@ use crate::operator::OpInfo;
 use crate::operator::binary_op_forward_0;
 use crate::operator::id::{MUL_CV_OP, MUL_VC_OP, MUL_VV_OP};
 use crate::ptrait::GenericAs;
-use crate::record::{GTape, ThisThreadTape};
+use crate::record::GTape;
+use crate::record::sealed::ThisThreadTape;
 // END_SORT_THIS_LINE_MINUS_1
 //
 #[cfg(doc)]

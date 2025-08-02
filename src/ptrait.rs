@@ -51,7 +51,7 @@ generic_as!(u16, usize);
 generic_as!(u8, usize);
 //
 // ----------------------------------------------------------------------------
-use crate::record::ThisThreadTape;
+use crate::record::sealed::ThisThreadTape;
 //
 pub trait ThisThreadTapePublic<U> : ThisThreadTape<U>
 where
