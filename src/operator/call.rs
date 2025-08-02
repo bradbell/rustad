@@ -39,7 +39,7 @@
 //
 use crate::ptrait::GenericAs;
 use crate::{Index, Float};
-use crate::checkpoint::THIS_THREAD_CHECKPOINT_ALL;
+use crate::checkpoint::ThisThreadCheckpointAll;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 use crate::operator::OpInfo;
 //
@@ -94,7 +94,8 @@ where
     }
     //
     // call_range_zero
-    let call_range_zero = THIS_THREAD_CHECKPOINT_ALL.with_borrow( |all| {
+    let local_key       = < Float as ThisThreadCheckpointAll<Index> >::get();
+    let call_range_zero = local_key.with_borrow( |all| {
         let checkpoint_info = &all.vec[call_index];
         let adfun           = &checkpoint_info.adfun;
         let trace           = false;

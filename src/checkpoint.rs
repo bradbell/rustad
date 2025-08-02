@@ -92,14 +92,49 @@ impl<F,U> AllCheckpointInfo<F,U> {
    }
 }
 //
-// THIS_THREAD_CHECKPOINT_ALL
-thread_local! {
-    //
-    /// thread local storage holding a vector of OneCheckpointInfo objects.
-    pub(crate) static THIS_THREAD_CHECKPOINT_ALL:
-        std::cell::RefCell< AllCheckpointInfo<Float,Index> > =
-            std::cell::RefCell::new( AllCheckpointInfo::new() );
+// ThisThreadCheckpointAll
+/// ```text
+///     < F as ThisThreadCheckpointAll >::get()
+/// ```
+/// returns a reference to this tape's GAD<F,U> checkpoint information.
+///
+/// 2DO: Perhaps it would be better if this were global instead of tape local.
+///
+pub(crate) trait ThisThreadCheckpointAll<U>
+where
+    Self : Sized + 'static ,
+    U    : Sized + 'static ,
+{
+    fn get() -> &'static LocalKey< RefCell< AllCheckpointInfo<Self, U> > >;
 }
+//
+/// Get reference to the tape for this thread.
+///
+/// * f1 : is the floating point type used for values calculations.
+/// * u2 : is the unsigned integer type used for tape indices.
+///
+macro_rules! impl_this_thread_checkpoint{ ($f1:ident, $u2:ident) => {
+    #[doc = concat!(
+        "This threads tape for recording ",
+        "GAD<" , stringify!($f1), ", ", stringify!($u2), "> operations"
+    ) ]
+    impl ThisThreadCheckpointAll<$u2> for $f1 {
+        fn get()
+        -> &'static LocalKey< RefCell< AllCheckpointInfo<$f1, $u2> > > {
+            thread_local! {
+                pub(crate) static THIS_THREAD_CHECKPOINT_ALL :
+                    RefCell< AllCheckpointInfo<$f1, $u2> > =
+                        RefCell::new( AllCheckpointInfo::new() );
+
+            }
+            &THIS_THREAD_CHECKPOINT_ALL
+        }
+    }
+} }
+impl_this_thread_checkpoint!(f32, u32);
+impl_this_thread_checkpoint!(f32, u64);
+impl_this_thread_checkpoint!(f64, u32);
+impl_this_thread_checkpoint!(f64, u64);
 //
 // store_checkpoint
 /// Converts an ADFun object to a checkpoint functions for this thread.
@@ -115,8 +150,9 @@ pub fn store_checkpoint(
     fun:  ADFun,
     name: &String) {
     //
-    // THIS_THREAD_CHECKPOINT_ALL
-    THIS_THREAD_CHECKPOINT_ALL.with_borrow_mut( |all| {
+    // This thread's checkpoint information for GAD<Float,Index>
+    let local_key = < Float as ThisThreadCheckpointAll<Index> >::get();
+    local_key.with_borrow_mut( |all| {
         assert!(
             ! all.map.contains_key(name),
             "store_checkpoint: name {name} was used before on this thread"
@@ -160,8 +196,9 @@ pub fn use_checkpoint(
     trace     : bool,
 ) -> Vec<AD> {
     //
-    // THIS_THREAD_CHECKPOINT_ALL
-    let ad_range = THIS_THREAD_CHECKPOINT_ALL.with_borrow( |all| {
+    // ad_range
+    let local_key = < Float as ThisThreadCheckpointAll<Index> >::get();
+    let ad_range  = local_key.with_borrow( |all| {
         let option_fun_index = all.map.get(name);
         if option_fun_index == None {
             panic!("use_checkpoint: \
