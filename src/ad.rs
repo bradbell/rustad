@@ -7,7 +7,7 @@
 //! : [parent module](super)
 //
 #[cfg(doc)]
-use crate::function::{ADFun, ad_domain};
+use crate::function::{GADFun, ad_domain};
 //
 #[cfg(doc)]
 use crate::record::sealed::ThisThreadTape;
@@ -17,7 +17,7 @@ use crate::record::sealed::ThisThreadTape;
 /// Generic AD, acts like F but in addition can record
 /// a function evaluation.
 ///
-/// The recording is used to create an [ADFun] object.
+/// The recording is used to create an [GADFun] object.
 ///
 /// * F : is the floating point type used for computations.
 ///

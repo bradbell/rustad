@@ -2,10 +2,12 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
-use rustad::Float;
-use rustad::AD;
+use rustad::ad::GAD;
 use rustad::function;
 use rustad::utility::avg_seconds_to_execute;
+
+type Float = f64;
+type AD    = GAD<Float, u32>;
 
 fn vec_float2ad(vec : &Vec<Float> ) -> Vec<AD> {
     let mut result = Vec::new();
@@ -19,7 +21,7 @@ fn test_add_vv() {
     let x  : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
     let dx : Vec<Float> = vec![ 4.0, 5.0, 6.0 ];
     let ry : Vec<Float> = vec![ 7.0, 8.0 ];
-    let ax      = function::ad_domain(&x);
+    let ax : Vec<AD>    = function::ad_domain(&x);
     let ay_0    = ax[0] + ax[1];
     let ay_1    = ax[1] + ax[2];
     let ay      = vec! [ ay_0, ay_1 ];
@@ -44,7 +46,7 @@ fn test_mul_vv() {
     let x  : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
     let dx : Vec<Float> = vec![ 4.0, 5.0, 6.0 ];
     let ry : Vec<Float> = vec![ 6.0, 8.0 ];
-    let ax      = function::ad_domain(&x);
+    let ax : Vec<AD>    = function::ad_domain(&x);
     let ay_0    = ax[0] * ax[1];
     let ay_1    = ax[1] * ax[2];
     let ay      = vec! [ ay_0, ay_1 ];

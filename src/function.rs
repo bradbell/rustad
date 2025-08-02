@@ -15,7 +15,6 @@ use crate::operator::GlobalOpInfoVec;
 use crate::ptrait::GenericAs;
 use crate::record::sealed::ThisThreadTape;
 use crate::record::{NEXT_TAPE_ID, GTape};
-use crate::{Index, Float};
 // END_SORT_THIS_LINE_MINUS_1
 //
 #[cfg(doc)]
@@ -497,9 +496,6 @@ pub struct GADFun<F,U> {
     pub(crate) con_all             : Vec<F>,
 }
 //
-// ADFun
-pub type ADFun = GADFun<Float, Index>;
-//
 // ---------------------------------------------------------------------------
 impl<F,U> GADFun<F,U> {
     //
@@ -614,11 +610,12 @@ where
     /// Note that this can be used as a sparsity pattern for the Jacobian
     /// of the function.
     ///```
-    /// use rustad::{Float, Index, function};
+    /// use rustad::function;
     /// use rustad::ad::GAD;
-    /// let x       : Vec<Float> = vec![1.0, 2.0, 3.0];
-    /// let ax      = function::ad_domain(&x);
-    /// let mut ay  : Vec< GAD<Float,Index> > = Vec::new();
+    /// type AD = GAD<f32, u64>;
+    /// let x  : Vec<f32> = vec![1.0, 2.0, 3.0];
+    /// let ax : Vec<AD>  = function::ad_domain(&x);
+    /// let mut ay : Vec<AD> = Vec::new();
     /// for j in 0 .. x.len() {
     ///     ay.push( ax[j] * ax[j] );
     /// }

@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
-
-use rustad::{AD, Float};
+//
+use rustad::ad::GAD;
 use rustad::function;
-
+//
+type Float = f64; // f32 or u32
+type Index = u32; // u32 or u64
+type AD    = GAD<Float, Index>;
+//
 #[test]
 fn test_add_vv() {
     let x  : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];

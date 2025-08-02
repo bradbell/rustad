@@ -8,8 +8,8 @@
 //!
 //! # Example
 //! ```
-//! use rustad::Float;
 //! use rustad::function;
+//! use rustad::ad::GAD;
 //! use rustad::checkpoint::{store_checkpoint, use_checkpoint};
 //! //
 //! // trace
@@ -17,10 +17,10 @@
 //! //
 //! // f
 //! // f(x) = [x0 + x1, x1 * x2]
-//! let  x : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
-//! let ax      = function::ad_domain(&x);
-//! let ay      = vec![ ax[0] + ax[1], ax[1] * ax[2] ];
-//! let f       = function::ad_fun(&ay);
+//! let  x : Vec<f32>            = vec![ 1.0, 2.0, 3.0 ];
+//! let ax : Vec< GAD<f32,u32> > = function::ad_domain(&x);
+//! let ay = vec![ ax[0] + ax[1], ax[1] * ax[2] ];
+//! let f  = function::ad_fun(&ay);
 //! //
 //! // f
 //! // store as a checkpoint function
@@ -30,11 +30,11 @@
 //! // g
 //! // g(u) = f( u0, u0 + u1, u1)
 //! //      = [ u0 + u0 + u1 , (u0 + u1) * u1 ]
-//! let  u : Vec<Float>  = vec![ 4.0, 5.0];
-//! let au      = function::ad_domain(&u);
-//! let ax      = vec![ au[0], au[0] + au[1], au[1] ];
-//! let ay      = use_checkpoint(&name, &ax, trace);
-//! let g       = function::ad_fun(&ay);
+//! let  u : Vec<f32>            = vec![ 4.0, 5.0];
+//! let au : Vec< GAD<f32,u32> > = function::ad_domain(&u);
+//! let ax = vec![ au[0], au[0] + au[1], au[1] ];
+//! let ay = use_checkpoint(&name, &ax, trace);
+//! let g  = function::ad_fun(&ay);
 //! //
 //! // w
 //! // w = g(u)

@@ -24,19 +24,8 @@ pub mod ptrait;
 // utility
 pub mod utility;
 //
-// Index
-/// Type used for indexing vectors in the tape.
-/// It must be able to represent the total number of
-/// tape ids, operator indices, constants, and arguments to operators.
-pub type Index = u64;
-//
-// Float
-/// Floating point Type used for AD operations.
-pub type Float = f64;
-//
-// AD
+// ad
 pub mod ad;
-pub type AD = ad::GAD<Float,Index>;
 //
 // operator
 pub(crate) mod operator;

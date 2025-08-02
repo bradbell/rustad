@@ -2,9 +2,13 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
-use rustad::{Float, AD};
+use rustad::ad::GAD;
 use rustad::function;
 use rustad::checkpoint::{store_checkpoint, use_checkpoint};
+//
+type Float = f64; // f32 or u32
+type Index = u64; // f64 or u64
+type AD    = GAD<Float, Index>;
 
 #[test]
 fn simple() {
@@ -13,7 +17,7 @@ fn simple() {
     // f
     // f(x) = [x0 + x1, x1 * x2]
     let  x : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
-    let ax      = function::ad_domain(&x);
+    let ax : Vec<AD>    = function::ad_domain(&x);
     let ay      = vec![ ax[0] + ax[1], ax[1] * ax[2] ];
     let f       = function::ad_fun(&ay);
     //
@@ -26,7 +30,7 @@ fn simple() {
     // g(u) = f( u0, u0 + u1, u1)
     //      = [ u0 + u0 + u1 , (u0 + u1) * u1 ]
     let  u : Vec<Float>  = vec![ 4.0, 5.0];
-    let au      = function::ad_domain(&u);
+    let au : Vec<AD>     = function::ad_domain(&u);
     let ax      = vec![ au[0], au[0] + au[1], au[1] ];
     let ay      = use_checkpoint(&name, &ax, trace);
     let g       = function::ad_fun(&ay);
@@ -48,10 +52,9 @@ fn constant_in_range_space() {
     // f
     // f(x) = [x0 + x1, x1 * x2, constant]
     let  x : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
+    let ax : Vec<AD>    = function::ad_domain(&x);
     let  constant : Float = 11.0;
-    let ax      = function::ad_domain(&x);
     let ay      = vec![ ax[0] + ax[1], ax[1] * ax[2], AD::from(constant) ];
-
     let f       = function::ad_fun(&ay);
     f.forward_zero(&x, trace);
     //
@@ -64,7 +67,7 @@ fn constant_in_range_space() {
     // g(u) = f( u0, u0 + u1, u1)
     //      = [ u0 + u0 + u1 , (u0 + u1) * u1 , constant]
     let  u : Vec<Float>  = vec![ 4.0, 5.0];
-    let au      = function::ad_domain(&u);
+    let au : Vec<AD>     = function::ad_domain(&u);
     let ax      = vec![ au[0], au[0] + au[1], au[1] ];
     let ay      = use_checkpoint(&name, &ax, trace);
     let g       = function::ad_fun(&ay);

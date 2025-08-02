@@ -10,15 +10,10 @@ use crate::ptrait::GenericAs;
 use crate::ad::GAD;
 //
 #[cfg(doc)]
-use crate::function::ADFun;
-//
-#[cfg(doc)]
 use crate::function::{doc_forward_zero, doc_forward_one, doc_reverse_one};
 //
 use crate::record::sealed::ThisThreadTape;
 use crate::checkpoint::sealed::ThisThreadCheckpointAll;
-use crate::Float;
-use crate::Index;
 use id::NUMBER_OP;
 //
 // id
@@ -177,7 +172,7 @@ pub type ForwardOne<F, U, E> = fn(
 );
 //
 // reverse_one_fn
-/// Float evaluation of first order reverse mode.
+/// evaluation of first order reverse mode.
 ///
 /// * F      : floating point type for values in this operation sequence.
 /// * U      : unsigned integer type for indices in this operation sequence.
@@ -265,7 +260,7 @@ pub type ForwardZeroBinary<F,U> = fn(_var_zero: &mut Vec<F>,
 ///
 #[cfg(doc)]
 pub type ForwardOneBinary<F,U> = fn(_var_one: &mut Vec<F>,
-    _var_zero : &Vec<U>, _con_all: &Vec<Float>, _arg: &[U], _res: usize
+    _var_zero : &Vec<U>, _con_all: &Vec<F>, _arg: &[U], _res: usize
 );
 //
 // ReverseOneBinary
@@ -452,13 +447,16 @@ macro_rules! impl_global_op_info_vec{ ($f1:ident, $u2:ident) => {
         }
     }
 } }
-impl_global_op_info_vec!(Float, Index);
+impl_global_op_info_vec!(f32, u32);
+impl_global_op_info_vec!(f32, u64);
+impl_global_op_info_vec!(f64, u32);
+impl_global_op_info_vec!(f64, u64);
 //
 // Test that all operators have the proper name.
 // This test is referenced as at the end of id.rs.
 #[test]
 fn test_op_info() {
-    let op_info_vec = &*< Float as GlobalOpInfoVec<Index> >::get();
+    let op_info_vec = &*< f32 as GlobalOpInfoVec<u32> >::get();
     assert_eq!( "add_cv",   op_info_vec[id::ADD_CV_OP as usize].name );
     assert_eq!( "add_vc",   op_info_vec[id::ADD_VC_OP as usize].name );
     assert_eq!( "add_vv",   op_info_vec[id::ADD_VV_OP as usize].name );
