@@ -51,15 +51,29 @@ generic_as!(u16, usize);
 generic_as!(u8, usize);
 //
 // ----------------------------------------------------------------------------
-use crate::record::sealed::ThisThreadTape;
+// Sealed traits
+// https://rust-lang.github.io/api-guidelines/future-proofing.html
 //
+// ThisThreadTapePublic
+use crate::record::sealed::ThisThreadTape;
 pub trait ThisThreadTapePublic<U> : ThisThreadTape<U>
 where
     U : Sized + 'static ,
 {}
-//
 impl<F,U> ThisThreadTapePublic<U> for F
 where
     F : ThisThreadTape<U> ,
+    U : Sized + 'static ,
+{}
+//
+// ThisThreadCheckpointAllPublic
+use crate::checkpoint::sealed::ThisThreadCheckpointAll;
+pub trait ThisThreadCheckpointAllPublic<U> : ThisThreadCheckpointAll<U>
+where
+    U : Sized + 'static ,
+{}
+impl<F,U> ThisThreadCheckpointAllPublic<U> for F
+where
+    F : ThisThreadCheckpointAll<U> ,
     U : Sized + 'static ,
 {}

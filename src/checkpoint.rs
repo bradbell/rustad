@@ -46,12 +46,17 @@
 use std::thread::LocalKey;
 use std::cell::RefCell;
 //
-use crate::{Index, Float};
-use crate::function::{GADFun, ADFun};
+// BEGIN_SORT_THIS_LINE_PLUS_1
 use crate::AD;
-use crate::record::{Tape, GTape};
-use crate::record::sealed::ThisThreadTape;
+use crate::function::GADFun;
+use crate::operator::GlobalOpInfoVec;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
+use crate::ptrait::GenericAs;
+use crate::ptrait::ThisThreadCheckpointAllPublic;
+use crate::record::sealed::ThisThreadTape;
+use crate::record::{Tape, GTape};
+use crate::{Index, Float};
+// END_SORT_THIS_LINE_MINUS_1
 //
 // OneCheckpointInfo
 /// Information used to splice a checkpoint function call into a recording.
@@ -68,7 +73,8 @@ pub(crate) struct OneCheckpointInfo<F,U> {
     pub name         : String,
     //
     // adfun
-    /// ia the [ADFun] object that is used to evaluate this chekcpoing unciton
+    /// ia the [GADFun] object that is used to evaluate this
+    // checkpoint function
     /// and its derivative.
     pub adfun        : GADFun<F,U>,
     //
@@ -79,28 +85,30 @@ pub(crate) struct OneCheckpointInfo<F,U> {
     pub dependency   : Vec<(U, U)>,
 }
 //
-// AllCheckpointInfo
-pub (crate) struct AllCheckpointInfo<F,U> {
-   pub vec : Vec< OneCheckpointInfo<F,U> > ,
-   pub map : std::collections::HashMap<String, usize> ,
-}
-impl<F,U> AllCheckpointInfo<F,U> {
-   pub fn new() -> Self {
-      Self {
-         vec : Vec::new() ,
-         map : std::collections::HashMap::new() ,
-      }
-   }
-}
-//
+// sealed::AllCheckpointInfo
 // sealed::ThisThreadCheckpointAll
 pub (crate) mod sealed {
     //! The sub-module sealed is used to seal traits in this package.
     //
     use std::thread::LocalKey;
     use std::cell::RefCell;
-    use super::AllCheckpointInfo;
+    use super::OneCheckpointInfo;
     //
+    // AllCheckpointInfo
+    pub struct AllCheckpointInfo<F,U> {
+       pub (crate) vec : Vec< OneCheckpointInfo<F,U> > ,
+       pub (crate) map : std::collections::HashMap<String, usize> ,
+    }
+    impl<F,U> AllCheckpointInfo<F,U> {
+       pub fn new() -> Self {
+          Self {
+             vec : Vec::new() ,
+             map : std::collections::HashMap::new() ,
+          }
+       }
+    }
+    //
+    // ThisThreadCheckpointAll
     /// ```text
     ///     < F as sealed::ThisThreadCheckpointAll >::get()
     /// ```
@@ -109,7 +117,7 @@ pub (crate) mod sealed {
     /// 2DO: Perhaps it would be better if this were global
     /// instead of tape local.
     ///
-    pub(crate) trait ThisThreadCheckpointAll<U>
+    pub trait ThisThreadCheckpointAll<U>
     where
         Self : Sized + 'static ,
         U    : Sized + 'static ,
@@ -129,12 +137,12 @@ macro_rules! impl_this_thread_checkpoint{ ($f1:ident, $u2:ident) => {
         "GAD<" , stringify!($f1), ", ", stringify!($u2), "> operations"
     ) ]
     impl sealed::ThisThreadCheckpointAll<$u2> for $f1 {
-        fn get()
-        -> &'static LocalKey< RefCell< AllCheckpointInfo<$f1, $u2> > > {
+        fn get() ->
+        &'static LocalKey< RefCell< sealed::AllCheckpointInfo<$f1, $u2> > > {
             thread_local! {
                 pub(crate) static THIS_THREAD_CHECKPOINT_ALL :
-                    RefCell< AllCheckpointInfo<$f1, $u2> > =
-                        RefCell::new( AllCheckpointInfo::new() );
+                    RefCell< sealed::AllCheckpointInfo<$f1, $u2> > =
+                        RefCell::new( sealed::AllCheckpointInfo::new() );
 
             }
             &THIS_THREAD_CHECKPOINT_ALL
@@ -156,12 +164,17 @@ impl_this_thread_checkpoint!(f64, u64);
 /// The name the user chooses for this checkpoint function.
 /// This name must not appear in a previous `store_checkpoint` call
 /// on this thread.
-pub fn store_checkpoint(
-    fun:  ADFun,
-    name: &String) {
+pub fn store_checkpoint<F,U>(
+    fun:  GADFun<F,U>,
+    name: &String)
+where
+    F     : GlobalOpInfoVec<U> + ThisThreadCheckpointAllPublic<U> ,
+    U     : Copy + 'static + GenericAs<usize> + std::cmp::PartialEq,
+    usize : GenericAs<U>,
+{
     //
-    // This thread's checkpoint information for GAD<Float,Index>
-    let local_key = < Float as sealed::ThisThreadCheckpointAll<Index> >::get();
+    // This thread's checkpoint information for GAD<F,U>
+    let local_key = < F as sealed::ThisThreadCheckpointAll<U> >::get();
     local_key.with_borrow_mut( |all| {
         assert!(
             ! all.map.contains_key(name),
