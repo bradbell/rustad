@@ -39,7 +39,6 @@
 //
 use crate::ad::GAD;
 use crate::ptrait::GenericAs;
-use crate::{Index, Float};
 use crate::checkpoint::sealed::ThisThreadCheckpointAll;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 use crate::operator::GlobalOpInfoVec;
@@ -56,7 +55,7 @@ use crate::operator::{
 };
 //
 // forward_0_call
-/// Float zero order forward for call operator.
+/// zero order forward for call operator.
 ///
 /// Note that checkpoints do not allow for ad_forward because
 /// it would just record the evaluation inside of the checkpoint function.
@@ -157,7 +156,17 @@ where
 /// * op_info_vec :
 /// The map from [operator::id] to operator information.
 /// The map results for CALL_OP are set.
- pub(crate) fn set_op_info( op_info_vec : &mut Vec< OpInfo<Float,Index> > ) {
+pub(crate) fn set_op_info<F,U>( op_info_vec : &mut Vec< OpInfo<F,U> > )
+where
+    usize:      GenericAs<U> ,
+    U:          Copy + 'static + GenericAs<usize> + std::fmt::Debug ,
+    GAD<F,U>:   Copy + From<F> ,
+    F:          Copy +
+                From<f32> +
+                std::fmt::Display +
+                GlobalOpInfoVec<U> +
+                ThisThreadCheckpointAll<U> ,
+{
     op_info_vec[CALL_OP as usize] = OpInfo{
         name           : "call".to_string() ,
         forward_0      : forward_0_call,
