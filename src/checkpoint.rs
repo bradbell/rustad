@@ -93,20 +93,29 @@ impl<F,U> AllCheckpointInfo<F,U> {
    }
 }
 //
-// ThisThreadCheckpointAll
-/// ```text
-///     < F as ThisThreadCheckpointAll >::get()
-/// ```
-/// returns a reference to this tape's GAD<F,U> checkpoint information.
-///
-/// 2DO: Perhaps it would be better if this were global instead of tape local.
-///
-pub(crate) trait ThisThreadCheckpointAll<U>
-where
-    Self : Sized + 'static ,
-    U    : Sized + 'static ,
-{
-    fn get() -> &'static LocalKey< RefCell< AllCheckpointInfo<Self, U> > >;
+// sealed::ThisThreadCheckpointAll
+pub (crate) mod sealed {
+    //! The sub-module sealed is used to seal traits in this package.
+    //
+    use std::thread::LocalKey;
+    use std::cell::RefCell;
+    use super::AllCheckpointInfo;
+    //
+    /// ```text
+    ///     < F as sealed::ThisThreadCheckpointAll >::get()
+    /// ```
+    /// returns a reference to this tape's GAD<F,U> checkpoint information.
+    ///
+    /// 2DO: Perhaps it would be better if this were global
+    /// instead of tape local.
+    ///
+    pub(crate) trait ThisThreadCheckpointAll<U>
+    where
+        Self : Sized + 'static ,
+        U    : Sized + 'static ,
+    {
+        fn get() -> &'static LocalKey< RefCell< AllCheckpointInfo<Self, U> > >;
+    }
 }
 //
 /// Get reference to the tape for this thread.
@@ -119,7 +128,7 @@ macro_rules! impl_this_thread_checkpoint{ ($f1:ident, $u2:ident) => {
         "This threads tape for recording ",
         "GAD<" , stringify!($f1), ", ", stringify!($u2), "> operations"
     ) ]
-    impl ThisThreadCheckpointAll<$u2> for $f1 {
+    impl sealed::ThisThreadCheckpointAll<$u2> for $f1 {
         fn get()
         -> &'static LocalKey< RefCell< AllCheckpointInfo<$f1, $u2> > > {
             thread_local! {
@@ -152,7 +161,7 @@ pub fn store_checkpoint(
     name: &String) {
     //
     // This thread's checkpoint information for GAD<Float,Index>
-    let local_key = < Float as ThisThreadCheckpointAll<Index> >::get();
+    let local_key = < Float as sealed::ThisThreadCheckpointAll<Index> >::get();
     local_key.with_borrow_mut( |all| {
         assert!(
             ! all.map.contains_key(name),
@@ -198,7 +207,7 @@ pub fn use_checkpoint(
 ) -> Vec<AD> {
     //
     // ad_range
-    let local_key = < Float as ThisThreadCheckpointAll<Index> >::get();
+    let local_key = < Float as sealed::ThisThreadCheckpointAll<Index> >::get();
     let ad_range  = local_key.with_borrow( |all| {
         let option_fun_index = all.map.get(name);
         if option_fun_index == None {

@@ -39,7 +39,7 @@
 //
 use crate::ptrait::GenericAs;
 use crate::{Index, Float};
-use crate::checkpoint::ThisThreadCheckpointAll;
+use crate::checkpoint::sealed::ThisThreadCheckpointAll;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 use crate::operator::OpInfo;
 //

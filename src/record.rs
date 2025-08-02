@@ -104,6 +104,8 @@ impl<F, U> GTape<F, U> {
 /// (0 is not used for a recording).
 pub (crate) static NEXT_TAPE_ID : Mutex<usize> = Mutex::new(1);
 // ---------------------------------------------------------------------------
+//
+// sealed::ThisThreadTape
 pub (crate) mod sealed {
     //! The sub-module sealed is used to seal traits in this package.
     //! This is not necessary for this case because the super mod is not public.
@@ -112,7 +114,6 @@ pub (crate) mod sealed {
     use std::cell::RefCell;
     use std::thread::LocalKey;
     //
-    // ThisThreadTape
     /// ```text
     ///     < F as sealed::ThisThreadTape >::get()
     /// ```
