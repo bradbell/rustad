@@ -15,6 +15,8 @@ use crate::function::ADFun;
 #[cfg(doc)]
 use crate::function::{doc_forward_zero, doc_forward_one, doc_reverse_one};
 //
+use crate::record::sealed::ThisThreadTape;
+use crate::checkpoint::sealed::ThisThreadCheckpointAll;
 use crate::Float;
 use crate::Index;
 use id::NUMBER_OP;
@@ -383,7 +385,24 @@ pub struct OpInfo<F,U> {
 //
 // default_op_info_vec
 /// a vector of [OpInfo] where the name is empty and all the functions panic.
-fn default_op_info_vec() -> Vec< OpInfo<Float,Index> > {
+fn default_op_info_vec<F,U>() -> Vec< OpInfo<F,U> >
+where
+    usize:      GenericAs<U> ,
+    U:          Copy + 'static + GenericAs<usize> + std::fmt::Debug,
+    F:          Copy + 'static + From<F> + From<f32> + std::fmt::Display +
+                std::ops::Add<F, Output = F> +
+                std::ops::Mul<F, Output = F> +
+                std::ops::Add< GAD<F,U>, Output =  GAD<F,U> > +
+                std::ops::Mul< GAD<F,U>, Output =  GAD<F,U> > +
+                GlobalOpInfoVec<U> +
+                ThisThreadTape<U> +
+                ThisThreadCheckpointAll<U> ,
+    GAD<F,U>:   Copy + From<F> + std::fmt::Display +
+                std::ops::Add< F, Output = GAD<F,U> > +
+                std::ops::Mul< F, Output = GAD<F,U> > +
+                std::ops::Add< GAD<F,U>, Output =  GAD<F,U> > +
+                std::ops::Mul< GAD<F,U>, Output =  GAD<F,U> > ,
+{
     let empty         = OpInfo{
         name           : "".to_string(),
         forward_0      : panic_zero,
@@ -394,7 +413,7 @@ fn default_op_info_vec() -> Vec< OpInfo<Float,Index> > {
         ad_reverse_1   : panic_one,
         arg_var_index  : panic_arg_var_index,
     };
-    let mut result    = vec![empty ; NUMBER_OP as usize];
+    let mut result : Vec< OpInfo<F,U> > = vec![empty ; NUMBER_OP as usize];
     add::set_op_info(&mut result);
     call::set_op_info(&mut result);
     mul::set_op_info(&mut result);
