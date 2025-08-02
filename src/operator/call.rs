@@ -37,10 +37,12 @@
 //! operator in the sequence of operations. These are place holders so that
 //! there is a direct correpondence between variable and operator indices.
 //
+use crate::ad::GAD;
 use crate::ptrait::GenericAs;
 use crate::{Index, Float};
 use crate::checkpoint::sealed::ThisThreadCheckpointAll;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
+use crate::operator::GlobalOpInfoVec;
 use crate::operator::OpInfo;
 //
 #[cfg(doc)]
@@ -59,15 +61,20 @@ use crate::operator::{
 /// Note that checkpoints do not allow for ad_forward because
 /// it would just record the evaluation inside of the checkpoint function.
 fn forward_0_call<F,U>(
-    var_zero:    &mut Vec<Float>,
+    var_zero:    &mut Vec<F>,
     con:         &Vec<F>,
     flag_all:    &Vec<bool>,
     arg:         &[U],
     res:         usize)
 where
-    Float : From<F> ,
-    F     : Copy ,
-    U     : Copy + GenericAs<usize> ,
+    U : 'static + Copy + GenericAs<usize> + std::fmt::Debug,
+    F : Copy +
+        From<F> +
+        From<f32> +
+        GlobalOpInfoVec<U> +
+        std::fmt::Display +
+        ThisThreadCheckpointAll<U>,
+    GAD<F,U>: From<F>,
 {   //
     // call_index, n_arg, n_res
     let call_index  = GenericAs::gas(arg[0]);
@@ -83,18 +90,18 @@ where
     let is_res_var  = &flag_all[begin .. end];
     //
     // call_domain_zero
-    let mut call_domain_zero : Vec<Float> = Vec::new();
+    let mut call_domain_zero : Vec<F> = Vec::new();
     for i_arg in 0 .. n_arg {
         if is_arg_var[i_arg] {
             call_domain_zero.push( var_zero[ GenericAs::gas(arg[i_arg + 4]) ] );
         } else {
             let c = con[ GenericAs::gas(arg[i_arg + 4]) ];
-            call_domain_zero.push( Float::from(c) );
+            call_domain_zero.push( c );
         }
     }
     //
     // call_range_zero
-    let local_key       = < Float as ThisThreadCheckpointAll<Index> >::get();
+    let local_key       = < F as ThisThreadCheckpointAll<U> >::get();
     let call_range_zero = local_key.with_borrow( |all| {
         let checkpoint_info = &all.vec[call_index];
         let adfun           = &checkpoint_info.adfun;
