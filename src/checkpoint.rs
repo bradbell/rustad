@@ -12,13 +12,18 @@
 //! use rustad::gad::GAD;
 //! use rustad::checkpoint::{store_checkpoint, use_checkpoint};
 //! //
+//! // F, AD
+//! type F  = f32;
+//! type U  = u64;
+//! type AD = GAD<F,U>;
+//! //
 //! // trace
 //! let trace   = false;
 //! //
 //! // f
 //! // f(x) = [x0 + x1, x1 * x2]
-//! let  x : Vec<f32>            = vec![ 1.0, 2.0, 3.0 ];
-//! let ax : Vec< GAD<f32,u32> > = function::ad_domain(&x);
+//! let  x : Vec<F>  = vec![ 1.0, 2.0, 3.0 ];
+//! let ax : Vec<AD> = function::ad_domain(&x);
 //! let ay = vec![ ax[0] + ax[1], ax[1] * ax[2] ];
 //! let f  = function::ad_fun(&ay);
 //! //
@@ -30,8 +35,8 @@
 //! // g
 //! // g(u) = f( u0, u0 + u1, u1)
 //! //      = [ u0 + u0 + u1 , (u0 + u1) * u1 ]
-//! let  u : Vec<f32>            = vec![ 4.0, 5.0];
-//! let au : Vec< GAD<f32,u32> > = function::ad_domain(&u);
+//! let  u : Vec<F>  = vec![ 4.0, 5.0];
+//! let au : Vec<AD> = function::ad_domain(&u);
 //! let ax = vec![ au[0], au[0] + au[1], au[1] ];
 //! let ay = use_checkpoint(&name, &ax, trace);
 //! let g  = function::ad_fun(&ay);
@@ -58,8 +63,23 @@ use crate::record::GTape;
 use crate::record::sealed::ThisThreadTape;
 // END_SORT_THIS_LINE_MINUS_1
 //
+/// Document F, U for this module.
+///
+/// * F :
+/// is the floating point type used for value calculations.
+/// To date the possible choices for *F* are f32 or f64 .
+///
+/// * U :
+/// is the unsigned integer type tracks the
+/// relationship between GAD objects; e.g., which variables or constants
+/// a GAD object depends on.
+/// To date the possible choices for *U* are u32 or u64 .
+///
+pub fn doc_f_and_u() {}
+//
 // OneCheckpointInfo
-/// Information used to splice a checkpoint function call into a recording.
+/// Information used to splice a checkpoint function call into a recording;
+/// see [doc_f_and_u].
 pub(crate) struct OneCheckpointInfo<F,U> {
     //
     // fun_index
@@ -90,11 +110,15 @@ pub(crate) struct OneCheckpointInfo<F,U> {
 pub (crate) mod sealed {
     //! The sub-module sealed is used to seal traits in this package.
     //
+    #[cfg(doc)]
+    use super::doc_f_and_u;
+    //
     use std::thread::LocalKey;
     use std::cell::RefCell;
     use super::OneCheckpointInfo;
     //
     // AllCheckpointInfo
+    /// Information for all the checkpoints; see [doc_f_and_u].
     pub struct AllCheckpointInfo<F,U> {
        pub (crate) vec : Vec< OneCheckpointInfo<F,U> > ,
        pub (crate) map : std::collections::HashMap<String, usize> ,
@@ -112,7 +136,8 @@ pub (crate) mod sealed {
     /// ```text
     ///     < F as sealed::ThisThreadCheckpointAll >::get()
     /// ```
-    /// returns a reference to this tape's GAD<F,U> checkpoint information.
+    /// returns a reference to this tape's GAD<F,U> checkpoint information;
+    /// see [doc_f_and_u].
     ///
     /// 2DO: Perhaps it would be better if this were global
     /// instead of tape local.
@@ -126,7 +151,9 @@ pub (crate) mod sealed {
     }
 }
 //
-/// Get reference to the tape for this thread.
+// impl_this_thread_checkpoint!
+/// Implement ThisThreadCheckpointAll
+/// for all possible values of F,U; see [doc_f_and_u] .
 ///
 /// * f1 : is the floating point type used for values calculations.
 /// * u2 : is the unsigned integer type used for tape indices.
@@ -155,7 +182,9 @@ impl_this_thread_checkpoint!(f64, u32);
 impl_this_thread_checkpoint!(f64, u64);
 //
 // store_checkpoint
-/// Converts an ADFun object to a checkpoint functions for this thread.
+/// Converts a [GADFun] object to a checkpoint functions for this thread.
+///
+/// * F, U : see [doc_f_and_u]
 ///
 /// * fun :
 /// The ADFun object that it converted to a checkpoint function.
@@ -199,6 +228,8 @@ where
 ///
 /// If the tape for this thread is recording, include the call
 /// as a checkpoint in the tape.
+///
+/// * F, U : see [doc_f_and_u]
 ///
 /// * name :
 /// The name that was used to store the checkpoint function.
@@ -256,6 +287,8 @@ where
 ///
 /// If the tape for this thread is recording, include the call
 /// as a checkpoint in the tape.
+///
+/// * F, U : see [doc_f_and_u]
 ///
 /// * tape :
 /// The tape that records operations on this thread.
