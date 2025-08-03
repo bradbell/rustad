@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! AD an automatic differentiation floating point type
+//! GAD a generic automatic differentiation floating point type
 //! : [parent module](super)
 //
 #[cfg(doc)]
@@ -14,14 +14,20 @@ use crate::record::sealed::ThisThreadTape;
 // ---------------------------------------------------------------------------
 // GAD
 //
-/// Generic AD, acts like F but in addition can record
+/// Generic AD type, acts like F but in addition can record
 /// a function evaluation.
 ///
 /// The recording is used to create an [GADFun] object.
 ///
-/// * F : is the floating point type used for computations.
+/// * F :
+/// is the floating point type used for value calculations.
+/// To date the possible choices for *F* are f32 or f64 .
 ///
-/// * U : is the unsigned integer type used for indices in the tape.
+/// * U :
+/// is the unsigned integer type tracks the
+/// relationship between GAD objects; e.g., which variables or constants
+/// a GAD object depends on.
+/// To date the possible choices for *U* are u32 or u64 .
 ///
 /// * variable :
 /// An AD object is a variable if it one of the [ad_domain] variables
@@ -51,11 +57,17 @@ pub struct GAD<F, U> {
 // -------------------------------------------------------------------------
 // ad_from_value!
 //
-/// Convert from a value to a GAD<F, U> type
+/// Create a [GAD] value from another type.
 ///
-/// * f1 : is the GAD floating point type F.
-/// * u2 : is the GAD tape index type U.
-/// * t3 : is the type being converted to GAD<F, U>.
+/// ```text
+///     let avalue : GAD<F,U> = GAD::from(value);
+/// ```
+///
+/// * value :
+/// is a value of type f32, f64, or isize .
+///
+/// * avalue :
+/// is a GAD<F,U> constant with the specified value.
 ///
 /// # Example
 /// ```
@@ -65,13 +77,20 @@ pub struct GAD<F, U> {
 /// let avalue : GAD<f32,u32> = GAD::from(value);
 /// assert_eq!(avalue.to_value(), value);
 /// ```
+pub fn doc_gad_from() {}
+//
+/// Create a [GAD] value from another type.
+///
+/// * f1 : is the GAD floating point type F.
+/// * u2 : is the GAD tape index type U.
+/// * t3 : is the type being converted to GAD<F,U>.
 ///
 macro_rules! ad_from_value { ($f1:ident , $u2:ident , $t3:ident) => {
         impl From<$t3> for GAD<$f1, $u2> {
-        #[doc = concat!(
+        #  [doc = concat!(
             " Convert from ", stringify!($t3),
             " to an GAD\\<", stringify!($f1),
-            ", ", stringify!($u2),  "\\> constant"
+            ", ", stringify!($u2),  "\\> constant; see [doc_gad_from]"
         ) ]
         fn from(fvalue : $t3) -> Self { Self
             {tape_id: 0 as $u2, var_index: 0 as $u2, value: fvalue as $f1, }
@@ -105,7 +124,7 @@ ad_from_value!(f64, u64, isize);
 /// assert_eq!(x, 4.0);
 /// ```
 impl<F : Copy, U> GAD<F, U> {
-    /// Extract value from a  AD object, variable information is lost
+    /// Extract value from a GAD object, variable information is lost
     pub fn to_value(&self) -> F { self.value }
 }
 // -------------------------------------------------------------------------
@@ -128,7 +147,7 @@ impl<F : std::fmt::Display, U> std::fmt::Display for GAD<F, U> {
 // -------------------------------------------------------------------------
 // PartialEq
 //
-/// Two GAD object are equal if their  values are equal.
+/// Two GAD object are equal if their values are equal.
 ///
 ///
 /// # Example
@@ -152,8 +171,10 @@ impl<F : std::cmp::PartialEq, U> PartialEq for GAD<F, U> {
 //
 /// Implement one binary GAD<f2,u2> operator where rhs is floating point type
 ///
-/// * f1 : the floating point type used for value calculations.
-/// * u2 : the unsigned integer type used for tape indices.
+/// * f1 : the floating point type used for value calculations; e.g. f32.
+/// * u2 : the unsigned integer type used for tape indices; e.g. u32.
+/// * t3 : is the trait for this binary operation; e.g., Add.
+/// * o4 : is the symbol used for the binary opereator; e.g., +.
 ///
 macro_rules! binary_ad_op_float{
     ($f1:ident, $u2:ident, $t3:ident, $o4:tt) => { paste::paste! {
@@ -180,9 +201,6 @@ pub(crate) use binary_ad_op_float;
 // binary_ad_operator!
 //
 /// Binary GAD<F,U> operators
-///
-/// * F : is the floating point type used for value calculations.
-/// * U : is the unsigned integer type used for tape indices.
 ///
 /// | Left      | Operator | Right     |
 /// |-----------|----------|-----------|
@@ -409,21 +427,35 @@ pub(crate) use binary_ad_assign_op;
 // -------------------------------------------------------------------------
 // gadvec!
 //
-/// Create a vector with GAD<F,U> elements
+/// Create a vector with GAD<F,U> elements.
+///
+/// * Syntax :
+/// ```text
+///     avec = rustad::gadvec![ F, U, e_0, e_1, ... , e_n ];
+/// ```
 ///
 /// * F :
-/// is the floating point type used for value calculations.
+/// is the floating point value type for the GAD<F,U> elements.
 ///
 /// * U :
-/// is the unsigned integer type used for indices in the tape.
+/// is the unsigned integer type for the GAD<F,U> elements.
 ///
-/// * E :
-/// is one of the elements. It must have a type that can be converted
-/// using GAD::from.
+/// * n :
+/// is the index of the last element in the vector; i.e.,
+/// n+1 is the length of the vector.
 ///
+/// * e_j :
+/// is the j-th expression which defines the value of the j-th element.
+/// The type for each expression must be convertible to GAD<F,U> ; i.e.,
+/// f32, f64, or isize.
+///
+/// * avec :
+/// is the GAD<F,U> vector with n+1 elements and j-th element equal to e_j .
+///
+/// # Example
 ///```
 /// use rustad::ad::GAD;
-/// let avec = rustad::gadvec![ f64, u64, 1f32, 2f64, 3isize ];
+/// let avec = rustad::gadvec![ f64, u32, 1f32, 2f64, 3isize ];
 /// assert_eq!( avec.len(), 3);
 /// assert_eq!( avec[0], GAD::from(1) );
 /// assert_eq!( avec[1], GAD::from(2) );
