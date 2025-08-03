@@ -5,16 +5,16 @@
 use rustad::ad::GAD;
 use rustad::function;
 //
-type Float = f64; // f32 or u32
-type Index = u32; // u32 or u64
-type AD    = GAD<Float, Index>;
-//
 #[test]
 fn test_add_vv() {
-    let x  : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
-    let dx : Vec<Float> = vec![ 4.0, 5.0, 6.0 ];
-    let ry : Vec<Float> = vec![ 7.0, 8.0 ];
-    let ax : Vec<AD>    = function::ad_domain(&x);
+    type F  = f64; // f32 or u32
+    type U  = u32; // u32 or u64
+    type AD = GAD<F,U>;
+    //
+    let x  : Vec<F>  = vec![ 1.0, 2.0, 3.0 ];
+    let dx : Vec<F>  = vec![ 4.0, 5.0, 6.0 ];
+    let ry : Vec<F>  = vec![ 7.0, 8.0 ];
+    let ax : Vec<AD> = function::ad_domain(&x);
     let ay_0      = ax[0] + ax[1];
     let ay_1      = ax[1] + ax[2];
     let ay        = vec! [ ay_0, ay_1 ];
@@ -36,10 +36,14 @@ fn test_add_vv() {
 
 #[test]
 fn test_add_vc() {
-    let x  : Vec<Float> = vec![ 2.0, 3.0 ];
-    let dx : Vec<Float> = vec![ 4.0, 5.0 ];
-    let ry : Vec<Float> = vec![ 7.0 ];
-    let ax : Vec<AD>    = function::ad_domain(&x);
+    type F  = f32; // f32 or u32
+    type U  = u32; // u32 or u64
+    type AD = GAD<F,U>;
+    //
+    let x  : Vec<F>  = vec![ 2.0, 3.0 ];
+    let dx : Vec<F>  = vec![ 4.0, 5.0 ];
+    let ry : Vec<F>  = vec![ 7.0 ];
+    let ax : Vec<AD> = function::ad_domain(&x);
     let ay_0      = ax[0] + 5.0;
     let ay        = vec! [ ay_0 ];
     let f         = function::ad_fun(&ay);
@@ -57,10 +61,14 @@ fn test_add_vc() {
 
 #[test]
 fn test_add_cv() {
-    let x  : Vec<Float> = vec![ 2.0, 3.0 ];
-    let dx : Vec<Float> = vec![ 4.0, 5.0 ];
-    let ry : Vec<Float> = vec![ 7.0 ];
-    let ax : Vec<AD>    = function::ad_domain(&x);
+    type F  = f32; // f32 or u32
+    type U  = u64; // u32 or u64
+    type AD = GAD<F,U>;
+    //
+    let x  : Vec<F>  = vec![ 2.0, 3.0 ];
+    let dx : Vec<F>  = vec![ 4.0, 5.0 ];
+    let ry : Vec<F>  = vec![ 7.0 ];
+    let ax : Vec<AD> = function::ad_domain(&x);
     let ay_0      = 5.0 + ax[1];
     let ay        = vec! [ ay_0 ];
     let f         = function::ad_fun(&ay);

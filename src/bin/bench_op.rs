@@ -6,22 +6,30 @@ use rustad::ad::GAD;
 use rustad::function;
 use rustad::utility::avg_seconds_to_execute;
 
-type Float = f64;
-type AD    = GAD<Float, u32>;
-
-fn vec_float2ad(vec : &Vec<Float> ) -> Vec<AD> {
-    let mut result = Vec::new();
+//
+// vec_float2ad
+fn vec_float2ad<F,U>(vec : &Vec<F> ) -> Vec< GAD<F,U> >
+where
+    F:        Copy,
+    GAD<F,U>: From<F> ,
+{
+    let mut result : Vec< GAD<F, U> > = Vec::new();
     for value in vec {
-        result.push( AD::from(*value) );
+        result.push( GAD::from(*value) );
     }
     result
 }
 
+// test_add_vv
 fn test_add_vv() {
-    let x  : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
-    let dx : Vec<Float> = vec![ 4.0, 5.0, 6.0 ];
-    let ry : Vec<Float> = vec![ 7.0, 8.0 ];
-    let ax : Vec<AD>    = function::ad_domain(&x);
+    type F  = f32;
+    type U  = u64;
+    type AD = GAD<F,U>;
+    //
+    let x  : Vec<F>  = vec![ 1.0, 2.0, 3.0 ];
+    let dx : Vec<F>  = vec![ 4.0, 5.0, 6.0 ];
+    let ry : Vec<F>  = vec![ 7.0, 8.0 ];
+    let ax : Vec<AD> = function::ad_domain(&x);
     let ay_0    = ax[0] + ax[1];
     let ay_1    = ax[1] + ax[2];
     let ay      = vec! [ ay_0, ay_1 ];
@@ -42,10 +50,15 @@ fn test_add_vv() {
     assert_eq!( rx[2], ry[1] );
 }
 
+// test_mul_vv
 fn test_mul_vv() {
-    let x  : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
-    let dx : Vec<Float> = vec![ 4.0, 5.0, 6.0 ];
-    let ry : Vec<Float> = vec![ 6.0, 8.0 ];
+    type F  = f32;
+    type U  = u32;
+    type AD = GAD<F,U>;
+    //
+    let x  : Vec<F>  = vec![ 1.0, 2.0, 3.0 ];
+    let dx : Vec<F>  = vec![ 4.0, 5.0, 6.0 ];
+    let ry : Vec<F>  = vec![ 6.0, 8.0 ];
     let ax : Vec<AD>    = function::ad_domain(&x);
     let ay_0    = ax[0] * ax[1];
     let ay_1    = ax[1] * ax[2];
@@ -68,14 +81,18 @@ fn test_mul_vv() {
 }
 
 fn test_ad_mul_vv() {
-    let x     : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
-    let ad_x  : Vec<AD>    = vec_float2ad(&x);
+    type F  = f64;
+    type U  = u32;
+    type AD = GAD<F,U>;
     //
-    let dx    : Vec<Float> = vec![ 4.0, 5.0, 6.0 ];
-    let ad_dx : Vec<AD>    = vec_float2ad(&dx);
+    let x     : Vec<F>  = vec![ 1.0, 2.0, 3.0 ];
+    let ad_x  : Vec<AD> = vec_float2ad(&x);
     //
-    let ry    : Vec<Float> = vec![ 6.0, 8.0 ];
-    let ad_ry : Vec<AD>    = vec_float2ad(&ry);
+    let dx    : Vec<F>  = vec![ 4.0, 5.0, 6.0 ];
+    let ad_dx : Vec<AD> = vec_float2ad(&dx);
+    //
+    let ry    : Vec<F>  = vec![ 6.0, 8.0 ];
+    let ad_ry : Vec<AD> = vec_float2ad(&ry);
     //
     let ax      = function::ad_domain(&x);
     let ay_0    = ax[0] * ax[1];

@@ -6,16 +6,17 @@ use rustad::ad::GAD;
 use rustad::gadvec;
 use rustad::function;
 //
-type Float = f32; // f32 or f64
-type Index = u32; // u32 or u64
-type AD    = GAD<Float, Index>;
-//
 /// example_mul
 fn example_mul() {
-    let x  : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
-    let dx : Vec<Float> = vec![ 4.0, 5.0, 6.0 ];
-    let ry : Vec<Float> = vec![ 7.0, 8.0 ];
-    let ax : Vec<AD>    = function::ad_domain(&x);
+    //
+    type F  = f32; // f32 or f64
+    type U  = u64; // u32 or u64
+    type AD = GAD<F,U>;
+    //
+    let x  : Vec<F>  = vec![ 1.0, 2.0, 3.0 ];
+    let dx : Vec<F>  = vec![ 4.0, 5.0, 6.0 ];
+    let ry : Vec<F>  = vec![ 7.0, 8.0 ];
+    let ax : Vec<AD> = function::ad_domain(&x);
     let ay_0        = ax[0] * ax[1];
     let mut ay_1    = ax[1]; // ax[1] * ax[2] using *=
     ay_1           *= ax[2];
@@ -38,13 +39,18 @@ fn example_mul() {
 }
 /// ad_example_mul
 fn ad_example_mul() {
-    let x   : Vec<Float> = vec![ 1.0, 2.0, 3.0 ];
-    let adx : Vec<AD> = gadvec![ Float, Index, 4.0, 5.0, 6.0 ];
-    let ary : Vec<AD> = gadvec![ Float, Index, 7.0, 8.0 ];
+    //
+    type F  = f64; // f32 or f64
+    type U  = u32; // u32 or u64
+    type AD = GAD<F,U>;
+    //
+    let x   : Vec<F> = vec![ 1.0, 2.0, 3.0 ];
+    let adx : Vec<AD> = gadvec![ F, U, 4.0, 5.0, 6.0 ];
+    let ary : Vec<AD> = gadvec![ F, U, 7.0, 8.0 ];
     let ax         = function::ad_domain(&x);
     let ay_0       = ax[0] * ax[1];
     let ay_1       = ax[1] * ax[2];
-    let ay         = gadvec![ Float, Index, ay_0, ay_1 ];
+    let ay         = gadvec![ F, U, ay_0, ay_1 ];
     let f          = function::ad_fun(&ay);
     let trace      = false;
     let (ay, av0 ) = f.ad_forward_zero(&ax, trace);
