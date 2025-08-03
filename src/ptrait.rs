@@ -9,6 +9,8 @@
 // Sealed traits
 // https://rust-lang.github.io/api-guidelines/future-proofing.html
 //
+/*
+// It has not been necessary to use GenericAsPublic (so far).
 // GenericAsPublic
 use crate::gas::sealed::GenericAs;
 pub trait GenericAsPublic<D> : GenericAs<D>
@@ -17,6 +19,7 @@ impl<S,D> GenericAsPublic<D> for S
 where
     S : GenericAs<D> ,
 { }
+*/
 //
 // ThisThreadTapePublic
 use crate::record::sealed::ThisThreadTape;
