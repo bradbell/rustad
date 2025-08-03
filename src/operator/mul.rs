@@ -21,10 +21,11 @@ use std::thread::LocalKey;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
 use crate::gad::GAD;
+use crate::gas::as_from;
+use crate::gas::sealed::GenericAs;
 use crate::operator::OpInfo;
 use crate::operator::binary_op_forward_0;
 use crate::operator::id::{MUL_CV_OP, MUL_VC_OP, MUL_VV_OP};
-use crate::ptrait::GenericAs;
 use crate::record::GTape;
 use crate::record::sealed::ThisThreadTape;
 // END_SORT_THIS_LINE_MINUS_1
@@ -57,7 +58,7 @@ where
 {
     debug_assert!( arg.len() == 2);
     var_one[ res ] =
-        con[ GenericAs::gas(arg[0]) ] * var_one[ GenericAs::gas(arg[1]) ];
+        con[ as_from(arg[0]) ] * var_one[ as_from(arg[1]) ];
 }
 //
 // forward_1_mul_vc
@@ -75,7 +76,7 @@ where
 {
     debug_assert!( arg.len() == 2);
     var_one[ res ] =
-        var_one[ GenericAs::gas(arg[0]) ] * con[ GenericAs::gas(arg[1]) ];
+        var_one[ as_from(arg[0]) ] * con[ as_from(arg[1]) ];
 }
 //
 // forward_1_mul_vv
@@ -92,8 +93,8 @@ where
 {
     debug_assert!( arg.len() == 2);
     var_one[ res ] =
-        var_zero[ GenericAs::gas(arg[0]) ] * var_one[ GenericAs::gas(arg[1]) ]
-        + var_one[ GenericAs::gas(arg[0]) ] * var_zero[ GenericAs::gas(arg[1]) ];
+        var_zero[ as_from(arg[0]) ] * var_one[ as_from(arg[1]) ]
+        + var_one[ as_from(arg[0]) ] * var_zero[ as_from(arg[1]) ];
 }
 // ---------------------------------------------------------------------------
 //
@@ -111,8 +112,8 @@ where
     E : Copy + std::ops::Mul<F, Output=E> + std::ops::Add<Output = E>,
 {
     debug_assert!( arg.len() == 2);
-    partial[ GenericAs::gas(arg[1]) ] = partial[ GenericAs::gas(arg[1]) ] +
-        partial[res] * con[ GenericAs::gas(arg[0]) ];
+    partial[ as_from(arg[1]) ] = partial[ as_from(arg[1]) ] +
+        partial[res] * con[ as_from(arg[0]) ];
 }
 //
 // reverse_1_mul_vc
@@ -129,8 +130,8 @@ where
     E : Copy + std::ops::Mul<F, Output = E> + std::ops::Add<Output = E>,
 {
     debug_assert!( arg.len() == 2);
-    partial[ GenericAs::gas(arg[0]) ] = partial[ GenericAs::gas(arg[0]) ] +
-        partial[res] * con[ GenericAs::gas(arg[1]) ];
+    partial[ as_from(arg[0]) ] = partial[ as_from(arg[0]) ] +
+        partial[res] * con[ as_from(arg[1]) ];
 }
 //
 // reverse_1_mul_vv
@@ -146,11 +147,11 @@ where
     E : Copy + std::ops::Mul<Output=E> + std::ops::Add<Output = E> ,
 {
     debug_assert!( arg.len() == 2);
-    partial[ GenericAs::gas(arg[0]) ] = partial[ GenericAs::gas(arg[0]) ]
-        + partial[res] * var_zero[ GenericAs::gas(arg[1]) ];
+    partial[ as_from(arg[0]) ] = partial[ as_from(arg[0]) ]
+        + partial[res] * var_zero[ as_from(arg[1]) ];
     //
-    partial[ GenericAs::gas(arg[1]) ] = partial[ GenericAs::gas(arg[1]) ]
-        + partial[res] * var_zero[ GenericAs::gas(arg[0]) ];
+    partial[ as_from(arg[1]) ] = partial[ as_from(arg[1]) ]
+        + partial[res] * var_zero[ as_from(arg[0]) ];
 }
 // ---------------------------------------------------------------------------
 // set_op_info

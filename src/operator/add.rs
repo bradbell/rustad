@@ -21,10 +21,11 @@ use std::thread::LocalKey;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
 use crate::gad::GAD;
+use crate::gas::as_from;
+use crate::gas::sealed::GenericAs;
 use crate::operator::OpInfo;
 use crate::operator::binary_op_forward_0;
 use crate::operator::id::{ADD_CV_OP, ADD_VC_OP, ADD_VV_OP};
-use crate::ptrait::GenericAs;
 use crate::record::GTape;
 use crate::record::sealed::ThisThreadTape;
 // END_SORT_THIS_LINE_MINUS_1
@@ -55,7 +56,7 @@ where
     E : Copy ,
 {
     debug_assert!( arg.len() == 2);
-    var_one[ res ] = var_one[ GenericAs::gas(arg[1]) ];
+    var_one[ res ] = var_one[ as_from(arg[1]) ];
 }
 //
 // forward_1_add_vc
@@ -71,7 +72,7 @@ where
     E : Copy ,
 {
     debug_assert!( arg.len() == 2);
-    var_one[ res ] = var_one[ GenericAs::gas(arg[0]) ];
+    var_one[ res ] = var_one[ as_from(arg[0]) ];
 }
 //
 // forward_1_add_vv
@@ -88,7 +89,7 @@ where
 {
     debug_assert!( arg.len() == 2);
     var_one[ res ] =
-        var_one[ GenericAs::gas(arg[0]) ] + var_one[ GenericAs::gas(arg[1]) ];
+        var_one[ as_from(arg[0]) ] + var_one[ as_from(arg[1]) ];
 }
 // ---------------------------------------------------------------------------
 //
@@ -105,8 +106,8 @@ where
     E : Copy + std::ops::Add<Output = E>,
 {
     debug_assert!( arg.len() == 2);
-    partial[ GenericAs::gas(arg[1]) ] =
-        partial[ GenericAs::gas(arg[1]) ] + partial[ res ];
+    partial[ as_from(arg[1]) ] =
+        partial[ as_from(arg[1]) ] + partial[ res ];
 }
 //
 // reverse_1_add_vc
@@ -122,8 +123,8 @@ where
     E : Copy + std::ops::Add<Output = E>,
 {
     debug_assert!( arg.len() == 2);
-    partial[ GenericAs::gas(arg[0]) ] =
-        partial[ GenericAs::gas(arg[0]) ] + partial[ res ];
+    partial[ as_from(arg[0]) ] =
+        partial[ as_from(arg[0]) ] + partial[ res ];
 }
 //
 // reverse_1_add_vv
@@ -139,11 +140,11 @@ where
     E : Copy + std::ops::Add<Output = E>,
 {
     debug_assert!( arg.len() == 2);
-    partial[ GenericAs::gas(arg[0]) ] =
-        partial[ GenericAs::gas(arg[0]) ] + partial[ res ];
+    partial[ as_from(arg[0]) ] =
+        partial[ as_from(arg[0]) ] + partial[ res ];
     //
-    partial[ GenericAs::gas(arg[1]) ] =
-        partial[ GenericAs::gas(arg[1]) ] + partial[ res ];
+    partial[ as_from(arg[1]) ] =
+        partial[ as_from(arg[1]) ] + partial[ res ];
 }
 // ---------------------------------------------------------------------------
 // set_op_info

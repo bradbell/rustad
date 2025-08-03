@@ -38,7 +38,8 @@
 //! there is a direct correpondence between variable and operator indices.
 //
 use crate::gad::GAD;
-use crate::ptrait::GenericAs;
+use crate::gas::sealed::GenericAs;
+use crate::gas::as_from;
 use crate::checkpoint::sealed::ThisThreadCheckpointAll;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 use crate::operator::GlobalOpInfoVec;
@@ -76,12 +77,12 @@ where
     GAD<F,U>: From<F>,
 {   //
     // call_index, n_arg, n_res
-    let call_index  = GenericAs::gas(arg[0]);
-    let n_arg       = GenericAs::gas(arg[1]);
-    let n_res       = GenericAs::gas(arg[2]);
+    let call_index  = as_from(arg[0]);
+    let n_arg       = as_from(arg[1]);
+    let n_res       = as_from(arg[2]);
     //
     // is_arg_var, is_res_var
-    let mut begin : usize = GenericAs::gas(arg[3]);
+    let mut begin : usize = as_from(arg[3]);
     let mut end     = begin + n_arg;
     let is_arg_var  = &flag_all[begin .. end];
     begin           = end;
@@ -92,9 +93,9 @@ where
     let mut call_domain_zero : Vec<F> = Vec::new();
     for i_arg in 0 .. n_arg {
         if is_arg_var[i_arg] {
-            call_domain_zero.push( var_zero[ GenericAs::gas(arg[i_arg + 4]) ] );
+            call_domain_zero.push( var_zero[ as_from(arg[i_arg + 4]) ] );
         } else {
-            let c = con[ GenericAs::gas(arg[i_arg + 4]) ];
+            let c = con[ as_from(arg[i_arg + 4]) ];
             call_domain_zero.push( c );
         }
     }
@@ -132,15 +133,15 @@ where
 {
     //
     // call_n_arg
-    let call_n_arg : usize = GenericAs::gas(arg[1]);
+    let call_n_arg : usize = as_from(arg[1]);
     //
     // is_var
-    let begin : usize = GenericAs::gas(arg[3]);
+    let begin : usize = as_from(arg[3]);
     let end           = begin + call_n_arg;
     let is_var        = &flag_all[begin .. end];
     //
     // arg_var_index
-    let zero_u : U = GenericAs::gas(0);
+    let zero_u : U = as_from(0);
     arg_var_index.resize(0, zero_u);
     for call_i_arg in 0 .. call_n_arg {
         if is_var[call_i_arg] {
@@ -210,6 +211,6 @@ where
     U     : Copy ,
     usize : GenericAs<U> ,
 {
-    let zero_u : U = GenericAs::gas(0);
+    let zero_u : U = as_from(0);
     arg_var_index.resize(0, zero_u);
 }

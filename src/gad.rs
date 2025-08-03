@@ -245,13 +245,13 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         let mut new_tape_id   = 0;
         let mut new_var_index = 0;
         if tape.recording {
-            let var_lhs    = GenericAs::gas(lhs.tape_id) == tape.tape_id;
-            let var_rhs    = GenericAs::gas(rhs.tape_id) == tape.tape_id;
+            let var_lhs    = as_from(lhs.tape_id) == tape.tape_id;
+            let var_rhs    = as_from(rhs.tape_id) == tape.tape_id;
             if var_lhs || var_rhs {
                 new_tape_id   = tape.tape_id;
                 new_var_index = tape.n_var;
                 tape.n_var   += 1;
-                tape.op2arg.push( GenericAs::gas(tape.arg_all.len()) );
+                tape.op2arg.push( as_from(tape.arg_all.len()) );
                 if var_lhs && var_rhs {
                     tape.id_all.push( [< $Trait:upper _VV_OP >] );
                     tape.arg_all.push( lhs.var_index );
@@ -259,17 +259,17 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
                 } else if var_lhs {
                     tape.id_all.push( [< $Trait:upper _VC_OP >] );
                     tape.arg_all.push( lhs.var_index );
-                    tape.arg_all.push( GenericAs::gas(tape.con_all.len()) );
+                    tape.arg_all.push( as_from(tape.con_all.len()) );
                     tape.con_all.push( rhs.value );
                 } else {
                     tape.id_all.push( [< $Trait:upper _CV_OP >] );
-                    tape.arg_all.push( GenericAs::gas(tape.con_all.len()) );
+                    tape.arg_all.push( as_from(tape.con_all.len()) );
                     tape.con_all.push( lhs.value );
                     tape.arg_all.push( rhs.var_index );
                 }
             }
         }
-        ( GenericAs::gas(new_tape_id), GenericAs::gas(new_var_index) )
+        ( as_from(new_tape_id), as_from(new_var_index) )
     }
     //
     #[doc = "see [doc_binary_ad_operator](crate::gad::doc_binary_ad_operator)"]
@@ -365,10 +365,10 @@ macro_rules! binary_ad_assign_op {
             usize : GenericAs<U> ,
         {
             if tape.recording {
-                let var_lhs    = GenericAs::gas(lhs.tape_id) == tape.tape_id;
-                let var_rhs    = GenericAs::gas(rhs.tape_id) == tape.tape_id;
+                let var_lhs    = as_from(lhs.tape_id) == tape.tape_id;
+                let var_rhs    = as_from(rhs.tape_id) == tape.tape_id;
                 if var_lhs || var_rhs {
-                    tape.op2arg.push( GenericAs::gas(tape.arg_all.len()) );
+                    tape.op2arg.push( as_from(tape.arg_all.len()) );
                     if var_lhs && var_rhs {
                         tape.id_all.push( [< $Name:upper _VV_OP >] );
                         tape.arg_all.push( lhs.var_index );
@@ -376,16 +376,16 @@ macro_rules! binary_ad_assign_op {
                     } else if var_lhs {
                         tape.id_all.push( [< $Name:upper _VC_OP >] );
                         tape.arg_all.push( lhs.var_index );
-                        tape.arg_all.push( GenericAs::gas(tape.con_all.len()) );
+                        tape.arg_all.push( as_from(tape.con_all.len()) );
                         tape.con_all.push( rhs.value );
                     } else {
                         tape.id_all.push( [< $Name:upper _CV_OP >] );
-                        tape.arg_all.push( GenericAs::gas(tape.con_all.len()) );
+                        tape.arg_all.push( as_from(tape.con_all.len()) );
                         tape.con_all.push( lhs.value );
                         tape.arg_all.push( rhs.var_index );
                     }
-                    lhs.tape_id   = GenericAs::gas(tape.tape_id);
-                    lhs.var_index = GenericAs::gas(tape.n_var);
+                    lhs.tape_id   = as_from(tape.tape_id);
+                    lhs.var_index = as_from(tape.n_var);
                     tape.n_var   += 1;
                 }
             }

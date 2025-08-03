@@ -5,54 +5,18 @@
 //! Define traits that are used by the public rustad API.
 //! : [parent module](super)
 //
-// ---------------------------------------------------------------------------
-/// Generic as function for converting types like `as` would.
-///
-/// * usize :
-/// conversion to and from usize is implement for the following types:
-/// u8, u16, u32, u64
-///
-/// # Example
-/// ```
-/// use rustad::ptrait::GenericAs;
-/// fn use_gas<T> (f : usize) -> T where usize : GenericAs<T> {
-///     GenericAs::gas(f)
-/// }
-/// let five    : usize = 5;
-/// let convert : u32   = use_gas(five);
-/// assert_eq!( 5u32, convert );
-/// ```
-///
-pub trait GenericAs<T> {
-    fn gas(self : Self) -> T;
-}
-//
-/// Implement gas returning F as T for one (F, T) type pair.
-///
-/// * F : is the from type
-/// * T : is the to type
-///
-macro_rules! generic_as{ ($F:ident, $T:ident) => {
-    impl GenericAs<$T> for $F {
-        fn gas(self : Self) -> $T {
-            self as $T
-        }
-    }
-} }
-//
-generic_as!(usize, u64);
-generic_as!(usize, u32);
-generic_as!(usize, u16);
-generic_as!(usize, u8);
-//
-generic_as!(u64, usize);
-generic_as!(u32, usize);
-generic_as!(u16, usize);
-generic_as!(u8, usize);
-//
 // ----------------------------------------------------------------------------
 // Sealed traits
 // https://rust-lang.github.io/api-guidelines/future-proofing.html
+//
+// GenericAsPublic
+use crate::gas::sealed::GenericAs;
+pub trait GenericAsPublic<D> : GenericAs<D>
+{ }
+impl<S,D> GenericAsPublic<D> for S
+where
+    S : GenericAs<D> ,
+{ }
 //
 // ThisThreadTapePublic
 use crate::record::sealed::ThisThreadTape;

@@ -18,7 +18,7 @@ pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
    std::sync::LazyLock::new( || "2025.8.3" );
 // ----------------------------------------------------------------------------
 //
-// gas
+// ptrait
 pub mod ptrait;
 //
 // utility
@@ -27,15 +27,17 @@ pub mod utility;
 // gad
 pub mod gad;
 //
-// operator
-pub(crate) mod operator;
-//
-// record
-pub(crate) mod record;
-//
 // function
 pub mod function;
 //
 // checkpoint
 pub mod checkpoint;
 //
+// gas
+pub(crate) mod gas;
+//
+// operator
+pub(crate) mod operator;
+//
+// record
+pub(crate) mod record;

@@ -6,7 +6,8 @@
 //! : [parent module](super)
 //
 //
-use crate::ptrait::GenericAs;
+use crate::gas::sealed::GenericAs;
+use crate::gas::as_from;
 use crate::gad::GAD;
 //
 #[cfg(doc)]
@@ -61,8 +62,8 @@ macro_rules! binary_op_forward_0 {
             E : Copy ,
         {
             assert_eq!( arg.len(), 2);
-            let lhs : usize = GenericAs::gas( arg[0] );
-            let rhs : usize = GenericAs::gas( arg[1] );
+            let lhs : usize = as_from( arg[0] );
+            let rhs : usize = as_from( arg[1] );
             var_zero[ res ] = con[lhs] $op var_zero[rhs];
         }
         #[doc = concat!(
@@ -81,8 +82,8 @@ macro_rules! binary_op_forward_0 {
             E : Copy + std::ops::$Trait<F, Output = E> ,
         {
             assert_eq!( arg.len(), 2);
-            let lhs : usize = GenericAs::gas( arg[0] );
-            let rhs : usize = GenericAs::gas( arg[1] );
+            let lhs : usize = as_from( arg[0] );
+            let rhs : usize = as_from( arg[1] );
             var_zero[ res ] = var_zero[lhs] $op con[rhs];
         }
         #[doc = concat!(
@@ -100,8 +101,8 @@ macro_rules! binary_op_forward_0 {
             E : Copy + std::ops::$Trait<E, Output = E> ,
         {
             assert_eq!( arg.len(), 2);
-            let lhs : usize = GenericAs::gas( arg[0] );
-            let rhs : usize = GenericAs::gas( arg[1] );
+            let lhs : usize = as_from( arg[0] );
+            let rhs : usize = as_from( arg[1] );
             var_zero[ res ] = var_zero[lhs] $op var_zero[rhs];
         }
     } };
@@ -317,7 +318,7 @@ fn arg_var_index_binary_cv<U>(
     U     : Copy ,
     usize : GenericAs<U> ,
 {
-    arg_var_index.resize( 1, GenericAs::gas(0) );
+    arg_var_index.resize( 1, as_from(0) );
     arg_var_index[0] = arg[1];
 }
 //
@@ -329,7 +330,7 @@ fn arg_var_index_binary_vc<U>(
     U     : Copy ,
     usize : GenericAs<U> ,
 {
-    arg_var_index.resize( 1, GenericAs::gas(0) );
+    arg_var_index.resize( 1, as_from(0) );
     arg_var_index[0] = arg[0];
 }
 //
@@ -341,7 +342,7 @@ fn arg_var_index_binary_vv<U>(
     U     : Copy ,
     usize : GenericAs<U> ,
 {
-    arg_var_index.resize( 2, GenericAs::gas(0) );
+    arg_var_index.resize( 2, as_from(0) );
     arg_var_index[0] = arg[0];
     arg_var_index[1] = arg[1];
 }
