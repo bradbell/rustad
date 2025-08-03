@@ -20,7 +20,7 @@ use std::cell::RefCell;
 use std::thread::LocalKey;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
-use crate::ad::GAD;
+use crate::gad::GAD;
 use crate::operator::OpInfo;
 use crate::operator::binary_op_forward_0;
 use crate::operator::id::{ADD_CV_OP, ADD_VC_OP, ADD_VV_OP};
@@ -34,7 +34,7 @@ use crate::operator;
 #[cfg(doc)]
 use crate::operator::{ForwardZeroBinary, ForwardOneBinary};
 #[cfg(doc)]
-use crate::ad::doc_binary_ad_operator;
+use crate::gad::doc_binary_ad_operator;
 //
 // forward_0_add_cv<F, U, E>
 // forward_0_add_vc<F, U, E>
@@ -197,7 +197,7 @@ where
 }
 //
 // AD + AD, Float + AD, AD + Float
-crate::ad::binary_ad_operator!( Add, + );
+crate::gad::binary_ad_operator!( Add, + );
 //
 // AD += AD, AD += Float
-crate::ad::binary_ad_assign_op!( Add, += );
+crate::gad::binary_ad_assign_op!( Add, += );

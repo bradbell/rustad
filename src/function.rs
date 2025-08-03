@@ -10,7 +10,7 @@ use std::cell::RefCell;
 use std::thread::LocalKey;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
-use crate::ad::GAD;
+use crate::gad::GAD;
 use crate::operator::GlobalOpInfoVec;
 use crate::ptrait::GenericAs;
 use crate::record::sealed::ThisThreadTape;
@@ -611,7 +611,7 @@ where
     /// of the function.
     ///```
     /// use rustad::function;
-    /// use rustad::ad::GAD;
+    /// use rustad::gad::GAD;
     /// type AD = GAD<f32, u64>;
     /// let x  : Vec<f32> = vec![1.0, 2.0, 3.0];
     /// let ax : Vec<AD>  = function::ad_domain(&x);

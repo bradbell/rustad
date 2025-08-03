@@ -37,7 +37,7 @@
 //! operator in the sequence of operations. These are place holders so that
 //! there is a direct correpondence between variable and operator indices.
 //
-use crate::ad::GAD;
+use crate::gad::GAD;
 use crate::ptrait::GenericAs;
 use crate::checkpoint::sealed::ThisThreadCheckpointAll;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};

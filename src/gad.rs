@@ -72,7 +72,7 @@ pub struct GAD<F, U> {
 /// # Example
 /// ```
 /// // ad_from_value!(f32, u32, f32) makes the following work:
-/// use rustad::ad::GAD;
+/// use rustad::gad::GAD;
 /// let value  : f32          = 3.0;
 /// let avalue : GAD<f32,u32> = GAD::from(value);
 /// assert_eq!(avalue.to_value(), value);
@@ -118,7 +118,7 @@ ad_from_value!(f64, u64, isize);
 ///
 /// # Example
 /// ```
-/// use rustad::ad::GAD;
+/// use rustad::gad::GAD;
 /// let ax : GAD<f64, u32> = GAD::from(4.0);
 /// let x = ax.to_value();
 /// assert_eq!(x, 4.0);
@@ -134,7 +134,7 @@ impl<F : Copy, U> GAD<F, U> {
 ///
 /// # Example
 /// ```
-/// use rustad::ad::GAD;
+/// use rustad::gad::GAD;
 /// let ax : GAD<f64, u32> = GAD::from(3);
 /// let s = format!( "{ax}" );
 /// assert_eq!(s, "3");
@@ -152,7 +152,7 @@ impl<F : std::fmt::Display, U> std::fmt::Display for GAD<F, U> {
 ///
 /// # Example
 /// ```
-/// use rustad::ad::GAD;
+/// use rustad::gad::GAD;
 /// let ax : GAD<f32, u64> = GAD::from(3.0);
 /// let ay : GAD<f32, u64> = GAD::from(3);
 /// assert_eq!(ax, ay);
@@ -179,7 +179,7 @@ impl<F : std::cmp::PartialEq, U> PartialEq for GAD<F, U> {
 macro_rules! binary_ad_op_float{
     ($f1:ident, $u2:ident, $t3:ident, $o4:tt) => { paste::paste! {
         #[doc =
-            "see [doc_binary_ad_operator](crate::ad::doc_binary_ad_operator)"
+            "see [doc_binary_ad_operator](crate::gad::doc_binary_ad_operator)"
         ]
         impl std::ops::$t3< GAD<$f1,$u2> > for $f1
         where
@@ -210,7 +210,7 @@ pub(crate) use binary_ad_op_float;
 ///
 /// # Example
 /// ```
-/// use rustad::ad::GAD;
+/// use rustad::gad::GAD;
 /// let ax : GAD<f32, u32> = GAD::from(3.0);
 /// let ay : GAD<f32, u32> = GAD::from(4.0);
 /// let az = ax + ay;
@@ -272,7 +272,7 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         ( GenericAs::gas(new_tape_id), GenericAs::gas(new_var_index) )
     }
     //
-    #[doc = "see [doc_binary_ad_operator](crate::ad::doc_binary_ad_operator)"]
+    #[doc = "see [doc_binary_ad_operator](crate::gad::doc_binary_ad_operator)"]
     impl<F,U> std::ops::$Trait< GAD<F,U> > for GAD<F,U>
     where
     F     : Copy + std::ops::$Trait<Output = F>  + ThisThreadTape<U> ,
@@ -296,7 +296,7 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         }
     }
     //
-    #[doc = "see [doc_binary_ad_operator](crate::ad::doc_binary_ad_operator)"]
+    #[doc = "see [doc_binary_ad_operator](crate::gad::doc_binary_ad_operator)"]
     impl<F,U> std::ops::$Trait<F> for GAD<F,U>
     where
     GAD<F,U> : From<F> ,
@@ -311,10 +311,10 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         }
     }
     //
-    crate::ad::binary_ad_op_float!(f32, u32, $Trait, $op);
-    crate::ad::binary_ad_op_float!(f32, u64, $Trait, $op);
-    crate::ad::binary_ad_op_float!(f64, u32, $Trait, $op);
-    crate::ad::binary_ad_op_float!(f64, u64, $Trait, $op);
+    crate::gad::binary_ad_op_float!(f32, u32, $Trait, $op);
+    crate::gad::binary_ad_op_float!(f32, u64, $Trait, $op);
+    crate::gad::binary_ad_op_float!(f64, u32, $Trait, $op);
+    crate::gad::binary_ad_op_float!(f64, u64, $Trait, $op);
 } } }
 //
 pub(crate) use binary_ad_operator;
@@ -330,7 +330,7 @@ pub(crate) use binary_ad_operator;
 ///
 /// # Example
 /// ```
-/// use rustad::ad::GAD;
+/// use rustad::gad::GAD;
 /// let ax     : GAD<f32, u64> = GAD::from(3.0);
 /// let mut ay : GAD<f32, u64> = GAD::from(4.0);
 /// ay += ax;
@@ -351,7 +351,7 @@ pub fn doc_binary_ad_assign_op() { }
 ///
 macro_rules! binary_ad_assign_op {
     ($Name:ident, $op:tt) => {paste::paste! {
-        crate::ad::binary_ad_assign_op!( $Name, $op, [< $Name Assign >] );
+        crate::gad::binary_ad_assign_op!( $Name, $op, [< $Name Assign >] );
     } };
     ($Name:ident, $op:tt, $Trait:ident) => {paste::paste! {
         //
@@ -454,7 +454,7 @@ pub(crate) use binary_ad_assign_op;
 ///
 /// # Example
 ///```
-/// use rustad::ad::GAD;
+/// use rustad::gad::GAD;
 /// let avec = rustad::gadvec![ f64, u32, 1f32, 2f64, 3isize ];
 /// assert_eq!( avec.len(), 3);
 /// assert_eq!( avec[0], GAD::from(1) );
@@ -465,9 +465,9 @@ pub(crate) use binary_ad_assign_op;
 macro_rules! gadvec {
     ( $F:ident,  $U:ident,  $( $E:expr ),* ) => {
         {
-            let mut avec : Vec< rustad::ad::GAD<$F,$U> > = Vec::new();
+            let mut avec : Vec< rustad::gad::GAD<$F,$U> > = Vec::new();
             $(
-                avec.push( rustad::ad::GAD::from( $E ) );
+                avec.push( rustad::gad::GAD::from( $E ) );
             )*
             avec
         }

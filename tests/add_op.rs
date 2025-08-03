@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-use rustad::ad::GAD;
+use rustad::gad::GAD;
 use rustad::function;
 //
 #[test]

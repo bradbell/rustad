@@ -9,7 +9,7 @@
 //! # Example
 //! ```
 //! use rustad::function;
-//! use rustad::ad::GAD;
+//! use rustad::gad::GAD;
 //! use rustad::checkpoint::{store_checkpoint, use_checkpoint};
 //! //
 //! // trace
@@ -47,8 +47,8 @@ use std::thread::LocalKey;
 use std::cell::RefCell;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
-use crate::ad::GAD;
 use crate::function::GADFun;
+use crate::gad::GAD;
 use crate::operator::GlobalOpInfoVec;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 use crate::ptrait::GenericAs;

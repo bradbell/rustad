@@ -7,7 +7,7 @@
 //
 //
 use crate::ptrait::GenericAs;
-use crate::ad::GAD;
+use crate::gad::GAD;
 //
 #[cfg(doc)]
 use crate::function::{doc_forward_zero, doc_forward_one, doc_reverse_one};

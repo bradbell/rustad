@@ -24,8 +24,8 @@ pub mod ptrait;
 // utility
 pub mod utility;
 //
-// ad
-pub mod ad;
+// gad
+pub mod gad;
 //
 // operator
 pub(crate) mod operator;
