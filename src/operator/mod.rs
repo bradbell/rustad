@@ -454,7 +454,7 @@ impl_global_op_info_vec!(f64, u32);
 impl_global_op_info_vec!(f64, u64);
 //
 // Test that all operators have the proper name.
-// This test is referenced as at the end of id.rs.
+// This test is referenced at the end of id.rs.
 #[test]
 fn test_op_info() {
     let op_info_vec = &*< f32 as GlobalOpInfoVec<u32> >::get();
