@@ -7,7 +7,7 @@
 //! : [parent module](super)
 //!
 //! Method List :
-//! 1. [GADFun::dependency]
+//! 1. [GADFun::sub_sparsity]
 //
 use super::GADFun;
 use crate::operator::GlobalOpInfoVec;
@@ -18,7 +18,7 @@ use crate::gas::as_from;
 use crate::doc_generic_f_and_u;
 //
 // ---------------------------------------------------------------------------
-// ADFun::dependency
+// ADFun::sub_sparsity
 impl<F,U> GADFun<F,U>
 where
     F     : GlobalOpInfoVec<U> ,
@@ -26,21 +26,22 @@ where
     usize : GenericAs<U>,
 
 {
-    // dependency
-    /// Compute dependency pattern for the operation sequence in this GADFun.
+    // sub_sparsity
+    /// Use the subgraph method to compute a Jacobian sparsity pattern.
     ///
     /// * Syntax :
     /// ```text
-    ///     pattern = f.dependency(trace)
+    ///     pattern = f.sub_sparsity(trace)
     /// ```
     ///
     /// * F, U : see [doc_generic_f_and_u]
     ///
     /// * f :
-    /// is this [GADFun] object.
+    /// is this [GADFun] object. The sparsity pattern is for the Jacobian
+    /// of the function defined by the operation sequence stored in f.
     ///
     /// * trace :
-    /// If trace is true, a trace of the dependency calculation
+    /// If trace is true, a trace of the sparsoty calculation
     /// is printed on standard output.
     /// Note that in the trace, the cases where *var_index* is less
     /// that the number of domain variables will end up in the pattern
@@ -48,12 +49,17 @@ where
     ///
     /// * pattern :
     /// The the return value *pattern* is vector of (row, column) pairs.
-    /// Each row (column) is non-negative and
-    /// less than the range (domain) dimension for the function.
+    /// Each row (column) is less than the range (domain)
+    /// dimension for the function.
     /// If a pair (i, j) does not appear, the range component
     /// with index i does not depend on the domain component with index j.
-    /// Note that this can be used as a sparsity pattern for the Jacobian
-    /// of the function.
+    ///
+    /// * dependency :
+    /// This is also a dependency pattern. For example,
+    /// if an range variable was equal to the
+    /// Heaviside function of a domain variable,
+    /// the corresponding pair would be in the sparisty pattern even though
+    /// the corresponding derivative is always zero.
     ///```
     /// use rustad::function;
     /// use rustad::gad::GAD;
@@ -66,14 +72,14 @@ where
     /// }
     /// let f           = function::ad_fun(&ay);
     /// let trace       = false;
-    /// let mut pattern = f.dependency(trace);
+    /// let mut pattern = f.sub_sparsity(trace);
     /// pattern.sort_by( |x, y| x.partial_cmp(y).unwrap() );
     /// assert_eq!( pattern.len(), 3 );
     /// assert_eq!( pattern[0], (0,0) );
     /// assert_eq!( pattern[1], (1,1) );
     /// assert_eq!( pattern[2], (2,2) );
     ///```
-    pub fn dependency(&self, trace : bool) -> Vec<(U, U)>
+    pub fn sub_sparsity(&self, trace : bool) -> Vec<(U, U)>
     {   //
         // op_info_vec
         let op_info_vec = &*< F as GlobalOpInfoVec<U> >::get();
@@ -164,7 +170,7 @@ where
             }
         } }
         if trace {
-            println!( "n_dependency = {}", result.len() );
+            println!( "n_pattern = {}", result.len() );
         }
         result
     }

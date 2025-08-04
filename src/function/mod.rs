@@ -499,6 +499,9 @@ impl<F,U> GADFun<F,U> {
     ///
     /// To be more specific,
     /// its domain and range vectors have length zero.
+    ///
+    /// * F, U : see [doc_generic_f_and_u]
+    ///
     /// # Example
     /// ```
     /// use rustad::function::GADFun;

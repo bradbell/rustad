@@ -200,7 +200,7 @@ where
         );
         let index           = all.vec.len();
         let trace           = false;
-        let pattern         = fun.dependency(trace);
+        let pattern         = fun.sub_sparsity(trace);
         let checkpoint_info = OneCheckpointInfo {
             fun_index  : index,
             name       : name.clone(),
