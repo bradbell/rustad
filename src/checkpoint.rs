@@ -63,23 +63,12 @@ use crate::record::GTape;
 use crate::record::sealed::ThisThreadTape;
 // END_SORT_THIS_LINE_MINUS_1
 //
-/// Document F, U for this module.
-///
-/// * F :
-/// is the floating point type used for value calculations.
-/// To date the possible choices for *F* are f32 or f64 .
-///
-/// * U :
-/// is the unsigned integer type tracks the
-/// relationship between GAD objects; e.g., which variables or constants
-/// a GAD object depends on.
-/// To date the possible choices for *U* are u32 or u64 .
-///
-pub fn doc_f_and_u() {}
+#[cfg(doc)]
+use crate::doc_generic_f_and_u;
 //
 // OneCheckpointInfo
 /// Information used to splice a checkpoint function call into a recording;
-/// see [doc_f_and_u].
+/// see [doc_generic_f_and_u].
 pub(crate) struct OneCheckpointInfo<F,U> {
     //
     // fun_index
@@ -111,14 +100,14 @@ pub (crate) mod sealed {
     //! The sub-module sealed is used to seal traits in this package.
     //
     #[cfg(doc)]
-    use super::doc_f_and_u;
+    use super::doc_generic_f_and_u;
     //
     use std::thread::LocalKey;
     use std::cell::RefCell;
     use super::OneCheckpointInfo;
     //
     // AllCheckpointInfo
-    /// Information for all the checkpoints; see [doc_f_and_u].
+    /// Information for all the checkpoints; see [doc_generic_f_and_u].
     pub struct AllCheckpointInfo<F,U> {
        pub (crate) vec : Vec< OneCheckpointInfo<F,U> > ,
        pub (crate) map : std::collections::HashMap<String, usize> ,
@@ -137,7 +126,7 @@ pub (crate) mod sealed {
     ///     < F as sealed::ThisThreadCheckpointAll >::get()
     /// ```
     /// returns a reference to this tape's GAD<F,U> checkpoint information;
-    /// see [doc_f_and_u].
+    /// see [doc_generic_f_and_u].
     ///
     /// 2DO: Perhaps it would be better if this were global
     /// instead of tape local.
@@ -153,7 +142,7 @@ pub (crate) mod sealed {
 //
 // impl_this_thread_checkpoint!
 /// Implement ThisThreadCheckpointAll
-/// for all possible values of F,U; see [doc_f_and_u] .
+/// for all possible values of F,U; see [doc_generic_f_and_u] .
 ///
 /// * f1 : is the floating point type used for values calculations.
 /// * u2 : is the unsigned integer type used for tape indices.
@@ -184,7 +173,7 @@ impl_this_thread_checkpoint!(f64, u64);
 // store_checkpoint
 /// Converts a [GADFun] object to a checkpoint functions for this thread.
 ///
-/// * F, U : see [doc_f_and_u]
+/// * F, U : see [doc_generic_f_and_u]
 ///
 /// * fun :
 /// The ADFun object that it converted to a checkpoint function.
@@ -229,7 +218,7 @@ where
 /// If the tape for this thread is recording, include the call
 /// as a checkpoint in the tape.
 ///
-/// * F, U : see [doc_f_and_u]
+/// * F, U : see [doc_generic_f_and_u]
 ///
 /// * name :
 /// The name that was used to store the checkpoint function.
@@ -288,7 +277,7 @@ where
 /// If the tape for this thread is recording, include the call
 /// as a checkpoint in the tape.
 ///
-/// * F, U : see [doc_f_and_u]
+/// * F, U : see [doc_generic_f_and_u]
 ///
 /// * tape :
 /// The tape that records operations on this thread.

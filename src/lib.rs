@@ -16,6 +16,19 @@
 /// ```
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
    std::sync::LazyLock::new( || "2025.8.3" );
+//
+/// Document the rustad generic type parameters F and U.
+///
+/// * F :
+/// is the floating point type used for value calculations.
+/// To date the possible choices for *F* are f32 or f64 .
+///
+/// * U :
+/// is the unsigned integer type that tracks the
+/// relationship between variables, constants, and operators.
+/// To date the possible choices for *U* are u32 or u64 .
+///
+pub fn doc_generic_f_and_u() {}
 // ----------------------------------------------------------------------------
 //
 // ptrait
