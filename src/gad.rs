@@ -7,6 +7,9 @@
 //! : [parent module](super)
 //
 #[cfg(doc)]
+use crate::doc_generic_f_and_u;
+//
+#[cfg(doc)]
 use crate::function::{GADFun, ad_domain};
 //
 #[cfg(doc)]
@@ -19,15 +22,7 @@ use crate::record::sealed::ThisThreadTape;
 ///
 /// The recording is used to create an [GADFun] object.
 ///
-/// * F :
-/// is the floating point type used for value calculations.
-/// To date the possible choices for *F* are f32 or f64 .
-///
-/// * U :
-/// is the unsigned integer type tracks the
-/// relationship between GAD objects; e.g., which variables or constants
-/// a GAD object depends on.
-/// To date the possible choices for *U* are u32 or u64 .
+/// * F, U : see [doc_generic_f_and_u]
 ///
 /// * variable :
 /// An AD object is a variable if it one of the [ad_domain] variables
@@ -200,7 +195,9 @@ pub(crate) use binary_ad_op_float;
 // ---------------------------------------------------------------------------
 // binary_ad_operator!
 //
-/// Binary GAD<F,U> operators
+/// Binary GAD<F,U> operators.
+///
+/// * F, U : see [doc_generic_f_and_u]
 ///
 /// | Left      | Operator | Right     |
 /// |-----------|----------|-----------|
@@ -321,7 +318,9 @@ pub(crate) use binary_ad_operator;
 // ---------------------------------------------------------------------------
 // binary_ad_assign_op!
 //
-/// Compound Assignment GAD<F,U> operators
+/// Compound Assignment GAD<F,U> operators.
+///
+/// * F, U : see [doc_generic_f_and_u]
 ///
 /// | Left      | Operator | Right     |
 /// |-----------|----------|-----------|
@@ -431,26 +430,22 @@ pub(crate) use binary_ad_assign_op;
 ///
 /// * Syntax :
 /// ```text
-///     avec = rustad::gadvec![ F, U, e_0, e_1, ... , e_n ];
+///     avec = rustad::gadvec![ F, U, E_0, E_1, ... , E_n ];
 /// ```
 ///
-/// * F :
-/// is the floating point value type for the GAD<F,U> elements.
-///
-/// * U :
-/// is the unsigned integer type for the GAD<F,U> elements.
+/// * F, U : see [doc_generic_f_and_u]
 ///
 /// * n :
 /// is the index of the last element in the vector; i.e.,
 /// n+1 is the length of the vector.
 ///
-/// * e_j :
+/// * E_j :
 /// is the j-th expression which defines the value of the j-th element.
 /// The type for each expression must be convertible to GAD<F,U> ; i.e.,
 /// f32, f64, or isize.
 ///
 /// * avec :
-/// is the GAD<F,U> vector with n+1 elements and j-th element equal to e_j .
+/// is the GAD<F,U> vector with n+1 elements and j-th element equal to E_j .
 ///
 /// # Example
 ///```
