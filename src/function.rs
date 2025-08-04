@@ -19,6 +19,9 @@ use crate::record::{NEXT_TAPE_ID, GTape};
 // END_SORT_THIS_LINE_MINUS_1
 //
 #[cfg(doc)]
+use crate::doc_generic_f_and_u;
+//
+#[cfg(doc)]
 use crate::operator;
 // -----------------------------------------------------------------------
 // forward_zero
@@ -32,11 +35,7 @@ use crate::operator;
 /// See [GADFun::forward_zero] and
 /// [GADFun::ad_forward_zero] prototypes.
 ///
-/// * F :
-/// is the floating point type used for value calculations.
-///
-/// * U :
-/// is the floating point type used for index inm the operation sequence.
+/// * F, U : see [doc_generic_f_and_u]
 ///
 /// * f :
 /// is this [GADFun] object.
@@ -170,11 +169,7 @@ macro_rules! forward_zero {
 /// See the [GADFun::forward_one] and
 /// [GADFun::ad_forward_one) prototypes.
 ///
-/// * F :
-/// is the floating point type used for value calculations.
-///
-/// * U :
-/// is the floating point type used for index inm the operation sequence.
+/// * F, U : see [doc_generic_f_and_u]
 ///
 /// * f :
 /// is this [GADFun] object.
@@ -310,6 +305,8 @@ macro_rules! forward_one {
 /// See the [GADFun::reverse_one] and
 /// [GADFun::ad_reverse_one] prototypes.
 ///
+/// * F, U : see [doc_generic_f_and_u]
+///
 /// * f :
 /// is this [GADFun object].
 ///
@@ -442,12 +439,7 @@ macro_rules! reverse_one {
 /// An [ad_fun] call is used to stop recording move the operation sequence
 /// to an new ADFun object.
 ///
-/// * F :
-/// is the floating point type used for value calculations when this
-/// operation sequence was recorded.
-///
-/// * U :
-/// is the unsigned integer type used for indices in the recording.
+/// * F, U : see [doc_generic_f_and_u]
 ///
 pub struct GADFun<F,U> {
     //
@@ -734,8 +726,7 @@ where
 /// There must not currently be a recording in process on the current thread
 /// when ad_domain is called. The recording is stopped when [ad_fun] is called.
 ///
-/// * F : is the floating point type used for values calculations.
-/// * U : is the unsigned integer type used for tape indices.
+/// * F, U : see [doc_generic_f_and_u]
 ///
 /// * domain :
 /// This vector determines the number of domain (independent) variables
@@ -797,8 +788,7 @@ where
 /// There must currently be a recording in process on the current thread
 /// ( started by [ad_domain] ).
 ///
-/// * F : is the floating point type used for values calculations.
-/// * U : is the unsigned integer type used for tape indices.
+/// * F, U : see [doc_generic_f_and_u]
 ///
 /// * ad_range :
 /// This is an AD vector of range space variables.
