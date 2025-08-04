@@ -12,18 +12,16 @@ use std::thread::LocalKey;
 use std::sync::Mutex;
 //
 #[cfg(doc)]
+use crate::doc_generic_f_and_u;
+#[cfg(doc)]
 use crate::operator;
 // ---------------------------------------------------------------------------
 // GTape
 ///
 /// GTape<F, U> is the type used to record a GAD<F, U> function evaluation
 ///
-/// * F : is the floating point type use for value calculations.
+/// * F, U : see [doc_generic_f_and_u]
 ///
-/// * U :
-/// is the unsigned integer type used indices in the tape.
-/// It must be able to represent the maximum:
-/// tape id, operator index, constant index, operator argument index.
 pub struct GTape<F, U> {
     //
     // recording

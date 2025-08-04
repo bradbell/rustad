@@ -24,8 +24,10 @@ pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
 /// To date the possible choices for *F* are f32 or f64 .
 ///
 /// * U :
-/// is the unsigned integer type that tracks the
-/// relationship between variables, constants, and operators.
+/// is the unsigned integer type that that is used to identify
+/// components in an operation sequence.
+/// It must be able to represent the maximum:
+/// tape id, operator index, constant index, and operator argument index.
 /// To date the possible choices for *U* are u32 or u64 .
 ///
 pub fn doc_generic_f_and_u() {}
