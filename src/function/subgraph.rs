@@ -55,7 +55,7 @@ where
     /// with index i does not depend on the domain component with index j.
     ///
     /// * dependency :
-    /// This is also a dependency pattern. For example,
+    /// This is a dependency pattern. For example,
     /// if an range variable was equal to the
     /// Heaviside function of a domain variable,
     /// the corresponding pair would be in the sparisty pattern even though
