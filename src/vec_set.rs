@@ -62,7 +62,8 @@ pub struct VecSet {
 impl VecSet {
     //
     // VecSet::new
-    /// Initial the vector of sets as having no sets
+    // Initial the vector of sets as having no sets.
+    // The first set identifier after this operation will be zero.
     pub fn new() -> Self {
         Self {
             link   : Vec::new(),
@@ -79,7 +80,7 @@ impl VecSet {
     /// Creae a new set with one element.
     ///
     /// ```test
-    ///     target = vs.union(element)
+    ///     target = vs.singleton(element)
     /// ```
     ///
     ///  vs :
@@ -91,6 +92,16 @@ impl VecSet {
     /// * target :
     /// is the identifier for the new set.
     /// It is one greater that the previous identifier returned by vs.
+    ///
+    /// # Example
+    /// ```
+    /// let mut vs  = rustad::vec_set::VecSet::new();
+    /// let element = 3usize;
+    /// let target  = vs.singleton(element);
+    /// let set     = vs.get(target);
+    /// assert_eq!( target,    0 );
+    /// assert_eq!( set.len(), 1 );
+    /// assert_eq!( set[0],    3 );
     ///
     pub fn singleton(self : &mut Self, element : usize) -> usize
     {   // link, start, data
@@ -126,7 +137,20 @@ impl VecSet {
     /// * set :
     /// is the set corresponding to id_set as a vector.
     /// The elements are in increasing order; i.e.,
-    /// if i+1 < set.len() then `set[i] < set[i+1]`.
+    /// if `i+1 < set.len()` then `set[i] < set[i+1]`.
+    ///
+    /// # Example
+    /// ```
+    /// let mut vs   = rustad::vec_set::VecSet::new();
+    /// let id_2     = vs.singleton(2);
+    /// let id_3     = vs.singleton(3);
+    /// let set      = vs.get( id_3 );
+    /// assert_eq!( set.len(), 1 );
+    /// assert_eq!( set[0],    3 );
+    /// let set      = vs.get( id_2 );
+    /// assert_eq!( set.len(), 1 );
+    /// assert_eq!( set[0],    2 );
+    /// ```
     ///
     pub fn get(self : &Self, mut id_set : usize) -> &[usize]
     {   //
@@ -159,13 +183,13 @@ impl VecSet {
 /// * Syntax :
 ///
 /// ```text
-///     target = vs.union(sets)
+///     target = vs.union(sub_sets)
 /// ```
 ///
 /// * vs :
 /// is this [VecSet] object.
 ///
-/// * sets :
+/// * sub_sets :
 /// is a vector is set identifiers that specifies which sets
 /// are included in the union.
 ///
@@ -173,7 +197,20 @@ impl VecSet {
 /// is the identifier for the new set that is the result of the union.
 /// It is one greater that the previous identifier returned by vs.
 ///
-pub fn union(self : &mut Self, sets : &Vec<usize> ) -> usize
+/// # Example
+/// ```
+/// let mut vs   = rustad::vec_set::VecSet::new();
+/// let id_2     = vs.singleton(2);
+/// let id_3     = vs.singleton(3);
+/// let sub_sets = vec![ id_2, id_3 ];
+/// let id_union = vs.union(&sub_sets);
+/// let set      = vs.get( id_union );
+/// assert_eq!( set.len(), 2 );
+/// assert_eq!( set[0],    2 );
+/// assert_eq!( set[1],    3 );
+/// ```
+///
+pub fn union(self : &mut Self, sub_sets : &Vec<usize> ) -> usize
 {   //
     // link, start, data, arg, next, equal, order
     let link  = &mut self.link;
@@ -199,8 +236,8 @@ pub fn union(self : &mut Self, sets : &Vec<usize> ) -> usize
     order.resize(0, 0);
     //
     // id_set
-    for i in 0 .. sets.len() {
-        let mut id_set = sets[i];
+    for i in 0 .. sub_sets.len() {
+        let mut id_set = sub_sets[i];
         debug_assert!( id_set < target );
         //
         while link[id_set] {
@@ -276,6 +313,8 @@ pub fn union(self : &mut Self, sets : &Vec<usize> ) -> usize
                             equal[i]      = false;
                             more_elements = true;
                         }
+                    } else {
+                        equal[i] = false;
                     }
                 }
             } // end: while more_elements {
@@ -284,8 +323,12 @@ pub fn union(self : &mut Self, sets : &Vec<usize> ) -> usize
             let mut i_min = arg.len();
             for i in 0 .. arg.len() {
                 if equal[i] {
-                    if arg[i] < arg[i_min] {
+                    if i_min == arg.len() {
                         i_min = i;
+                    } else {
+                        if arg[i] < arg[i_min] {
+                            i_min = i;
+                        }
                     }
                 }
             }
@@ -309,5 +352,5 @@ pub fn union(self : &mut Self, sets : &Vec<usize> ) -> usize
         } // end _ => {
     } // end:  match arg.len() {
     target
-} // end: pub fn union(self : &self, sets : &Vec<usize> )
+} // end: pub fn union(self : &self, sub_sets : &Vec<usize> )
 } // end: impl VecSet{
