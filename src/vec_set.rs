@@ -40,6 +40,7 @@ pub struct VecSet {
     /// For `0 <= i < arg.len()`,
     /// The set, in this vector of sets, with index
     /// `id_set = arg[i]` is an operand for this union operation.
+    /// In addition, the set is not a link and it is not empty.
     arg : Vec<usize>,
     //
     /// Fix i, and let `id_set = arg[i]`.
@@ -77,7 +78,7 @@ impl VecSet {
     }
     //
     // VecSet.singleton
-    /// Creae a new set with one element.
+    /// Create a new set with one element.
     ///
     /// ```test
     ///     target = vs.singleton(element)
@@ -172,6 +173,44 @@ impl VecSet {
         }
         &data[ start[id_set] .. end ]
     }
+    //
+    // VecSet.n_data
+    /// Return the number elements and links used to represent all the sets.
+    ///
+    /// ```test
+    ///     n_data = vs.n_data(element)
+    /// ```
+    ///
+    ///  vs :
+    /// is this [VecSet] object.
+    ///
+    /// n_data :
+    /// is the number of set elements, and link,
+    /// used to represent all the sets.
+    ///
+    /// # Example
+    /// ```
+    /// let mut vs  = rustad::vec_set::VecSet::new();
+    /// let id_2    = vs.singleton(2);
+    /// let id_3    = vs.singleton(3);
+    /// assert_eq!( 2, vs.n_element() );
+    /// //
+    /// // number of elements in {2}, {3}, {2,3}
+    /// let sub_set = vec![ id_2, id_3 ];
+    /// let id_2_3  = vs.union( &sub_set );
+    /// assert_eq!( 4, vs.n_element() );
+    /// //
+    /// // The sets {2, 3} union {3} = {2, 3},
+    /// // so it requires 4 elements plus one link to represent:
+    /// // {2}, {3}, {2, 3}, and {2, 3} union {3} .
+    /// let sub_set = vec![ id_2_3, id_3 ];
+    /// let id_next = vs.union( &sub_set );
+    /// assert_eq!( id_next, id_2_3 + 1);
+    /// assert_eq!( 5, vs.n_element() );
+    /// ```
+    ///
+    pub fn n_element(self : &Self) -> usize
+    {   self.data.len() }
 
 }
 
