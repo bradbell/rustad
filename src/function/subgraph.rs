@@ -24,7 +24,6 @@ where
     F     : GlobalOpInfoVec<U> ,
     U     : Copy + 'static + GenericAs<usize> + std::cmp::PartialEq,
     usize : GenericAs<U>,
-
 {
     // sub_sparsity
     /// Use the subgraph method to compute a Jacobian sparsity pattern.
@@ -73,7 +72,7 @@ where
     /// let f           = function::ad_fun(&ay);
     /// let trace       = false;
     /// let mut pattern = f.sub_sparsity(trace);
-    /// pattern.sort_by( |x, y| x.partial_cmp(y).unwrap() );
+    /// pattern.sort( );
     /// assert_eq!( pattern.len(), 3 );
     /// assert_eq!( pattern[0], (0,0) );
     /// assert_eq!( pattern[1], (1,1) );

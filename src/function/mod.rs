@@ -7,6 +7,7 @@
 //! : [parent module](super)
 //
 pub mod subgraph;
+pub mod forward;
 //
 use std::cell::RefCell;
 use std::thread::LocalKey;
