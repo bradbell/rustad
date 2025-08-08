@@ -69,11 +69,11 @@ where
     /// let mut pattern = f.for_sparsity(trace);
     /// pattern.sort();
     /// assert_eq!( pattern.len(), 3 );
-    /// assert_eq!( pattern[0], (0,0) );
-    /// assert_eq!( pattern[1], (1,1) );
-    /// assert_eq!( pattern[2], (2,2) );
+    /// assert_eq!( pattern[0], [0,0] );
+    /// assert_eq!( pattern[1], [1,1] );
+    /// assert_eq!( pattern[2], [2,2] );
     ///```
-    pub fn for_sparsity(&self, trace : bool) -> Vec<(U, U)>
+    pub fn for_sparsity(&self, trace : bool) -> Vec< [U; 2] >
     {   //
         // op_info_vec
         let op_info_vec = &*< F as GlobalOpInfoVec<U> >::get();
@@ -90,7 +90,7 @@ where
         let n_range           = range_is_var.len();
         //
         // result, arg_var_index, arg_var_usize
-        let mut result          : Vec<(U, U)> = Vec::new();
+        let mut result          : Vec< [U; 2] > = Vec::new();
         let mut arg_var_index   : Vec<U>      = Vec::new();
         let mut arg_var_usize   : Vec<usize>  = Vec::new();
         let mut set_vec         : VecSet      = VecSet::new();
@@ -156,7 +156,7 @@ where
             for j in 0 .. set.len() {
                 let row_u : U = as_from( i );
                 let col_u : U = as_from( set[j] );
-                result.push( (row_u, col_u) );
+                result.push( [row_u, col_u] );
             }
         }
         if trace {

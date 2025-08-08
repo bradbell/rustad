@@ -91,7 +91,7 @@ pub(crate) struct OneCheckpointInfo<F,U> {
     /// is the dependency pattern as vector of pairs of non-negative integers.
     /// If (i,j) is not in dependency, then the i-th component of the range
     /// does not depend on the j-th component of the domain.
-    pub dependency   : Vec<(U, U)>,
+    pub dependency   : Vec< [U; 2] >,
 }
 //
 // sealed::AllCheckpointInfo
@@ -355,7 +355,7 @@ where
         // is_var_range
         let mut is_var_range = vec![false; call_n_res];
         for k in 0 .. dependency.len() {
-            let (i,j) = dependency[k];
+            let [i,j] = dependency[k];
             if is_var_domain[ as_from(j) ] {
                 is_var_range[ as_from(i) ] = true;
             }

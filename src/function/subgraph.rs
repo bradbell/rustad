@@ -72,13 +72,13 @@ where
     /// let f           = function::ad_fun(&ay);
     /// let trace       = false;
     /// let mut pattern = f.sub_sparsity(trace);
-    /// pattern.sort( );
+    /// pattern.sort();
     /// assert_eq!( pattern.len(), 3 );
-    /// assert_eq!( pattern[0], (0,0) );
-    /// assert_eq!( pattern[1], (1,1) );
-    /// assert_eq!( pattern[2], (2,2) );
+    /// assert_eq!( pattern[0], [0,0] );
+    /// assert_eq!( pattern[1], [1,1] );
+    /// assert_eq!( pattern[2], [2,2] );
     ///```
-    pub fn sub_sparsity(&self, trace : bool) -> Vec<(U, U)>
+    pub fn sub_sparsity(&self, trace : bool) -> Vec< [U; 2] >
     {   //
         // op_info_vec
         let op_info_vec = &*< F as GlobalOpInfoVec<U> >::get();
@@ -99,7 +99,7 @@ where
         let mut done : Vec<U> = vec![n_var_u; n_var];
         //
         // result, arg_var_index, var_index_stack
-        let mut result          : Vec<(U, U)> = Vec::new();
+        let mut result          : Vec< [U; 2] > = Vec::new();
         let mut arg_var_index   : Vec<U> = Vec::new();
         let mut var_index_stack : Vec<U> = Vec::new();
         //
@@ -138,7 +138,7 @@ where
                         //
                         // result
                         // var_index is a domain variable index
-                        result.push( (row_u, var_index_u) );
+                        result.push( [row_u, var_index_u] );
                     } else {
                         //
                         // op_index
