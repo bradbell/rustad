@@ -15,6 +15,8 @@
 /// * A singleton set can be created from a usize value.
 /// * A set can be created as the union of other sets.
 ///
+/// Note that there is no way to create an empty set.
+///
 pub struct VecSet {
     //
     /// The number of sets is equal to the length of link.
@@ -30,8 +32,8 @@ pub struct VecSet {
     /// you must eventually some to a set that is not a link.
     ///
     /// * If `link[this_set]` is false, `start[this_set]` is the first element
-    /// of the this set. If `start[this_set]` is equal to `start[this_set+1]`,
-    /// this set is empty.
+    /// of the this set. None of the sets are empty; i.e.,
+    ///  `start[this_set] < start[this_set+1]` .
     start : Vec<usize> ,
     //
     /// This vector that holds all the elements, and links, for all the sets.
@@ -40,12 +42,12 @@ pub struct VecSet {
     /// For `0 <= i < arg.len()`,
     /// The set, in this vector of sets, with index
     /// `id_set = arg[i]` is an operand for this union operation.
-    /// In addition, the set is not a link and it is not empty.
+    /// In addition, the set is not a link.
     arg : Vec<usize>,
     //
     /// Fix i, and let `id_set = arg[i]`.
-    /// If `next[i] = start[id_set+1]`,
-    /// there are no more elements in the id_set set.
+    /// If `next[i] = start[id_set + 1]` or `next[i] == data.len()` ,
+    /// there are no more elements in the `id_set` set.
     /// Otherwise `data[ next[i] ]`
     /// is the next element of the id_set set;
     /// `next.len() == arg.len()` .
@@ -55,7 +57,7 @@ pub struct VecSet {
     /// `equal.len() == arg.len()` .
     equal : Vec<bool>,
     //
-    /// Vector used to order the operands for this union;
+    /// This vector is used to order the operands for this union;
     /// `order.len() == arg.len()` .
     order : Vec<usize>,
 }
@@ -287,28 +289,23 @@ pub fn union(self : &mut Self, sub_sets : &Vec<usize> ) -> usize
         debug_assert!( ! link[id_set] );
         //
         // arg, next, equal, order
-        let empty = start[id_set] == start[id_set + 1];
-        if ! empty {
-            let mut in_arg = false;
-            for j in 0 .. arg.len() {
-                if id_set == arg[j] {
-                    in_arg = true;
-                }
+        debug_assert!( start[id_set] < start[id_set + 1] );
+        let mut in_arg = false;
+        for j in 0 .. arg.len() {
+            if id_set == arg[j] {
+                in_arg = true;
             }
-            if ! in_arg {
-                arg.push( id_set );
-                next.push( start[id_set] );
-                equal.push( true );
-                order.push( order.len() );
-            }
+        }
+        if ! in_arg {
+            arg.push( id_set );
+            next.push( start[id_set] );
+            equal.push( true );
+            order.push( order.len() );
         }
     }
     //
+    debug_assert!( 0 < arg.len() );
     match arg.len() {
-        0 => {
-            // result is empty for this union
-            debug_assert!( start[target] == data.len() );
-        }
         1 => {
             // link, data
             // result is equal to argument for this union
