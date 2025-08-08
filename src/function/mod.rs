@@ -6,8 +6,8 @@
 //! AD function objects
 //! : [parent module](super)
 //
-pub mod subgraph;
-pub mod forward;
+// sparsity
+pub mod sparsity;
 //
 use std::cell::RefCell;
 use std::thread::LocalKey;
