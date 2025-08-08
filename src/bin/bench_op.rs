@@ -20,30 +20,6 @@ where
     result
 }
 
-// test_temp
-fn test_temp() {
-    use rustad::function;
-    use rustad::gad::GAD;
-    type AD = GAD<f32, u64>;
-    let nx : usize = 4;
-    let x  : Vec<f32> = vec![2.0; nx];
-    let ax : Vec<AD>  = function::ad_domain(&x);
-    let mut ay : Vec<AD> = Vec::new();
-    ay.push( AD::from( x[0] * x[0] ) );
-    for j in 1 .. nx {
-        ay.push( ax[j] * ax[j] );
-    }
-    let f           = function::ad_fun(&ay);
-    let trace       = true;
-    let mut pattern = f.for_sparsity(trace);
-    pattern.sort();
-    assert_eq!( pattern.len(), nx-1 );
-    for j in 1 .. nx {
-        let j64 = j as u64;
-        assert_eq!( pattern[j-1], [j64, j64] );
-    }
-}
-
 // test_add_vv
 fn test_add_vv() {
     type F  = f32;
@@ -153,5 +129,4 @@ fn main() {
     bench( &"test_add_vv".to_string() , test_add_vv );
     bench( &"test_mul_vv".to_string() , test_mul_vv );
     bench( &"test_ad_mul_vv".to_string() , test_ad_mul_vv );
-    test_temp();
 }

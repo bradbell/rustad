@@ -56,10 +56,6 @@ pub struct VecSet {
     /// If `equal[i]`, the result of the union is equal to the set `arg[i]`;
     /// `equal.len() == arg.len()` .
     equal : Vec<bool>,
-    //
-    /// This vector is used to order the operands for this union;
-    /// `order.len() == arg.len()` .
-    order : Vec<usize>,
 }
 //
 impl VecSet {
@@ -75,7 +71,6 @@ impl VecSet {
             arg    : Vec::new(),
             next   : Vec::new(),
             equal  : Vec::new(),
-            order  : Vec::new(),
         }
     }
     //
@@ -253,14 +248,13 @@ impl VecSet {
 ///
 pub fn union(self : &mut Self, sub_sets : &Vec<usize> ) -> usize
 {   //
-    // link, start, data, arg, next, equal, order
+    // link, start, data, arg, next, equal
     let link  = &mut self.link;
     let start = &mut self.start;
     let data  = &mut self.data;
     let arg   = &mut self.arg;
     let next  = &mut self.next;
     let equal = &mut self.equal;
-    let order = &mut self.order;
     //
     // target
     debug_assert!( link.len() == start.len() );
@@ -270,14 +264,15 @@ pub fn union(self : &mut Self, sub_sets : &Vec<usize> ) -> usize
     start.push( data.len() );
     link.push( false );
     //
-    // arg, next, equal, order
+    // arg, next, equal
     arg.resize(0, 0);
     next.resize(0, 0);
     equal.resize(0, false);
-    order.resize(0, 0);
     //
-    // id_set
+    // arg, next, equal
     for i in 0 .. sub_sets.len() {
+        //
+        // id_set
         let mut id_set = sub_sets[i];
         debug_assert!( id_set < target );
         //
@@ -286,9 +281,10 @@ pub fn union(self : &mut Self, sub_sets : &Vec<usize> ) -> usize
             debug_assert!( data[ start[id_set] ] < id_set );
             id_set = data[ start[id_set] ];
         }
+        debug_assert!( start[id_set] < start[id_set + 1] );
         debug_assert!( ! link[id_set] );
         //
-        // arg, next, equal, order
+        // arg, next, equal
         debug_assert!( start[id_set] < start[id_set + 1] );
         let mut in_arg = false;
         for j in 0 .. arg.len() {
@@ -300,10 +296,8 @@ pub fn union(self : &mut Self, sub_sets : &Vec<usize> ) -> usize
             arg.push( id_set );
             next.push( start[id_set] );
             equal.push( true );
-            order.push( order.len() );
         }
     }
-    //
     debug_assert!( 0 < arg.len() );
     match arg.len() {
         1 => {
@@ -315,48 +309,49 @@ pub fn union(self : &mut Self, sub_sets : &Vec<usize> ) -> usize
         }
         _ => {
             //
-            // more_elements
-            let mut more_elements = true;
-            while more_elements {
-                //
-                // order
-                order.sort_by_key( |&i| {
-                    let id_set = arg[i];
-                    //
-                    let mut result = usize::MAX;
-                    if next[i] < start[id_set + 1] {
-                        result = data[ next[i] ];
-                    }
-                    result
-                } );
+            // i_min
+            let mut i_min = 0;
+            for i in 1 .. arg.len() {
+                if data[ next[i] ] < data[ next[i_min] ] {
+                    i_min = i;
+                }
+            }
+            //
+            while i_min < arg.len() {
                 //
                 // data
-                let first_set = arg[ order[0] ];
-                debug_assert!( next[ order[0] ] < start[first_set + 1] );
-                let element = data[ next[ order[0] ] ];
+                let element = data[ next[i_min] ];
                 data.push( element );
                 //
-                // next, equal, more_elements
-                more_elements = false;
+                // next, equal
                 for i in 0 .. arg.len() {
                     if next[i] < start[ arg[i] + 1 ] {
                         if element == data[ next[i] ]  {
                             next[i] += 1;
-                            if next[i] < start[ arg[i] + 1 ] {
-                                more_elements = true;
-                            }
                         } else {
                             equal[i]      = false;
-                            more_elements = true;
                         }
                     } else {
                         equal[i] = false;
                     }
                 }
-            } // end: while more_elements {
+                // i_min
+                i_min = arg.len();
+                for i in 0 .. arg.len() {
+                    if next[i] < start[ arg[i] + 1 ] {
+                        if i_min == arg.len() {
+                            i_min = i;
+                        } else {
+                            if data[ next[i] ] < data[ next[i_min] ] {
+                                i_min = i;
+                            }
+                        }
+                    }
+                }
+            } // end: while i_min < arg.len() {
             //
             // i_min
-            let mut i_min = arg.len();
+            i_min = arg.len();
             for i in 0 .. arg.len() {
                 if equal[i] {
                     if i_min == arg.len() {
