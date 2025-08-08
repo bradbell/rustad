@@ -218,20 +218,23 @@ where
     /// use rustad::function;
     /// use rustad::gad::GAD;
     /// type AD = GAD<f32, u64>;
-    /// let x  : Vec<f32> = vec![1.0, 2.0, 3.0];
+    /// let nx : usize = 4;
+    /// let x  : Vec<f32> = vec![2.0; nx];
     /// let ax : Vec<AD>  = function::ad_domain(&x);
     /// let mut ay : Vec<AD> = Vec::new();
-    /// for j in 0 .. x.len() {
-    ///     ay.push( ax[j] * ax[j] );
+    /// ay.push( AD::from( x[0] * x[0] ) ); // y[0] is a constant
+    /// for j in 1 .. nx {
+    ///     ay.push( ax[j] * ax[j] );       // y[j] is a variable
     /// }
     /// let f           = function::ad_fun(&ay);
     /// let trace       = false;
     /// let mut pattern = f.for_sparsity(trace);
     /// pattern.sort();
-    /// assert_eq!( pattern.len(), 3 );
-    /// assert_eq!( pattern[0], [0,0] );
-    /// assert_eq!( pattern[1], [1,1] );
-    /// assert_eq!( pattern[2], [2,2] );
+    /// assert_eq!( pattern.len(), nx-1 );
+    /// for j in 1 .. nx {
+    ///     let j64 = j as u64;
+    ///     assert_eq!( pattern[j-1], [j64, j64] );
+    /// }
     ///```
     pub fn for_sparsity(&self, trace : bool) -> Vec< [U; 2] >
     {   //
@@ -261,10 +264,8 @@ where
         }
         //
         if trace {
-            println!(
-                "Begin Trace: for_sparisty: n_domain = {}, n_range = {}",
-                 n_domain, n_range
-            );
+            println!( "Begin Trace: for_sparisty: n_domain = {}", n_domain);
+            println!("range = {:?}", range2tape_index);
             println!("var_index, operator, var_arguments, set_result");
         }
         //
@@ -310,7 +311,7 @@ where
                 );
             }
         }
-        for i in 0 .. n_range {
+        for i in 0 .. n_range { if range_is_var[i] {
             let row_var_index : usize = as_from( range2tape_index[i] );
             let set  = set_vec.get(row_var_index);
             for j in 0 .. set.len() {
@@ -318,7 +319,7 @@ where
                 let col_u : U = as_from( set[j] );
                 result.push( [row_u, col_u] );
             }
-        }
+        } }
         if trace {
             println!( "n_pattern = {}", result.len() );
         }

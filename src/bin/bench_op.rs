@@ -20,6 +20,30 @@ where
     result
 }
 
+// test_temp
+fn test_temp() {
+    use rustad::function;
+    use rustad::gad::GAD;
+    type AD = GAD<f32, u64>;
+    let nx : usize = 4;
+    let x  : Vec<f32> = vec![2.0; nx];
+    let ax : Vec<AD>  = function::ad_domain(&x);
+    let mut ay : Vec<AD> = Vec::new();
+    ay.push( AD::from( x[0] * x[0] ) );
+    for j in 1 .. nx {
+        ay.push( ax[j] * ax[j] );
+    }
+    let f           = function::ad_fun(&ay);
+    let trace       = true;
+    let mut pattern = f.for_sparsity(trace);
+    pattern.sort();
+    assert_eq!( pattern.len(), nx-1 );
+    for j in 1 .. nx {
+        let j64 = j as u64;
+        assert_eq!( pattern[j-1], [j64, j64] );
+    }
+}
+
 // test_add_vv
 fn test_add_vv() {
     type F  = f32;
@@ -106,7 +130,7 @@ fn test_ad_mul_vv() {
     let ad_dy         = f.ad_forward_one(&ad_dx, &ad_v0, trace);
     let ad_rx         = f.ad_reverse_one(&ad_ry, &ad_v0, trace);
     //
-    assert_eq!( ad_y[0].to_value(), x[0] * x[1] );
+    assert_eq!( ad_y[0].to_value() , x[0] * x[1] );
     assert_eq!( ad_y[1].to_value() , x[1] * x[2] );
     //
     assert_eq!( ad_dy[0].to_value() , dx[0] * x[1] + x[0] * dx[1] );
@@ -129,4 +153,5 @@ fn main() {
     bench( &"test_add_vv".to_string() , test_add_vv );
     bench( &"test_mul_vv".to_string() , test_mul_vv );
     bench( &"test_ad_mul_vv".to_string() , test_ad_mul_vv );
+    test_temp();
 }
