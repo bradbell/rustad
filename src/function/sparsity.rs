@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This module implements [GADFun] methods that compute sparsity patterns.
+//! Implements [GADFun] methods that compute sparsity patterns.
 //! : [parent module](super)
 //!
 //! Method List :
@@ -60,6 +60,8 @@ where
     /// Heaviside function of a domain variable,
     /// the corresponding pair would be in the sparisty pattern even though
     /// the corresponding derivative is always zero.
+    ///
+    /// # Example
     ///```
     /// use rustad::function;
     /// use rustad::gad::GAD;
@@ -214,6 +216,8 @@ where
     /// Heaviside function of a domain variable,
     /// the corresponding pair would be in the sparisty pattern even though
     /// the corresponding derivative is always zero.
+    ///
+    /// # Example
     ///```
     /// use rustad::function;
     /// use rustad::gad::GAD;

@@ -11,7 +11,11 @@ use crate::gas::as_from;
 use crate::gad::GAD;
 //
 #[cfg(doc)]
-use crate::function::{doc_forward_zero, doc_forward_one, doc_reverse_one};
+use crate::function::sweep::{
+    doc_forward_zero,
+    doc_forward_one,
+    doc_reverse_one,
+};
 //
 use crate::record::sealed::ThisThreadTape;
 use crate::checkpoint::sealed::ThisThreadCheckpointAll;
