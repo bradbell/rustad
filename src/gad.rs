@@ -4,7 +4,8 @@
 // ---------------------------------------------------------------------------
 //
 //! GAD a generic automatic differentiation floating point type
-//! : [parent module](super)
+//!
+//! Link to [parent module](super)
 //
 #[cfg(doc)]
 use crate::doc_generic_f_and_u;

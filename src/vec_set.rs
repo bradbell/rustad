@@ -3,7 +3,8 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //! VecSet a vector of sets class
-//! : [parent module](super)
+//!
+//! Link to [parent module](super)
 //
 /// This vector of sets class is specalized to work with sparsity calculations.
 ///

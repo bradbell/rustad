@@ -3,7 +3,8 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //! Define traits that are used by the public rustad API.
-//! : [parent module](super)
+//!
+//! Link to [parent module](super)
 //
 // ----------------------------------------------------------------------------
 // Sealed traits

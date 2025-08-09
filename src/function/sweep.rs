@@ -4,7 +4,8 @@
 // ---------------------------------------------------------------------------
 //
 //! Implement [GADFun] methods that compute function values and derivatives.
-//! : [parent module](super)
+//!
+//! Link to [parent module](super)
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
 use crate::function::GADFun;

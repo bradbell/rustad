@@ -3,7 +3,8 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
 //! Operator that calls an ADFun
-//! : [parent module](super)
+//!
+//! Link to [parent module](super)
 //!
 //! # Operator Id
 //!  CALL_OP

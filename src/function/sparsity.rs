@@ -4,7 +4,8 @@
 // ---------------------------------------------------------------------------
 //
 //! Implements [GADFun] methods that compute sparsity patterns.
-//! : [parent module](super)
+//!
+//! Link to [parent module](super)
 //!
 //! Method List :
 //! 1. [GADFun::sub_sparsity]

@@ -3,7 +3,8 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //! Generic as function for converting types like `as` would.
-//! : [parent module](super)
+//!
+//! Link to [parent module](super)
 ///
 // sealed::GenericAs
 pub (crate) mod sealed {

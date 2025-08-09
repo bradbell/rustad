@@ -29,10 +29,10 @@ src_list=$(find src -name '*.rs' | $sed \
 )
 for file in $src_list
 do
-   if ! grep '^//! : \[parent module\](super) *$' $file > /dev/null
+   if ! grep '^//! Link to \[parent module\](super) *$' $file > /dev/null
    then
       echo "Cannot find the following line in $file:"
-      echo '//! : [parent module](super)'
+      echo '//! Link to [parent module](super)'
       exit 1
    fi
 done

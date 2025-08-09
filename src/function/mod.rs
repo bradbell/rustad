@@ -4,7 +4,8 @@
 // ---------------------------------------------------------------------------
 //
 //! AD function objects
-//! : [parent module](super)
+//!
+//! Link to [parent module](super)
 //
 // sparsity
 pub mod sparsity;

@@ -3,7 +3,8 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
 //! Store and compute for AD add operation
-//! : [parent module](super)
+//!
+//! Link to [parent module](super)
 //!
 //! * F : Floating point type used for value calculations .
 //! * U : Unsigned integer type used for indices in the Tape .

@@ -4,7 +4,8 @@
 // ---------------------------------------------------------------------------
 //
 //! This module can be used to checkpoint a section of AD computation
-//! : [parent module](super)
+//!
+//! Link to [parent module](super)
 //!
 //! # Example
 //! ```

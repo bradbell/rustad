@@ -4,7 +4,8 @@
 // ---------------------------------------------------------------------------
 //
 //! Define tape objects
-//! : [parent module](super)
+//!
+//! Link to [parent module](super)
 //
 use std::cell::RefCell;
 use std::thread::LocalKey;

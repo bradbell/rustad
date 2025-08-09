@@ -3,7 +3,8 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
 //! Operations for specific operators
-//! : [parent module](super)
+//!
+//! Link to [parent module](super)
 //
 //
 use crate::gas::sealed::GenericAs;
