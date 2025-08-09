@@ -7,47 +7,8 @@
 //!
 //! Link to [parent module](super)
 //!
-//! # Example
-//! ```
-//! use rustad::function;
-//! use rustad::gad::GAD;
-//! use rustad::checkpoint::{store_checkpoint, use_checkpoint};
-//! //
-//! // F, AD
-//! type F  = f32;
-//! type U  = u64;
-//! type AD = GAD<F,U>;
-//! //
-//! // trace
-//! let trace   = false;
-//! //
-//! // f
-//! // f(x) = [x0 + x1, x1 * x2]
-//! let  x : Vec<F>  = vec![ 1.0, 2.0, 3.0 ];
-//! let ax : Vec<AD> = function::ad_domain(&x);
-//! let ay = vec![ ax[0] + ax[1], ax[1] * ax[2] ];
-//! let f  = function::ad_fun(&ay);
-//! //
-//! // f
-//! // store as a checkpoint function
-//! let name    = "f".to_string();
-//! store_checkpoint(f, &name);
-//! //
-//! // g
-//! // g(u) = f( u0, u0 + u1, u1)
-//! //      = [ u0 + u0 + u1 , (u0 + u1) * u1 ]
-//! let  u : Vec<F>  = vec![ 4.0, 5.0];
-//! let au : Vec<AD> = function::ad_domain(&u);
-//! let ax = vec![ au[0], au[0] + au[1], au[1] ];
-//! let ay = use_checkpoint(&name, &ax, trace);
-//! let g  = function::ad_fun(&ay);
-//! //
-//! // w
-//! // w = g(u)
-//! let (w, _)  = g.forward_zero(&u, trace);
-//! assert_eq!( w[0], u[0] + u[0] + u[1] );
-//! assert_eq!( w[1], (u[0] + u[1]) * u[1] );
-//! ```
+// ---------------------------------------------------------------------------
+// use
 //
 use std::thread::LocalKey;
 use std::cell::RefCell;
@@ -66,6 +27,157 @@ use crate::record::sealed::ThisThreadTape;
 //
 #[cfg(doc)]
 use crate::doc_generic_f_and_u;
+// ---------------------------------------------------------------------------
+//
+// store_checkpoint
+/// Converts a [GADFun] object to a checkpoint functions for this thread.
+///
+/// * F, U : see [doc_generic_f_and_u]
+///
+/// * fun :
+/// The ADFun object that it converted to a checkpoint function.
+///
+/// * name :
+/// The name the user chooses for this checkpoint function.
+/// This name must not appear in a previous `store_checkpoint` call
+/// on this thread.
+///
+/// * Example : see the example in [use_checkpoint]
+///
+pub fn store_checkpoint<F,U>(
+    fun:  GADFun<F,U>,
+    name: &String)
+where
+    F     : GlobalOpInfoVec<U> + ThisThreadCheckpointAllPublic<U> ,
+    U     : Copy + 'static + GenericAs<usize> + std::cmp::PartialEq,
+    usize : GenericAs<U>,
+{
+    //
+    // This thread's checkpoint information for GAD<F,U>
+    let local_key = < F as sealed::ThisThreadCheckpointAll<U> >::get();
+    local_key.with_borrow_mut( |all| {
+        assert!(
+            ! all.map.contains_key(name),
+            "store_checkpoint: name {name} was used before on this thread"
+        );
+        let index           = all.vec.len();
+        let trace           = false;
+        let pattern         = fun.sub_sparsity(trace);
+        let checkpoint_info = OneCheckpointInfo {
+            fun_index  : index,
+            name       : name.clone(),
+            adfun      : fun,
+            dependency : pattern,
+        };
+        all.vec.push( checkpoint_info );
+        all.map.insert(name.clone(), index);
+    } );
+}
+//
+// use_checkpoint
+/// Makes a call, by name, to a checkpoint function.
+///
+/// ```text
+///     ad_range = use_checkpoint(&name, &ad_comain, trace)
+/// ```
+///
+/// If the tape for this thread is recording, include the call
+/// as a checkpoint in the tape.
+///
+/// * F, U : see [doc_generic_f_and_u]
+///
+/// * name :
+/// The name that was used to store the checkpoint function.
+///
+/// * ad_domain :
+/// The value of the domain variables for the function bning called.
+///
+/// * trace :
+/// If this is true (false), evaluation of the
+/// checkpoint function corresponding is traced.
+///
+/// * ad_range :
+/// The range variable values that correspond to the
+/// domain variable values.
+///
+/// # Example
+/// ```
+/// use rustad::function;
+/// use rustad::gad::GAD;
+/// use rustad::checkpoint::{store_checkpoint, use_checkpoint};
+/// //
+/// // F, AD
+/// type F  = f32;
+/// type U  = u64;
+/// type AD = GAD<F,U>;
+/// //
+/// // trace
+/// let trace   = false;
+/// //
+/// // f
+/// // f(x) = [x0 + x1, x1 * x2]
+/// let  x : Vec<F>  = vec![ 1.0, 2.0, 3.0 ];
+/// let ax : Vec<AD> = function::ad_domain(&x);
+/// let ay = vec![ ax[0] + ax[1], ax[1] * ax[2] ];
+/// let f  = function::ad_fun(&ay);
+/// //
+/// // f
+/// // store as a checkpoint function
+/// let name    = "f".to_string();
+/// store_checkpoint(f, &name);
+/// //
+/// // g
+/// // g(u) = f( u0, u0 + u1, u1)
+/// //      = [ u0 + u0 + u1 , (u0 + u1) * u1 ]
+/// let  u : Vec<F>  = vec![ 4.0, 5.0];
+/// let au : Vec<AD> = function::ad_domain(&u);
+/// let ax = vec![ au[0], au[0] + au[1], au[1] ];
+/// let ay = use_checkpoint(&name, &ax, trace);
+/// let g  = function::ad_fun(&ay);
+/// //
+/// // w
+/// // w = g(u)
+/// let (w, _)  = g.forward_zero(&u, trace);
+/// assert_eq!( w[0], u[0] + u[0] + u[1] );
+/// assert_eq!( w[1], (u[0] + u[1]) * u[1] );
+/// ```
+pub fn use_checkpoint<F,U>(
+    name      : &String,
+    ad_domain : &Vec< GAD<F,U> >,
+    trace     : bool,
+) -> Vec< GAD<F,U> >
+where
+    U:        'static + Copy + GenericAs<usize> + std::fmt::Debug,
+    usize:    GenericAs<U> ,
+    GAD<F,U>: From<F>,
+    F:        Copy +
+              From<f32> +
+              std::fmt::Display +
+              sealed::ThisThreadCheckpointAll<U> +
+              GlobalOpInfoVec<U> +
+              ThisThreadTape<U>,
+{   //
+    // ad_range
+    let local_key = < F as sealed::ThisThreadCheckpointAll<U> >::get();
+    let ad_range  = local_key.with_borrow( |all| {
+        let option_fun_index = all.map.get(name);
+        if option_fun_index == None {
+            panic!("use_checkpoint: \
+                    name {name} has not been stored as a checkpoint."
+            );
+        }
+        let fun_index        = *option_fun_index.unwrap();
+        let check_point_info = &all.vec[fun_index];
+        assert_eq!( fun_index, check_point_info.fun_index );
+        let local_key : &LocalKey< RefCell< GTape<F,U> > > =
+            < F as ThisThreadTape<U> >::get();
+        let ad_range_zero = local_key.with_borrow_mut( |tape|
+            use_checkpoint_info(tape, check_point_info, ad_domain, trace)
+        );
+        ad_range_zero
+    } );
+    ad_range
+}
 //
 // OneCheckpointInfo
 /// Information used to splice a checkpoint function call into a recording;
@@ -170,107 +282,6 @@ impl_this_thread_checkpoint!(f32, u32);
 impl_this_thread_checkpoint!(f32, u64);
 impl_this_thread_checkpoint!(f64, u32);
 impl_this_thread_checkpoint!(f64, u64);
-//
-// store_checkpoint
-/// Converts a [GADFun] object to a checkpoint functions for this thread.
-///
-/// * F, U : see [doc_generic_f_and_u]
-///
-/// * fun :
-/// The ADFun object that it converted to a checkpoint function.
-///
-/// * name :
-/// The name the user chooses for this checkpoint function.
-/// This name must not appear in a previous `store_checkpoint` call
-/// on this thread.
-pub fn store_checkpoint<F,U>(
-    fun:  GADFun<F,U>,
-    name: &String)
-where
-    F     : GlobalOpInfoVec<U> + ThisThreadCheckpointAllPublic<U> ,
-    U     : Copy + 'static + GenericAs<usize> + std::cmp::PartialEq,
-    usize : GenericAs<U>,
-{
-    //
-    // This thread's checkpoint information for GAD<F,U>
-    let local_key = < F as sealed::ThisThreadCheckpointAll<U> >::get();
-    local_key.with_borrow_mut( |all| {
-        assert!(
-            ! all.map.contains_key(name),
-            "store_checkpoint: name {name} was used before on this thread"
-        );
-        let index           = all.vec.len();
-        let trace           = false;
-        let pattern         = fun.sub_sparsity(trace);
-        let checkpoint_info = OneCheckpointInfo {
-            fun_index  : index,
-            name       : name.clone(),
-            adfun      : fun,
-            dependency : pattern,
-        };
-        all.vec.push( checkpoint_info );
-        all.map.insert(name.clone(), index);
-    } );
-}
-//
-// use_checkpoint
-/// Makes a call, by name, to a checkpoint function.
-///
-/// If the tape for this thread is recording, include the call
-/// as a checkpoint in the tape.
-///
-/// * F, U : see [doc_generic_f_and_u]
-///
-/// * name :
-/// The name that was used to store the checkpoint function.
-///
-/// * ad_domain :
-/// The value of the domain variables for the function bning called.
-///
-/// * trace :
-/// If this is true (false), evaluation of the
-/// checkpoint function corresponding to *ad_domain* is traced.
-///
-/// * return :
-/// The values of the range variables that correspond to the
-/// domain variable values.
-pub fn use_checkpoint<F,U>(
-    name      : &String,
-    ad_domain : &Vec< GAD<F,U> >,
-    trace     : bool,
-) -> Vec< GAD<F,U> >
-where
-    U:        'static + Copy + GenericAs<usize> + std::fmt::Debug,
-    usize:    GenericAs<U> ,
-    GAD<F,U>: From<F>,
-    F:        Copy +
-              From<f32> +
-              std::fmt::Display +
-              sealed::ThisThreadCheckpointAll<U> +
-              GlobalOpInfoVec<U> +
-              ThisThreadTape<U>,
-{   //
-    // ad_range
-    let local_key = < F as sealed::ThisThreadCheckpointAll<U> >::get();
-    let ad_range  = local_key.with_borrow( |all| {
-        let option_fun_index = all.map.get(name);
-        if option_fun_index == None {
-            panic!("use_checkpoint: \
-                    name {name} has not been stored as a checkpoint."
-            );
-        }
-        let fun_index        = *option_fun_index.unwrap();
-        let check_point_info = &all.vec[fun_index];
-        assert_eq!( fun_index, check_point_info.fun_index );
-        let local_key : &LocalKey< RefCell< GTape<F,U> > > =
-            < F as ThisThreadTape<U> >::get();
-        let ad_range_zero = local_key.with_borrow_mut( |tape|
-            use_checkpoint_info(tape, check_point_info, ad_domain, trace)
-        );
-        ad_range_zero
-    } );
-    ad_range
-}
 //
 // use_checkpoint_info
 /// Make a call, by OneCheckpointInfo, to a checkpoint function.
