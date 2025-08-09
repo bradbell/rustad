@@ -23,8 +23,7 @@ pub mod function;
 pub mod checkpoint;
 //
 // vec_set
-// 2DO: change this module to be pub(crate).
-pub mod vec_set;
+pub(crate) mod vec_set;
 //
 // gas
 pub(crate) mod gas;

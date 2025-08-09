@@ -58,7 +58,8 @@ pub struct VecSet {
     /// `equal.len() == arg.len()` .
     equal : Vec<bool>,
 }
-//
+// ----------------------------------------------------------------------------
+// VecSet.new
 impl VecSet {
     //
     // VecSet::new
@@ -74,6 +75,10 @@ impl VecSet {
             equal  : Vec::new(),
         }
     }
+}
+// ----------------------------------------------------------------------------
+// VecSet.singleton
+impl VecSet {
     //
     // VecSet.singleton
     /// Create a new set with one element.
@@ -92,15 +97,7 @@ impl VecSet {
     /// is the identifier for the new set.
     /// It is one greater that the previous identifier returned by vs.
     ///
-    /// # Example
-    /// ```
-    /// let mut vs  = rustad::vec_set::VecSet::new();
-    /// let element = 3usize;
-    /// let target  = vs.singleton(element);
-    /// let set     = vs.get(target);
-    /// assert_eq!( target,    0 );
-    /// assert_eq!( set.len(), 1 );
-    /// assert_eq!( set[0],    3 );
+    /// * Example : Select the source code link in [example_singleton] .
     ///
     pub fn singleton(self : &mut Self, element : usize) -> usize
     {   // link, start, data
@@ -119,6 +116,20 @@ impl VecSet {
         //
         target
     }
+}
+#[cfg( any(test,doc) )]
+fn example_singleton() {
+    let mut vs  = crate::vec_set::VecSet::new();
+    let element = 3usize;
+    let target  = vs.singleton(element);
+    let set     = vs.get(target);
+    assert_eq!( target,    0 );
+    assert_eq!( set.len(), 1 );
+    assert_eq!( set[0],    3 );
+}
+// ----------------------------------------------------------------------------
+// VecSet.get
+impl VecSet {
     //
     // VecSet.get
     /// Get one set from the vector of sets.
@@ -138,18 +149,7 @@ impl VecSet {
     /// The elements are in increasing order; i.e.,
     /// if `i+1 < set.len()` then `set[i] < set[i+1]`.
     ///
-    /// # Example
-    /// ```
-    /// let mut vs   = rustad::vec_set::VecSet::new();
-    /// let id_2     = vs.singleton(2);
-    /// let id_3     = vs.singleton(3);
-    /// let set      = vs.get( id_3 );
-    /// assert_eq!( set.len(), 1 );
-    /// assert_eq!( set[0],    3 );
-    /// let set      = vs.get( id_2 );
-    /// assert_eq!( set.len(), 1 );
-    /// assert_eq!( set[0],    2 );
-    /// ```
+    /// * Example : Select the source code link in [example_get] .
     ///
     pub fn get(self : &Self, mut id_set : usize) -> &[usize]
     {   //
@@ -171,6 +171,22 @@ impl VecSet {
         }
         &data[ start[id_set] .. end ]
     }
+}
+#[cfg( any(test,doc) )]
+fn example_get() {
+    let mut vs   = crate::vec_set::VecSet::new();
+    let id_2     = vs.singleton(2);
+    let id_3     = vs.singleton(3);
+    let set      = vs.get( id_3 );
+    assert_eq!( set.len(), 1 );
+    assert_eq!( set[0],    3 );
+    let set      = vs.get( id_2 );
+    assert_eq!( set.len(), 1 );
+    assert_eq!( set[0],    2 );
+}
+// ----------------------------------------------------------------------------
+// VecSet.n_data
+impl VecSet {
     //
     // VecSet.n_data
     /// Return the number elements and links used to represent all the sets.
@@ -186,32 +202,34 @@ impl VecSet {
     /// is the number of set elements, and link,
     /// used to represent all the sets.
     ///
-    /// # Example
-    /// ```
-    /// let mut vs  = rustad::vec_set::VecSet::new();
-    /// let id_2    = vs.singleton(2);
-    /// let id_3    = vs.singleton(3);
-    /// assert_eq!( 2, vs.n_element() );
-    /// //
-    /// // number of elements in {2}, {3}, {2,3}
-    /// let sub_set = vec![ id_2, id_3 ];
-    /// let id_2_3  = vs.union( &sub_set );
-    /// assert_eq!( 4, vs.n_element() );
-    /// //
-    /// // The sets {2, 3} union {3} = {2, 3},
-    /// // so it requires 4 elements plus one link to represent:
-    /// // {2}, {3}, {2, 3}, and {2, 3} union {3} .
-    /// let sub_set = vec![ id_2_3, id_3 ];
-    /// let id_next = vs.union( &sub_set );
-    /// assert_eq!( id_next, id_2_3 + 1);
-    /// assert_eq!( 5, vs.n_element() );
-    /// ```
+    /// * Example : Select the source code link in [example_n_data] .
     ///
+    #[cfg( any(test,doc) )]
     pub fn n_element(self : &Self) -> usize
     {   self.data.len() }
 
 }
-
+#[cfg( any(test,doc) )]
+fn example_n_data() {
+    let mut vs  = crate::vec_set::VecSet::new();
+    let id_2    = vs.singleton(2);
+    let id_3    = vs.singleton(3);
+    assert_eq!( 2, vs.n_element() );
+    //
+    // number of elements in {2}, {3}, {2,3}
+    let sub_set = vec![ id_2, id_3 ];
+    let id_2_3  = vs.union( &sub_set );
+    assert_eq!( 4, vs.n_element() );
+    //
+    // The sets {2, 3} union {3} = {2, 3},
+    // so it requires 4 elements plus one link to represent:
+    // {2}, {3}, {2, 3}, and {2, 3} union {3} .
+    let sub_set = vec![ id_2_3, id_3 ];
+    let id_next = vs.union( &sub_set );
+    assert_eq!( id_next, id_2_3 + 1);
+    assert_eq!( 5, vs.n_element() );
+}
+// ----------------------------------------------------------------------------
 // VecSet.union
 impl VecSet {
 //
@@ -234,18 +252,7 @@ impl VecSet {
 /// is the identifier for the new set that is the result of the union.
 /// It is one greater that the previous identifier returned by vs.
 ///
-/// # Example
-/// ```
-/// let mut vs   = rustad::vec_set::VecSet::new();
-/// let id_2     = vs.singleton(2);
-/// let id_3     = vs.singleton(3);
-/// let sub_sets = vec![ id_2, id_3 ];
-/// let id_union = vs.union(&sub_sets);
-/// let set      = vs.get( id_union );
-/// assert_eq!( set.len(), 2 );
-/// assert_eq!( set[0],    2 );
-/// assert_eq!( set[1],    3 );
-/// ```
+/// * Example : Select the source code link in [example_union] .
 ///
 pub fn union(self : &mut Self, sub_sets : &Vec<usize> ) -> usize
 {   //
@@ -395,3 +402,23 @@ pub fn union(self : &mut Self, sub_sets : &Vec<usize> ) -> usize
     target
 } // end: pub fn union(self : &self, sub_sets : &Vec<usize> )
 } // end: impl VecSet{
+#[cfg( any(test,doc) )]
+fn example_union() {
+    let mut vs   = crate::vec_set::VecSet::new();
+    let id_2     = vs.singleton(2);
+    let id_3     = vs.singleton(3);
+    let sub_sets = vec![ id_2, id_3 ];
+    let id_union = vs.union(&sub_sets);
+    let set      = vs.get( id_union );
+    assert_eq!( set.len(), 2 );
+    assert_eq!( set[0],    2 );
+    assert_eq!( set[1],    3 );
+}
+// ----------------------------------------------------------------------------
+#[test]
+fn test_vec_set() {
+    example_singleton();
+    example_get();
+    example_n_data();
+    example_union();
+}
