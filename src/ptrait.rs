@@ -5,6 +5,11 @@
 //! Define traits that are used by the public rustad API.
 //!
 //! Link to [parent module](super)
+// ----------------------------------------------------------------------------
+// use
+//
+use crate::record::sealed::ThisThreadTape;
+use crate::checkpoint::sealed::ThisThreadCheckpointAll;
 //
 // ----------------------------------------------------------------------------
 // Sealed traits
@@ -14,6 +19,7 @@
 // It has not been necessary to use GenericAsPublic (so far).
 // GenericAsPublic
 use crate::gas::sealed::GenericAs;
+/// This is the public interface to a sealed trait
 pub trait GenericAsPublic<D> : GenericAs<D>
 { }
 impl<S,D> GenericAsPublic<D> for S
@@ -23,7 +29,7 @@ where
 */
 //
 // ThisThreadTapePublic
-use crate::record::sealed::ThisThreadTape;
+/// This is the public interface to a sealed trait
 pub trait ThisThreadTapePublic<U> : ThisThreadTape<U>
 where
     U : Sized + 'static ,
@@ -35,7 +41,7 @@ where
 {}
 //
 // ThisThreadCheckpointAllPublic
-use crate::checkpoint::sealed::ThisThreadCheckpointAll;
+/// This is the public interface to a sealed trait
 pub trait ThisThreadCheckpointAllPublic<U> : ThisThreadCheckpointAll<U>
 where
     U : Sized + 'static ,
