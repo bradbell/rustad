@@ -102,7 +102,7 @@ where
 ///
 /// # Example
 /// ```
-/// use rustad::gad::GAD;
+/// use rustad::GAD;
 /// use rustad::store_checkpoint;
 /// use rustad::use_checkpoint;
 /// //

@@ -68,7 +68,7 @@ pub struct GAD<F, U> {
 /// # Example
 /// ```
 /// // ad_from_value!(f32, u32, f32) makes the following work:
-/// use rustad::gad::GAD;
+/// use rustad::GAD;
 /// let value  : f32          = 3.0;
 /// let avalue : GAD<f32,u32> = GAD::from(value);
 /// assert_eq!(avalue.to_value(), value);
@@ -114,7 +114,7 @@ ad_from_value!(f64, u64, isize);
 ///
 /// # Example
 /// ```
-/// use rustad::gad::GAD;
+/// use rustad::GAD;
 /// let ax : GAD<f64, u32> = GAD::from(4.0);
 /// let x = ax.to_value();
 /// assert_eq!(x, 4.0);
@@ -130,7 +130,7 @@ impl<F : Copy, U> GAD<F, U> {
 ///
 /// # Example
 /// ```
-/// use rustad::gad::GAD;
+/// use rustad::GAD;
 /// let ax : GAD<f64, u32> = GAD::from(3);
 /// let s = format!( "{ax}" );
 /// assert_eq!(s, "3");
@@ -148,7 +148,7 @@ impl<F : std::fmt::Display, U> std::fmt::Display for GAD<F, U> {
 ///
 /// # Example
 /// ```
-/// use rustad::gad::GAD;
+/// use rustad::GAD;
 /// let ax : GAD<f32, u64> = GAD::from(3.0);
 /// let ay : GAD<f32, u64> = GAD::from(3);
 /// assert_eq!(ax, ay);
@@ -208,7 +208,7 @@ pub(crate) use binary_float_op_gad;
 ///
 /// # Example
 /// ```
-/// use rustad::gad::GAD;
+/// use rustad::GAD;
 /// let ax : GAD<f32, u32> = GAD::from(3.0);
 /// let ay : GAD<f32, u32> = GAD::from(4.0);
 /// let az = ax + ay;
@@ -330,7 +330,7 @@ pub(crate) use binary_gad_operator;
 ///
 /// # Example
 /// ```
-/// use rustad::gad::GAD;
+/// use rustad::GAD;
 /// let ax     : GAD<f32, u64> = GAD::from(3.0);
 /// let mut ay : GAD<f32, u64> = GAD::from(4.0);
 /// ay += ax;
@@ -450,7 +450,7 @@ pub(crate) use binary_gad_assign_op;
 ///
 /// # Example
 ///```
-/// use rustad::gad::GAD;
+/// use rustad::GAD;
 /// let avec = rustad::gadvec![ f64, u32, 1f32, 2f64, 3isize ];
 /// assert_eq!( avec.len(), 3);
 /// assert_eq!( avec[0], GAD::from(1) );
@@ -461,9 +461,9 @@ pub(crate) use binary_gad_assign_op;
 macro_rules! gadvec {
     ( $F:ident,  $U:ident,  $( $E:expr ),* ) => {
         {
-            let mut avec : Vec< rustad::gad::GAD<$F,$U> > = Vec::new();
+            let mut avec : Vec< rustad::GAD<$F,$U> > = Vec::new();
             $(
-                avec.push( rustad::gad::GAD::from( $E ) );
+                avec.push( rustad::GAD::from( $E ) );
             )*
             avec
         }

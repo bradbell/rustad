@@ -11,7 +11,7 @@
 pub mod utility;
 //
 // gad
-pub mod gad;
+pub(crate) mod gad;
 //
 // function
 pub(crate) mod function;
@@ -37,6 +37,12 @@ pub(crate) mod record;
 // use
 // https://doc.rust-lang.org/rustdoc/write-documentation/re-exports.html
 //
+pub use crate::gad::{
+    GAD,
+    doc_gad_from,
+    doc_binary_gad_operator,
+    doc_binary_gad_assign_op,
+};
 pub use crate::function::{
     GADFun,
     ad_domain,

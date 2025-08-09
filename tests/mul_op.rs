@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
-use rustad::gad::GAD;
+use rustad::GAD;
 //
 type Float = f32; // f32 or u32
 type Index = u32; // u32 or u64

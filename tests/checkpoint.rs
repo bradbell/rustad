@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 
-use rustad::gad::GAD;
+use rustad::GAD;
 use rustad::store_checkpoint;
 use rustad::use_checkpoint;
 //

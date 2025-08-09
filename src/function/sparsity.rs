@@ -64,7 +64,7 @@ where
     ///
     /// # Example
     ///```
-    /// use rustad::gad::GAD;
+    /// use rustad::GAD;
     /// type AD = GAD<f32, u64>;
     /// let x  : Vec<f32> = vec![1.0, 2.0, 3.0];
     /// let ax : Vec<AD>  = rustad::ad_domain(&x);
@@ -219,7 +219,7 @@ where
     ///
     /// # Example
     ///```
-    /// use rustad::gad::GAD;
+    /// use rustad::GAD;
     /// type AD = GAD<f32, u64>;
     /// let nx : usize = 4;
     /// let x  : Vec<f32> = vec![2.0; nx];
