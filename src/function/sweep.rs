@@ -52,6 +52,29 @@ use crate::operator;
 /// in the operation sequence.
 /// This is used as an input when computing derivatives.
 ///
+/// # Example
+/// ```
+/// type AD     = rustad::GAD<f32, u32>;
+/// type ADFun  = rustad::GADFun<f32, u32>;
+/// //
+/// // f
+/// let x        : Vec<f32> = vec![ 2.0, 2.0, 2.0 ];
+/// let ax                  = rustad::ad_domain(&x);
+/// let mut asum : AD       = AD::from(0f32);
+/// for j in 0 .. ax.len() {
+///     asum += ax[j];
+/// }
+/// let ay = vec![ asum ];
+/// let f  = rustad::ad_fun(&ay);
+/// //
+/// // y
+/// let trace             = false;
+/// let x      : Vec<f32> = vec![ 1.0, 2.0, 3.0 ];
+/// let (y, v)            = f.forward_zero(&x, trace);
+/// //
+/// assert_eq!( y[0] , (1 + 2 + 3) as f32 );
+/// ```
+///
 pub fn doc_forward_zero() { }
 //
 /// Create the zero order forward mode member functions.
