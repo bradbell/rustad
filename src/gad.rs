@@ -159,23 +159,23 @@ impl<F : std::cmp::PartialEq, U> PartialEq for GAD<F, U> {
     }
 }
 // ---------------------------------------------------------------------------
-// binary_ad_op_float
+// binary_float_op_gad
 //
 // If you try to make this implementation generic,
 // you get a message saying that f1 must be covered
 // because it is not a local type.
 //
-/// Implement one binary GAD<f2,u2> operator where rhs is floating point type
+/// Implement one binary GAD<f2,u2> operator where lhs is floating point type
 ///
 /// * f1 : the floating point type used for value calculations; e.g. f32.
 /// * u2 : the unsigned integer type used for tape indices; e.g. u32.
 /// * t3 : is the trait for this binary operation; e.g., Add.
 /// * o4 : is the symbol used for the binary opereator; e.g., +.
 ///
-macro_rules! binary_ad_op_float{
+macro_rules! binary_float_op_gad{
     ($f1:ident, $u2:ident, $t3:ident, $o4:tt) => { paste::paste! {
         #[doc =
-            "see [doc_binary_ad_operator](crate::gad::doc_binary_ad_operator)"
+            "see [doc_binary_gad_operator](crate::gad::doc_binary_gad_operator)"
         ]
         impl std::ops::$t3< GAD<$f1,$u2> > for $f1
         where
@@ -192,9 +192,9 @@ macro_rules! binary_ad_op_float{
         }
     }
     } }
-pub(crate) use binary_ad_op_float;
+pub(crate) use binary_float_op_gad;
 // ---------------------------------------------------------------------------
-// binary_ad_operator!
+// binary_gad_operator!
 //
 /// Binary GAD<F,U> operators.
 ///
@@ -215,12 +215,12 @@ pub(crate) use binary_ad_op_float;
 /// assert_eq!(GAD::from(7.0), az);
 ///```
 ///
-pub fn doc_binary_ad_operator() { }
+pub fn doc_binary_gad_operator() { }
 //
 /// This macro implements the the GAD<F, U> binary operators.
 ///
 /// This include storing the operation in the tape for this thread and AD type.
-/// See [doc_binary_ad_operator].
+/// See [doc_binary_gad_operator].
 ///
 /// * Trait :
 /// is the std::ops trait for this operator; e.g., Add .
@@ -228,7 +228,7 @@ pub fn doc_binary_ad_operator() { }
 /// * op :
 /// is the token for this operator; e.g., + .
 ///
-macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
+macro_rules! binary_gad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
     //
     fn [< record_ $Trait:lower >]<F,U> (
         tape: &mut GTape<F,U> ,
@@ -270,7 +270,7 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         ( as_from(new_tape_id), as_from(new_var_index) )
     }
     //
-    #[doc = "see [doc_binary_ad_operator](crate::gad::doc_binary_ad_operator)"]
+    #[doc = "see [doc_binary_gad_operator](crate::gad::doc_binary_gad_operator)"]
     impl<F,U> std::ops::$Trait< GAD<F,U> > for GAD<F,U>
     where
     F     : Copy + std::ops::$Trait<Output = F>  + ThisThreadTape<U> ,
@@ -294,7 +294,7 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         }
     }
     //
-    #[doc = "see [doc_binary_ad_operator](crate::gad::doc_binary_ad_operator)"]
+    #[doc = "see [doc_binary_gad_operator](crate::gad::doc_binary_gad_operator)"]
     impl<F,U> std::ops::$Trait<F> for GAD<F,U>
     where
     GAD<F,U> : From<F> ,
@@ -309,15 +309,15 @@ macro_rules! binary_ad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         }
     }
     //
-    crate::gad::binary_ad_op_float!(f32, u32, $Trait, $op);
-    crate::gad::binary_ad_op_float!(f32, u64, $Trait, $op);
-    crate::gad::binary_ad_op_float!(f64, u32, $Trait, $op);
-    crate::gad::binary_ad_op_float!(f64, u64, $Trait, $op);
+    crate::gad::binary_float_op_gad!(f32, u32, $Trait, $op);
+    crate::gad::binary_float_op_gad!(f32, u64, $Trait, $op);
+    crate::gad::binary_float_op_gad!(f64, u32, $Trait, $op);
+    crate::gad::binary_float_op_gad!(f64, u64, $Trait, $op);
 } } }
 //
-pub(crate) use binary_ad_operator;
+pub(crate) use binary_gad_operator;
 // ---------------------------------------------------------------------------
-// binary_ad_assign_op!
+// binary_gad_assign_op!
 //
 /// Compound Assignment GAD<F,U> operators.
 ///
@@ -336,12 +336,12 @@ pub(crate) use binary_ad_operator;
 /// ay += ax;
 /// assert_eq!(GAD::from(7.0), ay);
 ///```
-pub fn doc_binary_ad_assign_op() { }
+pub fn doc_binary_gad_assign_op() { }
 //
 /// This macro implements the the GAD<F, U> compound assignment operators.
 ///
 /// This include storing the operation in the tape for this thread and AD type.
-/// See [doc_binary_ad_assign_op].
+/// See [doc_binary_gad_assign_op].
 ///
 /// * Name :
 /// is the operator name for this compound assignment; e.g., Add .
@@ -349,9 +349,9 @@ pub fn doc_binary_ad_assign_op() { }
 /// * op :
 /// is the token for this compound assignment; e.g., += .
 ///
-macro_rules! binary_ad_assign_op {
+macro_rules! binary_gad_assign_op {
     ($Name:ident, $op:tt) => {paste::paste! {
-        crate::gad::binary_ad_assign_op!( $Name, $op, [< $Name Assign >] );
+        crate::gad::binary_gad_assign_op!( $Name, $op, [< $Name Assign >] );
     } };
     ($Name:ident, $op:tt, $Trait:ident) => {paste::paste! {
         //
@@ -423,7 +423,7 @@ macro_rules! binary_ad_assign_op {
 }
 //
 // make this macro visible in the entire crate
-pub(crate) use binary_ad_assign_op;
+pub(crate) use binary_gad_assign_op;
 // -------------------------------------------------------------------------
 // gadvec!
 //

@@ -36,7 +36,7 @@ use crate::operator;
 #[cfg(doc)]
 use crate::operator::ForwardZeroBinary;
 #[cfg(doc)]
-use crate::gad::doc_binary_ad_operator;
+use crate::gad::doc_binary_gad_operator;
 //
 // forward_0_mul_cv<F, U, E>
 // forward_0_mul_vc<F, U, E>
@@ -209,7 +209,7 @@ where
 }
 //
 // AD * AD, Float * AD, AD * Float
-crate::gad::binary_ad_operator!( Mul, * );
+crate::gad::binary_gad_operator!( Mul, * );
 //
 // AD *= AD, AD *= Float
-crate::gad::binary_ad_assign_op!( Mul, *= );
+crate::gad::binary_gad_assign_op!( Mul, *= );
