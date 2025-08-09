@@ -26,8 +26,8 @@ use crate::operator;
 ///
 /// * Syntax :
 /// ```text
-///     (range_zero, var_zero) = f.forward_zero(domain_zero, trace)
-///     (range_zero, var_zero) = f.ad_forward_zero(domain_zero, trace)
+///     (range_zero, var_zero) = f.forward_zero(&domain_zero, trace)
+///     (range_zero, var_zero) = f.ad_forward_zero(&domain_zero, trace)
 /// ```
 /// See [GADFun::forward_zero] and
 /// [GADFun::ad_forward_zero] prototypes.
@@ -183,8 +183,8 @@ macro_rules! forward_zero {
 ///
 /// * Syntax :
 /// ```text
-///     range_one = f.forward_one(domain_one, var_zero, trace)
-///     range_one = f.ad_forward_one(domain_one, var_zero, trace)
+///     range_one = f.forward_one(&domain_one, &var_zero, trace)
+///     range_one = f.ad_forward_one(&domain_one, &var_zero, trace)
 /// ```
 /// See the [GADFun::forward_one] and
 /// [GADFun::ad_forward_one) prototypes.
@@ -210,6 +210,38 @@ macro_rules! forward_zero {
 /// domain_one and var_zero;
 /// i.e., the directional derivative for the fuctioon
 /// corresponding to the operation sequence.
+///
+/// # Float Example
+/// ```
+/// type AD     = rustad::GAD<f64, u32>;
+/// type ADFun  = rustad::GADFun<f64, u32>;
+/// //
+/// // nx
+/// let nx = 3;
+///
+/// // f
+/// let x        : Vec<f64> = vec![ 2.0; nx ];
+/// let ax                  = rustad::ad_domain(&x);
+/// let mut asum : AD       = AD::from(0f64);
+/// for j in 0 .. nx {
+///     asum += ax[j] * ax[j];
+/// }
+/// let ay = vec![ asum ];
+/// let f  = rustad::ad_fun(&ay);
+/// //
+/// // trace, x0, v0
+/// let trace               = false;
+/// let x0       : Vec<f64> = vec![ 1.0, 2.0, 3.0 ];
+/// let (y0, v0)            = f.forward_zero(&x0, trace);
+/// //
+/// // dy[0] = df/dx[j]
+/// for j in 0 .. nx {
+///     let mut dx : Vec<f64> = vec![ 0.0; nx ];
+///     dx[j]   = 1.0 as f64;
+///     let dy = f.forward_one(&dx, &v0, trace);
+///     assert_eq!( dy[0] ,  2.0 * x0[j] );
+/// }
+/// ```
 ///
 pub fn doc_forward_one() { }
 //
