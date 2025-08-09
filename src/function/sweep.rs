@@ -52,12 +52,18 @@ use crate::operator;
 /// in the operation sequence.
 /// This is used as an input when computing derivatives.
 ///
-/// # Example
+/// # Example : ad_forward_zero
+/// See the ad_forward_one and ad_reverse_one examples in
+/// [doc_forward_one] and [doc_reverse_one] .
+///
+/// # Example : forward_zero
+/// Compute function values using forward_zero :
 /// ```
 /// type F      = f32;
 /// type AD     = rustad::GAD<F, u32>;
 /// //
 /// // f
+/// // f(x) = x[0] * x[0] + ... + x[nx-1] * x[nx-1]
 /// let x        : Vec<F> = vec![ 2.0, 2.0, 2.0 ];
 /// let ax                = rustad::ad_domain(&x);
 /// let mut asum : AD     = AD::from(0.0);
@@ -68,6 +74,7 @@ use crate::operator;
 /// let f  = rustad::ad_fun(&ay);
 /// //
 /// // y
+/// // y[0] = f(x)
 /// let trace           = false;
 /// let x      : Vec<F> = vec![ 1.0, 2.0, 3.0 ];
 /// let (y, v)          = f.forward_zero(&x, trace);
@@ -211,7 +218,8 @@ macro_rules! forward_zero {
 /// i.e., the directional derivative for the fuctioon
 /// corresponding to the operation sequence.
 ///
-/// # Float Example
+/// # Example : forward_one
+/// Compute derivrive values using forward_one :
 /// ```
 /// type F      = f64;
 /// type AD     = rustad::GAD<F, u32>;
@@ -220,6 +228,7 @@ macro_rules! forward_zero {
 /// let nx = 3;
 ///
 /// // f
+/// // f(x) = x[0] * x[0] + ... + x[nx-1] * x[nx-1]
 /// let x        : Vec<F> = vec![ 2.0; nx ];
 /// let ax                = rustad::ad_domain(&x);
 /// let mut asum : AD     = AD::from(0.0);
@@ -234,12 +243,70 @@ macro_rules! forward_zero {
 /// let x0       : Vec<F> = vec![ 1.0, 2.0, 3.0 ];
 /// let (y0, v0)          = f.forward_zero(&x0, trace);
 /// //
-/// // dy[0] = df/dx[j]
+/// // y1[0] = df/dx[j]
 /// for j in 0 .. nx {
-///     let mut dx : Vec<F> = vec![ 0.0; nx ];
-///     dx[j]   = 1.0 as F;
-///     let dy  = f.forward_one(&dx, &v0, trace);
-///     assert_eq!( dy[0] ,  2.0 * x0[j] );
+///     let mut x1 : Vec<F> = vec![ 0.0; nx ];
+///     x1[j]               = 1.0 as F;
+///     let y1              = f.forward_one(&x1, &v0, trace);
+///     assert_eq!( y1[0] ,  2.0 * x0[j] );
+/// }
+/// ```
+///
+/// # Example : ad_forward_one
+/// Compute Hessian values using ad_forward_one :
+/// ```
+/// type F      = f64;
+/// type AD     = rustad::GAD<F, u64>;
+/// //
+/// // nx
+/// let nx = 3;
+///
+/// // f
+/// // f(x) = x[0] * x[0] * x[0] + ... + x[nx-1] * x[nx-1] * x[nx-1]
+/// let x        : Vec<F> = vec![ 2.0; nx ];
+/// let ax                = rustad::ad_domain(&x);
+/// let mut asum : AD     = AD::from(0.0);
+/// for j in 0 .. nx {
+///     asum += ax[j] * ax[j] * ax[j];
+/// }
+/// let ay = vec![ asum ];
+/// let f  = rustad::ad_fun(&ay);
+/// //
+/// // trace, av0
+/// let trace              = false;
+/// let x0        : Vec<F> = vec![ 2.0; nx ];
+/// let ax0                = rustad::ad_domain(&x0);
+/// let (ay0, av0)         = f.ad_forward_zero(&ax0, trace);
+/// //
+/// // g
+/// // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
+/// let mut ay : Vec<AD> = Vec::new();
+/// for j in 0 .. nx {
+///     let mut ax1 = vec![ AD::from(0.0); nx ];
+///     ax1[j]      = AD::from(1.0);
+///     let ay1     = f.ad_forward_one(&ax1, &av0, trace);
+///     ay.push( ay1[0] );
+/// }
+/// let g = rustad::ad_fun(&ay);
+/// //
+/// // x0, v0
+/// let trace             = true;
+/// let x0       : Vec<F> = vec![ 1.0, 2.0, 3.0 ];
+/// let (y0, v0)          = g.forward_zero(&x0, trace);
+/// //
+/// // y1
+/// // y1[i] = partial g[i] w.r.t x[j]
+/// for j in 0 .. nx {
+///     let mut x1 : Vec<F> = vec![ 0.0; nx ];
+///     x1[j]               = 1.0 as F;
+///     let y1              = g.forward_one(&x1, &v0, trace);
+///     for i in 0 .. nx {
+///         if i == j {
+///             assert_eq!( y1[i] ,  6.0 * x0[j] );
+///         } else {
+///             assert_eq!( y1[i] ,  0.0 );
+///         }
+///     }
 /// }
 /// ```
 ///
@@ -352,7 +419,7 @@ macro_rules! forward_one {
 /// * Syntax :
 /// ```text
 ///     domain_one = f.reverse_one(range_one, var_zero, trace)
-///     domain_one = f.reverse_one(range_one, var_zero, trace)
+///     domain_one = f.ad_reverse_one(range_one, var_zero, trace)
 /// ```
 /// See the [GADFun::reverse_one] and
 /// [GADFun::ad_reverse_one] prototypes.
@@ -377,6 +444,91 @@ macro_rules! forward_one {
 /// The return value is the gradiemt of the weighted sum
 /// with respect to the domain variables.
 ///
+/// # Example : reverse_one
+/// Compute derivative values using reverse_one :
+/// ```
+/// type F      = f64;
+/// type AD     = rustad::GAD<F, u64>;
+/// //
+/// // nx
+/// let nx = 3;
+///
+/// // f
+/// // f(x) = x[0] * x[0] + ... + x[nx-1] * x[nx-1]
+/// let x        : Vec<F> = vec![ 2.0; nx ];
+/// let ax                = rustad::ad_domain(&x);
+/// let mut asum : AD     = AD::from(0.0);
+/// for j in 0 .. nx {
+///     asum += ax[j] * ax[j];
+/// }
+/// let ay = vec![ asum ];
+/// let f  = rustad::ad_fun(&ay);
+/// //
+/// // trace, x0, v0
+/// let trace             = false;
+/// let x0       : Vec<F> = vec![ 1.0, 2.0, 3.0 ];
+/// let (y0, v0)          = f.forward_zero(&x0, trace);
+/// //
+/// // x1 = df/dx
+/// let y1 : Vec<F> = vec![ 1.0 ];
+/// let x1          = f.reverse_one(&y1, &v0, trace);
+/// for j in 0 .. nx {
+///     assert_eq!( x1[j] ,  2.0 * x0[j] );
+/// }
+/// ```
+///
+/// # Example : ad_reverse_one
+/// Compute Hessian values using ad_reverse_one :
+/// ```
+/// type F      = f32;
+/// type AD     = rustad::GAD<F, u64>;
+/// //
+/// // nx
+/// let nx = 3;
+///
+/// // f
+/// // f(x) = x[0] * x[0] * x[0] + ... + x[nx-1] * x[nx-1] * x[nx-1]
+/// let x        : Vec<F> = vec![ 2.0; nx ];
+/// let ax                = rustad::ad_domain(&x);
+/// let mut asum : AD     = AD::from(0.0);
+/// for j in 0 .. nx {
+///     asum += ax[j] * ax[j] * ax[j];
+/// }
+/// let ay = vec![ asum ];
+/// let f  = rustad::ad_fun(&ay);
+/// //
+/// // trace, av0
+/// let trace              = false;
+/// let x0        : Vec<F> = vec![ 2.0; nx ];
+/// let ax0                = rustad::ad_domain(&x0);
+/// let (ay0, av0)         = f.ad_forward_zero(&ax0, trace);
+/// //
+/// // g
+/// // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
+/// let ay1 : Vec<AD> = vec![ AD::from(1.0) ];
+/// let ax1           = f.ad_reverse_one(&ay1, &av0, trace);
+/// let g             = rustad::ad_fun(&ax1);
+/// //
+/// // x0, v0
+/// let trace             = true;
+/// let x0       : Vec<F> = vec![ 1.0, 2.0, 3.0 ];
+/// let (y0, v0)          = g.forward_zero(&x0, trace);
+/// //
+/// // y1
+/// // y1[i] = partial g[i] w.r.t x[j]
+/// for j in 0 .. nx {
+///     let mut x1 : Vec<F> = vec![ 0.0; nx ];
+///     x1[j]               = 1.0 as F;
+///     let y1              = g.forward_one(&x1, &v0, trace);
+///     for i in 0 .. nx {
+///         if i == j {
+///             assert_eq!( y1[i] ,  6.0 * x0[j] );
+///         } else {
+///             assert_eq!( y1[i] ,  0.0 );
+///         }
+///     }
+/// }
+/// ```
 pub fn doc_reverse_one() { }
 //
 /// Create the first order reverse mode member functions.
