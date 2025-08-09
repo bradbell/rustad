@@ -6,12 +6,16 @@
 //! AD function objects
 //!
 //! Link to [parent module](super)
+// ---------------------------------------------------------------------------
+// sub-modules
 //
 // sparsity
 pub mod sparsity;
 //
 // sweep
 pub mod sweep;
+// ---------------------------------------------------------------------------
+// use
 //
 use std::cell::RefCell;
 use std::thread::LocalKey;

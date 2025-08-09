@@ -5,7 +5,18 @@
 //! Operations for specific operators
 //!
 //! Link to [parent module](super)
+// ---------------------------------------------------------------------------
+// sub-modules
 //
+// id
+pub mod id;
+//
+// operators
+pub mod add;
+pub mod mul;
+pub mod call;
+// ---------------------------------------------------------------------------
+// use
 //
 use crate::gas::sealed::GenericAs;
 use crate::gas::as_from;
@@ -21,16 +32,6 @@ use crate::function::sweep::{
 use crate::record::sealed::ThisThreadTape;
 use crate::checkpoint::sealed::ThisThreadCheckpointAll;
 use id::NUMBER_OP;
-//
-// id
-pub mod id;
-// ---------------------------------------------------------------------------
-//
-// operators
-pub mod add;
-pub mod mul;
-pub mod call;
-//
 // ---------------------------------------------------------------------------
 /// Implement zero order forward for binary operators.
 ///
