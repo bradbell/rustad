@@ -54,13 +54,14 @@ use crate::operator;
 ///
 /// # Example
 /// ```
-/// type AD     = rustad::GAD<f32, u32>;
-/// type ADFun  = rustad::GADFun<f32, u32>;
+/// type F      = f32;
+/// type AD     = rustad::GAD<F, u32>;
+/// type ADFun  = rustad::GADFun<F, u32>;
 /// //
 /// // f
-/// let x        : Vec<f32> = vec![ 2.0, 2.0, 2.0 ];
-/// let ax                  = rustad::ad_domain(&x);
-/// let mut asum : AD       = AD::from(0f32);
+/// let x        : Vec<F> = vec![ 2.0, 2.0, 2.0 ];
+/// let ax                = rustad::ad_domain(&x);
+/// let mut asum : AD     = AD::from(0.0);
 /// for j in 0 .. ax.len() {
 ///     asum += ax[j];
 /// }
@@ -68,11 +69,11 @@ use crate::operator;
 /// let f  = rustad::ad_fun(&ay);
 /// //
 /// // y
-/// let trace             = false;
-/// let x      : Vec<f32> = vec![ 1.0, 2.0, 3.0 ];
-/// let (y, v)            = f.forward_zero(&x, trace);
+/// let trace           = false;
+/// let x      : Vec<F> = vec![ 1.0, 2.0, 3.0 ];
+/// let (y, v)          = f.forward_zero(&x, trace);
 /// //
-/// assert_eq!( y[0] , (1 + 2 + 3) as f32 );
+/// assert_eq!( y[0] , (1 + 2 + 3) as F );
 /// ```
 ///
 pub fn doc_forward_zero() { }
@@ -213,16 +214,17 @@ macro_rules! forward_zero {
 ///
 /// # Float Example
 /// ```
-/// type AD     = rustad::GAD<f64, u32>;
-/// type ADFun  = rustad::GADFun<f64, u32>;
+/// type F      = f64;
+/// type AD     = rustad::GAD<F, u32>;
+/// type ADFun  = rustad::GADFun<F, u32>;
 /// //
 /// // nx
 /// let nx = 3;
 ///
 /// // f
-/// let x        : Vec<f64> = vec![ 2.0; nx ];
-/// let ax                  = rustad::ad_domain(&x);
-/// let mut asum : AD       = AD::from(0f64);
+/// let x        : Vec<F> = vec![ 2.0; nx ];
+/// let ax                = rustad::ad_domain(&x);
+/// let mut asum : AD     = AD::from(0.0);
 /// for j in 0 .. nx {
 ///     asum += ax[j] * ax[j];
 /// }
@@ -230,15 +232,15 @@ macro_rules! forward_zero {
 /// let f  = rustad::ad_fun(&ay);
 /// //
 /// // trace, x0, v0
-/// let trace               = false;
-/// let x0       : Vec<f64> = vec![ 1.0, 2.0, 3.0 ];
-/// let (y0, v0)            = f.forward_zero(&x0, trace);
+/// let trace             = false;
+/// let x0       : Vec<F> = vec![ 1.0, 2.0, 3.0 ];
+/// let (y0, v0)          = f.forward_zero(&x0, trace);
 /// //
 /// // dy[0] = df/dx[j]
 /// for j in 0 .. nx {
-///     let mut dx : Vec<f64> = vec![ 0.0; nx ];
-///     dx[j]   = 1.0 as f64;
-///     let dy = f.forward_one(&dx, &v0, trace);
+///     let mut dx : Vec<F> = vec![ 0.0; nx ];
+///     dx[j]   = 1.0 as F;
+///     let dy  = f.forward_one(&dx, &v0, trace);
 ///     assert_eq!( dy[0] ,  2.0 * x0[j] );
 /// }
 /// ```
