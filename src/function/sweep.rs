@@ -56,7 +56,6 @@ use crate::operator;
 /// ```
 /// type F      = f32;
 /// type AD     = rustad::GAD<F, u32>;
-/// type ADFun  = rustad::GADFun<F, u32>;
 /// //
 /// // f
 /// let x        : Vec<F> = vec![ 2.0, 2.0, 2.0 ];
@@ -216,7 +215,6 @@ macro_rules! forward_zero {
 /// ```
 /// type F      = f64;
 /// type AD     = rustad::GAD<F, u32>;
-/// type ADFun  = rustad::GADFun<F, u32>;
 /// //
 /// // nx
 /// let nx = 3;
