@@ -274,28 +274,37 @@ pub fn union(self : &mut Self, sub_sets : &Vec<usize> ) -> usize
     for i in 0 .. sub_sets.len() {
         //
         // id_set
-        let mut id_set = sub_sets[i];
+        let id_set = sub_sets[i];
         debug_assert!( id_set < target );
         //
-        while link[id_set] {
-            debug_assert!( start[id_set] < start[id_set + 1] );
-            debug_assert!( data[ start[id_set] ] < id_set );
-            id_set = data[ start[id_set] ];
+        // id_equal
+        let mut id_equal = id_set;
+        let mut count    = 0;
+        while link[id_equal] {
+            debug_assert!( start[id_equal] < start[id_equal + 1] );
+            debug_assert!( data[ start[id_equal] ] < id_equal );
+            id_equal = data[ start[id_equal] ];
+            count   += 1;
         }
-        debug_assert!( start[id_set] < start[id_set + 1] );
-        debug_assert!( ! link[id_set] );
+        debug_assert!( start[id_equal] < start[id_equal + 1] );
+        debug_assert!( ! link[id_equal] );
+        //
+        // start[id_set]
+        if 1 < count {
+            start[id_set] = id_equal;
+        }
         //
         // arg, next, equal
-        debug_assert!( start[id_set] < start[id_set + 1] );
+        debug_assert!( start[id_equal] < start[id_equal + 1] );
         let mut in_arg = false;
         for j in 0 .. arg.len() {
-            if id_set == arg[j] {
+            if id_equal == arg[j] {
                 in_arg = true;
             }
         }
         if ! in_arg {
-            arg.push( id_set );
-            next.push( start[id_set] );
+            arg.push( id_equal );
+            next.push( start[id_equal] );
             equal.push( true );
         }
     }
