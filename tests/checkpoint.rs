@@ -4,7 +4,8 @@
 
 use rustad::gad::GAD;
 use rustad::function;
-use rustad::checkpoint::{store_checkpoint, use_checkpoint};
+use rustad::store_checkpoint;
+use rustad::use_checkpoint;
 //
 type Float = f64; // f32 or u32
 type Index = u64; // f64 or u64

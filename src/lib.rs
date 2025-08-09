@@ -20,7 +20,7 @@ pub mod gad;
 pub mod function;
 //
 // checkpoint
-pub mod checkpoint;
+pub(crate) mod checkpoint;
 //
 // vec_set
 pub(crate) mod vec_set;
@@ -33,6 +33,12 @@ pub(crate) mod operator;
 //
 // record
 pub(crate) mod record;
+// ----------------------------------------------------------------------------
+// use
+// https://doc.rust-lang.org/rustdoc/write-documentation/re-exports.html
+//
+pub use crate::checkpoint::store_checkpoint;
+pub use crate::checkpoint::use_checkpoint;
 // ----------------------------------------------------------------------------
 //
 // YEAR_MONTH_DAY

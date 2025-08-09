@@ -104,7 +104,8 @@ where
 /// ```
 /// use rustad::function;
 /// use rustad::gad::GAD;
-/// use rustad::checkpoint::{store_checkpoint, use_checkpoint};
+/// use rustad::store_checkpoint;
+/// use rustad::use_checkpoint;
 /// //
 /// // F, AD
 /// type F  = f32;
