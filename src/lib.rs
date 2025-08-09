@@ -14,7 +14,7 @@ pub mod utility;
 pub mod gad;
 //
 // function
-pub mod function;
+pub(crate) mod function;
 //
 // ptrait
 pub(crate) mod ptrait;
@@ -36,6 +36,17 @@ pub(crate) mod record;
 // ----------------------------------------------------------------------------
 // use
 // https://doc.rust-lang.org/rustdoc/write-documentation/re-exports.html
+//
+pub use crate::function::{
+    GADFun,
+    ad_domain,
+    ad_fun,
+};
+pub use crate::function::sweep::{
+    doc_forward_zero,
+    doc_forward_one,
+    doc_reverse_one,
+};
 //
 pub use crate::ptrait::{
     ThisThreadTapePublic,

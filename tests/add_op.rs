@@ -3,7 +3,6 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
 use rustad::gad::GAD;
-use rustad::function;
 //
 #[test]
 fn test_add_vv() {
@@ -14,11 +13,11 @@ fn test_add_vv() {
     let x  : Vec<F>  = vec![ 1.0, 2.0, 3.0 ];
     let dx : Vec<F>  = vec![ 4.0, 5.0, 6.0 ];
     let ry : Vec<F>  = vec![ 7.0, 8.0 ];
-    let ax : Vec<AD> = function::ad_domain(&x);
+    let ax : Vec<AD> = rustad::ad_domain(&x);
     let ay_0      = ax[0] + ax[1];
     let ay_1      = ax[1] + ax[2];
     let ay        = vec! [ ay_0, ay_1 ];
-    let f         = function::ad_fun(&ay);
+    let f         = rustad::ad_fun(&ay);
     let trace     = false;
     let (y, v0)   = f.forward_zero(&x, trace);
     let dy        = f.forward_one(&dx, &v0, trace);
@@ -43,10 +42,10 @@ fn test_add_vc() {
     let x  : Vec<F>  = vec![ 2.0, 3.0 ];
     let dx : Vec<F>  = vec![ 4.0, 5.0 ];
     let ry : Vec<F>  = vec![ 7.0 ];
-    let ax : Vec<AD> = function::ad_domain(&x);
+    let ax : Vec<AD> = rustad::ad_domain(&x);
     let ay_0      = ax[0] + 5.0;
     let ay        = vec! [ ay_0 ];
-    let f         = function::ad_fun(&ay);
+    let f         = rustad::ad_fun(&ay);
     let trace     = false;
     let (y, v0)   = f.forward_zero(&x, trace);
     let dy        = f.forward_one(&dx, &v0, trace);
@@ -68,10 +67,10 @@ fn test_add_cv() {
     let x  : Vec<F>  = vec![ 2.0, 3.0 ];
     let dx : Vec<F>  = vec![ 4.0, 5.0 ];
     let ry : Vec<F>  = vec![ 7.0 ];
-    let ax : Vec<AD> = function::ad_domain(&x);
+    let ax : Vec<AD> = rustad::ad_domain(&x);
     let ay_0      = 5.0 + ax[1];
     let ay        = vec! [ ay_0 ];
-    let f         = function::ad_fun(&ay);
+    let f         = rustad::ad_fun(&ay);
     let trace     = false;
     let (y, v0)   = f.forward_zero(&x, trace);
     let dy        = f.forward_one(&dx, &v0, trace);

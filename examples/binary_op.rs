@@ -4,7 +4,6 @@
 
 use rustad::gad::GAD;
 use rustad::gadvec;
-use rustad::function;
 //
 /// example_mul
 fn example_mul() {
@@ -16,12 +15,12 @@ fn example_mul() {
     let x  : Vec<F>  = vec![ 1.0, 2.0, 3.0 ];
     let dx : Vec<F>  = vec![ 4.0, 5.0, 6.0 ];
     let ry : Vec<F>  = vec![ 7.0, 8.0 ];
-    let ax : Vec<AD> = function::ad_domain(&x);
+    let ax : Vec<AD> = rustad::ad_domain(&x);
     let ay_0        = ax[0] * ax[1];
     let mut ay_1    = ax[1]; // ax[1] * ax[2] using *=
     ay_1           *= ax[2];
     let ay          = vec! [ ay_0, ay_1 ];
-    let f           = function::ad_fun(&ay);
+    let f           = rustad::ad_fun(&ay);
     let trace       = false;
     let (y, v0 )    = f.forward_zero(&x, trace);
     let dy          = f.forward_one(&dx, &v0, trace);
@@ -47,11 +46,11 @@ fn ad_example_mul() {
     let x   : Vec<F> = vec![ 1.0, 2.0, 3.0 ];
     let adx : Vec<AD> = gadvec![ F, U, 4.0, 5.0, 6.0 ];
     let ary : Vec<AD> = gadvec![ F, U, 7.0, 8.0 ];
-    let ax         = function::ad_domain(&x);
+    let ax         = rustad::ad_domain(&x);
     let ay_0       = ax[0] * ax[1];
     let ay_1       = ax[1] * ax[2];
     let ay         = gadvec![ F, U, ay_0, ay_1 ];
-    let f          = function::ad_fun(&ay);
+    let f          = rustad::ad_fun(&ay);
     let trace      = false;
     let (ay, av0 ) = f.ad_forward_zero(&ax, trace);
     let ady        = f.ad_forward_one(&adx, &av0, trace);

@@ -64,16 +64,15 @@ where
     ///
     /// # Example
     ///```
-    /// use rustad::function;
     /// use rustad::gad::GAD;
     /// type AD = GAD<f32, u64>;
     /// let x  : Vec<f32> = vec![1.0, 2.0, 3.0];
-    /// let ax : Vec<AD>  = function::ad_domain(&x);
+    /// let ax : Vec<AD>  = rustad::ad_domain(&x);
     /// let mut ay : Vec<AD> = Vec::new();
     /// for j in 0 .. x.len() {
     ///     ay.push( ax[j] * ax[j] );
     /// }
-    /// let f           = function::ad_fun(&ay);
+    /// let f           = rustad::ad_fun(&ay);
     /// let trace       = false;
     /// let mut pattern = f.sub_sparsity(trace);
     /// pattern.sort();
@@ -220,18 +219,17 @@ where
     ///
     /// # Example
     ///```
-    /// use rustad::function;
     /// use rustad::gad::GAD;
     /// type AD = GAD<f32, u64>;
     /// let nx : usize = 4;
     /// let x  : Vec<f32> = vec![2.0; nx];
-    /// let ax : Vec<AD>  = function::ad_domain(&x);
+    /// let ax : Vec<AD>  = rustad::ad_domain(&x);
     /// let mut ay : Vec<AD> = Vec::new();
     /// ay.push( AD::from( x[0] * x[0] ) ); // y[0] is a constant
     /// for j in 1 .. nx {
     ///     ay.push( ax[j] * ax[j] );       // y[j] is a variable
     /// }
-    /// let f           = function::ad_fun(&ay);
+    /// let f           = rustad::ad_fun(&ay);
     /// let trace       = false;
     /// let mut pattern = f.for_sparsity(trace);
     /// pattern.sort();

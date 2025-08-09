@@ -102,7 +102,6 @@ where
 ///
 /// # Example
 /// ```
-/// use rustad::function;
 /// use rustad::gad::GAD;
 /// use rustad::store_checkpoint;
 /// use rustad::use_checkpoint;
@@ -118,9 +117,9 @@ where
 /// // f
 /// // f(x) = [x0 + x1, x1 * x2]
 /// let  x : Vec<F>  = vec![ 1.0, 2.0, 3.0 ];
-/// let ax : Vec<AD> = function::ad_domain(&x);
+/// let ax : Vec<AD> = rustad::ad_domain(&x);
 /// let ay = vec![ ax[0] + ax[1], ax[1] * ax[2] ];
-/// let f  = function::ad_fun(&ay);
+/// let f  = rustad::ad_fun(&ay);
 /// //
 /// // f
 /// // store as a checkpoint function
@@ -131,10 +130,10 @@ where
 /// // g(u) = f( u0, u0 + u1, u1)
 /// //      = [ u0 + u0 + u1 , (u0 + u1) * u1 ]
 /// let  u : Vec<F>  = vec![ 4.0, 5.0];
-/// let au : Vec<AD> = function::ad_domain(&u);
+/// let au : Vec<AD> = rustad::ad_domain(&u);
 /// let ax = vec![ au[0], au[0] + au[1], au[1] ];
 /// let ay = use_checkpoint(&name, &ax, trace);
-/// let g  = function::ad_fun(&ay);
+/// let g  = rustad::ad_fun(&ay);
 /// //
 /// // w
 /// // w = g(u)

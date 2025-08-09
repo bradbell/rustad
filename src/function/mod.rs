@@ -110,7 +110,7 @@ impl<F,U> GADFun<F,U> {
     ///
     /// # Example
     /// ```
-    /// use rustad::function::GADFun;
+    /// use rustad::GADFun;
     /// let f : GADFun<f32,u32> = GADFun::new();
     /// assert_eq!( f.domain_len(), 0 );
     /// assert_eq!( f.range_len(), 0 );
