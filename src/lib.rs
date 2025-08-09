@@ -7,9 +7,6 @@
 // ----------------------------------------------------------------------------
 // sub-modules
 //
-// ptrait
-pub mod ptrait;
-//
 // utility
 pub mod utility;
 //
@@ -18,6 +15,9 @@ pub mod gad;
 //
 // function
 pub mod function;
+//
+// ptrait
+pub(crate) mod ptrait;
 //
 // checkpoint
 pub(crate) mod checkpoint;
@@ -37,8 +37,14 @@ pub(crate) mod record;
 // use
 // https://doc.rust-lang.org/rustdoc/write-documentation/re-exports.html
 //
-pub use crate::checkpoint::store_checkpoint;
-pub use crate::checkpoint::use_checkpoint;
+pub use crate::ptrait::{
+    ThisThreadTapePublic,
+    ThisThreadCheckpointAllPublic,
+};
+pub use crate::checkpoint::{
+    store_checkpoint,
+    use_checkpoint,
+};
 // ----------------------------------------------------------------------------
 //
 // YEAR_MONTH_DAY
