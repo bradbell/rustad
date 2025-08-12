@@ -18,6 +18,8 @@ pub mod call;
 // ---------------------------------------------------------------------------
 // use
 //
+use std::sync::LazyLock;
+//
 use crate::gas::sealed::GenericAs;
 use crate::gas::as_from;
 use crate::gad::GAD;
@@ -433,7 +435,7 @@ where
     Self : Sized + 'static ,
     U    : Sized + 'static ,
 {
-    fn get() -> &'static std::sync::LazyLock< Vec< OpInfo<Self,U> > >;
+    fn get() -> &'static LazyLock< Vec< OpInfo<Self,U> > >;
 }
 /// Get reference to the gloal OpInfo vector.
 ///
@@ -446,10 +448,10 @@ macro_rules! impl_global_op_info_vec{ ($f1:ident, $u2:ident) => {
         "GAD<" , stringify!($f1), ", ", stringify!($u2), "> operations"
     ) ]
     impl GlobalOpInfoVec<$u2> for $f1 {
-        fn get() -> &'static std::sync::LazyLock< Vec< OpInfo<$f1,$u2> > > {
+        fn get() -> &'static LazyLock< Vec< OpInfo<$f1,$u2> > > {
             pub static OP_INFO_VEC :
-                std::sync::LazyLock< Vec< OpInfo<$f1,$u2> > > =
-                    std::sync::LazyLock::new( || default_op_info_vec() );
+                LazyLock< Vec< OpInfo<$f1,$u2> > > =
+                    LazyLock::new( || default_op_info_vec() );
             &OP_INFO_VEC
         }
     }
