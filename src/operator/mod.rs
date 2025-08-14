@@ -32,7 +32,7 @@ use crate::function::sweep::{
 };
 //
 use crate::record::sealed::ThisThreadTape;
-use crate::checkpoint::sealed::ThisThreadCheckpointAll;
+use crate::checkpoint::sealed::CheckpointAll;
 use id::NUMBER_OP;
 // ---------------------------------------------------------------------------
 /// Implement zero order forward for binary operators.
@@ -400,7 +400,7 @@ where
                 std::ops::Mul< GAD<F,U>, Output =  GAD<F,U> > +
                 GlobalOpInfoVec<U> +
                 ThisThreadTape<U> +
-                ThisThreadCheckpointAll<U> ,
+                CheckpointAll<U> ,
     GAD<F,U>:   Copy + From<F> + std::fmt::Display +
                 std::ops::Add< F, Output = GAD<F,U> > +
                 std::ops::Mul< F, Output = GAD<F,U> > +

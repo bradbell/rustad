@@ -56,7 +56,7 @@ pub use crate::function::sweep::{
 //
 pub use crate::ptrait::{
     ThisThreadTapePublic,
-    ThisThreadCheckpointAllPublic,
+    CheckpointAllPublic,
 };
 pub use crate::checkpoint::{
     store_checkpoint,

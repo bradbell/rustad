@@ -24,7 +24,7 @@ use crate::gas::as_from;
 use crate::gas::sealed::GenericAs;
 use crate::operator::GlobalOpInfoVec;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
-use crate::ptrait::ThisThreadCheckpointAllPublic;
+use crate::ptrait::CheckpointAllPublic;
 use crate::record::GTape;
 use crate::record::sealed::ThisThreadTape;
 // END_SORT_THIS_LINE_MINUS_1
@@ -52,13 +52,13 @@ pub fn store_checkpoint<F,U>(
     fun:  GADFun<F,U>,
     name: &String)
 where
-    F     : GlobalOpInfoVec<U> + ThisThreadCheckpointAllPublic<U> ,
+    F     : GlobalOpInfoVec<U> + CheckpointAllPublic<U> ,
     U     : Copy + 'static + GenericAs<usize> + std::cmp::PartialEq,
     usize : GenericAs<U>,
 {
     //
     // This thread's checkpoint information for GAD<F,U>
-    let lazy_lock      = < F as sealed::ThisThreadCheckpointAll<U> >::get();
+    let lazy_lock      = < F as sealed::CheckpointAll<U> >::get();
     let rw_lock        = &*lazy_lock;
     let mut try_write  = rw_lock.try_write();
     let mut count      = 0;
@@ -167,12 +167,12 @@ where
     F:        Copy +
               From<f32> +
               std::fmt::Display +
-              sealed::ThisThreadCheckpointAll<U> +
+              sealed::CheckpointAll<U> +
               GlobalOpInfoVec<U> +
               ThisThreadTape<U>,
 {   //
     // ad_range
-    let lazy_lock     = < F as sealed::ThisThreadCheckpointAll<U> >::get();
+    let lazy_lock     = < F as sealed::CheckpointAll<U> >::get();
     let rw_lock       = &*lazy_lock;
     let mut try_read  = rw_lock.try_read();
     let mut count     = 0;
@@ -231,7 +231,7 @@ pub(crate) struct OneCheckpointInfo<F,U> {
 }
 //
 // sealed::AllCheckpointInfo
-// sealed::ThisThreadCheckpointAll
+// sealed::CheckpointAll
 pub (crate) mod sealed {
     //! The sub-module sealed is used to seal traits in this package.
     //
@@ -257,9 +257,9 @@ pub (crate) mod sealed {
        }
     }
     //
-    // ThisThreadCheckpointAll
+    // CheckpointAll
     /// ```text
-    ///     < F as sealed::ThisThreadCheckpointAll >::get()
+    ///     < F as sealed::CheckpointAll >::get()
     /// ```
     /// returns a reference to this tape's GAD<F,U> checkpoint information;
     /// see [doc_generic_f_and_u].
@@ -267,7 +267,7 @@ pub (crate) mod sealed {
     /// 2DO: Perhaps it would be better if this were global
     /// instead of tape local.
     ///
-    pub trait ThisThreadCheckpointAll<U>
+    pub trait CheckpointAll<U>
     where
         Self : Sized + 'static ,
         U    : Sized + 'static ,
@@ -277,7 +277,7 @@ pub (crate) mod sealed {
 }
 //
 // impl_this_thread_checkpoint!
-/// Implement ThisThreadCheckpointAll
+/// Implement CheckpointAll
 /// for all possible values of F,U; see [doc_generic_f_and_u] .
 ///
 /// * f1 : is the floating point type used for values calculations.
@@ -288,15 +288,15 @@ macro_rules! impl_this_thread_checkpoint{ ($f1:ident, $u2:ident) => {
         "This threads tape for recording ",
         "GAD<" , stringify!($f1), ", ", stringify!($u2), "> operations"
     ) ]
-    impl sealed::ThisThreadCheckpointAll<$u2> for $f1 {
+    impl sealed::CheckpointAll<$u2> for $f1 {
         fn get() ->
         &'static LazyLock< RwLock< sealed::AllCheckpointInfo<$f1, $u2> > > {
-            pub(crate) static THIS_THREAD_CHECKPOINT_ALL :
+            pub(crate) static CHECKPOINT_ALL :
                 LazyLock< RwLock< sealed::AllCheckpointInfo<$f1, $u2> > >  =
                         LazyLock::new(|| RwLock::new(
                              sealed::AllCheckpointInfo::new()
             ) );
-            &THIS_THREAD_CHECKPOINT_ALL
+            &CHECKPOINT_ALL
         }
     }
 } }

@@ -9,7 +9,7 @@
 // use
 //
 use crate::record::sealed::ThisThreadTape;
-use crate::checkpoint::sealed::ThisThreadCheckpointAll;
+use crate::checkpoint::sealed::CheckpointAll;
 //
 // ----------------------------------------------------------------------------
 // Sealed traits
@@ -40,14 +40,14 @@ where
     U : Sized + 'static ,
 {}
 //
-// ThisThreadCheckpointAllPublic
+// CheckpointAllPublic
 /// This is the public interface to a sealed trait
-pub trait ThisThreadCheckpointAllPublic<U> : ThisThreadCheckpointAll<U>
+pub trait CheckpointAllPublic<U> : CheckpointAll<U>
 where
     U : Sized + 'static ,
 {}
-impl<F,U> ThisThreadCheckpointAllPublic<U> for F
+impl<F,U> CheckpointAllPublic<U> for F
 where
-    F : ThisThreadCheckpointAll<U> ,
+    F : CheckpointAll<U> ,
     U : Sized + 'static ,
 {}

@@ -41,7 +41,7 @@
 use crate::gad::GAD;
 use crate::gas::sealed::GenericAs;
 use crate::gas::as_from;
-use crate::checkpoint::sealed::ThisThreadCheckpointAll;
+use crate::checkpoint::sealed::CheckpointAll;
 use crate::operator::id::{CALL_OP, CALL_RES_OP};
 use crate::operator::GlobalOpInfoVec;
 use crate::operator::OpInfo;
@@ -74,7 +74,7 @@ where
         From<f32> +
         GlobalOpInfoVec<U> +
         std::fmt::Display +
-        ThisThreadCheckpointAll<U>,
+        CheckpointAll<U>,
     GAD<F,U>: From<F>,
 {   //
     // call_index, n_arg, n_res
@@ -102,7 +102,7 @@ where
     }
     //
     // call_range_zero
-    let lazy_lock = < F as ThisThreadCheckpointAll<U> >::get();
+    let lazy_lock = < F as CheckpointAll<U> >::get();
     let rw_lock   = &*lazy_lock;
     let try_read  = rw_lock.try_read();
     if try_read.is_err() { panic!(
@@ -170,7 +170,7 @@ where
                 From<f32> +
                 std::fmt::Display +
                 GlobalOpInfoVec<U> +
-                ThisThreadCheckpointAll<U> ,
+                CheckpointAll<U> ,
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
         name           : "call".to_string() ,
