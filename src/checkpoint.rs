@@ -48,7 +48,7 @@ use crate::doc_generic_f_and_u;
 ///
 /// * Example : see the example in [use_checkpoint]
 ///
-pub fn store_checkpoint<F,U>( fun:  GADFun<F,U>, name: &String) -> usize
+pub fn store_checkpoint<F,U>(fun:  GADFun<F,U>) -> usize
 where
     F     : GlobalOpInfoVec<U> + CheckpointAllPublic<U> ,
     U     : Copy + 'static + GenericAs<usize> + std::cmp::PartialEq,
@@ -71,22 +71,16 @@ where
     //
     // all, checkpoint_id
     let mut all = try_write.unwrap();
-    assert!(
-        ! all.map.contains_key(name),
-        "store_checkpoint: name {name} was used before on this thread"
-    );
     let index           = all.vec.len();
     let trace           = false;
     let pattern         = fun.sub_sparsity(trace);
     let checkpoint_info = OneCheckpointInfo {
         checkpoint_id  : index,
-        name           : name.clone(),
         adfun          : fun,
         dependency     : pattern,
     };
     let checkpoint_id = all.vec.len();
     all.vec.push( checkpoint_info );
-    all.map.insert(name.clone(), index);
     //
     checkpoint_id
 }
@@ -140,8 +134,7 @@ where
 /// //
 /// // f
 /// // store as a checkpoint function
-/// let name          = "f".to_string();
-/// let checkpoint_id = store_checkpoint(f, &name);
+/// let checkpoint_id = store_checkpoint(f);
 /// //
 /// // g
 /// // g(u) = f( u0, u0 + u1, u1)
@@ -149,7 +142,7 @@ where
 /// let  u : Vec<F>  = vec![ 4.0, 5.0];
 /// let au : Vec<AD> = rustad::ad_domain(&u);
 /// let ax = vec![ au[0], au[0] + au[1], au[1] ];
-/// let ay = use_checkpoint(checkpoint_id, &name, &ax, trace);
+/// let ay = use_checkpoint(checkpoint_id, &ax, trace);
 /// let g  = rustad::ad_fun(&ay);
 /// //
 /// // w
@@ -160,7 +153,6 @@ where
 /// ```
 pub fn use_checkpoint<F,U>(
     checkpoint_id : usize ,
-    name          : &String,
     ad_domain     : &Vec< GAD<F,U> >,
     trace         : bool,
 ) -> Vec< GAD<F,U> >
@@ -189,14 +181,6 @@ where
         "use_checkpoint: timeout while waiting for read lock"
     ) };
     let all = try_read.unwrap();
-    let option_fun_index = all.map.get(name);
-    if option_fun_index == None {
-        panic!("use_checkpoint: \
-                name {name} has not been stored as a checkpoint."
-        );
-    }
-    let fun_index        = *option_fun_index.unwrap();
-    assert_eq!( checkpoint_id, fun_index );
     let check_point_info = &all.vec[checkpoint_id];
     assert_eq!( checkpoint_id, check_point_info.checkpoint_id );
     let local_key : &LocalKey< RefCell< GTape<F,U> > > =
@@ -216,11 +200,6 @@ pub(crate) struct OneCheckpointInfo<F,U> {
     /// is the index of this checkpoint function in the vector of all
     /// checkpoint functions.
     pub checkpoint_id    : usize,
-    //
-    // name
-    /// ia a name, that is meaningful to the user, used to identify
-    /// this checkpoint function.
-    pub name             : String,
     //
     // adfun
     /// ia the [GADFun] object that is used to evaluate this
@@ -251,13 +230,11 @@ pub (crate) mod sealed {
     /// Information for all the checkpoints; see [doc_generic_f_and_u].
     pub struct AllCheckpointInfo<F,U> {
        pub (crate) vec : Vec< OneCheckpointInfo<F,U> > ,
-       pub (crate) map : std::collections::HashMap<String, usize> ,
     }
     impl<F,U> AllCheckpointInfo<F,U> {
        pub fn new() -> Self {
           Self {
              vec : Vec::new() ,
-             map : std::collections::HashMap::new() ,
           }
        }
     }
@@ -347,15 +324,14 @@ where
     usize:     GenericAs<U>,
 {
     //
-    // name, adfun, dependency
+    // adfun, dependency
     let checkpoint_id  = check_point_info.checkpoint_id;
-    let name           = &check_point_info.name;
     let adfun          = &check_point_info.adfun;
     let dependency     = &check_point_info.dependency;
     if adfun.domain_len() != ad_domain.len() {
         panic!( "use_chckpoint: ad_domain.len() = {} \
-                is not equal to {name}.domain_len() = {}",
-                ad_domain.len(), adfun.domain_len()
+                is not equal to domain size for checkpoint_id = {}",
+                ad_domain.len(), checkpoint_id
         );
     }
     //
