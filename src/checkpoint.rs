@@ -48,16 +48,14 @@ use crate::doc_generic_f_and_u;
 ///
 /// * Example : see the example in [use_checkpoint]
 ///
-pub fn store_checkpoint<F,U>(
-    fun:  GADFun<F,U>,
-    name: &String)
+pub fn store_checkpoint<F,U>( fun:  GADFun<F,U>, name: &String) -> usize
 where
     F     : GlobalOpInfoVec<U> + CheckpointAllPublic<U> ,
     U     : Copy + 'static + GenericAs<usize> + std::cmp::PartialEq,
     usize : GenericAs<U>,
 {
     //
-    // This thread's checkpoint information for GAD<F,U>
+    // try_write
     let lazy_lock      = < F as sealed::CheckpointAll<U> >::get();
     let rw_lock        = &*lazy_lock;
     let mut try_write  = rw_lock.try_write();
@@ -70,6 +68,8 @@ where
     if try_write.is_err() { panic!(
         "store_checkpoint: timed out while waiting for a write lock"
     ) };
+    //
+    // all, checkpoint_id
     let mut all = try_write.unwrap();
     assert!(
         ! all.map.contains_key(name),
@@ -79,13 +79,16 @@ where
     let trace           = false;
     let pattern         = fun.sub_sparsity(trace);
     let checkpoint_info = OneCheckpointInfo {
-        fun_index  : index,
-        name       : name.clone(),
-        adfun      : fun,
-        dependency : pattern,
+        checkpoint_id  : index,
+        name           : name.clone(),
+        adfun          : fun,
+        dependency     : pattern,
     };
+    let checkpoint_id = all.vec.len();
     all.vec.push( checkpoint_info );
     all.map.insert(name.clone(), index);
+    //
+    checkpoint_id
 }
 //
 // use_checkpoint
@@ -137,8 +140,8 @@ where
 /// //
 /// // f
 /// // store as a checkpoint function
-/// let name    = "f".to_string();
-/// store_checkpoint(f, &name);
+/// let name          = "f".to_string();
+/// let checkpoint_id = store_checkpoint(f, &name);
 /// //
 /// // g
 /// // g(u) = f( u0, u0 + u1, u1)
@@ -146,7 +149,7 @@ where
 /// let  u : Vec<F>  = vec![ 4.0, 5.0];
 /// let au : Vec<AD> = rustad::ad_domain(&u);
 /// let ax = vec![ au[0], au[0] + au[1], au[1] ];
-/// let ay = use_checkpoint(&name, &ax, trace);
+/// let ay = use_checkpoint(checkpoint_id, &name, &ax, trace);
 /// let g  = rustad::ad_fun(&ay);
 /// //
 /// // w
@@ -156,9 +159,10 @@ where
 /// assert_eq!( w[1], (u[0] + u[1]) * u[1] );
 /// ```
 pub fn use_checkpoint<F,U>(
-    name      : &String,
-    ad_domain : &Vec< GAD<F,U> >,
-    trace     : bool,
+    checkpoint_id : usize ,
+    name          : &String,
+    ad_domain     : &Vec< GAD<F,U> >,
+    trace         : bool,
 ) -> Vec< GAD<F,U> >
 where
     U:        'static + Copy + GenericAs<usize> + std::fmt::Debug,
@@ -192,8 +196,9 @@ where
         );
     }
     let fun_index        = *option_fun_index.unwrap();
-    let check_point_info = &all.vec[fun_index];
-    assert_eq!( fun_index, check_point_info.fun_index );
+    assert_eq!( checkpoint_id, fun_index );
+    let check_point_info = &all.vec[checkpoint_id];
+    assert_eq!( checkpoint_id, check_point_info.checkpoint_id );
     let local_key : &LocalKey< RefCell< GTape<F,U> > > =
         < F as ThisThreadTape<U> >::get();
     let ad_range = local_key.with_borrow_mut( |tape|
@@ -207,27 +212,27 @@ where
 /// see [doc_generic_f_and_u].
 pub(crate) struct OneCheckpointInfo<F,U> {
     //
-    // fun_index
+    // checkpoint_id
     /// is the index of this checkpoint function in the vector of all
     /// checkpoint functions.
-    pub fun_index    : usize,
+    pub checkpoint_id    : usize,
     //
     // name
     /// ia a name, that is meaningful to the user, used to identify
     /// this checkpoint function.
-    pub name         : String,
+    pub name             : String,
     //
     // adfun
     /// ia the [GADFun] object that is used to evaluate this
     // checkpoint function
     /// and its derivative.
-    pub adfun        : GADFun<F,U>,
+    pub adfun            : GADFun<F,U>,
     //
     // dependency
     /// is the dependency pattern as vector of pairs of non-negative integers.
     /// If (i,j) is not in dependency, then the i-th component of the range
     /// does not depend on the j-th component of the domain.
-    pub dependency   : Vec< [U; 2] >,
+    pub dependency       : Vec< [U; 2] >,
 }
 //
 // sealed::AllCheckpointInfo
@@ -343,10 +348,10 @@ where
 {
     //
     // name, adfun, dependency
-    let fun_index  = check_point_info.fun_index;
-    let name       = &check_point_info.name;
-    let adfun      = &check_point_info.adfun;
-    let dependency = &check_point_info.dependency;
+    let checkpoint_id  = check_point_info.checkpoint_id;
+    let name           = &check_point_info.name;
+    let adfun          = &check_point_info.adfun;
+    let dependency     = &check_point_info.dependency;
     if adfun.domain_len() != ad_domain.len() {
         panic!( "use_chckpoint: ad_domain.len() = {} \
                 is not equal to {name}.domain_len() = {}",
@@ -400,7 +405,7 @@ where
         tape.op2arg.push( as_from( tape.arg_all.len() ) );
         //
         // tape.arg_all, tape.con_all
-        tape.arg_all.push( as_from(fun_index) );           // arg[0]
+        tape.arg_all.push( as_from(checkpoint_id) );           // arg[0]
         tape.arg_all.push( as_from(call_n_arg) );          // arg[1]
         tape.arg_all.push( as_from(call_n_res) );          // arg[2]
         tape.arg_all.push( as_from( tape.flag_all.len() ) ); // arg[3]
