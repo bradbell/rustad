@@ -71,21 +71,21 @@ where
         "store_checkpoint: timed out while waiting for a write lock"
     ) };
     let mut all = try_write.unwrap();
-        assert!(
-            ! all.map.contains_key(name),
-            "store_checkpoint: name {name} was used before on this thread"
-        );
-        let index           = all.vec.len();
-        let trace           = false;
-        let pattern         = fun.sub_sparsity(trace);
-        let checkpoint_info = OneCheckpointInfo {
-            fun_index  : index,
-            name       : name.clone(),
-            adfun      : fun,
-            dependency : pattern,
-        };
-        all.vec.push( checkpoint_info );
-        all.map.insert(name.clone(), index);
+    assert!(
+        ! all.map.contains_key(name),
+        "store_checkpoint: name {name} was used before on this thread"
+    );
+    let index           = all.vec.len();
+    let trace           = false;
+    let pattern         = fun.sub_sparsity(trace);
+    let checkpoint_info = OneCheckpointInfo {
+        fun_index  : index,
+        name       : name.clone(),
+        adfun      : fun,
+        dependency : pattern,
+    };
+    all.vec.push( checkpoint_info );
+    all.map.insert(name.clone(), index);
 }
 //
 // use_checkpoint
@@ -185,20 +185,20 @@ where
         "use_checkpoint: timeout while waiting for read lock"
     ) };
     let all = try_read.unwrap();
-        let option_fun_index = all.map.get(name);
-        if option_fun_index == None {
-            panic!("use_checkpoint: \
-                    name {name} has not been stored as a checkpoint."
-            );
-        }
-        let fun_index        = *option_fun_index.unwrap();
-        let check_point_info = &all.vec[fun_index];
-        assert_eq!( fun_index, check_point_info.fun_index );
-        let local_key : &LocalKey< RefCell< GTape<F,U> > > =
-            < F as ThisThreadTape<U> >::get();
-        let ad_range = local_key.with_borrow_mut( |tape|
-            use_checkpoint_info(tape, check_point_info, ad_domain, trace)
+    let option_fun_index = all.map.get(name);
+    if option_fun_index == None {
+        panic!("use_checkpoint: \
+                name {name} has not been stored as a checkpoint."
         );
+    }
+    let fun_index        = *option_fun_index.unwrap();
+    let check_point_info = &all.vec[fun_index];
+    assert_eq!( fun_index, check_point_info.fun_index );
+    let local_key : &LocalKey< RefCell< GTape<F,U> > > =
+        < F as ThisThreadTape<U> >::get();
+    let ad_range = local_key.with_borrow_mut( |tape|
+        use_checkpoint_info(tape, check_point_info, ad_domain, trace)
+    );
     ad_range
 }
 //
