@@ -102,15 +102,18 @@ where
     }
     //
     // call_range_zero
-    let local_key       = < F as ThisThreadCheckpointAll<U> >::get();
-    let call_range_zero = local_key.with_borrow( |all| {
+    let lazy_lock = < F as ThisThreadCheckpointAll<U> >::get();
+    let rw_lock   = &*lazy_lock;
+    let try_read  = rw_lock.try_read();
+    if try_read.is_err() { panic!(
+        "use_checkpoint: there is a store_chckpoint at the same time"
+    ) };
+    let all = try_read.unwrap();
         let checkpoint_info = &all.vec[call_index];
         let adfun           = &checkpoint_info.adfun;
         let trace           = false;
-        let (range_zero, _call_var_zero) =
+        let (call_range_zero, _call_var_zero) =
             adfun.forward_zero(&call_domain_zero, trace);
-        range_zero
-    } );
     //
     // var_zero
     let mut j_res = 0;

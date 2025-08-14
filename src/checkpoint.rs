@@ -12,6 +12,10 @@
 //
 use std::thread::LocalKey;
 use std::cell::RefCell;
+use std::sync::LazyLock;
+use std::sync::RwLock;
+use std::thread::sleep;
+use std::time::Duration;
 //
 // BEGIN_SORT_THIS_LINE_PLUS_1
 use crate::function::GADFun;
@@ -54,8 +58,19 @@ where
 {
     //
     // This thread's checkpoint information for GAD<F,U>
-    let local_key = < F as sealed::ThisThreadCheckpointAll<U> >::get();
-    local_key.with_borrow_mut( |all| {
+    let lazy_lock      = < F as sealed::ThisThreadCheckpointAll<U> >::get();
+    let rw_lock        = &*lazy_lock;
+    let mut try_write  = rw_lock.try_write();
+    let mut count      = 0;
+    while try_write.is_err() && count < 30 {
+        sleep( Duration::from_secs(1) );
+        count     += 1;
+        try_write  = rw_lock.try_write();
+    }
+    if try_write.is_err() { panic!(
+        "store_checkpoint: timed out while waiting for a write lock"
+    ) };
+    let mut all = try_write.unwrap();
         assert!(
             ! all.map.contains_key(name),
             "store_checkpoint: name {name} was used before on this thread"
@@ -71,7 +86,6 @@ where
         };
         all.vec.push( checkpoint_info );
         all.map.insert(name.clone(), index);
-    } );
 }
 //
 // use_checkpoint
@@ -158,8 +172,19 @@ where
               ThisThreadTape<U>,
 {   //
     // ad_range
-    let local_key = < F as sealed::ThisThreadCheckpointAll<U> >::get();
-    let ad_range  = local_key.with_borrow( |all| {
+    let lazy_lock     = < F as sealed::ThisThreadCheckpointAll<U> >::get();
+    let rw_lock       = &*lazy_lock;
+    let mut try_read  = rw_lock.try_read();
+    let mut count     = 0;
+    while try_read.is_err() && count < 30 {
+        sleep( Duration::from_secs(1) );
+        count     += 1;
+        try_read  = rw_lock.try_read();
+    }
+    if try_read.is_err() { panic!(
+        "use_checkpoint: timeout while waiting for read lock"
+    ) };
+    let all = try_read.unwrap();
         let option_fun_index = all.map.get(name);
         if option_fun_index == None {
             panic!("use_checkpoint: \
@@ -171,11 +196,9 @@ where
         assert_eq!( fun_index, check_point_info.fun_index );
         let local_key : &LocalKey< RefCell< GTape<F,U> > > =
             < F as ThisThreadTape<U> >::get();
-        let ad_range_zero = local_key.with_borrow_mut( |tape|
+        let ad_range = local_key.with_borrow_mut( |tape|
             use_checkpoint_info(tape, check_point_info, ad_domain, trace)
         );
-        ad_range_zero
-    } );
     ad_range
 }
 //
@@ -215,8 +238,8 @@ pub (crate) mod sealed {
     #[cfg(doc)]
     use super::doc_generic_f_and_u;
     //
-    use std::thread::LocalKey;
-    use std::cell::RefCell;
+    use std::sync::LazyLock;
+    use std::sync::RwLock;
     use super::OneCheckpointInfo;
     //
     // AllCheckpointInfo
@@ -249,7 +272,7 @@ pub (crate) mod sealed {
         Self : Sized + 'static ,
         U    : Sized + 'static ,
     {
-        fn get() -> &'static LocalKey< RefCell< AllCheckpointInfo<Self, U> > >;
+        fn get() -> &'static LazyLock< RwLock< AllCheckpointInfo<Self, U> > >;
     }
 }
 //
@@ -267,13 +290,12 @@ macro_rules! impl_this_thread_checkpoint{ ($f1:ident, $u2:ident) => {
     ) ]
     impl sealed::ThisThreadCheckpointAll<$u2> for $f1 {
         fn get() ->
-        &'static LocalKey< RefCell< sealed::AllCheckpointInfo<$f1, $u2> > > {
-            thread_local! {
-                pub(crate) static THIS_THREAD_CHECKPOINT_ALL :
-                    RefCell< sealed::AllCheckpointInfo<$f1, $u2> > =
-                        RefCell::new( sealed::AllCheckpointInfo::new() );
-
-            }
+        &'static LazyLock< RwLock< sealed::AllCheckpointInfo<$f1, $u2> > > {
+            pub(crate) static THIS_THREAD_CHECKPOINT_ALL :
+                LazyLock< RwLock< sealed::AllCheckpointInfo<$f1, $u2> > >  =
+                        LazyLock::new(|| RwLock::new(
+                             sealed::AllCheckpointInfo::new()
+            ) );
             &THIS_THREAD_CHECKPOINT_ALL
         }
     }

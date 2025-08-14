@@ -23,7 +23,7 @@ fn simple() {
     //
     // f
     // store as a checkpoint function
-    let name    = "f".to_string();
+    let name    = "simple.f".to_string();
     store_checkpoint(f, &name);
     //
     // g
@@ -60,7 +60,7 @@ fn constant_in_range_space() {
     //
     // f
     // store as a checkpoint function
-    let name    = "f".to_string();
+    let name    = "constant_in_range_space.f".to_string();
     store_checkpoint(f, &name);
     //
     // g
