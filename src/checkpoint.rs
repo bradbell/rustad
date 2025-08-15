@@ -35,15 +35,19 @@ use crate::doc_generic_f_and_u;
 // store_checkpoint
 /// Converts a [GADFun] object to a checkpoint functions for this thread.
 ///
+/// * Syntax :
+/// ```text
+///     checkpoint_id = store_checkpoint(fun)
+/// ```
+///
 /// * F, U : see [doc_generic_f_and_u]
 ///
 /// * fun :
 /// The ADFun object that it converted to a checkpoint function.
 ///
-/// * name :
-/// The name the user chooses for this checkpoint function.
-/// This name must not appear in a previous `store_checkpoint` call
-/// on this thread.
+/// * checkpoint_id :
+/// is an identifier used to specify this checkpoint function in
+/// calls to [use_checkpoint] .
 ///
 /// * Example : see the example in [use_checkpoint]
 ///
