@@ -81,9 +81,9 @@ where
     GAD<F,U>: From<F>,
 {   //
     // call_index, n_arg, n_res
-    let call_index  = as_from(arg[0]);
-    let n_arg       = as_from(arg[1]);
-    let n_res       = as_from(arg[2]);
+    let call_index  : usize = as_from(arg[0]);
+    let n_arg       : usize = as_from(arg[1]);
+    let n_res       : usize = as_from(arg[2]);
     //
     // is_arg_var, is_res_var
     let mut begin : usize = as_from(arg[3]);
