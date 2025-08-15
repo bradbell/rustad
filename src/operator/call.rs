@@ -105,8 +105,7 @@ where
     }
     //
     // call_range_zero
-    let lazy_lock = < F as CheckpointAll<U> >::get();
-    let rw_lock   = &*lazy_lock;
+    let rw_lock       = < F as CheckpointAll<U> >::get();
     let mut try_read  = rw_lock.try_read();
     let mut count     = 0;
     while try_read.is_err() && count < 30 {

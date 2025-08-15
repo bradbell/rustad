@@ -12,7 +12,6 @@
 //
 use std::thread::LocalKey;
 use std::cell::RefCell;
-use std::sync::LazyLock;
 use std::sync::RwLock;
 use std::thread::sleep;
 use std::time::Duration;
@@ -61,8 +60,7 @@ where
     let pattern        = fun.sub_sparsity(trace);
     //
     // try_write
-    let lazy_lock      = < F as sealed::CheckpointAll<U> >::get();
-    let rw_lock        = &*lazy_lock;
+    let rw_lock        = < F as sealed::CheckpointAll<U> >::get();
     let mut try_write  = rw_lock.try_write();
     let mut count      = 0;
     while try_write.is_err() && count < 30 {
@@ -177,8 +175,7 @@ where
               ThisThreadTape<U>,
 {   //
     // ad_range
-    let lazy_lock     = < F as sealed::CheckpointAll<U> >::get();
-    let rw_lock       = &*lazy_lock;
+    let rw_lock       = < F as sealed::CheckpointAll<U> >::get();
     let mut try_read  = rw_lock.try_read();
     let mut count     = 0;
     while try_read.is_err() && count < 30 {
@@ -237,7 +234,6 @@ pub (crate) mod sealed {
     #[cfg(doc)]
     use super::doc_generic_f_and_u;
     //
-    use std::sync::LazyLock;
     use std::sync::RwLock;
     use super::OneCheckpointInfo;
     //
@@ -247,7 +243,7 @@ pub (crate) mod sealed {
        pub (crate) vec : Vec< OneCheckpointInfo<F,U> > ,
     }
     impl<F,U> AllCheckpointInfo<F,U> {
-       pub fn new() -> Self {
+       pub const fn new() -> Self {
           Self {
              vec : Vec::new() ,
           }
@@ -269,7 +265,7 @@ pub (crate) mod sealed {
         Self : Sized + 'static ,
         U    : Sized + 'static ,
     {
-        fn get() -> &'static LazyLock< RwLock< AllCheckpointInfo<Self, U> > >;
+        fn get() -> &'static RwLock< AllCheckpointInfo<Self, U> >;
     }
 }
 //
@@ -287,12 +283,10 @@ macro_rules! impl_this_thread_checkpoint{ ($f1:ident, $u2:ident) => {
     ) ]
     impl sealed::CheckpointAll<$u2> for $f1 {
         fn get() ->
-        &'static LazyLock< RwLock< sealed::AllCheckpointInfo<$f1, $u2> > > {
+        &'static RwLock< sealed::AllCheckpointInfo<$f1, $u2> > {
             pub(crate) static CHECKPOINT_ALL :
-                LazyLock< RwLock< sealed::AllCheckpointInfo<$f1, $u2> > >  =
-                        LazyLock::new(|| RwLock::new(
-                             sealed::AllCheckpointInfo::new()
-            ) );
+                RwLock< sealed::AllCheckpointInfo<$f1, $u2> > =
+                        RwLock::new( sealed::AllCheckpointInfo::new() );
             &CHECKPOINT_ALL
         }
     }
