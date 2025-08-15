@@ -23,7 +23,7 @@ fn simple() {
     //
     // f
     // store as a checkpoint function
-    let timeout_sec   = 5;
+    let timeout_sec   = 5u64;
     let checkpoint_id = store_checkpoint(f, timeout_sec);
     //
     // g
@@ -60,7 +60,7 @@ fn constant_in_range_space() {
     //
     // f
     // store as a checkpoint function
-    let timeout_sec   = 3;
+    let timeout_sec   = 3u64;
     let checkpoint_id = store_checkpoint(f, timeout_sec);
     //
     // g

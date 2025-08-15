@@ -57,17 +57,23 @@ use crate::doc_generic_f_and_u;
 ///
 /// * Example : see the example in [use_checkpoint]
 ///
-pub fn store_checkpoint<F,U>(fun:  GADFun<F,U>, timeout_sec : usize) -> usize
+pub fn store_checkpoint<F,U>(fun:  GADFun<F,U>, timeout_sec : U) -> usize
 where
     F     : GlobalOpInfoVec<U> + CheckpointAllPublic<U> ,
-    U     : Copy + 'static + GenericAs<usize> + std::cmp::PartialEq,
-    usize : GenericAs<U>,
+    usize : GenericAs<U> + GenericAs<u64>,
+    U     : Copy +
+            'static +
+            GenericAs<usize> +
+            std::cmp::PartialEq +
+            std::fmt::Display ,
 {
     //
     // n_try, sleep_ms
-    let n_try          = 50;
-    let ratio          = 1000u64 / (n_try as u64);
-    let sleep_ms : u64 = ratio * (timeout_sec as u64);
+    let timeout_usize : usize   = as_from(timeout_sec);
+    let timeout_u64   : u64     = as_from(timeout_usize);
+    let n_try                   = 50;
+    let ratio                   = 1000u64 / (n_try as u64);
+    let sleep_ms                = ratio * timeout_u64;
     //
     // pattern
     // do this calculation outside of the lock
@@ -77,7 +83,7 @@ where
     // try_write
     let rw_lock        = < F as sealed::CheckpointAll<U> >::get();
     let mut try_write  = rw_lock.try_write();
-    if timeout_sec > 0 {
+    if sleep_ms > 0u64 {
         let mut count      = 0;
         while try_write.is_err() && count < n_try {
             sleep( Duration::from_millis(sleep_ms) );
@@ -165,7 +171,7 @@ where
 /// //
 /// // f
 /// // store as a checkpoint function
-/// let timeout_sec   = 5;
+/// let timeout_sec   = 5u64;
 /// let checkpoint_id = store_checkpoint(f, timeout_sec);
 /// //
 /// // g
@@ -187,29 +193,35 @@ pub fn use_checkpoint<F,U>(
     checkpoint_id : usize ,
     ad_domain     : &Vec< GAD<F,U> >,
     trace         : bool,
-    timeout_sec   : usize,
+    timeout_sec   : U,
 ) -> Vec< GAD<F,U> >
 where
-    U:        'static + Copy + GenericAs<usize> + std::fmt::Debug,
-    usize:    GenericAs<U> ,
+    usize:    GenericAs<U> + GenericAs<u64>,
     GAD<F,U>: From<F>,
-    F:        Copy +
-              From<f32> +
-              std::fmt::Display +
-              sealed::CheckpointAll<U> +
-              GlobalOpInfoVec<U> +
-              ThisThreadTape<U>,
+    U:     'static +
+            Copy +
+            GenericAs<usize> +
+            std::fmt::Debug +
+            std::fmt::Display,
+    F:      Copy +
+            From<f32> +
+            std::fmt::Display +
+            sealed::CheckpointAll<U> +
+            GlobalOpInfoVec<U> +
+            ThisThreadTape<U>,
 {   //
     //
     // n_try, sleep_ms
-    let n_try          = 50;
-    let ratio          = 1000u64 / (n_try as u64);
-    let sleep_ms : u64 = ratio * (timeout_sec as u64);
+    let timeout_usize : usize   = as_from(timeout_sec);
+    let timeout_u64   : u64     = as_from(timeout_usize);
+    let n_try                   = 50;
+    let ratio                   = 1000u64 / (n_try as u64);
+    let sleep_ms                = ratio * timeout_u64;
     //
     // ad_range
     let rw_lock       = < F as sealed::CheckpointAll<U> >::get();
     let mut try_read  = rw_lock.try_read();
-    if timeout_sec > 0 {
+    if sleep_ms > 0u64 {
         let mut count      = 0;
         while try_read.is_err() && count < n_try {
             sleep( Duration::from_millis(sleep_ms) );
