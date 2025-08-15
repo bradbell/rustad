@@ -37,7 +37,7 @@ use crate::doc_generic_f_and_u;
 ///
 /// * Syntax :
 /// ```text
-///     checkpoint_id = store_checkpoint(fun)
+///     checkpoint_id = store_checkpoint(fun, timeout_sec)
 /// ```
 ///
 /// * F, U : see [doc_generic_f_and_u]
@@ -49,14 +49,25 @@ use crate::doc_generic_f_and_u;
 /// is an identifier used to specify this checkpoint function in
 /// calls to [use_checkpoint] .
 ///
+/// * timeout_sec :
+/// store_checkpoint must get a lock before changing the global structure
+/// that holds all the checkpoint functions.
+/// If a lock cannot be obtained in *timeout_sec* seconds,
+/// this routine will panic with an error message.
+///
 /// * Example : see the example in [use_checkpoint]
 ///
-pub fn store_checkpoint<F,U>(fun:  GADFun<F,U>) -> usize
+pub fn store_checkpoint<F,U>(fun:  GADFun<F,U>, timeout_sec : usize) -> usize
 where
     F     : GlobalOpInfoVec<U> + CheckpointAllPublic<U> ,
     U     : Copy + 'static + GenericAs<usize> + std::cmp::PartialEq,
     usize : GenericAs<U>,
 {
+    //
+    // n_try, sleep_ms
+    let n_try          = 50;
+    let ratio          = 1000u64 / (n_try as u64);
+    let sleep_ms : u64 = ratio * (timeout_sec as u64);
     //
     // pattern
     // do this calculation outside of the lock
@@ -66,18 +77,21 @@ where
     // try_write
     let rw_lock        = < F as sealed::CheckpointAll<U> >::get();
     let mut try_write  = rw_lock.try_write();
-    let mut count      = 0;
-    while try_write.is_err() && count < 30 {
-        sleep( Duration::from_millis(100) );
-        count     += 1;
-        try_write  = rw_lock.try_write();
+    if timeout_sec > 0 {
+        let mut count      = 0;
+        while try_write.is_err() && count < n_try {
+            sleep( Duration::from_millis(sleep_ms) );
+            count     += 1;
+            try_write  = rw_lock.try_write();
+        }
     }
     // ----------------------------------------------------------------------
     // Begin: lock out read and other writes
     // ----------------------------------------------------------------------
-    if try_write.is_err() { panic!(
-        "store_checkpoint: timed out while waiting for a write lock"
-    ) };
+    if try_write.is_err() {
+        let msg = "store_checkpoint: timed out while waiting for a write lock";
+        panic!( "{msg} : timeout_sec = {timeout_sec} " );
+    };
     //
     // all, checkpoint_id
     let mut all = try_write.unwrap();
@@ -100,7 +114,7 @@ where
 ///
 /// * Syntax :
 /// ```text
-///     ad_range = use_checkpoint(checkpoint_id, &ad_comain, trace)
+/// ad_range = use_checkpoint(checkpoint_id, &ad_comain, trace, timeout_sec)
 /// ```
 ///
 /// If the tape for this thread is recording, include the call
@@ -117,6 +131,12 @@ where
 /// * trace :
 /// If this is true (false), evaluation of the
 /// checkpoint function corresponding is traced.
+///
+/// * timeout_sec :
+/// use_checkpoint must get a lock before reading the global structure
+/// that holds all the checkpoint functions.
+/// If a lock cannot be obtained in *timeout_sec* seconds,
+/// this routine will panic with an error message.
 ///
 /// * ad_range :
 /// The range variable values that correspond to the
@@ -145,7 +165,8 @@ where
 /// //
 /// // f
 /// // store as a checkpoint function
-/// let checkpoint_id = store_checkpoint(f);
+/// let timeout_sec   = 5;
+/// let checkpoint_id = store_checkpoint(f, timeout_sec);
 /// //
 /// // g
 /// // g(u) = f( u0, u0 + u1, u1)
@@ -153,7 +174,7 @@ where
 /// let  u : Vec<F>  = vec![ 4.0, 5.0];
 /// let au : Vec<AD> = rustad::ad_domain(&u);
 /// let ax = vec![ au[0], au[0] + au[1], au[1] ];
-/// let ay = use_checkpoint(checkpoint_id, &ax, trace);
+/// let ay = use_checkpoint(checkpoint_id, &ax, trace, timeout_sec);
 /// let g  = rustad::ad_fun(&ay);
 /// //
 /// // w
@@ -166,6 +187,7 @@ pub fn use_checkpoint<F,U>(
     checkpoint_id : usize ,
     ad_domain     : &Vec< GAD<F,U> >,
     trace         : bool,
+    timeout_sec   : usize,
 ) -> Vec< GAD<F,U> >
 where
     U:        'static + Copy + GenericAs<usize> + std::fmt::Debug,
@@ -178,18 +200,27 @@ where
               GlobalOpInfoVec<U> +
               ThisThreadTape<U>,
 {   //
+    //
+    // n_try, sleep_ms
+    let n_try          = 50;
+    let ratio          = 1000u64 / (n_try as u64);
+    let sleep_ms : u64 = ratio * (timeout_sec as u64);
+    //
     // ad_range
     let rw_lock       = < F as sealed::CheckpointAll<U> >::get();
     let mut try_read  = rw_lock.try_read();
-    let mut count     = 0;
-    while try_read.is_err() && count < 30 {
-        sleep( Duration::from_millis(100) );
-        count     += 1;
-        try_read  = rw_lock.try_read();
+    if timeout_sec > 0 {
+        let mut count      = 0;
+        while try_read.is_err() && count < n_try {
+            sleep( Duration::from_millis(sleep_ms) );
+            count     += 1;
+            try_read  = rw_lock.try_read();
+        }
     }
-    if try_read.is_err() { panic!(
-        "use_checkpoint: timeout while waiting for read lock"
-    ) };
+    if try_read.is_err() {
+        let msg = "use_checkpoint: timed out while waiting for a read lock";
+        panic!( "{msg} : timeout_sec = {timeout_sec} " );
+    };
     // ----------------------------------------------------------------------
     // Begin: lock out writes
     // ----------------------------------------------------------------------
@@ -244,12 +275,12 @@ pub (crate) mod sealed {
     // AllCheckpointInfo
     /// Information for all the checkpoints; see [doc_generic_f_and_u].
     pub struct AllCheckpointInfo<F,U> {
-       pub (crate) vec : Vec< OneCheckpointInfo<F,U> > ,
+       pub (crate) vec          : Vec< OneCheckpointInfo<F,U> > ,
     }
     impl<F,U> AllCheckpointInfo<F,U> {
        pub const fn new() -> Self {
           Self {
-             vec : Vec::new() ,
+            vec         : Vec::new() ,
           }
        }
     }

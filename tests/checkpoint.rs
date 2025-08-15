@@ -23,7 +23,8 @@ fn simple() {
     //
     // f
     // store as a checkpoint function
-    let checkpoint_id = store_checkpoint(f);
+    let timeout_sec   = 5;
+    let checkpoint_id = store_checkpoint(f, timeout_sec);
     //
     // g
     // g(u) = f( u0, u0 + u1, u1)
@@ -31,7 +32,7 @@ fn simple() {
     let  u : Vec<Float>  = vec![ 4.0, 5.0];
     let au : Vec<AD>     = rustad::ad_domain(&u);
     let ax      = vec![ au[0], au[0] + au[1], au[1] ];
-    let ay      = use_checkpoint(checkpoint_id, &ax, trace);
+    let ay      = use_checkpoint(checkpoint_id, &ax, trace, timeout_sec);
     let g       = rustad::ad_fun(&ay);
     //
     // w
@@ -59,7 +60,8 @@ fn constant_in_range_space() {
     //
     // f
     // store as a checkpoint function
-    let checkpoint_id = store_checkpoint(f);
+    let timeout_sec   = 3;
+    let checkpoint_id = store_checkpoint(f, timeout_sec);
     //
     // g
     // g(u) = f( u0, u0 + u1, u1)
@@ -67,7 +69,7 @@ fn constant_in_range_space() {
     let  u : Vec<Float>  = vec![ 4.0, 5.0];
     let au : Vec<AD>     = rustad::ad_domain(&u);
     let ax      = vec![ au[0], au[0] + au[1], au[1] ];
-    let ay      = use_checkpoint(checkpoint_id, &ax, trace);
+    let ay      = use_checkpoint(checkpoint_id, &ax, trace, timeout_sec);
     let g       = rustad::ad_fun(&ay);
     //
     // w
