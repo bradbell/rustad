@@ -55,41 +55,50 @@ where
     usize : GenericAs<U>,
 {
     //
+    // pattern
+    // do this calculation outside of the lock
+    let trace          = false;
+    let pattern        = fun.sub_sparsity(trace);
+    //
     // try_write
     let lazy_lock      = < F as sealed::CheckpointAll<U> >::get();
     let rw_lock        = &*lazy_lock;
     let mut try_write  = rw_lock.try_write();
     let mut count      = 0;
     while try_write.is_err() && count < 30 {
-        sleep( Duration::from_secs(1) );
+        sleep( Duration::from_millis(100) );
         count     += 1;
         try_write  = rw_lock.try_write();
     }
+    // ----------------------------------------------------------------------
+    // Begin: lock out read and other writes
+    // ----------------------------------------------------------------------
     if try_write.is_err() { panic!(
         "store_checkpoint: timed out while waiting for a write lock"
     ) };
     //
     // all, checkpoint_id
     let mut all = try_write.unwrap();
-    let index           = all.vec.len();
-    let trace           = false;
-    let pattern         = fun.sub_sparsity(trace);
+    let checkpoint_id   = all.vec.len();
     let checkpoint_info = OneCheckpointInfo {
-        checkpoint_id  : index,
+        checkpoint_id  : checkpoint_id,
         adfun          : fun,
         dependency     : pattern,
     };
-    let checkpoint_id = all.vec.len();
     all.vec.push( checkpoint_info );
     //
     checkpoint_id
+    // ----------------------------------------------------------------------
+    // End lock
+    // ----------------------------------------------------------------------
 }
 //
 // use_checkpoint
 /// Makes a call, by name, to a checkpoint function.
 ///
+/// * Syntax :
 /// ```text
-///     ad_range = use_checkpoint(&name, &ad_comain, trace)
+///     ad_range = use_checkpoint(checkpoint_id, &ad_comain, trace)
 /// ```
 ///
 /// If the tape for this thread is recording, include the call
@@ -97,8 +106,8 @@ where
 ///
 /// * F, U : see [doc_generic_f_and_u]
 ///
-/// * name :
-/// The name that was used to store the checkpoint function.
+/// * checkpoint_id :
+/// the checkpoint_id returned by a previous call to [store_checkpoint] ;
 ///
 /// * ad_domain :
 /// The value of the domain variables for the function bning called.
@@ -173,13 +182,16 @@ where
     let mut try_read  = rw_lock.try_read();
     let mut count     = 0;
     while try_read.is_err() && count < 30 {
-        sleep( Duration::from_secs(1) );
+        sleep( Duration::from_millis(100) );
         count     += 1;
         try_read  = rw_lock.try_read();
     }
     if try_read.is_err() { panic!(
         "use_checkpoint: timeout while waiting for read lock"
     ) };
+    // ----------------------------------------------------------------------
+    // Begin: lock out writes
+    // ----------------------------------------------------------------------
     let all = try_read.unwrap();
     let check_point_info = &all.vec[checkpoint_id];
     assert_eq!( checkpoint_id, check_point_info.checkpoint_id );
@@ -189,6 +201,9 @@ where
         use_checkpoint_info(tape, check_point_info, ad_domain, trace)
     );
     ad_range
+    // ----------------------------------------------------------------------
+    // End: lock out writes
+    // ----------------------------------------------------------------------
 }
 //
 // OneCheckpointInfo

@@ -38,6 +38,9 @@
 //! operator in the sequence of operations. These are place holders so that
 //! there is a direct correpondence between variable and operator indices.
 //
+use std::time::Duration;
+use std::thread::sleep;
+//
 use crate::gad::GAD;
 use crate::gas::sealed::GenericAs;
 use crate::gas::as_from;
@@ -104,16 +107,25 @@ where
     // call_range_zero
     let lazy_lock = < F as CheckpointAll<U> >::get();
     let rw_lock   = &*lazy_lock;
-    let try_read  = rw_lock.try_read();
+    let mut try_read  = rw_lock.try_read();
+    let mut count     = 0;
+    while try_read.is_err() && count < 30 {
+        sleep( Duration::from_millis(100) );
+        count     += 1;
+        try_read  = rw_lock.try_read();
+    }
     if try_read.is_err() { panic!(
-        "use_checkpoint: there is a store_chckpoint at the same time"
+        "use_checkpoint: timeout while waiting for read lock"
     ) };
-    let all = try_read.unwrap();
-        let checkpoint_info = &all.vec[call_index];
-        let adfun           = &checkpoint_info.adfun;
-        let trace           = false;
-        let (call_range_zero, _call_var_zero) =
-            adfun.forward_zero(&call_domain_zero, trace);
+    // ----------------------------------------------------------------------
+    // Begin: lock out writes
+    // ----------------------------------------------------------------------
+    let all             = try_read.unwrap();
+    let checkpoint_info = &all.vec[call_index];
+    let adfun           = &checkpoint_info.adfun;
+    let trace           = false;
+    let (call_range_zero, _call_var_zero) =
+        adfun.forward_zero(&call_domain_zero, trace);
     //
     // var_zero
     let mut j_res = 0;
@@ -123,6 +135,9 @@ where
             j_res += 1;
         }
     }
+    // ----------------------------------------------------------------------
+    // End: lock
+    // ----------------------------------------------------------------------
 }
 //
 // call_arg_var_index
