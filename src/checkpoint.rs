@@ -91,13 +91,13 @@ where
             try_write  = rw_lock.try_write();
         }
     }
-    // ----------------------------------------------------------------------
-    // Begin: lock out read and other writes
-    // ----------------------------------------------------------------------
     if try_write.is_err() {
         let msg = "store_checkpoint: timed out while waiting for a write lock";
         panic!( "{msg} : timeout_sec = {timeout_sec} " );
     };
+    // ----------------------------------------------------------------------
+    // Begin: lock out read and other writes
+    // ----------------------------------------------------------------------
     //
     // all, checkpoint_id
     let mut all = try_write.unwrap();
@@ -218,7 +218,7 @@ where
     let ratio                   = 1000u64 / (n_try as u64);
     let sleep_ms                = ratio * timeout_u64;
     //
-    // ad_range
+    // try_read
     let rw_lock       = < F as sealed::CheckpointAll<U> >::get();
     let mut try_read  = rw_lock.try_read();
     if sleep_ms > 0u64 {
@@ -236,6 +236,8 @@ where
     // ----------------------------------------------------------------------
     // Begin: lock out writes
     // ----------------------------------------------------------------------
+    //
+    // ad_range
     let all = try_read.unwrap();
     let check_point_info = &all.vec[checkpoint_id];
     assert_eq!( checkpoint_id, check_point_info.checkpoint_id );

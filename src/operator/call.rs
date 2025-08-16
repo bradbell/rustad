@@ -104,14 +104,23 @@ where
         }
     }
     //
-    // call_range_zero
+    // n_try, sleep_ms
+    let timeout_usize : usize   = 3;
+    let timeout_u64   : u64     = as_from(timeout_usize);
+    let n_try                   = 50;
+    let ratio                   = 1000u64 / (n_try as u64);
+    let sleep_ms                = ratio * timeout_u64;
+    //
+    // try_read
     let rw_lock       = < F as CheckpointAll<U> >::get();
     let mut try_read  = rw_lock.try_read();
-    let mut count     = 0;
-    while try_read.is_err() && count < 30 {
-        sleep( Duration::from_millis(100) );
-        count     += 1;
-        try_read  = rw_lock.try_read();
+    if sleep_ms > 0u64 {
+        let mut count      = 0;
+        while try_read.is_err() && count < n_try {
+            sleep( Duration::from_millis(sleep_ms) );
+            count     += 1;
+            try_read  = rw_lock.try_read();
+        }
     }
     if try_read.is_err() { panic!(
         "use_checkpoint: timeout while waiting for read lock"
@@ -119,6 +128,8 @@ where
     // ----------------------------------------------------------------------
     // Begin: lock out writes
     // ----------------------------------------------------------------------
+    //
+    // call_range_zero
     let all             = try_read.unwrap();
     let checkpoint_info = &all.vec[call_index];
     let adfun           = &checkpoint_info.adfun;
