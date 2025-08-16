@@ -143,6 +143,9 @@ where
 /// that holds all the checkpoint functions.
 /// If a lock cannot be obtained in *timeout_sec* seconds,
 /// this routine will panic with an error message.
+/// If a recording is currently in progress,
+/// timeout_sec is also used when the corresponding [GADFun] executes
+/// the call for this checkpoint function.
 ///
 /// * ad_range :
 /// The range variable values that correspond to the
@@ -244,7 +247,9 @@ where
     let local_key : &LocalKey< RefCell< GTape<F,U> > > =
         < F as ThisThreadTape<U> >::get();
     let ad_range = local_key.with_borrow_mut( |tape|
-        use_checkpoint_info(tape, check_point_info, ad_domain, trace)
+        record_checkpoint_call(
+            tape, check_point_info, ad_domain, trace, timeout_sec
+        )
     );
     ad_range
     // ----------------------------------------------------------------------
@@ -263,7 +268,7 @@ pub(crate) struct OneCheckpointInfo<F,U> {
     pub checkpoint_id    : usize,
     //
     // adfun
-    /// ia the [GADFun] object that is used to evaluate this
+    /// is the [GADFun] object that is used to evaluate this
     // checkpoint function
     /// and its derivative.
     pub adfun            : GADFun<F,U>,
@@ -345,7 +350,7 @@ impl_this_thread_checkpoint!(f32, u64);
 impl_this_thread_checkpoint!(f64, u32);
 impl_this_thread_checkpoint!(f64, u64);
 //
-// use_checkpoint_info
+// record_checkpoint_call
 /// Make a call, by OneCheckpointInfo, to a checkpoint function.
 ///
 /// If the tape for this thread is recording, include the call
@@ -366,14 +371,21 @@ impl_this_thread_checkpoint!(f64, u64);
 /// If this is true (false), evaluation of the
 /// checkpoint function corresponding to *ad_domain* is traced.
 ///
+/// * timeout_sec :
+/// When the call executes, it must get a lock before reading the
+/// global structure that holds all the checkpoint functions.
+/// If a lock cannot be obtained in *timeout_sec* seconds,
+/// that call will panic with an error message.
+///
 /// * return :
 /// The values of the range variables that correspond to the
 /// domain variable values.
-fn use_checkpoint_info<F,U>(
+fn record_checkpoint_call<F,U>(
     tape             : &mut GTape<F,U>,
     check_point_info : &OneCheckpointInfo<F,U>,
     ad_domain        : &Vec< GAD<F,U> >,
     trace            : bool,
+    timeout_sec      : U,
 ) -> Vec< GAD<F,U> >
 where
     F:         Copy + From<f32> + GlobalOpInfoVec<U> + std::fmt::Display,
@@ -381,10 +393,6 @@ where
     GAD<F, U>: From<F>,
     usize:     GenericAs<U>,
 {
-    //
-    // timeout_sec
-    // 2DO: make this an argument to use_checkpoint_info
-    let timeout_sec = 3;
     //
     // adfun, dependency
     let checkpoint_id  = check_point_info.checkpoint_id;
@@ -444,7 +452,7 @@ where
         //
         // tape.arg_all, tape.con_all
         tape.arg_all.push( as_from(checkpoint_id) );          // arg[0]
-        tape.arg_all.push( as_from(timeout_sec) );            // arg[1]
+        tape.arg_all.push( timeout_sec );                     // arg[1]
         tape.arg_all.push( as_from(call_n_arg) );             // arg[2]
         tape.arg_all.push( as_from(call_n_res) );             // arg[3]
         tape.arg_all.push( as_from( tape.flag_all.len() ) );  // arg[4]
