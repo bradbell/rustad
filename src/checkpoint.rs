@@ -33,7 +33,7 @@ use crate::doc_generic_f_and_u;
 // ---------------------------------------------------------------------------
 //
 // store_checkpoint
-/// Converts a [GADFun] object to a checkpoint functions for this thread.
+/// Converts a [GADFun] object to a checkpoint function.
 ///
 /// * Syntax :
 /// ```text
@@ -46,7 +46,7 @@ use crate::doc_generic_f_and_u;
 /// The ADFun object that it converted to a checkpoint function.
 ///
 /// * checkpoint_id :
-/// is an identifier used to specify this checkpoint function in
+/// is an identifier used to specify this checkpoint function during future
 /// calls to [use_checkpoint] .
 ///
 /// * timeout_sec :
@@ -54,6 +54,9 @@ use crate::doc_generic_f_and_u;
 /// that holds all the checkpoint functions.
 /// If a lock cannot be obtained in *timeout_sec* seconds,
 /// this routine will panic with an error message.
+/// This timeout_sec should be zero
+/// if you know that no other threads should calling store_checkpoint,
+/// [use_checkpoint], or executing a call operator stored by use_checkpoint.
 ///
 /// * Example : see the example in [use_checkpoint]
 ///
@@ -116,7 +119,7 @@ where
 }
 //
 // use_checkpoint
-/// Makes a call, by name, to a checkpoint function.
+/// Makes a call to a checkpoint function.
 ///
 /// * Syntax :
 /// ```text
@@ -146,6 +149,10 @@ where
 /// If a recording is currently in progress,
 /// timeout_sec is also used when the corresponding [GADFun] executes
 /// the call for this checkpoint function.
+/// This timeout_sec should be zero
+/// if you know that no other threads should calling [store_checkpoint] now,
+/// or during the execution of the call operator stored by
+/// this call to use_checkpoint.
 ///
 /// * ad_range :
 /// The range variable values that correspond to the

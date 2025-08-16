@@ -13,7 +13,7 @@
 //! | Index    | Meaning |
 //! | -------  | ------- |
 //! | 0        | Index that identifies the ADFun object being called |
-//! | 1        | Will be used for timeout_sec |
+//! | 1        | Number secs to wait for a checkpoint read lock timeout_sec |
 //! | 2        | Number of arguments to the function being called (n_arg) |
 //! | 3        | Number of results for the function being called  (n_res) |
 //! | 4        | Index of the first boolean for this operator |
@@ -83,6 +83,7 @@ where
 {   //
     // call_index, n_arg, n_res
     let call_index  : usize = as_from(arg[0]);
+    let timeout_sec : usize = as_from(arg[1]);
     let n_arg       : usize = as_from(arg[2]);
     let n_res       : usize = as_from(arg[3]);
     //
@@ -106,8 +107,7 @@ where
     }
     //
     // n_try, sleep_ms
-    let timeout_usize : usize   = 3;
-    let timeout_u64   : u64     = as_from(timeout_usize);
+    let timeout_u64   : u64     = as_from(timeout_sec);
     let n_try                   = 50;
     let ratio                   = 1000u64 / (n_try as u64);
     let sleep_ms                = ratio * timeout_u64;
@@ -123,9 +123,10 @@ where
             try_read  = rw_lock.try_read();
         }
     }
-    if try_read.is_err() { panic!(
-        "use_checkpoint: timeout while waiting for read lock"
-    ) };
+    if try_read.is_err() {
+        let msg = "checkpoint operator: timeout while waiting for read lock";
+        panic!( "{msg}: timeout_sec = {}", timeout_sec);
+    };
     // ----------------------------------------------------------------------
     // Begin: lock out writes
     // ----------------------------------------------------------------------
