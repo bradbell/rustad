@@ -13,13 +13,14 @@
 //! | Index    | Meaning |
 //! | -------  | ------- |
 //! | 0        | Index that identifies the ADFun object being called |
-//! | 1        | Number of arguments to the function being called (n_arg) |
-//! | 2        | Number of results for the function being called  (n_res) |
-//! | 3        | Index of the first boolean for this operator |
-//! | 4        | Variable or constant index for first argument to call |
-//! | 5        | Variable or constant index for second argument to call |
+//! | 1        | Will be used for timeout_sec |
+//! | 2        | Number of arguments to the function being called (n_arg) |
+//! | 3        | Number of results for the function being called  (n_res) |
+//! | 4        | Index of the first boolean for this operator |
+//! | 5        | Variable or constant index for first argument to call |
+//! | 6        | Variable or constant index for second argument to call |
 //! | ...      | ... |
-//! | 3+n_arg  | Variable or constant index for last argument to call |
+//! | 4+n_arg  | Variable or constant index for last argument to call |
 //!
 //! # Operator Booleans
 //! | Index    | Meaning |
@@ -82,11 +83,11 @@ where
 {   //
     // call_index, n_arg, n_res
     let call_index  : usize = as_from(arg[0]);
-    let n_arg       : usize = as_from(arg[1]);
-    let n_res       : usize = as_from(arg[2]);
+    let n_arg       : usize = as_from(arg[2]);
+    let n_res       : usize = as_from(arg[3]);
     //
     // is_arg_var, is_res_var
-    let mut begin : usize = as_from(arg[3]);
+    let mut begin : usize = as_from(arg[4]);
     let mut end     = begin + n_arg;
     let is_arg_var  = &flag_all[begin .. end];
     begin           = end;
@@ -97,9 +98,9 @@ where
     let mut call_domain_zero : Vec<F> = Vec::new();
     for i_arg in 0 .. n_arg {
         if is_arg_var[i_arg] {
-            call_domain_zero.push( var_zero[ as_from(arg[i_arg + 4]) ] );
+            call_domain_zero.push( var_zero[ as_from(arg[i_arg + 5]) ] );
         } else {
-            let c = con[ as_from(arg[i_arg + 4]) ];
+            let c = con[ as_from(arg[i_arg + 5]) ];
             call_domain_zero.push( c );
         }
     }

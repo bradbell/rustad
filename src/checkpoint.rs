@@ -382,6 +382,10 @@ where
     usize:     GenericAs<U>,
 {
     //
+    // timeout_sec
+    // 2DO: make this an argument to use_checkpoint_info
+    let timeout_sec = 3;
+    //
     // adfun, dependency
     let checkpoint_id  = check_point_info.checkpoint_id;
     let adfun          = &check_point_info.adfun;
@@ -439,10 +443,11 @@ where
         tape.op2arg.push( as_from( tape.arg_all.len() ) );
         //
         // tape.arg_all, tape.con_all
-        tape.arg_all.push( as_from(checkpoint_id) );           // arg[0]
-        tape.arg_all.push( as_from(call_n_arg) );          // arg[1]
-        tape.arg_all.push( as_from(call_n_res) );          // arg[2]
-        tape.arg_all.push( as_from( tape.flag_all.len() ) ); // arg[3]
+        tape.arg_all.push( as_from(checkpoint_id) );          // arg[0]
+        tape.arg_all.push( as_from(timeout_sec) );            // arg[1]
+        tape.arg_all.push( as_from(call_n_arg) );             // arg[2]
+        tape.arg_all.push( as_from(call_n_res) );             // arg[3]
+        tape.arg_all.push( as_from( tape.flag_all.len() ) );  // arg[4]
         for j in 0 .. call_n_arg {
             let index = if is_var_domain[j] {
                 as_from( ad_domain[j].var_index )
@@ -451,7 +456,7 @@ where
                 tape.con_all.push( ad_domain[j].value );
                 con_index
             };
-            tape.arg_all.push( as_from(index) ); // arg[4+j]
+            tape.arg_all.push( as_from(index) ); // arg[5+j]
         }
         //
         // tape.flag_all
