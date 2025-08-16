@@ -87,11 +87,14 @@ where
     let mut try_write  = rw_lock.try_write();
     if sleep_ms > 0u64 {
         let mut count      = 0;
-        while try_write.is_err() && count < n_try {
+        while try_write.is_err() && ! rw_lock.is_poisoned() && count < n_try {
             sleep( Duration::from_millis(sleep_ms) );
             count     += 1;
             try_write  = rw_lock.try_write();
         }
+    }
+    if rw_lock.is_poisoned() {
+        panic!( "store_checkpoint: rwlock was poisoned" );
     }
     if try_write.is_err() {
         let msg = "store_checkpoint: timed out while waiting for a write lock";
@@ -233,11 +236,14 @@ where
     let mut try_read  = rw_lock.try_read();
     if sleep_ms > 0u64 {
         let mut count      = 0;
-        while try_read.is_err() && count < n_try {
+        while try_read.is_err() && ! rw_lock.is_poisoned() && count < n_try {
             sleep( Duration::from_millis(sleep_ms) );
             count     += 1;
             try_read  = rw_lock.try_read();
         }
+    }
+    if rw_lock.is_poisoned() {
+        panic!( "use_checkpoint: rwlock was poisoned" );
     }
     if try_read.is_err() {
         let msg = "use_checkpoint: timed out while waiting for a read lock";

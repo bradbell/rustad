@@ -117,16 +117,19 @@ where
     let mut try_read  = rw_lock.try_read();
     if sleep_ms > 0u64 {
         let mut count      = 0;
-        while try_read.is_err() && count < n_try {
+        while try_read.is_err() && ! rw_lock.is_poisoned() && count < n_try {
             sleep( Duration::from_millis(sleep_ms) );
             count     += 1;
             try_read  = rw_lock.try_read();
         }
     }
+    if rw_lock.is_poisoned() {
+        panic!("checkpoint operator: rwlock is poisoned");
+    }
     if try_read.is_err() {
         let msg = "checkpoint operator: timeout while waiting for read lock";
         panic!( "{msg}: timeout_sec = {}", timeout_sec);
-    };
+    }
     // ----------------------------------------------------------------------
     // Begin: lock out writes
     // ----------------------------------------------------------------------
