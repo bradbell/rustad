@@ -54,9 +54,8 @@ use crate::doc_generic_f_and_u;
 /// that holds all the checkpoint functions.
 /// If a lock cannot be obtained in *timeout_sec* seconds,
 /// this routine will panic with an error message.
-/// This timeout_sec should be zero
-/// if you know that no other threads should calling store_checkpoint,
-/// [use_checkpoint], or executing a call operator stored by use_checkpoint.
+/// This timeout_sec should be zero if you know that
+/// no other threads is currently calling [store_checkpoint].
 ///
 /// * Example : see the example in [use_checkpoint]
 ///
@@ -149,10 +148,10 @@ where
 /// If a recording is currently in progress,
 /// timeout_sec is also used when the corresponding [GADFun] executes
 /// the call for this checkpoint function.
-/// This timeout_sec should be zero
-/// if you know that no other threads should calling [store_checkpoint] now,
-/// or during the execution of the call operator stored by
-/// this call to use_checkpoint.
+/// This timeout_sec should be zero if you know the following conditions hold:
+///     1. No other threads is currently calling store_checkpoint.
+///     2. No other thread is currently calling [use_checkpoint]
+///     3. No other thread is currently executing a checkpoint call operator.
 ///
 /// * ad_range :
 /// The range variable values that correspond to the
@@ -180,8 +179,9 @@ where
 /// let f  = rustad::ad_fun(&ay);
 /// //
 /// // f
-/// // store as a checkpoint function
-/// let timeout_sec   = 5u64;
+/// // Convert f to a checkpoint function. Use timeout_sec equal to 0 because
+/// // there are no other checkpoint tests that will be run at the same time.
+/// let timeout_sec   = 0u64;
 /// let checkpoint_id = store_checkpoint(f, timeout_sec);
 /// //
 /// // g
@@ -249,8 +249,15 @@ where
     //
     // ad_range
     let all = try_read.unwrap();
+    if all.vec.len() <= checkpoint_id {
+        if all.vec.len() == 0 {
+            panic!( "use_checkpoint: no previous call to store_checkpoint");
+        }
+        let msg1 = "use_checkpoint: checkpoint_id =";
+        let msg2 = "which is not <= maximum store_checkpoint return =";
+        panic!( "{} {} {} {}", msg1, checkpoint_id, msg2, all.vec.len() - 1);
+    }
     let check_point_info = &all.vec[checkpoint_id];
-    assert_eq!( checkpoint_id, check_point_info.checkpoint_id );
     let local_key : &LocalKey< RefCell< GTape<F,U> > > =
         < F as ThisThreadTape<U> >::get();
     let ad_range = local_key.with_borrow_mut( |tape|
