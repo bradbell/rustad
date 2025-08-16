@@ -67,6 +67,7 @@ version_file_list='
 # BEGIN_SORT_THIS_LINE_PLUS_2
 no_copyright_list='
    .gitignore
+   readme.md
 '
 # END_SORT_THIS_LINE_MINUS_2
 #
