@@ -175,7 +175,7 @@ impl<F : std::cmp::PartialEq, U> PartialEq for GAD<F, U> {
 macro_rules! binary_float_op_gad{
     ($f1:ident, $u2:ident, $t3:ident, $o4:tt) => { paste::paste! {
         #[doc =
-            "see [doc_binary_gad_operator](crate::gad::doc_binary_gad_operator)"
+        "see [doc_binary_gad_operator](crate::gad::doc_binary_gad_operator)"
         ]
         impl std::ops::$t3< GAD<$f1,$u2> > for $f1
         where
@@ -270,7 +270,9 @@ macro_rules! binary_gad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         ( as_from(new_tape_id), as_from(new_var_index) )
     }
     //
-    #[doc = "see [doc_binary_gad_operator](crate::gad::doc_binary_gad_operator)"]
+    #[doc =
+    "see [doc_binary_gad_operator](crate::gad::doc_binary_gad_operator)"
+    ]
     impl<F,U> std::ops::$Trait< GAD<F,U> > for GAD<F,U>
     where
     F     : Copy + std::ops::$Trait<Output = F>  + ThisThreadTape<U> ,
@@ -294,7 +296,9 @@ macro_rules! binary_gad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         }
     }
     //
-    #[doc = "see [doc_binary_gad_operator](crate::gad::doc_binary_gad_operator)"]
+    #[doc =
+    "see [doc_binary_gad_operator](crate::gad::doc_binary_gad_operator)"
+    ]
     impl<F,U> std::ops::$Trait<F> for GAD<F,U>
     where
     GAD<F,U> : From<F> ,
