@@ -210,21 +210,30 @@ pub(crate) use binary_float_op_gad;
 ///
 /// * F, U : see [doc_generic_f_and_u]
 ///
-/// | Left      | Operator | Right     |
-/// |-----------|----------|-----------|
-/// | GAD<F,U>  | +, *     | GAD<F,U>  |
-/// | F         | +, *     | GAD<F,U>  |
-/// | GAD<F,U>  | +, *     | F         |
+/// * Op : The possibl binary operators (Op below) are +, -
+///
+/// * Prototype :
+/// ```text
+///     GAD<F,U>   Op   GAD<F,U>
+///     F          Op   GAD<F,U>
+///     GAD<F,U>   Op   F
+///
+///     &GAD<F,U>  Op  &GAD<F,U>
+/// ```
 ///
 /// # Example
 /// ```
 /// use rustad::GAD;
-/// let ax : GAD<f32, u32> = GAD::from(3.0);
-/// let ay : GAD<f32, u32> = GAD::from(4.0);
-/// let az = ax + ay;
-/// assert_eq!(GAD::from(7.0), az);
-/// let az = &ax * &ay;
-/// assert_eq!(GAD::from(12.0), az);
+/// let  x : f32           = 3.0;
+/// let  y : f32           = 4.0;
+/// let ax : GAD<f32, u32> = GAD::from(x);
+/// let ay : GAD<f32, u32> = GAD::from(y);
+///
+/// let az = ax + ay;  assert_eq!(GAD::from(7.0),  az);
+/// let az = x  * ay;  assert_eq!(GAD::from(12.0), az);
+/// let az = ax + y;   assert_eq!(GAD::from(7.0),  az);
+///
+/// let az = &ax * &ay; assert_eq!(GAD::from(12.0), az);
 ///```
 ///
 pub fn doc_binary_gad_operator() { }
@@ -286,7 +295,7 @@ macro_rules! binary_gad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
     ]
     impl<'a,F,U> std::ops::$Trait<&'a GAD<F,U> > for &'a GAD<F,U>
     where
-    F     : Copy + std::ops::$Trait<Output = F>  + ThisThreadTape<U> ,
+    F     : Copy + ThisThreadTape<U> ,
     U     : 'static + GenericAs<usize> + Copy ,
     usize : GenericAs<U>,
     &'a F : std::ops::$Trait<&'a F, Output = F> ,
