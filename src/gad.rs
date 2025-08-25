@@ -250,7 +250,7 @@ pub fn doc_binary_gad_operator() { }
 /// is the token for this operator; e.g., + .
 ///
 macro_rules! binary_gad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
-    //
+    // -----------------------------------------------------------------------
     fn [< record_ $Trait:lower >]<F,U> (
         tape: &mut GTape<F,U> ,
         lhs: &GAD<F,U>        ,
@@ -290,29 +290,7 @@ macro_rules! binary_gad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
         }
         ( as_from(new_tape_id), as_from(new_var_index) )
     }
-    #[doc =
-    "see [doc_binary_gad_operator](crate::gad::doc_binary_gad_operator)"
-    ]
-    impl<'a,F,U> std::ops::$Trait<&'a GAD<F,U> > for &'a GAD<F,U>
-    where
-    F     : Copy + ThisThreadTape<U> ,
-    U     : 'static + GenericAs<usize> + Copy ,
-    usize : GenericAs<U>,
-    &'a F : std::ops::$Trait<&'a F, Output = F> ,
-    {   type Output = GAD<F,U>;
-        //
-        fn [< $Trait:lower >] (self, rhs : Self) -> GAD<F,U> {
-            let new_value = &(self.value) $op &(rhs.value);
-            let local_key : &LocalKey< RefCell< GTape<F, U> > > =
-                < F as ThisThreadTape<U> >::get();
-            let ( new_tape_id, new_var_index) =
-            local_key.with_borrow_mut(
-                |tape| [< record_ $Trait:lower >] (tape, self, rhs)
-            );
-            GAD::new( new_tape_id, new_var_index, new_value )
-        }
-    }
-    //
+    // -----------------------------------------------------------------------
     #[doc =
     "see [doc_binary_gad_operator](crate::gad::doc_binary_gad_operator)"
     ]
@@ -338,7 +316,31 @@ macro_rules! binary_gad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
             }
         }
     }
-    //
+    #[doc =
+    "see [doc_binary_gad_operator](crate::gad::doc_binary_gad_operator)"
+    ]
+    impl<'a,F,U> std::ops::$Trait<&'a GAD<F,U> > for &'a GAD<F,U>
+    where
+    F     : Copy + ThisThreadTape<U> ,
+    U     : 'static + GenericAs<usize> + Copy ,
+    usize : GenericAs<U>,
+    &'a F : std::ops::$Trait<&'a F, Output = F> ,
+    {   type Output = GAD<F,U>;
+        //
+        // Being explicit about the input and output types (not using Self)
+        fn [< $Trait:lower >] (self : &'a GAD<F,U>, rhs : &'a GAD<F,U>)
+        -> GAD<F,U> {
+            let new_value = &(self.value) $op &(rhs.value);
+            let local_key : &LocalKey< RefCell< GTape<F, U> > > =
+                < F as ThisThreadTape<U> >::get();
+            let ( new_tape_id, new_var_index) =
+            local_key.with_borrow_mut(
+                |tape| [< record_ $Trait:lower >] (tape, self, rhs)
+            );
+            GAD::new( new_tape_id, new_var_index, new_value )
+        }
+    }
+    // -----------------------------------------------------------------------
     #[doc =
     "see [doc_binary_gad_operator](crate::gad::doc_binary_gad_operator)"
     ]
@@ -355,7 +357,7 @@ macro_rules! binary_gad_operator { ($Trait:ident, $op:tt) => {paste::paste! {
             self $op GAD::from(rhs)
         }
     }
-    //
+    // -----------------------------------------------------------------------
     crate::gad::binary_float_op_gad!(f32, u32, $Trait, $op);
     crate::gad::binary_float_op_gad!(f32, u64, $Trait, $op);
     crate::gad::binary_float_op_gad!(f64, u32, $Trait, $op);
