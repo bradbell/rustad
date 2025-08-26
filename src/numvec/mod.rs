@@ -65,9 +65,9 @@ impl<S> NumVec<S>
 ///```
 /// use rustad::numvec::NumVec;
 ///
-/// let a : NumVec<f64> = NumVec::new( vec![ 1f64, 2f64 ] );
-/// let b : NumVec<f64> = NumVec::new( vec![ 3f64 ] );
-/// let c : NumVec<f64> = NumVec::new( vec![ 4f64 ] );
+/// let a  = NumVec::new( vec![ 1f64, 2f64 ] );
+/// let b  = NumVec::new( vec![ 3f64 ] );
+/// let c  = NumVec::new( vec![ 4f64 ] );
 ///
 /// let d = &a * &b;
 /// assert_eq!( d.len(), 2);
@@ -143,9 +143,9 @@ numvec_binary_op!(Div, /);
 ///```
 /// use rustad::numvec::NumVec;
 ///
-/// let mut a : NumVec<f64> = NumVec::new( vec![ 12f64, 6f64 ] );
-/// let mut b : NumVec<f64> = NumVec::new( vec![ 3f64 ] );
-/// let c     : NumVec<f64> = NumVec::new( vec![ 4f64 ] );
+/// let mut a = NumVec::new( vec![ 12f64, 6f64 ] );
+/// let mut b = NumVec::new( vec![ 3f64 ] );
+/// let c     = NumVec::new( vec![ 4f64 ] );
 ///
 /// a /= &b;
 /// assert_eq!( a.len(), 2);

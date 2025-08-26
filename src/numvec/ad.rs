@@ -79,7 +79,7 @@ impl<V> AD<V> {
     /// use rustad::numvec::NumVec;
     /// use rustad::numvec::ad_from_value;
     /// let v   : Vec<f64>    = vec![ 2.0, 3.0 ];
-    /// let nv  : NumVec<f64> = NumVec::new(v);
+    /// let nv                = NumVec::new(v);
     /// let av                = ad_from_value(nv);
     /// let nv                = av.to_value();
     /// assert_eq!( nv.vec[0], 2.0 );
