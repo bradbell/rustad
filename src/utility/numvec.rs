@@ -7,6 +7,11 @@
 //!
 //! Link to [parent module](super)
 //!
+//! Binary operations can only be preformed between two vectors of the
+//! same length or one of the vectors must have length one.
+//! If a vector has one element, it acts like a scalar; i.e.,
+//! a vector with length equal to the other operand and all its elements 
+//! equal to the scalar value.
 // ---------------------------------------------------------------------------
 #[derive(Debug,Clone)]
 pub struct NumVec<S> {
@@ -28,6 +33,7 @@ impl<S> NumVec<S>
         self.vec.len()
     }
 }
+// ---------------------------------------------------------------------------
 /// Binary `NumVec` < *S* > operators.
 ///
 /// S : is the type of the elements of the numeric vector.
@@ -104,3 +110,76 @@ numvec_binary_op!(Add, +);
 numvec_binary_op!(Sub, -);
 numvec_binary_op!(Mul, *);
 numvec_binary_op!(Div, /);
+// ----------------------------------------------------------------------------`
+/// Compound Assignment `NumVec` < *S* > operators.
+///
+/// S : is the scalar type; i.e., type of the elements of the numeric vector.
+///
+/// Op : is the source code token for this binary operator;
+/// i.e., `+=` , `-=` , `*=` , or `/=` .
+///
+/// Prototype:
+/// <br/>
+/// & `NumVec` < *S* > *Op* & `NumVec` < *S* >
+///
+/// # Example
+///```
+/// use rustad::utility::NumVec;
+///
+/// let mut a : NumVec<f64> = NumVec::new( vec![ 12f64, 6f64 ] );
+/// let mut b : NumVec<f64> = NumVec::new( vec![ 3f64 ] );
+/// let c     : NumVec<f64> = NumVec::new( vec![ 4f64 ] );
+///
+/// a /= &b;
+/// assert_eq!( a.len(), 2);
+/// assert_eq!( a.vec[0], 4f64 );
+/// assert_eq!( a.vec[1], 2f64 );
+///
+/// b += &c;
+/// assert_eq!( b.len(), 1);
+/// assert_eq!( b.vec[0], 7.0f64 );
+/// ```
+pub fn doc_numvec_compound_op() { }
+//
+// numvec_binary_op
+macro_rules! numvec_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
+
+    #[doc = concat!(
+        "`NumVec` < *S* > ", stringify!($Op), " & `NumVec` < *S* >",
+        "; see [doc_numvec_compound_op]"
+    )]
+    impl<'a, S> std::ops::$Name< &'a NumVec<S> > for NumVec<S>
+    where
+        S : Copy + std::ops::$Name ,
+    {   //
+        fn [< $Name:snake >] (&mut self, rhs : &'a NumVec<S> )
+        {   //
+            if self.len() == 1 {
+                if rhs.len() == 1 {
+                    self.vec[0] $Op rhs.vec[0];
+                } else {
+                    self.vec = vec![ self.vec[0] ; rhs.len() ];
+                    for j in 0 .. rhs.len() {
+                        self.vec[j] $Op rhs.vec[j];
+                    }
+                }
+            } else {
+                if rhs.len() == 1 {
+                    for j in 0 .. self.len() {
+                        self.vec[j] $Op rhs.vec[0];
+                    }
+                } else {
+                    assert_eq!( self.len(), rhs.len() );
+                    for j in 0 .. self.len() {
+                        self.vec[j] $Op rhs.vec[j];
+                    }
+                }
+            }
+        }
+    }
+} } }
+//
+numvec_compound_op!(AddAssign, +=);
+numvec_compound_op!(SubAssign, -=);
+numvec_compound_op!(MulAssign, *=);
+numvec_compound_op!(DivAssign, /=);
