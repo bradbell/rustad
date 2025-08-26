@@ -7,10 +7,10 @@
 //!
 //! Link to [parent module](super)
 //!
-//! Binary operations can only be preformed between two vectors of the
+//! Binary operations can only be performed between two vectors of the
 //! same length or one of the vectors must have length one.
 //! If a vector has one element, it acts like a scalar; i.e.,
-//! a vector with length equal to the other operand and all its elements 
+//! a vector with length equal to the other operand and all its elements
 //! equal to the scalar value.
 // ---------------------------------------------------------------------------
 #[derive(Debug,Clone)]
@@ -47,7 +47,7 @@ impl<S> NumVec<S>
 ///
 /// # Example
 ///```
-/// use rustad::utility::NumVec;
+/// use rustad::numvec::NumVec;
 ///
 /// let a : NumVec<f64> = NumVec::new( vec![ 1f64, 2f64 ] );
 /// let b : NumVec<f64> = NumVec::new( vec![ 3f64 ] );
@@ -124,7 +124,7 @@ numvec_binary_op!(Div, /);
 ///
 /// # Example
 ///```
-/// use rustad::utility::NumVec;
+/// use rustad::numvec::NumVec;
 ///
 /// let mut a : NumVec<f64> = NumVec::new( vec![ 12f64, 6f64 ] );
 /// let mut b : NumVec<f64> = NumVec::new( vec![ 3f64 ] );

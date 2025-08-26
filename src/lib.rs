@@ -10,6 +10,9 @@
 // utility
 pub mod utility;
 //
+// numvec
+pub mod numvec;
+//
 // gad
 pub(crate) mod gad;
 //
