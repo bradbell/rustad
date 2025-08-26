@@ -13,14 +13,29 @@
 //! a vector with length equal to the other operand and all its elements
 //! equal to the scalar value.
 // ---------------------------------------------------------------------------
+// sub-modules
+pub mod ad;
+// ---------------------------------------------------------------------------
+// use
+//
+pub use ad::{
+    AD,
+    ad_from_value,
+};
+// ---------------------------------------------------------------------------
+//
+// NumVec
+/// The numeric vector type
 #[derive(Debug,Clone)]
 pub struct NumVec<S> {
+    /// The elements of this numeric vector
     pub vec : Vec<S> ,
 }
 //
 // new
 impl<S> NumVec<S>
-{
+{   //
+    /// Create a new numeric vector using the specified data
     pub fn new( v : Vec<S> ) -> Self {
         Self { vec: v }
     }
@@ -28,7 +43,8 @@ impl<S> NumVec<S>
 //
 // len
 impl<S> NumVec<S>
-{
+{   //
+    /// Length of this numeric vector
     pub fn len(self : &NumVec<S> ) -> usize {
         self.vec.len()
     }
@@ -64,7 +80,8 @@ impl<S> NumVec<S>
 /// ```
 pub fn doc_numvec_binary_op() { }
 //
-// numvec_binary_op
+/// Add one binary operator to the `NumVec` < *S* > class;
+/// see [doc_numvec_binary_op]
 macro_rules! numvec_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
 
     #[doc = concat!(
@@ -141,7 +158,8 @@ numvec_binary_op!(Div, /);
 /// ```
 pub fn doc_numvec_compound_op() { }
 //
-// numvec_binary_op
+/// Add one compound assignment operator to the `NumVec` < *S* > class;
+/// see [doc_numvec_binary_op]
 macro_rules! numvec_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
 
     #[doc = concat!(
