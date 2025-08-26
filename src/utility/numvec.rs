@@ -1,0 +1,96 @@
+// SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
+// SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
+// SPDX-FileContributor: 2025 Bradley M. Bell
+// ---------------------------------------------------------------------------
+//
+//! This module defines the numeric vector class NumVec.
+//!
+//! Link to [parent module](super)
+//!
+// ---------------------------------------------------------------------------
+#[derive(Debug,Clone)]
+pub struct NumVec<S> {
+    pub vec : Vec<S> ,
+}
+//
+// new
+impl<S> NumVec<S>
+{
+    pub fn new( v : Vec<S> ) -> Self {
+        Self { vec: v }
+    }
+}
+//
+// len
+impl<S> NumVec<S>
+{
+    fn len(self : &NumVec<S> ) -> usize {
+        self.vec.len()
+    }
+}
+/// Binary NumVec\<S\> operators.
+///
+/// S : is the type of the elements of the numeric vector.
+///
+/// $Token : is the source code token for this binary operator;
+/// i.e., `+` , `-` , `*` , or `/` .
+///
+/// Prototype:
+/// ```text
+///     & NumVec<S> $Token & NumVec<S>
+/// ```
+///
+/// # Example
+///```
+/// use rustad::utility::NumVec;
+///
+/// let a : NumVec<f64> = NumVec::new( vec![ 1f64, 2f64 ] );
+/// let b : NumVec<f64> = NumVec::new( vec![ 3f64 ] );
+/// let c = &a * &b;
+/// assert_eq!( c.vec[0], 3f64 );
+/// assert_eq!( c.vec[1], 6f64 );
+/// ```
+pub fn doc_numvec_binary_op() { }
+//
+// numvec_binary_op
+macro_rules! numvec_binary_op { ($Name:ident, $Token:tt) => { paste::paste! {
+
+    #[doc = concat!(
+        "& NumVec<S,> ", stringify!($Name), " & NumVec<S,>",
+        "; see [doc_numvec_binary_op]"
+    )]
+    impl<'a, S> std::ops::$Name< &'a NumVec<S> > for &'a NumVec<S>
+    where
+        S : Copy + std::ops::$Name<Output=S> ,
+    {   type Output = NumVec<S>;
+        //
+        fn [< $Name:lower >](self : &'a NumVec<S>, rhs : &'a NumVec<S> )
+        -> NumVec<S>
+        {   let mut v : Vec<S>;
+            if self.len() == 1 {
+                v = rhs.vec.clone();
+                for j in 0 .. rhs.len() {
+                    v[j] = self.vec[0] $Token rhs.vec[j];
+                }
+            } else {
+                v = self.vec.clone();
+                if rhs.len() == 1 {
+                    for j in 0 .. self.len() {
+                        v[j] = self.vec[j] $Token rhs.vec[0];
+                    }
+                } else {
+                    assert_eq!( self.len(), rhs.len() );
+                    for j in 0 .. self.len() {
+                        v[j] = self.vec[j] $Token rhs.vec[j];
+                    }
+                }
+            }
+            NumVec::new(v)
+        }
+    }
+} } }
+//
+numvec_binary_op!(Add, +);
+numvec_binary_op!(Sub, -);
+numvec_binary_op!(Mul, *);
+numvec_binary_op!(Div, /);

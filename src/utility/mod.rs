@@ -5,6 +5,16 @@
 //! Some utilities not specific to implementing the rustd package
 //!
 //! Link to [parent module](super)
+// --------------------------------------------------------------------------
+// sub-modules
+//
+// numvec
+pub mod numvec;
+// --------------------------------------------------------------------------
+// re-exports
+//
+pub use numvec::NumVec;
+// --------------------------------------------------------------------------
 //
 // avg_seconds_to_execute
 /// Compute the average time required to execute a function.
