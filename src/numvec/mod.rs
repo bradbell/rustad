@@ -201,3 +201,29 @@ numvec_compound_op!(AddAssign, +=);
 numvec_compound_op!(SubAssign, -=);
 numvec_compound_op!(MulAssign, *=);
 numvec_compound_op!(DivAssign, /=);
+// ----------------------------------------------------------------------------`
+/// Displays a `NumVec` < *S* > object.
+///
+/// The text "[ " and " ]" surround the elements of the vector.
+/// The elements are separated by ", "
+/// and there is a "," after the last element.
+///
+/// # Example using NumVec
+/// ```
+/// use rustad::numvec::AD;
+/// use rustad::numvec::ad_from_value;
+/// use rustad::numvec::NumVec;
+/// let x     : Vec<f64>  = vec![5.0, 6.0];
+/// let x_nv              = NumVec::new(x);
+/// let s                 = format!( "{x_nv}" );
+/// assert_eq!( s, "[ 5, 6, ]" );
+/// ```
+impl<S : std::fmt::Display> std::fmt::Display for NumVec<S> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "[ ")?;
+        for j in 0 .. self.len() {
+            write!(f, "{}, ", self.vec[j])?;
+        }
+        write!(f, "]")
+    }
+}

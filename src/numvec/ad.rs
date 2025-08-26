@@ -102,7 +102,19 @@ impl<V> AD<V> {
 /// let ax        = ad_from_value(x);
 /// let s         = format!( "{ax}" );
 /// assert_eq!(s, "5");
-///```
+/// ```
+///
+/// # Example Using NumVec
+/// ```
+/// use rustad::numvec::AD;
+/// use rustad::numvec::ad_from_value;
+/// use rustad::numvec::NumVec;
+/// let x  : Vec<f64>  = vec![ 5.0, 6.0 ];
+/// let x_nv           = NumVec::new(x);
+/// let ax             = ad_from_value(x_nv);
+/// let s              = format!( "{ax}" );
+/// assert_eq!(s, "[ 5, 6, ]");
+/// ```
 impl<V : std::fmt::Display> std::fmt::Display for AD<V> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", self.value)
