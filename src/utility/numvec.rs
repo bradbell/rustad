@@ -24,21 +24,20 @@ impl<S> NumVec<S>
 // len
 impl<S> NumVec<S>
 {
-    fn len(self : &NumVec<S> ) -> usize {
+    pub fn len(self : &NumVec<S> ) -> usize {
         self.vec.len()
     }
 }
-/// Binary NumVec\<S\> operators.
+/// Binary `NumVec` < *S* > operators.
 ///
 /// S : is the type of the elements of the numeric vector.
 ///
-/// $Token : is the source code token for this binary operator;
+/// Op : is the source code token for this binary operator;
 /// i.e., `+` , `-` , `*` , or `/` .
 ///
 /// Prototype:
-/// ```text
-///     & NumVec<S> $Token & NumVec<S>
-/// ```
+/// <br/>
+/// & `NumVec` < *S* > *Op* & `NumVec` < *S* >
 ///
 /// # Example
 ///```
@@ -46,17 +45,24 @@ impl<S> NumVec<S>
 ///
 /// let a : NumVec<f64> = NumVec::new( vec![ 1f64, 2f64 ] );
 /// let b : NumVec<f64> = NumVec::new( vec![ 3f64 ] );
-/// let c = &a * &b;
-/// assert_eq!( c.vec[0], 3f64 );
-/// assert_eq!( c.vec[1], 6f64 );
+/// let c : NumVec<f64> = NumVec::new( vec![ 4f64 ] );
+///
+/// let d = &a * &b;
+/// assert_eq!( d.len(), 2);
+/// assert_eq!( d.vec[0], 3f64 );
+/// assert_eq!( d.vec[1], 6f64 );
+///
+/// let d = &b - &c;
+/// assert_eq!( d.len(), 1);
+/// assert_eq!( d.vec[0], -1.0f64 );
 /// ```
 pub fn doc_numvec_binary_op() { }
 //
 // numvec_binary_op
-macro_rules! numvec_binary_op { ($Name:ident, $Token:tt) => { paste::paste! {
+macro_rules! numvec_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
 
     #[doc = concat!(
-        "& NumVec<S,> ", stringify!($Name), " & NumVec<S,>",
+        "& `NumVec` < *S* > ", stringify!($Op), " & `NumVec` < *S* >",
         "; see [doc_numvec_binary_op]"
     )]
     impl<'a, S> std::ops::$Name< &'a NumVec<S> > for &'a NumVec<S>
@@ -69,19 +75,23 @@ macro_rules! numvec_binary_op { ($Name:ident, $Token:tt) => { paste::paste! {
         {   let mut v : Vec<S>;
             if self.len() == 1 {
                 v = rhs.vec.clone();
-                for j in 0 .. rhs.len() {
-                    v[j] = self.vec[0] $Token rhs.vec[j];
+                if rhs.len() == 1 {
+                    v[0] = self.vec[0] $Op rhs.vec[0];
+                } else {
+                    for j in 0 .. rhs.len() {
+                        v[j] = self.vec[0] $Op rhs.vec[j];
+                    }
                 }
             } else {
                 v = self.vec.clone();
                 if rhs.len() == 1 {
                     for j in 0 .. self.len() {
-                        v[j] = self.vec[j] $Token rhs.vec[0];
+                        v[j] = self.vec[j] $Op rhs.vec[0];
                     }
                 } else {
                     assert_eq!( self.len(), rhs.len() );
                     for j in 0 .. self.len() {
-                        v[j] = self.vec[j] $Token rhs.vec[j];
+                        v[j] = self.vec[j] $Op rhs.vec[j];
                     }
                 }
             }
