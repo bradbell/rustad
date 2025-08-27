@@ -3,15 +3,17 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This module defines the numeric vector class NumVec.
+//! This module defines the numeric vector class `NumVec` < *S* >.
 //!
 //! Link to [parent module](super)
 //!
-//! Binary operations can only be performed between two vectors of the
-//! same length or one of the vectors must have length one.
-//! If a vector has one element, it acts like a scalar; i.e.,
-//! a vector with length equal to the other operand and all its elements
+//! * Scalars :
+//! If a NunVec has one element, it acts like a scalar; i.e.,
+//! a vector with any required length and all the element
 //! equal to the scalar value.
+//!
+//! * Copy, Clone :
+//!  The NumVec types implement Clone, but not the Copy trait.
 // ---------------------------------------------------------------------------
 // sub-modules
 pub mod ad;

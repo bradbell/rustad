@@ -164,7 +164,7 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 /// ```
 ///
 /// # Example using NumVec
-///```
+/// ```
 /// use rustad::numvec::AD;
 /// use rustad::numvec::ad_from_value;
 /// use rustad::numvec::NumVec;
@@ -176,8 +176,7 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 /// let ax               = ad_from_value(x_nv);
 /// let ay               = ad_from_value(y_nv);
 /// let az               = &ax / &ay;
-/// assert_eq!( az.to_value().vec[0], 0.5f64 );
-/// assert_eq!( az.to_value().vec[1], 2.0f64 );
+/// assert_eq!( az.to_value().vec, vec![0.5f64, 2.0f64] );
 /// ```
 pub fn doc_ad_binary_op() { }
 //
