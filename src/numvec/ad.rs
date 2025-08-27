@@ -3,9 +3,13 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! AD a generic automatic differentiation floating point type
+//! This module defines the automatic differentiation class `AD` < *V* >.
 //!
 //! Link to [parent module](super)
+//!
+//! * V :
+//! is the type used for calculating values, AD adds variable dependency
+//! information so that the value calculations can create a function.
 // ---------------------------------------------------------------------------
 //
 /// The type used for indices in the tape and function objects
@@ -207,3 +211,66 @@ ad_binary_op!(Add, +);
 ad_binary_op!(Sub, -);
 ad_binary_op!(Mul, *);
 ad_binary_op!(Div, /);
+// ---------------------------------------------------------------------------
+/// Cmpound Assignment `AD` < *V* > operators.
+///
+/// V : is the floating point type used for value calculations.
+///
+/// Op : is the source code token for this binary operator;
+/// i.e., `+=` , `-=` , `*=` , or `/=` .
+///
+/// Prototype:
+/// <br/>
+/// & `AD` < *V* > *Op* & `AD` < *V* >
+///
+/// # Example
+/// ```
+/// use rustad::numvec::AD;
+/// use rustad::numvec::ad_from_value;
+///
+/// let mut a   = ad_from_value( 3.0f64 );
+/// let b       = ad_from_value( 4.0f64 );
+/// a          -= &b;
+/// assert_eq!( a.to_value(), -1.0f64 );
+/// ```
+///
+/// # Example using NumVec
+/// ```
+/// use rustad::numvec::AD;
+/// use rustad::numvec::ad_from_value;
+/// use rustad::numvec::NumVec;
+///
+/// let x     : Vec<f32>  = vec![ 1.0, 4.0 ];
+/// let y     : Vec<f32>  = vec![ 2.0, 2.0 ];
+/// let x_nv              = NumVec::new(x);
+/// let y_nv              = NumVec::new(y);
+/// let mut ax            = ad_from_value(x_nv);
+/// let ay                = ad_from_value(y_nv);
+/// ax                   *= &ay;
+/// assert_eq!( ax.to_value().vec, vec![2.0f32, 8.0f32] );
+/// ```
+pub fn doc_ad_compound_op() { }
+//
+/// Add one compound assignment operator to the `AD` < *V* > class;
+/// see [doc_ad_compound_op]
+macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
+
+    #[doc = concat!(
+        "`AD` < *V* > ", stringify!($Op), " & `AD` < *V* >",
+        "; see [doc_ad_compound_op]"
+    )]
+    impl<'a, V> std::ops::$Name< &'a AD<V> > for AD<V>
+    where
+        V: std::ops::$Name<&'a V>,
+    {   //
+        fn [< $Name:snake >](&mut self, rhs : &'a AD<V> )
+        {
+            self.value $Op &rhs.value
+        }
+    }
+} } }
+//
+ad_compound_op!(AddAssign, +=);
+ad_compound_op!(SubAssign, -=);
+ad_compound_op!(MulAssign, *=);
+ad_compound_op!(DivAssign, /=);
