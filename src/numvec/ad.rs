@@ -140,3 +140,54 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
     let var_index = 0 as Tindex;
     AD::new(tape_id, var_index, value)
 }
+// ---------------------------------------------------------------------------
+/// Binary `AD` < *V* > operators.
+///
+/// V : is the floating point type used for value calculations.
+///
+/// Op : is the source code token for this binary operator;
+/// i.e., `+` , `-` , `*` , or `/` .
+///
+/// Prototype:
+/// <br/>
+/// & `AD` < *V* > *Op* & `AD` < *V* >
+///
+/// # Example
+///```
+/// use rustad::numvec::AD;
+/// use rustad::numvec::ad_from_value;
+///
+/// let a  = ad_from_value( 3.0f32 );
+/// let b  = ad_from_value( 4.0f32 );
+/// let c = &a * &b;
+/// assert_eq!( c.to_value(), 12.0f32 );
+/// ```
+pub fn doc_ad_binary_op() { }
+//
+/// Add one binary operator to the `NumVec` < *S* > class;
+/// see [doc_ad_binary_op]
+macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
+
+    #[doc = concat!(
+        "& `AD` < *V* > ", stringify!($Op), " & `AD` < *V* >",
+        "; see [doc_ad_binary_op]"
+    )]
+    impl<'a, V> std::ops::$Name< &'a AD<V> > for &'a AD<V>
+    where
+        &'a V: std::ops::$Name<&'a V, Output=V>,
+    {   type Output = AD<V>;
+        //
+        fn [< $Name:lower >](self : &'a AD<V> , rhs : &'a AD<V> ) -> AD<V>
+        {
+            let new_tape_id   : Tindex = 0 as Tindex;
+            let new_var_index : Tindex = 0 as Tindex;
+            let new_value     : V      = &self.value  $Op &rhs.value;
+            AD::new( new_tape_id, new_var_index, new_value )
+        }
+    }
+} } }
+//
+ad_binary_op!(Add, +);
+ad_binary_op!(Sub, -);
+ad_binary_op!(Mul, *);
+ad_binary_op!(Div, /);
