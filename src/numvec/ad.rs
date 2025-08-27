@@ -12,9 +12,6 @@
 //! information so that the value calculations can create a function.
 // ---------------------------------------------------------------------------
 //
-// Tindex
-use crate::numvec::tape::Tindex;
-// ---------------------------------------------------------------------------
 // AD
 //
 /// AD acts like V but in addition can record a function evaluation.
@@ -37,12 +34,12 @@ pub struct AD<V> {
     /// 1. This threads tape is currently recording.
     /// 2. This threads tape and the AD object have the same *tape_id* .
     /// 2DO: Change to pub(crate) when this gets used.
-    pub tape_id   : Tindex,
+    pub tape_id   : usize,
     //
     // var_index
     /// If this AD object is a variable, *var_index* is its index in the tape.
     /// 2DO: Change to pub(crate) when this gets used.
-    pub var_index : Tindex,
+    pub var_index : usize,
     //
     // value
     /// is the value of this AD variable or constant.
@@ -60,7 +57,7 @@ impl<V> AD<V> {
     ///
     /// * new_value : is the [AD::value}} for the new object.
     pub(crate) fn new(
-        new_tape_id: Tindex, new_var_index: Tindex, new_value: V )-> Self {
+        new_tape_id: usize, new_var_index: usize, new_value: V )-> Self {
         Self {
             tape_id   : new_tape_id,
             var_index : new_var_index,
@@ -140,8 +137,8 @@ impl<V : std::fmt::Display> std::fmt::Display for AD<V> {
 /// assert_eq!( ax.to_value(), 3.0 );
 /// ```
 pub fn ad_from_value<V> ( value : V ) ->AD<V> {
-    let tape_id   = 0 as Tindex;
-    let var_index = 0 as Tindex;
+    let tape_id   = 0;
+    let var_index = 0;
     AD::new(tape_id, var_index, value)
 }
 // ---------------------------------------------------------------------------
@@ -199,9 +196,9 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         //
         fn [< $Name:lower >](self : &'a AD<V> , rhs : &'a AD<V> ) -> AD<V>
         {
-            let new_tape_id   : Tindex = 0 as Tindex;
-            let new_var_index : Tindex = 0 as Tindex;
-            let new_value     : V      = &self.value  $Op &rhs.value;
+            let new_tape_id   = 0;
+            let new_var_index = 0;
+            let new_value     = &self.value  $Op &rhs.value;
             AD::new( new_tape_id, new_var_index, new_value )
         }
     }
