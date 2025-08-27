@@ -7,6 +7,9 @@
 //!
 //! Link to [parent module](super)
 //!
+//! * S :
+//! is the scalar type; i.e., the type of elements of the vector.
+//!
 //! * Scalars :
 //! If a NunVec has one element, it acts like a scalar; i.e.,
 //! a vector with any required length and all the element
@@ -16,7 +19,12 @@
 //!  The NumVec types implement Clone, but not the Copy trait.
 // ---------------------------------------------------------------------------
 // sub-modules
+//
+// ad
 pub mod ad;
+//
+// tape
+pub mod tape;
 // ---------------------------------------------------------------------------
 // use
 //
@@ -161,7 +169,7 @@ numvec_binary_op!(Div, /);
 pub fn doc_numvec_compound_op() { }
 //
 /// Add one compound assignment operator to the `NumVec` < *S* > class;
-/// see [doc_numvec_binary_op]
+/// see [doc_numvec_compound_op]
 macro_rules! numvec_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
 
     #[doc = concat!(

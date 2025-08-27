@@ -12,8 +12,8 @@
 //! information so that the value calculations can create a function.
 // ---------------------------------------------------------------------------
 //
-/// The type used for indices in the tape and function objects
-type Tindex = u32;
+// Tindex
+use crate::numvec::tape::Tindex;
 // ---------------------------------------------------------------------------
 // AD
 //
