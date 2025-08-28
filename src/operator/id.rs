@@ -49,16 +49,32 @@ set_operator_ids!(
     ADD_VC_OP,
     /// variable + variable
     ADD_VV_OP,
-    /// Call a chckpoint function
-    CALL_OP,
-    /// Place holder for results of call operator
-    CALL_RES_OP,
+    //
+    /// constant + variable
+    SUB_CV_OP,
+    /// variable + constant
+    SUB_VC_OP,
+    /// variable + variable
+    SUB_VV_OP,
+    //
     /// constant * variable
     MUL_CV_OP,
     /// variable * constant
     MUL_VC_OP,
     /// variable * variable
     MUL_VV_OP,
+    //
+    /// constant * variable
+    DIV_CV_OP,
+    /// variable * constant
+    DIV_VC_OP,
+    /// variable * variable
+    DIV_VV_OP,
+    //
+    /// Call a chckpoint function
+    CALL_OP,
+    /// Place holder for results of call operator
+    CALL_RES_OP,
     /// number of operator identifiers
     NUMBER_OP,
 );

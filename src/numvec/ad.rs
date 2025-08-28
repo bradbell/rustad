@@ -11,6 +11,14 @@
 //! is the type used for calculating values, AD adds variable dependency
 //! information so that the value calculations can create a function.
 // ---------------------------------------------------------------------------
+use std::thread::LocalKey;
+use std::cell::RefCell;
+//
+use crate::numvec::tape::Tindex;
+use crate::numvec::tape::Tape;
+use crate::numvec::tape::sealed::ThisThreadTape;
+use crate::operator::id;
+// ---------------------------------------------------------------------------
 //
 // AD
 //
@@ -184,7 +192,45 @@ pub fn doc_ad_binary_op() { }
 /// Add one binary operator to the `NumVec` < *S* > class;
 /// see [doc_ad_binary_op]
 macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
-
+    // -----------------------------------------------------------------------
+    fn [< record_ $Name:lower >]<V> (
+        tape: &mut Tape<V> ,
+        lhs:       &AD<V>  ,
+        rhs:       &AD<V>  ,
+    ) -> (usize, usize)
+    where
+        V : Clone ,
+    {
+        let mut new_tape_id   = 0;
+        let mut new_var_index = 0;
+        if tape.recording {
+            let var_lhs    = lhs.tape_id == tape.tape_id;
+            let var_rhs    = rhs.tape_id == tape.tape_id;
+            if var_lhs || var_rhs {
+                new_tape_id   = tape.tape_id;
+                new_var_index = tape.n_var;
+                tape.n_var   += 1;
+                tape.op2arg.push( tape.arg_all.len() as Tindex );
+                if var_lhs && var_rhs {
+                    tape.id_all.push( id::[< $Name:upper _VV_OP >] );
+                    tape.arg_all.push( lhs.var_index as Tindex );
+                    tape.arg_all.push( rhs.var_index as Tindex );
+                } else if var_lhs {
+                    tape.id_all.push( id::[< $Name:upper _VC_OP >] );
+                    tape.arg_all.push( lhs.var_index as Tindex );
+                    tape.arg_all.push( tape.con_all.len() as Tindex );
+                    tape.con_all.push( rhs.value.clone() );
+                } else {
+                    tape.id_all.push( id::[< $Name:upper _CV_OP >] );
+                    tape.arg_all.push( tape.con_all.len() as Tindex );
+                    tape.con_all.push( lhs.value.clone() );
+                    tape.arg_all.push( rhs.var_index as Tindex );
+                }
+            }
+        }
+        ( new_tape_id, new_var_index )
+    }
+    // -----------------------------------------------------------------------
     #[doc = concat!(
         "& `AD` < *V* > ", stringify!($Op), " & `AD` < *V* >",
         "; see [doc_ad_binary_op]"
@@ -192,14 +238,26 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     impl<'a, V> std::ops::$Name< &'a AD<V> > for &'a AD<V>
     where
         &'a V: std::ops::$Name<&'a V, Output=V>,
+        V    : Clone + crate::numvec::ThisThreadTapePublic ,
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self : &'a AD<V> , rhs : &'a AD<V> ) -> AD<V>
         {
-            let new_tape_id   = 0;
-            let new_var_index = 0;
+            // new_value
             let new_value     = &self.value  $Op &rhs.value;
-            AD::new( new_tape_id, new_var_index, new_value )
+            //
+            // local_key
+            let local_key : &LocalKey< RefCell< Tape<V> > > =
+                ThisThreadTape::get();
+            //
+            // new_tape_id, new_var_index
+            let (new_tape_id, new_var_index) =
+                local_key.with_borrow_mut( |tape|
+                    [< record_ $Name:lower >] ( tape, &self, &rhs )
+            );
+            //
+            // result
+            AD::new(new_tape_id, new_var_index, new_value)
         }
     }
 } } }
@@ -209,7 +267,7 @@ ad_binary_op!(Sub, -);
 ad_binary_op!(Mul, *);
 ad_binary_op!(Div, /);
 // ---------------------------------------------------------------------------
-/// Cmpound Assignment `AD` < *V* > operators.
+/// Compound Assignment `AD` < *V* > operators.
 ///
 /// V : is the floating point type used for value calculations.
 ///

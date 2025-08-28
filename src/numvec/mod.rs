@@ -26,6 +26,17 @@ pub mod ad;
 // tape
 pub mod tape;
 // ---------------------------------------------------------------------------
+// Sealed Traits
+//
+// ThisThreadTapePublic
+/// This is the public interface to a sealed trait
+pub trait ThisThreadTapePublic : tape::sealed::ThisThreadTape
+{ }
+impl<V> ThisThreadTapePublic for V
+where
+    V : tape::sealed::ThisThreadTape ,
+{ }
+// ---------------------------------------------------------------------------
 // use
 //
 pub use ad::{
