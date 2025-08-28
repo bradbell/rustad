@@ -189,7 +189,12 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 /// ```
 pub fn doc_ad_binary_op() { }
 //
-/// Add one binary operator to the `NumVec` < *S* > class;
+/// Add one binary operator to the `AD` < *V* > class;
+///
+/// * Name : is the operator name; i.e., Add, Sub, Mul, or Div.
+///
+/// * Op : is the operator token; i.e., +, -, *, or /.
+///
 /// see [doc_ad_binary_op]
 macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     // -----------------------------------------------------------------------
@@ -307,25 +312,79 @@ ad_binary_op!(Div, /);
 pub fn doc_ad_compound_op() { }
 //
 /// Add one compound assignment operator to the `AD` < *V* > class;
+///
+/// * Name : is the operator name with Assign at end;
+/// i.e., Add, Sub, Mul, or Div.
+///
+/// * Op : is the operator token; i.e., +=, -=, *=, or /= .
+///
+/// see [doc_ad_compound_op]
+//
 /// see [doc_ad_compound_op]
 macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
-
+    // ------------------------------------------------------------------------
+     fn [< record_ $Name:lower _assign >]<V> (
+         tape: &mut Tape<V> ,
+         lhs:  &mut AD<V>   ,
+         rhs:  &    AD<V>   )
+     where
+        V : Clone,
+     {
+         if tape.recording {
+             let var_lhs    = lhs.tape_id == tape.tape_id;
+             let var_rhs    = rhs.tape_id == tape.tape_id;
+             if var_lhs || var_rhs {
+                 tape.op2arg.push( tape.arg_all.len() as Tindex );
+                 if var_lhs && var_rhs {
+                     tape.id_all.push( id::[< $Name:upper _VV_OP >] );
+                     tape.arg_all.push( lhs.var_index as Tindex);
+                     tape.arg_all.push( rhs.var_index as Tindex);
+                 } else if var_lhs {
+                     tape.id_all.push( id::[< $Name:upper _VC_OP >] );
+                     tape.arg_all.push( lhs.var_index as Tindex);
+                     tape.arg_all.push( tape.con_all.len() as Tindex );
+                     tape.con_all.push( rhs.value.clone() );
+                 } else {
+                     tape.id_all.push( id::[< $Name:upper _CV_OP >] );
+                     tape.arg_all.push( tape.con_all.len() as Tindex );
+                     tape.con_all.push( lhs.value.clone() );
+                     tape.arg_all.push( rhs.var_index as Tindex);
+                 }
+                 lhs.tape_id   = tape.tape_id;
+                 lhs.var_index = tape.n_var;
+                 tape.n_var   += 1;
+             }
+         }
+     }
+    // ------------------------------------------------------------------------
     #[doc = concat!(
         "`AD` < *V* > ", stringify!($Op), " & `AD` < *V* >",
         "; see [doc_ad_compound_op]"
     )]
-    impl<'a, V> std::ops::$Name< &'a AD<V> > for AD<V>
+    impl<'a, V> std::ops::[< $Name Assign >] < &'a AD<V> > for AD<V>
     where
-        V: std::ops::$Name<&'a V>,
+        V: Clone +
+            std::ops::[< $Name Assign >] <&'a V> +
+            crate::numvec::ThisThreadTapePublic  ,
     {   //
-        fn [< $Name:snake >](&mut self, rhs : &'a AD<V> )
-        {
-            self.value $Op &rhs.value
+        fn [< $Name:lower _assign >] (&mut self, rhs : &'a AD<V> )
+        {   //
+            // self.value
+            self.value $Op &rhs.value;
+            //
+            // local_key
+            let local_key : &LocalKey< RefCell< Tape<V> > > =
+                ThisThreadTape::get();
+            //
+            // tape, self.tape_id, self.var_index
+            local_key.with_borrow_mut( |tape|
+                [< record_ $Name:lower _assign >] ( tape, self, rhs )
+            );
         }
     }
 } } }
 //
-ad_compound_op!(AddAssign, +=);
-ad_compound_op!(SubAssign, -=);
-ad_compound_op!(MulAssign, *=);
-ad_compound_op!(DivAssign, /=);
+ad_compound_op!(Add, +=);
+ad_compound_op!(Sub, -=);
+ad_compound_op!(Mul, *=);
+ad_compound_op!(Div, /=);
