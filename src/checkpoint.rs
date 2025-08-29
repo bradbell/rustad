@@ -331,7 +331,7 @@ pub (crate) mod sealed {
     /// returns a reference to this tape's GAD<F,U> checkpoint information;
     /// see [doc_generic_f_and_u].
     ///
-    /// 2DO: Perhaps it would be better if this were global
+    /// TODO: Perhaps it would be better if this were global
     /// instead of tape local.
     ///
     pub trait CheckpointAll<U>

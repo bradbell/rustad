@@ -325,7 +325,7 @@ where
     } );
     //
     // range_is_var, range2tape_index, con_all
-    // 2DO: figure out how to do this without any cloning of values.
+    // TODO: figure out how to do this without any cloning of values.
     for i in 0 .. arange.len() {
         if arange[i].tape_id == tape_id {
             ad_fn.range_is_var.push( true );

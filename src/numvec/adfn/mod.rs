@@ -26,7 +26,7 @@ use crate::numvec::tape::Tindex;
 /// An operation sequence is a single assignment representation of
 /// a function; i.e., each variable is only assigned once.
 ///
-/// * 2DO : Change member variables to pub(crate) (once they get used).
+/// * TODO : Change member variables to pub(crate) (once they get used).
 pub struct ADFn<V> {
     //
     // n_domain
