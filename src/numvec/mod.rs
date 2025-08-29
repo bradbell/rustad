@@ -26,7 +26,11 @@ pub mod ad;
 // tape
 pub mod tape;
 //
+// adfn
 pub mod adfn;
+//
+// op
+pub(crate) mod op;
 // ---------------------------------------------------------------------------
 // Sealed Traits
 //

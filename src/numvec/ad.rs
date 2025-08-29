@@ -14,7 +14,7 @@ use std::cell::RefCell;
 use crate::numvec::tape::Tindex;
 use crate::numvec::tape::Tape;
 use crate::numvec::tape::sealed::ThisThreadTape;
-use crate::operator::id;
+use crate::numvec::op::id;
 // ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter V.
 ///
