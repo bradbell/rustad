@@ -48,6 +48,10 @@ pub use ad::{
 pub use adfn::{
     ADFn,
 };
+pub use tape::{
+    start_recording,
+    stop_recording,
+};
 // ---------------------------------------------------------------------------
 //
 // NumVec

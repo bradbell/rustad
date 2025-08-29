@@ -266,11 +266,11 @@ where
 /// let diff                = &adomain[0] - &adomain[1];
 /// let times               = &adomain[0] * &adomain[1];
 /// let arange              = vec![ sum, diff, times ];
-/// let ad_fn               = stop_recording( &arange );
+/// let ad_fn               = stop_recording( arange );
 /// assert_eq!( ad_fn.domain_len(), 2);
 /// assert_eq!( ad_fn.range_len(), 3);
 /// ```
-pub fn stop_recording<V>( arange : &Vec< AD<V> > ) -> ADFn<V>
+pub fn stop_recording<V>( arange : Vec< AD<V> > ) -> ADFn<V>
 where
     Tindex : TryFrom<usize> ,
     V : Clone + Sized + 'static + sealed::ThisThreadTape ,
@@ -324,7 +324,8 @@ where
         tape.tape_id
     } );
     //
-    // range_is_var, range2tape_index
+    // range_is_var, range2tape_index, con_all
+    // 2DO: figure out how to do this without any cloning of values.
     for i in 0 .. arange.len() {
         if arange[i].tape_id == tape_id {
             ad_fn.range_is_var.push( true );
