@@ -68,6 +68,7 @@ version_file_list='
 no_copyright_list='
    .gitignore
    readme.md
+   typos.toml
 '
 # END_SORT_THIS_LINE_MINUS_2
 #
