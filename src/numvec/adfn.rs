@@ -8,6 +8,9 @@
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
 //
+#[cfg(doc)]
+use crate::numvec::ad::doc_generic_v;
+//
 // Tindex
 use crate::numvec::tape::Tindex;
 //
@@ -15,14 +18,13 @@ use crate::numvec::tape::Tindex;
 // ADFn
 //
 /// An ADFn can an evaluate the function and its derivatives
-/// corresponding to an AD operation sequence.
+/// corresponding to an ``AD`` < *V* > operation sequence.
+///
+/// * V : [doc_generic_v]
 ///
 /// * Operation sequence :
-/// The operation sequence is a single assignment representation of
-/// the function; i.e., each variable is only assigned once.
-///
-/// * V : The value type for the operation sequence.
-/// The operations were recorded using the type ``AD`` < *V* > .
+/// An operation sequence is a single assignment representation of
+/// a function; i.e., each variable is only assigned once.
 ///
 /// * 2DO : Change member variables to pub(crate) (once they get used).
 pub struct ADFn<V> {
@@ -30,7 +32,7 @@ pub struct ADFn<V> {
     // n_domain
     /// The dimension of the domain space for this function.
     /// The domain variables have index 0 .. n_domain-1.
-    pub(crate) n_domain            : usize,
+    pub(crate) n_domain     : usize,
     //
     // n_var
     /// The total number of variables in the operation sequence.
@@ -65,7 +67,7 @@ pub struct ADFn<V> {
     /// The length of this vector is the dimension of the range space.
     /// If range_is_var\[i\] is true (false), the i-th range space component
     /// is a variable (constant).
-    pub(crate) range_is_var        : Vec<bool>,
+    pub(crate) range_is_var : Vec<bool>,
     //
     // range2tape_index
     /// The length of this vector is also the dimension of the range space.

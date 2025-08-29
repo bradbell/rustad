@@ -7,9 +7,6 @@
 //!
 //! Link to [parent module](super)
 //!
-//! * V :
-//! is the type used for calculating values, AD adds variable dependency
-//! information so that the value calculations can create a function.
 // ---------------------------------------------------------------------------
 use std::thread::LocalKey;
 use std::cell::RefCell;
@@ -19,12 +16,19 @@ use crate::numvec::tape::Tape;
 use crate::numvec::tape::sealed::ThisThreadTape;
 use crate::operator::id;
 // ---------------------------------------------------------------------------
+/// Documentation for the rustad generic type parameter V.
+///
+/// The generic parameter *V* , in ``AD`` < *V* > and other generic types ,
+/// is the type used for calculating values.
+/// It does not have dependency information that represents
+/// how each value is related to the domain variables (independent variables).
+pub fn doc_generic_v() {}
 //
 // AD
 //
 /// AD acts like V but in addition can record a function evaluation.
 ///
-/// * V : is the floating point type used for value calculations.
+/// * V : see [doc_generic_v]
 ///
 /// * variable :
 /// An AD object is a variable if it one of the domain variables
@@ -152,7 +156,7 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 // ---------------------------------------------------------------------------
 /// Binary `AD` < *V* > operators.
 ///
-/// V : is the floating point type used for value calculations.
+/// V : see [doc_generic_v]
 ///
 /// Op : is the source code token for this binary operator;
 /// i.e., `+` , `-` , `*` , or `/` .
@@ -274,7 +278,7 @@ ad_binary_op!(Div, /);
 // ---------------------------------------------------------------------------
 /// Compound Assignment `AD` < *V* > operators.
 ///
-/// V : is the floating point type used for value calculations.
+/// V : see [doc_generic_v]
 ///
 /// Op : is the source code token for this binary operator;
 /// i.e., `+=` , `-=` , `*=` , or `/=` .
