@@ -156,24 +156,31 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 // ---------------------------------------------------------------------------
 /// Binary `AD<V>` operators.
 ///
+/// * Syntax :
+/// ```text
+///        az = &ax Op &ay
+///        az = &ay Op &y
+/// ```
+///
 /// * V : see [doc_generic_v]
 ///
 /// * Op : is the source code token for this binary operator;
 /// i.e., `+` , `-` , `*` , or `/` .
 ///
-/// * Prototype:
-///     * & `AD<V>` *Op* & `AD<V>`
-///     * & `AD<V>` *Op* & *V*
+/// * ax : left hand side `AD<V>` object
+/// * ay : right hand side `AD<V>` object
+/// * az : result `AD<V>` object
+/// * y  : right hand size *V* object
 ///
 /// # Example
 ///```
 /// use rustad::numvec::AD;
 /// use rustad::numvec::ad_from_value;
 ///
-/// let a  = ad_from_value( 3.0f32 );
-/// let b  = 4.0f32;
-/// let c = &a * &b;
-/// assert_eq!( c.to_value(), 12.0f32 );
+/// let ax  = ad_from_value( 3.0f32 );
+/// let y   = 4.0f32;
+/// let az  = &ax * &y;
+/// assert_eq!( az.to_value(), 12.0f32 );
 /// ```
 ///
 /// # Example using NumVec
@@ -334,14 +341,14 @@ ad_binary_op!(Div, /);
 // ---------------------------------------------------------------------------
 /// Compound Assignment `AD<V>` operators.
 ///
-/// V : see [doc_generic_v]
+/// * V : see [doc_generic_v]
 ///
-/// Op : is the source code token for this binary operator;
+/// * Op : is the source code token for this binary operator;
 /// i.e., `+=` , `-=` , `*=` , or `/=` .
 ///
-/// Prototype:
-/// <br/>
-/// & `AD<V>` *Op* & `AD<V>`
+/// * Prototype:
+///     * & `AD<V>` *Op* & `AD<V>`
+///     * & `AD<V>` *Op* & *V*
 ///
 /// # Example
 /// ```
