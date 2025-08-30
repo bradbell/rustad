@@ -73,6 +73,7 @@ pub use op::info::{
 macro_rules! setup_this_value_type{ ($V:ty) => {
         crate::numvec::tape::impl_this_thread_tape!($V);
         crate::numvec::op::info::impl_global_op_info_vec!($V);
+        crate::numvec::ad::impl_value_op_ad!($V);
 } }
 setup_this_value_type!(f32);
 setup_this_value_type!(f64);

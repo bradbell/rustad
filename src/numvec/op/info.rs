@@ -118,6 +118,7 @@ where
 {
     fn get() -> &'static std::sync::LazyLock< Vec< OpInfo<Self> > >;
 }
+// impl_global_op_info_vec!
 /// Implement GlobalOpInfoVec for the value type *V* ; see [doc_generic_v]
 ///
 /// This macro can be executed from anywhere within the rustad crate.

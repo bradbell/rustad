@@ -171,7 +171,8 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 /// * ay : right hand side `AD<V>` object
 /// * az : result `AD<V>` object
 ///
-/// * y  : right hand size *V* object
+/// * x  : left hand side *V* object
+/// * y  : right hand side *V* object
 ///
 /// # Example
 ///```
@@ -181,6 +182,11 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 /// let ax  = ad_from_value( 3.0f32 );
 /// let y   = 4.0f32;
 /// let az  = &ax * &y;
+/// assert_eq!( az.to_value(), 12.0f32 );
+///
+/// let x  = 3.0f32;
+/// let ay = ad_from_value(4.0f32 );
+/// let az  = &x * &ay;
 /// assert_eq!( az.to_value(), 12.0f32 );
 /// ```
 ///
@@ -202,9 +208,9 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 pub fn doc_ad_binary_op() { }
 //
 /// Add one binary operator to the `AD<V>` class;
-///
+//
+/// * V : see [doc_generic_v]
 /// * Name : is the operator name; i.e., Add, Sub, Mul, or Div.
-///
 /// * Op : is the operator token; i.e., +, -, *, or /.
 ///
 /// see [doc_ad_binary_op]
@@ -387,6 +393,8 @@ pub fn doc_ad_compound_op() { }
 //
 /// Add one compound assignment operator to the `AD<V>` class;
 ///
+/// * V : see [doc_generic_v]
+///
 /// * Name : is the operator name with Assign at end;
 /// i.e., Add, Sub, Mul, or Div.
 ///
@@ -509,3 +517,114 @@ ad_compound_op!(Add, +=);
 ad_compound_op!(Sub, -=);
 ad_compound_op!(Mul, *=);
 ad_compound_op!(Div, /=);
+// ---------------------------------------------------------------------------
+// record_value_op_ad!
+//
+/// Create function that records
+/// one binary operation where lhs is *V* and rhs is `AD<V>` .
+///
+/// * Name         : is the operator name; i.e., Add, Sub, Mul, or Div.
+///
+/// * Op           : is the operator token; i.e., +, -, *, or /.
+///
+/// * Function Name: `record_value_` *name* `_ad` where *name* is
+///  a lower case version of Name.
+///
+macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
+    #[doc = concat!( "record one ", stringify!($Name),
+        " where lhs is a value and rhs is a variable"
+    ) ]
+    pub(crate) fn [< record_value_ $Name:lower _ad >]<V> (
+        tape: &mut Tape<V> ,
+        lhs:       &V      ,
+        rhs:       &AD<V>  ,
+    ) -> (usize, usize)
+    where
+        V : Clone ,
+    {
+        let mut new_tape_id   = 0;
+        let mut new_var_index = 0;
+        if tape.recording {
+            let var_rhs    = rhs.tape_id == tape.tape_id;
+            if var_rhs {
+                new_tape_id   = tape.tape_id;
+                new_var_index = tape.n_var;
+                tape.n_var   += 1;
+                tape.op2arg.push( tape.arg_all.len() as Tindex );
+                tape.id_all.push( id::[< $Name:upper _CV_OP >] );
+                tape.arg_all.push( tape.con_all.len() as Tindex );
+                tape.con_all.push( lhs.clone() );
+                tape.arg_all.push( rhs.var_index as Tindex );
+            }
+        }
+        (new_tape_id, new_var_index)
+    }
+} } }
+record_value_op_ad!(Add, +=);
+record_value_op_ad!(Sub, -=);
+record_value_op_ad!(Mul, *=);
+record_value_op_ad!(Div, /=);
+// ---------------------------------------------------------------------------
+// impl_value_op_ad!
+//
+// If you try to make this implementation generic w.r.t V,
+// you get a message saying that f32 and f64 must be covered
+// because they are not local types.
+//
+/// Implement one binary `AD<V>` operator where lhs is a *V* object.
+///
+/// * V : see [doc_generic_v]
+/// * Name : is the operator name; i.e., Add, Sub, Mul, or Div.
+/// * Op : is the operator token; i.e., +, -, *, or /.
+///
+/// If *V* is the only argument to this macro, it will invoke itself
+/// with *Op* equal to +, -, *, / and the corresponding *Name* .
+///
+/// see [doc_ad_binary_op]
+///
+/// This macro can be invoked from anywhere in the rustad crate.
+macro_rules! impl_value_op_ad{
+    ($V:ty)                      => {
+        crate::numvec::ad::impl_value_op_ad!($V, Add, +);
+        crate::numvec::ad::impl_value_op_ad!($V, Sub, -);
+        crate::numvec::ad::impl_value_op_ad!($V, Mul, *);
+        crate::numvec::ad::impl_value_op_ad!($V, Div, /);
+    };
+    ($V:ty, $Name:ident, $Op:tt) => { paste::paste! {
+        #[doc =
+        "see [doc_ad_binary_op](crate::numvec::ad::doc_ad_binary_op)"
+        ]
+        impl<'a> std::ops::$Name< &'a crate::numvec::AD<$V> > for &'a $V
+        where
+        {   type Output = crate::numvec::AD<$V>;
+            //
+            #[ doc = concat!(
+                "compute & `", stringify!($V), "` ",
+                stringify!($Op), " & `AD<", stringify!($f1), ">` "
+            ) ]
+            fn [< $Name:lower >]
+                (self : &'a $V, rhs : &'a crate::numvec::AD<$V>
+            ) -> crate::numvec::AD<$V> {
+                //
+                // new_value
+                let new_value = self $Op &rhs.value;
+                //
+                // local_key
+                let local_key : &std::thread::LocalKey<
+                    std::cell::RefCell< crate::numvec::tape::Tape<$V> >
+                > = crate::numvec::tape::sealed::ThisThreadTape::get();
+                //
+                // new_tape_id, new_var_index
+                let (new_tape_id, new_var_index) =
+                    local_key.with_borrow_mut( |tape|
+                        crate::numvec::ad::[< record_value_ $Name:lower _ad >]
+                            ( tape, &self, &rhs )
+                );
+                //
+                // result
+                crate::numvec::AD::new(new_tape_id, new_var_index, new_value)
+            }
+        }
+    } }
+}
+pub(crate) use impl_value_op_ad;

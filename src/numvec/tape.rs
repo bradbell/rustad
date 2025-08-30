@@ -125,7 +125,7 @@ pub (crate) mod sealed {
         fn get() -> &'static LocalKey< RefCell< Tape<Self> > >;
     }
 }
-//
+// impl_this_thread_tape!
 /// Implement ThisThreadTape for the value type V; see [doc_generic_v].
 ///
 /// * V : see [doc_generic_v]
