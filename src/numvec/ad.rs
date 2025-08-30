@@ -170,6 +170,7 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 /// * ax : left hand side `AD<V>` object
 /// * ay : right hand side `AD<V>` object
 /// * az : result `AD<V>` object
+///
 /// * y  : right hand size *V* object
 ///
 /// # Example
@@ -246,7 +247,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         }
         ( new_tape_id, new_var_index )
     }
-    // -----------------------------------------------------------------------
+    //
     #[doc = concat!(
         "& `AD<V>` ", stringify!($Op), " & `AD<V>`",
         "; see [doc_ad_binary_op]"
@@ -302,7 +303,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         }
         (new_tape_id, new_var_index)
     }
-    // -----------------------------------------------------------------------
+    //
     #[doc = concat!(
         "& `AD<V>` ", stringify!($Op), " & V`",
         "; see [doc_ad_binary_op]"
@@ -341,24 +342,30 @@ ad_binary_op!(Div, /);
 // ---------------------------------------------------------------------------
 /// Compound Assignment `AD<V>` operators.
 ///
+/// Syntax :
+/// ```text
+///     ax Op &ay
+///     ax Op &y
+/// ```
+///
 /// * V : see [doc_generic_v]
 ///
 /// * Op : is the source code token for this binary operator;
 /// i.e., `+=` , `-=` , `*=` , or `/=` .
 ///
-/// * Prototype:
-///     * & `AD<V>` *Op* & `AD<V>`
-///     * & `AD<V>` *Op* & *V*
+/// * ax : left hand side `AD<V>` object.
+/// * ay : right hand size `AD<V>` object
+/// * y  : right hand size *V* object
 ///
 /// # Example
 /// ```
 /// use rustad::numvec::AD;
 /// use rustad::numvec::ad_from_value;
 ///
-/// let mut a   = ad_from_value( 3.0f64 );
-/// let b       = ad_from_value( 4.0f64 );
-/// a          -= &b;
-/// assert_eq!( a.to_value(), -1.0f64 );
+/// let mut ax   = ad_from_value( 3.0f64 );
+/// let y        = 4.0f64;
+/// ax          -= &y;
+/// assert_eq!( ax.to_value(), -1.0f64 );
 /// ```
 ///
 /// # Example using NumVec
@@ -390,7 +397,7 @@ pub fn doc_ad_compound_op() { }
 /// see [doc_ad_compound_op]
 macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     // ------------------------------------------------------------------------
-     fn [< record_ $Name:lower _assign >]<V> (
+     fn [< record_ $Name:lower _assign_vv >]<V> (
          tape: &mut Tape<V> ,
          lhs:  &mut AD<V>   ,
          rhs:  &    AD<V>   )
@@ -423,7 +430,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
              }
          }
      }
-    // ------------------------------------------------------------------------
+    //
     #[doc = concat!(
         "`AD<V>` ", stringify!($Op), " & `AD<V>`",
         "; see [doc_ad_compound_op]"
@@ -445,7 +452,54 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             //
             // tape, self.tape_id, self.var_index
             local_key.with_borrow_mut( |tape|
-                [< record_ $Name:lower _assign >] ( tape, self, rhs )
+                [< record_ $Name:lower _assign_vv >] ( tape, self, rhs )
+            );
+        }
+    }
+    // ------------------------------------------------------------------------
+     fn [< record_ $Name:lower _assign_vc >]<V> (
+         tape: &mut Tape<V> ,
+         lhs:  &mut AD<V>   ,
+         rhs:  &    V       )
+     where
+        V : Clone,
+     {
+         if tape.recording {
+             let var_lhs    = lhs.tape_id == tape.tape_id;
+             if var_lhs {
+                 tape.op2arg.push( tape.arg_all.len() as Tindex );
+                 tape.id_all.push( id::[< $Name:upper _VC_OP >] );
+                 tape.arg_all.push( lhs.var_index as Tindex);
+                 tape.arg_all.push( tape.con_all.len() as Tindex );
+                 tape.con_all.push( rhs.clone() );
+                 //
+                 lhs.var_index = tape.n_var;
+                 tape.n_var   += 1;
+             }
+         }
+     }
+    //
+    #[doc = concat!(
+        "`AD<V>` ", stringify!($Op), " & V; see [doc_ad_compound_op]"
+    )]
+    impl<'a, V> std::ops::[< $Name Assign >] <&'a V> for AD<V>
+    where
+        V: Clone +
+            std::ops::[< $Name Assign >] <&'a V> +
+            crate::numvec::ThisThreadTapePublic  ,
+    {   //
+        fn [< $Name:lower _assign >] (&mut self, rhs : &'a V)
+        {   //
+            // self.value
+            self.value $Op &rhs;
+            //
+            // local_key
+            let local_key : &LocalKey< RefCell< Tape<V> > > =
+                ThisThreadTape::get();
+            //
+            // tape, self.tape_id, self.var_index
+            local_key.with_borrow_mut( |tape|
+                [< record_ $Name:lower _assign_vc >] ( tape, self, rhs )
             );
         }
     }
