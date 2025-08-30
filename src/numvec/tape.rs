@@ -12,7 +12,6 @@ use std::cell::RefCell;
 use std::thread::LocalKey;
 use std::sync::Mutex;
 //
-use crate::numvec::NumVec;
 use crate::numvec::AD;
 use crate::numvec::ADFn;
 //
@@ -127,7 +126,7 @@ pub (crate) mod sealed {
     }
 }
 //
-/// Get reference to the tape for this thread.
+/// Implement ThisThreadTape for the value type V; see [doc_generic_v].
 ///
 /// * V : see [doc_generic_v]
 ///
@@ -139,20 +138,22 @@ macro_rules! impl_this_thread_tape{ ($V:ty) => {
         "This threads tape for recording ",
         "`AD<" , stringify!($V), ">` operations"
     ) ]
-    impl sealed::ThisThreadTape for $V {
-        fn get() -> &'static LocalKey< RefCell< Tape<$V> > > {
+    impl crate::numvec::tape::sealed::ThisThreadTape for $V {
+        fn get() -> &'static std::thread::LocalKey<
+                std::cell::RefCell<
+                        crate::numvec::tape::Tape<$V>
+                >
+            > {
             thread_local! {
-                pub(crate) static THIS_THREAD_TAPE :
-                    RefCell< Tape<$V> > = RefCell::new( Tape::new() );
+                pub(crate) static THIS_THREAD_TAPE : std::cell::RefCell<
+                    crate::numvec::tape::Tape<$V>
+                > = std::cell::RefCell::new( crate::numvec::tape::Tape::new() );
             }
             &THIS_THREAD_TAPE
         }
     }
 } }
-impl_this_thread_tape!(f32);
-impl_this_thread_tape!( NumVec<f32> );
-impl_this_thread_tape!(f64);
-impl_this_thread_tape!( NumVec<f64> );
+pub(crate) use impl_this_thread_tape;
 // ----------------------------------------------------------------------------
 // start_recording
 //
