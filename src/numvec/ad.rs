@@ -156,14 +156,14 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 // ---------------------------------------------------------------------------
 /// Binary `AD<V>` operators.
 ///
-/// V : see [doc_generic_v]
+/// * V : see [doc_generic_v]
 ///
-/// Op : is the source code token for this binary operator;
+/// * Op : is the source code token for this binary operator;
 /// i.e., `+` , `-` , `*` , or `/` .
 ///
-/// Prototype:
-/// <br/>
-/// & `AD<V>` *Op* & `AD<V>`
+/// * Prototype:
+///     * & `AD<V>` *Op* & `AD<V>`
+///     * & `AD<V>` *Op* & *V*
 ///
 /// # Example
 ///```
@@ -171,7 +171,7 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 /// use rustad::numvec::ad_from_value;
 ///
 /// let a  = ad_from_value( 3.0f32 );
-/// let b  = ad_from_value( 4.0f32 );
+/// let b  = 4.0f32;
 /// let c = &a * &b;
 /// assert_eq!( c.to_value(), 12.0f32 );
 /// ```
@@ -202,7 +202,7 @@ pub fn doc_ad_binary_op() { }
 /// see [doc_ad_binary_op]
 macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     // -----------------------------------------------------------------------
-    fn [< record_ $Name:lower >]<V> (
+    fn [< record_ $Name:lower _vv >]<V> (
         tape: &mut Tape<V> ,
         lhs:       &AD<V>  ,
         rhs:       &AD<V>  ,
@@ -262,7 +262,63 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             // new_tape_id, new_var_index
             let (new_tape_id, new_var_index) =
                 local_key.with_borrow_mut( |tape|
-                    [< record_ $Name:lower >] ( tape, &self, &rhs )
+                    [< record_ $Name:lower _vv >] ( tape, &self, &rhs )
+            );
+            //
+            // result
+            AD::new(new_tape_id, new_var_index, new_value)
+        }
+    }
+    // -----------------------------------------------------------------------
+    fn [< record_ $Name:lower _vc >]<V> (
+        tape: &mut Tape<V> ,
+        lhs:       &AD<V>  ,
+        rhs:       &V      ,
+    ) -> (usize, usize)
+    where
+        V : Clone ,
+    {
+        let mut new_tape_id   = 0;
+        let mut new_var_index = 0;
+        if tape.recording {
+            let var_lhs    = lhs.tape_id == tape.tape_id;
+            if var_lhs {
+                new_tape_id   = tape.tape_id;
+                new_var_index = tape.n_var;
+                tape.n_var   += 1;
+                tape.op2arg.push( tape.arg_all.len() as Tindex );
+                tape.id_all.push( id::[< $Name:upper _VC_OP >] );
+                tape.arg_all.push( lhs.var_index as Tindex );
+                tape.arg_all.push( tape.con_all.len() as Tindex );
+                tape.con_all.push( rhs.clone() );
+            }
+        }
+        (new_tape_id, new_var_index)
+    }
+    // -----------------------------------------------------------------------
+    #[doc = concat!(
+        "& `AD<V>` ", stringify!($Op), " & V`",
+        "; see [doc_ad_binary_op]"
+    )]
+    impl<'a, V> std::ops::$Name< &'a V> for &'a AD<V>
+    where
+        &'a V: std::ops::$Name<&'a V, Output=V>,
+        V    : Clone + crate::numvec::ThisThreadTapePublic ,
+    {   type Output = AD<V>;
+        //
+        fn [< $Name:lower >](self : &'a AD<V> , rhs : &'a V ) -> AD<V>
+        {
+            // new_value
+            let new_value     = &self.value  $Op &rhs;
+            //
+            // local_key
+            let local_key : &LocalKey< RefCell< Tape<V> > > =
+                ThisThreadTape::get();
+            //
+            // new_tape_id, new_var_index
+            let (new_tape_id, new_var_index) =
+                local_key.with_borrow_mut( |tape|
+                    [< record_ $Name:lower _vc >] ( tape, &self, &rhs )
             );
             //
             // result
