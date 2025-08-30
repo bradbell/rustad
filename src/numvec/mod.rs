@@ -56,6 +56,12 @@ pub use tape::{
     start_recording,
     stop_recording,
 };
+//
+// TODO: remove these when GlobalOpInfoVec gets used
+pub use op::info::{
+    GlobalOpInfoVec,
+    OpInfo
+};
 // ---------------------------------------------------------------------------
 /// Set up rustad to do calculations with value type V; see
 /// [doc_generic_v](crate::numvec::ad::doc_generic_v) .
@@ -66,6 +72,7 @@ pub use tape::{
 /// for the following types: `f32` , `f64` , `NumVec<f32>`, `NumVec<f64>`.
 macro_rules! setup_this_value_type{ ($V:ty) => {
         crate::numvec::tape::impl_this_thread_tape!($V);
+        crate::numvec::op::info::impl_global_op_info_vec!($V);
 } }
 setup_this_value_type!(f32);
 setup_this_value_type!(f64);

@@ -133,6 +133,8 @@ pub (crate) mod sealed {
 /// This macro must be executed once for any type *V*  where
 /// `AD` < *V* > is used. The rustad package automatically executes it
 /// for the following types: `f32` , `f64` , `NumVec<f32>`, `NumVec<f64>`.
+///
+/// This macro can be executed from anywhere within the rustad crate.
 macro_rules! impl_this_thread_tape{ ($V:ty) => {
     #[doc = concat!(
         "This threads tape for recording ",
