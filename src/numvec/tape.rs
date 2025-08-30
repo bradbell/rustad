@@ -23,7 +23,7 @@ pub(crate) type Tindex = u32;
 // ---------------------------------------------------------------------------
 // Tape
 ///
-/// `Tape` < *V* > is the type were to an `AD` < *V* >
+/// `Tape` < *V* > is the type were to an `AD<V>`
 /// operation sequence is recorded.
 ///
 /// * V : see [doc_generic_v]
@@ -115,7 +115,7 @@ pub (crate) mod sealed {
     ///     local_key : &LocalKey< RefCell< Tape<V> > > = ThisThreadTape::get()
     //      local_key.with_borrow_mut( |tape| { ... } )
     /// ```
-    /// Sets `tape` to a reference to the tape for recording `AD` < *V* >
+    /// Sets `tape` to a reference to the tape for recording `AD<V>`
     /// operations.
     ///
     pub trait ThisThreadTape
@@ -131,7 +131,7 @@ pub (crate) mod sealed {
 /// * V : see [doc_generic_v]
 ///
 /// This macro must be executed once for any type *V*  where
-/// `AD` < *V* > is used. The rustad package automatically executes it
+/// `AD<V>` is used. The rustad package automatically executes it
 /// for the following types: `f32` , `f64` , `NumVec<f32>`, `NumVec<f64>`.
 ///
 /// This macro can be executed from anywhere within the rustad crate.

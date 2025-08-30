@@ -30,7 +30,7 @@ use crate::numvec::tape::Tindex;
 ///     *E* is the same as ``AD`` < *V* >; see [doc_generic_v] and [AD].
 ///
 /// Note that *V* evaluations are used to compute values and
-/// `AD` < *V* > evaluations are used to build new AD function objects.
+/// `AD<V>` evaluations are used to build new AD function objects.
 ///
 pub fn doc_generic_e() {}
 // ---------------------------------------------------------------------------

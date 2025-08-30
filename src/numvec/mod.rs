@@ -67,7 +67,7 @@ pub use op::info::{
 /// [doc_generic_v](crate::numvec::ad::doc_generic_v) .
 ///
 /// /// This macro must be executed once for any type *V*  where
-/// `AD` < *V* > is used.
+/// `AD<V>` is used.
 /// The rustad package automatically executes this macro
 /// for the following types: `f32` , `f64` , `NumVec<f32>`, `NumVec<f64>`.
 macro_rules! setup_this_value_type{ ($V:ty) => {

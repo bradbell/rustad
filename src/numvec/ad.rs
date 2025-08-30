@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This module defines the automatic differentiation class `AD` < *V* >.
+//! This module defines the automatic differentiation class `AD<V>`.
 //!
 //! Link to [parent module](super)
 //!
@@ -154,7 +154,7 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
     AD::new(tape_id, var_index, value)
 }
 // ---------------------------------------------------------------------------
-/// Binary `AD` < *V* > operators.
+/// Binary `AD<V>` operators.
 ///
 /// V : see [doc_generic_v]
 ///
@@ -163,7 +163,7 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 ///
 /// Prototype:
 /// <br/>
-/// & `AD` < *V* > *Op* & `AD` < *V* >
+/// & `AD<V>` *Op* & `AD<V>`
 ///
 /// # Example
 ///```
@@ -193,7 +193,7 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 /// ```
 pub fn doc_ad_binary_op() { }
 //
-/// Add one binary operator to the `AD` < *V* > class;
+/// Add one binary operator to the `AD<V>` class;
 ///
 /// * Name : is the operator name; i.e., Add, Sub, Mul, or Div.
 ///
@@ -241,7 +241,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     }
     // -----------------------------------------------------------------------
     #[doc = concat!(
-        "& `AD` < *V* > ", stringify!($Op), " & `AD` < *V* >",
+        "& `AD<V>` ", stringify!($Op), " & `AD<V>`",
         "; see [doc_ad_binary_op]"
     )]
     impl<'a, V> std::ops::$Name< &'a AD<V> > for &'a AD<V>
@@ -276,7 +276,7 @@ ad_binary_op!(Sub, -);
 ad_binary_op!(Mul, *);
 ad_binary_op!(Div, /);
 // ---------------------------------------------------------------------------
-/// Compound Assignment `AD` < *V* > operators.
+/// Compound Assignment `AD<V>` operators.
 ///
 /// V : see [doc_generic_v]
 ///
@@ -285,7 +285,7 @@ ad_binary_op!(Div, /);
 ///
 /// Prototype:
 /// <br/>
-/// & `AD` < *V* > *Op* & `AD` < *V* >
+/// & `AD<V>` *Op* & `AD<V>`
 ///
 /// # Example
 /// ```
@@ -315,7 +315,7 @@ ad_binary_op!(Div, /);
 /// ```
 pub fn doc_ad_compound_op() { }
 //
-/// Add one compound assignment operator to the `AD` < *V* > class;
+/// Add one compound assignment operator to the `AD<V>` class;
 ///
 /// * Name : is the operator name with Assign at end;
 /// i.e., Add, Sub, Mul, or Div.
@@ -362,7 +362,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
      }
     // ------------------------------------------------------------------------
     #[doc = concat!(
-        "`AD` < *V* > ", stringify!($Op), " & `AD` < *V* >",
+        "`AD<V>` ", stringify!($Op), " & `AD<V>`",
         "; see [doc_ad_compound_op]"
     )]
     impl<'a, V> std::ops::[< $Name Assign >] < &'a AD<V> > for AD<V>
