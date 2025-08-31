@@ -258,13 +258,13 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         "& `AD<V>` ", stringify!($Op), " & `AD<V>`",
         "; see [doc_ad_binary_op]"
     )]
-    impl<'a, V> std::ops::$Name< &'a AD<V> > for &'a AD<V>
+    impl<V> std::ops::$Name< &AD<V> > for &AD<V>
     where
-        &'a V: std::ops::$Name<&'a V, Output=V>,
+        for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
         V    : Clone + crate::numvec::ThisThreadTapePublic ,
     {   type Output = AD<V>;
         //
-        fn [< $Name:lower >](self : &'a AD<V> , rhs : &'a AD<V> ) -> AD<V>
+        fn [< $Name:lower >](self , rhs : &AD<V> ) -> AD<V>
         {
             // new_value
             let new_value     = &self.value  $Op &rhs.value;
@@ -443,13 +443,13 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
         "`AD<V>` ", stringify!($Op), " & `AD<V>`",
         "; see [doc_ad_compound_op]"
     )]
-    impl<'a, V> std::ops::[< $Name Assign >] < &'a AD<V> > for AD<V>
+    impl<V> std::ops::[< $Name Assign >] < &AD<V> > for AD<V>
     where
         V: Clone +
-            std::ops::[< $Name Assign >] <&'a V> +
+            for<'a> std::ops::[< $Name Assign >] <&'a V> +
             crate::numvec::ThisThreadTapePublic  ,
     {   //
-        fn [< $Name:lower _assign >] (&mut self, rhs : &'a AD<V> )
+        fn [< $Name:lower _assign >] (&mut self, rhs : &AD<V> )
         {   //
             // self.value
             self.value $Op &rhs.value;
@@ -490,13 +490,13 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     #[doc = concat!(
         "`AD<V>` ", stringify!($Op), " & V; see [doc_ad_compound_op]"
     )]
-    impl<'a, V> std::ops::[< $Name Assign >] <&'a V> for AD<V>
+    impl<V> std::ops::[< $Name Assign >] <&V> for AD<V>
     where
         V: Clone +
-            std::ops::[< $Name Assign >] <&'a V> +
+            for<'a> std::ops::[< $Name Assign >] <&'a V> +
             crate::numvec::ThisThreadTapePublic  ,
     {   //
-        fn [< $Name:lower _assign >] (&mut self, rhs : &'a V)
+        fn [< $Name:lower _assign >] (&mut self, rhs : &V)
         {   //
             // self.value
             self.value $Op &rhs;
