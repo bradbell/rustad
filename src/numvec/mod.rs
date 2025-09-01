@@ -66,10 +66,21 @@ pub use op::info::{
 /// Set up rustad to do calculations with value type V; see
 /// [doc_generic_v](crate::numvec::ad::doc_generic_v) .
 ///
-/// /// This macro must be executed once for any type *V*  where
-/// `AD<V>` is used.
+/// This macro must be executed once for any type *V*  where `AD<V>` is used.
 /// The rustad package automatically executes this macro
 /// for the following types: `f32` , `f64` , `NumVec<f32>`, `NumVec<f64>`.
+///
+/// This macro can be invoked from anywhere given the following use statements:
+/// ```text
+///     use std::sync::LazyLock;
+///     use std::thread::LocalKey;
+///     use std::cell::RefCell;
+///     use crate::numvec::ad::AD;
+/// ```
+///
+use std::sync::LazyLock;
+use std::thread::LocalKey;
+use std::cell::RefCell;
 macro_rules! setup_this_value_type{ ($V:ty) => {
         crate::numvec::tape::impl_this_thread_tape!($V);
         crate::numvec::op::info::impl_global_op_info_vec!($V);

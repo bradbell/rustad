@@ -582,8 +582,10 @@ record_value_op_ad!(Div, /=);
 ///
 /// see [doc_ad_binary_op]
 ///
-/// This macro can be invoked from anywhere given the following us statements:
+/// This macro can be invoked from anywhere given the following use statements:
 /// ```text
+///     use std::thread::LocalKey;
+///     use std::cell::RefCell;
 ///     use crate::numvec::ad::AD;
 /// ```
 macro_rules! impl_value_op_ad{
@@ -613,8 +615,8 @@ macro_rules! impl_value_op_ad{
                 let new_value = self $Op &rhs.value;
                 //
                 // local_key
-                let local_key : &std::thread::LocalKey<
-                    std::cell::RefCell< crate::numvec::tape::Tape<$V> >
+                let local_key : &LocalKey<
+                    RefCell< crate::numvec::tape::Tape<$V> >
                 > = crate::numvec::tape::sealed::ThisThreadTape::get();
                 //
                 // new_tape_id, new_var_index

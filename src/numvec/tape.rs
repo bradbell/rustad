@@ -134,22 +134,24 @@ pub (crate) mod sealed {
 /// `AD<V>` is used. The rustad package automatically executes it
 /// for the following types: `f32` , `f64` , `NumVec<f32>`, `NumVec<f64>`.
 ///
-/// This macro can be executed from anywhere within the rustad crate.
+/// This macro can be invoked from anywhere given the following use statements:
+/// ```text
+///     use std::thread::LocalKey;
+///     use std::cell::RefCell;
+/// ```
 macro_rules! impl_this_thread_tape{ ($V:ty) => {
     #[doc = concat!(
         "This threads tape for recording ",
         "`AD<" , stringify!($V), ">` operations"
     ) ]
     impl crate::numvec::tape::sealed::ThisThreadTape for $V {
-        fn get() -> &'static std::thread::LocalKey<
-                std::cell::RefCell<
-                        crate::numvec::tape::Tape<$V>
-                >
+        fn get() -> &'static LocalKey<
+                RefCell< crate::numvec::tape::Tape<$V> >
             > {
             thread_local! {
-                pub(crate) static THIS_THREAD_TAPE : std::cell::RefCell<
+                pub(crate) static THIS_THREAD_TAPE : RefCell<
                     crate::numvec::tape::Tape<$V>
-                > = std::cell::RefCell::new( crate::numvec::tape::Tape::new() );
+                > = RefCell::new( crate::numvec::tape::Tape::new() );
             }
             &THIS_THREAD_TAPE
         }

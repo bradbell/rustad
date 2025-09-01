@@ -121,22 +121,24 @@ where
 // impl_global_op_info_vec!
 /// Implement GlobalOpInfoVec for the value type *V* ; see [doc_generic_v]
 ///
-/// This macro can be executed from anywhere within the rustad crate.
+/// This macro can be invoked from anywhere given the following use statements:
+/// ```text
+///     use std::thread::LocalKey;
+///     use std::cell::RefCell;
+///     use crate::numvec::ad::AD;
+/// ```
 macro_rules! impl_global_op_info_vec{ ($V:ty) => {
     #[doc = concat!(
         "Operator information used when evaluating `",
         stringify!($V), "`, and `AD<", stringify!($V), ">` operations"
     ) ]
     impl crate::numvec::op::info::GlobalOpInfoVec for $V {
-        fn get() -> &'static std::sync::LazyLock<
+        fn get() -> &'static LazyLock<
             Vec< crate::numvec::op::info::OpInfo<$V> >
         > {
             pub static OP_INFO_VEC :
-                std::sync::LazyLock<
-                Vec< crate::numvec::op::info::OpInfo<$V> >
-            > = std::sync::LazyLock::new(
-                || crate::numvec::op::info::op_info_vec()
-            );
+                LazyLock< Vec< crate::numvec::op::info::OpInfo<$V> > > =
+                    LazyLock::new( || crate::numvec::op::info::op_info_vec() );
             &OP_INFO_VEC
         }
     }
