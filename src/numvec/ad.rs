@@ -314,13 +314,13 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         "& `AD<V>` ", stringify!($Op), " & V`",
         "; see [doc_ad_binary_op]"
     )]
-    impl<'a, V> std::ops::$Name< &'a V> for &'a AD<V>
+    impl<V> std::ops::$Name< &V> for &AD<V>
     where
-        &'a V: std::ops::$Name<&'a V, Output=V>,
-        V    : Clone + crate::numvec::ThisThreadTapePublic ,
+        for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
+        V            : Clone + crate::numvec::ThisThreadTapePublic ,
     {   type Output = AD<V>;
         //
-        fn [< $Name:lower >](self : &'a AD<V> , rhs : &'a V ) -> AD<V>
+        fn [< $Name:lower >](self , rhs : &V ) -> AD<V>
         {
             // new_value
             let new_value     = &self.value  $Op &rhs;
@@ -599,9 +599,9 @@ macro_rules! impl_value_op_ad{
         #[doc =
         "see [doc_ad_binary_op](crate::numvec::ad::doc_ad_binary_op)"
         ]
-        impl<'a> std::ops::$Name< &'a AD<$V> > for &'a $V
+        impl std::ops::$Name< &AD<$V> > for & $V
         where
-            &'a $V : std::ops::$Name<&'a $V, Output=$V>,
+            for <'a> &'a $V : std::ops::$Name<&'a $V, Output=$V>,
         {   type Output = AD<$V>;
             //
             #[ doc = concat!(
@@ -609,7 +609,7 @@ macro_rules! impl_value_op_ad{
                 stringify!($Op), " & `AD<", stringify!($f1), ">` "
             ) ]
             fn [< $Name:lower >]
-                (self : &'a $V, rhs : &'a AD<$V>
+                (self , rhs : &AD<$V>
             ) -> AD<$V> {
                 //
                 // new_value

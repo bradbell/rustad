@@ -16,6 +16,12 @@ then
    exit 1
 fi
 #
+# rustad.long-types-*
+if ls rustad.long-type-* >& /dev/null
+then
+   rm rustad.long-type-*
+fi
+#
 # typos
 if ! which typos > /dev/null
 then
