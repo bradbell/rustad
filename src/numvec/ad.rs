@@ -582,7 +582,10 @@ record_value_op_ad!(Div, /=);
 ///
 /// see [doc_ad_binary_op]
 ///
-/// This macro can be invoked from anywhere in the rustad crate.
+/// This macro can be invoked from anywhere given the following us statements:
+/// ```text
+///     use crate::numvec::ad::AD;
+/// ```
 macro_rules! impl_value_op_ad{
     ($V:ty)                      => {
         crate::numvec::ad::impl_value_op_ad!($V, Add, +);
@@ -594,17 +597,17 @@ macro_rules! impl_value_op_ad{
         #[doc =
         "see [doc_ad_binary_op](crate::numvec::ad::doc_ad_binary_op)"
         ]
-        impl<'a> std::ops::$Name< &'a crate::numvec::AD<$V> > for &'a $V
+        impl<'a> std::ops::$Name< &'a AD<$V> > for &'a $V
         where
-        {   type Output = crate::numvec::AD<$V>;
+        {   type Output = AD<$V>;
             //
             #[ doc = concat!(
                 "compute & `", stringify!($V), "` ",
                 stringify!($Op), " & `AD<", stringify!($f1), ">` "
             ) ]
             fn [< $Name:lower >]
-                (self : &'a $V, rhs : &'a crate::numvec::AD<$V>
-            ) -> crate::numvec::AD<$V> {
+                (self : &'a $V, rhs : &'a AD<$V>
+            ) -> AD<$V> {
                 //
                 // new_value
                 let new_value = self $Op &rhs.value;
@@ -622,7 +625,7 @@ macro_rules! impl_value_op_ad{
                 );
                 //
                 // result
-                crate::numvec::AD::new(new_tape_id, new_var_index, new_value)
+                AD::new(new_tape_id, new_var_index, new_value)
             }
         }
     } }
