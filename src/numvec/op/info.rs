@@ -23,10 +23,10 @@ use crate::numvec::adfn::doc_generic_e;
 /// * var_zero :
 /// vector of zero order results for all the variable by variable index.
 ///
-/// * con_all :
+/// * con :
 /// vector of all the constant values used by operators.
 ///
-/// * flag_all :
+/// * flag :
 /// vector of all the boolean values used by operators.
 ///
 /// * arg :
@@ -51,8 +51,8 @@ pub fn doc_common_arguments() {}
 /// * Other Arguments :  see [doc_common_arguments]
 pub type ForwardZero<V, E> = fn(
     _var_zero : &mut Vec<E> ,
-    _con_all  : &Vec<V>     ,
-    _flag_all : &Vec<bool>  ,
+    _con      : &Vec<V>     ,
+    _flag     : &Vec<bool>  ,
     _arg      : &[usize]    ,
     _res      : usize       ,
 );
@@ -60,8 +60,8 @@ pub type ForwardZero<V, E> = fn(
 /// default [ForwardZero] function will panic
 fn panic_zero<V,E> (
     _var_zero : &mut Vec<E> ,
-    _con_all  : &Vec<V>     ,
-    _flag_all : &Vec<bool>  ,
+    _con      : &Vec<V>     ,
+    _flag     : &Vec<bool>  ,
     _arg      : &[usize]    ,
     _res      : usize       ,
 ) { panic!(); }
