@@ -601,6 +601,7 @@ macro_rules! impl_value_op_ad{
         ]
         impl<'a> std::ops::$Name< &'a AD<$V> > for &'a $V
         where
+            &'a $V : std::ops::$Name<&'a $V, Output=$V>,
         {   type Output = AD<$V>;
             //
             #[ doc = concat!(
