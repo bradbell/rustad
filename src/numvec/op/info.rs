@@ -37,11 +37,10 @@ use crate::numvec::adfn::doc_generic_e;
 #[cfg(doc)]
 pub fn doc_common_arguments() {}
 // ---------------------------------------------------------------------------
-// ForwardZero
+// ForwardZeroValue
 /// Evaluation of zero order forward mpode.
 ///
 /// * V : see [doc_generic_v]
-/// * E : see [doc_generic_e]
 ///
 /// * var_zero :
 /// is the vector of zero order variable values.
@@ -49,21 +48,49 @@ pub fn doc_common_arguments() {}
 /// for the results of this operator.
 ///
 /// * Other Arguments :  see [doc_common_arguments]
-pub type ForwardZero<V, E> = fn(
-    _var_zero : &mut Vec<E> ,
+pub type ForwardZeroValue<V> = fn(
+    _var_zero : &mut Vec<V> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[usize]    ,
     _res      : usize       ,
 );
-// panic_zero
-/// default [ForwardZero] function will panic
-fn panic_zero<V,E> (
-    _var_zero : &mut Vec<E> ,
+// panic_zero_value
+/// default [ForwardZeroValue] function will panic
+fn panic_zero_value<V> (
+    _var_zero : &mut Vec<V> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[usize]    ,
     _res      : usize       ,
+) { panic!(); }
+// ---------------------------------------------------------------------------
+// ForwardZeroAD
+/// Evaluation of zero order forward mpode.
+///
+/// * V : see [doc_generic_v]
+///
+/// * var_zero :
+/// is the vector of zero order variable values.
+/// This is an input for variable indices less than *res* and an output
+/// for the results of this operator.
+///
+/// * Other Arguments :  see [doc_common_arguments]
+pub type ForwardZeroAD<V> = fn(
+    _var_zero : &mut Vec< AD<V> > ,
+    _con      : &Vec<V>           ,
+    _flag     : &Vec<bool>        ,
+    _arg      : &[usize]          ,
+    _res      : usize             ,
+);
+// panic_zero_value
+/// default [ForwardZeroAD] function will panic
+fn panic_zero_ad<V> (
+    _var_zero : &mut Vec< AD<V> > ,
+    _con      : &Vec<V>           ,
+    _flag     : &Vec<bool>        ,
+    _arg      : &[usize]          ,
+    _res      : usize             ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
 /// Information for one operator
@@ -74,14 +101,14 @@ pub struct OpInfo<V> {
     pub name : &'static str,
     //
     /// zero order forward mode *V* evaluation for this operator
-    pub forward_0 : ForwardZero<V, V>,
+    pub forward_0_value : ForwardZeroValue<V>,
     //
     /// zero order forward mode ``AD`` < *V* > evaluation for this operator
-    pub ad_forward_0 : ForwardZero<V, AD<V> >,
+    pub forward_0_ad : ForwardZeroAD<V>,
 }
 // ---------------------------------------------------------------------------
 // op_info_vec
-/// returns the vector of length [NUMBER_OP]
+/// returns the vector of length crate::numvec::op::id::NUMBER_OP
 /// that maps each operator id to it's [OpInfo] .
 ///
 pub fn op_info_vec<V>() -> Vec< OpInfo<V> >
@@ -89,9 +116,9 @@ where
     OpInfo<V> : Clone ,
 {
     let empty = OpInfo {
-        name         : &"",
-        forward_0    : panic_zero,
-        ad_forward_0 : panic_zero,
+        name             : &"",
+        forward_0_value  : panic_zero_value::<V>,
+        forward_0_ad     : panic_zero_ad::<V>,
     };
     let result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
     // TODO: add this calls

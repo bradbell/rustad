@@ -30,7 +30,8 @@ pub mod tape;
 pub mod adfn;
 //
 // op
-pub(crate) mod op;
+// TODO: Change to pub(crate)
+pub mod op;
 //
 // setup
 pub(crate) mod setup;
