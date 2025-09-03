@@ -83,7 +83,7 @@ pub type ForwardZeroAD<V> = fn(
     _arg      : &[usize]          ,
     _res      : usize             ,
 );
-// panic_zero_value
+// panic_zero_ad
 /// default [ForwardZeroAD] function will panic
 fn panic_zero_ad<V> (
     _var_zero : &mut Vec< AD<V> > ,
@@ -116,7 +116,7 @@ where
     OpInfo<V> : Clone ,
 {
     let empty = OpInfo {
-        name             : &"",
+        name             : &"panic",
         forward_0_value  : panic_zero_value::<V>,
         forward_0_ad     : panic_zero_ad::<V>,
     };

@@ -276,7 +276,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             // new_tape_id, new_var_index
             let (new_tape_id, new_var_index) =
                 local_key.with_borrow_mut( |tape|
-                    [< record_ $Name:lower _vv >] ( tape, &self, &rhs )
+                    [< record_ $Name:lower _vv >]::<V> ( tape, &self, &rhs )
             );
             //
             // result
@@ -332,7 +332,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             // new_tape_id, new_var_index
             let (new_tape_id, new_var_index) =
                 local_key.with_borrow_mut( |tape|
-                    [< record_ $Name:lower _vc >] ( tape, &self, &rhs )
+                    [< record_ $Name:lower _vc >]::<V> ( tape, &self, &rhs )
             );
             //
             // result
@@ -460,7 +460,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             //
             // tape, self.tape_id, self.var_index
             local_key.with_borrow_mut( |tape|
-                [< record_ $Name:lower _assign_vv >] ( tape, self, rhs )
+                [< record_ $Name:lower _assign_vv >]::<V> ( tape, self, rhs )
             );
         }
     }
@@ -507,7 +507,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             //
             // tape, self.tape_id, self.var_index
             local_key.with_borrow_mut( |tape|
-                [< record_ $Name:lower _assign_vc >] ( tape, self, rhs )
+                [< record_ $Name:lower _assign_vc >]::<V> ( tape, self, rhs )
             );
         }
     }
@@ -623,7 +623,7 @@ macro_rules! impl_value_op_ad{
                 // new_tape_id, new_var_index
                 let (new_tape_id, new_var_index) =
                     local_key.with_borrow_mut( |tape|
-                        crate::numvec::ad::[< record_value_ $Name:lower _ad >]
+                    crate::numvec::ad::[< record_value_ $Name:lower _ad >]::<$V>
                             ( tape, &self, &rhs )
                 );
                 //
