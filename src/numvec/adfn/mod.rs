@@ -9,7 +9,7 @@
 // ---------------------------------------------------------------------------
 //
 #[cfg(doc)]
-use crate::numvec::ad::doc_generic_v;
+use crate::numvec::doc_generic_v;
 #[cfg(doc)]
 use crate::numvec::ad::AD;
 //

@@ -6,7 +6,7 @@
 //!
 //! Link to [parent module](super)
 //!
-//! * V : see [doc_generic_v](crate::numvec::ad::doc_generic_v)
+//! * V : see [doc_generic_v](crate::numvec::doc_generic_v)
 //! * E : see [doc_generic_e](crate::numvec::adfn::doc_generic_e)
 //!
 //! * [op::id](crate::numvec::op::id)

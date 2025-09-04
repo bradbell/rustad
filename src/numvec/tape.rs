@@ -16,7 +16,7 @@ use crate::numvec::AD;
 use crate::numvec::ADFn;
 //
 #[cfg(doc)]
-use crate::numvec::ad::doc_generic_v;
+use crate::numvec::doc_generic_v;
 //
 /// The type used for vectors of indices in the tape and function objects
 pub(crate) type Tindex = u32;

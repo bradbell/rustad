@@ -18,7 +18,7 @@
  use crate::numvec::NumVec;
  ///
  /// Set up rustad to do calculations with value type V; see
- /// [doc_generic_v](crate::numvec::ad::doc_generic_v) .
+ /// [doc_generic_v](crate::numvec::doc_generic_v) .
  ///
  /// This macro must be executed once for any type *V*  where `AD<V>` is used.
  /// The rustad package automatically executes this macro

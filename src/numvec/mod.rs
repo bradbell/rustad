@@ -52,9 +52,11 @@ where
 pub use ad::{
     AD,
     ad_from_value,
+    doc_generic_v,
 };
 pub use adfn::{
     ADFn,
+    doc_generic_e,
 };
 pub use tape::{
     start_recording,
