@@ -138,7 +138,7 @@ impl<V : std::fmt::Display> std::fmt::Display for AD<V> {
 /// Convert a value to an AD object with no variable information;
 /// i.e., constant.
 ///
-/// **See Also** : example in [AD::to_value]
+/// **See Also** : example in [AD::to_value], [ad_from_vector]
 ///
 /// # Example
 /// ```
@@ -634,3 +634,28 @@ macro_rules! impl_value_op_ad{
     } }
 }
 pub(crate) use impl_value_op_ad;
+// ---------------------------------------------------------------------------
+// ad_from_vector
+/// Convert a vector to an vector of AD objects with no variable information;
+/// i.e., a vector of constants.
+///
+/// **See Also** : example in [ad_from_value]
+///
+/// # Example
+/// ```
+/// use rustad::numvec::AD;
+/// use rustad::numvec::ad_from_vector;
+/// let x  : Vec<f64>  = vec![ 3.0, 4.0 ];
+/// let ax             = ad_from_vector(x);
+/// assert_eq!( ax[0].clone().to_value(), 3.0 );
+/// assert_eq!( ax[1].clone().to_value(), 4.0 );
+/// ```
+pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
+    assert_ne!( vec.len() , 0 );
+    let tape_id   = 0;
+    let var_index = 0;
+    let avec      = vec.into_iter().map(
+        |value| AD::new(tape_id, var_index, value)
+    ).collect();
+    avec
+}

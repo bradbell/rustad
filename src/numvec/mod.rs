@@ -52,6 +52,7 @@ where
 pub use ad::{
     AD,
     ad_from_value,
+    ad_from_vector,
     doc_generic_v,
 };
 pub use adfn::{
