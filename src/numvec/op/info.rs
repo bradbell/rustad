@@ -114,6 +114,7 @@ pub struct OpInfo<V> {
 ///
 pub fn op_info_vec<V>() -> Vec< OpInfo<V> >
 where
+    for<'a> &'a V : std::ops::Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
     V             : Clone + ThisThreadTape ,
 {
