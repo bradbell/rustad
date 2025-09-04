@@ -84,16 +84,15 @@ impl<V> AD<V> {
     /// Convert an AD object to a value
     /// (its the variable information is lost).
     ///
-    /// **See Also** : example in [ad_from_value]
+    /// **See Also** : example in [AD::from]
     ///
     /// # Example using NumVec
     /// ```
     /// use rustad::numvec::AD;
     /// use rustad::numvec::NumVec;
-    /// use rustad::numvec::ad_from_value;
     /// let v   : Vec<f64>    = vec![ 2.0, 3.0 ];
     /// let nv                = NumVec::new(v);
-    /// let av                = ad_from_value(nv);
+    /// let av                = AD::from(nv);
     /// let nv                = av.to_value();
     /// assert_eq!( nv.vec[0], 2.0 );
     /// assert_eq!( nv.vec[1], 3.0 );
@@ -110,9 +109,8 @@ impl<V> AD<V> {
 /// # Example
 /// ```
 /// use rustad::numvec::AD;
-/// use rustad::numvec::ad_from_value;
 /// let x  : f64  = 5.0;
-/// let ax        = ad_from_value(x);
+/// let ax        = AD::from(x);
 /// let s         = format!( "{ax}" );
 /// assert_eq!(s, "5");
 /// ```
@@ -120,11 +118,10 @@ impl<V> AD<V> {
 /// # Example using NumVec
 /// ```
 /// use rustad::numvec::AD;
-/// use rustad::numvec::ad_from_value;
 /// use rustad::numvec::NumVec;
 /// let x  : Vec<f64>  = vec![ 5.0, 6.0 ];
 /// let x_nv           = NumVec::new(x);
-/// let ax             = ad_from_value(x_nv);
+/// let ax             = AD::from(x_nv);
 /// let s              = format!( "{ax}" );
 /// assert_eq!(s, "[ 5, 6, ]");
 /// ```
@@ -132,26 +129,6 @@ impl<V : std::fmt::Display> std::fmt::Display for AD<V> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", self.value)
     }
-}
-// ---------------------------------------------------------------------------
-// ad_from_value
-/// Convert a value to an AD object with no variable information;
-/// i.e., constant.
-///
-/// **See Also** : example in [AD::to_value], [ad_from_vector]
-///
-/// # Example
-/// ```
-/// use rustad::numvec::AD;
-/// use rustad::numvec::ad_from_value;
-/// let x  : f32  = 3.0;
-/// let ax        = ad_from_value(x);
-/// assert_eq!( ax.to_value(), 3.0 );
-/// ```
-pub fn ad_from_value<V> ( value : V ) ->AD<V> {
-    let tape_id   = 0;
-    let var_index = 0;
-    AD::new(tape_id, var_index, value)
 }
 // ---------------------------------------------------------------------------
 /// Binary `AD<V>` operators.
@@ -177,15 +154,14 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 /// # Example
 ///```
 /// use rustad::numvec::AD;
-/// use rustad::numvec::ad_from_value;
 ///
-/// let ax  = ad_from_value( 3.0f32 );
+/// let ax  = AD::from( 3.0f32 );
 /// let y   = 4.0f32;
 /// let az  = &ax * &y;
 /// assert_eq!( az.to_value(), 12.0f32 );
 ///
 /// let x  = 3.0f32;
-/// let ay = ad_from_value(4.0f32 );
+/// let ay = AD::from(4.0f32 );
 /// let az  = &x * &ay;
 /// assert_eq!( az.to_value(), 12.0f32 );
 /// ```
@@ -193,15 +169,14 @@ pub fn ad_from_value<V> ( value : V ) ->AD<V> {
 /// # Example using NumVec
 /// ```
 /// use rustad::numvec::AD;
-/// use rustad::numvec::ad_from_value;
 /// use rustad::numvec::NumVec;
 ///
 /// let x     : Vec<f64> = vec![ 1.0, 4.0 ];
 /// let y     : Vec<f64> = vec![ 2.0, 2.0 ];
 /// let x_nv             = NumVec::new(x);
 /// let y_nv             = NumVec::new(y);
-/// let ax               = ad_from_value(x_nv);
-/// let ay               = ad_from_value(y_nv);
+/// let ax               = AD::from(x_nv);
+/// let ay               = AD::from(y_nv);
 /// let az               = &ax / &ay;
 /// assert_eq!( az.to_value().vec, vec![0.5f64, 2.0f64] );
 /// ```
@@ -366,9 +341,8 @@ ad_binary_op!(Div, /);
 /// # Example
 /// ```
 /// use rustad::numvec::AD;
-/// use rustad::numvec::ad_from_value;
 ///
-/// let mut ax   = ad_from_value( 3.0f64 );
+/// let mut ax   = AD::from( 3.0f64 );
 /// let y        = 4.0f64;
 /// ax          -= &y;
 /// assert_eq!( ax.to_value(), -1.0f64 );
@@ -377,15 +351,14 @@ ad_binary_op!(Div, /);
 /// # Example using NumVec
 /// ```
 /// use rustad::numvec::AD;
-/// use rustad::numvec::ad_from_value;
 /// use rustad::numvec::NumVec;
 ///
 /// let x     : Vec<f32>  = vec![ 1.0, 4.0 ];
 /// let y     : Vec<f32>  = vec![ 2.0, 2.0 ];
 /// let x_nv              = NumVec::new(x);
 /// let y_nv              = NumVec::new(y);
-/// let mut ax            = ad_from_value(x_nv);
-/// let ay                = ad_from_value(y_nv);
+/// let mut ax            = AD::from(x_nv);
+/// let ay                = AD::from(y_nv);
 /// ax                   *= &ay;
 /// assert_eq!( ax.to_value().vec, vec![2.0f32, 8.0f32] );
 /// ```
@@ -639,7 +612,7 @@ pub(crate) use impl_value_op_ad;
 /// Convert a vector to an vector of AD objects with no variable information;
 /// i.e., a vector of constants.
 ///
-/// **See Also** : example in [ad_from_value]
+/// **See Also** : example in [AD::from]
 ///
 /// # Example
 /// ```
@@ -669,9 +642,8 @@ pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
 /// # Example
 /// ```
 /// use rustad::numvec::AD;
-/// use rustad::numvec::ad_from_value;
 /// use rustad::numvec::ad_to_vector;
-/// let ax    = vec![ ad_from_value(3f64), ad_from_value(4f64) ];
+/// let ax    = vec![ AD::from(3f64), AD::from(4f64) ];
 /// let y     = ad_to_vector(ax);
 /// assert_eq!( y , vec![ 3f64, 4f64 ] );
 /// ```
@@ -697,4 +669,25 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
     assert_ne!( avec.len() , 0 );
     let vec  = avec.into_iter().map( |ad| ad.value).collect();
     vec
+}
+// ---------------------------------------------------------------------------
+// From
+/// Convert a value to an AD object with no variable information;
+/// i.e., constant.
+///
+/// **See Also** : example in [AD::to_value], [ad_from_vector]
+///
+/// # Example
+/// ```
+/// use rustad::numvec::AD;
+/// let x  : f32  = 3.0;
+/// let ax        = AD::from(x);
+/// assert_eq!( ax.to_value(), 3.0 );
+/// ```
+impl<V> From<V> for AD<V> {
+    fn from ( value : V )->AD<V> {
+        let tape_id   = 0;
+        let var_index = 0;
+        AD::new(tape_id, var_index, value)
+    }
 }

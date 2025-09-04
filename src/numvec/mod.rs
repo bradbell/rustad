@@ -51,7 +51,6 @@ where
 //
 pub use ad::{
     AD,
-    ad_from_value,
     ad_from_vector,
     ad_to_vector,
     doc_generic_v,
@@ -259,7 +258,6 @@ numvec_compound_op!(DivAssign, /=);
 /// # Example using NumVec
 /// ```
 /// use rustad::numvec::AD;
-/// use rustad::numvec::ad_from_value;
 /// use rustad::numvec::NumVec;
 /// let x     : Vec<f64>  = vec![5.0, 6.0];
 /// let x_nv              = NumVec::new(x);
@@ -277,13 +275,18 @@ impl<S : std::fmt::Display> std::fmt::Display for NumVec<S> {
 }
 // ----------------------------------------------------------------------------`
 // From
-impl From<f32> for NumVec<f32> {
-    fn from( scalar : f32 ) -> Self {
-        NumVec { vec : vec![ scalar ] }
-    }
-}
-impl From<f64> for NumVec<f64> {
-    fn from( scalar : f64 ) -> Self {
+/// Convert a scalar to a NumVec object with one element.
+///
+/// # Example
+/// ```
+/// use rustad::numvec::NumVec;
+/// let x  : f32  = 3.0;
+/// let ax        = NumVec::from(x);
+/// assert_eq!( ax.vec.len(), 1 );
+/// assert_eq!( ax.vec[0],    3.0 );
+/// ```
+impl<S> From<S> for NumVec<S> {
+    fn from ( scalar : S )->NumVec<S> {
         NumVec { vec : vec![ scalar ] }
     }
 }
