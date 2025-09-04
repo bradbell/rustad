@@ -114,8 +114,8 @@ impl<S> NumVec<S>
 /// use rustad::numvec::NumVec;
 ///
 /// let a  = NumVec::new( vec![ 1f64, 2f64 ] );
-/// let b  = NumVec::new( vec![ 3f64 ] );
-/// let c  = NumVec::new( vec![ 4f64 ] );
+/// let b  = NumVec::from( 3f64 );
+/// let c  = NumVec::from( 4f64 );
 ///
 /// let d = &a * &b;
 /// assert_eq!( d.len(), 2);
@@ -192,8 +192,8 @@ numvec_binary_op!(Div, /);
 /// use rustad::numvec::NumVec;
 ///
 /// let mut a = NumVec::new( vec![ 12f64, 6f64 ] );
-/// let mut b = NumVec::new( vec![ 3f64 ] );
-/// let c     = NumVec::new( vec![ 4f64 ] );
+/// let mut b = NumVec::from( 3f64 );
+/// let c     = NumVec::from( 4f64 );
 ///
 /// a /= &b;
 /// assert_eq!( a.len(), 2);
@@ -273,5 +273,17 @@ impl<S : std::fmt::Display> std::fmt::Display for NumVec<S> {
             write!(f, "{}, ", self.vec[j])?;
         }
         write!(f, "]")
+    }
+}
+// ----------------------------------------------------------------------------`
+// From
+impl From<f32> for NumVec<f32> {
+    fn from( scalar : f32 ) -> Self {
+        NumVec { vec : vec![ scalar ] }
+    }
+}
+impl From<f64> for NumVec<f64> {
+    fn from( scalar : f64 ) -> Self {
+        NumVec { vec : vec![ scalar ] }
     }
 }
