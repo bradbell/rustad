@@ -124,6 +124,9 @@ where
     // mul
     for<'a> &'a V : std::ops::Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Mul<&'a V, Output = V> ,
+    // div
+    for<'a> &'a V : std::ops::Div<&'a AD<V>, Output = AD<V> > ,
+    for<'a> &'a V : std::ops::Div<&'a V, Output = V> ,
     //
     V             : Clone + ThisThreadTape ,
 {
@@ -136,8 +139,7 @@ where
     crate::numvec::op::add::set_op_info::<V>(&mut result);
     crate::numvec::op::sub::set_op_info::<V>(&mut result);
     crate::numvec::op::mul::set_op_info::<V>(&mut result);
-    // TODO: add these calls
-    // crate::numvec::op::div::set_op_info(&mut result);
+    crate::numvec::op::div::set_op_info::<V>(&mut result);
     result
 }
 // ---------------------------------------------------------------------------
