@@ -21,70 +21,20 @@
 // use
 //
 use crate::numvec::tape::sealed::ThisThreadTape;
+use crate::numvec::tape::Tindex;
 use crate::numvec::ad::AD;
+use crate::numvec::op::binary::eval_binary_forward_0;
 use crate::numvec::op::info::OpInfo;
 use crate::numvec::op::id::{
-    ADD_VV_OP,
-    ADD_VC_OP,
     ADD_CV_OP,
+    ADD_VC_OP,
+    ADD_VV_OP,
 };
-// --------------------------------------------------------------------------
-// add_vv
-// --------------------------------------------------------------------------
-// add_vv_forward_0
-/// E Evaluation of zero order forward for variable + variable
-fn add_vv_forward_0 <V, E>(
-    var_zero  : &mut Vec<E> ,
-    _con      : &Vec<V>     ,
-    _flag     : &Vec<bool>  ,
-    arg       : &[usize]    ,
-    res       : usize       )
-where
-    for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
-{
-    debug_assert!( arg.len() == 2);
-    let lhs  = arg[0] as usize;
-    let rhs  = arg[1] as usize;
-    var_zero[ res ] = &var_zero[lhs] + &var_zero[rhs];
-}
-// --------------------------------------------------------------------------
-// add_vc
-// --------------------------------------------------------------------------
-// add_vc_forward_0
-/// E Evaluation of zero order forward for variable + constant
-fn add_vc_forward_0 <V, E>(
-    var_zero  : &mut Vec<E> ,
-    con       : &Vec<V>     ,
-    _flag     : &Vec<bool>  ,
-    arg       : &[usize]    ,
-    res       : usize       )
-where
-    for<'a> &'a E : std::ops::Add<&'a V, Output = E> ,
-{
-    debug_assert!( arg.len() == 2);
-    let lhs  = arg[0] as usize;
-    let rhs  = arg[1] as usize;
-    var_zero[ res ] = &var_zero[lhs] + &con[rhs];
-}
-// --------------------------------------------------------------------------
-// add_cv
-// --------------------------------------------------------------------------
+// -------------------------------------------------------------------------
 // add_cv_forward_0
-/// E Evaluation of zero order forward for constant + variable
-fn add_cv_forward_0 <V, E>(
-    var_zero  : &mut Vec<E> ,
-    con       : &Vec<V>     ,
-    _flag     : &Vec<bool>  ,
-    arg       : &[usize]    ,
-    res       : usize       )
-where
-    for<'a> &'a V : std::ops::Add<&'a E, Output = E> ,
-{
-    debug_assert!( arg.len() == 2);
-    let lhs  = arg[0] as usize;
-    let rhs  = arg[1] as usize;
-    var_zero[ res ] = &con[lhs] + &var_zero[rhs];
-}
+// add_vc_forward_0
+// add_vv_forward_0
+eval_binary_forward_0!(Add, +);
 // ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the add operators.
@@ -98,19 +48,19 @@ where
     for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
     V             : Clone + ThisThreadTape ,
 {
-    op_info_vec[ADD_VV_OP as usize] = OpInfo{
-        name              : "add_vv",
-        forward_0_value   : add_vv_forward_0::<V, V>,
-        forward_0_ad      : add_vv_forward_0::<V, AD<V> >,
+    op_info_vec[ADD_CV_OP as usize] = OpInfo{
+        name              : "add_cv",
+        forward_0_value   : add_cv_forward_0::<V, V>,
+        forward_0_ad      : add_cv_forward_0::<V, AD<V> >,
     };
     op_info_vec[ADD_VC_OP as usize] = OpInfo{
         name              : "add_vc",
         forward_0_value   : add_vc_forward_0::<V, V>,
         forward_0_ad      : add_vc_forward_0::<V, AD<V> >,
     };
-    op_info_vec[ADD_CV_OP as usize] = OpInfo{
-        name              : "add_cv",
-        forward_0_value   : add_cv_forward_0::<V, V>,
-        forward_0_ad      : add_cv_forward_0::<V, AD<V> >,
+    op_info_vec[ADD_VV_OP as usize] = OpInfo{
+        name              : "add_vv",
+        forward_0_value   : add_vv_forward_0::<V, V>,
+        forward_0_ad      : add_vv_forward_0::<V, AD<V> >,
     };
 }

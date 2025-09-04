@@ -8,8 +8,9 @@
 // ---------------------------------------------------------------------------
 // use
 //
-use crate::numvec::AD;
+use crate::numvec::ad::AD;
 use crate::numvec::op::id::NUMBER_OP;
+use crate::numvec::tape::Tindex;
 use crate::numvec::tape::sealed::ThisThreadTape;
 //
 #[cfg(doc)]
@@ -53,7 +54,7 @@ pub type ForwardZeroValue<V> = fn(
     _var_zero : &mut Vec<V> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
-    _arg      : &[usize]    ,
+    _arg      : &[Tindex]   ,
     _res      : usize       ,
 );
 // panic_zero_value
@@ -62,7 +63,7 @@ fn panic_zero_value<V> (
     _var_zero : &mut Vec<V> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
-    _arg      : &[usize]    ,
+    _arg      : &[Tindex]   ,
     _res      : usize       ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
@@ -81,7 +82,7 @@ pub type ForwardZeroAD<V> = fn(
     _var_zero : &mut Vec< AD<V> > ,
     _con      : &Vec<V>           ,
     _flag     : &Vec<bool>        ,
-    _arg      : &[usize]          ,
+    _arg      : &[Tindex]         ,
     _res      : usize             ,
 );
 // panic_zero_ad
@@ -90,7 +91,7 @@ fn panic_zero_ad<V> (
     _var_zero : &mut Vec< AD<V> > ,
     _con      : &Vec<V>           ,
     _flag     : &Vec<bool>        ,
-    _arg      : &[usize]          ,
+    _arg      : &[Tindex]         ,
     _res      : usize             ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
