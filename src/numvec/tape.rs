@@ -263,8 +263,8 @@ where
 /// ```
 /// # Example
 /// ```
-/// use rustad::numvec::tape::start_recording;
-/// use rustad::numvec::tape::stop_recording;
+/// use rustad::numvec::start_recording;
+/// use rustad::numvec::stop_recording;
 /// let domain  : Vec<f32>  = vec![ 1.0, 2.0 ];
 /// let adomain             = start_recording( domain );
 /// let sum                 = &adomain[0] + &adomain[1];
