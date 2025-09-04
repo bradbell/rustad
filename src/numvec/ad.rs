@@ -675,6 +675,24 @@ pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
 /// let y     = ad_to_vector(ax);
 /// assert_eq!( y , vec![ 3f64, 4f64 ] );
 /// ```
+///
+/// # Example using NumVec
+/// ```
+/// use rustad::numvec::AD;
+/// use rustad::numvec::NumVec;
+/// use rustad::numvec::ad_from_vector;
+/// use rustad::numvec::ad_to_vector;
+/// let v_0  : Vec<f32>   = vec![ 2.0, 3.0 ];
+/// let nv_0              = NumVec::new(v_0);
+/// let v_1  : Vec<f32>   = vec![ 4.0, 5.0 ];
+/// let nv_1              = NumVec::new(v_1);
+/// let av                = ad_from_vector( vec![nv_0, nv_1] );
+/// let v                 = ad_to_vector(av);
+/// assert_eq!( v[0].vec[0], 2.0 );
+/// assert_eq!( v[0].vec[1], 3.0 );
+/// assert_eq!( v[1].vec[0], 4.0 );
+/// assert_eq!( v[1].vec[1], 5.0 );
+/// ```
 pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
     assert_ne!( avec.len() , 0 );
     let vec  = avec.into_iter().map( |ad| ad.value).collect();
