@@ -118,6 +118,9 @@ where
     // add
     for<'a> &'a V : std::ops::Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
+    // sub
+    for<'a> &'a V : std::ops::Sub<&'a AD<V>, Output = AD<V> > ,
+    for<'a> &'a V : std::ops::Sub<&'a V, Output = V> ,
     // mul
     for<'a> &'a V : std::ops::Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Mul<&'a V, Output = V> ,
@@ -131,9 +134,9 @@ where
     };
     let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
     crate::numvec::op::add::set_op_info::<V>(&mut result);
+    crate::numvec::op::sub::set_op_info::<V>(&mut result);
     crate::numvec::op::mul::set_op_info::<V>(&mut result);
     // TODO: add these calls
-    // crate::numvec::op::sub::set_op_info(&mut result);
     // crate::numvec::op::div::set_op_info(&mut result);
     result
 }
