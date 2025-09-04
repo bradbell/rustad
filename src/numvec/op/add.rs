@@ -32,32 +32,15 @@ use crate::numvec::op::id::{
 // add_vv
 // --------------------------------------------------------------------------
 // add_vv_forward_0_value
-/// V Evaluation zero order forward: variable + variable
-fn add_vv_forward_0_value <V>(
-    var_zero  : &mut Vec<V> ,
+/// E Evaluation of zero order forward for variable + variable
+fn add_vv_forward_0 <V, E>(
+    var_zero  : &mut Vec<E> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     arg       : &[usize]    ,
     res       : usize       )
 where
-    for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
-{
-    debug_assert!( arg.len() == 2);
-    let lhs  = arg[0] as usize;
-    let rhs  = arg[1] as usize;
-    var_zero[ res ] = &var_zero[lhs] + &var_zero[rhs];
-}
-// add_vv_forward_0_ad
-/// ``AD`` < *V* > Evaluation zero order forward: variable + variable
-fn add_vv_forward_0_ad <V>(
-    var_zero  : &mut Vec< AD<V> > ,
-    _con      : &Vec<V>           ,
-    _flag     : &Vec<bool>        ,
-    arg       : &[usize]          ,
-    res       : usize             )
-where
-    for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
-    V             : Clone + ThisThreadTape ,
+    for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs  = arg[0] as usize;
@@ -152,8 +135,8 @@ where
 {
     op_info_vec[ADD_VV_OP as usize] = OpInfo{
         name              : "add_vv",
-        forward_0_value   : add_vv_forward_0_value::<V>,
-        forward_0_ad      : add_vv_forward_0_ad::<V>,
+        forward_0_value   : add_vv_forward_0::<V, V>,
+        forward_0_ad      : add_vv_forward_0::<V, AD<V> >,
     };
     op_info_vec[ADD_VC_OP as usize] = OpInfo{
         name              : "add_vc",
