@@ -55,7 +55,7 @@ pub use ad::{
     doc_generic_v,
 };
 pub use adfn::{
-    ADFn,
+    ADfn,
     doc_generic_e,
 };
 pub use tape::{

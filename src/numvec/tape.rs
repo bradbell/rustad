@@ -13,7 +13,7 @@ use std::thread::LocalKey;
 use std::sync::Mutex;
 //
 use crate::numvec::AD;
-use crate::numvec::ADFn;
+use crate::numvec::ADfn;
 //
 #[cfg(doc)]
 use crate::numvec::doc_generic_v;
@@ -231,7 +231,7 @@ where
 // ----------------------------------------------------------------------------
 // stop_recording
 //
-/// Stops a recordng and moves it to an ADFn object.
+/// Stops a recordng and moves it to an ADfn object.
 ///
 /// * Syntax :
 /// ```test
@@ -249,7 +249,7 @@ where
 /// the range space variables.
 ///
 /// * ad_fn :
-/// The return value is an `ADFn` < *V* > containing the operation sequence
+/// The return value is an `ADfn` < *V* > containing the operation sequence
 /// that computed arange as a function of the adomain returned by
 /// [start_recording] .
 /// It can compute the values for the function and its derivative.
@@ -275,12 +275,12 @@ where
 /// assert_eq!( ad_fn.domain_len(), 2);
 /// assert_eq!( ad_fn.range_len(), 3);
 /// ```
-pub fn stop_recording<V>( arange : Vec< AD<V> > ) -> ADFn<V>
+pub fn stop_recording<V>( arange : Vec< AD<V> > ) -> ADfn<V>
 where
     Tindex : TryFrom<usize> ,
     V : Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
-    let mut ad_fn : ADFn<V> = ADFn::new();
+    let mut ad_fn : ADfn<V> = ADfn::new();
     let local_key : &LocalKey< RefCell< Tape<V> > > =
         sealed::ThisThreadTape::get();
     let tape_id : usize = local_key.with_borrow_mut( |tape| {

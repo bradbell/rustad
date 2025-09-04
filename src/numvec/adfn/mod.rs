@@ -19,7 +19,7 @@ use crate::numvec::tape::Tindex;
 // ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter E.
 ///
-/// This is the type used to evaluate ADFn member functions with names
+/// This is the type used to evaluate ADfn member functions with names
 /// that begin with ``forward`` or ``reverse`` .
 ///
 /// *   If a member function name ends with `_value` ,
@@ -29,13 +29,13 @@ use crate::numvec::tape::Tindex;
 ///     *E* is the same as ``AD`` < *V* >; see [doc_generic_v] and [AD].
 ///
 /// Note that *V* evaluations are used to compute values and
-/// `AD<V>` evaluations are used to build new [ADFn] objects.
+/// `AD<V>` evaluations are used to build new [ADfn] objects.
 ///
 pub fn doc_generic_e() {}
 // ---------------------------------------------------------------------------
-// ADFn
+// ADfn
 //
-/// An ADFn can an evaluate the function and its derivatives
+/// An ADfn can an evaluate the function and its derivatives
 /// corresponding to an ``AD`` < *V* > operation sequence.
 ///
 /// * V : [doc_generic_v]
@@ -45,7 +45,7 @@ pub fn doc_generic_e() {}
 /// a function; i.e., each variable is only assigned once.
 ///
 /// * TODO : Change member variables to pub(crate) (once they get used).
-pub struct ADFn<V> {
+pub struct ADfn<V> {
     //
     // n_domain
     /// The dimension of the domain space for this function.
@@ -95,18 +95,18 @@ pub struct ADFn<V> {
 }
 //
 // ---------------------------------------------------------------------------
-impl<V> ADFn<V> {
+impl<V> ADfn<V> {
     //
     // new
-    /// This creates an ADFn object with an empty operation sequence.
+    /// This creates an ADfn object with an empty operation sequence.
     ///
     /// To be more specific,
     /// the corresponding  domain and range vectors have length zero.
     ///
     /// # Example
     /// ```
-    /// use rustad::numvec::adfn::ADFn;
-    /// let f : ADFn<f32> = ADFn::new();
+    /// use rustad::numvec::adfn::ADfn;
+    /// let f : ADfn<f32> = ADfn::new();
     /// assert_eq!( f.domain_len(), 0 );
     /// assert_eq!( f.range_len(), 0 );
     /// ```
