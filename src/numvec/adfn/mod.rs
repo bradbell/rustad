@@ -20,17 +20,16 @@ use crate::numvec::tape::Tindex;
 /// Documentation for the rustad generic type parameter E.
 ///
 /// This is the type used to evaluate ADFn member functions with names
-/// that begin with
-/// ``forward`` , ``reverse`` , ``ad_forward`` , ``ad_reverse`` .
+/// that begin with ``forward`` or ``reverse`` .
 ///
-/// *   If a member function name begins with `forward` or ``reverse`` ,
+/// *   If a member function name ends with `_value` ,
 ///     *E* is the same as *V*; see [doc_generic_v] and [AD].
 ///
-/// *   If a member function name begins with `ad_forward` or ``ad_reverse`` ,
+/// *   If a member function name ends with `_ad` ,
 ///     *E* is the same as ``AD`` < *V* >; see [doc_generic_v] and [AD].
 ///
 /// Note that *V* evaluations are used to compute values and
-/// `AD<V>` evaluations are used to build new AD function objects.
+/// `AD<V>` evaluations are used to build new [ADFn] objects.
 ///
 pub fn doc_generic_e() {}
 // ---------------------------------------------------------------------------
