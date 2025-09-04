@@ -36,7 +36,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         arg         : &[Tindex]   ,
         res         : usize       )
     where
-        for<'a> &'a V : std::ops::Add<&'a E, Output = E> ,
+        for<'a> &'a V : std::ops::$Name<&'a E, Output = E> ,
     {
         assert_eq!( arg.len(), 2);
         let lhs = arg[0] as usize;
@@ -54,7 +54,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         arg         : &[Tindex]   ,
         res         : usize       )
     where
-        for<'a> &'a E : std::ops::Add<&'a V, Output = E> ,
+        for<'a> &'a E : std::ops::$Name<&'a V, Output = E> ,
     {
         assert_eq!( arg.len(), 2);
         let lhs = arg[0] as usize;
@@ -72,7 +72,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         arg         : &[Tindex]   ,
         res         : usize       )
     where
-        for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
+        for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,
     {
         assert_eq!( arg.len(), 2);
         let lhs = arg[0] as usize;

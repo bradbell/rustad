@@ -71,6 +71,6 @@ set_operator_ids!(
     /// variable * variable
     DIV_VV_OP,
     //
-    /// number of valid operator_id
+    /// number of valid operator ids
     NUMBER_OP,
 );

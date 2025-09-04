@@ -10,5 +10,7 @@
 //
 pub mod id;
 pub mod info;
-pub mod add;
 pub mod binary;
+//
+pub mod add;
+pub mod mul;
