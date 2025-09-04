@@ -51,32 +51,15 @@ where
 // add_vc
 // --------------------------------------------------------------------------
 // add_vc_forward_0_value
-/// V Evaluation zero order forward: variable + constant
-fn add_vc_forward_0_value <V>(
-    var_zero  : &mut Vec<V> ,
+/// E Evaluation zero order forward for variable + constant
+fn add_vc_forward_0 <V, E>(
+    var_zero  : &mut Vec<E> ,
     con       : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     arg       : &[usize]    ,
     res       : usize       )
 where
-    for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
-{
-    debug_assert!( arg.len() == 2);
-    let lhs  = arg[0] as usize;
-    let rhs  = arg[1] as usize;
-    var_zero[ res ] = &var_zero[lhs] + &con[rhs];
-}
-// add_vc_forward_0_ad
-/// ``AD`` < *V* > Evaluation zero order forward: variable + constant
-fn add_vc_forward_0_ad <V>(
-    var_zero  : &mut Vec< AD<V> > ,
-    con       : &Vec<V>           ,
-    _flag     : &Vec<bool>        ,
-    arg       : &[usize]          ,
-    res       : usize             )
-where
-    for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
-    V             : Clone + ThisThreadTape ,
+    for<'a> &'a E : std::ops::Add<&'a V, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs  = arg[0] as usize;
@@ -140,8 +123,8 @@ where
     };
     op_info_vec[ADD_VC_OP as usize] = OpInfo{
         name              : "add_vc",
-        forward_0_value   : add_vc_forward_0_value::<V>,
-        forward_0_ad      : add_vc_forward_0_ad::<V>,
+        forward_0_value   : add_vc_forward_0::<V, V>,
+        forward_0_ad      : add_vc_forward_0::<V, AD<V> >,
     };
     op_info_vec[ADD_CV_OP as usize] = OpInfo{
         name              : "add_cv",
