@@ -53,6 +53,7 @@ pub use ad::{
     AD,
     ad_from_value,
     ad_from_vector,
+    ad_to_vector,
     doc_generic_v,
 };
 pub use adfn::{

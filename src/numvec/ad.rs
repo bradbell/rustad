@@ -659,3 +659,24 @@ pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
     ).collect();
     avec
 }
+// ---------------------------------------------------------------------------
+// ad_to_vector
+/// Convert a vector of AD object to a vector of values
+/// (any variable information is lost).
+///
+/// **See Also** : example in [ad_from_vector], [AD::to_value]
+///
+/// # Example
+/// ```
+/// use rustad::numvec::AD;
+/// use rustad::numvec::ad_from_value;
+/// use rustad::numvec::ad_to_vector;
+/// let ax    = vec![ ad_from_value(3f64), ad_from_value(4f64) ];
+/// let y     = ad_to_vector(ax);
+/// assert_eq!( y , vec![ 3f64, 4f64 ] );
+/// ```
+pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
+    assert_ne!( avec.len() , 0 );
+    let vec  = avec.into_iter().map( |ad| ad.value).collect();
+    vec
+}
