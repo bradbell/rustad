@@ -621,8 +621,8 @@ macro_rules! impl_value_op_ad{
                 > = crate::numvec::tape::sealed::ThisThreadTape::get();
                 //
                 // new_tape_id, new_var_index
-                let (new_tape_id, new_var_index) =
-                    local_key.with_borrow_mut( |tape|
+                let (new_tape_id, new_var_index) = local_key.with_borrow_mut(
+                    |tape|
                     crate::numvec::ad::[< record_value_ $Name:lower _ad >]::<$V>
                             ( tape, &self, &rhs )
                 );

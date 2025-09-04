@@ -10,6 +10,7 @@
 //
 use crate::numvec::AD;
 use crate::numvec::op::id::NUMBER_OP;
+use crate::numvec::tape::sealed::ThisThreadTape;
 //
 #[cfg(doc)]
 use crate::numvec::ad::doc_generic_v;
@@ -113,16 +114,17 @@ pub struct OpInfo<V> {
 ///
 pub fn op_info_vec<V>() -> Vec< OpInfo<V> >
 where
-    OpInfo<V> : Clone ,
+    for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
+    V             : Clone + ThisThreadTape ,
 {
     let empty = OpInfo {
         name             : &"panic",
         forward_0_value  : panic_zero_value::<V>,
         forward_0_ad     : panic_zero_ad::<V>,
     };
-    let result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
-    // TODO: add this calls
-    // crate::numvec::op::add::set_op_info(&mut result);
+    let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
+    crate::numvec::op::add::set_op_info::<V>(&mut result);
+    // TODO: add these calls
     // crate::numvec::op::sub::set_op_info(&mut result);
     // crate::numvec::op::mul::set_op_info(&mut result);
     // crate::numvec::op::div::set_op_info(&mut result);
@@ -165,7 +167,9 @@ macro_rules! impl_global_op_info_vec{ ($V:ty) => {
         > {
             pub static OP_INFO_VEC :
                 LazyLock< Vec< crate::numvec::op::info::OpInfo<$V> > > =
-                    LazyLock::new( || crate::numvec::op::info::op_info_vec() );
+                    LazyLock::new(
+                        || crate::numvec::op::info::op_info_vec::<$V>()
+                    );
             &OP_INFO_VEC
         }
     }
