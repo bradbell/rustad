@@ -27,8 +27,8 @@ use crate::numvec::doc_generic_e;
 ///     (range_zero, var_zero) = f.forward_zero_value(&domain_zero, trace)
 ///     (range_zero, var_zero) = f.forward_zero_ad(&domain_zero,   trace)
 /// ```
-/// See ADfn::forward_zero_value and
-/// ADfn::forward_zero_ad prototypes.
+/// * Prototype
+/// see [ADfn::forward_zero_value] and [ADfn::forward_zero_ad]
 ///
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
@@ -92,12 +92,12 @@ pub fn doc_forward_zero() { }
 /// If *suffix* is ``value`` , *E must be be the value type *V* .
 /// If *suffix* is ``ad`` , *E must be be the type `AD` < *V* > .
 ///
-/// See [ doc_forward_zero ]
+/// See [doc_forward_zero]
 macro_rules! forward_zero {
     ( $suffix:ident, $V:ident, $E:ty ) => { paste::paste! {
         #[doc = concat!(
             " `", stringify!($E), "` evaluation of zero order forward mode; ",
-            "see [ doc_forward_zero ]",
+            "see [doc_forward_zero]",
         )]
         pub fn [< forward_zero_ $suffix >] (
             &self,
