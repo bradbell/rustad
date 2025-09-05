@@ -75,10 +75,29 @@ pub fn panic_zero<V, E> (
 /// * var_one :
 /// is the vector of directional derivative for each variable.
 /// This is an input for variable indices less than *res* and an output
-/// for the results of this operator; i.e. index *res* .
+/// for the result of this operator; i.e. index *res* .
 ///
 /// * Other Arguments :  see [doc_common_arguments]
 pub type ForwardOne<V, E> = fn(
+    _var_one  : &mut Vec<E> ,
+    _var_zero : &Vec<E>     ,
+    _con      : &Vec<V>     ,
+    _flag     : &Vec<bool>  ,
+    _arg      : &[Tindex]   ,
+    _res      : usize       ,
+);
+// ReverseOne
+/// Evaluation of first order reverse mode.
+///
+/// * var_one :
+/// Is the vector of partial derivatives with respect to the
+/// variables with index less than or equal to *res* .
+/// This operation expresses the result of this operator as
+/// a function of its arguments and modifies the argument partial derivatives
+/// accordingly.
+///
+/// * Other Arguments :  see [doc_common_arguments]
+pub type ReverseOne<V, E> = fn(
     _var_one  : &mut Vec<E> ,
     _var_zero : &Vec<E>     ,
     _con      : &Vec<V>     ,
@@ -109,13 +128,19 @@ pub struct OpInfo<V> {
     pub forward_0_value : ForwardZero<V, V>,
     //
     /// zero order forward mode `AD<V>` evaluation for this operator
-    pub forward_0_ad : ForwardZero<V, AD<V> >,
+    pub forward_0_ad    : ForwardZero<V, AD<V> >,
     //
     /// first order forward mode V evaluation for this operator
     pub forward_1_value : ForwardOne<V, V>,
     //
     /// first order forward mode `AD<V>` evaluation for this operator
-    pub forward_1_ad : ForwardOne<V, AD<V> >,
+    pub forward_1_ad    : ForwardOne<V, AD<V> >,
+    //
+    /// first order reverse mode V evaluation for this operator
+    pub reverse_1_value : ReverseOne<V, V>,
+    //
+    /// first order reverse mode `AD<V>` evaluation for this operator
+    pub reverse_1_ad    : ReverseOne<V, AD<V> >,
 }
 // ---------------------------------------------------------------------------
 // op_info_vec
@@ -124,6 +149,8 @@ pub struct OpInfo<V> {
 ///
 pub fn op_info_vec<V>() -> Vec< OpInfo<V> >
 where
+    // add_assign
+    for<'a> V : std::ops::AddAssign<&'a V> ,
     // add
     for<'a> &'a V : std::ops::Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
@@ -145,6 +172,8 @@ where
         forward_0_ad     : panic_zero::<V, AD<V>>,
         forward_1_value  : panic_one::<V, V>,
         forward_1_ad     : panic_one::<V, AD<V>>,
+        reverse_1_value  : panic_one::<V, V>,
+        reverse_1_ad     : panic_one::<V, AD<V>>,
     };
     let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
     crate::numvec::op::add::set_op_info::<V>(&mut result);

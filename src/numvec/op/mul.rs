@@ -31,7 +31,10 @@ use crate::numvec::op::id::{
     MUL_VV_OP,
 };
 #[cfg(doc)]
-use crate::numvec::op::info::ForwardOne;
+use crate::numvec::op::info::{
+        ForwardOne,
+        ReverseOne,
+};
 // -------------------------------------------------------------------------
 // forward_0
 // -------------------------------------------------------------------------
@@ -89,8 +92,8 @@ fn mul_vv_forward_1 <V, E>(
     arg        :   &[Tindex]   ,
     res        :       usize   )
 where
-    for<'a> &'a E : std::ops::Mul<&'a E, Output = E> ,
     for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
+    for<'a> &'a E : std::ops::Mul<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
@@ -98,6 +101,73 @@ where
     let term1    = &var_zero[lhs]  * &var_one[rhs];
     let term2    = &var_one[lhs]   * &var_zero[rhs];
     var_one[res] = &term1 + &term2;
+}
+// ---------------------------------------------------------------------------
+// reverse_1
+// ---------------------------------------------------------------------------
+//
+// mul_cv_reverse_1
+/// first order reverse for constant * variable; see [ReverseOne]
+fn mul_cv_reverse_1 <V, E>(
+    var_one    :   &mut Vec<E> ,
+    _var_zero  :   &Vec<E>     ,
+    con        :   &Vec<V>     ,
+    _flag      :   &Vec<bool>  ,
+    arg        :   &[Tindex]   ,
+    res        :       usize   )
+where
+    for<'a> E : std::ops::AddAssign<&'a E> ,
+    for<'a> &'a E : std::ops::Mul<&'a V, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    let rhs = arg[1] as usize;
+    let term      = &var_one[res] * &con[lhs];
+    var_one[rhs] += &term;
+}
+//
+// mul_vc_reverse_1
+/// first order reverse for variable * constant; see [ReverseOne]
+fn mul_vc_reverse_1 <V, E>(
+    var_one    :   &mut Vec<E> ,
+    _var_zero  :   &Vec<E>     ,
+    con        :   &Vec<V>     ,
+    _flag      :   &Vec<bool>  ,
+    arg        :   &[Tindex]   ,
+    res        :       usize   )
+where
+    for<'a> E : std::ops::AddAssign<&'a E> ,
+    for<'a> &'a E : std::ops::Mul<&'a V, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    let rhs = arg[1] as usize;
+    let term      = &var_one[res] * &con[rhs];
+    var_one[lhs] += &term;
+}
+//
+// mul_vv_reverse_1
+/// first order reverse for variable * variable; see [ReverseOne]
+fn mul_vv_reverse_1 <V, E>(
+    var_one    :   &mut Vec<E> ,
+    var_zero   :   &Vec<E>     ,
+    _con       :   &Vec<V>     ,
+    _flag      :   &Vec<bool>  ,
+    arg        :   &[Tindex]   ,
+    res        :       usize   )
+where
+    for<'a> E : std::ops::AddAssign<&'a E> ,
+    for<'a> &'a E : std::ops::Mul<&'a E, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    let rhs = arg[1] as usize;
+    //
+    let term      = &var_one[res] * &var_zero[rhs];
+    var_one[lhs] += &term;
+    //
+    let term      = &var_one[res] * &var_zero[lhs];
+    var_one[rhs] += &term;
 }
 // ---------------------------------------------------------------------------
 // set_op_info
@@ -108,8 +178,11 @@ where
 /// The the map results for MUL_CV_OP, MUL_VC_OP, and MUL_VV_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
+    for<'a> V : std::ops::AddAssign<&'a V> ,
+    //
     for<'a> &'a V : std::ops::Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
+    //
     for<'a> &'a V : std::ops::Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Mul<&'a V, Output = V> ,
     V             : Clone + ThisThreadTape ,
@@ -120,6 +193,8 @@ where
         forward_0_ad      : mul_cv_forward_0::<V, AD<V> >,
         forward_1_value   : mul_cv_forward_1::<V, V>,
         forward_1_ad      : mul_cv_forward_1::<V, AD<V> >,
+        reverse_1_value   : mul_cv_reverse_1::<V, V>,
+        reverse_1_ad      : mul_cv_reverse_1::<V, AD<V> >,
     };
     op_info_vec[MUL_VC_OP as usize] = OpInfo{
         name              : "mul_vc",
@@ -127,6 +202,8 @@ where
         forward_0_ad      : mul_vc_forward_0::<V, AD<V> >,
         forward_1_value   : mul_vc_forward_1::<V, V>,
         forward_1_ad      : mul_vc_forward_1::<V, AD<V> >,
+        reverse_1_value   : mul_vc_reverse_1::<V, V>,
+        reverse_1_ad      : mul_vc_reverse_1::<V, AD<V> >,
     };
     op_info_vec[MUL_VV_OP as usize] = OpInfo{
         name              : "mul_vv",
@@ -134,5 +211,7 @@ where
         forward_0_ad      : mul_vv_forward_0::<V, AD<V> >,
         forward_1_value   : mul_vv_forward_1::<V, V>,
         forward_1_ad      : mul_vv_forward_1::<V, AD<V> >,
+        reverse_1_value   : mul_vv_reverse_1::<V, V>,
+        reverse_1_ad      : mul_vv_reverse_1::<V, AD<V> >,
     };
 }

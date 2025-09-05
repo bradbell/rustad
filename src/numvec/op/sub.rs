@@ -55,6 +55,8 @@ where
         forward_0_ad      : sub_cv_forward_0::<V, AD<V> >,
         forward_1_value   : panic_one::<V, V>,
         forward_1_ad      : panic_one::<V, AD<V> >,
+        reverse_1_value   : panic_one::<V, V>,
+        reverse_1_ad      : panic_one::<V, AD<V> >,
     };
     op_info_vec[SUB_VC_OP as usize] = OpInfo{
         name              : "sub_vc",
@@ -62,6 +64,8 @@ where
         forward_0_ad      : sub_vc_forward_0::<V, AD<V> >,
         forward_1_value   : panic_one::<V, V>,
         forward_1_ad      : panic_one::<V, AD<V> >,
+        reverse_1_value   : panic_one::<V, V>,
+        reverse_1_ad      : panic_one::<V, AD<V> >,
     };
     op_info_vec[SUB_VV_OP as usize] = OpInfo{
         name              : "sub_vv",
@@ -69,5 +73,7 @@ where
         forward_0_ad      : sub_vv_forward_0::<V, AD<V> >,
         forward_1_value   : panic_one::<V, V>,
         forward_1_ad      : panic_one::<V, AD<V> >,
+        reverse_1_value   : panic_one::<V, V>,
+        reverse_1_ad      : panic_one::<V, AD<V> >,
     };
 }
