@@ -215,7 +215,7 @@ macro_rules! forward_zero {
 /// * range_one :
 /// The return value is the range vector corresponding to
 /// domain_one and var_zero;
-/// i.e., the directional derivative for the fuctioon
+/// i.e., the directional derivative for the function
 /// corresponding to the operation sequence.
 ///
 /// # Example : forward_one
@@ -357,7 +357,7 @@ macro_rules! forward_one {
                 var_one[j] = domain_one[j];
             }
             if trace {
-                println!( "Begin Trace: forward_zero: n_var = {}", self.n_var);
+                println!( "Begin Trace: forward_one: n_var = {}", self.n_var);
                 println!( "index, flag" );
                 for j in 0 .. self.flag_all.len() {
                     println!( "{}, {}", j, self.flag_all[j] );
@@ -577,7 +577,7 @@ macro_rules! reverse_one {
                 partial[index] += range_one[j];
             }
             if trace {
-                println!( "Begin Trace: forward_zero: n_var = {}", self.n_var);
+                println!( "Begin Trace: reverse_one: n_var = {}", self.n_var);
                 println!( "index, flag" );
                 for j in 0 .. self.flag_all.len() {
                     println!( "{}, {}", j, self.flag_all[j] );
