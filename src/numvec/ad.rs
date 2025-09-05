@@ -191,7 +191,7 @@ pub fn doc_ad_binary_op() { }
 /// see [doc_ad_binary_op]
 macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     // -----------------------------------------------------------------------
-    fn [< record_ $Name:lower _vv >]<V> (
+    fn [< record_ $Name:lower _aa >]<V> (
         tape: &mut Tape<V> ,
         lhs:       &AD<V>  ,
         rhs:       &AD<V>  ,
@@ -251,7 +251,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             // new_tape_id, new_var_index
             let (new_tape_id, new_var_index) =
                 local_key.with_borrow_mut( |tape|
-                    [< record_ $Name:lower _vv >]::<V> ( tape, &self, &rhs )
+                    [< record_ $Name:lower _aa >]::<V> ( tape, &self, &rhs )
             );
             //
             // result
@@ -259,7 +259,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         }
     }
     // -----------------------------------------------------------------------
-    fn [< record_ $Name:lower _vc >]<V> (
+    fn [< record_ $Name:lower _av >]<V> (
         tape: &mut Tape<V> ,
         lhs:       &AD<V>  ,
         rhs:       &V      ,
@@ -307,7 +307,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             // new_tape_id, new_var_index
             let (new_tape_id, new_var_index) =
                 local_key.with_borrow_mut( |tape|
-                    [< record_ $Name:lower _vc >]::<V> ( tape, &self, &rhs )
+                    [< record_ $Name:lower _av >]::<V> ( tape, &self, &rhs )
             );
             //
             // result
@@ -378,7 +378,7 @@ pub fn doc_ad_compound_op() { }
 /// see [doc_ad_compound_op]
 macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     // ------------------------------------------------------------------------
-    fn [< record_ $Name:lower _assign_vv >]<V> (
+    fn [< record_ $Name:lower _assign_aa >]<V> (
          tape: &mut Tape<V> ,
          lhs:  &mut AD<V>   ,
          rhs:  &    AD<V>   )
@@ -431,7 +431,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             //
             // tape, self.tape_id, self.var_index
             local_key.with_borrow_mut( |tape|
-                [< record_ $Name:lower _assign_vv >]::<V> ( tape, self, rhs )
+                [< record_ $Name:lower _assign_aa >]::<V> ( tape, self, rhs )
             );
             //
             // self.value
@@ -440,7 +440,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
         }
     }
     // ------------------------------------------------------------------------
-     fn [< record_ $Name:lower _assign_vc >]<V> (
+     fn [< record_ $Name:lower _assign_av >]<V> (
          tape: &mut Tape<V> ,
          lhs:  &mut AD<V>   ,
          rhs:  &    V       )
@@ -479,7 +479,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             //
             // tape, self.tape_id, self.var_index
             local_key.with_borrow_mut( |tape|
-                [< record_ $Name:lower _assign_vc >]::<V> ( tape, self, rhs )
+                [< record_ $Name:lower _assign_av >]::<V> ( tape, self, rhs )
             );
             //
             // self.value
