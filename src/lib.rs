@@ -75,10 +75,10 @@ pub use crate::checkpoint::{
 /// # Example
 /// ```
 /// let date = *rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2025.9.4");
+/// assert_eq!(date, "2025.9.5");
 /// ```
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
-   std::sync::LazyLock::new( || "2025.9.4" );
+   std::sync::LazyLock::new( || "2025.9.5" );
 //
 /// Document the rustad generic type parameters F and U.
 ///

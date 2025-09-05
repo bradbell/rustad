@@ -22,6 +22,9 @@ use crate::numvec::adfn::doc_generic_e;
 // doc_common_arguments
 /// Common arguments for operator evaluation functions.
 ///
+/// * V : see [doc_generic_v]
+/// * E : see [doc_generic_e]
+///
 /// * var_zero :
 /// vector of zero order results for all the variable by variable index.
 ///
@@ -39,10 +42,8 @@ use crate::numvec::adfn::doc_generic_e;
 #[cfg(doc)]
 pub fn doc_common_arguments() {}
 // ---------------------------------------------------------------------------
-// ForwardZeroValue
-/// Evaluation of zero order forward mpode.
-///
-/// * V : see [doc_generic_v]
+// ForwardZero
+/// Evaluation of zero order forward mode.
 ///
 /// * var_zero :
 /// is the vector of zero order variable values.
@@ -50,49 +51,21 @@ pub fn doc_common_arguments() {}
 /// for the results of this operator.
 ///
 /// * Other Arguments :  see [doc_common_arguments]
-pub type ForwardZeroValue<V> = fn(
-    _var_zero : &mut Vec<V> ,
+pub type ForwardZero<V, E> = fn(
+    _var_zero : &mut Vec<E> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[Tindex]   ,
     _res      : usize       ,
 );
-// panic_zero_value
-/// default [ForwardZeroValue] function will panic
-fn panic_zero_value<V> (
-    _var_zero : &mut Vec<V> ,
+// panic_zero
+/// default [ForwardZero] function will panic
+fn panic_zero<V, E> (
+    _var_zero : &mut Vec<E> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[Tindex]   ,
     _res      : usize       ,
-) { panic!(); }
-// ---------------------------------------------------------------------------
-// ForwardZeroAD
-/// Evaluation of zero order forward mpode.
-///
-/// * V : see [doc_generic_v]
-///
-/// * var_zero :
-/// is the vector of zero order variable values.
-/// This is an input for variable indices less than *res* and an output
-/// for the results of this operator.
-///
-/// * Other Arguments :  see [doc_common_arguments]
-pub type ForwardZeroAD<V> = fn(
-    _var_zero : &mut Vec< AD<V> > ,
-    _con      : &Vec<V>           ,
-    _flag     : &Vec<bool>        ,
-    _arg      : &[Tindex]         ,
-    _res      : usize             ,
-);
-// panic_zero_ad
-/// default [ForwardZeroAD] function will panic
-fn panic_zero_ad<V> (
-    _var_zero : &mut Vec< AD<V> > ,
-    _con      : &Vec<V>           ,
-    _flag     : &Vec<bool>        ,
-    _arg      : &[Tindex]         ,
-    _res      : usize             ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
 /// Information for one operator
@@ -102,11 +75,11 @@ pub struct OpInfo<V> {
     /// name the user sees for this operator
     pub name : &'static str,
     //
-    /// zero order forward mode *V* evaluation for this operator
-    pub forward_0_value : ForwardZeroValue<V>,
+    /// zero order forward mode V evaluation for this operator
+    pub forward_0_value : ForwardZero<V, V>,
     //
-    /// zero order forward mode ``AD`` < *V* > evaluation for this operator
-    pub forward_0_ad : ForwardZeroAD<V>,
+    /// zero order forward mode `AD<V>` evaluation for this operator
+    pub forward_0_ad : ForwardZero<V, AD<V> >,
 }
 // ---------------------------------------------------------------------------
 // op_info_vec
@@ -132,8 +105,8 @@ where
 {
     let empty = OpInfo {
         name             : &"panic",
-        forward_0_value  : panic_zero_value::<V>,
-        forward_0_ad     : panic_zero_ad::<V>,
+        forward_0_value  : panic_zero::<V, V>,
+        forward_0_ad     : panic_zero::<V, AD<V>>,
     };
     let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
     crate::numvec::op::add::set_op_info::<V>(&mut result);
