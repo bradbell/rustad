@@ -60,8 +60,38 @@ pub type ForwardZero<V, E> = fn(
 );
 // panic_zero
 /// default [ForwardZero] function will panic
-fn panic_zero<V, E> (
+/// TODO: make this private when removed from all binary operators.
+pub fn panic_zero<V, E> (
     _var_zero : &mut Vec<E> ,
+    _con      : &Vec<V>     ,
+    _flag     : &Vec<bool>  ,
+    _arg      : &[Tindex]   ,
+    _res      : usize       ,
+) { panic!(); }
+// ---------------------------------------------------------------------------
+// ForwardOne
+/// Evaluation of first order forward mode.
+///
+/// * var_one :
+/// is the vector of directional derivative for each variable.
+/// This is an input for variable indices less than *res* and an output
+/// for the results of this operator; i.e. index *res* .
+///
+/// * Other Arguments :  see [doc_common_arguments]
+pub type ForwardOne<V, E> = fn(
+    _var_one  : &mut Vec<E> ,
+    _var_zero : &Vec<E>     ,
+    _con      : &Vec<V>     ,
+    _flag     : &Vec<bool>  ,
+    _arg      : &[Tindex]   ,
+    _res      : usize       ,
+);
+// panic_one
+/// default [ForwardOne] function will panic
+/// TODO: make this private when removed from all binary operators.
+pub fn panic_one<V, E> (
+    _var_one  : &mut Vec<E> ,
+    _var_zero : &Vec<E>     ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[Tindex]   ,
@@ -80,6 +110,12 @@ pub struct OpInfo<V> {
     //
     /// zero order forward mode `AD<V>` evaluation for this operator
     pub forward_0_ad : ForwardZero<V, AD<V> >,
+    //
+    /// first order forward mode V evaluation for this operator
+    pub forward_1_value : ForwardOne<V, V>,
+    //
+    /// first order forward mode `AD<V>` evaluation for this operator
+    pub forward_1_ad : ForwardOne<V, AD<V> >,
 }
 // ---------------------------------------------------------------------------
 // op_info_vec
@@ -107,6 +143,8 @@ where
         name             : &"panic",
         forward_0_value  : panic_zero::<V, V>,
         forward_0_ad     : panic_zero::<V, AD<V>>,
+        forward_1_value  : panic_one::<V, V>,
+        forward_1_ad     : panic_one::<V, AD<V>>,
     };
     let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
     crate::numvec::op::add::set_op_info::<V>(&mut result);

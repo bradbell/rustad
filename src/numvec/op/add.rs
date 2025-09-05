@@ -25,6 +25,7 @@ use crate::numvec::tape::Tindex;
 use crate::numvec::ad::AD;
 use crate::numvec::op::binary::eval_binary_forward_0;
 use crate::numvec::op::info::OpInfo;
+use crate::numvec::op::info::panic_one;
 use crate::numvec::op::id::{
     ADD_CV_OP,
     ADD_VC_OP,
@@ -52,15 +53,21 @@ where
         name              : "add_cv",
         forward_0_value   : add_cv_forward_0::<V, V>,
         forward_0_ad      : add_cv_forward_0::<V, AD<V> >,
+        forward_1_value   : panic_one::<V, V>,
+        forward_1_ad      : panic_one::<V, AD<V> >,
     };
     op_info_vec[ADD_VC_OP as usize] = OpInfo{
         name              : "add_vc",
         forward_0_value   : add_vc_forward_0::<V, V>,
         forward_0_ad      : add_vc_forward_0::<V, AD<V> >,
+        forward_1_value   : panic_one::<V, V>,
+        forward_1_ad      : panic_one::<V, AD<V> >,
     };
     op_info_vec[ADD_VV_OP as usize] = OpInfo{
         name              : "add_vv",
         forward_0_value   : add_vv_forward_0::<V, V>,
         forward_0_ad      : add_vv_forward_0::<V, AD<V> >,
+        forward_1_value   : panic_one::<V, V>,
+        forward_1_ad      : panic_one::<V, AD<V> >,
     };
 }

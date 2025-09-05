@@ -30,11 +30,75 @@ use crate::numvec::op::id::{
     MUL_VC_OP,
     MUL_VV_OP,
 };
+#[cfg(doc)]
+use crate::numvec::op::info::ForwardOne;
+// -------------------------------------------------------------------------
+// forward_0
 // -------------------------------------------------------------------------
 // mul_cv_forward_0
 // mul_vc_forward_0
 // mul_vv_forward_0
 eval_binary_forward_0!(Mul, *);
+// ---------------------------------------------------------------------------
+// forward_1
+// ---------------------------------------------------------------------------
+//
+// mul_cv_forward_1
+/// first order forward for constant * variable; see [ForwardOne]
+fn mul_cv_forward_1 <V, E>(
+    var_one    :   &mut Vec<E> ,
+    _var_zero  :   &Vec<E>     ,
+    con        :   &Vec<V>     ,
+    _flag      :   &Vec<bool>  ,
+    arg        :   &[Tindex]   ,
+    res        :       usize   )
+where
+    for<'a> &'a V : std::ops::Mul<&'a E, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    let rhs = arg[1] as usize;
+    var_one[ res ] = &con[lhs] * &var_one[rhs];
+}
+//
+// mul_vc_forward_1
+/// first order forward for variable * constant; see [ForwardOne]
+fn mul_vc_forward_1 <V, E>(
+    var_one    :   &mut Vec<E> ,
+    _var_zero  :   &Vec<E>     ,
+    con        :   &Vec<V>     ,
+    _flag      :   &Vec<bool>  ,
+    arg        :   &[Tindex]   ,
+    res        :       usize   )
+where
+    for<'a> &'a E : std::ops::Mul<&'a V, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    let rhs = arg[1] as usize;
+    var_one[ res ] = &var_one[lhs] * &con[rhs];
+}
+//
+// mul_vv_forward_1
+/// first order forward for variable * variable; see [ForwardOne]
+fn mul_vv_forward_1 <V, E>(
+    var_one    :   &mut Vec<E> ,
+    var_zero   :   &Vec<E>     ,
+    _con       :   &Vec<V>     ,
+    _flag      :   &Vec<bool>  ,
+    arg        :   &[Tindex]   ,
+    res        :       usize   )
+where
+    for<'a> &'a E : std::ops::Mul<&'a E, Output = E> ,
+    for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    let rhs = arg[1] as usize;
+    let term1    = &var_zero[lhs]  * &var_one[rhs];
+    let term2    = &var_one[lhs]   * &var_zero[rhs];
+    var_one[res] = &term1 + &term2;
+}
 // ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the Mul operators.
@@ -44,6 +108,8 @@ eval_binary_forward_0!(Mul, *);
 /// The the map results for MUL_CV_OP, MUL_VC_OP, and MUL_VV_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
+    for<'a> &'a V : std::ops::Add<&'a AD<V>, Output = AD<V> > ,
+    for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
     for<'a> &'a V : std::ops::Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Mul<&'a V, Output = V> ,
     V             : Clone + ThisThreadTape ,
@@ -52,15 +118,21 @@ where
         name              : "mul_cv",
         forward_0_value   : mul_cv_forward_0::<V, V>,
         forward_0_ad      : mul_cv_forward_0::<V, AD<V> >,
+        forward_1_value   : mul_cv_forward_1::<V, V>,
+        forward_1_ad      : mul_cv_forward_1::<V, AD<V> >,
     };
     op_info_vec[MUL_VC_OP as usize] = OpInfo{
         name              : "mul_vc",
         forward_0_value   : mul_vc_forward_0::<V, V>,
         forward_0_ad      : mul_vc_forward_0::<V, AD<V> >,
+        forward_1_value   : mul_vc_forward_1::<V, V>,
+        forward_1_ad      : mul_vc_forward_1::<V, AD<V> >,
     };
     op_info_vec[MUL_VV_OP as usize] = OpInfo{
         name              : "mul_vv",
         forward_0_value   : mul_vv_forward_0::<V, V>,
         forward_0_ad      : mul_vv_forward_0::<V, AD<V> >,
+        forward_1_value   : mul_vv_forward_1::<V, V>,
+        forward_1_ad      : mul_vv_forward_1::<V, AD<V> >,
     };
 }

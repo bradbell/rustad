@@ -26,8 +26,8 @@
 /// that uses eval_binary_forward_0
 macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     #[doc = concat!(
-        " E zero order forward constant ",
-        stringify!( $op ), " variable where E = V or `AD<V>`"
+        " zero order forward for constant ", stringify!( $op ),
+        " variable; see [ForwardZero](crate::numvec::op::info::ForwardZero)"
     ) ]
     fn [< $Name:lower _cv_forward_0 >] <V, E> (
         var_zero    : &mut Vec<E> ,
@@ -44,8 +44,8 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         var_zero[ res ] = &con[lhs] $op &var_zero[rhs];
     }
     #[doc = concat!(
-        " E zero order forward variable ",
-        stringify!( $op ), " constant where E = V or `AD<V>`"
+        " zero order forward variable ", stringify!( $op ),
+        " constant; see [ForwardZero](crate::numvec::op::info::ForwardZero)"
     ) ]
     fn [< $Name:lower _vc_forward_0 >] <V, E> (
         var_zero    : &mut Vec<E> ,
@@ -62,8 +62,8 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         var_zero[ res ] = &var_zero[lhs] $op &con[rhs];
     }
     #[doc = concat!(
-        " E zero order forward variable ",
-        stringify!( $op ), " variable where E = V or `AD<V>`"
+        " E zero order forward variable ", stringify!( $op ),
+        " variable; see [ForwardZero](crate::numvec::op::info::ForwardZero)"
     ) ]
     fn [< $Name:lower _vv_forward_0 >] <V, E> (
         var_zero    : &mut Vec<E> ,
