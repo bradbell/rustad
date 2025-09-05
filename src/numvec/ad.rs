@@ -378,7 +378,7 @@ pub fn doc_ad_compound_op() { }
 /// see [doc_ad_compound_op]
 macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     // ------------------------------------------------------------------------
-     fn [< record_ $Name:lower _assign_vv >]<V> (
+    fn [< record_ $Name:lower _assign_vv >]<V> (
          tape: &mut Tape<V> ,
          lhs:  &mut AD<V>   ,
          rhs:  &    AD<V>   )
@@ -424,8 +424,6 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : &AD<V> )
         {   //
-            // self.value
-            self.value $Op &rhs.value;
             //
             // local_key
             let local_key : &LocalKey< RefCell< Tape<V> > > =
@@ -435,6 +433,10 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             local_key.with_borrow_mut( |tape|
                 [< record_ $Name:lower _assign_vv >]::<V> ( tape, self, rhs )
             );
+            //
+            // self.value
+            // record above assuees that self.value is its value before this op
+            self.value $Op &rhs.value;
         }
     }
     // ------------------------------------------------------------------------
@@ -471,9 +473,6 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : &V)
         {   //
-            // self.value
-            self.value $Op &rhs;
-            //
             // local_key
             let local_key : &LocalKey< RefCell< Tape<V> > > =
                 ThisThreadTape::get();
@@ -482,6 +481,10 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             local_key.with_borrow_mut( |tape|
                 [< record_ $Name:lower _assign_vc >]::<V> ( tape, self, rhs )
             );
+            //
+            // self.value
+            // record above assuees that self.value is its value before this op
+            self.value $Op &rhs;
         }
     }
 } } }

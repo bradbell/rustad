@@ -7,6 +7,11 @@
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
+// sub-modules
+//
+// forward_zero
+pub mod forward_zero;
+// ---------------------------------------------------------------------------
 //
 #[cfg(doc)]
 use crate::numvec::doc_generic_v;
