@@ -13,6 +13,7 @@ pub mod forward_zero;
 pub mod forward_one;
 pub mod reverse_one;
 pub mod sub_sparsity;
+pub mod for_sparsity;
 // ---------------------------------------------------------------------------
 //
 #[cfg(doc)]

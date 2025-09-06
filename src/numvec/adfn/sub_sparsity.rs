@@ -85,8 +85,8 @@ where
     /// ```
     pub fn sub_sparsity(&self, trace : bool) -> Vec< [usize; 2] >
     {   //
-        // zero_tindex
-        let zero_tindex  = 0 as Tindex;
+        // zero_t
+        let zero_t  = 0 as Tindex;
         //
         // op_info_vec
         let op_info_vec = &*<V as GlobalOpInfoVec>::get();
@@ -112,9 +112,10 @@ where
         let mut arg_var_index   : Vec<Tindex>       = Vec::new();
         let mut var_index_stack : Vec<Tindex>       = Vec::new();
         //
-        if trace {
-            println!( "n_domain = {}, n_range = {}", n_domain, n_range );
-        }
+        if trace { println!(
+            "Begin Trace: sub_sparsity: n_domain = {}, n_range = {}",
+            n_domain, n_range
+        ); }
         //
         // row
         // determine the variables that range index row depends on
@@ -123,12 +124,12 @@ where
             // var_index
             let var_index = range2tape_index[row] as usize;
             if trace {
-                println!( "row {} var_index {}", row, var_index );
+                println!( "row = {}", row );
             }
             //
             // var_index_stack
             // use resize instead of new stack to reduce memory allocation
-            var_index_stack.resize(0, zero_tindex);
+            var_index_stack.resize(0, zero_t);
             var_index_stack.push( var_index as Tindex );
             while var_index_stack.len() > 0 {
                 //
@@ -137,15 +138,18 @@ where
                 //
                 if done[var_index] != row {
                     done[var_index] = row;
-                    if trace {
-                        println!( "    var_index = {}", var_index );
-                    }
                     if var_index < n_domain {
+                        if trace {
+                            println!( "    col = {}", var_index );
+                        }
                         //
                         // result
                         // var_index is a domain variable index
                         result.push( [row, var_index] );
                     } else {
+                        if trace {
+                            println!( "    var_index = {}", var_index );
+                        }
                         //
                         // op_index
                         // the operator that creates this variable
