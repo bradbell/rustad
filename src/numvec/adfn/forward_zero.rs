@@ -114,7 +114,7 @@ macro_rules! forward_zero {
             );
             //
             // op_info_vec
-            let op_info_vec        = &*GlobalOpInfoVec::get();
+            let op_info_vec = &*GlobalOpInfoVec::get();
             //
             // var_zero
             let nan_v         : $V = f32::NAN.into();
