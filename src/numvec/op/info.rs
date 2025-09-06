@@ -14,10 +14,10 @@ use crate::numvec::tape::Tindex;
 use crate::numvec::tape::sealed::ThisThreadTape;
 //
 #[cfg(doc)]
-use crate::numvec::doc_generic_v;
-#[cfg(doc)]
-use crate::numvec::adfn::doc_generic_e;
-//
+use crate::numvec::{
+    doc_generic_v,
+    doc_generic_e,
+};
 // ---------------------------------------------------------------------------
 // doc_common_arguments
 /// Common arguments for operator evaluation functions.

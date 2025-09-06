@@ -14,9 +14,10 @@ use crate::numvec::ADfn;
 use crate::numvec::op::info::GlobalOpInfoVec;
 //
 #[cfg(doc)]
-use crate::numvec::doc_generic_v;
-#[cfg(doc)]
-use crate::numvec::doc_generic_e;
+use crate::numvec::{
+    doc_generic_v,
+    doc_generic_e,
+};
 //
 // -----------------------------------------------------------------------
 // forward_one

@@ -15,9 +15,10 @@ pub mod reverse_one;
 // ---------------------------------------------------------------------------
 //
 #[cfg(doc)]
-use crate::numvec::doc_generic_v;
-#[cfg(doc)]
-use crate::numvec::ad::AD;
+use crate::numvec::{
+    doc_generic_v,
+    AD,
+};
 //
 // Tindex
 use crate::numvec::tape::Tindex;
