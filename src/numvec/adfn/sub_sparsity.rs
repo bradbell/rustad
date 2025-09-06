@@ -13,10 +13,7 @@ use crate::numvec::tape::Tindex;
 use crate::numvec::op::info::GlobalOpInfoVec;
 //
 #[cfg(doc)]
-use crate::numvec::{
-    doc_generic_v,
-    doc_generic_e,
-};
+use crate::numvec::doc_generic_v;
 //
 // ---------------------------------------------------------------------------
 // ADfn::sub_sparsoty
@@ -59,7 +56,7 @@ where
     /// the corresponding derivative is always zero.
     ///
     /// # Example
-    ///```
+    /// ```
     /// use rustad::numvec::AD;
     /// use rustad::numvec::start_recording;
     /// use rustad::numvec::stop_recording;
@@ -67,21 +64,25 @@ where
     /// // V
     /// type V = f32;
     /// //
-    /// let x      : Vec<V>       = vec![1.0, 2.0, 3.0];
+    /// // nx
+    /// let nx = 4;
+    /// //
+    /// let x      : Vec<V>       = vec![2.0; nx];
     /// let ax                    = start_recording(x);
     /// let mut ay : Vec< AD<V> > = Vec::new();
-    /// for j in 0 .. ax.len() {
-    ///     ay.push( &ax[j] * &ax[j] );
+    /// ay.push( AD::from( V::from(5.0) ) ); // ay[0] is a constant
+    /// for j in 1 .. nx {
+    ///     ay.push( &ax[j] * &ax[j] );      // ay[j] is a variable
     /// }
     /// let f           = stop_recording(ay);
     /// let trace       = false;
     /// let mut pattern = f.sub_sparsity(trace);
     /// pattern.sort();
-    /// assert_eq!( pattern.len(), 3 );
-    /// assert_eq!( pattern[0], [0,0] );
-    /// assert_eq!( pattern[1], [1,1] );
-    /// assert_eq!( pattern[2], [2,2] );
-    ///```
+    /// assert_eq!( pattern.len(), nx - 1 );
+    /// for j in 1 .. nx {
+    ///     assert_eq!( pattern[j-1], [j,j] );
+    /// }
+    /// ```
     pub fn sub_sparsity(&self, trace : bool) -> Vec< [usize; 2] >
     {   //
         // zero_tindex
