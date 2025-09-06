@@ -20,10 +20,10 @@
 // --------------------------------------------------------------------------
 // use
 //
+use crate::numvec::op::binary;
 use crate::numvec::tape::sealed::ThisThreadTape;
 use crate::numvec::tape::Tindex;
 use crate::numvec::ad::AD;
-use crate::numvec::op::binary::eval_binary_forward_0;
 use crate::numvec::op::info::OpInfo;
 use crate::numvec::op::info::panic_one;
 use crate::numvec::op::id::{
@@ -35,7 +35,7 @@ use crate::numvec::op::id::{
 // div_cv_forward_0
 // div_vc_forward_0
 // div_vv_forward_0
-eval_binary_forward_0!(Div, /);
+binary::eval_binary_forward_0!(Div, /);
 // ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the Div operators.
@@ -57,6 +57,7 @@ where
         forward_1_ad      : panic_one::<V, AD<V> >,
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
+        arg_var_index     : binary::binary_cv_arg_var_index,
     };
     op_info_vec[DIV_VC_OP as usize] = OpInfo{
         name              : "div_vc",
@@ -66,6 +67,7 @@ where
         forward_1_ad      : panic_one::<V, AD<V> >,
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
+        arg_var_index     : binary::binary_vc_arg_var_index,
     };
     op_info_vec[DIV_VV_OP as usize] = OpInfo{
         name              : "div_vv",
@@ -75,5 +77,6 @@ where
         forward_1_ad      : panic_one::<V, AD<V> >,
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
+        arg_var_index     : binary::binary_vv_arg_var_index,
     };
 }

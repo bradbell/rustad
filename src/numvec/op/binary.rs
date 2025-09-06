@@ -2,10 +2,47 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! Macro used by the binary operators.
+//! Utilities used by the binary operators.
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
+//
+use crate::numvec::tape::Tindex;
+//
+// ---------------------------------------------------------------------------
+//
+// binary_cv_arg_var_index
+pub(crate) fn binary_cv_arg_var_index(
+    arg_var_index : &mut Vec<Tindex> ,
+    _flag         : &Vec<bool>       ,
+    arg           : &[Tindex]        ,
+) {
+    arg_var_index.resize(1, 0 as Tindex);
+    arg_var_index[0] = arg[1];
+}
+//
+// binary_vc_arg_var_index
+pub(crate) fn binary_vc_arg_var_index(
+    arg_var_index : &mut Vec<Tindex> ,
+    _flag         : &Vec<bool>       ,
+    arg           : &[Tindex]        ,
+) {
+    arg_var_index.resize(1, 0 as Tindex);
+    arg_var_index[0] = arg[0];
+}
+//
+// binary_vv_arg_var_index
+pub(crate) fn binary_vv_arg_var_index(
+    arg_var_index : &mut Vec<Tindex> ,
+    _flag         : &Vec<bool>       ,
+    arg           : &[Tindex]        ,
+) {
+    arg_var_index.resize(2, 0 as Tindex);
+    arg_var_index[0] = arg[0];
+    arg_var_index[1] = arg[1];
+}
+// ---------------------------------------------------------------------------
+// eval_binary_forward_0
 /// Evaluation of zero order forward for binary operators.
 ///
 /// * V      : see [doc_generic_v](crate::numvec::doc_generic_v)
@@ -22,8 +59,7 @@
 /// where {name} is a lower case version of Name and
 /// v (c) means the corresponding operand is a variable (constant) .
 ///
-/// [Tindex](crate::numvec::tape::Tindex) must be defined in any module
-/// that uses eval_binary_forward_0
+/// [Tindex] must be defined in any module that uses eval_binary_forward_0
 macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     #[doc = concat!(
         " zero order forward for constant ", stringify!( $op ),

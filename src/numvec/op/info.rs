@@ -106,7 +106,7 @@ pub type ReverseOne<V, E> = fn(
     _res      : usize       ,
 );
 // panic_one
-/// default [ForwardOne] function will panic
+/// default [ForwardOne] and [ReverseOne] function will panic
 /// TODO: make this private when removed from all binary operators.
 pub fn panic_one<V, E> (
     _var_one  : &mut Vec<E> ,
@@ -117,13 +117,42 @@ pub fn panic_one<V, E> (
     _res      : usize       ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
+// ArgVarIndex
+/// Return indices for variables that are arguments for an operation
+///
+/// * arg_var_index :
+/// This vector is both an input and the output for this function
+/// (to avoid having to reallocate memory for each call).
+/// Only the capacity of the vector matters on input.
+/// Upon return, it contains the indices for the variables that are
+/// arguments for this operator.
+///
+/// * flag :
+/// vector of all the boolean values used by operators.
+///
+/// * arg :
+/// The arguments for this operator as a sub-vector of all the arguments.
+///
+pub type ArgVarIndex = fn(
+    _arg_var_index : &mut Vec<Tindex> ,
+    _flag          : &Vec<bool>       ,
+    _arg           : &[Tindex]        ,
+);
+// panic_arg_var_index
+/// default [ArgVarIndex] function will panic.
+fn panic_arg_var_index(
+    _arg_var_index : &mut Vec<Tindex> ,
+    _flag          : &Vec<bool>       ,
+    _arg           : &[Tindex]        ,
+) { panic!() }
+// ---------------------------------------------------------------------------
 /// Information for one operator
 #[derive(Clone)]
 pub struct OpInfo<V> {
     //
     /// name the user sees for this operator
     pub name : &'static str,
-    //
+        //
     /// zero order forward mode V evaluation for this operator
     pub forward_0_value : ForwardZero<V, V>,
     //
@@ -141,6 +170,9 @@ pub struct OpInfo<V> {
     //
     /// first order reverse mode `AD<V>` evaluation for this operator
     pub reverse_1_ad    : ReverseOne<V, AD<V> >,
+    //
+    /// get indices for variables that are arguments to this function
+    pub arg_var_index   : ArgVarIndex,
 }
 // ---------------------------------------------------------------------------
 // op_info_vec
@@ -174,6 +206,7 @@ where
         forward_1_ad     : panic_one::<V, AD<V>>,
         reverse_1_value  : panic_one::<V, V>,
         reverse_1_ad     : panic_one::<V, AD<V>>,
+        arg_var_index    : panic_arg_var_index,
     };
     let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
     crate::numvec::op::add::set_op_info::<V>(&mut result);

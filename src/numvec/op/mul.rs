@@ -20,10 +20,10 @@
 // --------------------------------------------------------------------------
 // use
 //
+use crate::numvec::op::binary;
 use crate::numvec::tape::sealed::ThisThreadTape;
 use crate::numvec::tape::Tindex;
 use crate::numvec::ad::AD;
-use crate::numvec::op::binary::eval_binary_forward_0;
 use crate::numvec::op::info::OpInfo;
 use crate::numvec::op::id::{
     MUL_CV_OP,
@@ -41,7 +41,7 @@ use crate::numvec::op::info::{
 // mul_cv_forward_0
 // mul_vc_forward_0
 // mul_vv_forward_0
-eval_binary_forward_0!(Mul, *);
+binary::eval_binary_forward_0!(Mul, *);
 // ---------------------------------------------------------------------------
 // forward_1
 // ---------------------------------------------------------------------------
@@ -195,6 +195,7 @@ where
         forward_1_ad      : mul_cv_forward_1::<V, AD<V> >,
         reverse_1_value   : mul_cv_reverse_1::<V, V>,
         reverse_1_ad      : mul_cv_reverse_1::<V, AD<V> >,
+        arg_var_index     : binary::binary_cv_arg_var_index,
     };
     op_info_vec[MUL_VC_OP as usize] = OpInfo{
         name              : "mul_vc",
@@ -204,6 +205,7 @@ where
         forward_1_ad      : mul_vc_forward_1::<V, AD<V> >,
         reverse_1_value   : mul_vc_reverse_1::<V, V>,
         reverse_1_ad      : mul_vc_reverse_1::<V, AD<V> >,
+        arg_var_index     : binary::binary_vc_arg_var_index,
     };
     op_info_vec[MUL_VV_OP as usize] = OpInfo{
         name              : "mul_vv",
@@ -213,5 +215,6 @@ where
         forward_1_ad      : mul_vv_forward_1::<V, AD<V> >,
         reverse_1_value   : mul_vv_reverse_1::<V, V>,
         reverse_1_ad      : mul_vv_reverse_1::<V, AD<V> >,
+        arg_var_index     : binary::binary_vv_arg_var_index,
     };
 }

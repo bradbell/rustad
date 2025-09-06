@@ -20,10 +20,10 @@
 // --------------------------------------------------------------------------
 // use
 //
+use crate::numvec::op::binary;
 use crate::numvec::tape::sealed::ThisThreadTape;
 use crate::numvec::tape::Tindex;
 use crate::numvec::ad::AD;
-use crate::numvec::op::binary::eval_binary_forward_0;
 use crate::numvec::op::info::OpInfo;
 use crate::numvec::op::info::panic_one;
 use crate::numvec::op::id::{
@@ -35,7 +35,7 @@ use crate::numvec::op::id::{
 // sub_cv_forward_0
 // sub_vc_forward_0
 // sub_vv_forward_0
-eval_binary_forward_0!(Sub, -);
+binary::eval_binary_forward_0!(Sub, -);
 // ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the Sub operators.
@@ -46,8 +46,8 @@ eval_binary_forward_0!(Sub, -);
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
     for<'a> &'a V : std::ops::Sub<&'a AD<V>, Output = AD<V> > ,
-    for<'a> &'a V : std::ops::Sub<&'a V, Output = V> ,
-    V             : Clone + ThisThreadTape ,
+    for<'a> &'a V : std::ops::Sub<&'a V, Output = V>          ,
+    V             : Clone + ThisThreadTape                    ,
 {
     op_info_vec[SUB_CV_OP as usize] = OpInfo{
         name              : "sub_cv",
@@ -57,6 +57,7 @@ where
         forward_1_ad      : panic_one::<V, AD<V> >,
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
+        arg_var_index     : binary::binary_cv_arg_var_index,
     };
     op_info_vec[SUB_VC_OP as usize] = OpInfo{
         name              : "sub_vc",
@@ -66,6 +67,7 @@ where
         forward_1_ad      : panic_one::<V, AD<V> >,
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
+        arg_var_index     : binary::binary_vc_arg_var_index,
     };
     op_info_vec[SUB_VV_OP as usize] = OpInfo{
         name              : "sub_vv",
@@ -75,5 +77,6 @@ where
         forward_1_ad      : panic_one::<V, AD<V> >,
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
+        arg_var_index     : binary::binary_vv_arg_var_index,
     };
 }
