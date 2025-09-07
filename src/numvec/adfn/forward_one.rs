@@ -56,9 +56,9 @@ use crate::numvec::adfn::forward_zero::doc_forward_zero;
 /// ```text
 ///     range_one = f'(domain_zero) * domain_one
 /// ```
-/// Here *f'* is the derivative of the function and
-/// *domain_zero* is its value in the call to
-/// [forward_zero](doc_forward_zero) that created the *cache* .
+/// Here `f'` is the derivative of the function and
+/// [domain_zero](doc_forward_zero#domain_zero) is its value in the call to
+/// forward_zero that created the *cache* .
 ///
 /// # Example
 /// Computing one partial derivative using forward_one :

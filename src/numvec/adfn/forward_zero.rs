@@ -34,23 +34,23 @@ use crate::numvec::{
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
 ///
-/// * f :
+/// ## f
 /// is an [ADfn] object.
 ///
-/// * cache :
+/// ## cache
 /// The input value of this vector should have length zero.
 /// Upon return it has information that is used to compute derivatives.
 ///
-/// * domain_zero :
-/// specifies the domain space variable values.
-///
-/// * trace :
+/// ## trace
 /// if true, a trace of the operatiopn sequence is printed on stdout.
 ///
-/// * range_zero :
+/// ## range_zero
 /// The first return
 /// is the range vector corresponding to the domain space variable values;
 /// i.e., the value of the function correspdong the operation sequence in f.
+///
+/// ## domain_zero
+/// specifies the domain space variable values.
 ///
 /// # Example
 /// Computing function values using forward_zero :
