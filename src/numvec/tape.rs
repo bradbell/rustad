@@ -18,8 +18,8 @@ use crate::numvec::ADfn;
 #[cfg(doc)]
 use crate::numvec::doc_generic_v;
 //
-/// The type used for vectors of indices in the tape and function objects
-pub(crate) type IndexT = u32;
+/// The type is used, instead of usize, to save space in vectors of indices.
+pub type IndexT = u32;
 // ---------------------------------------------------------------------------
 // Tape
 ///

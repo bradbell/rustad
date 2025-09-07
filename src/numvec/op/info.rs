@@ -10,7 +10,7 @@
 //
 use crate::numvec::ad::AD;
 use crate::numvec::op::id::NUMBER_OP;
-use crate::numvec::tape::IndexT;
+use crate::numvec::IndexT;
 use crate::numvec::tape::sealed::ThisThreadTape;
 //
 #[cfg(doc)]

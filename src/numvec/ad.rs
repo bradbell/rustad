@@ -11,7 +11,7 @@
 use std::thread::LocalKey;
 use std::cell::RefCell;
 //
-use crate::numvec::tape::IndexT;
+use crate::numvec::IndexT;
 use crate::numvec::tape::Tape;
 use crate::numvec::tape::sealed::ThisThreadTape;
 use crate::numvec::op::id;

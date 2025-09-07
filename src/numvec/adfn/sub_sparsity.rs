@@ -9,7 +9,7 @@
 // ---------------------------------------------------------------------------
 //
 use crate::numvec::ADfn;
-use crate::numvec::tape::IndexT;
+use crate::numvec::IndexT;
 use crate::numvec::op::info::GlobalOpInfoVec;
 //
 #[cfg(doc)]

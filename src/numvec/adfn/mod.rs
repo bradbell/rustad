@@ -23,7 +23,7 @@ use crate::numvec::{
 };
 //
 // IndexT
-use crate::numvec::tape::IndexT;
+use crate::numvec::IndexT;
 //
 // ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter E.

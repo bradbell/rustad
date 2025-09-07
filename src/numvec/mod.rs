@@ -60,6 +60,7 @@ pub use adfn::{
     doc_generic_e,
 };
 pub use tape::{
+    IndexT,
     start_recording,
     stop_recording,
 };
