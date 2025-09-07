@@ -25,8 +25,8 @@ use crate::numvec::{
 ///
 /// * Syntax :
 /// ```text
-///     (range_zero, var_zero) = f.forward_zero_value(domain_zero, trace)
-///     (range_zero, var_zero) = f.forward_zero_ad(domain_zero, trace)
+///     range_zero = f.forward_zero_value(cache, domain_zero, trace)
+///     range_zero = f.forward_zero_ad(   cache, domain_zero, trace)
 /// ```
 /// * Prototype :
 /// see [ADfn::forward_zero_value] and [ADfn::forward_zero_ad]
@@ -36,6 +36,10 @@ use crate::numvec::{
 ///
 /// * f :
 /// is an [ADfn] object.
+///
+/// * cache :
+/// The input value of this vector should have length zero.
+/// Upon return it has information that is used to compute derivatives.
 ///
 /// * domain_zero :
 /// specifies the domain space variable values.
@@ -47,11 +51,6 @@ use crate::numvec::{
 /// The first return
 /// is the range vector corresponding to the domain space variable values;
 /// i.e., the value of the function correspdong the operation sequence in f.
-///
-/// * var_zero :
-/// The second return
-/// is the value for all the variables in the operation sequence.
-/// This is used as an input when computing derivatives.
 ///
 /// # Example
 /// Computing function values using forward_zero :
@@ -78,7 +77,8 @@ use crate::numvec::{
 /// // y[0] = f(x)
 /// let trace           = true;
 /// let x      : Vec<V> = vec![ 1.0, 2.0, 3.0 ];
-/// let (y, v)          = f.forward_zero_value(x, trace);
+/// let mut c  : Vec<V> = Vec::new();
+/// let y  = f.forward_zero_value(&mut c, x, trace);
 /// //
 /// assert_eq!( y[0] , (1 + 2 + 3) as V );
 /// ```
@@ -105,22 +105,29 @@ macro_rules! forward_zero {
         )]
         pub fn [< forward_zero_ $suffix >] (
             &self,
-            domain_zero : Vec<$E> ,
-            trace       : bool    ,
-        ) -> ( Vec<$E> , Vec<$E> )
-        {
+            cache       : &mut Vec<$E> ,
+            domain_zero : Vec<$E>      ,
+            trace       : bool         ,
+        ) -> Vec<$E>
+        {   assert_eq!(
+                cache.len(), 0,
+                "f.forward_zero: cache does not have length zero"
+            );
             assert_eq!(
                 domain_zero.len(), self.n_domain,
                 "f.forward_zero: domain vector length does not match f"
             );
             //
+            // var_zero
+            let var_zero = cache;
+            //
             // op_info_vec
             let op_info_vec = &*GlobalOpInfoVec::get();
             //
             // var_zero
-            let nan_v         : $V = f32::NAN.into();
-            let nan_e         : $E = nan_v.into();
-            let mut var_zero       = domain_zero;
+            let nan_v  : $V = f32::NAN.into();
+            let nan_e  : $E = nan_v.into();
+            *var_zero       = domain_zero;
             var_zero.resize( self.n_var, nan_e );
             //
             if trace {
@@ -146,7 +153,7 @@ macro_rules! forward_zero {
                 let arg   = &self.arg_all[start .. end];
                 let res   = self.n_domain + op_index;
                 let forward_0 = op_info_vec[op_id].[< forward_0_ $suffix >];
-                forward_0(&mut var_zero,
+                forward_0(var_zero,
                     &self.con_all, &self.flag_all, &arg, res
                 );
                 if trace {
@@ -180,7 +187,7 @@ macro_rules! forward_zero {
                     range_zero.push( constant.into() );
                 }
             }
-            ( range_zero, var_zero )
+            range_zero
         }
     } } }
     //

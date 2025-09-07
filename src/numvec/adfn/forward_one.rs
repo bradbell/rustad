@@ -76,9 +76,10 @@ use crate::numvec::{
 /// // y[0] = f(x)
 /// let trace           = true;
 /// let x0     : Vec<V> = vec![ 4.0, 5.0, 6.0 ];
-/// let (y0, v0)        = f.forward_zero_value(x0, trace);
+/// let mut c0 : Vec<V> = Vec::new();
+/// let y0              = f.forward_zero_value(&mut c0, x0, trace);
 /// let x1     : Vec<V> = vec![ 1.0, 0.0, 0.0 ];
-/// let y1              = f.forward_one_value(x1, &v0, trace);
+/// let y1              = f.forward_one_value(x1, &c0, trace);
 /// //
 /// assert_eq!( y1[0] , 5.0 * 6.0 );
 /// ```
