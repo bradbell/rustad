@@ -8,6 +8,8 @@
 // ---------------------------------------------------------------------------
 // use
 //
+use std::sync::RwLock;
+//
 use crate::numvec::IndexT;
 use crate::numvec::AtomEvalVecPublic;
 //
@@ -36,7 +38,7 @@ pub type Callback<V> = fn(
     _cache         : &mut Vec<V> ,
     _vec_in        : Vec<V>      ,
     _trace         : bool        ,
-    _call_info     : usize       ,
+    _call_info     : IndexT      ,
 ) -> Vec<V> ;
 //
 // Sparsity
@@ -123,15 +125,18 @@ pub(crate) use impl_atom_eval_vec;
 // register_atom
 /// Register an atomic function.
 ///
+/// * Syntax :
 /// ```text
-///     atom_index = register_atom(atom_eval)
+///     atom_id = register_atom(atom_eval)
 /// ```
 ///
-/// * atom_eval :
+/// * V : see [doc_generic_v]
+///
+/// ## atom_eval :
 /// contains references to the callback functions that compute
 /// values for this atomic function.
 ///
-/// *atom_index :
+/// ## atom_id :
 /// is the index that is used to identify this atomic function.
 ///
 pub fn register_atom<V>( atom_eval : AtomEval<V> ) -> usize
@@ -139,10 +144,10 @@ where
     V : AtomEvalVecPublic ,
 {   //
     // rwlock
-    let rw_lock    = <V as sealed::AtomEvalVec>::get();
+    let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
     //
-    // atom_index
-    let atom_index : usize;
+    // atom_id
+    let atom_id : usize;
     {   //
         // write_lock
         let write_lock = rw_lock.write();
@@ -150,8 +155,8 @@ where
         //
         // Rest of this block has a lock, so it has to be fast and can't fail.
         let mut atom_eval_vec = write_lock.unwrap();
-        atom_index            = atom_eval_vec.len();
+        atom_id               = atom_eval_vec.len();
         atom_eval_vec.push( atom_eval );
     }
-    atom_index
+    atom_id
 }
