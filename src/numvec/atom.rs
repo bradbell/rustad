@@ -9,6 +9,7 @@
 // use
 //
 use crate::numvec::IndexT;
+use crate::numvec::AtomEvalVecPublic;
 //
 #[cfg(doc)]
 use crate::numvec::{
@@ -31,26 +32,10 @@ use crate::numvec::adfn::{
 /// * call_info :
 /// is the *call_info* value used when the atomic function was called.
 ///
-/// * callback_type = "forward_zero"
-///     * cache  : see [forward_zero cache](doc_forward_zero#cache]
-///     * vec_in : see [forward_zero domain_zero](doc_forward_zero#domain_zero)
-///     * return : see [forward_zero range_zero](doc_forward_zero#range_zero)
-///
-/// * callback_type = "forward_one"
-///     * cache  : see [forward_one cache](doc_forward_one#cache]
-///     * vec_in : see [forward_one domain_one](doc_forward_one#domain_one)
-///     * return : see [forward_one range_one](doc_forward_one#range_one)
-///
-/// * callback_type = "reverse_one"
-///     * cache  : see [reverse_one cache](doc_reverse_one#cache]
-///     * vec_in : see [reverse_one range_one](doc_reverse_one#range_one)
-///     * return : see [reverse_one domain_one](doc_forward_one#domain_one)
-///
 pub type Callback<V> = fn(
     _cache         : &mut Vec<V> ,
     _vec_in        : Vec<V>      ,
     _trace         : bool        ,
-    _callback_type : &str        ,
     _call_info     : usize       ,
 ) -> Vec<V> ;
 //
@@ -58,15 +43,38 @@ pub type Callback<V> = fn(
 /// Atomic function dependency calculations.
 ///
 /// see [ADfn::sub_sparsity] or [ADfn::for_sparsity]
-pub type Sparsity = fn( _call_info : IndexT )-> Vec< [usize; 2] >;
+pub type Sparsity = fn(
+    _trace       : bool   ,
+    _call_info   : IndexT ,
+)-> Vec< [usize; 2] >;
 //
 // AtomEval
-/// Functions necessary to evaluation one atomic function.
-///
-/// TODO: make fields in this struct private (once they are used)
+/// Functions that evaluate an atomic function.
 pub struct AtomEval<V> {
-        pub callback : Callback::<V> ,
-        pub sparsity : Sparsity      ,
+    // forward_zero
+    /// forward_zero Callback parameters
+    /// * cache  : see [forward_zero cache](doc_forward_zero#cache]
+    /// * vec_in : see [forward_zero domain_zero](doc_forward_zero#domain_zero)
+    /// * return : see [forward_zero range_zero](doc_forward_zero#range_zero)
+    pub  forward_zero : Callback::<V> ,
+    //
+    // forward_one
+    /// forward_zero Callback parameters
+    /// * cache  : see [forward_one cache](doc_forward_one#cache]
+    /// * vec_in : see [forward_one domain_one](doc_forward_one#domain_one)
+    /// * return : see [forward_one range_one](doc_forward_one#range_one)
+    pub  forward_one  : Callback::<V> ,
+    //
+    // reverse_one
+    /// reverse_one Callback parameters
+    /// * cache  : see [reverse_one cache](doc_reverse_one#cache]
+    /// * vec_in : see [reverse_one range_one](doc_reverse_one#range_one)
+    /// * return : see [reverse_one domain_one](doc_forward_one#domain_one)
+    pub  reverse_one  : Callback::<V> ,
+    //
+    // sparsity
+    /// see [ADfn::sub_sparsity] or [ADfn::for_sparsity]
+    pub sparsity      : Sparsity      ,
 }
 // ----------------------------------------------------------------------------
 pub (crate) mod sealed {
@@ -111,3 +119,39 @@ macro_rules! impl_atom_eval_vec{ ($V:ty) => {
     }
 } }
 pub(crate) use impl_atom_eval_vec;
+// ----------------------------------------------------------------------------
+// register_atom
+/// Register an atomic function.
+///
+/// ```text
+///     atom_index = register_atom(atom_eval)
+/// ```
+///
+/// * atom_eval :
+/// contains references to the callback functions that compute
+/// values for this atomic function.
+///
+/// *atom_index :
+/// is the index that is used to identify this atomic function.
+///
+pub fn register_atom<V>( atom_eval : AtomEval<V> ) -> usize
+where
+    V : AtomEvalVecPublic ,
+{   //
+    // rwlock
+    let rw_lock    = <V as sealed::AtomEvalVec>::get();
+    //
+    // atom_index
+    let atom_index : usize;
+    {   //
+        // write_lock
+        let write_lock = rw_lock.write();
+        assert!( write_lock.is_ok() );
+        //
+        // Rest of this block has a lock, so it has to be fast and can't fail.
+        let mut atom_eval_vec = write_lock.unwrap();
+        atom_index            = atom_eval_vec.len();
+        atom_eval_vec.push( atom_eval );
+    }
+    atom_index
+}
