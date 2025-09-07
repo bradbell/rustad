@@ -22,7 +22,7 @@
 //
 use crate::numvec::op::binary;
 use crate::numvec::tape::sealed::ThisThreadTape;
-use crate::numvec::tape::Tindex;
+use crate::numvec::tape::IndexT;
 use crate::numvec::ad::AD;
 use crate::numvec::op::info::OpInfo;
 use crate::numvec::op::id::{
@@ -53,7 +53,7 @@ fn mul_cv_forward_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     con        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
-    arg        :   &[Tindex]   ,
+    arg        :   &[IndexT]   ,
     res        :       usize   )
 where
     for<'a> &'a V : std::ops::Mul<&'a E, Output = E> ,
@@ -71,7 +71,7 @@ fn mul_vc_forward_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     con        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
-    arg        :   &[Tindex]   ,
+    arg        :   &[IndexT]   ,
     res        :       usize   )
 where
     for<'a> &'a E : std::ops::Mul<&'a V, Output = E> ,
@@ -89,7 +89,7 @@ fn mul_vv_forward_1 <V, E>(
     var_zero   :   &Vec<E>     ,
     _con       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
-    arg        :   &[Tindex]   ,
+    arg        :   &[IndexT]   ,
     res        :       usize   )
 where
     for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
@@ -113,7 +113,7 @@ fn mul_cv_reverse_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     con        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
-    arg        :   &[Tindex]   ,
+    arg        :   &[IndexT]   ,
     res        :       usize   )
 where
     for<'a> E : std::ops::AddAssign<&'a E> ,
@@ -133,7 +133,7 @@ fn mul_vc_reverse_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     con        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
-    arg        :   &[Tindex]   ,
+    arg        :   &[IndexT]   ,
     res        :       usize   )
 where
     for<'a> E : std::ops::AddAssign<&'a E> ,
@@ -153,7 +153,7 @@ fn mul_vv_reverse_1 <V, E>(
     var_zero   :   &Vec<E>     ,
     _con       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
-    arg        :   &[Tindex]   ,
+    arg        :   &[IndexT]   ,
     res        :       usize   )
 where
     for<'a> E : std::ops::AddAssign<&'a E> ,

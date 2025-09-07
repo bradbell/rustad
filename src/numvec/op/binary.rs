@@ -7,37 +7,37 @@
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
 //
-use crate::numvec::tape::Tindex;
+use crate::numvec::tape::IndexT;
 //
 // ---------------------------------------------------------------------------
 //
 // binary_cv_arg_var_index
 pub(crate) fn binary_cv_arg_var_index(
-    arg_var_index : &mut Vec<Tindex> ,
+    arg_var_index : &mut Vec<IndexT> ,
     _flag         : &Vec<bool>       ,
-    arg           : &[Tindex]        ,
+    arg           : &[IndexT]        ,
 ) {
-    arg_var_index.resize(1, 0 as Tindex);
+    arg_var_index.resize(1, 0 as IndexT);
     arg_var_index[0] = arg[1];
 }
 //
 // binary_vc_arg_var_index
 pub(crate) fn binary_vc_arg_var_index(
-    arg_var_index : &mut Vec<Tindex> ,
+    arg_var_index : &mut Vec<IndexT> ,
     _flag         : &Vec<bool>       ,
-    arg           : &[Tindex]        ,
+    arg           : &[IndexT]        ,
 ) {
-    arg_var_index.resize(1, 0 as Tindex);
+    arg_var_index.resize(1, 0 as IndexT);
     arg_var_index[0] = arg[0];
 }
 //
 // binary_vv_arg_var_index
 pub(crate) fn binary_vv_arg_var_index(
-    arg_var_index : &mut Vec<Tindex> ,
+    arg_var_index : &mut Vec<IndexT> ,
     _flag         : &Vec<bool>       ,
-    arg           : &[Tindex]        ,
+    arg           : &[IndexT]        ,
 ) {
-    arg_var_index.resize(2, 0 as Tindex);
+    arg_var_index.resize(2, 0 as IndexT);
     arg_var_index[0] = arg[0];
     arg_var_index[1] = arg[1];
 }
@@ -59,7 +59,7 @@ pub(crate) fn binary_vv_arg_var_index(
 /// where {name} is a lower case version of Name and
 /// v (c) means the corresponding operand is a variable (constant) .
 ///
-/// [Tindex] must be defined in any module that uses eval_binary_forward_0
+/// [IndexT] must be defined in any module that uses eval_binary_forward_0
 macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     #[doc = concat!(
         " zero order forward for constant ", stringify!( $op ),
@@ -69,7 +69,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         var_zero    : &mut Vec<E> ,
         con         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
-        arg         : &[Tindex]   ,
+        arg         : &[IndexT]   ,
         res         : usize       )
     where
         for<'a> &'a V : std::ops::$Name<&'a E, Output = E> ,
@@ -87,7 +87,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         var_zero    : &mut Vec<E> ,
         con         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
-        arg         : &[Tindex]   ,
+        arg         : &[IndexT]   ,
         res         : usize       )
     where
         for<'a> &'a E : std::ops::$Name<&'a V, Output = E> ,
@@ -105,7 +105,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         var_zero    : &mut Vec<E> ,
         _con        : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
-        arg         : &[Tindex]   ,
+        arg         : &[IndexT]   ,
         res         : usize       )
     where
         for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,

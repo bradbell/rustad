@@ -22,7 +22,7 @@
 //
 use crate::numvec::op::binary;
 use crate::numvec::tape::sealed::ThisThreadTape;
-use crate::numvec::tape::Tindex;
+use crate::numvec::tape::IndexT;
 use crate::numvec::ad::AD;
 use crate::numvec::op::info::OpInfo;
 use crate::numvec::op::info::panic_one;

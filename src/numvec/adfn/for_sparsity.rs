@@ -10,7 +10,7 @@
 //
 use crate::vec_set::VecSet;
 use crate::numvec::ADfn;
-use crate::numvec::tape::Tindex;
+use crate::numvec::tape::IndexT;
 use crate::numvec::op::info::GlobalOpInfoVec;
 //
 #[cfg(doc)]
@@ -99,7 +99,7 @@ where
         //
         // result, arg_var_index, arg_var_usize, set_vec
         let mut result          : Vec< [usize; 2] > = Vec::new();
-        let mut arg_var_index   : Vec<Tindex>       = Vec::new();
+        let mut arg_var_index   : Vec<IndexT>       = Vec::new();
         let mut arg_var_usize   : Vec<usize>        = Vec::new();
         let mut set_vec         : VecSet            = VecSet::new();
         //
@@ -109,7 +109,7 @@ where
         }
         //
         if trace {
-            let mut range_var_index : Vec<Tindex> = Vec::new();
+            let mut range_var_index : Vec<IndexT> = Vec::new();
             for i in 0 .. range2tape_index.len() {
                 if range_is_var[i] {
                         range_var_index.push(  range2tape_index[i] );

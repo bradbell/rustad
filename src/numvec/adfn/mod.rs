@@ -22,8 +22,8 @@ use crate::numvec::{
     AD,
 };
 //
-// Tindex
-use crate::numvec::tape::Tindex;
+// IndexT
+use crate::numvec::tape::IndexT;
 //
 // ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter E.
@@ -78,12 +78,12 @@ pub struct ADfn<V> {
     // op2arg
     /// This maps each operator's index in the operation sequence to
     /// the index of its first argument in arg_all.
-    pub op2arg              : Vec<Tindex>,
+    pub op2arg              : Vec<IndexT>,
     //
     // arg_all
     /// This contains all the arguments for the opereators in the
     /// operatioon sequence.
-    pub arg_all             : Vec<Tindex>,
+    pub arg_all             : Vec<IndexT>,
     //
     // con_all
     /// This contains the value of all the constants needed
@@ -100,7 +100,7 @@ pub struct ADfn<V> {
     /// The length of this vector is also the dimension of the range space.
     /// If range_is_var\[i\] is true (false), range2tape_indx\[i\] is the
     /// variable (constant) index for the i-th component of the range space.
-    pub range2tape_index    : Vec<Tindex>,
+    pub range2tape_index    : Vec<IndexT>,
 }
 //
 // ---------------------------------------------------------------------------

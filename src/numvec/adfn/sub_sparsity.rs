@@ -9,7 +9,7 @@
 // ---------------------------------------------------------------------------
 //
 use crate::numvec::ADfn;
-use crate::numvec::tape::Tindex;
+use crate::numvec::tape::IndexT;
 use crate::numvec::op::info::GlobalOpInfoVec;
 //
 #[cfg(doc)]
@@ -86,7 +86,7 @@ where
     pub fn sub_sparsity(&self, trace : bool) -> Vec< [usize; 2] >
     {   //
         // zero_t
-        let zero_t  = 0 as Tindex;
+        let zero_t  = 0 as IndexT;
         //
         // op_info_vec
         let op_info_vec = &*<V as GlobalOpInfoVec>::get();
@@ -109,8 +109,8 @@ where
         //
         // result, arg_var_index, var_index_stack
         let mut result          : Vec< [usize; 2] > = Vec::new();
-        let mut arg_var_index   : Vec<Tindex>       = Vec::new();
-        let mut var_index_stack : Vec<Tindex>       = Vec::new();
+        let mut arg_var_index   : Vec<IndexT>       = Vec::new();
+        let mut var_index_stack : Vec<IndexT>       = Vec::new();
         //
         if trace { println!(
             "Begin Trace: sub_sparsity: n_domain = {}, n_range = {}",
@@ -130,7 +130,7 @@ where
             // var_index_stack
             // use resize instead of new stack to reduce memory allocation
             var_index_stack.resize(0, zero_t);
-            var_index_stack.push( var_index as Tindex );
+            var_index_stack.push( var_index as IndexT );
             while var_index_stack.len() > 0 {
                 //
                 // var_index

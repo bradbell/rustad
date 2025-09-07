@@ -11,7 +11,7 @@
 use std::thread::LocalKey;
 use std::cell::RefCell;
 //
-use crate::numvec::tape::Tindex;
+use crate::numvec::tape::IndexT;
 use crate::numvec::tape::Tape;
 use crate::numvec::tape::sealed::ThisThreadTape;
 use crate::numvec::op::id;
@@ -208,21 +208,21 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 new_tape_id   = tape.tape_id;
                 new_var_index = tape.n_var;
                 tape.n_var   += 1;
-                tape.op2arg.push( tape.arg_all.len() as Tindex );
+                tape.op2arg.push( tape.arg_all.len() as IndexT );
                 if var_lhs && var_rhs {
                     tape.id_all.push( id::[< $Name:upper _VV_OP >] );
-                    tape.arg_all.push( lhs.var_index as Tindex );
-                    tape.arg_all.push( rhs.var_index as Tindex );
+                    tape.arg_all.push( lhs.var_index as IndexT );
+                    tape.arg_all.push( rhs.var_index as IndexT );
                 } else if var_lhs {
                     tape.id_all.push( id::[< $Name:upper _VC_OP >] );
-                    tape.arg_all.push( lhs.var_index as Tindex );
-                    tape.arg_all.push( tape.con_all.len() as Tindex );
+                    tape.arg_all.push( lhs.var_index as IndexT );
+                    tape.arg_all.push( tape.con_all.len() as IndexT );
                     tape.con_all.push( rhs.value.clone() );
                 } else {
                     tape.id_all.push( id::[< $Name:upper _CV_OP >] );
-                    tape.arg_all.push( tape.con_all.len() as Tindex );
+                    tape.arg_all.push( tape.con_all.len() as IndexT );
                     tape.con_all.push( lhs.value.clone() );
-                    tape.arg_all.push( rhs.var_index as Tindex );
+                    tape.arg_all.push( rhs.var_index as IndexT );
                 }
             }
         }
@@ -275,10 +275,10 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 new_tape_id   = tape.tape_id;
                 new_var_index = tape.n_var;
                 tape.n_var   += 1;
-                tape.op2arg.push( tape.arg_all.len() as Tindex );
+                tape.op2arg.push( tape.arg_all.len() as IndexT );
                 tape.id_all.push( id::[< $Name:upper _VC_OP >] );
-                tape.arg_all.push( lhs.var_index as Tindex );
-                tape.arg_all.push( tape.con_all.len() as Tindex );
+                tape.arg_all.push( lhs.var_index as IndexT );
+                tape.arg_all.push( tape.con_all.len() as IndexT );
                 tape.con_all.push( rhs.clone() );
             }
         }
@@ -389,21 +389,21 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
              let var_lhs    = lhs.tape_id == tape.tape_id;
              let var_rhs    = rhs.tape_id == tape.tape_id;
              if var_lhs || var_rhs {
-                 tape.op2arg.push( tape.arg_all.len() as Tindex );
+                 tape.op2arg.push( tape.arg_all.len() as IndexT );
                  if var_lhs && var_rhs {
                      tape.id_all.push( id::[< $Name:upper _VV_OP >] );
-                     tape.arg_all.push( lhs.var_index as Tindex);
-                     tape.arg_all.push( rhs.var_index as Tindex);
+                     tape.arg_all.push( lhs.var_index as IndexT);
+                     tape.arg_all.push( rhs.var_index as IndexT);
                  } else if var_lhs {
                      tape.id_all.push( id::[< $Name:upper _VC_OP >] );
-                     tape.arg_all.push( lhs.var_index as Tindex);
-                     tape.arg_all.push( tape.con_all.len() as Tindex );
+                     tape.arg_all.push( lhs.var_index as IndexT);
+                     tape.arg_all.push( tape.con_all.len() as IndexT );
                      tape.con_all.push( rhs.value.clone() );
                  } else {
                      tape.id_all.push( id::[< $Name:upper _CV_OP >] );
-                     tape.arg_all.push( tape.con_all.len() as Tindex );
+                     tape.arg_all.push( tape.con_all.len() as IndexT );
                      tape.con_all.push( lhs.value.clone() );
-                     tape.arg_all.push( rhs.var_index as Tindex);
+                     tape.arg_all.push( rhs.var_index as IndexT);
                  }
                  lhs.tape_id   = tape.tape_id;
                  lhs.var_index = tape.n_var;
@@ -450,10 +450,10 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
          if tape.recording {
              let var_lhs    = lhs.tape_id == tape.tape_id;
              if var_lhs {
-                 tape.op2arg.push( tape.arg_all.len() as Tindex );
+                 tape.op2arg.push( tape.arg_all.len() as IndexT );
                  tape.id_all.push( id::[< $Name:upper _VC_OP >] );
-                 tape.arg_all.push( lhs.var_index as Tindex);
-                 tape.arg_all.push( tape.con_all.len() as Tindex );
+                 tape.arg_all.push( lhs.var_index as IndexT);
+                 tape.arg_all.push( tape.con_all.len() as IndexT );
                  tape.con_all.push( rhs.clone() );
                  //
                  lhs.var_index = tape.n_var;
@@ -526,11 +526,11 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
                 new_tape_id   = tape.tape_id;
                 new_var_index = tape.n_var;
                 tape.n_var   += 1;
-                tape.op2arg.push( tape.arg_all.len() as Tindex );
+                tape.op2arg.push( tape.arg_all.len() as IndexT );
                 tape.id_all.push( id::[< $Name:upper _CV_OP >] );
-                tape.arg_all.push( tape.con_all.len() as Tindex );
+                tape.arg_all.push( tape.con_all.len() as IndexT );
                 tape.con_all.push( lhs.clone() );
-                tape.arg_all.push( rhs.var_index as Tindex );
+                tape.arg_all.push( rhs.var_index as IndexT );
             }
         }
         (new_tape_id, new_var_index)

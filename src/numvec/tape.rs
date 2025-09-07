@@ -19,7 +19,7 @@ use crate::numvec::ADfn;
 use crate::numvec::doc_generic_v;
 //
 /// The type used for vectors of indices in the tape and function objects
-pub(crate) type Tindex = u32;
+pub(crate) type IndexT = u32;
 // ---------------------------------------------------------------------------
 // Tape
 ///
@@ -56,13 +56,13 @@ pub struct Tape<V> {
     // op2arg
     /// For each op_index in the operation sequence, op2arg\[op_index\]
     /// is the index in arg_all of the first argument for the operator.
-    pub op2arg         : Vec<Tindex>,
+    pub op2arg         : Vec<IndexT>,
     //
     // arg_all
     /// For each op_index in the operation sequence,
     /// the arguments for the operator are a slice of arg_all
     /// starting at op2arg\[index\] .
-    pub arg_all        : Vec<Tindex>,
+    pub arg_all        : Vec<IndexT>,
     //
     // con_all
     /// is a vector containing the constant values used by the
@@ -257,9 +257,9 @@ where
 /// * Assumptions :
 /// The following assumptions are checked for the tape for this thread:
 /// ```text
-///     1. tape.arg_all.len()                <= [Tindex]::Max
-///     2. tape.tape_id                      <= Tindex::Max
-///     3. tape.con_all.len() + arange.len() <= Tindex::Max
+///     1. tape.arg_all.len()                <= [IndexT]::Max
+///     2. tape.tape_id                      <= IndexT::Max
+///     3. tape.con_all.len() + arange.len() <= IndexT::Max
 /// ```
 /// # Example
 /// ```
@@ -277,7 +277,7 @@ where
 /// ```
 pub fn stop_recording<V>( arange : Vec< AD<V> > ) -> ADfn<V>
 where
-    Tindex : TryFrom<usize> ,
+    IndexT : TryFrom<usize> ,
     V : Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
     let mut ad_fn : ADfn<V> = ADfn::new();
@@ -292,18 +292,18 @@ where
         tape.recording = false;
         //
         // check documented assumptions
-        match Tindex::try_from( tape.arg_all.len() ) {
-            Err(_) => panic!( "tape.arg_all.len() > Tindex::MAX" ),
+        match IndexT::try_from( tape.arg_all.len() ) {
+            Err(_) => panic!( "tape.arg_all.len() > IndexT::MAX" ),
             Ok(_)  => (),
         }
-        match Tindex::try_from( tape.tape_id ) {
-            Err(_) => panic!( "tape.tape_id > Tindex::MAX" ),
+        match IndexT::try_from( tape.tape_id ) {
+            Err(_) => panic!( "tape.tape_id > IndexT::MAX" ),
             Ok(_)  => (),
         }
         let con_all_len = tape.con_all.len() + arange.len();
-        match Tindex::try_from( con_all_len ) {
+        match IndexT::try_from( con_all_len ) {
             Err(_) => panic!(
-                "tape.con_all.len() + arange.len() > Tindex::MAX"
+                "tape.con_all.len() + arange.len() > IndexT::MAX"
             ),
             Ok(_)  => (),
         }
@@ -314,7 +314,7 @@ where
         //
         // tape.op2arg
         // end marker for arguments to the last operation
-        tape.op2arg.push( tape.arg_all.len() as Tindex );
+        tape.op2arg.push( tape.arg_all.len() as IndexT );
         //
         // swap fields in ad_fn and tape
         std::mem::swap( &mut ad_fn.n_domain,      &mut tape.n_domain );
@@ -334,10 +334,10 @@ where
     for i in 0 .. arange.len() {
         if arange[i].tape_id == tape_id {
             ad_fn.range_is_var.push( true );
-            ad_fn.range2tape_index.push( arange[i].var_index as Tindex );
+            ad_fn.range2tape_index.push( arange[i].var_index as IndexT );
         } else {
             ad_fn.range_is_var.push( false );
-            ad_fn.range2tape_index.push( ad_fn.con_all.len() as Tindex  );
+            ad_fn.range2tape_index.push( ad_fn.con_all.len() as IndexT  );
             ad_fn.con_all.push( arange[i].value.clone() );
         }
     }

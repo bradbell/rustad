@@ -10,7 +10,7 @@
 //
 use crate::numvec::ad::AD;
 use crate::numvec::op::id::NUMBER_OP;
-use crate::numvec::tape::Tindex;
+use crate::numvec::tape::IndexT;
 use crate::numvec::tape::sealed::ThisThreadTape;
 //
 #[cfg(doc)]
@@ -55,7 +55,7 @@ pub type ForwardZero<V, E> = fn(
     _var_zero : &mut Vec<E> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
-    _arg      : &[Tindex]   ,
+    _arg      : &[IndexT]   ,
     _res      : usize       ,
 );
 // panic_zero
@@ -65,7 +65,7 @@ pub fn panic_zero<V, E> (
     _var_zero : &mut Vec<E> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
-    _arg      : &[Tindex]   ,
+    _arg      : &[IndexT]   ,
     _res      : usize       ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
@@ -83,7 +83,7 @@ pub type ForwardOne<V, E> = fn(
     _var_zero : &Vec<E>     ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
-    _arg      : &[Tindex]   ,
+    _arg      : &[IndexT]   ,
     _res      : usize       ,
 );
 // ReverseOne
@@ -102,7 +102,7 @@ pub type ReverseOne<V, E> = fn(
     _var_zero : &Vec<E>     ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
-    _arg      : &[Tindex]   ,
+    _arg      : &[IndexT]   ,
     _res      : usize       ,
 );
 // panic_one
@@ -113,7 +113,7 @@ pub fn panic_one<V, E> (
     _var_zero : &Vec<E>     ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
-    _arg      : &[Tindex]   ,
+    _arg      : &[IndexT]   ,
     _res      : usize       ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
@@ -134,16 +134,16 @@ pub fn panic_one<V, E> (
 /// The arguments for this operator as a sub-vector of all the arguments.
 ///
 pub type ArgVarIndex = fn(
-    _arg_var_index : &mut Vec<Tindex> ,
+    _arg_var_index : &mut Vec<IndexT> ,
     _flag          : &Vec<bool>       ,
-    _arg           : &[Tindex]        ,
+    _arg           : &[IndexT]        ,
 );
 // panic_arg_var_index
 /// default [ArgVarIndex] function will panic.
 fn panic_arg_var_index(
-    _arg_var_index : &mut Vec<Tindex> ,
+    _arg_var_index : &mut Vec<IndexT> ,
     _flag          : &Vec<bool>       ,
-    _arg           : &[Tindex]        ,
+    _arg           : &[IndexT]        ,
 ) { panic!() }
 // ---------------------------------------------------------------------------
 /// Information for one operator
