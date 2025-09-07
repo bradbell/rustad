@@ -18,14 +18,16 @@ use crate::numvec::{
     doc_generic_v,
     doc_generic_e,
 };
+#[cfg(doc)]
+use crate::numvec::adfn::forward_zero::doc_forward_zero;
 // -----------------------------------------------------------------------
 // reverse_one
-/// First order reverse mode evaluation; i.e., directional derivatives.
+/// First order reverse mode evaluation; i.e., partial derivatives.
 ///
 /// * Syntax :
 /// ```text
-///     domain_one = f.reverse_one_value(range_one, &var_zero, trace)
-///     domain_one = f.reverse_one_ad(range_one, &var_zero, trace)
+///     domain_one = f.reverse_one_value(&mut cache, range_one, trace)
+///     domain_one = f.reverse_one_ad(   &mut cache, range_one, trace)
 /// ```
 ///
 /// * Prototype :
@@ -37,6 +39,10 @@ use crate::numvec::{
 /// * f :
 /// is an [ADfn] object.
 ///
+/// * cache :
+/// On input, must be the *cache* output by a previous call to forward_zero,
+/// forward_one, or reverse_one for this *f* .
+///
 /// * range_one :
 /// specifies the range space weights that define the scalar function
 /// for this reverse mode calculation.
@@ -44,10 +50,16 @@ use crate::numvec::{
 /// * trace :
 /// if true, a trace of the operatiopn sequence is printed on stdout.
 ///
+///
 /// * domain_one :
-/// The return value contains the partial derivatives ,
-/// at the point specified *var_zero* ,
-/// of the scalar function with respced to each of the domain variables.
+/// The return value is the partial derivative
+/// ```text
+///     domain_one = range_one * f'(domain_zero)
+/// ```
+/// Here *f'* is the derivative of the function and
+/// *domain_zero* is its value in the call to
+/// [forward_zero](doc_forward_zero)
+/// that created the *cache* .
 ///
 /// # Example
 /// Computing all the partial derivatives using reverse_one :
@@ -77,7 +89,7 @@ use crate::numvec::{
 /// let mut c0 : Vec<V> = Vec::new();
 /// let y0              = f.forward_zero_value(&mut c0, x0, trace);
 /// let y1     : Vec<V> = vec![ 1.0 ];
-/// let x1              = f.reverse_one_value(y1, &c0, trace);
+/// let x1              = f.reverse_one_value(&mut c0, y1, trace);
 /// //
 /// assert_eq!( x1[0] , 5.0 * 6.0 );
 /// assert_eq!( x1[1] , 4.0 * 6.0 );
@@ -106,9 +118,9 @@ macro_rules! reverse_one {
         )]
         pub fn [< reverse_one_ $suffix >] (
             &self,
-            range_one   : Vec<$E>  ,
-            var_zero    : &Vec<$E> ,
-            trace       : bool     ,
+            cache       : &mut Vec<$E> ,
+            range_one   : Vec<$E>      ,
+            trace       : bool         ,
         ) -> Vec<$E>
         {
             assert_eq!(
@@ -116,9 +128,13 @@ macro_rules! reverse_one {
                 "f.reverse_one: range vector length does not match f"
             );
             assert_eq!(
-                var_zero.len(), self.n_var,
-                "f.reverse_one: var_zero length does not match f"
+                cache.len(), self.n_var,
+                "f.reverse_one: cache does not have the proper length"
             );
+            //
+            // var_zero
+            // Is the zero order value for all the variables (not modified).
+            let var_zero = cache;
             //
             // op_info_vec
             let op_info_vec = &*GlobalOpInfoVec::get();

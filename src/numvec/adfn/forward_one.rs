@@ -18,6 +18,8 @@ use crate::numvec::{
     doc_generic_v,
     doc_generic_e,
 };
+#[cfg(doc)]
+use crate::numvec::adfn::forward_zero::doc_forward_zero;
 //
 // -----------------------------------------------------------------------
 // forward_one
@@ -50,10 +52,13 @@ use crate::numvec::{
 /// if true, a trace of the operatiopn sequence is printed on stdout.
 ///
 /// * range_one :
-/// The return value is
-/// the directional derivative for the function,
-/// corresponding to the operation sequence,
-/// at the point specified *var_zero* and in the direction *domain_one* .
+/// The return value is the directional derivative
+/// ```text
+///     range_one = f'(domain_zero) * domain_one
+/// ```
+/// Here *f'* is the derivative of the function and
+/// *domain_zero* is its value in the call to
+/// [forward_zero](doc_forward_zero) that created the *cache* .
 ///
 /// # Example
 /// Computing one partial derivative using forward_one :
