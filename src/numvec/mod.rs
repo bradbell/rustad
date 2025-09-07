@@ -29,6 +29,9 @@ pub mod tape;
 // adfn
 pub mod adfn;
 //
+// atom
+pub mod atom;
+//
 // op
 // TODO: Change to pub(crate)
 pub mod op;
@@ -45,6 +48,15 @@ pub trait ThisThreadTapePublic : tape::sealed::ThisThreadTape
 impl<V> ThisThreadTapePublic for V
 where
     V : tape::sealed::ThisThreadTape ,
+{ }
+//
+// AtomEvalVec
+/// This is the public interface to a sealed trait
+pub trait AtomEvalVecPublic : atom::sealed::AtomEvalVec
+{ }
+impl<V> AtomEvalVecPublic for V
+where
+    V : atom::sealed::AtomEvalVec ,
 { }
 // ---------------------------------------------------------------------------
 // re-export

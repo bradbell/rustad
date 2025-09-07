@@ -37,21 +37,21 @@ use crate::numvec::adfn::forward_zero::doc_forward_zero;
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
 ///
-/// * f :
+/// ## f
 /// is an [ADfn] object.
 ///
-/// * cache :
+/// ## cache
 /// On input, must be the *cache* output by a previous call to forward_zero,
 /// forward_one, or reverse_one for this *f* .
 ///
-/// * domain_one :
+/// ## domain_one
 /// specifies the domain space direction along which the directional
 /// derivative is evaluated.
 ///
-/// * trace :
-/// if true, a trace of the operatiopn sequence is printed on stdout.
+/// ## trace
+/// if true, a trace of the calculations is printed on stdout.
 ///
-/// * range_one :
+/// ## range_one
 /// The return value is the directional derivative
 /// ```text
 ///     range_one = f'(domain_zero) * domain_one

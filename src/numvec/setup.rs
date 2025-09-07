@@ -12,6 +12,7 @@
 //
 // use
  use std::sync::LazyLock;
+ use std::sync::RwLock;
  use std::thread::LocalKey;
  use std::cell::RefCell;
  use crate::numvec::ad::AD;
@@ -27,6 +28,7 @@
  /// This macro requires the following use statements:
  /// ```text
  ///     use std::sync::LazyLock;
+ ///     use std::sync::RwLock;
  ///     use std::thread::LocalKey;
  ///     use std::cell::RefCell;
  ///     use crate::numvec::ad::AD;
@@ -35,6 +37,7 @@
          crate::numvec::tape::impl_this_thread_tape!($V);
          crate::numvec::op::info::impl_global_op_info_vec!($V);
          crate::numvec::ad::impl_value_op_ad!($V);
+         crate::numvec::atom::impl_atom_eval_vec!($V);
  } }
  //
  setup_this_value_type!(f32);

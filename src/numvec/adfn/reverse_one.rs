@@ -36,22 +36,22 @@ use crate::numvec::adfn::forward_zero::doc_forward_zero;
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
 ///
-/// * f :
+/// ## f
 /// is an [ADfn] object.
 ///
-/// * cache :
+/// ## cache
 /// On input, must be the *cache* output by a previous call to forward_zero,
 /// forward_one, or reverse_one for this *f* .
 ///
-/// * range_one :
+/// ## range_one
 /// specifies the range space weights that define the scalar function
 /// for this reverse mode calculation.
 ///
-/// * trace :
-/// if true, a trace of the operatiopn sequence is printed on stdout.
+/// ## trace
+/// if true, a trace of the operations is printed on stdout.
 ///
 ///
-/// * domain_one :
+/// ## domain_one
 /// The return value is the partial derivative
 /// ```text
 ///     domain_one = range_one * f'(domain_zero)

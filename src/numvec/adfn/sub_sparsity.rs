@@ -23,6 +23,8 @@ where
 {
     /// Use the subgraph method to compute a Jacobian sparsity pattern.
     ///
+    /// * See Also : [ADfn::for_sparsity]
+    ///
     /// * Syntax :
     /// ```text
     ///     pattern = f.sub_sparsity(trace)
@@ -48,7 +50,7 @@ where
     /// If a pair [i, j] does not appear, the range component
     /// with index i does not depend on the domain component with index j.
     ///
-    /// * dependency :
+    /// ## dependency :
     /// This is a dependency pattern. For example,
     /// if an range variable was equal to the
     /// Heaviside function of a domain variable,

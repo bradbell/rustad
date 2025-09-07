@@ -126,7 +126,7 @@ pub (crate) mod sealed {
     }
 }
 // impl_this_thread_tape!
-/// Implement ThisThreadTape for the value type V; see [doc_generic_v].
+/// Implement ThisThreadTape for the value type V
 ///
 /// * V : see [doc_generic_v]
 ///

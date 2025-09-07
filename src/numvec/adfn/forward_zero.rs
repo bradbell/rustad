@@ -42,7 +42,7 @@ use crate::numvec::{
 /// Upon return it has information that is used to compute derivatives.
 ///
 /// ## trace
-/// if true, a trace of the operatiopn sequence is printed on stdout.
+/// if true, a trace of the calculation is printed on stdout.
 ///
 /// ## range_zero
 /// The first return

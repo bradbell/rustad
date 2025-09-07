@@ -23,6 +23,8 @@ where
 {
     /// Use the forward mode to compute a Jacobian sparsity pattern.
     ///
+    /// See Also : [ADfn::sub_sparsity]
+    ///
     /// * Syntax :
     /// ```text
     ///     pattern = f.for_sparsity(trace)
