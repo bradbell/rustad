@@ -25,8 +25,8 @@ use crate::numvec::{
 ///
 /// * Syntax :
 /// ```text
-///     range_one = f.forward_one_value(domain_one, &var_zero, trace)
-///     range_one = f.forward_one_ad(domain_one, &var_zero, trace)
+///     range_one = f.forward_one_value(&mut cache, domain_one, trace)
+///     range_one = f.forward_one_ad(   &mut cache, domain_one, trace)
 /// ```
 ///
 /// * Prototype :
@@ -37,6 +37,10 @@ use crate::numvec::{
 ///
 /// * f :
 /// is an [ADfn] object.
+///
+/// * cache :
+/// On input, must be the *cache* output by a previous call to forward_zero,
+/// forward_one, or reverse_one for this *f* .
 ///
 /// * domain_one :
 /// specifies the domain space direction along which the directional
@@ -79,7 +83,7 @@ use crate::numvec::{
 /// let mut c0 : Vec<V> = Vec::new();
 /// let y0              = f.forward_zero_value(&mut c0, x0, trace);
 /// let x1     : Vec<V> = vec![ 1.0, 0.0, 0.0 ];
-/// let y1              = f.forward_one_value(x1, &c0, trace);
+/// let y1              = f.forward_one_value(&mut c0, x1,  trace);
 /// //
 /// assert_eq!( y1[0] , 5.0 * 6.0 );
 /// ```
@@ -106,9 +110,9 @@ macro_rules! forward_one {
         )]
         pub fn [< forward_one_ $suffix >] (
             &self,
-            domain_one  : Vec<$E>  ,
-            var_zero    : &Vec<$E> ,
-            trace       : bool     ,
+            cache       : &mut Vec<$E> ,
+            domain_one  : Vec<$E>      ,
+            trace       : bool         ,
         ) -> Vec<$E>
         {
             assert_eq!(
@@ -116,9 +120,13 @@ macro_rules! forward_one {
                 "f.forward_one: domain vector length does not match f"
             );
             assert_eq!(
-                var_zero.len(), self.n_var,
-                "f.forward_one: var_zero length does not match f"
+                cache.len(), self.n_var,
+                "f.forward_one: cache does not have the correct length"
             );
+            //
+            // var_zero
+            // Is the zero order value for all the variables (not modified).
+            let var_zero = cache;
             //
             // op_info_vec
             let op_info_vec = &*GlobalOpInfoVec::get();

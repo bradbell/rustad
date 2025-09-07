@@ -25,8 +25,8 @@ use crate::numvec::{
 ///
 /// * Syntax :
 /// ```text
-///     range_zero = f.forward_zero_value(cache, domain_zero, trace)
-///     range_zero = f.forward_zero_ad(   cache, domain_zero, trace)
+///     range_zero = f.forward_zero_value(&mut cache, domain_zero, trace)
+///     range_zero = f.forward_zero_ad(   &mut cache, domain_zero, trace)
 /// ```
 /// * Prototype :
 /// see [ADfn::forward_zero_value] and [ADfn::forward_zero_ad]
@@ -119,6 +119,7 @@ macro_rules! forward_zero {
             );
             //
             // var_zero
+            // Upon return, will be the zero order value for all the variables.
             let var_zero = cache;
             //
             // op_info_vec
