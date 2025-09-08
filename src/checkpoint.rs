@@ -125,7 +125,7 @@ where
 ///
 /// * Syntax :
 /// ```text
-/// ad_range = use_checkpoint(checkpoint_id, &ad_comain, trace, timeout_sec)
+/// ad_range = use_checkpoint(checkpoint_id, &ad_domain, trace, timeout_sec)
 /// ```
 ///
 /// If the tape for this thread is recording, include the call

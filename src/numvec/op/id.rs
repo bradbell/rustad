@@ -43,6 +43,7 @@ macro_rules! set_operator_ids {
 // See test at end mod.rs that check that every operator has a different name.
 // This ensures that the number of operators is less that u8::MAX.
 set_operator_ids!(
+    // ADD
     /// constant + variable
     ADD_CV_OP,
     /// variable + constant
@@ -50,6 +51,7 @@ set_operator_ids!(
     /// variable + variable
     ADD_VV_OP,
     //
+    // SUB
     /// constant + variable
     SUB_CV_OP,
     /// variable + constant
@@ -57,6 +59,7 @@ set_operator_ids!(
     /// variable + variable
     SUB_VV_OP,
     //
+    // MUL
     /// constant * variable
     MUL_CV_OP,
     /// variable * constant
@@ -64,12 +67,19 @@ set_operator_ids!(
     /// variable * variable
     MUL_VV_OP,
     //
+    // DIV
     /// constant * variable
     DIV_CV_OP,
     /// variable * constant
     DIV_VC_OP,
     /// variable * variable
     DIV_VV_OP,
+    //
+    // CALL
+    /// callback to an atomic function
+    CALL_OP,
+    /// place holder for results of a call operator
+    CALL_RES_OP,
     //
     /// number of valid operator ids
     NUMBER_OP,

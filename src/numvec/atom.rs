@@ -4,14 +4,29 @@
 // ---------------------------------------------------------------------------
 //! This module implements AD atomic functions
 //!
+//! Then are called atomic functions because they are recorded as a
+//! single operation in tapes and ADfn objects.
+//!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
 // use
 //
 use std::sync::RwLock;
+use std::thread::LocalKey;
+use std::cell::RefCell;
 //
-use crate::numvec::IndexT;
-use crate::numvec::AtomEvalVecPublic;
+use crate::numvec::op::id::CALL_OP;
+use crate::numvec::op::id::CALL_RES_OP;
+use crate::numvec::tape::Tape;
+use crate::numvec::tape::sealed::ThisThreadTape;
+use crate::numvec::{
+    IndexT,
+    AD,
+    ad_from_vector,
+    ad_to_vector,
+    AtomEvalVecPublic,
+    ThisThreadTapePublic,
+};
 //
 #[cfg(doc)]
 use crate::numvec::{
@@ -54,29 +69,30 @@ pub type Sparsity = fn(
 /// Functions that evaluate an atomic function.
 pub struct AtomEval<V> {
     // forward_zero
-    /// forward_zero Callback parameters
+    /// Callback function used during [ADfn::forward_zero_value]
     /// * cache  : see [forward_zero cache](doc_forward_zero#cache]
     /// * vec_in : see [forward_zero domain_zero](doc_forward_zero#domain_zero)
     /// * return : see [forward_zero range_zero](doc_forward_zero#range_zero)
     pub  forward_zero : Callback::<V> ,
     //
     // forward_one
-    /// forward_zero Callback parameters
+    /// Callback function used during [ADfn::forward_one_value]
     /// * cache  : see [forward_one cache](doc_forward_one#cache]
     /// * vec_in : see [forward_one domain_one](doc_forward_one#domain_one)
     /// * return : see [forward_one range_one](doc_forward_one#range_one)
     pub  forward_one  : Callback::<V> ,
     //
     // reverse_one
-    /// reverse_one Callback parameters
+    /// Callback function used during [ADfn::reverse_one_value]
     /// * cache  : see [reverse_one cache](doc_reverse_one#cache]
     /// * vec_in : see [reverse_one range_one](doc_reverse_one#range_one)
-    /// * return : see [reverse_one domain_one](doc_forward_one#domain_one)
+    /// * return : see [reverse_one domain_one](doc_reverse_one#domain_one)
     pub  reverse_one  : Callback::<V> ,
     //
-    // sparsity
+    // dependency
+    /// A dependency pattern for the atomic function;
     /// see [ADfn::sub_sparsity] or [ADfn::for_sparsity]
-    pub sparsity      : Sparsity      ,
+    pub dependency  : Vec< [usize;2] > ,
 }
 // ----------------------------------------------------------------------------
 pub (crate) mod sealed {
@@ -139,7 +155,7 @@ pub(crate) use impl_atom_eval_vec;
 /// ## atom_id :
 /// is the index that is used to identify this atomic function.
 ///
-pub fn register_atom<V>( atom_eval : AtomEval<V> ) -> usize
+pub fn register_atom<V>( atom_eval : AtomEval<V> ) -> IndexT
 where
     V : AtomEvalVecPublic ,
 {   //
@@ -147,7 +163,8 @@ where
     let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
     //
     // atom_id
-    let atom_id : usize;
+    let atom_id           : IndexT;
+    let atom_id_too_large : bool;
     {   //
         // write_lock
         let write_lock = rw_lock.write();
@@ -155,8 +172,211 @@ where
         //
         // Rest of this block has a lock, so it has to be fast and can't fail.
         let mut atom_eval_vec = write_lock.unwrap();
-        atom_id               = atom_eval_vec.len();
+        let atom_id_usize     = atom_eval_vec.len();
+        atom_id_too_large     = (IndexT::MAX as usize) < atom_id_usize;
+        atom_id               = atom_eval_vec.len() as IndexT;
         atom_eval_vec.push( atom_eval );
     }
+    assert!( ! atom_id_too_large );
     atom_id
+}
+// ----------------------------------------------------------------------------
+// record_call_atom
+fn record_call_atom<V>(
+    tape             : &mut Tape<V>                  ,
+    rw_lock          : &RwLock< Vec< AtomEval<V> > > ,
+    range_zero       : Vec<V>                        ,
+    atom_id          : IndexT                        ,
+    call_info        : IndexT                        ,
+    domain_zero      : Vec<V>                        ,
+    domain_tape_id   : Vec<usize>                    ,
+    domain_var_index : Vec<usize>                    ,
+) -> Vec< AD<V> >
+where
+    V : Clone ,
+{   //
+    // tape.recordng
+    debug_assert!( tape.recording );
+    //
+    // call_n_arg, call_n_res
+    let call_n_arg = domain_zero.len();
+    let call_n_res = range_zero.len();
+    //
+    // arange
+    let mut arange : Vec< AD<V> > = ad_from_vector(range_zero);
+    //
+    // is_var_domain
+    let is_var_domain : Vec<bool> = domain_tape_id.iter().map(
+        |tape_id| *tape_id == tape.tape_id
+    ).collect();
+    //
+    // is_var_range
+    let mut is_var_range = vec![false; call_n_res];
+    {   //
+        // read_lock
+        let read_lock = rw_lock.read();
+        assert!( read_lock.is_ok() );
+        //
+        // Rest of this block has a lock, so it should be fast and not fail.
+        let atom_eval_vec = read_lock.unwrap();
+        let dependency    = &atom_eval_vec[atom_id as usize].dependency;
+        for k in 0 .. dependency.len() {
+            let [i,j] = dependency[k];
+            if is_var_domain[j] {
+                is_var_range[i] = true;
+            }
+        }
+    }
+    //
+    // arange, n_var_res
+    let mut n_var_res = 0;
+    for i in 0 .. call_n_res {
+        if is_var_range[i] {
+            arange[i].tape_id   = tape.tape_id;
+            arange[i].var_index = tape.n_var + n_var_res;
+            n_var_res += 1;
+        }
+    }
+    if n_var_res > 0 {
+        //
+        // tape.id_all, tape.op2arg
+        tape.id_all.push( CALL_OP );
+        tape.op2arg.push( tape.arg_all.len() as IndexT );
+        //
+        // tape.arg_all, tape.con_all
+        tape.arg_all.push( atom_id );                        // arg[0]
+        tape.arg_all.push( call_info );                      // arg[1]
+        tape.arg_all.push( call_n_arg as IndexT );           // arg[2]
+        tape.arg_all.push( call_n_res as IndexT );           // arg[3]
+        tape.arg_all.push( tape.flag_all.len() as IndexT );  // arg[4]
+        //
+        // tape.arg_all
+        for j in 0 .. call_n_arg {
+            let index = if is_var_domain[j] {
+                domain_var_index[j]
+            } else {
+                let con_index = tape.con_all.len();
+                tape.con_all.push( domain_zero[j].clone() );
+                con_index
+            };
+            tape.arg_all.push( index as IndexT);             // arg[5+j]
+        }
+        //
+        // tape.flag_all
+        for j in 0 .. call_n_arg {
+            tape.flag_all.push( is_var_domain[j] );
+        }
+        for i in 0 .. call_n_res {
+            tape.flag_all.push( is_var_range[i] );
+        }
+        //
+        // tape.n_var
+        tape.n_var += n_var_res;
+        //
+        // tape.id_all, tape.op2arg
+        for _i in 0 .. (n_var_res - 1) {
+            tape.id_all.push( CALL_RES_OP );
+            tape.op2arg.push( tape.arg_all.len() as IndexT );
+        }
+    }
+    arange
+}
+// ----------------------------------------------------------------------------
+// call_atom_ad
+/// Make an AD call to an atomic function.
+///
+/// Compute the result of an atomic function and,
+/// if this thread is currently recording, include the call in its tape.
+///
+/// * Syntax :
+/// ```text
+///     arange = call_atom_ad(atom_id, call_info, adomain, trace)
+/// ```
+///
+/// * V : see [doc_generic_v]
+/// `
+/// * atom_id :
+/// The [atom_id](register_atom#atom_id) returned by register_atom for this
+/// atomic function.
+///
+/// * call_info :
+/// This is information about that call that will be passed on to the
+/// call back functions specified by [atom_eval](register_atom#atom_eval).
+///
+/// * adomain :
+/// This is the value of the arguments to the atomic function.
+///
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+pub fn call_atom_ad<V>(
+    atom_id     : IndexT       ,
+    call_info   : IndexT       ,
+    adomain     : Vec< AD<V> > ,
+    trace       : bool         ,
+) -> Vec< AD<V> >
+where
+    V   : Clone + From<f32> + ThisThreadTapePublic + AtomEvalVecPublic ,
+{
+    //
+    // local_key
+    let local_key : &LocalKey< RefCell< Tape<V> > > = ThisThreadTape::get();
+    //
+    // recording
+    let recording : bool = local_key.with_borrow( |tape| tape.recording );
+    //
+    // rwlock
+    let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
+    //
+    // forward_zero
+    let forward_zero : Callback<V>;
+    {   //
+        // read_lock
+        let read_lock = rw_lock.read();
+        assert!( read_lock.is_ok() );
+        //
+        // Rest of this block has a lock, so it should be fast and not fail.
+        // We do not clone dependency because it could be large.
+        // Instead we access it using a separate read lock in record_call_atom.
+        let atom_eval_vec = read_lock.unwrap();
+        forward_zero  = atom_eval_vec[atom_id as usize].forward_zero.clone();
+    }
+    //
+    // domain_tape_id, domain_var_index, domain_zero
+    let mut domain_tape_id   = vec![ 0 ; adomain.len() ];
+    let mut domain_var_index = vec![ 0 ; adomain.len() ];
+    if recording {
+        for j in 0 .. adomain.len() {
+            domain_tape_id[j]   = adomain[j].tape_id;
+            domain_var_index[j] = adomain[j].var_index;
+        }
+    }
+    let domain_zero = ad_to_vector(adomain);
+    //
+    // range_zero
+    // restore domain_zero using the cache.
+    let mut cache : Vec<V> = Vec::new();
+    let domain_len  = domain_zero.len();
+    let zero_v : V  =  0f32.into();
+    let range_zero  = forward_zero(&mut cache, domain_zero, trace, call_info);
+    let mut domain_zero = cache;
+    domain_zero.resize(domain_len, zero_v);
+    domain_zero.shrink_to_fit();
+    //
+    // arange
+    let arange : Vec< AD<V> >;
+    if ! recording {
+        arange = ad_from_vector(range_zero);
+    } else {
+        arange = local_key.with_borrow_mut( |tape| record_call_atom::<V>(
+            tape,
+            rw_lock,
+            range_zero,
+            atom_id,
+            call_info,
+            domain_zero,
+            domain_tape_id,
+            domain_var_index
+        ) );
+    }
+    arange
 }

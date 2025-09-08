@@ -40,6 +40,10 @@ use crate::numvec::{
 /// ## cache
 /// The input value of this vector should have length zero.
 /// Upon return it has information that is used to compute derivatives.
+/// The *cache* starts off with domain.zero; i.e.,
+/// the slice cache[ 0 .. domain_zero.len() ] is equal to domain_zero.
+/// (This may be useful to know because domain_zero is consumed by
+/// this operation.)
 ///
 /// ## trace
 /// if true, a trace of the calculation is printed on stdout.
