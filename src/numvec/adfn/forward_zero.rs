@@ -25,8 +25,8 @@ use crate::numvec::{
 ///
 /// * Syntax :
 /// ```text
-///     range_zero = f.forward_zero_value(&mut cache, domain_zero, trace)
-///     range_zero = f.forward_zero_ad(   &mut cache, domain_zero, trace)
+///     range_zero = f.forward_zero_value(&mut var_zero, domain_zero, trace)
+///     range_zero = f.forward_zero_ad(   &mut var_zero, domain_zero, trace)
 /// ```
 /// * Prototype :
 /// see [ADfn::forward_zero_value] and [ADfn::forward_zero_ad]
@@ -37,13 +37,16 @@ use crate::numvec::{
 /// ## f
 /// is an [ADfn] object.
 ///
-/// ## cache
+/// ## var_zero
 /// The input value of this vector should have length zero.
-/// Upon return it has information that is used to compute derivatives.
-/// The *cache* starts off with domain.zero; i.e.,
-/// the slice cache[ 0 .. domain_zero.len() ] is equal to domain_zero.
-/// (This may be useful to know because domain_zero is consumed by
-/// this operation.)
+/// Upon return it has the zero order forward mode values for all
+/// the variables in the operation sequence.
+/// This begins with *domain.zero* ; i.e.,
+/// ```text
+///     var_zero[ 0 .. domain_zero.len() ] == domain_zero
+/// ```
+/// It may be useful to know this because domain_zero is consumed by
+/// this operation.
 ///
 /// ## trace
 /// if true, a trace of the calculation is printed on stdout.
@@ -109,22 +112,18 @@ macro_rules! forward_zero {
         )]
         pub fn [< forward_zero_ $suffix >] (
             &self,
-            cache       : &mut Vec<$E> ,
+            var_zero    : &mut Vec<$E> ,
             domain_zero : Vec<$E>      ,
             trace       : bool         ,
         ) -> Vec<$E>
         {   assert_eq!(
-                cache.len(), 0,
-                "f.forward_zero: cache does not have length zero"
+                var_zero.len(), 0,
+                "f.forward_zero: var_zero  does not have length zero"
             );
             assert_eq!(
                 domain_zero.len(), self.n_domain,
                 "f.forward_zero: domain vector length does not match f"
             );
-            //
-            // var_zero
-            // Upon return, will be the zero order value for all the variables.
-            let var_zero = cache;
             //
             // op_info_vec
             let op_info_vec = &*GlobalOpInfoVec::get();
@@ -132,7 +131,7 @@ macro_rules! forward_zero {
             // var_zero
             let nan_v  : $V = f32::NAN.into();
             let nan_e  : $E = nan_v.into();
-            *var_zero       = domain_zero;
+            *var_zero        = domain_zero;
             var_zero.resize( self.n_var, nan_e );
             //
             if trace {

@@ -26,8 +26,8 @@ use crate::numvec::adfn::forward_zero::doc_forward_zero;
 ///
 /// * Syntax :
 /// ```text
-///     domain_one = f.reverse_one_value(&mut cache, range_one, trace)
-///     domain_one = f.reverse_one_ad(   &mut cache, range_one, trace)
+///     domain_one = f.reverse_one_value(&var_zero, range_one, trace)
+///     domain_one = f.reverse_one_ad(   &var_zero, range_one, trace)
 /// ```
 ///
 /// * Prototype :
@@ -39,9 +39,8 @@ use crate::numvec::adfn::forward_zero::doc_forward_zero;
 /// ## f
 /// is an [ADfn] object.
 ///
-/// ## cache
-/// On input, must be the *cache* output by a previous call to forward_zero,
-/// forward_one, or reverse_one for this *f* .
+/// ## var_zero
+/// must be the *var_zero* computed by a previous call to forward_zero.
 ///
 /// ## range_one
 /// specifies the range space weights that define the scalar function
@@ -58,7 +57,7 @@ use crate::numvec::adfn::forward_zero::doc_forward_zero;
 /// ```
 /// Here `f'` is the derivative of the function and
 /// [domain_zero](doc_forward_zero#domain_zero) is its value in the call to
-/// forward_zero that created the *cache* .
+/// forward_zero that created the *var_zero* .
 ///
 /// # Example
 /// Computing all the partial derivatives using reverse_one :
@@ -117,7 +116,7 @@ macro_rules! reverse_one {
         )]
         pub fn [< reverse_one_ $suffix >] (
             &self,
-            cache       : &mut Vec<$E> ,
+            var_zero    : &mut Vec<$E> ,
             range_one   : Vec<$E>      ,
             trace       : bool         ,
         ) -> Vec<$E>
@@ -127,13 +126,9 @@ macro_rules! reverse_one {
                 "f.reverse_one: range vector length does not match f"
             );
             assert_eq!(
-                cache.len(), self.n_var,
-                "f.reverse_one: cache does not have the proper length"
+                 var_zero.len(), self.n_var,
+                "f.reverse_one:  var_zero does not have the proper length"
             );
-            //
-            // var_zero
-            // Is the zero order value for all the variables (not modified).
-            let var_zero = cache;
             //
             // op_info_vec
             let op_info_vec = &*GlobalOpInfoVec::get();

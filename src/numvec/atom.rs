@@ -50,7 +50,7 @@ use crate::numvec::adfn::{
 /// is the *call_info* value used when the atomic function was called.
 ///
 pub type Callback<V> = fn(
-    _cache         : &mut Vec<V> ,
+    _var_zero      : &mut Vec<V> ,
     _vec_in        : Vec<V>      ,
     _trace         : bool        ,
     _call_info     : IndexT      ,
@@ -70,21 +70,21 @@ pub type Sparsity = fn(
 pub struct AtomEval<V> {
     // forward_zero
     /// Callback function used during [ADfn::forward_zero_value]
-    /// * cache  : see [forward_zero cache](doc_forward_zero#cache]
+    /// * var_zero  : see [forward_zero var_zero](doc_forward_zero#var_zero]
     /// * vec_in : see [forward_zero domain_zero](doc_forward_zero#domain_zero)
     /// * return : see [forward_zero range_zero](doc_forward_zero#range_zero)
     pub  forward_zero : Callback::<V> ,
     //
     // forward_one
     /// Callback function used during [ADfn::forward_one_value]
-    /// * cache  : see [forward_one cache](doc_forward_one#cache]
+    /// * var_zero  : see [forward_one var_zero](doc_forward_one#var_zero]
     /// * vec_in : see [forward_one domain_one](doc_forward_one#domain_one)
     /// * return : see [forward_one range_one](doc_forward_one#range_one)
     pub  forward_one  : Callback::<V> ,
     //
     // reverse_one
     /// Callback function used during [ADfn::reverse_one_value]
-    /// * cache  : see [reverse_one cache](doc_reverse_one#cache]
+    /// * var_zero  : see [reverse_one var_zero](doc_reverse_one#var_zero]
     /// * vec_in : see [reverse_one range_one](doc_reverse_one#range_one)
     /// * return : see [reverse_one domain_one](doc_reverse_one#domain_one)
     pub  reverse_one  : Callback::<V> ,
@@ -282,7 +282,7 @@ where
     arange
 }
 // ----------------------------------------------------------------------------
-// call_atom_ad
+// call_atom
 /// Make an AD call to an atomic function.
 ///
 /// Compute the result of an atomic function and,
@@ -300,8 +300,8 @@ where
 /// atomic function.
 ///
 /// * call_info :
-/// This is information about that call that will be passed on to the
-/// call back functions specified by [atom_eval](register_atom#atom_eval).
+/// This is information about this call that is be passed on to the
+/// callback functions specified by [atom_eval](register_atom#atom_eval).
 ///
 /// * adomain :
 /// This is the value of the arguments to the atomic function.
@@ -353,12 +353,14 @@ where
     let domain_zero = ad_to_vector(adomain);
     //
     // range_zero
-    // restore domain_zero using the cache.
-    let mut cache : Vec<V> = Vec::new();
+    // restore domain_zero using var_zero.
+    let mut var_zero : Vec<V> = Vec::new();
     let domain_len  = domain_zero.len();
     let zero_v : V  =  0f32.into();
-    let range_zero  = forward_zero(&mut cache, domain_zero, trace, call_info);
-    let mut domain_zero = cache;
+    let range_zero  = forward_zero(
+        &mut var_zero, domain_zero, trace, call_info
+    );
+    let mut domain_zero = var_zero;
     domain_zero.resize(domain_len, zero_v);
     domain_zero.shrink_to_fit();
     //
