@@ -12,6 +12,7 @@ use crate::vec_set::VecSet;
 use crate::numvec::ADfn;
 use crate::numvec::IndexT;
 use crate::numvec::op::info::GlobalOpInfoVec;
+use crate::numvec::op::info::OpInfo;
 //
 #[cfg(doc)]
 use crate::numvec::doc_generic_v;
@@ -86,7 +87,7 @@ where
     pub fn for_sparsity(&self, trace : bool) -> Vec< [usize; 2] >
     {   //
         // op_info_vec
-        let op_info_vec = &*<V as GlobalOpInfoVec>::get();
+        let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
         //
         // n_domain, n_var, flag_all, arg_all, op2arg,
         // range_is_var, range2tape_index, n_range

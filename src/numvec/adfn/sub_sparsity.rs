@@ -11,6 +11,7 @@
 use crate::numvec::ADfn;
 use crate::numvec::IndexT;
 use crate::numvec::op::info::GlobalOpInfoVec;
+use crate::numvec::op::info::OpInfo;
 //
 #[cfg(doc)]
 use crate::numvec::doc_generic_v;
@@ -91,7 +92,7 @@ where
         let zero_t  = 0 as IndexT;
         //
         // op_info_vec
-        let op_info_vec = &*<V as GlobalOpInfoVec>::get();
+        let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
         //
         // n_domain ... range2tape_index.
         let n_domain          = self.n_domain;
