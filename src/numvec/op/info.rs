@@ -12,6 +12,7 @@ use crate::numvec::ad::AD;
 use crate::numvec::op::id::NUMBER_OP;
 use crate::numvec::IndexT;
 use crate::numvec::tape::sealed::ThisThreadTape;
+use crate::numvec::atom::sealed::AtomEvalVec;
 //
 #[cfg(doc)]
 use crate::numvec::{
@@ -194,7 +195,7 @@ where
     for<'a> &'a V : std::ops::Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Div<&'a V, Output = V> ,
     //
-    V             : Clone + ThisThreadTape ,
+    V  : Clone + ThisThreadTape + AtomEvalVec,
 {
     let empty = OpInfo {
         name             : &"panic",
@@ -211,6 +212,7 @@ where
     crate::numvec::op::sub::set_op_info::<V>(&mut result);
     crate::numvec::op::mul::set_op_info::<V>(&mut result);
     crate::numvec::op::div::set_op_info::<V>(&mut result);
+    crate::numvec::op::call::set_op_info::<V>(&mut result);
     result
 }
 // ---------------------------------------------------------------------------

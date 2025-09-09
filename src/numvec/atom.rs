@@ -52,7 +52,7 @@ use crate::numvec::adfn::{
 ///
 pub type Callback<V> = fn(
     _var_zero      : &mut Vec<V> ,
-    _vec_in        : Vec<V>      ,
+    _vec_in        : Vec<&V>     ,
     _trace         : bool        ,
     _call_info     : IndexT      ,
 ) -> Vec<V> ;
@@ -354,13 +354,19 @@ where
     }
     let domain_zero = ad_to_vector(adomain);
     //
+    // domain_zero_ref
+    let mut domain_zero_ref : Vec<&V> = Vec::new();
+    for j in 0 .. domain_zero.len() {
+        domain_zero_ref.push( &domain_zero[j] );
+    }
+    //
     // range_zero
     // restore domain_zero using var_zero.
     let mut var_zero : Vec<V> = Vec::new();
     let domain_len  = domain_zero.len();
     let zero_v : V  =  0f32.into();
     let range_zero  = forward_zero(
-        &mut var_zero, domain_zero, trace, call_info
+        &mut var_zero, domain_zero_ref, trace, call_info
     );
     let mut domain_zero = var_zero;
     domain_zero.resize(domain_len, zero_v);

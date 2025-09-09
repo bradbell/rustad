@@ -41,12 +41,24 @@
 // --------------------------------------------------------------------------
 // use
 //
+use std::sync::RwLock;
+//
+use crate::numvec::op::info::OpInfo;
+use crate::numvec::atom::{
+    Callback,
+    sealed::AtomEvalVec,
+};
 use crate::numvec::op::id::{
         CALL_OP,
-        CALL_RES_OP
+        CALL_RES_OP,
 };
-// use
-use crate::numvec::IndexT;
+use crate::numvec::{
+    AD,
+    IndexT,
+    AtomEval,
+    panic_zero,
+    panic_one,
+};
 // --------------------------------------------------------------------------
 //
 // forward_0_call_value
@@ -57,10 +69,12 @@ fn call_forward_0<V> (
     flag       : &Vec<bool>    ,
     arg        : &[IndexT]     ,
     res        : usize         )
+where
+    V : AtomEvalVec,
 {   //
-    // call_index, call_info, n_arg, n_res
-    let call_index = arg[0] as usize;
-    let call_info  = arg[1] as usize;
+    // atom_id, call_info, n_arg, n_res
+    let atom_id    = arg[0] as usize;
+    let call_info  = arg[1];
     let call_n_arg = arg[2] as usize;
     let call_n_res = arg[3] as usize;
     //
@@ -75,7 +89,7 @@ fn call_forward_0<V> (
     // domain_zero
     let mut call_domain_zero : Vec<&V> = Vec::new();
     for i_arg in 0 .. call_n_arg {
-        let index = arg[iarg + 5] as usize;
+        let index = arg[i_arg + 5] as usize;
         if is_arg_var[i_arg] {
             call_domain_zero.push( &var_zero[index] );
         } else {
@@ -84,7 +98,7 @@ fn call_forward_0<V> (
     }
     //
     // rwlock
-    let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
+    let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
     //
     // forward_zero
     let forward_zero : Callback<V>;
@@ -99,19 +113,20 @@ fn call_forward_0<V> (
     }
     //
     // call_range_zero
-    let call_var_zero  : Vec<V> = Vec::new();
-    let call_range_zero = forward_zero(
+    let mut call_var_zero  : Vec<V> = Vec::new();
+    let trace = false;
+    let mut call_range_zero = forward_zero(
         &mut call_var_zero, call_domain_zero, trace, call_info
     );
     //
     // var_zero
     let mut j_res = 0;
     call_range_zero.reverse();
-    for i_res in (0 .. call_n_res).reverse() {
-        range_i = call_range_zero.pop();
-        debug_assert!( range_i.is_ok() );
+    for i_res in (0 .. call_n_res).rev() {
+        let range_i = call_range_zero.pop();
+        debug_assert!( range_i.is_some() );
         if is_res_var[i_res] {
-            var_zero[res + j_res] = range_i;
+            var_zero[res + j_res] = range_i.unwrap();
             j_res += 1;
         }
     }
@@ -135,8 +150,8 @@ fn call_arg_var_index(
     let is_var   = &flag[begin .. end];
     //
     // arg_var_index
-    let zero_t : Tindex = 0.into();
-    arg_var_index.resize(0, zero_u);
+    let zero_t = 0 as IndexT;
+    arg_var_index.resize(0, zero_t);
     for call_i_arg in 0 .. call_n_arg {
         if is_var[call_i_arg] {
             arg_var_index.push( arg[5 + call_i_arg]  );
@@ -149,62 +164,64 @@ fn call_arg_var_index(
 /// Set the operator information for call.
 ///
 /// * op_info_vec :
-/// The map from [operator::id] to operator information.
-/// The map results for CALL_OP are set.
-pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<F,U> > )
+/// The map from operator id to operator information [OpInfo] .
+/// The map results for CALL_OP and CALL_RES_OP are set.
+pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
+    V : AtomEvalVec ,
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
         name              : "call" ,
         forward_0_value   : call_forward_0::<V>,
-        forward_0_ad      : panic_one::<V, AD<V> >,
+        forward_0_ad      : panic_zero::<V, AD<V> >,
         forward_1_value   : panic_one::<V, V>,
         forward_1_ad      : panic_one::<V, AD<V> >,
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
-        arg_var_index     : call_arg_var_index,,
+        arg_var_index     : call_arg_var_index,
     };
     op_info_vec[CALL_RES_OP as usize] = OpInfo{
         name              : "call_res" ,
-        forward_0_value   : call_forward_0::<V>,
-        forward_0_ad      : panic_one::<V, AD<V> >,
-        forward_1_value   : panic_one::<V, V>,
-        forward_1_ad      : panic_one::<V, AD<V> >,
-        reverse_1_value   : panic_one::<V, V>,
-        reverse_1_ad      : panic_one::<V, AD<V> >,
-        arg_var_index     : call_arg_var_index,,
+        forward_0_value   : no_op_zero::<V, V>,
+        forward_0_ad      : no_op_zero::<V, AD<V> >,
+        forward_1_value   : no_op_one::<V, V>,
+        forward_1_ad      : no_op_one::<V, AD<V> >,
+        reverse_1_value   : no_op_one::<V, V>,
+        reverse_1_ad      : no_op_one::<V, AD<V> >,
+        arg_var_index     : no_op_arg_var_index,
     };
-
-    op_info_vec[CALL_RES_OP as usize] = OpInfo{
-        name           : "call_res".to_string() ,
-        forward_0      : no_op_zero::<V>,
-        forward_1      : no_op_one::<V>,
-        reverse_1      : no_op_one::<V>,
-        ad_forward_0   : no_op_zero::<V>,
-        ad_forward_1   : no_op_one::<V>,
-        ad_reverse_1   : no_op_one::<V>,
-        arg_var_index  : no_op_arg_var_index,
-     };
 }
 // ---------------------------------------------------------------------------
 //
 // no_op_zero
-/// [ForwardZero] function
-fn no_op_zero<V>( _var_zero: &mut Vec<V>,
-    _con: &Vec<V>, _flag : &Vec<bool>, _arg: &[IndexT], _res: usize)
-{ }
+/// [ForwardZero](crate::numvec::op::info::ForwardZero) function
+fn no_op_zero<V, E>(
+    _var_zero : &mut Vec<E> ,
+    _con      : &Vec<V>     ,
+    _flag     : &Vec<bool>  ,
+    _arg      : &[IndexT]   ,
+    _res      : usize       ,
+) { }
 //
 // no_op_one
-/// [ForwardOne] or [ReverseOne] function
-fn no_op_one<V>( _var_one: &mut Vec<V>, _var_zero : &Vec<V>,
-    _con: &Vec<V>, _arg: &[IndexT], _res: usize)
-{ }
+/// [ForwardOne](crate::numvec::op::info::ForwardOne) or
+/// [ReverseOne](crate::numvec::op::info::ReverseOne) function
+fn no_op_one<V, E>(
+    _var_one  : &mut Vec<E> ,
+    _var_zero : &Vec<E>     ,
+    _con      : &Vec<V>     ,
+    _flag     : &Vec<bool>  ,
+    _arg      : &[IndexT]   ,
+    _res      : usize       ,
+) { }
 //
 // no_op_arg_var_index
-/// [ArgVarIndex] function
+/// [ArgVarIndex](crate::numvec::op::info::ArgVarIndex) function
 fn no_op_arg_var_index(
-    arg_var_index: &mut Vec<IndexT>, _flag: &Vec<bool>, _arg: &[IndexT]
+    arg_var_index  : &mut Vec<IndexT> ,
+    _flag          : &Vec<bool>       ,
+    _arg           : &[IndexT]        ,
 ) {
-    let zero_u : Tindex = 0.into();
-    arg_var_index.resize(0, zero_u);
+    let zero_t = 0 as IndexT;
+    arg_var_index.resize(0, zero_t);
 }
