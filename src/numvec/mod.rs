@@ -296,13 +296,37 @@ impl<S : std::fmt::Display> std::fmt::Display for NumVec<S> {
 /// # Example
 /// ```
 /// use rustad::numvec::NumVec;
-/// let x  : f32  = 3.0;
-/// let ax        = NumVec::from(x);
-/// assert_eq!( ax.vec.len(), 1 );
-/// assert_eq!( ax.vec[0],    3.0 );
+///
+/// // f32 -> NumVec<f32>
+/// let x                  = 3.0 as f32;
+/// let x_nv : NumVec<f32> = NumVec::from(x);
+/// assert_eq!( x_nv.vec.len(), 1 );
+/// assert_eq!( x_nv.vec[0], 3.0 as f32 );
+///
+/// // f32 -> NumVec<f64>
+/// let x                  = 3.0 as f32;
+/// let x_nv : NumVec<f64> = NumVec::from(x);
+/// assert_eq!( x_nv.vec.len(), 1 );
+/// assert_eq!( x_nv.vec[0], 3.0 as f64 );
+///
+/// // f64 -> NumVec<f64>
+/// let x                  = 3.0 as f64;
+/// let x_nv : NumVec<f64> = NumVec::from(x);
+/// assert_eq!( x_nv.vec.len(), 1 );
+/// assert_eq!( x_nv.vec[0], 3.0 as f64 );
 /// ```
-impl<S> From<S> for NumVec<S> {
-    fn from ( scalar : S )->NumVec<S> {
+impl From<f32> for NumVec<f32> {
+    fn from ( scalar : f32 )-> NumVec<f32> {
+        NumVec { vec : vec![ scalar ] }
+    }
+}
+impl From<f32> for NumVec<f64> {
+    fn from ( scalar : f32 )-> NumVec<f64> {
+        NumVec { vec : vec![ scalar as f64 ] }
+    }
+}
+impl From<f64> for NumVec<f64> {
+    fn from ( scalar : f64 )-> NumVec<f64> {
         NumVec { vec : vec![ scalar ] }
     }
 }

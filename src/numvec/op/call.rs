@@ -62,9 +62,9 @@ use crate::numvec::{
     AtomEval,
 };
 // --------------------------------------------------------------------------
+// call_forward_0
 //
-// forward_0_call_value
-/// zero order forward for call operator for atomic functions
+/// zero order forward call operator for atomic functions
 fn call_forward_0<V> (
     var_zero   : &mut Vec<V>   ,
     con        : &Vec<V>       ,
@@ -73,7 +73,9 @@ fn call_forward_0<V> (
     res        : usize         )
 where
     V : AtomEvalVec,
-{   //
+{   // ----------------------------------------------------------------------
+    // Same in call forward zero, forward one, and reverse one
+    //
     // atom_id, call_info, n_arg, n_res
     let atom_id    = arg[0] as usize;
     let call_info  = arg[1];
@@ -98,13 +100,14 @@ where
             call_domain_zero.push( &con[index] );
         }
     }
-    //
-    // rwlock
-    let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
+    // ----------------------------------------------------------------------
     //
     // forward_zero
     let forward_zero : Callback<V>;
     {   //
+        // rw_lock
+        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
+        //
         // read_lock
         let read_lock = rw_lock.read();
         assert!( read_lock.is_ok() );
@@ -133,6 +136,100 @@ where
         }
     }
 }
+// --------------------------------------------------------------------------
+// call_forward_1
+//
+/// first order forward call operator for atomic functions
+fn call_forward_1<V> (
+    var_zero   : &Vec<V>       ,
+    var_one    : &mut Vec<V>   ,
+    con        : &Vec<V>       ,
+    flag       : &Vec<bool>    ,
+    arg        : &[IndexT]     ,
+    res        : usize         )
+where
+    V : AtomEvalVec + From<f32>,
+{   // ----------------------------------------------------------------------
+    // Same in call forward zero, forward one, and reverse one
+    //
+    // atom_id, call_info, n_arg, n_res
+    let atom_id    = arg[0] as usize;
+    let call_info  = arg[1];
+    let call_n_arg = arg[2] as usize;
+    let call_n_res = arg[3] as usize;
+    //
+    // is_arg_var, is_res_var
+    let mut begin   = arg[4] as usize;
+    let mut end     = begin + call_n_arg;
+    let is_arg_var  = &flag[begin .. end];
+    begin           = end;
+    end             = begin + call_n_res;
+    let is_res_var  = &flag[begin .. end];
+    //
+    // call_domain_zero
+    let mut call_domain_zero : Vec<&V> = Vec::new();
+    for i_arg in 0 .. call_n_arg {
+        let index = arg[i_arg + 5] as usize;
+        if is_arg_var[i_arg] {
+            call_domain_zero.push( &var_zero[index] );
+        } else {
+            call_domain_zero.push( &con[index] );
+        }
+    }
+    // ----------------------------------------------------------------------
+    //
+    // forward_zero, forward_one
+    let forward_zero : Callback<V>;
+    let forward_one : Callback<V>;
+    {   //
+        // rw_lock
+        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
+        //
+        // read_lock
+        let read_lock = rw_lock.read();
+        assert!( read_lock.is_ok() );
+        //
+        // Rest of this block has a lock, so it should be fast and not fail.
+        let atom_eval_vec = read_lock.unwrap();
+        let atom_eval     = &atom_eval_vec[atom_id as usize];
+        forward_zero      = atom_eval.forward_zero.clone();
+        forward_one       = atom_eval.forward_one.clone();
+    }
+    //
+    // call_var_zero
+    let mut call_var_zero : Vec<V> = Vec::new();
+    let trace = false;
+    forward_zero(&mut call_var_zero, &call_domain_zero, trace, call_info);
+    //
+    // call_domain_one
+    let zero_v : V = 0f32.into();
+    let mut call_domain_one : Vec<&V> = Vec::new();
+    for i_arg in 0 .. call_n_arg {
+        let index = arg[i_arg + 5] as usize;
+        if is_arg_var[i_arg] {
+            call_domain_one.push( &var_one[index] );
+        } else {
+            call_domain_one.push( &zero_v );
+        }
+    }
+    // call_range_one
+    let mut call_range_one = forward_one(
+        &mut call_var_zero, &call_domain_one, trace, call_info
+    );
+    //
+    // var_one
+    let mut j_res = 0;
+    call_range_one.reverse();
+    for i_res in (0 .. call_n_res).rev() {
+        let range_i = call_range_one.pop();
+        debug_assert!( range_i.is_some() );
+        if is_res_var[i_res] {
+            var_one[res + j_res] = range_i.unwrap();
+            j_res += 1;
+        }
+    }
+}
+// --------------------------------------------------------------------------
 //
 // call_arg_var_index
 /// vector of variable indices that are arguments to this call operator
@@ -170,13 +267,13 @@ fn call_arg_var_index(
 /// The map results for CALL_OP and CALL_RES_OP are set.
 pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    V : AtomEvalVec ,
+    V : AtomEvalVec + From<f32> ,
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
         name              : "call" ,
         forward_0_value   : call_forward_0::<V>,
         forward_0_ad      : panic_zero::<V, AD<V> >,
-        forward_1_value   : panic_one::<V, V>,
+        forward_1_value   : call_forward_1::<V>,
         forward_1_ad      : panic_one::<V, AD<V> >,
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
