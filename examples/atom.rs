@@ -24,14 +24,34 @@ fn sumsq_panic(
 //
 // sumsq_forward_zero
 fn sumsq_forward_zero(
-    _var_zero    : &mut Vec<V> ,
+    var_zero     : &mut Vec<V> ,
     domain_zero  : &Vec<&V>    ,
     _trace       : bool        ,
-    _call_info   : IndexT      ) -> Vec<V>
+    call_info    : IndexT      ) -> Vec<V>
 {   //
+    assert_eq!( var_zero.len(), 0 );
     let mut sumsq = 0 as V;
     for j in 0 .. domain_zero.len() {
         sumsq += domain_zero[j] * domain_zero[j];
+        if call_info == 1 {
+            var_zero.push( *domain_zero[j] )
+        }
+    }
+    vec![ sumsq ]
+}
+//
+// sumsq_forward_one
+fn sumsq_forward_one(
+    domain_zero  : &mut Vec<V> ,
+    domain_one   : &Vec<&V>    ,
+    _trace       : bool        ,
+    call_info    : IndexT      ) -> Vec<V>
+{   //
+    assert_eq!( call_info,  1 );
+    assert_eq!( domain_zero.len(), domain_one.len() );
+    let mut sumsq = 0 as V;
+    for j in 0 .. domain_one.len() {
+        sumsq += 2.0 * domain_zero[j] * domain_one[j];
     }
     vec![ sumsq ]
 }
@@ -54,7 +74,7 @@ fn test_forward_zero() {
     // sumsq_atom_eval
     let sumsq_atom_eval = AtomEval {
         forward_zero_value   :  sumsq_forward_zero,
-        forward_one_value    :  sumsq_panic,
+        forward_one_value    :  sumsq_forward_one,
         reverse_one_value    :  sumsq_panic,
         forward_depend       :  sumsq_forward_depend,
     };
@@ -65,7 +85,7 @@ fn test_forward_zero() {
     // ax
     let x       : Vec<V> = vec![ 1.0 , 2.0 ];
     let ax               = start_recording(x);
-    let call_info        = 0 as IndexT;
+    let call_info        = 1 as IndexT;
     let trace            = false;
     let ay               = call_atom(sumsq_atom_id, call_info, ax, trace);
     let f                = stop_recording(ay);
@@ -73,6 +93,9 @@ fn test_forward_zero() {
     let mut v   : Vec<V> = Vec::new();
     let y                = f.forward_zero_value(&mut v , x.clone(), trace);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
+    let dx      : Vec<V> = vec![ 5.0, 6.0 ];
+    let dy               = f.forward_one_value(&mut v , dx.clone(), trace);
+    assert_eq!( dy[0], 2.0 * x[0]*dx[0] + 2.0 * x[1]*dx[1] );
 }
 
 #[test]
