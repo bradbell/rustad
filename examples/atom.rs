@@ -53,10 +53,10 @@ fn test_forward_zero() {
     //
     // sumsq_atom_eval
     let sumsq_atom_eval = AtomEval {
-        forward_zero   :  sumsq_forward_zero,
-        forward_one    :  sumsq_panic,
-        reverse_one    :  sumsq_panic,
-        forward_depend :  sumsq_forward_depend,
+        forward_zero_value   :  sumsq_forward_zero,
+        forward_one_value    :  sumsq_panic,
+        reverse_one_value    :  sumsq_panic,
+        forward_depend       :  sumsq_forward_depend,
     };
     //
     // sumsq_atom_id

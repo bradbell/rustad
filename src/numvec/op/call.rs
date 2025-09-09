@@ -114,7 +114,8 @@ where
         //
         // Rest of this block has a lock, so it should be fast and not fail.
         let atom_eval_vec = read_lock.unwrap();
-        forward_zero  = atom_eval_vec[atom_id as usize].forward_zero.clone();
+        let atom_eval = &atom_eval_vec[atom_id as usize];
+        forward_zero  = atom_eval.forward_zero_value.clone();
     }
     //
     // call_range_zero
@@ -192,8 +193,8 @@ where
         // Rest of this block has a lock, so it should be fast and not fail.
         let atom_eval_vec = read_lock.unwrap();
         let atom_eval     = &atom_eval_vec[atom_id as usize];
-        forward_zero      = atom_eval.forward_zero.clone();
-        forward_one       = atom_eval.forward_one.clone();
+        forward_zero      = atom_eval.forward_zero_value.clone();
+        forward_one       = atom_eval.forward_one_value.clone();
     }
     //
     // call_var_zero
