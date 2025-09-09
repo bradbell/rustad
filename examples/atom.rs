@@ -14,6 +14,14 @@ use rustad::numvec::{
 // V
 type V = f64;
 //
+// sumsq_panic
+fn sumsq_panic(
+    _var_zero     : &mut Vec<V> ,
+    _domain_zero  : Vec<&V>     ,
+    _trace        : bool        ,
+    _call_info    : IndexT      ) -> Vec<V>
+{   panic!( "atomic sumsq not implemented for this case"); }
+//
 // sumsq_forward_zero
 fn sumsq_forward_zero(
     _var_zero    : &mut Vec<V> ,
@@ -21,22 +29,14 @@ fn sumsq_forward_zero(
     _trace       : bool        ,
     _call_info   : IndexT      ) -> Vec<V>
 {   //
-    let mut sumsq : V = 0.into();
+    let mut sumsq = 0 as V;
     for j in 0 .. domain_zero.len() {
         sumsq += domain_zero[j] * domain_zero[j];
     }
     vec![ sumsq ]
 }
 //
-// atomic_panic
-fn atomic_panic(
-    _var_zero     : &mut Vec<V> ,
-    _domain_zero  : Vec<&V>     ,
-    _trace        : bool        ,
-    _call_info    : IndexT      ) -> Vec<V>
-{   panic!(); }
-//
-// forward_depend
+// sumsq_forward_depend
 fn sumsq_forward_depend(
     is_var_domain  : &Vec<bool> ,
     _trace         : bool       ,
@@ -49,14 +49,13 @@ fn sumsq_forward_depend(
     vec![ is_var_range ]
 }
 
-#[test]
-fn main() {
+fn test_forward_zero() {
     //
     // sumsq_atom_eval
     let sumsq_atom_eval = AtomEval {
         forward_zero   :  sumsq_forward_zero,
-        forward_one    :  atomic_panic,
-        reverse_one    :  atomic_panic,
+        forward_one    :  sumsq_panic,
+        reverse_one    :  sumsq_panic,
         forward_depend :  sumsq_forward_depend,
     };
     //
@@ -70,8 +69,13 @@ fn main() {
     let trace            = false;
     let ay               = call_atom(sumsq_atom_id, call_info, ax, trace);
     let f                = stop_recording(ay);
-    let x0      : Vec<V> = vec![ 3.0 , 4.0 ];
-    let mut v0  : Vec<V> = Vec::new();
-    let y0               = f.forward_zero_value(&mut v0, x0, trace);
-    assert_eq!( y0[0] , 25.0 );
+    let x       : Vec<V> = vec![ 3.0 , 4.0 ];
+    let mut v   : Vec<V> = Vec::new();
+    let y                = f.forward_zero_value(&mut v , x.clone(), trace);
+    assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
+}
+
+#[test]
+fn main() {
+    test_forward_zero();
 }
