@@ -25,13 +25,14 @@
 //! # Operator Booleans
 //! | Index    | Meaning |
 //! | -------- | ------- |
-//! | 0        | true (false) if first argument is a variable (constant)   |
-//! | 1        | true (false) if second argument is a variable (constant)  |
+//! | 0        | is the value of the trace argument of this call           |
+//! | 1        | true (false) if first argument is a variable (constant)   |
+//! | 2        | true (false) if second argument is a variable (constant)  |
 //! | ...      | ... |
-//! | n_arg-1  | true (false) if last argument is a variable (constant)    |
-//! | n_arg    | true (false) if first result is a variable (constant)     |
-//! | n_arg+1  | true (false) if second result is a variable (constant)    |
-//! | n_arg+n_res-1 | true (false) if last result is a variable (constant) |
+//! | n_arg    | true (false) if last argument is a variable (constant)    |
+//! | n_arg+1  | true (false) if first result is a variable (constant)     |
+//! | n_arg+2  | true (false) if second result is a variable (constant)    |
+//! | n_arg+n_res | true (false) if last result is a variable (constant)   |
 //!
 //! # Operator Results
 //! We use n_var_res for the number of results that are variables.
@@ -76,14 +77,15 @@ where
 {   // ----------------------------------------------------------------------
     // Same in call forward zero, forward one, and reverse one
     //
-    // atom_id, call_info, n_arg, n_res
+    // atom_id, call_info, n_arg, n_res, trace
     let atom_id    = arg[0] as usize;
     let call_info  = arg[1];
     let call_n_arg = arg[2] as usize;
     let call_n_res = arg[3] as usize;
+    let trace      = flag[ arg[4] as usize ];
     //
     // is_arg_var, is_res_var
-    let mut begin   = arg[4] as usize;
+    let mut begin   = (arg[4] as usize) + 1;
     let mut end     = begin + call_n_arg;
     let is_arg_var  = &flag[begin .. end];
     begin           = end;
@@ -120,7 +122,6 @@ where
     //
     // call_range_zero
     let mut call_var_zero  : Vec<V> = Vec::new();
-    let trace = false;
     let mut call_range_zero = forward_zero(
         &mut call_var_zero, &call_domain_zero, trace, call_info
     );
@@ -153,14 +154,15 @@ where
 {   // ----------------------------------------------------------------------
     // Same in call forward zero, forward one, and reverse one
     //
-    // atom_id, call_info, n_arg, n_res
+    // atom_id, call_info, n_arg, n_res, trace
     let atom_id    = arg[0] as usize;
     let call_info  = arg[1];
     let call_n_arg = arg[2] as usize;
     let call_n_res = arg[3] as usize;
+    let trace      = flag[ arg[4] as usize ];
     //
     // is_arg_var, is_res_var
-    let mut begin   = arg[4] as usize;
+    let mut begin   = (arg[4] as usize) + 1;
     let mut end     = begin + call_n_arg;
     let is_arg_var  = &flag[begin .. end];
     begin           = end;
@@ -199,7 +201,6 @@ where
     //
     // call_var_zero
     let mut call_var_zero : Vec<V> = Vec::new();
-    let trace = false;
     forward_zero(&mut call_var_zero, &call_domain_zero, trace, call_info);
     //
     // call_domain_one

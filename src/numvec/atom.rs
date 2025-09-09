@@ -326,11 +326,12 @@ where
         }
         //
         // tape.flag_all
+        tape.flag_all.push( trace );               // flag[ arg[4] ]
         for j in 0 .. call_n_arg {
-            tape.flag_all.push( is_var_arg[j] );
+            tape.flag_all.push( is_var_arg[j] );   // flag[ arg[4] + j + 1]
         }
         for i in 0 .. call_n_res {
-            tape.flag_all.push( is_var_res[i] );
+            tape.flag_all.push( is_var_res[i] );   // flag[ arg[4] + n_res + i]
         }
         //
         // tape.n_var
@@ -371,6 +372,7 @@ where
 ///
 /// * trace :
 /// if true, a trace of the calculations may be printed on stdout.
+/// This may be useful for debugging atomic functions.
 pub fn call_atom<V>(
     atom_id     : IndexT       ,
     call_info   : IndexT       ,

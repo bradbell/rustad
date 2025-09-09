@@ -26,7 +26,7 @@ fn sumsq_panic(
 fn sumsq_forward_zero(
     var_zero     : &mut Vec<V> ,
     domain_zero  : &Vec<&V>    ,
-    _trace       : bool        ,
+    trace        : bool        ,
     call_info    : IndexT      ) -> Vec<V>
 {   //
     assert_eq!( var_zero.len(), 0 );
@@ -36,6 +36,16 @@ fn sumsq_forward_zero(
         if call_info == 1 {
             var_zero.push( *domain_zero[j] )
         }
+    }
+    if trace {
+        println!("Begin Trace: sumsq_forward_one");
+        print!("domain_zero = [ ");
+        for j in 0 .. domain_zero.len() {
+                print!("{}, ", domain_zero[j]);
+        }
+        println!("]");
+        println!("sumsq = {}", sumsq);
+        println!("End Trace: sumsq_forward_one");
     }
     vec![ sumsq ]
 }
@@ -68,8 +78,9 @@ fn sumsq_forward_depend(
     }
     vec![ is_var_range ]
 }
-
-fn test_forward_zero() {
+//
+// register_sumsq_atom
+fn register_sumsq_atom()-> IndexT {
     //
     // sumsq_atom_eval
     let sumsq_atom_eval = AtomEval {
@@ -81,6 +92,27 @@ fn test_forward_zero() {
     //
     // sumsq_atom_id
     let sumsq_atom_id = register_atom( sumsq_atom_eval );
+    sumsq_atom_id
+}
+//
+// test_forward_zero
+fn test_forward_zero(sumsq_atom_id : IndexT) {
+    //
+    // ax
+    let x       : Vec<V> = vec![ 1.0 , 2.0 ];
+    let ax               = start_recording(x);
+    let call_info        = 0 as IndexT;
+    let trace            = false;
+    let ay               = call_atom(sumsq_atom_id, call_info, ax, trace);
+    let f                = stop_recording(ay);
+    let x       : Vec<V> = vec![ 3.0 , 4.0 ];
+    let mut v   : Vec<V> = Vec::new();
+    let y                = f.forward_zero_value(&mut v , x.clone(), trace);
+    assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
+}
+//
+// test_forward_one
+fn test_forward_one(sumsq_atom_id : IndexT) {
     //
     // ax
     let x       : Vec<V> = vec![ 1.0 , 2.0 ];
@@ -91,8 +123,7 @@ fn test_forward_zero() {
     let f                = stop_recording(ay);
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
     let mut v   : Vec<V> = Vec::new();
-    let y                = f.forward_zero_value(&mut v , x.clone(), trace);
-    assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
+    f.forward_zero_value(&mut v , x.clone(), trace);
     let dx      : Vec<V> = vec![ 5.0, 6.0 ];
     let dy               = f.forward_one_value(&mut v , dx.clone(), trace);
     assert_eq!( dy[0], 2.0 * x[0]*dx[0] + 2.0 * x[1]*dx[1] );
@@ -100,5 +131,7 @@ fn test_forward_zero() {
 
 #[test]
 fn main() {
-    test_forward_zero();
+    let sumsq_atom_id = register_sumsq_atom();
+    test_forward_zero(sumsq_atom_id);
+    test_forward_one(sumsq_atom_id);
 }
