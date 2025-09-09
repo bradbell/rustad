@@ -49,8 +49,8 @@ binary::eval_binary_forward_0!(Mul, *);
 // mul_cv_forward_1
 /// first order forward for constant * variable; see [ForwardOne]
 fn mul_cv_forward_1 <V, E>(
-    var_one    :   &mut Vec<E> ,
     _var_zero  :   &Vec<E>     ,
+    var_one    :   &mut Vec<E> ,
     con        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
@@ -67,8 +67,8 @@ where
 // mul_vc_forward_1
 /// first order forward for variable * constant; see [ForwardOne]
 fn mul_vc_forward_1 <V, E>(
-    var_one    :   &mut Vec<E> ,
     _var_zero  :   &Vec<E>     ,
+    var_one    :   &mut Vec<E> ,
     con        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
@@ -85,8 +85,8 @@ where
 // mul_vv_forward_1
 /// first order forward for variable * variable; see [ForwardOne]
 fn mul_vv_forward_1 <V, E>(
-    var_one    :   &mut Vec<E> ,
     var_zero   :   &Vec<E>     ,
+    var_one    :   &mut Vec<E> ,
     _con       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
@@ -109,8 +109,8 @@ where
 // mul_cv_reverse_1
 /// first order reverse for constant * variable; see [ReverseOne]
 fn mul_cv_reverse_1 <V, E>(
-    var_one    :   &mut Vec<E> ,
     _var_zero  :   &Vec<E>     ,
+    var_one    :   &mut Vec<E> ,
     con        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
@@ -129,8 +129,8 @@ where
 // mul_vc_reverse_1
 /// first order reverse for variable * constant; see [ReverseOne]
 fn mul_vc_reverse_1 <V, E>(
-    var_one    :   &mut Vec<E> ,
     _var_zero  :   &Vec<E>     ,
+    var_one    :   &mut Vec<E> ,
     con        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
@@ -149,8 +149,8 @@ where
 // mul_vv_reverse_1
 /// first order reverse for variable * variable; see [ReverseOne]
 fn mul_vv_reverse_1 <V, E>(
-    var_one    :   &mut Vec<E> ,
     var_zero   :   &Vec<E>     ,
+    var_one    :   &mut Vec<E> ,
     _con       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,

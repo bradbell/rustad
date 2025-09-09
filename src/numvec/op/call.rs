@@ -209,8 +209,8 @@ fn no_op_zero<V, E>(
 /// [ForwardOne](crate::numvec::op::info::ForwardOne) or
 /// [ReverseOne](crate::numvec::op::info::ReverseOne) function
 fn no_op_one<V, E>(
-    _var_one  : &mut Vec<E> ,
     _var_zero : &Vec<E>     ,
+    _var_one  : &mut Vec<E> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,

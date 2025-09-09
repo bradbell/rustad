@@ -176,8 +176,13 @@ macro_rules! reverse_one {
                 let arg   = &self.arg_all[start .. end];
                 let res   = self.n_domain + op_index;
                 let reverse_1 = op_info_vec[op_id].[< reverse_1_ $suffix >];
-                reverse_1(&mut var_one,
-                    &var_zero, &self.con_all, &self.flag_all, &arg, res
+                reverse_1(
+                    &var_zero,
+                    &mut var_one,
+                    &self.con_all,
+                    &self.flag_all,
+                    &arg,
+                    res
                 );
                 if trace {
                     let name = &op_info_vec[op_id].name;

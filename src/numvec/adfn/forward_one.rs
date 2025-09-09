@@ -166,8 +166,13 @@ macro_rules! forward_one {
                 let arg   = &self.arg_all[start .. end];
                 let res   = self.n_domain + op_index;
                 let forward_1 = op_info_vec[op_id].[< forward_1_ $suffix >];
-                forward_1(&mut var_one,
-                    &var_zero, &self.con_all, &self.flag_all, &arg, res
+                forward_1(
+                    &var_zero,
+                    &mut var_one,
+                    &self.con_all,
+                    &self.flag_all,
+                    &arg,
+                    res
                 );
                 if trace {
                     let name = &op_info_vec[op_id].name;

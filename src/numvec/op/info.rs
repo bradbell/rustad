@@ -79,8 +79,8 @@ pub fn panic_zero<V, E> (
 ///
 /// * Other Arguments :  see [doc_common_arguments]
 pub type ForwardOne<V, E> = fn(
-    _var_one  : &mut Vec<E> ,
     _var_zero : &Vec<E>     ,
+    _var_one  : &mut Vec<E> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
@@ -98,8 +98,8 @@ pub type ForwardOne<V, E> = fn(
 ///
 /// * Other Arguments :  see [doc_common_arguments]
 pub type ReverseOne<V, E> = fn(
-    _var_one  : &mut Vec<E> ,
     _var_zero : &Vec<E>     ,
+    _var_one  : &mut Vec<E> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
@@ -108,8 +108,8 @@ pub type ReverseOne<V, E> = fn(
 // panic_one
 /// default [ForwardOne] and [ReverseOne] function will panic
 pub fn panic_one<V, E> (
-    _var_one  : &mut Vec<E> ,
     _var_zero : &Vec<E>     ,
+    _var_one  : &mut Vec<E> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
