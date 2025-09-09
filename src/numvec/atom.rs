@@ -23,7 +23,6 @@ use crate::numvec::{
     IndexT,
     AD,
     ad_from_vector,
-    ad_to_vector,
     AtomEvalVecPublic,
     ThisThreadTapePublic,
 };
@@ -201,9 +200,7 @@ fn record_call_atom<V>(
     range_zero       : Vec<V>                        ,
     atom_id          : IndexT                        ,
     call_info        : IndexT                        ,
-    domain_zero      : Vec<V>                        ,
-    domain_tape_id   : Vec<usize>                    ,
-    domain_var_index : Vec<usize>                    ,
+    adomain          : Vec< AD<V> >                  ,
     trace            : bool                          ,
 ) -> Vec< AD<V> >
 where
@@ -213,24 +210,24 @@ where
     debug_assert!( tape.recording );
     //
     // call_n_arg, call_n_res
-    let call_n_arg = domain_zero.len();
+    let call_n_arg = adomain.len();
     let call_n_res = range_zero.len();
     //
     // arange
     let mut arange : Vec< AD<V> > = ad_from_vector(range_zero);
     //
-    // is_var_domain
-    let is_var_domain : Vec<bool> = domain_tape_id.iter().map(
-        |tape_id| *tape_id == tape.tape_id
+    // is_var_arg
+    let is_var_arg : Vec<bool> = adomain.iter().map(
+        |adomain_j| (*adomain_j).tape_id == tape.tape_id
     ).collect();
     //
-    // is_var_range
-    let is_var_range = forward_depend(&is_var_domain, trace, call_info);
+    // is_var_res
+    let is_var_res = forward_depend(&is_var_arg, trace, call_info);
     //
     // arange, n_var_res
     let mut n_var_res = 0;
     for i in 0 .. call_n_res {
-        if is_var_range[i] {
+        if is_var_res[i] {
             arange[i].tape_id   = tape.tape_id;
             arange[i].var_index = tape.n_var + n_var_res;
             n_var_res += 1;
@@ -251,22 +248,22 @@ where
         //
         // tape.arg_all
         for j in 0 .. call_n_arg {
-            let index = if is_var_domain[j] {
-                domain_var_index[j]
+            let index = if is_var_arg[j] {
+                adomain[j].var_index
             } else {
                 let con_index = tape.con_all.len();
-                tape.con_all.push( domain_zero[j].clone() );
+                tape.con_all.push( adomain[j].value.clone() );
                 con_index
             };
-            tape.arg_all.push( index as IndexT);             // arg[5+j]
+            tape.arg_all.push( index as IndexT );            // arg[5+j]
         }
         //
         // tape.flag_all
         for j in 0 .. call_n_arg {
-            tape.flag_all.push( is_var_domain[j] );
+            tape.flag_all.push( is_var_arg[j] );
         }
         for i in 0 .. call_n_res {
-            tape.flag_all.push( is_var_range[i] );
+            tape.flag_all.push( is_var_res[i] );
         }
         //
         // tape.n_var
@@ -335,42 +332,24 @@ where
         assert!( read_lock.is_ok() );
         //
         // Rest of this block has a lock, so it should be fast and not fail.
-        // We do not clone dependency because it could be large.
-        // Instead we access it using a separate read lock in record_call_atom.
         let atom_eval_vec = read_lock.unwrap();
         let atom_eval     = &atom_eval_vec[atom_id as usize];
         forward_zero      = atom_eval.forward_zero.clone();
         forward_depend    = atom_eval.forward_depend.clone();
     }
     //
-    // domain_tape_id, domain_var_index, domain_zero
-    let mut domain_tape_id   = vec![ 0 ; adomain.len() ];
-    let mut domain_var_index = vec![ 0 ; adomain.len() ];
-    if recording {
-        for j in 0 .. adomain.len() {
-            domain_tape_id[j]   = adomain[j].tape_id;
-            domain_var_index[j] = adomain[j].var_index;
-        }
-    }
-    let domain_zero = ad_to_vector(adomain);
-    //
-    // domain_zero_ref
-    let mut domain_zero_ref : Vec<&V> = Vec::new();
-    for j in 0 .. domain_zero.len() {
-        domain_zero_ref.push( &domain_zero[j] );
+    // domain_zero
+    let mut domain_zero : Vec<&V> = Vec::new();
+    for j in 0 .. adomain.len() {
+        domain_zero.push( &adomain[j].value );
     }
     //
     // range_zero
     // restore domain_zero using var_zero.
     let mut var_zero : Vec<V> = Vec::new();
-    let domain_len  = domain_zero.len();
-    let zero_v : V  =  0f32.into();
     let range_zero  = forward_zero(
-        &mut var_zero, domain_zero_ref, trace, call_info
+        &mut var_zero, domain_zero, trace, call_info
     );
-    let mut domain_zero = var_zero;
-    domain_zero.resize(domain_len, zero_v);
-    domain_zero.shrink_to_fit();
     //
     // arange
     let arange : Vec< AD<V> >;
@@ -383,9 +362,7 @@ where
             range_zero,
             atom_id,
             call_info,
-            domain_zero,
-            domain_tape_id,
-            domain_var_index,
+            adomain,
             trace,
         ) );
     }
