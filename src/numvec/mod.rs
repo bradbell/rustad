@@ -77,15 +77,13 @@ pub use tape::{
     stop_recording,
 };
 pub use atom::{
+    register_atom,
+    call_atom,
     AtomEval,
 };
 //
-// TODO: remove these when GlobalOpInfoVec gets used
 pub use op::info::{
-    GlobalOpInfoVec,
     OpInfo,
-    panic_zero,
-    panic_one,
 };
 // ---------------------------------------------------------------------------
 //

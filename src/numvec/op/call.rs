@@ -43,7 +43,11 @@
 //
 use std::sync::RwLock;
 //
-use crate::numvec::op::info::OpInfo;
+use crate::numvec::op::info::{
+    OpInfo,
+    panic_zero,
+    panic_one,
+};
 use crate::numvec::atom::{
     Callback,
     sealed::AtomEvalVec,
@@ -56,8 +60,6 @@ use crate::numvec::{
     AD,
     IndexT,
     AtomEval,
-    panic_zero,
-    panic_one,
 };
 // --------------------------------------------------------------------------
 //
