@@ -41,6 +41,7 @@ use crate::numvec::adfn::{
 };
 // ---------------------------------------------------------------------------
 //
+// Callback
 /// Atomic function evaluation type.
 ///
 /// * trace :
@@ -56,14 +57,24 @@ pub type Callback<V> = fn(
     _call_info     : IndexT      ,
 ) -> Vec<V> ;
 //
-// Sparsity
-/// Atomic function dependency calculations.
+// ForwardDepend
+/// Atomic function forward dependency type.
 ///
-/// see [ADfn::sub_sparsity] or [ADfn::for_sparsity]
-pub type Sparsity = fn(
-    _trace       : bool   ,
-    _call_info   : IndexT ,
-)-> Vec< [usize; 2] >;
+/// * is_var_domain :
+/// This has the same length as *adomain* in the corresponding [call_atom].
+/// The j-th component is true (false) if the j-th component
+/// of *adomain* is a variable (constant).
+///
+/// * return :
+/// This has the same length as *arange* in the corresponding [call_atom].
+/// The i-th component is true (false) if the i-th component
+/// of *arange* depends on a variable in *adomaion.
+///
+pub type ForwardDepend = fn(
+    _is_var_domain  : &Vec<bool> ,
+    _trace          : bool       ,
+    _call_info      : IndexT     ,
+)-> Vec<bool>;
 //
 // AtomEval
 /// Functions that evaluate an atomic function.
@@ -89,10 +100,12 @@ pub struct AtomEval<V> {
     /// * return : see [reverse_one domain_one](doc_reverse_one#domain_one)
     pub  reverse_one  : Callback::<V> ,
     //
-    // dependency
-    /// A dependency pattern for the atomic function;
-    /// see [ADfn::sub_sparsity] or [ADfn::for_sparsity]
-    pub dependency  : Vec< [usize;2] > ,
+    // forward_depend
+    /// Callback function used during forward_zero to determine
+    /// which range components are variables.
+    ///
+    /// A range component that depends on a variable is also a variable.
+    pub forward_depend  : ForwardDepend ,
 }
 // ----------------------------------------------------------------------------
 pub (crate) mod sealed {
@@ -184,13 +197,14 @@ where
 // record_call_atom
 fn record_call_atom<V>(
     tape             : &mut Tape<V>                  ,
-    rw_lock          : &RwLock< Vec< AtomEval<V> > > ,
+    forward_depend   : ForwardDepend                 ,
     range_zero       : Vec<V>                        ,
     atom_id          : IndexT                        ,
     call_info        : IndexT                        ,
     domain_zero      : Vec<V>                        ,
     domain_tape_id   : Vec<usize>                    ,
     domain_var_index : Vec<usize>                    ,
+    trace            : bool                          ,
 ) -> Vec< AD<V> >
 where
     V : Clone ,
@@ -211,22 +225,7 @@ where
     ).collect();
     //
     // is_var_range
-    let mut is_var_range = vec![false; call_n_res];
-    {   //
-        // read_lock
-        let read_lock = rw_lock.read();
-        assert!( read_lock.is_ok() );
-        //
-        // Rest of this block has a lock, so it should be fast and not fail.
-        let atom_eval_vec = read_lock.unwrap();
-        let dependency    = &atom_eval_vec[atom_id as usize].dependency;
-        for k in 0 .. dependency.len() {
-            let [i,j] = dependency[k];
-            if is_var_domain[j] {
-                is_var_range[i] = true;
-            }
-        }
-    }
+    let is_var_range = forward_depend(&is_var_domain, trace, call_info);
     //
     // arange, n_var_res
     let mut n_var_res = 0;
@@ -308,7 +307,7 @@ where
 ///
 /// * trace :
 /// if true, a trace of the calculations may be printed on stdout.
-pub fn call_atom_ad<V>(
+pub fn call_atom<V>(
     atom_id     : IndexT       ,
     call_info   : IndexT       ,
     adomain     : Vec< AD<V> > ,
@@ -327,8 +326,9 @@ where
     // rwlock
     let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
     //
-    // forward_zero
+    // forward_zero, forward_depend
     let forward_zero : Callback<V>;
+    let forward_depend : ForwardDepend;
     {   //
         // read_lock
         let read_lock = rw_lock.read();
@@ -338,7 +338,9 @@ where
         // We do not clone dependency because it could be large.
         // Instead we access it using a separate read lock in record_call_atom.
         let atom_eval_vec = read_lock.unwrap();
-        forward_zero  = atom_eval_vec[atom_id as usize].forward_zero.clone();
+        let atom_eval     = &atom_eval_vec[atom_id as usize];
+        forward_zero      = atom_eval.forward_zero.clone();
+        forward_depend    = atom_eval.forward_depend.clone();
     }
     //
     // domain_tape_id, domain_var_index, domain_zero
@@ -371,13 +373,14 @@ where
     } else {
         arange = local_key.with_borrow_mut( |tape| record_call_atom::<V>(
             tape,
-            rw_lock,
+            forward_depend,
             range_zero,
             atom_id,
             call_info,
             domain_zero,
             domain_tape_id,
-            domain_var_index
+            domain_var_index,
+            trace,
         ) );
     }
     arange
