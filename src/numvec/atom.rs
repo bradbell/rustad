@@ -105,6 +105,9 @@ pub struct AtomEval<V> {
     // forward_one_value
     /// Callback function used during [ADfn::forward_one_value]
     ///
+    /// If you do not expect to use this atomic function with forward_one,
+    /// you can it just panic if it gets used.
+    ///
     /// *Syntax*
     /// ```text
     ///     range_one = forward_zero_value(
@@ -136,6 +139,10 @@ pub struct AtomEval<V> {
     //
     // reverse_one_value
     /// Callback function used during [ADfn::reverse_one_value]
+    ///
+    /// If you do not expect to use this atomic function with reverse_one,
+    /// you can it just panic if it gets used.
+    ///
     ///
     /// *Syntax*
     /// ```text

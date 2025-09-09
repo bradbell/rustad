@@ -232,6 +232,96 @@ where
     }
 }
 // --------------------------------------------------------------------------
+// call_reverse_1
+//
+/// first order reverse call operator for atomic functions
+fn call_reverse_1<V> (
+    var_zero   : &Vec<V>       ,
+    var_one    : &mut Vec<V>   ,
+    con        : &Vec<V>       ,
+    flag       : &Vec<bool>    ,
+    arg        : &[IndexT]     ,
+    res        : usize         )
+where
+    for<'a> V : AtomEvalVec + std::ops::AddAssign<&'a V>  + From<f32>,
+{   // ----------------------------------------------------------------------
+    // Same in call forward zero, forward one, and reverse one
+    //
+    // atom_id, call_info, n_arg, n_res, trace
+    let atom_id    = arg[0] as usize;
+    let call_info  = arg[1];
+    let call_n_arg = arg[2] as usize;
+    let call_n_res = arg[3] as usize;
+    let trace      = flag[ arg[4] as usize ];
+    //
+    // is_arg_var, is_res_var
+    let mut begin   = (arg[4] as usize) + 1;
+    let mut end     = begin + call_n_arg;
+    let is_arg_var  = &flag[begin .. end];
+    begin           = end;
+    end             = begin + call_n_res;
+    let is_res_var  = &flag[begin .. end];
+    //
+    // call_domain_zero
+    let mut call_domain_zero : Vec<&V> = Vec::new();
+    for i_arg in 0 .. call_n_arg {
+        let index = arg[i_arg + 5] as usize;
+        if is_arg_var[i_arg] {
+            call_domain_zero.push( &var_zero[index] );
+        } else {
+            call_domain_zero.push( &con[index] );
+        }
+    }
+    // ----------------------------------------------------------------------
+    //
+    // forward_zero, reverse_one
+    let forward_zero : Callback<V>;
+    let reverse_one : Callback<V>;
+    {   //
+        // rw_lock
+        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
+        //
+        // read_lock
+        let read_lock = rw_lock.read();
+        assert!( read_lock.is_ok() );
+        //
+        // Rest of this block has a lock, so it should be fast and not fail.
+        let atom_eval_vec = read_lock.unwrap();
+        let atom_eval     = &atom_eval_vec[atom_id as usize];
+        forward_zero      = atom_eval.forward_zero_value.clone();
+        reverse_one       = atom_eval.reverse_one_value.clone();
+    }
+    //
+    // call_var_zero
+    let mut call_var_zero : Vec<V> = Vec::new();
+    forward_zero(&mut call_var_zero, &call_domain_zero, trace, call_info);
+    //
+    // call_range_one
+    let zero_v : V = 0f32.into();
+    let mut call_range_one : Vec<&V> = Vec::new();
+    let mut j_res = 0;
+    for i_res in 0 .. call_n_res {
+        if is_res_var[i_res] {
+            call_range_one.push( &var_one[res + j_res] );
+            j_res += 1;
+        } else {
+            call_range_one.push( &zero_v );
+        }
+    }
+    // call_domain_one
+    let call_domain_one = reverse_one(
+        &mut call_var_zero, &call_range_one, trace, call_info
+    );
+    //
+    // var_one
+    for i_arg in 0 .. call_n_arg {
+        let index = arg[i_arg + 5] as usize;
+        if is_arg_var[i_arg] {
+            var_one[index] += &call_domain_one[i_arg];
+        }
+    }
+}
+// --------------------------------------------------------------------------
 //
 // call_arg_var_index
 /// vector of variable indices that are arguments to this call operator
@@ -269,7 +359,7 @@ fn call_arg_var_index(
 /// The map results for CALL_OP and CALL_RES_OP are set.
 pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    V : AtomEvalVec + From<f32> ,
+    for<'a> V : AtomEvalVec + std::ops::AddAssign<&'a V> + From<f32> ,
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
         name              : "call" ,
@@ -277,7 +367,7 @@ where
         forward_0_ad      : panic_zero::<V, AD<V> >,
         forward_1_value   : call_forward_1::<V>,
         forward_1_ad      : panic_one::<V, AD<V> >,
-        reverse_1_value   : panic_one::<V, V>,
+        reverse_1_value   : call_reverse_1::<V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
         arg_var_index     : call_arg_var_index,
     };

@@ -195,7 +195,7 @@ where
     for<'a> &'a V : std::ops::Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Div<&'a V, Output = V> ,
     //
-    V  : Clone + ThisThreadTape + AtomEvalVec + From<f32>,
+    V : Clone + From<f32> + ThisThreadTape + AtomEvalVec
 {
     let empty = OpInfo {
         name             : &"panic",
