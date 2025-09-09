@@ -88,7 +88,7 @@ where
     end             = begin + call_n_res;
     let is_res_var  = &flag[begin .. end];
     //
-    // domain_zero
+    // call_domain_zero
     let mut call_domain_zero : Vec<&V> = Vec::new();
     for i_arg in 0 .. call_n_arg {
         let index = arg[i_arg + 5] as usize;
@@ -118,7 +118,7 @@ where
     let mut call_var_zero  : Vec<V> = Vec::new();
     let trace = false;
     let mut call_range_zero = forward_zero(
-        &mut call_var_zero, call_domain_zero, trace, call_info
+        &mut call_var_zero, &call_domain_zero, trace, call_info
     );
     //
     // var_zero

@@ -17,7 +17,7 @@ type V = f64;
 // sumsq_panic
 fn sumsq_panic(
     _var_zero     : &mut Vec<V> ,
-    _domain_zero  : Vec<&V>     ,
+    _domain_zero  : &Vec<&V>    ,
     _trace        : bool        ,
     _call_info    : IndexT      ) -> Vec<V>
 {   panic!( "atomic sumsq not implemented for this case"); }
@@ -25,7 +25,7 @@ fn sumsq_panic(
 // sumsq_forward_zero
 fn sumsq_forward_zero(
     _var_zero    : &mut Vec<V> ,
-    domain_zero  : Vec<&V>     ,
+    domain_zero  : &Vec<&V>    ,
     _trace       : bool        ,
     _call_info   : IndexT      ) -> Vec<V>
 {   //
