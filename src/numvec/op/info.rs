@@ -60,7 +60,6 @@ pub type ForwardZero<V, E> = fn(
 );
 // panic_zero
 /// default [ForwardZero] function will panic
-/// TODO: make this private when removed from all binary operators.
 pub fn panic_zero<V, E> (
     _var_zero : &mut Vec<E> ,
     _con      : &Vec<V>     ,
@@ -107,7 +106,6 @@ pub type ReverseOne<V, E> = fn(
 );
 // panic_one
 /// default [ForwardOne] and [ReverseOne] function will panic
-/// TODO: make this private when removed from all binary operators.
 pub fn panic_one<V, E> (
     _var_one  : &mut Vec<E> ,
     _var_zero : &Vec<E>     ,

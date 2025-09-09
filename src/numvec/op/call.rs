@@ -94,8 +94,6 @@ fn call_forward_0<V> (
         assert!( read_lock.is_ok() );
         //
         // Rest of this block has a lock, so it should be fast and not fail.
-        // We do not clone dependency because it could be large.
-        // Instead we access it using a separate read lock in record_call_atom.
         let atom_eval_vec = read_lock.unwrap();
         forward_zero  = atom_eval_vec[atom_id as usize].forward_zero.clone();
     }
@@ -126,7 +124,6 @@ fn call_arg_var_index(
     flag          : &Vec<bool>,
     arg           : &[IndexT]
 )
-where
 {
     //
     // call_n_arg
