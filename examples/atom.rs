@@ -13,16 +13,9 @@ use rustad::numvec::{
 //
 // V
 type V = f64;
-//
-// sumsq_panic
-fn sumsq_panic(
-    _var_zero     : &mut Vec<V> ,
-    _domain_zero  : &Vec<&V>    ,
-    _trace        : bool        ,
-    _call_info    : IndexT      ) -> Vec<V>
-{   panic!( "atomic sumsq not implemented for this case"); }
-//
+// -------------------------------------------------------------------------
 // sumsq_forward_zero
+// -------------------------------------------------------------------------
 fn sumsq_forward_zero(
     var_zero     : &mut Vec<V> ,
     domain_zero  : &Vec<&V>    ,
@@ -49,8 +42,9 @@ fn sumsq_forward_zero(
     }
     vec![ sumsq ]
 }
-//
+// -------------------------------------------------------------------------
 // sumsq_forward_one
+// -------------------------------------------------------------------------
 fn sumsq_forward_one(
     domain_zero  : &mut Vec<V> ,
     domain_one   : &Vec<&V>    ,
@@ -65,8 +59,26 @@ fn sumsq_forward_one(
     }
     vec![ sumsq ]
 }
-//
+// -------------------------------------------------------------------------
+// sumsq_reverse_one
+// -------------------------------------------------------------------------
+fn sumsq_reverse_one(
+    domain_zero  : &mut Vec<V> ,
+    range_one    : &Vec<&V>    ,
+    _trace       : bool        ,
+    call_info    : IndexT      ) -> Vec<V>
+{   //
+    assert_eq!( call_info,  1 );
+    assert_eq!( range_one.len(), 1 );
+    let mut domain_one : Vec<V> = Vec::new();
+    for j in 0 .. domain_zero.len() {
+        domain_one.push( 2.0 * domain_zero[j] * range_one[0] );
+    }
+    domain_one
+}
+// -------------------------------------------------------------------------
 // sumsq_forward_depend
+// -------------------------------------------------------------------------
 fn sumsq_forward_depend(
     is_var_domain  : &Vec<bool> ,
     _trace         : bool       ,
@@ -78,15 +90,16 @@ fn sumsq_forward_depend(
     }
     vec![ is_var_range ]
 }
-//
+// -------------------------------------------------------------------------
 // register_sumsq_atom
+// -------------------------------------------------------------------------
 fn register_sumsq_atom()-> IndexT {
     //
     // sumsq_atom_eval
     let sumsq_atom_eval = AtomEval {
         forward_zero_value   :  sumsq_forward_zero,
         forward_one_value    :  sumsq_forward_one,
-        reverse_one_value    :  sumsq_panic,
+        reverse_one_value    :  sumsq_reverse_one,
         forward_depend       :  sumsq_forward_depend,
     };
     //
@@ -94,8 +107,9 @@ fn register_sumsq_atom()-> IndexT {
     let sumsq_atom_id = register_atom( sumsq_atom_eval );
     sumsq_atom_id
 }
-//
-// test_forward_zero
+// -------------------------------------------------------------------------
+// Tests
+// -------------------------------------------------------------------------
 fn test_forward_zero(sumsq_atom_id : IndexT) {
     //
     // ax
@@ -128,10 +142,33 @@ fn test_forward_one(sumsq_atom_id : IndexT) {
     let dy               = f.forward_one_value(&mut v , dx.clone(), trace);
     assert_eq!( dy[0], 2.0 * x[0]*dx[0] + 2.0 * x[1]*dx[1] );
 }
-
+//
+// test_reverse_one
+fn test_reverse_one(sumsq_atom_id : IndexT) {
+    //
+    // ax
+    let x       : Vec<V> = vec![ 1.0 , 2.0 ];
+    let ax               = start_recording(x);
+    let call_info        = 1 as IndexT;
+    let trace            = false;
+    let ay               = call_atom(sumsq_atom_id, call_info, ax, trace);
+    let f                = stop_recording(ay);
+    let x       : Vec<V> = vec![ 3.0 , 4.0 ];
+    let mut v   : Vec<V> = Vec::new();
+    f.forward_zero_value(&mut v , x.clone(), trace);
+    let dy      : Vec<V> = vec![ 5.0 ];
+    let dx               = f.reverse_one_value(&mut v , dy.clone(), trace);
+    assert_eq!( dx[0], 2.0 * x[0]*dy[0] );
+    assert_eq!( dx[1], 2.0 * x[1]*dy[0] );
+}
+//
+// -------------------------------------------------------------------------
+// main
+// -------------------------------------------------------------------------
 #[test]
 fn main() {
     let sumsq_atom_id = register_sumsq_atom();
     test_forward_zero(sumsq_atom_id);
     test_forward_one(sumsq_atom_id);
+    test_reverse_one(sumsq_atom_id);
 }
