@@ -151,7 +151,7 @@ fn register_checkpoint_atom()-> IndexT {
 // main
 // -------------------------------------------------------------------------
 #[test]
-fn main() {
+fn example_checkpoint() {
     //
     // trace
     let trace = false;

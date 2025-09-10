@@ -12,10 +12,10 @@ use rustad::numvec::{
     stop_recording,
 };
 //
-// test_hessian
+// example_hessian
 // Simple case where V = f32
 #[test]
-fn test_hessian () {
+fn example_hessian () {
     //
     type V     = f32;
     let nx     = 3;
@@ -83,10 +83,10 @@ fn test_hessian () {
     }
 }
 //
-// test_numvec_hessian
+// example_numvec_hessian
 // Same function where V = NumVec<f64>
 #[test]
-fn test_numvec_hessian () {
+fn example_numvec_hessian () {
     //
     type F     = f64;
     type V     = NumVec<F>;
