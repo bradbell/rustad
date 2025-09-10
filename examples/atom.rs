@@ -18,7 +18,7 @@ type V = f64;
 // -------------------------------------------------------------------------
 fn sumsq_forward_zero(
     var_zero     : &mut Vec<V> ,
-    domain_zero  : &Vec<&V>    ,
+    domain_zero  : Vec<&V>     ,
     trace        : bool        ,
     call_info    : IndexT      ) -> Vec<V>
 {   //
@@ -47,7 +47,7 @@ fn sumsq_forward_zero(
 // -------------------------------------------------------------------------
 fn sumsq_forward_one(
     domain_zero  : &Vec<V>     ,
-    domain_one   : &Vec<&V>    ,
+    domain_one   : Vec<&V>     ,
     trace        : bool        ,
     call_info    : IndexT      ) -> Vec<V>
 {   //
@@ -74,7 +74,7 @@ fn sumsq_forward_one(
 // -------------------------------------------------------------------------
 fn sumsq_reverse_one(
     domain_zero  : &Vec<V>     ,
-    range_one    : &Vec<&V>    ,
+    range_one    : Vec<&V>     ,
     trace        : bool        ,
     call_info    : IndexT      ) -> Vec<V>
 {   //

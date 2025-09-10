@@ -124,7 +124,7 @@ where
     // call_range_zero
     let mut call_var_zero  : Vec<V> = Vec::new();
     let mut call_range_zero = forward_zero(
-        &mut call_var_zero, &call_domain_zero, trace, call_info
+        &mut call_var_zero, call_domain_zero, trace, call_info
     );
     //
     // var_zero
@@ -202,7 +202,7 @@ where
     //
     // call_var_zero
     let mut call_var_zero : Vec<V> = Vec::new();
-    forward_zero(&mut call_var_zero, &call_domain_zero, trace, call_info);
+    forward_zero(&mut call_var_zero, call_domain_zero, trace, call_info);
     //
     // call_domain_one
     let zero_v : V = 0f32.into();
@@ -217,7 +217,7 @@ where
     }
     // call_range_one
     let mut call_range_one = forward_one(
-        &call_var_zero, &call_domain_one, trace, call_info
+        &call_var_zero, call_domain_one, trace, call_info
     );
     //
     // var_one
@@ -295,7 +295,7 @@ where
     //
     // call_var_zero
     let mut call_var_zero : Vec<V> = Vec::new();
-    forward_zero(&mut call_var_zero, &call_domain_zero, trace, call_info);
+    forward_zero(&mut call_var_zero, call_domain_zero, trace, call_info);
     //
     // call_range_one
     let zero_v : V = 0f32.into();
@@ -311,7 +311,7 @@ where
     }
     // call_domain_one
     let call_domain_one = reverse_one(
-        &call_var_zero, &call_range_one, trace, call_info
+        &call_var_zero, call_range_one, trace, call_info
     );
     //
     // var_one

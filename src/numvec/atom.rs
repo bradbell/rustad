@@ -45,13 +45,13 @@ use crate::numvec::adfn::{
 ///
 pub type CallbackZero<V> = fn(
     _var_zero      : &mut Vec<V> ,
-    _domain_zero   : &Vec<&V>    ,
+    _domain_zero   : Vec<&V>     ,
     _trace         : bool        ,
     _call_info     : IndexT      ,
 ) -> Vec<V> ;
 pub type CallbackOne<V> = fn(
     _var_zero      : &Vec<V>     ,
-    _vec_in        : &Vec<&V>    ,
+    _vec_in        : Vec<&V>     ,
     _trace         : bool        ,
     _call_info     : IndexT      ,
 ) -> Vec<V> ;
@@ -84,7 +84,7 @@ pub struct AtomEval<V> {
     /// * Syntax :
     /// ```text
     ///     range_zero = forward_zero_value(
-    ///         &mut var_zero, &domain_zero, trace, call_info
+    ///         &mut var_zero, domain_zero, trace, call_info
     ///     )
     /// ```
     ///
@@ -118,8 +118,8 @@ pub struct AtomEval<V> {
     ///
     /// Syntax :
     /// ```text
-    ///     range_one = forward_zero_value(
-    ///         &mut var_zero, &domain_one, trace, call_info
+    ///     range_one = forward_one_value(
+    ///         &mut var_zero, domain_one, trace, call_info
     ///     )
     /// ```
     ///
@@ -155,10 +155,10 @@ pub struct AtomEval<V> {
     /// you can it just panic if it gets used.
     ///
     ///
-    /// *Syntax*
+    /// * Syntax :
     /// ```text
-    ///     domain_one = forward_zero_value(
-    ///         &mut var_zero, &range_one, trace, call_info
+    ///     domain_one = reverse_one_value(
+    ///         &var_zero, range_one, trace, call_info
     ///     )
     /// ```
     ///
@@ -438,7 +438,7 @@ where
     // restore domain_zero using var_zero.
     let mut var_zero : Vec<V> = Vec::new();
     let range_zero  = forward_zero(
-        &mut var_zero, &domain_zero, trace, call_info
+        &mut var_zero, domain_zero, trace, call_info
     );
     //
     // arange

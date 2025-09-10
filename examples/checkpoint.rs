@@ -30,7 +30,7 @@ thread_local! {
 // -------------------------------------------------------------------------
 fn checkpoint_forward_zero(
     var_zero         : &mut Vec<V> ,
-    domain_zero_ref  : &Vec<&V>    ,
+    domain_zero_ref  : Vec<&V>     ,
     trace            : bool        ,
     adfn_index       : IndexT      ) -> Vec<V>
 {   //
@@ -55,7 +55,7 @@ fn checkpoint_forward_zero(
 // -------------------------------------------------------------------------
 fn checkpoint_forward_one(
     var_zero         : &Vec<V>     ,
-    domain_one_ref   : &Vec<&V>    ,
+    domain_one_ref   : Vec<&V>     ,
     trace            : bool        ,
     adfn_index       : IndexT      ) -> Vec<V>
 {   //
@@ -80,7 +80,7 @@ fn checkpoint_forward_one(
 // -------------------------------------------------------------------------
 fn checkpoint_reverse_one(
     var_zero         : &Vec<V>     ,
-    range_one_ref    : &Vec<&V>    ,
+    range_one_ref    : Vec<&V>     ,
     trace            : bool        ,
     adfn_index       : IndexT      ) -> Vec<V>
 {   //
