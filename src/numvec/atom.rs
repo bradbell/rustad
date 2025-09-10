@@ -43,13 +43,6 @@ use crate::numvec::adfn::{
 // AtomForwardZero
 /// Callback to atomic functions during [ADfn::forward_zero_value]
 ///
-/// * Syntax :
-/// ```text
-///     range_zero = forward_zero_value(
-///         &mut var_zero, domain_zero, trace, call_info
-///     )
-/// ```
-///
 /// * var_zero
 /// This vector will have size zero on input.
 /// It can be used to cache information for use by forward_one
@@ -58,20 +51,21 @@ use crate::numvec::adfn::{
 /// * domain_zero :
 /// this contains the value of the atomic function domain variables.
 ///
-/// * trace :
-/// if true, a trace of the calculations may be printed on stdout.
-///
 /// * call_info :
 /// is the *call_info* value used when the atomic function was called.
 ///
-/// * range_zero :
-/// this contains the value of the atomic function range variables.
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+///
+/// * return :
+/// The return value *range_one*
+/// contains the value of the atomic function range variables.
 ///
 pub type AtomForwardZero<V> = fn(
     _var_zero      : &mut Vec<V> ,
     _domain_zero   : Vec<&V>     ,
-    _trace         : bool        ,
     _call_info     : IndexT      ,
+    _trace         : bool        ,
 ) -> Vec<V> ;
 //
 // AtomForwardOne
@@ -80,12 +74,6 @@ pub type AtomForwardZero<V> = fn(
 /// If you do not expect to use an atomic function with forward_one,
 /// it can just panic if it gets used.
 ///
-/// Syntax :
-/// ```text
-///     range_one = forward_one_value(
-///         &mut var_zero, domain_one, trace, call_info
-///     )
-/// ```
 /// * var_zero :
 /// This will contain the values set by forward_zero for the
 /// same call to this atomic function; i.e., same [call_atom].
@@ -93,23 +81,23 @@ pub type AtomForwardZero<V> = fn(
 /// * domain_one :
 /// this contains the direction for the directional derivative.
 ///
-/// * trace :
-/// if true, a trace of the calculations may be printed on stdout.
-///
 /// * call_info :
 /// is the *call_info* value used when the atomic function was called.
 ///
-/// * range_one :
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+///
+/// * return :
 /// Let *domain_zero* be its value in the call to forward_zero
-/// that set *var_zero* . The return value is
+/// that set *var_zero* . The return value *range_one* is
 /// ```text
 ///     range_one = f'(domain_zero) * domain_one
 /// ```
 pub type AtomForwardOne<V> = fn(
     _var_zero      : &Vec<V>     ,
     _domain_one    : Vec<&V>     ,
-    _trace         : bool        ,
     _call_info     : IndexT      ,
+    _trace         : bool        ,
 ) -> Vec<V> ;
 //
 // AtomReverseOne
@@ -118,13 +106,6 @@ pub type AtomForwardOne<V> = fn(
 /// If you do not expect to use an atomic function with reverse_one,
 /// it can just panic if it gets used.
 ///
-/// * Syntax :
-/// ```text
-///     domain_one = reverse_one_value(
-///         &var_zero, range_one, trace, call_info
-///     )
-/// ```
-///
 /// * var_zero :
 /// This will contain the values set by forward_zero for the
 /// same call to this atomic function; i.e., same [call_atom].
@@ -132,23 +113,23 @@ pub type AtomForwardOne<V> = fn(
 /// * range_one :
 /// this contains the function weights for the partial derivatives.
 ///
-/// * trace :
-/// if true, a trace of the calculations may be printed on stdout.
-///
 /// * call_info :
 /// is the *call_info* value used when the atomic function was called.
 ///
-/// * domain_one :
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+///
+/// * return :
 /// Let *domain_zero* be its value in the call to forward_zero
-/// that set *var_zero* . The return value is
+/// that set *var_zero* . The return value *domain_one* is
 /// ```text
 ///     domain_one = range_one * f'(domain_zero)
 /// ```
 pub type AtomReverseOne<V> = fn(
     _var_zero      : &Vec<V>     ,
     _range_one     : Vec<&V>     ,
-    _trace         : bool        ,
     _call_info     : IndexT      ,
+    _trace         : bool        ,
 ) -> Vec<V> ;
 //
 // ForwardDepend
@@ -159,6 +140,12 @@ pub type AtomReverseOne<V> = fn(
 /// The j-th component is true (false) if the j-th component
 /// of *adomain* is a variable (constant).
 ///
+/// * call_info :
+/// is the *call_info* value used when the atomic function was called.
+///
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+///
 /// * return :
 /// This has the same length as *arange* in the corresponding [call_atom].
 /// The i-th component is true (false) if the i-th component
@@ -166,8 +153,8 @@ pub type AtomReverseOne<V> = fn(
 ///
 pub type ForwardDepend = fn(
     _is_var_domain  : &Vec<bool> ,
-    _trace          : bool       ,
     _call_info      : IndexT     ,
+    _trace          : bool       ,
 )-> Vec<bool>;
 //
 // AtomEval
@@ -294,7 +281,7 @@ where
     ).collect();
     //
     // is_var_res
-    let is_var_res = forward_depend(&is_var_arg, trace, call_info);
+    let is_var_res = forward_depend(&is_var_arg, call_info, trace);
     //
     // arange, n_var_res
     let mut n_var_res = 0;
@@ -422,7 +409,7 @@ where
     // restore domain_zero using var_zero.
     let mut var_zero : Vec<V> = Vec::new();
     let range_zero  = forward_zero(
-        &mut var_zero, domain_zero, trace, call_info
+        &mut var_zero, domain_zero, call_info, trace
     );
     //
     // arange

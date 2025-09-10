@@ -19,8 +19,9 @@ type V = f64;
 fn sumsq_forward_zero(
     var_zero     : &mut Vec<V> ,
     domain_zero  : Vec<&V>     ,
+    call_info    : IndexT      ,
     trace        : bool        ,
-    call_info    : IndexT      ) -> Vec<V>
+) -> Vec<V>
 {   //
     assert_eq!( var_zero.len(), 0 );
     let mut sumsq_zero = 0 as V;
@@ -48,8 +49,9 @@ fn sumsq_forward_zero(
 fn sumsq_forward_one(
     domain_zero  : &Vec<V>     ,
     domain_one   : Vec<&V>     ,
+    call_info    : IndexT      ,
     trace        : bool        ,
-    call_info    : IndexT      ) -> Vec<V>
+) -> Vec<V>
 {   //
     assert_eq!( call_info,  1 );
     assert_eq!( domain_zero.len(), domain_one.len() );
@@ -75,8 +77,9 @@ fn sumsq_forward_one(
 fn sumsq_reverse_one(
     domain_zero  : &Vec<V>     ,
     range_one    : Vec<&V>     ,
+    call_info    : IndexT      ,
     trace        : bool        ,
-    call_info    : IndexT      ) -> Vec<V>
+) -> Vec<V>
 {   //
     assert_eq!( call_info,  1 );
     assert_eq!( range_one.len(), 1 );
@@ -101,8 +104,9 @@ fn sumsq_reverse_one(
 // -------------------------------------------------------------------------
 fn sumsq_forward_depend(
     is_var_domain  : &Vec<bool> ,
+    _call_info     : IndexT     ,
     _trace         : bool       ,
-    _call_info     : IndexT     ) -> Vec<bool>
+) -> Vec<bool>
 {
     let mut is_var_range = false;
     for j in 0 .. is_var_domain.len() {

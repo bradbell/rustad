@@ -31,8 +31,9 @@ thread_local! {
 fn checkpoint_forward_zero(
     var_zero         : &mut Vec<V> ,
     domain_zero_ref  : Vec<&V>     ,
+    adfn_index       : IndexT      ,
     trace            : bool        ,
-    adfn_index       : IndexT      ) -> Vec<V>
+) -> Vec<V>
 {   //
     assert_eq!( var_zero.len(), 0 );
     //
@@ -56,8 +57,9 @@ fn checkpoint_forward_zero(
 fn checkpoint_forward_one(
     var_zero         : &Vec<V>     ,
     domain_one_ref   : Vec<&V>     ,
+    adfn_index       : IndexT      ,
     trace            : bool        ,
-    adfn_index       : IndexT      ) -> Vec<V>
+) -> Vec<V>
 {   //
     assert_ne!( var_zero.len(), 0 );
     //
@@ -81,8 +83,9 @@ fn checkpoint_forward_one(
 fn checkpoint_reverse_one(
     var_zero         : &Vec<V>     ,
     range_one_ref    : Vec<&V>     ,
+    adfn_index       : IndexT      ,
     trace            : bool        ,
-    adfn_index       : IndexT      ) -> Vec<V>
+) -> Vec<V>
 {   //
     assert_ne!( var_zero.len(), 0 );
     //
@@ -105,8 +108,9 @@ fn checkpoint_reverse_one(
 // -------------------------------------------------------------------------
 fn checkpoint_forward_depend(
     is_var_domain  : &Vec<bool> ,
+    adfn_index     : IndexT     ,
     trace          : bool       ,
-    adfn_index     : IndexT     ) -> Vec<bool>
+) -> Vec<bool>
 {   //
     // dependency
     let mut dependency : Vec< [usize; 2] > = Vec::new();
