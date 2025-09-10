@@ -25,7 +25,6 @@ use crate::numvec::tape::sealed::ThisThreadTape;
 use crate::numvec::IndexT;
 use crate::numvec::ad::AD;
 use crate::numvec::op::info::OpInfo;
-use crate::numvec::op::info::panic_one;
 use crate::numvec::op::id::{
     ADD_CV_OP,
     ADD_VC_OP,
@@ -92,6 +91,73 @@ where
     var_one[res] = &var_one[lhs]  + &var_one[rhs];
 }
 // ---------------------------------------------------------------------------
+// reverse_1
+// ---------------------------------------------------------------------------
+//
+// add_cv_reverse_1
+/// first order reverse for constant * variable; see [ForwardOne]
+fn add_cv_reverse_1 <V, E>(
+    _var_zero  :   &Vec<E>     ,
+    var_one    :   &mut Vec<E> ,
+    _con       :   &Vec<V>     ,
+    _flag      :   &Vec<bool>  ,
+    arg        :   &[IndexT]   ,
+    res        :       usize   )
+where
+    for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let rhs = arg[1] as usize;
+    //
+    // var_one[rhs] += &var_one[res];
+    let sum      = &var_one[rhs] + &var_one[res];
+    var_one[rhs] = sum;
+}
+//
+// add_vc_reverse_1
+/// first order reverse for variable * constant; see [ForwardOne]
+fn add_vc_reverse_1 <V, E>(
+    _var_zero  :   &Vec<E>     ,
+    var_one    :   &mut Vec<E> ,
+    _con       :   &Vec<V>     ,
+    _flag      :   &Vec<bool>  ,
+    arg        :   &[IndexT]   ,
+    res        :       usize   )
+where
+    for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    //
+    // var_one[lhs] += &var_one[res];
+    let sum      = &var_one[lhs] + &var_one[res];
+    var_one[lhs] = sum;
+}
+//
+// add_vv_reverse_1
+/// first order reverse for variable * variable; see [ForwardOne]
+fn add_vv_reverse_1 <V, E>(
+    _var_zero  :   &Vec<E>     ,
+    var_one    :   &mut Vec<E> ,
+    _con       :   &Vec<V>     ,
+    _flag      :   &Vec<bool>  ,
+    arg        :   &[IndexT]   ,
+    res        :       usize   )
+where
+    for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    let rhs = arg[1] as usize;
+    //
+    // var_one[lhs] += &var_one[res];
+    // var_one[rhs] += &var_one[res];
+    let sum      = &var_one[rhs] + &var_one[res];
+    var_one[rhs] = sum;
+    let sum      = &var_one[lhs] + &var_one[res];
+    var_one[lhs] = sum;
+}
+// ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the Add operators.
 ///
@@ -102,7 +168,7 @@ pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
     for<'a> &'a V : std::ops::Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
-    V             : Clone + ThisThreadTape ,
+    for<'a> V     : Clone + ThisThreadTape + std::ops::AddAssign<&'a V>,
 {
     op_info_vec[ADD_CV_OP as usize] = OpInfo{
         name              : "add_cv",
@@ -110,8 +176,8 @@ where
         forward_0_ad      : add_cv_forward_0::<V, AD<V> >,
         forward_1_value   : add_cv_forward_1::<V, V>,
         forward_1_ad      : add_cv_forward_1::<V, AD<V> >,
-        reverse_1_value   : panic_one::<V, V>,
-        reverse_1_ad      : panic_one::<V, AD<V> >,
+        reverse_1_value   : add_cv_reverse_1::<V, V>,
+        reverse_1_ad      : add_cv_reverse_1::<V, AD<V> >,
         arg_var_index     : binary::binary_cv_arg_var_index,
     };
     op_info_vec[ADD_VC_OP as usize] = OpInfo{
@@ -120,8 +186,8 @@ where
         forward_0_ad      : add_vc_forward_0::<V, AD<V> >,
         forward_1_value   : add_vc_forward_1::<V, V>,
         forward_1_ad      : add_vc_forward_1::<V, AD<V> >,
-        reverse_1_value   : panic_one::<V, V>,
-        reverse_1_ad      : panic_one::<V, AD<V> >,
+        reverse_1_value   : add_vc_reverse_1::<V, V>,
+        reverse_1_ad      : add_vc_reverse_1::<V, AD<V> >,
         arg_var_index     : binary::binary_vc_arg_var_index,
     };
     op_info_vec[ADD_VV_OP as usize] = OpInfo{
@@ -130,8 +196,8 @@ where
         forward_0_ad      : add_vv_forward_0::<V, AD<V> >,
         forward_1_value   : add_vv_forward_1::<V, V>,
         forward_1_ad      : add_vv_forward_1::<V, AD<V> >,
-        reverse_1_value   : panic_one::<V, V>,
-        reverse_1_ad      : panic_one::<V, AD<V> >,
+        reverse_1_value   : add_vv_reverse_1::<V, V>,
+        reverse_1_ad      : add_vv_reverse_1::<V, AD<V> >,
         arg_var_index     : binary::binary_vv_arg_var_index,
     };
 }

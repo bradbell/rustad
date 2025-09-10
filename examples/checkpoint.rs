@@ -175,14 +175,20 @@ fn main() {
     let ay           = call_atom(atom_id, adfn_index, ax, trace);
     let g            = stop_recording(ay);
     //
-    // g.forward_zero_values
+    // g.forward_zero_value
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
     let mut v   : Vec<V> = Vec::new();
     let y                = g.forward_zero_value(&mut v , x.clone(), trace);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
     //
-    // g.forward_one_values
+    // g.forward_one_value
     let dx      : Vec<V> = vec![ 5.0, 6.0 ];
     let dy               = g.forward_one_value(&mut v , dx.clone(), trace);
     assert_eq!( dy[0], 2.0 * x[0]*dx[0] + 2.0 * x[1]*dx[1] );
+    //
+    // g.reverse_one_value
+    let dy      : Vec<V> = vec![ 5.0 ];
+    let dx               = g.reverse_one_value(&mut v , dy.clone(), trace);
+    assert_eq!( dx[0], 2.0 * x[0]*dy[0] );
+    assert_eq!( dx[1], 2.0 * x[1]*dy[0] );
 }
