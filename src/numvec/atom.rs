@@ -344,12 +344,10 @@ where
 /// Compute the result of an atomic function and,
 /// if this thread is currently recording, include the call in its tape.
 ///
-/// * Syntax :
-/// ```text
-///     arange = call_atom_ad(atom_id, call_info, adomain, trace)
-/// ```
-///
 /// * V : see [doc_generic_v]
+///
+/// * adomain :
+/// This is the value of the arguments to the atomic function.
 /// `
 /// * atom_id :
 /// The [atom_id](register_atom#atom_id) returned by register_atom for this
@@ -359,12 +357,14 @@ where
 /// This is information about this call that is be passed on to the
 /// callback functions specified by [atom_eval](register_atom#atom_eval).
 ///
-/// * adomain :
-/// This is the value of the arguments to the atomic function.
-///
 /// * trace :
 /// if true, a trace of the calculations may be printed on stdout.
 /// This may be useful for debugging atomic functions.
+///
+/// * return :
+/// The return value *arange* is the range, as a function of the domain,
+/// for this atomic function.
+///
 pub fn call_atom<V>(
     adomain     : Vec< AD<V> > ,
     atom_id     : IndexT       ,
