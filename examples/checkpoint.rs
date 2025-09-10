@@ -38,7 +38,6 @@ fn checkpoint_forward_zero(
     for j in 0 .. domain_zero_ref.len() {
         domain_zero.push( (*domain_zero_ref[j]).clone() );
     }
-    domain_zero.reverse();
     //
     // range_zero
     let mut range_zero : Vec<V> = Vec::new();
@@ -64,7 +63,6 @@ fn checkpoint_forward_one(
     for j in 0 .. domain_one_ref.len() {
         domain_one.push( (*domain_one_ref[j]).clone() );
     }
-    domain_one.reverse();
     //
     // range_one
     let mut range_one : Vec<V> = Vec::new();
@@ -177,8 +175,14 @@ fn main() {
     let ay           = call_atom(atom_id, adfn_index, ax, trace);
     let g            = stop_recording(ay);
     //
+    // g.forward_zero_values
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
     let mut v   : Vec<V> = Vec::new();
     let y                = g.forward_zero_value(&mut v , x.clone(), trace);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
+    //
+    // g.forward_one_values
+    let dx      : Vec<V> = vec![ 5.0, 6.0 ];
+    let dy               = g.forward_one_value(&mut v , dx.clone(), trace);
+    assert_eq!( dy[0], 2.0 * x[0]*dx[0] + 2.0 * x[1]*dx[1] );
 }

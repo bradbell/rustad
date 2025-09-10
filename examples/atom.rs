@@ -23,24 +23,24 @@ fn sumsq_forward_zero(
     call_info    : IndexT      ) -> Vec<V>
 {   //
     assert_eq!( var_zero.len(), 0 );
-    let mut sumsq = 0 as V;
+    let mut sumsq_zero = 0 as V;
     for j in 0 .. domain_zero.len() {
-        sumsq += domain_zero[j] * domain_zero[j];
+        sumsq_zero += domain_zero[j] * domain_zero[j];
         if call_info == 1 {
             var_zero.push( *domain_zero[j] )
         }
     }
     if trace {
-        println!("Begin Trace: sumsq_forward_one");
+        println!("Begin Trace: sumsq_forward_zero");
         print!("domain_zero = [ ");
         for j in 0 .. domain_zero.len() {
                 print!("{}, ", domain_zero[j]);
         }
         println!("]");
-        println!("sumsq = {}", sumsq);
-        println!("End Trace: sumsq_forward_one");
+        println!("sumsq_zero = {}", sumsq_zero);
+        println!("End Trace: sumsq_forward_zero");
     }
-    vec![ sumsq ]
+    vec![ sumsq_zero ]
 }
 // -------------------------------------------------------------------------
 // sumsq_forward_one
@@ -48,16 +48,26 @@ fn sumsq_forward_zero(
 fn sumsq_forward_one(
     domain_zero  : &mut Vec<V> ,
     domain_one   : &Vec<&V>    ,
-    _trace       : bool        ,
+    trace        : bool        ,
     call_info    : IndexT      ) -> Vec<V>
 {   //
     assert_eq!( call_info,  1 );
     assert_eq!( domain_zero.len(), domain_one.len() );
-    let mut sumsq = 0 as V;
+    let mut sumsq_one = 0 as V;
     for j in 0 .. domain_one.len() {
-        sumsq += 2.0 * domain_zero[j] * domain_one[j];
+        sumsq_one += 2.0 * domain_zero[j] * domain_one[j];
     }
-    vec![ sumsq ]
+    if trace {
+        println!("Begin Trace: sumsq_forward_one");
+        print!("domain_one = [ ");
+        for j in 0 .. domain_one.len() {
+                print!("{}, ", domain_one[j]);
+        }
+        println!("]");
+        println!("sumsq_one = {}", sumsq_one);
+        println!("End Trace: sumsq_forward_one");
+    }
+    vec![ sumsq_one ]
 }
 // -------------------------------------------------------------------------
 // sumsq_reverse_one
@@ -65,7 +75,7 @@ fn sumsq_forward_one(
 fn sumsq_reverse_one(
     domain_zero  : &mut Vec<V> ,
     range_one    : &Vec<&V>    ,
-    _trace       : bool        ,
+    trace        : bool        ,
     call_info    : IndexT      ) -> Vec<V>
 {   //
     assert_eq!( call_info,  1 );
@@ -73,6 +83,16 @@ fn sumsq_reverse_one(
     let mut domain_one : Vec<V> = Vec::new();
     for j in 0 .. domain_zero.len() {
         domain_one.push( 2.0 * domain_zero[j] * range_one[0] );
+    }
+    if trace {
+        println!("Begin Trace: sumsq_reverse_one");
+        println!("range_one = [ {} ]", range_one[0]);
+        print!("domain_one = [ ");
+        for j in 0 .. domain_one.len() {
+                print!("{}, ", range_one[j]);
+        }
+        println!("]");
+        println!("End Trace: sumsq_reverse_one");
     }
     domain_one
 }
@@ -112,11 +132,13 @@ fn register_sumsq_atom()-> IndexT {
 // -------------------------------------------------------------------------
 fn test_forward_zero(sumsq_atom_id : IndexT) {
     //
+    // trace
+    let trace            = false;
+    //
     // ax
     let x       : Vec<V> = vec![ 1.0 , 2.0 ];
     let ax               = start_recording(x);
     let call_info        = 0 as IndexT;
-    let trace            = false;
     let ay               = call_atom(sumsq_atom_id, call_info, ax, trace);
     let f                = stop_recording(ay);
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
@@ -128,11 +150,13 @@ fn test_forward_zero(sumsq_atom_id : IndexT) {
 // test_forward_one
 fn test_forward_one(sumsq_atom_id : IndexT) {
     //
+    // trace
+    let trace            = false;
+    //
     // ax
     let x       : Vec<V> = vec![ 1.0 , 2.0 ];
     let ax               = start_recording(x);
     let call_info        = 1 as IndexT;
-    let trace            = false;
     let ay               = call_atom(sumsq_atom_id, call_info, ax, trace);
     let f                = stop_recording(ay);
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
@@ -146,11 +170,13 @@ fn test_forward_one(sumsq_atom_id : IndexT) {
 // test_reverse_one
 fn test_reverse_one(sumsq_atom_id : IndexT) {
     //
+    // trace
+    let trace            = false;
+    //
     // ax
     let x       : Vec<V> = vec![ 1.0 , 2.0 ];
     let ax               = start_recording(x);
     let call_info        = 1 as IndexT;
-    let trace            = false;
     let ay               = call_atom(sumsq_atom_id, call_info, ax, trace);
     let f                = stop_recording(ay);
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];

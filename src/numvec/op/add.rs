@@ -37,6 +37,61 @@ use crate::numvec::op::id::{
 // add_vv_forward_0
 binary::eval_binary_forward_0!(Add, +);
 // ---------------------------------------------------------------------------
+// forward_1
+// ---------------------------------------------------------------------------
+//
+// add_cv_forward_1
+/// first order forward for constant * variable; see [ForwardOne]
+fn add_cv_forward_1 <V, E>(
+    _var_zero  :   &Vec<E>     ,
+    var_one    :   &mut Vec<E> ,
+    _con       :   &Vec<V>     ,
+    _flag      :   &Vec<bool>  ,
+    arg        :   &[IndexT]   ,
+    res        :       usize   )
+where
+    E             : Clone,
+{
+    debug_assert!( arg.len() == 2);
+    let rhs = arg[1] as usize;
+    var_one[ res ] = var_one[rhs].clone();
+}
+//
+// add_vc_forward_1
+/// first order forward for variable * constant; see [ForwardOne]
+fn add_vc_forward_1 <V, E>(
+    _var_zero  :   &Vec<E>     ,
+    var_one    :   &mut Vec<E> ,
+    _con       :   &Vec<V>     ,
+    _flag      :   &Vec<bool>  ,
+    arg        :   &[IndexT]   ,
+    res        :       usize   )
+where
+    E             : Clone,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    var_one[ res ] = var_one[lhs].clone();
+}
+//
+// add_vv_forward_1
+/// first order forward for variable * variable; see [ForwardOne]
+fn add_vv_forward_1 <V, E>(
+    _var_zero  :   &Vec<E>     ,
+    var_one    :   &mut Vec<E> ,
+    _con       :   &Vec<V>     ,
+    _flag      :   &Vec<bool>  ,
+    arg        :   &[IndexT]   ,
+    res        :       usize   )
+where
+    for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    let rhs = arg[1] as usize;
+    var_one[res] = &var_one[lhs]  + &var_one[rhs];
+}
+// ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the Add operators.
 ///
@@ -53,8 +108,8 @@ where
         name              : "add_cv",
         forward_0_value   : add_cv_forward_0::<V, V>,
         forward_0_ad      : add_cv_forward_0::<V, AD<V> >,
-        forward_1_value   : panic_one::<V, V>,
-        forward_1_ad      : panic_one::<V, AD<V> >,
+        forward_1_value   : add_cv_forward_1::<V, V>,
+        forward_1_ad      : add_cv_forward_1::<V, AD<V> >,
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
         arg_var_index     : binary::binary_cv_arg_var_index,
@@ -63,8 +118,8 @@ where
         name              : "add_vc",
         forward_0_value   : add_vc_forward_0::<V, V>,
         forward_0_ad      : add_vc_forward_0::<V, AD<V> >,
-        forward_1_value   : panic_one::<V, V>,
-        forward_1_ad      : panic_one::<V, AD<V> >,
+        forward_1_value   : add_vc_forward_1::<V, V>,
+        forward_1_ad      : add_vc_forward_1::<V, AD<V> >,
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
         arg_var_index     : binary::binary_vc_arg_var_index,
@@ -73,8 +128,8 @@ where
         name              : "add_vv",
         forward_0_value   : add_vv_forward_0::<V, V>,
         forward_0_ad      : add_vv_forward_0::<V, AD<V> >,
-        forward_1_value   : panic_one::<V, V>,
-        forward_1_ad      : panic_one::<V, AD<V> >,
+        forward_1_value   : add_vv_forward_1::<V, V>,
+        forward_1_ad      : add_vv_forward_1::<V, AD<V> >,
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
         arg_var_index     : binary::binary_vv_arg_var_index,
