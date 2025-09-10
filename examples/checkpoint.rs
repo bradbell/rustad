@@ -1,0 +1,184 @@
+// SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
+// SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
+// SPDX-FileContributor: 2025 Bradley M. Bell
+//
+use std::cell::RefCell;
+//
+use rustad::numvec::{
+    AD,
+    ADfn,
+    start_recording,
+    stop_recording,
+    register_atom,
+    call_atom,
+    AtomEval,
+    IndexT,
+};
+//
+// V
+type V = f64;
+//
+thread_local! {
+    static ADFN_VEC : RefCell< Vec< ADfn<V> > > =
+        RefCell::new( Vec::new() );
+}
+// -------------------------------------------------------------------------
+// checkpoint_forward_zero
+// -------------------------------------------------------------------------
+fn checkpoint_forward_zero(
+    var_zero         : &mut Vec<V> ,
+    domain_zero_ref  : &Vec<&V>    ,
+    trace            : bool        ,
+    adfn_index       : IndexT      ) -> Vec<V>
+{   //
+    assert_eq!( var_zero.len(), 0 );
+    //
+    // domain_zero
+    let mut domain_zero : Vec<V> = Vec::new();
+    for j in 0 .. domain_zero_ref.len() {
+        domain_zero.push( (*domain_zero_ref[j]).clone() );
+    }
+    domain_zero.reverse();
+    //
+    // range_zero
+    let mut range_zero : Vec<V> = Vec::new();
+    ADFN_VEC.with_borrow( |f_vec| {
+       let f      = &f_vec[adfn_index as usize];
+       range_zero = f.forward_zero_value(var_zero, domain_zero, trace);
+    } );
+    range_zero
+}
+// -------------------------------------------------------------------------
+// checkpoint_forward_one
+// -------------------------------------------------------------------------
+fn checkpoint_forward_one(
+    var_zero         : &mut Vec<V> ,
+    domain_one_ref   : &Vec<&V>    ,
+    trace            : bool        ,
+    adfn_index       : IndexT      ) -> Vec<V>
+{   //
+    assert_ne!( var_zero.len(), 0 );
+    //
+    // domain_one
+    let mut domain_one : Vec<V> = Vec::new();
+    for j in 0 .. domain_one_ref.len() {
+        domain_one.push( (*domain_one_ref[j]).clone() );
+    }
+    domain_one.reverse();
+    //
+    // range_one
+    let mut range_one : Vec<V> = Vec::new();
+    ADFN_VEC.with_borrow( |f_vec| {
+       let f     = &f_vec[adfn_index as usize];
+       range_one = f.forward_one_value(&var_zero, domain_one, trace);
+    } );
+    range_one
+}
+// -------------------------------------------------------------------------
+// checkpoint_reverse_one
+// -------------------------------------------------------------------------
+fn checkpoint_reverse_one(
+    var_zero         : &mut Vec<V> ,
+    range_one_ref    : &Vec<&V>    ,
+    trace            : bool        ,
+    adfn_index       : IndexT      ) -> Vec<V>
+{   //
+    assert_ne!( var_zero.len(), 0 );
+    //
+    // range_one
+    let mut range_one : Vec<V> = Vec::new();
+    for j in 0 .. range_one_ref.len() {
+        range_one.push( (*range_one_ref[j]).clone() );
+    }
+    //
+    // domain_one
+    let mut domain_one : Vec<V> = Vec::new();
+    ADFN_VEC.with_borrow( |f_vec| {
+       let f      = &f_vec[adfn_index as usize];
+       domain_one = f.reverse_one_value(var_zero, range_one, trace);
+    } );
+    domain_one
+}
+// -------------------------------------------------------------------------
+// checkpoint_forward_depend
+// -------------------------------------------------------------------------
+fn checkpoint_forward_depend(
+    is_var_domain  : &Vec<bool> ,
+    trace          : bool       ,
+    adfn_index     : IndexT     ) -> Vec<bool>
+{   //
+    // dependency
+    let dependency = ADFN_VEC.with_borrow( |f_vec| {
+       let f       = &f_vec[adfn_index as usize];
+       let pattern = f.sub_sparsity(trace);
+       pattern
+    } );
+    //
+    // is_var_range
+    let mut is_var_range = false;
+    for [i,j] in dependency {
+        assert_eq!(i, 0);
+        if is_var_domain[j] {
+            is_var_range = true;
+        }
+    }
+    vec![ is_var_range ]
+}
+// -------------------------------------------------------------------------
+// register_checkpoint_atom
+// -------------------------------------------------------------------------
+fn register_checkpoint_atom()-> IndexT {
+    //
+    // checkpoint_atom_eval
+    let checkpoint_atom_eval = AtomEval {
+        forward_zero_value   :  checkpoint_forward_zero,
+        forward_one_value    :  checkpoint_forward_one,
+        reverse_one_value    :  checkpoint_reverse_one,
+        forward_depend       :  checkpoint_forward_depend,
+    };
+    //
+    // atom_id
+    let atom_id = register_atom( checkpoint_atom_eval );
+    atom_id
+}
+// -------------------------------------------------------------------------
+// main
+// -------------------------------------------------------------------------
+#[test]
+fn main() {
+    //
+    // trace
+    let trace = false;
+    //
+    // atom_id
+    let atom_id = register_checkpoint_atom();
+    //
+    // f
+    let x   : Vec<V> = vec![ 1.0 , 2.0 ];
+    let ax           = start_recording(x);
+    let mut asumsq : AD<V> = AD::from( 0 as V );
+    for j in 0 .. ax.len() {
+        let term = &ax[j] * &ax[j];
+        asumsq  += &term;
+    }
+    let ay          = vec![ asumsq ];
+    let f           = stop_recording(ay);
+    //
+    // adfn_index, ADFN_VEC
+    let adfn_index = ADFN_VEC.with_borrow_mut( |f_vec| {
+            let index = f_vec.len() as IndexT;
+            f_vec.push( f );
+            index
+    } );
+    //
+    // g
+    let x   : Vec<V> = vec![ 1.0 , 2.0 ];
+    let ax           = start_recording(x);
+    let ay           = call_atom(atom_id, adfn_index, ax, trace);
+    let g            = stop_recording(ay);
+    //
+    let x       : Vec<V> = vec![ 3.0 , 4.0 ];
+    let mut v   : Vec<V> = Vec::new();
+    let y                = g.forward_zero_value(&mut v , x.clone(), trace);
+    assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
+}
