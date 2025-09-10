@@ -30,6 +30,11 @@ use crate::numvec::op::id::{
     ADD_VC_OP,
     ADD_VV_OP,
 };
+#[cfg(doc)]
+use crate::numvec::op::info::{
+    ForwardOne,
+    ReverseOne,
+};
 // -------------------------------------------------------------------------
 // add_cv_forward_0
 // add_vc_forward_0
@@ -95,7 +100,7 @@ where
 // ---------------------------------------------------------------------------
 //
 // add_cv_reverse_1
-/// first order reverse for constant * variable; see [ForwardOne]
+/// first order reverse for constant * variable; see [ReverseOne]
 fn add_cv_reverse_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
@@ -115,7 +120,7 @@ where
 }
 //
 // add_vc_reverse_1
-/// first order reverse for variable * constant; see [ForwardOne]
+/// first order reverse for variable * constant; see [ReverseOne]
 fn add_vc_reverse_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
@@ -135,7 +140,7 @@ where
 }
 //
 // add_vv_reverse_1
-/// first order reverse for variable * variable; see [ForwardOne]
+/// first order reverse for variable * variable; see [ReverseOne]
 fn add_vv_reverse_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,

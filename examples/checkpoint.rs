@@ -2,6 +2,9 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
+// ---------------------------------------------------------------------------
+// TODO: convert this example in to a general purpose checkpoint routine.
+// ---------------------------------------------------------------------------
 use std::cell::RefCell;
 //
 use rustad::numvec::{

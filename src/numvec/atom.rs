@@ -415,7 +415,7 @@ where
     }
     //
     // domain_zero
-    let mut domain_zero : Vec<&V> = Vec::new();
+    let mut domain_zero : Vec<&V> = Vec::with_capacity( adomain.len() );
     for j in 0 .. adomain.len() {
         domain_zero.push( &adomain[j].value );
     }

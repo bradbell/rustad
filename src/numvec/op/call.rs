@@ -93,7 +93,7 @@ where
     let is_res_var  = &flag[begin .. end];
     //
     // call_domain_zero
-    let mut call_domain_zero : Vec<&V> = Vec::new();
+    let mut call_domain_zero : Vec<&V> = Vec::with_capacity( call_n_arg );
     for i_arg in 0 .. call_n_arg {
         let index = arg[i_arg + 5] as usize;
         if is_arg_var[i_arg] {
@@ -170,7 +170,7 @@ where
     let is_res_var  = &flag[begin .. end];
     //
     // call_domain_zero
-    let mut call_domain_zero : Vec<&V> = Vec::new();
+    let mut call_domain_zero : Vec<&V> = Vec::with_capacity( call_n_arg );
     for i_arg in 0 .. call_n_arg {
         let index = arg[i_arg + 5] as usize;
         if is_arg_var[i_arg] {
@@ -205,7 +205,7 @@ where
     //
     // call_domain_one
     let zero_v : V = 0f32.into();
-    let mut call_domain_one : Vec<&V> = Vec::new();
+    let mut call_domain_one : Vec<&V> = Vec::with_capacity( call_n_arg );
     for i_arg in 0 .. call_n_arg {
         let index = arg[i_arg + 5] as usize;
         if is_arg_var[i_arg] {
@@ -263,7 +263,7 @@ where
     let is_res_var  = &flag[begin .. end];
     //
     // call_domain_zero
-    let mut call_domain_zero : Vec<&V> = Vec::new();
+    let mut call_domain_zero : Vec<&V> = Vec::with_capacity( call_n_arg );
     for i_arg in 0 .. call_n_arg {
         let index = arg[i_arg + 5] as usize;
         if is_arg_var[i_arg] {
@@ -298,7 +298,7 @@ where
     //
     // call_range_one
     let zero_v : V = 0f32.into();
-    let mut call_range_one : Vec<&V> = Vec::new();
+    let mut call_range_one : Vec<&V> = Vec::with_capacity( call_n_res );
     let mut j_res = 0;
     for i_res in 0 .. call_n_res {
         if is_res_var[i_res] {
