@@ -7,7 +7,7 @@
 use rustad::numvec::AD;
 //
 #[test]
-fn test_componund_ad() {
+fn test_compoundd_ad() {
     //
     // add
     let mut ax   = AD::from( 3.0f64 );
