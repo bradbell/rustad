@@ -13,59 +13,13 @@ pub mod utility;
 // numvec
 pub mod numvec;
 //
-// gad
-pub(crate) mod gad;
-//
-// function
-pub(crate) mod function;
-//
-// ptrait
-pub(crate) mod ptrait;
-//
-// checkpoint
-pub(crate) mod checkpoint;
-//
 // vec_set
 pub(crate) mod vec_set;
-//
-// gas
-pub(crate) mod gas;
-//
-// operator
-pub(crate) mod operator;
-//
-// record
-pub(crate) mod record;
 //
 // ----------------------------------------------------------------------------
 // use
 // https://doc.rust-lang.org/rustdoc/write-documentation/re-exports.html
 //
-pub use crate::gad::{
-    GAD,
-    doc_gad_from,
-    doc_binary_gad_operator,
-    doc_binary_gad_assign_op,
-};
-pub use crate::function::{
-    GADFun,
-    ad_domain,
-    ad_fun,
-};
-pub use crate::function::sweep::{
-    doc_forward_zero,
-    doc_forward_one,
-    doc_reverse_one,
-};
-//
-pub use crate::ptrait::{
-    ThisThreadTapePublic,
-    CheckpointAllPublic,
-};
-pub use crate::checkpoint::{
-    store_checkpoint,
-    use_checkpoint,
-};
 // ----------------------------------------------------------------------------
 //
 // YEAR_MONTH_DAY
@@ -79,18 +33,3 @@ pub use crate::checkpoint::{
 /// ```
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
    std::sync::LazyLock::new( || "2025.9.10" );
-//
-/// Document the rustad generic type parameters F and U.
-///
-/// * F :
-/// is the floating point type used for value calculations.
-/// To date the possible choices for *F* are f32 or f64 .
-///
-/// * U :
-/// is the unsigned integer type that that is used to identify
-/// components in an operation sequence.
-/// It must be able to represent the maximum:
-/// tape id, operator index, constant index, and operator argument index.
-/// To date the possible choices for *U* are u32 or u64 .
-///
-pub fn doc_generic_f_and_u() {}
