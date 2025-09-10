@@ -16,10 +16,78 @@ pub mod numvec;
 // vec_set
 pub(crate) mod vec_set;
 //
+// ad
+pub mod ad;
+//
+// tape
+pub mod tape;
+//
+// adfn
+pub mod adfn;
+//
+// atom
+pub mod atom;
+//
+// op
+// TODO: Change to pub(crate)
+pub mod op;
+//
+// setup
+pub(crate) mod setup;
+//
 // ----------------------------------------------------------------------------
 // use
 // https://doc.rust-lang.org/rustdoc/write-documentation/re-exports.html
+// ---------------------------------------------------------------------------
+// re-export
 //
+pub use numvec::{
+    NumVec,
+};
+pub use ad::{
+    AD,
+    ad_from_vector,
+    ad_to_vector,
+    doc_generic_v,
+};
+pub use adfn::{
+    ADfn,
+    doc_generic_e,
+};
+pub use tape::{
+    IndexT,
+    start_recording,
+    stop_recording,
+};
+pub use atom::{
+    register_atom,
+    call_atom,
+    AtomEval,
+};
+//
+pub use op::info::{
+    OpInfo,
+};
+// ---------------------------------------------------------------------------
+// Sealed Traits
+//
+// ThisThreadTapePublic
+/// This is the public interface to a sealed trait
+pub trait ThisThreadTapePublic : tape::sealed::ThisThreadTape
+{ }
+impl<V> ThisThreadTapePublic for V
+where
+    V : tape::sealed::ThisThreadTape ,
+{ }
+//
+// AtomEvalVec
+/// This is the public interface to a sealed trait
+pub trait AtomEvalVecPublic : atom::sealed::AtomEvalVec
+{ }
+impl<V> AtomEvalVecPublic for V
+where
+    V : atom::sealed::AtomEvalVec ,
+{ }
 // ----------------------------------------------------------------------------
 //
 // YEAR_MONTH_DAY

@@ -17,13 +17,13 @@ pub mod for_sparsity;
 // ---------------------------------------------------------------------------
 //
 #[cfg(doc)]
-use crate::numvec::{
+use crate::{
     doc_generic_v,
     AD,
 };
 //
 // IndexT
-use crate::numvec::IndexT;
+use crate::IndexT;
 //
 // ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter E.
@@ -114,7 +114,7 @@ impl<V> ADfn<V> {
     ///
     /// # Example
     /// ```
-    /// use rustad::numvec::adfn::ADfn;
+    /// use rustad::adfn::ADfn;
     /// let f : ADfn<f32> = ADfn::new();
     /// assert_eq!( f.domain_len(), 0 );
     /// assert_eq!( f.range_len(), 0 );

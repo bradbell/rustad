@@ -15,11 +15,11 @@
  use std::sync::RwLock;
  use std::thread::LocalKey;
  use std::cell::RefCell;
- use crate::numvec::ad::AD;
- use crate::numvec::NumVec;
+ use crate::ad::AD;
+ use crate::NumVec;
  ///
  /// Set up rustad to do calculations with value type V; see
- /// [doc_generic_v](crate::numvec::doc_generic_v) .
+ /// [doc_generic_v](crate::doc_generic_v) .
  ///
  /// This macro must be executed once for any type *V*  where `AD<V>` is used.
  /// The rustad package automatically executes this macro
@@ -31,13 +31,13 @@
  ///     use std::sync::RwLock;
  ///     use std::thread::LocalKey;
  ///     use std::cell::RefCell;
- ///     use crate::numvec::ad::AD;
+ ///     use crate::ad::AD;
  /// ```
  macro_rules! setup_this_value_type{ ($V:ty) => {
-         crate::numvec::tape::impl_this_thread_tape!($V);
-         crate::numvec::op::info::impl_global_op_info_vec!($V);
-         crate::numvec::ad::impl_value_op_ad!($V);
-         crate::numvec::atom::impl_atom_eval_vec!($V);
+         crate::tape::impl_this_thread_tape!($V);
+         crate::op::info::impl_global_op_info_vec!($V);
+         crate::ad::impl_value_op_ad!($V);
+         crate::atom::impl_atom_eval_vec!($V);
  } }
  //
  setup_this_value_type!(f32);

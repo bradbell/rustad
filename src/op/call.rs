@@ -44,22 +44,22 @@
 //
 use std::sync::RwLock;
 //
-use crate::numvec::op::info::{
+use crate::op::info::{
     OpInfo,
     panic_zero,
     panic_one,
 };
-use crate::numvec::atom::{
+use crate::atom::{
     AtomForwardZero,
     AtomForwardOne,
     AtomReverseOne,
     sealed::AtomEvalVec,
 };
-use crate::numvec::op::id::{
+use crate::op::id::{
         CALL_OP,
         CALL_RES_OP,
 };
-use crate::numvec::{
+use crate::{
     AD,
     IndexT,
     AtomEval,
@@ -387,7 +387,7 @@ where
 // ---------------------------------------------------------------------------
 //
 // no_op_zero
-/// [ForwardZero](crate::numvec::op::info::ForwardZero) function
+/// [ForwardZero](crate::op::info::ForwardZero) function
 fn no_op_zero<V, E>(
     _var_zero : &mut Vec<E> ,
     _con      : &Vec<V>     ,
@@ -397,8 +397,8 @@ fn no_op_zero<V, E>(
 ) { }
 //
 // no_op_one
-/// [ForwardOne](crate::numvec::op::info::ForwardOne) or
-/// [ReverseOne](crate::numvec::op::info::ReverseOne) function
+/// [ForwardOne](crate::op::info::ForwardOne) or
+/// [ReverseOne](crate::op::info::ReverseOne) function
 fn no_op_one<V, E>(
     _var_zero : &Vec<E>     ,
     _var_one  : &mut Vec<E> ,
@@ -409,7 +409,7 @@ fn no_op_one<V, E>(
 ) { }
 //
 // no_op_arg_var_index
-/// [ArgVarIndex](crate::numvec::op::info::ArgVarIndex) function
+/// [ArgVarIndex](crate::op::info::ArgVarIndex) function
 fn no_op_arg_var_index(
     arg_var_index  : &mut Vec<IndexT> ,
     _flag          : &Vec<bool>       ,

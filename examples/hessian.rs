@@ -4,7 +4,7 @@
 //
 // Example Hessian
 //
-use rustad::numvec::{
+use rustad::{
     AD,
     ad_from_vector,
     NumVec,

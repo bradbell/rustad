@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
 use rustad::utility::avg_seconds_to_execute;
-use rustad::numvec::{
+use rustad::{
     AD,
     NumVec,
 };

@@ -9,13 +9,13 @@
 // ---------------------------------------------------------------------------
 //
 use crate::vec_set::VecSet;
-use crate::numvec::ADfn;
-use crate::numvec::IndexT;
-use crate::numvec::op::info::GlobalOpInfoVec;
-use crate::numvec::op::info::OpInfo;
+use crate::ADfn;
+use crate::IndexT;
+use crate::op::info::GlobalOpInfoVec;
+use crate::op::info::OpInfo;
 //
 #[cfg(doc)]
-use crate::numvec::doc_generic_v;
+use crate::doc_generic_v;
 // ----------------------------------------------------------------------------
 // ADfn::for_sparsity
 impl<V> ADfn<V>
@@ -57,9 +57,9 @@ where
     ///
     /// # Example
     /// ```
-    /// use rustad::numvec::AD;
-    /// use rustad::numvec::start_recording;
-    /// use rustad::numvec::stop_recording;
+    /// use rustad::AD;
+    /// use rustad::start_recording;
+    /// use rustad::stop_recording;
     /// //
     /// // V
     /// type V = f32;

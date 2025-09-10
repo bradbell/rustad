@@ -9,12 +9,12 @@
 // ---------------------------------------------------------------------------
 // use
 //
-use crate::numvec::AD;
-use crate::numvec::ADfn;
-use crate::numvec::op::info::GlobalOpInfoVec;
+use crate::AD;
+use crate::ADfn;
+use crate::op::info::GlobalOpInfoVec;
 //
 #[cfg(doc)]
-use crate::numvec::{
+use crate::{
     doc_generic_v,
     doc_generic_e,
 };
@@ -62,9 +62,9 @@ use crate::numvec::{
 /// # Example
 /// Computing function values using forward_zero :
 /// ```
-/// use rustad::numvec::start_recording;
-/// use rustad::numvec::stop_recording;
-/// use rustad::numvec::AD;
+/// use rustad::start_recording;
+/// use rustad::stop_recording;
+/// use rustad::AD;
 /// //
 /// // V
 /// type V = f32;

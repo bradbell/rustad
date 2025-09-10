@@ -6,10 +6,10 @@
 //!
 //! Link to [parent module](super)
 //!
-//! * V : see [doc_generic_v](crate::numvec::doc_generic_v)
-//! * E : see [doc_generic_e](crate::numvec::adfn::doc_generic_e)
+//! * V : see [doc_generic_v](crate::doc_generic_v)
+//! * E : see [doc_generic_e](crate::adfn::doc_generic_e)
 //!
-//! * [op::id](crate::numvec::op::id)
+//! * [op::id](crate::op::id)
 //!     * DIV_CV_OP : constant / variable
 //!     * DIV_VC_OP : variable / constant
 //!     * DIV_VV_OP : variable / variable
@@ -20,13 +20,13 @@
 // --------------------------------------------------------------------------
 // use
 //
-use crate::numvec::op::binary;
-use crate::numvec::tape::sealed::ThisThreadTape;
-use crate::numvec::IndexT;
-use crate::numvec::ad::AD;
-use crate::numvec::op::info::OpInfo;
-use crate::numvec::op::info::panic_one;
-use crate::numvec::op::id::{
+use crate::op::binary;
+use crate::tape::sealed::ThisThreadTape;
+use crate::IndexT;
+use crate::ad::AD;
+use crate::op::info::OpInfo;
+use crate::op::info::panic_one;
+use crate::op::id::{
     DIV_CV_OP,
     DIV_VC_OP,
     DIV_VV_OP,
@@ -41,7 +41,7 @@ binary::eval_binary_forward_0!(Div, /);
 /// Set the operator information for all the Div operators.
 ///
 /// * op_info_vec :
-/// The map from [op::id](crate::numvec::op::id) to operator information.
+/// The map from [op::id](crate::op::id) to operator information.
 /// The the map results for DIV_CV_OP, DIV_VC_OP, and DIV_VV_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where

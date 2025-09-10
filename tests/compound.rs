@@ -4,7 +4,7 @@
 //
 // Testing compoound assignment operators
 //
-use rustad::numvec::AD;
+use rustad::AD;
 //
 #[test]
 fn test_compoundd_ad() {

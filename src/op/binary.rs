@@ -7,7 +7,7 @@
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
 //
-use crate::numvec::IndexT;
+use crate::IndexT;
 //
 // ---------------------------------------------------------------------------
 //
@@ -45,8 +45,8 @@ pub(crate) fn binary_vv_arg_var_index(
 // eval_binary_forward_0
 /// Evaluation of zero order forward for binary operators.
 ///
-/// * V      : see [doc_generic_v](crate::numvec::doc_generic_v)
-/// * E      : see [doc_generic_e](crate::numvec::doc_generic_e)
+/// * V      : see [doc_generic_v](crate::doc_generic_v)
+/// * E      : see [doc_generic_e](crate::doc_generic_e)
 /// * Name   :  is Add , Sub , Mul , or Div  ,
 /// * op     : is the corresponding operator; e.g. + for Add.
 ///
@@ -63,7 +63,7 @@ pub(crate) fn binary_vv_arg_var_index(
 macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     #[doc = concat!(
         " zero order forward for constant ", stringify!( $op ),
-        " variable; see [ForwardZero](crate::numvec::op::info::ForwardZero)"
+        " variable; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
     fn [< $Name:lower _cv_forward_0 >] <V, E> (
         var_zero    : &mut Vec<E> ,
@@ -81,7 +81,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     }
     #[doc = concat!(
         " zero order forward variable ", stringify!( $op ),
-        " constant; see [ForwardZero](crate::numvec::op::info::ForwardZero)"
+        " constant; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
     fn [< $Name:lower _vc_forward_0 >] <V, E> (
         var_zero    : &mut Vec<E> ,
@@ -99,7 +99,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     }
     #[doc = concat!(
         " E zero order forward variable ", stringify!( $op ),
-        " variable; see [ForwardZero](crate::numvec::op::info::ForwardZero)"
+        " variable; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
     fn [< $Name:lower _vv_forward_0 >] <V, E> (
         var_zero    : &mut Vec<E> ,

@@ -18,74 +18,6 @@
 //! * Copy, Clone :
 //!  The NumVec types implement Clone, but not the Copy trait.
 // ---------------------------------------------------------------------------
-// sub-modules
-//
-// ad
-pub mod ad;
-//
-// tape
-pub mod tape;
-//
-// adfn
-pub mod adfn;
-//
-// atom
-pub mod atom;
-//
-// op
-// TODO: Change to pub(crate)
-pub mod op;
-//
-// setup
-pub(crate) mod setup;
-// ---------------------------------------------------------------------------
-// Sealed Traits
-//
-// ThisThreadTapePublic
-/// This is the public interface to a sealed trait
-pub trait ThisThreadTapePublic : tape::sealed::ThisThreadTape
-{ }
-impl<V> ThisThreadTapePublic for V
-where
-    V : tape::sealed::ThisThreadTape ,
-{ }
-//
-// AtomEvalVec
-/// This is the public interface to a sealed trait
-pub trait AtomEvalVecPublic : atom::sealed::AtomEvalVec
-{ }
-impl<V> AtomEvalVecPublic for V
-where
-    V : atom::sealed::AtomEvalVec ,
-{ }
-// ---------------------------------------------------------------------------
-// re-export
-//
-pub use ad::{
-    AD,
-    ad_from_vector,
-    ad_to_vector,
-    doc_generic_v,
-};
-pub use adfn::{
-    ADfn,
-    doc_generic_e,
-};
-pub use tape::{
-    IndexT,
-    start_recording,
-    stop_recording,
-};
-pub use atom::{
-    register_atom,
-    call_atom,
-    AtomEval,
-};
-//
-pub use op::info::{
-    OpInfo,
-};
-// ---------------------------------------------------------------------------
 //
 // NumVec
 /// The numeric vector type
@@ -126,7 +58,7 @@ impl<S> NumVec<S>
 ///
 /// # Example
 ///```
-/// use rustad::numvec::NumVec;
+/// use rustad::NumVec;
 ///
 /// let a  = NumVec::new( vec![ 1f64, 2f64 ] );
 /// let b  = NumVec::from( 3f64 );
@@ -204,7 +136,7 @@ numvec_binary_op!(Div, /);
 ///
 /// # Example
 ///```
-/// use rustad::numvec::NumVec;
+/// use rustad::NumVec;
 ///
 /// let mut a = NumVec::new( vec![ 12f64, 6f64 ] );
 /// let mut b = NumVec::from( 3f64 );
@@ -273,8 +205,8 @@ numvec_compound_op!(DivAssign, /=);
 ///
 /// # Example using NumVec
 /// ```
-/// use rustad::numvec::AD;
-/// use rustad::numvec::NumVec;
+/// use rustad::AD;
+/// use rustad::NumVec;
 /// let x     : Vec<f64>  = vec![5.0, 6.0];
 /// let x_nv              = NumVec::new(x);
 /// let s                 = format!( "{x_nv}" );
@@ -295,7 +227,7 @@ impl<S : std::fmt::Display> std::fmt::Display for NumVec<S> {
 ///
 /// # Example
 /// ```
-/// use rustad::numvec::NumVec;
+/// use rustad::NumVec;
 ///
 /// // f32 -> NumVec<f32>
 /// let x                  = 3.0 as f32;

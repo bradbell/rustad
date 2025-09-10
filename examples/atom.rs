@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-use rustad::numvec::{
+use rustad::{
     start_recording,
     stop_recording,
     register_atom,

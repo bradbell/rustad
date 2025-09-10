@@ -8,14 +8,14 @@
 // ---------------------------------------------------------------------------
 // use
 //
-use crate::numvec::ad::AD;
-use crate::numvec::op::id::NUMBER_OP;
-use crate::numvec::IndexT;
-use crate::numvec::tape::sealed::ThisThreadTape;
-use crate::numvec::atom::sealed::AtomEvalVec;
+use crate::ad::AD;
+use crate::op::id::NUMBER_OP;
+use crate::IndexT;
+use crate::tape::sealed::ThisThreadTape;
+use crate::atom::sealed::AtomEvalVec;
 //
 #[cfg(doc)]
-use crate::numvec::{
+use crate::{
     doc_generic_v,
     doc_generic_e,
 };
@@ -175,7 +175,7 @@ pub struct OpInfo<V> {
 }
 // ---------------------------------------------------------------------------
 // op_info_vec
-/// returns the vector of length crate::numvec::op::id::NUMBER_OP
+/// returns the vector of length crate::op::id::NUMBER_OP
 /// that maps each operator id to it's [OpInfo] .
 ///
 pub fn op_info_vec<V>() -> Vec< OpInfo<V> >
@@ -208,11 +208,11 @@ where
         arg_var_index    : panic_arg_var_index,
     };
     let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
-    crate::numvec::op::add::set_op_info::<V>(&mut result);
-    crate::numvec::op::sub::set_op_info::<V>(&mut result);
-    crate::numvec::op::mul::set_op_info::<V>(&mut result);
-    crate::numvec::op::div::set_op_info::<V>(&mut result);
-    crate::numvec::op::call::set_op_info::<V>(&mut result);
+    crate::op::add::set_op_info::<V>(&mut result);
+    crate::op::sub::set_op_info::<V>(&mut result);
+    crate::op::mul::set_op_info::<V>(&mut result);
+    crate::op::div::set_op_info::<V>(&mut result);
+    crate::op::call::set_op_info::<V>(&mut result);
     result
 }
 // ---------------------------------------------------------------------------
@@ -239,21 +239,21 @@ where
 /// ```text
 ///     use std::thread::LocalKey;
 ///     use std::cell::RefCell;
-///     use crate::numvec::ad::AD;
+///     use crate::ad::AD;
 /// ```
 macro_rules! impl_global_op_info_vec{ ($V:ty) => {
     #[doc = concat!(
         "Operator information used when evaluating `",
         stringify!($V), "`, and `AD<", stringify!($V), ">` operations"
     ) ]
-    impl crate::numvec::op::info::GlobalOpInfoVec for $V {
+    impl crate::op::info::GlobalOpInfoVec for $V {
         fn get() -> &'static LazyLock<
-            Vec< crate::numvec::op::info::OpInfo<$V> >
+            Vec< crate::op::info::OpInfo<$V> >
         > {
             pub static OP_INFO_VEC :
-                LazyLock< Vec< crate::numvec::op::info::OpInfo<$V> > > =
+                LazyLock< Vec< crate::op::info::OpInfo<$V> > > =
                     LazyLock::new(
-                        || crate::numvec::op::info::op_info_vec::<$V>()
+                        || crate::op::info::op_info_vec::<$V>()
                     );
             &OP_INFO_VEC
         }

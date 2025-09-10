@@ -7,7 +7,7 @@
 // ---------------------------------------------------------------------------
 use std::cell::RefCell;
 //
-use rustad::numvec::{
+use rustad::{
     AD,
     ADfn,
     start_recording,

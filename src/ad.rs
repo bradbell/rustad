@@ -11,10 +11,10 @@
 use std::thread::LocalKey;
 use std::cell::RefCell;
 //
-use crate::numvec::IndexT;
-use crate::numvec::tape::Tape;
-use crate::numvec::tape::sealed::ThisThreadTape;
-use crate::numvec::op::id;
+use crate::IndexT;
+use crate::tape::Tape;
+use crate::tape::sealed::ThisThreadTape;
+use crate::op::id;
 // ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter V.
 ///
@@ -88,8 +88,8 @@ impl<V> AD<V> {
     ///
     /// # Example using NumVec
     /// ```
-    /// use rustad::numvec::AD;
-    /// use rustad::numvec::NumVec;
+    /// use rustad::AD;
+    /// use rustad::NumVec;
     /// let v   : Vec<f64>    = vec![ 2.0, 3.0 ];
     /// let nv                = NumVec::new(v);
     /// let av                = AD::from(nv);
@@ -108,7 +108,7 @@ impl<V> AD<V> {
 ///
 /// # Example
 /// ```
-/// use rustad::numvec::AD;
+/// use rustad::AD;
 /// let x  : f64  = 5.0;
 /// let ax        = AD::from(x);
 /// let s         = format!( "{ax}" );
@@ -117,8 +117,8 @@ impl<V> AD<V> {
 ///
 /// # Example using NumVec
 /// ```
-/// use rustad::numvec::AD;
-/// use rustad::numvec::NumVec;
+/// use rustad::AD;
+/// use rustad::NumVec;
 /// let x  : Vec<f64>  = vec![ 5.0, 6.0 ];
 /// let x_nv           = NumVec::new(x);
 /// let ax             = AD::from(x_nv);
@@ -153,7 +153,7 @@ impl<V : std::fmt::Display> std::fmt::Display for AD<V> {
 ///
 /// # Example
 ///```
-/// use rustad::numvec::AD;
+/// use rustad::AD;
 ///
 /// let ax  = AD::from( 3.0f32 );
 /// let y   = 4.0f32;
@@ -168,8 +168,8 @@ impl<V : std::fmt::Display> std::fmt::Display for AD<V> {
 ///
 /// # Example using NumVec
 /// ```
-/// use rustad::numvec::AD;
-/// use rustad::numvec::NumVec;
+/// use rustad::AD;
+/// use rustad::NumVec;
 ///
 /// let x     : Vec<f64> = vec![ 1.0, 4.0 ];
 /// let y     : Vec<f64> = vec![ 2.0, 2.0 ];
@@ -236,7 +236,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     impl<V> std::ops::$Name< &AD<V> > for &AD<V>
     where
         for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
-        V    : Clone + crate::numvec::ThisThreadTapePublic ,
+        V    : Clone + crate::ThisThreadTapePublic ,
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self , rhs : &AD<V> ) -> AD<V>
@@ -292,7 +292,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     impl<V> std::ops::$Name< &V> for &AD<V>
     where
         for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
-        V            : Clone + crate::numvec::ThisThreadTapePublic ,
+        V            : Clone + crate::ThisThreadTapePublic ,
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self , rhs : &V ) -> AD<V>
@@ -340,7 +340,7 @@ ad_binary_op!(Div, /);
 ///
 /// # Example
 /// ```
-/// use rustad::numvec::AD;
+/// use rustad::AD;
 ///
 /// let mut ax   = AD::from( 3.0f64 );
 /// let y        = 4.0f64;
@@ -350,8 +350,8 @@ ad_binary_op!(Div, /);
 ///
 /// # Example using NumVec
 /// ```
-/// use rustad::numvec::AD;
-/// use rustad::numvec::NumVec;
+/// use rustad::AD;
+/// use rustad::NumVec;
 ///
 /// let x     : Vec<f32>  = vec![ 1.0, 4.0 ];
 /// let y     : Vec<f32>  = vec![ 2.0, 2.0 ];
@@ -420,7 +420,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     where
         V: Clone +
             for<'a> std::ops::[< $Name Assign >] <&'a V> +
-            crate::numvec::ThisThreadTapePublic  ,
+            crate::ThisThreadTapePublic  ,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : &AD<V> )
         {   //
@@ -469,7 +469,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     where
         V: Clone +
             for<'a> std::ops::[< $Name Assign >] <&'a V> +
-            crate::numvec::ThisThreadTapePublic  ,
+            crate::ThisThreadTapePublic  ,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : &V)
         {   //
@@ -562,18 +562,18 @@ record_value_op_ad!(Div, /=);
 /// ```text
 ///     use std::thread::LocalKey;
 ///     use std::cell::RefCell;
-///     use crate::numvec::ad::AD;
+///     use crate::ad::AD;
 /// ```
 macro_rules! impl_value_op_ad{
     ($V:ty)                      => {
-        crate::numvec::ad::impl_value_op_ad!($V, Add, +);
-        crate::numvec::ad::impl_value_op_ad!($V, Sub, -);
-        crate::numvec::ad::impl_value_op_ad!($V, Mul, *);
-        crate::numvec::ad::impl_value_op_ad!($V, Div, /);
+        crate::ad::impl_value_op_ad!($V, Add, +);
+        crate::ad::impl_value_op_ad!($V, Sub, -);
+        crate::ad::impl_value_op_ad!($V, Mul, *);
+        crate::ad::impl_value_op_ad!($V, Div, /);
     };
     ($V:ty, $Name:ident, $Op:tt) => { paste::paste! {
         #[doc =
-        "see [doc_ad_binary_op](crate::numvec::ad::doc_ad_binary_op)"
+        "see [doc_ad_binary_op](crate::ad::doc_ad_binary_op)"
         ]
         impl std::ops::$Name< &AD<$V> > for & $V
         where
@@ -593,13 +593,13 @@ macro_rules! impl_value_op_ad{
                 //
                 // local_key
                 let local_key : &LocalKey<
-                    RefCell< crate::numvec::tape::Tape<$V> >
-                > = crate::numvec::tape::sealed::ThisThreadTape::get();
+                    RefCell< crate::tape::Tape<$V> >
+                > = crate::tape::sealed::ThisThreadTape::get();
                 //
                 // new_tape_id, new_var_index
                 let (new_tape_id, new_var_index) = local_key.with_borrow_mut(
                     |tape|
-                    crate::numvec::ad::[< record_value_ $Name:lower _ad >]::<$V>
+                    crate::ad::[< record_value_ $Name:lower _ad >]::<$V>
                             ( tape, &self, &rhs )
                 );
                 //
@@ -619,8 +619,8 @@ pub(crate) use impl_value_op_ad;
 ///
 /// # Example
 /// ```
-/// use rustad::numvec::AD;
-/// use rustad::numvec::ad_from_vector;
+/// use rustad::AD;
+/// use rustad::ad_from_vector;
 /// let x  : Vec<f64>  = vec![ 3.0, 4.0 ];
 /// let ax             = ad_from_vector(x);
 /// assert_eq!( ax[0].clone().to_value(), 3.0 );
@@ -644,8 +644,8 @@ pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
 ///
 /// # Example
 /// ```
-/// use rustad::numvec::AD;
-/// use rustad::numvec::ad_to_vector;
+/// use rustad::AD;
+/// use rustad::ad_to_vector;
 /// let ax    = vec![ AD::from(3f64), AD::from(4f64) ];
 /// let y     = ad_to_vector(ax);
 /// assert_eq!( y , vec![ 3f64, 4f64 ] );
@@ -653,10 +653,10 @@ pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
 ///
 /// # Example using NumVec
 /// ```
-/// use rustad::numvec::AD;
-/// use rustad::numvec::NumVec;
-/// use rustad::numvec::ad_from_vector;
-/// use rustad::numvec::ad_to_vector;
+/// use rustad::AD;
+/// use rustad::NumVec;
+/// use rustad::ad_from_vector;
+/// use rustad::ad_to_vector;
 /// let v_0  : Vec<f32>   = vec![ 2.0, 3.0 ];
 /// let nv_0              = NumVec::new(v_0);
 /// let v_1  : Vec<f32>   = vec![ 4.0, 5.0 ];
@@ -682,7 +682,7 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
 ///
 /// # Example
 /// ```
-/// use rustad::numvec::AD;
+/// use rustad::AD;
 /// let x  : f32  = 3.0;
 /// let ax        = AD::from(x);
 /// assert_eq!( ax.to_value(), 3.0 );

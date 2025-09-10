@@ -12,11 +12,11 @@ use std::cell::RefCell;
 use std::thread::LocalKey;
 use std::sync::Mutex;
 //
-use crate::numvec::AD;
-use crate::numvec::ADfn;
+use crate::AD;
+use crate::ADfn;
 //
 #[cfg(doc)]
-use crate::numvec::doc_generic_v;
+use crate::doc_generic_v;
 //
 /// The type is used, instead of usize, to save space in vectors of indices.
 pub type IndexT = u32;
@@ -144,14 +144,14 @@ macro_rules! impl_this_thread_tape{ ($V:ty) => {
         "This threads tape for recording ",
         "`AD<" , stringify!($V), ">` operations"
     ) ]
-    impl crate::numvec::tape::sealed::ThisThreadTape for $V {
+    impl crate::tape::sealed::ThisThreadTape for $V {
         fn get() -> &'static LocalKey<
-                RefCell< crate::numvec::tape::Tape<$V> >
+                RefCell< crate::tape::Tape<$V> >
             > {
             thread_local! {
                 pub(crate) static THIS_THREAD_TAPE : RefCell<
-                    crate::numvec::tape::Tape<$V>
-                > = RefCell::new( crate::numvec::tape::Tape::new() );
+                    crate::tape::Tape<$V>
+                > = RefCell::new( crate::tape::Tape::new() );
             }
             &THIS_THREAD_TAPE
         }
@@ -263,8 +263,8 @@ where
 /// ```
 /// # Example
 /// ```
-/// use rustad::numvec::start_recording;
-/// use rustad::numvec::stop_recording;
+/// use rustad::start_recording;
+/// use rustad::stop_recording;
 /// let domain  : Vec<f32>  = vec![ 1.0, 2.0 ];
 /// let adomain             = start_recording( domain );
 /// let sum                 = &adomain[0] + &adomain[1];

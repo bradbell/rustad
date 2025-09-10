@@ -15,11 +15,11 @@ use std::sync::RwLock;
 use std::thread::LocalKey;
 use std::cell::RefCell;
 //
-use crate::numvec::op::id::CALL_OP;
-use crate::numvec::op::id::CALL_RES_OP;
-use crate::numvec::tape::Tape;
-use crate::numvec::tape::sealed::ThisThreadTape;
-use crate::numvec::{
+use crate::op::id::CALL_OP;
+use crate::op::id::CALL_RES_OP;
+use crate::tape::Tape;
+use crate::tape::sealed::ThisThreadTape;
+use crate::{
     IndexT,
     AD,
     ad_from_vector,
@@ -28,12 +28,12 @@ use crate::numvec::{
 };
 //
 #[cfg(doc)]
-use crate::numvec::{
+use crate::{
         doc_generic_v,
         ADfn,
 };
 #[cfg(doc)]
-use crate::numvec::adfn::{
+use crate::adfn::{
     forward_zero::doc_forward_zero,
     forward_one::doc_forward_one,
     reverse_one::doc_reverse_one,
@@ -197,11 +197,11 @@ macro_rules! impl_atom_eval_vec{ ($V:ty) => {
     #[doc = concat!(
         "The atomic evaluation vector for value type `", stringify!($V), "`"
     ) ]
-    impl crate::numvec::atom::sealed::AtomEvalVec for $V {
+    impl crate::atom::sealed::AtomEvalVec for $V {
         fn get() -> &'static
-        RwLock< Vec< crate::numvec::atom::AtomEval<$V> > > {
+        RwLock< Vec< crate::atom::AtomEval<$V> > > {
             pub(crate) static ATOM_EVAL_VEC :
-            RwLock< Vec< crate::numvec::atom::AtomEval<$V> > > =
+            RwLock< Vec< crate::atom::AtomEval<$V> > > =
                 RwLock::new( Vec::new() );
             &ATOM_EVAL_VEC
         }
