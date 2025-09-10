@@ -143,7 +143,7 @@ fn test_forward_zero(sumsq_atom_id : IndexT) {
     let x       : Vec<V> = vec![ 1.0 , 2.0 ];
     let ax               = start_recording(x);
     let call_info        = 0 as IndexT;
-    let ay               = call_atom(sumsq_atom_id, call_info, ax, trace);
+    let ay               = call_atom(ax, sumsq_atom_id, call_info, trace);
     let f                = stop_recording(ay);
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
     let mut v   : Vec<V> = Vec::new();
@@ -161,7 +161,7 @@ fn test_forward_one(sumsq_atom_id : IndexT) {
     let x       : Vec<V> = vec![ 1.0 , 2.0 ];
     let ax               = start_recording(x);
     let call_info        = 1 as IndexT;
-    let ay               = call_atom(sumsq_atom_id, call_info, ax, trace);
+    let ay               = call_atom(ax, sumsq_atom_id, call_info, trace);
     let f                = stop_recording(ay);
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
     let mut v   : Vec<V> = Vec::new();
@@ -181,7 +181,7 @@ fn test_reverse_one(sumsq_atom_id : IndexT) {
     let x       : Vec<V> = vec![ 1.0 , 2.0 ];
     let ax               = start_recording(x);
     let call_info        = 1 as IndexT;
-    let ay               = call_atom(sumsq_atom_id, call_info, ax, trace);
+    let ay               = call_atom(ax, sumsq_atom_id, call_info, trace);
     let f                = stop_recording(ay);
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
     let mut v   : Vec<V> = Vec::new();

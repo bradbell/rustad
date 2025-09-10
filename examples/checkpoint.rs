@@ -31,7 +31,7 @@ thread_local! {
 fn checkpoint_forward_zero(
     var_zero         : &mut Vec<V> ,
     domain_zero_ref  : Vec<&V>     ,
-    adfn_index       : IndexT      ,
+    call_info        : IndexT      ,
     trace            : bool        ,
 ) -> Vec<V>
 {   //
@@ -46,7 +46,7 @@ fn checkpoint_forward_zero(
     // range_zero
     let mut range_zero : Vec<V> = Vec::new();
     ADFN_VEC.with_borrow( |f_vec| {
-       let f      = &f_vec[adfn_index as usize];
+       let f      = &f_vec[call_info as usize];
        range_zero = f.forward_zero_value(var_zero, domain_zero, trace);
     } );
     range_zero
@@ -57,7 +57,7 @@ fn checkpoint_forward_zero(
 fn checkpoint_forward_one(
     var_zero         : &Vec<V>     ,
     domain_one_ref   : Vec<&V>     ,
-    adfn_index       : IndexT      ,
+    call_info        : IndexT      ,
     trace            : bool        ,
 ) -> Vec<V>
 {   //
@@ -72,7 +72,7 @@ fn checkpoint_forward_one(
     // range_one
     let mut range_one : Vec<V> = Vec::new();
     ADFN_VEC.with_borrow( |f_vec| {
-       let f     = &f_vec[adfn_index as usize];
+       let f     = &f_vec[call_info as usize];
        range_one = f.forward_one_value(&var_zero, domain_one, trace);
     } );
     range_one
@@ -83,7 +83,7 @@ fn checkpoint_forward_one(
 fn checkpoint_reverse_one(
     var_zero         : &Vec<V>     ,
     range_one_ref    : Vec<&V>     ,
-    adfn_index       : IndexT      ,
+    call_info        : IndexT      ,
     trace            : bool        ,
 ) -> Vec<V>
 {   //
@@ -98,7 +98,7 @@ fn checkpoint_reverse_one(
     // domain_one
     let mut domain_one : Vec<V> = Vec::new();
     ADFN_VEC.with_borrow( |f_vec| {
-       let f      = &f_vec[adfn_index as usize];
+       let f      = &f_vec[call_info as usize];
        domain_one = f.reverse_one_value(var_zero, range_one, trace);
     } );
     domain_one
@@ -108,7 +108,7 @@ fn checkpoint_reverse_one(
 // -------------------------------------------------------------------------
 fn checkpoint_forward_depend(
     is_var_domain  : &Vec<bool> ,
-    adfn_index     : IndexT     ,
+    call_info      : IndexT     ,
     trace          : bool       ,
 ) -> Vec<bool>
 {   //
@@ -116,7 +116,7 @@ fn checkpoint_forward_depend(
     let mut dependency : Vec< [usize; 2] > = Vec::new();
     let mut call_n_res : usize             = 0;
     ADFN_VEC.with_borrow( |f_vec| {
-       let f       = &f_vec[adfn_index as usize];
+       let f       = &f_vec[call_info as usize];
        dependency = f.sub_sparsity(trace);
        call_n_res = f.range_len();
     } );
@@ -170,8 +170,8 @@ fn main() {
     let ay          = vec![ asumsq ];
     let f           = stop_recording(ay);
     //
-    // adfn_index, ADFN_VEC
-    let adfn_index = ADFN_VEC.with_borrow_mut( |f_vec| {
+    // call_info , ADFN_VEC
+    let call_info  = ADFN_VEC.with_borrow_mut( |f_vec| {
             let index = f_vec.len() as IndexT;
             f_vec.push( f );
             index
@@ -180,7 +180,7 @@ fn main() {
     // g
     let x   : Vec<V> = vec![ 1.0 , 2.0 ];
     let ax           = start_recording(x);
-    let ay           = call_atom(atom_id, adfn_index, ax, trace);
+    let ay           = call_atom(ax, atom_id, call_info, trace);
     let g            = stop_recording(ay);
     //
     // g.forward_zero_value

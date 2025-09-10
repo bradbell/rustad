@@ -256,10 +256,10 @@ where
 fn record_call_atom<V>(
     tape             : &mut Tape<V>                  ,
     forward_depend   : ForwardDepend                 ,
+    adomain          : Vec< AD<V> >                  ,
     range_zero       : Vec<V>                        ,
     atom_id          : IndexT                        ,
     call_info        : IndexT                        ,
-    adomain          : Vec< AD<V> >                  ,
     trace            : bool                          ,
 ) -> Vec< AD<V> >
 where
@@ -366,9 +366,9 @@ where
 /// if true, a trace of the calculations may be printed on stdout.
 /// This may be useful for debugging atomic functions.
 pub fn call_atom<V>(
+    adomain     : Vec< AD<V> > ,
     atom_id     : IndexT       ,
     call_info   : IndexT       ,
-    adomain     : Vec< AD<V> > ,
     trace       : bool         ,
 ) -> Vec< AD<V> >
 where
@@ -420,10 +420,10 @@ where
         arange = local_key.with_borrow_mut( |tape| record_call_atom::<V>(
             tape,
             forward_depend,
+            adomain,
             range_zero,
             atom_id,
             call_info,
-            adomain,
             trace,
         ) );
     }
