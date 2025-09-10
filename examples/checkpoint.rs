@@ -54,7 +54,7 @@ fn checkpoint_forward_zero(
 // checkpoint_forward_one
 // -------------------------------------------------------------------------
 fn checkpoint_forward_one(
-    var_zero         : &mut Vec<V> ,
+    var_zero         : &Vec<V>     ,
     domain_one_ref   : &Vec<&V>    ,
     trace            : bool        ,
     adfn_index       : IndexT      ) -> Vec<V>
@@ -79,7 +79,7 @@ fn checkpoint_forward_one(
 // checkpoint_reverse_one
 // -------------------------------------------------------------------------
 fn checkpoint_reverse_one(
-    var_zero         : &mut Vec<V> ,
+    var_zero         : &Vec<V>     ,
     range_one_ref    : &Vec<&V>    ,
     trace            : bool        ,
     adfn_index       : IndexT      ) -> Vec<V>

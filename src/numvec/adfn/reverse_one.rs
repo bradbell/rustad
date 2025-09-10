@@ -87,7 +87,7 @@ use crate::numvec::adfn::forward_zero::doc_forward_zero;
 /// let mut c0 : Vec<V> = Vec::new();
 /// let y0              = f.forward_zero_value(&mut c0, x0, trace);
 /// let y1     : Vec<V> = vec![ 1.0 ];
-/// let x1              = f.reverse_one_value(&mut c0, y1, trace);
+/// let x1              = f.reverse_one_value(&c0, y1, trace);
 /// //
 /// assert_eq!( x1[0] , 5.0 * 6.0 );
 /// assert_eq!( x1[1] , 4.0 * 6.0 );
@@ -116,9 +116,9 @@ macro_rules! reverse_one {
         )]
         pub fn [< reverse_one_ $suffix >] (
             &self,
-            var_zero    : &mut Vec<$E> ,
-            range_one   : Vec<$E>      ,
-            trace       : bool         ,
+            var_zero    : &Vec<$E>  ,
+            range_one   : Vec<$E>   ,
+            trace       : bool      ,
         ) -> Vec<$E>
         {
             assert_eq!(

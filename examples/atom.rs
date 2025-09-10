@@ -46,7 +46,7 @@ fn sumsq_forward_zero(
 // sumsq_forward_one
 // -------------------------------------------------------------------------
 fn sumsq_forward_one(
-    domain_zero  : &mut Vec<V> ,
+    domain_zero  : &Vec<V>     ,
     domain_one   : &Vec<&V>    ,
     trace        : bool        ,
     call_info    : IndexT      ) -> Vec<V>
@@ -73,7 +73,7 @@ fn sumsq_forward_one(
 // sumsq_reverse_one
 // -------------------------------------------------------------------------
 fn sumsq_reverse_one(
-    domain_zero  : &mut Vec<V> ,
+    domain_zero  : &Vec<V>     ,
     range_one    : &Vec<&V>    ,
     trace        : bool        ,
     call_info    : IndexT      ) -> Vec<V>

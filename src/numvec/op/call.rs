@@ -50,7 +50,8 @@ use crate::numvec::op::info::{
     panic_one,
 };
 use crate::numvec::atom::{
-    Callback,
+    CallbackZero,
+    CallbackOne,
     sealed::AtomEvalVec,
 };
 use crate::numvec::op::id::{
@@ -105,7 +106,7 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero
-    let forward_zero : Callback<V>;
+    let forward_zero : CallbackZero<V>;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -182,8 +183,8 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero, forward_one
-    let forward_zero : Callback<V>;
-    let forward_one : Callback<V>;
+    let forward_zero : CallbackZero<V>;
+    let forward_one  : CallbackOne<V>;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -216,7 +217,7 @@ where
     }
     // call_range_one
     let mut call_range_one = forward_one(
-        &mut call_var_zero, &call_domain_one, trace, call_info
+        &call_var_zero, &call_domain_one, trace, call_info
     );
     //
     // var_one
@@ -275,8 +276,8 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero, reverse_one
-    let forward_zero : Callback<V>;
-    let reverse_one : Callback<V>;
+    let forward_zero : CallbackZero<V>;
+    let reverse_one  : CallbackOne<V>;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -310,7 +311,7 @@ where
     }
     // call_domain_one
     let call_domain_one = reverse_one(
-        &mut call_var_zero, &call_range_one, trace, call_info
+        &call_var_zero, &call_range_one, trace, call_info
     );
     //
     // var_one
