@@ -50,8 +50,9 @@ use crate::numvec::op::info::{
     panic_one,
 };
 use crate::numvec::atom::{
-    CallbackZero,
-    CallbackOne,
+    AtomForwardZero,
+    AtomForwardOne,
+    AtomReverseOne,
     sealed::AtomEvalVec,
 };
 use crate::numvec::op::id::{
@@ -106,7 +107,7 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero
-    let forward_zero : CallbackZero<V>;
+    let forward_zero : AtomForwardZero<V>;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -183,8 +184,8 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero, forward_one
-    let forward_zero : CallbackZero<V>;
-    let forward_one  : CallbackOne<V>;
+    let forward_zero : AtomForwardZero<V>;
+    let forward_one  : AtomForwardOne<V>;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -276,8 +277,8 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero, reverse_one
-    let forward_zero : CallbackZero<V>;
-    let reverse_one  : CallbackOne<V>;
+    let forward_zero : AtomForwardZero<V>;
+    let reverse_one  : AtomReverseOne<V>;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();

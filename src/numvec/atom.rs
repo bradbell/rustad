@@ -40,18 +40,113 @@ use crate::numvec::adfn::{
 };
 // ---------------------------------------------------------------------------
 //
-// Callback
-/// Atomic function evaluation type.
+// AtomForwardZero
+/// Callback to atomic functions during [ADfn::forward_zero_value]
 ///
-pub type CallbackZero<V> = fn(
+/// * Syntax :
+/// ```text
+///     range_zero = forward_zero_value(
+///         &mut var_zero, domain_zero, trace, call_info
+///     )
+/// ```
+///
+/// * var_zero
+/// This vector will have size zero on input.
+/// It can be used to cache information for use by forward_one
+/// and reverse one (and has no other restrictions).
+///
+/// * domain_zero :
+/// this contains the value of the atomic function domain variables.
+///
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+///
+/// * call_info :
+/// is the *call_info* value used when the atomic function was called.
+///
+/// * range_zero :
+/// this contains the value of the atomic function range variables.
+///
+pub type AtomForwardZero<V> = fn(
     _var_zero      : &mut Vec<V> ,
     _domain_zero   : Vec<&V>     ,
     _trace         : bool        ,
     _call_info     : IndexT      ,
 ) -> Vec<V> ;
-pub type CallbackOne<V> = fn(
+//
+// AtomForwardOne
+/// Callback to atomic functions during [ADfn::forward_one_value]
+///
+/// If you do not expect to use an atomic function with forward_one,
+/// it can just panic if it gets used.
+///
+/// Syntax :
+/// ```text
+///     range_one = forward_one_value(
+///         &mut var_zero, domain_one, trace, call_info
+///     )
+/// ```
+/// * var_zero :
+/// This will contain the values set by forward_zero for the
+/// same call to this atomic function; i.e., same [call_atom].
+///
+/// * domain_one :
+/// this contains the direction for the directional derivative.
+///
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+///
+/// * call_info :
+/// is the *call_info* value used when the atomic function was called.
+///
+/// * range_one :
+/// Let *domain_zero* be its value in the call to forward_zero
+/// that set *var_zero* . The return value is
+/// ```text
+///     range_one = f'(domain_zero) * domain_one
+/// ```
+pub type AtomForwardOne<V> = fn(
     _var_zero      : &Vec<V>     ,
-    _vec_in        : Vec<&V>     ,
+    _domain_one    : Vec<&V>     ,
+    _trace         : bool        ,
+    _call_info     : IndexT      ,
+) -> Vec<V> ;
+//
+// AtomReverseOne
+/// Callback to atomic functions during [ADfn::reverse_one_value]
+///
+/// If you do not expect to use an atomic function with reverse_one,
+/// it can just panic if it gets used.
+///
+/// * Syntax :
+/// ```text
+///     domain_one = reverse_one_value(
+///         &var_zero, range_one, trace, call_info
+///     )
+/// ```
+///
+/// * var_zero :
+/// This will contain the values set by forward_zero for the
+/// same call to this atomic function; i.e., same [call_atom].
+///
+/// * range_one :
+/// this contains the function weights for the partial derivatives.
+///
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+///
+/// * call_info :
+/// is the *call_info* value used when the atomic function was called.
+///
+/// * domain_one :
+/// Let *domain_zero* be its value in the call to forward_zero
+/// that set *var_zero* . The return value is
+/// ```text
+///     domain_one = range_one * f'(domain_zero)
+/// ```
+pub type AtomReverseOne<V> = fn(
+    _var_zero      : &Vec<V>     ,
+    _range_one     : Vec<&V>     ,
     _trace         : bool        ,
     _call_info     : IndexT      ,
 ) -> Vec<V> ;
@@ -76,123 +171,12 @@ pub type ForwardDepend = fn(
 )-> Vec<bool>;
 //
 // AtomEval
-/// Functions that evaluate an atomic function.
+/// Atomic function evaluation routines.
 pub struct AtomEval<V> {
-    // forward_zero_value
-    /// Callback function used during [ADfn::forward_zero_value]
-    ///
-    /// * Syntax :
-    /// ```text
-    ///     range_zero = forward_zero_value(
-    ///         &mut var_zero, domain_zero, trace, call_info
-    ///     )
-    /// ```
-    ///
-    /// * Prototype :
-    /// see [CallbackZero]
-    ///
-    /// * var_zero
-    /// This vector will have size zero on input.
-    /// It can be used to cache information for use by forward_one
-    /// and reverse one (and has no other restrictions).
-    ///
-    /// * domain_zero :
-    /// this contains the value of the atomic function domain variables.
-    ///
-    /// * trace :
-    /// if true, a trace of the calculations may be printed on stdout.
-    ///
-    /// * call_info :
-    /// is the *call_info* value used when the atomic function was called.
-    ///
-    /// * range_zero :
-    /// this contains the value of the atomic function range variables.
-    ///
-    pub  forward_zero_value : CallbackZero::<V> ,
-    //
-    // forward_one_value
-    /// Callback function used during [ADfn::forward_one_value]
-    ///
-    /// If you do not expect to use this atomic function with forward_one,
-    /// you can it just panic if it gets used.
-    ///
-    /// Syntax :
-    /// ```text
-    ///     range_one = forward_one_value(
-    ///         &mut var_zero, domain_one, trace, call_info
-    ///     )
-    /// ```
-    ///
-    /// * Prototype :
-    /// see [CallbackOne]
-    ///
-    /// * var_zero :
-    /// This will contain the values set by forward_zero for the
-    /// same call to this atomic function; i.e., same [call_atom].
-    ///
-    /// * domain_one :
-    /// this contains the direction for the directional derivative
-    /// ( this is called called *vec_in* in [CallbackOne] ).
-    ///
-    /// * trace :
-    /// if true, a trace of the calculations may be printed on stdout.
-    ///
-    /// * call_info :
-    /// is the *call_info* value used when the atomic function was called.
-    ///
-    /// * range_one :
-    /// Let *domain_zero* be its value in the call to forward_zero
-    /// that set *var_zero* . The return value is
-    /// ```text
-    ///     range_one = f'(domain_zero) * domain_one
-    /// ```
-    pub  forward_one_value  : CallbackOne::<V> ,
-    //
-    // reverse_one_value
-    /// Callback function used during [ADfn::reverse_one_value]
-    ///
-    /// If you do not expect to use this atomic function with reverse_one,
-    /// you can it just panic if it gets used.
-    ///
-    ///
-    /// * Syntax :
-    /// ```text
-    ///     domain_one = reverse_one_value(
-    ///         &var_zero, range_one, trace, call_info
-    ///     )
-    /// ```
-    ///
-    /// * Prototype :
-    /// see [CallbackOne]
-    ///
-    /// * var_zero :
-    /// This will contain the values set by forward_zero for the
-    /// same call to this atomic function; i.e., same [call_atom].
-    ///
-    /// * range_one :
-    /// this contains the function weights for the partial derivatives
-    /// ( this is called *vec_in* in [CallbackOne] ).
-    ///
-    /// * trace :
-    /// if true, a trace of the calculations may be printed on stdout.
-    ///
-    /// * call_info :
-    /// is the *call_info* value used when the atomic function was called.
-    ///
-    /// * domain_one :
-    /// Let *domain_zero* be its value in the call to forward_zero
-    /// that set *var_zero* . The return value is
-    /// ```text
-    ///     domain_one = range_one * f'(domain_zero)
-    /// ```
-    pub  reverse_one_value  : CallbackOne::<V> ,
-    //
-    // forward_depend
-    /// Callback function used during forward_zero to determine
-    /// which range components are variables.
-    ///
-    /// A range component that depends on a variable is also a variable.
-    pub forward_depend  : ForwardDepend ,
+    pub forward_zero_value : AtomForwardZero::<V> ,
+    pub forward_one_value  : AtomForwardOne::<V>  ,
+    pub reverse_one_value  : AtomReverseOne::<V>  ,
+    pub forward_depend     : ForwardDepend        ,
 }
 // ----------------------------------------------------------------------------
 pub (crate) mod sealed {
@@ -414,7 +398,7 @@ where
     let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
     //
     // forward_zero, forward_depend
-    let forward_zero : CallbackZero<V>;
+    let forward_zero   : AtomForwardZero<V>;
     let forward_depend : ForwardDepend;
     {   //
         // read_lock
