@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
 // ---------------------------------------------------------------------------
-// TODO: convert this example in to a general purpose checkpoint routine.
+// TODO: convert this example in to a general purpose checkpoint utility.
 // ---------------------------------------------------------------------------
 use std::cell::RefCell;
 //
@@ -109,21 +109,22 @@ fn checkpoint_forward_depend(
     adfn_index     : IndexT     ) -> Vec<bool>
 {   //
     // dependency
-    let dependency = ADFN_VEC.with_borrow( |f_vec| {
+    let mut dependency : Vec< [usize; 2] > = Vec::new();
+    let mut call_n_res : usize             = 0;
+    ADFN_VEC.with_borrow( |f_vec| {
        let f       = &f_vec[adfn_index as usize];
-       let pattern = f.sub_sparsity(trace);
-       pattern
+       dependency = f.sub_sparsity(trace);
+       call_n_res = f.range_len();
     } );
     //
     // is_var_range
-    let mut is_var_range = false;
+    let mut is_var_range = vec![false; call_n_res];
     for [i,j] in dependency {
-        assert_eq!(i, 0);
         if is_var_domain[j] {
-            is_var_range = true;
+            is_var_range[i] = true;
         }
     }
-    vec![ is_var_range ]
+    is_var_range
 }
 // -------------------------------------------------------------------------
 // register_checkpoint_atom
