@@ -35,6 +35,7 @@ fn test_add_vv() {
     //
     assert_eq!( dx[0], dy[0] );
     assert_eq!( dx[1], dy[0] + dy[1] );
+    assert_eq!( dx[2], dy[1] );
 }
 //
 #[test]
