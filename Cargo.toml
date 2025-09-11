@@ -3,12 +3,24 @@
 # SPDX-FileContributor: 2025 Bradley M. Bell
 
 [package]
-name = "rustad"
-version = "0.0.0"
-edition = "2024"
+name           = "rustad"
+version        = "0.0.0"
+authors        = [ "Bradley M. Bell" ]
+edition        = "2024"
+description    = "A rustd Automatic Differentiation package"
+readme         = "readme.md"
+repository     = "https://github.com/bradbell/rustad"
+license        = "EPL-2.0 OR GPL-2.0-or-later"
+keywords       = ["differentiation", "AD", "machine learning" ]
+categories     = [ "development-tools"]
+include        = ["/src",  "!/src/bin", "/examples" , "/tests" ]
+
 
 [dependencies]
 paste = "1.0.15"
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--cfg", "docsrs"]
+
+[badges]
+maintenance = { status = "expermental" }

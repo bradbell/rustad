@@ -2,7 +2,7 @@
 
 ## Goals
 This package is intended to include many of the features in
-[CppAD](https://github.com/coin-or/CppAD) in a way that :
+[CppAD](https://cppad.readthedocs.io/latest/) in a way that :
 
 1. It is easy to use.
 2. Its source code is easy to understand and maintain.

@@ -4,6 +4,9 @@
 // ----------------------------------------------------------------------------
 //
 //! The rustad Automatic Differentiation Package
+//!
+//! This package is Under Construction and its API is not stable; see its
+//! [readme file](<https://github.com/bradbell/rustad/blob/main/readme.md>)
 // ----------------------------------------------------------------------------
 // sub-modules
 //
