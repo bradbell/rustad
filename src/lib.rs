@@ -13,9 +13,6 @@ pub mod utility;
 // numvec
 pub mod numvec;
 //
-// vec_set
-pub(crate) mod vec_set;
-//
 // ad
 pub mod ad;
 //
@@ -28,9 +25,11 @@ pub mod adfn;
 // atom
 pub mod atom;
 //
+// vec_set
+pub(crate) mod vec_set;
+//
 // op
-// TODO: Change to pub(crate)
-pub mod op;
+pub(crate) mod op;
 //
 // setup
 pub(crate) mod setup;
@@ -97,7 +96,7 @@ where
 /// # Example
 /// ```
 /// let date = *rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2025.9.10");
+/// assert_eq!(date, "2025.9.11");
 /// ```
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
-   std::sync::LazyLock::new( || "2025.9.10" );
+   std::sync::LazyLock::new( || "2025.9.11" );

@@ -45,13 +45,11 @@ pub struct AD<V> {
     /// An AD object is a variable if the following two conditions hold:
     /// 1. This threads tape is currently recording.
     /// 2. This threads tape and the AD object have the same *tape_id* .
-    /// TODO: Change to pub(crate) when this gets used.
-    pub tape_id   : usize,
+    pub(crate) tape_id   : usize,
     //
     // var_index
     /// If this AD object is a variable, *var_index* is its index in the tape.
-    /// TODO: Change to pub(crate) when this gets used.
-    pub var_index : usize,
+    pub(crate) var_index : usize,
     //
     // value
     /// is the value of this AD variable or constant.
