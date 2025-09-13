@@ -58,6 +58,7 @@ where
     /// # Example
     /// ```
     /// use rustad::AD;
+    /// use rustad::ad_from_value;
     /// use rustad::start_recording;
     /// use rustad::stop_recording;
     /// //
@@ -70,7 +71,7 @@ where
     /// let x      : Vec<V>       = vec![2.0; nx];
     /// let ax                    = start_recording(x);
     /// let mut ay : Vec< AD<V> > = Vec::new();
-    /// ay.push( AD::from( V::from(5.0) ) ); // ay[0] is a constant
+    /// ay.push( ad_from_value( V::from(5.0) ) ); // ay[0] is a constant
     /// for j in 1 .. nx {
     ///     ay.push( &ax[j] * &ax[j] );      // ay[j] is a variable
     /// }

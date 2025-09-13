@@ -65,6 +65,7 @@ use crate::{
 /// use rustad::start_recording;
 /// use rustad::stop_recording;
 /// use rustad::AD;
+/// use rustad::ad_from_value;
 /// //
 /// // V
 /// type V = f32;
@@ -73,7 +74,7 @@ use crate::{
 /// // f(x) = x[0] + ... + x[nx-1]
 /// let x        : Vec<V> = vec![ 1.0, 1.0, 1.0 ];
 /// let ax                = start_recording(x);
-/// let mut asum          = AD::from( V::from(0.0) );
+/// let mut asum          = ad_from_value( V::from(0.0) );
 /// for j in 0 .. ax.len() {
 ///     asum += &ax[j];
 /// }
