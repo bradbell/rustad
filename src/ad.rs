@@ -82,7 +82,7 @@ impl<V> AD<V> {
     /// Convert an AD object to a value
     /// (its the variable information is lost).
     ///
-    /// **See Also** : example in [AD::from]
+    /// **See Also** : example in [ad_from_value]
     ///
     /// # Example using NumVec
     /// ```
@@ -638,7 +638,7 @@ pub fn ad_from_value<V>(value : V) -> AD<V> {
 /// Convert a vector to an vector of AD objects with no variable information;
 /// i.e., a vector of constants.
 ///
-/// **See Also** : example in [AD::from]
+/// **See Also** : example in [ad_from_value]
 ///
 /// # Example
 /// ```
