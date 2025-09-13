@@ -6,6 +6,7 @@
 //
 use rustad::{
     AD,
+    ad_from_value,
     ad_from_vector,
     NumVec,
     start_recording,
@@ -28,7 +29,7 @@ fn example_hessian () {
     let ax       = start_recording(x.clone());
     //
     // asum
-    let mut asum : AD<V>  = AD::from(  0.0 as V );
+    let mut asum : AD<V>  = ad_from_value(  0.0 as V );
     for j in 0 .. nx {
         let cubed  = &( &ax[j] * &ax[j] ) * &ax[j];
         asum      += &cubed;
@@ -103,7 +104,7 @@ fn example_numvec_hessian () {
     let ax       = start_recording(x.clone());
     //
     // asum
-    let mut asum : AD<V>  = AD::from(  NumVec::from( 0.0 as F ) );
+    let mut asum : AD<V>  = ad_from_value(  NumVec::from( 0.0 as F ) );
     for j in 0 .. nx {
         let cubed  = &( &ax[j] * &ax[j] ) * &ax[j];
         asum      += &cubed;

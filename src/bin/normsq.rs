@@ -5,6 +5,7 @@
 use rustad::utility::avg_seconds_to_execute;
 use rustad::{
     AD,
+    ad_from_value,
     NumVec,
 };
 //
@@ -30,9 +31,9 @@ pub fn normsq_f64()
 //
 // AD<f64>
 pub fn normsq_ad_f64()
-{   let mut sum_sq  : AD<f64> = AD::from( 0 as f64 );
+{   let mut sum_sq  : AD<f64> = ad_from_value( 0 as f64 );
     for j in 0 .. N_SUM {
-        let ad_j  : AD<f64> = AD::from(j as f64);
+        let ad_j  : AD<f64> = ad_from_value(j as f64);
         sum_sq += &( &ad_j * &ad_j );
     }
     assert!( (N_SUM as f64) < sum_sq.to_value() );
@@ -50,9 +51,9 @@ pub fn normsq_nv_f64()
 //
 // AD< NUMVEC<f64> >
 pub fn normsq_ad_nv_f64()
-{   let mut sum_sq  : AD< NumVec<f64> > = AD::from( NumVec::from(0 as f64) );
+{   let mut sum_sq  : AD< NumVec<f64> > = ad_from_value( NumVec::from(0 as f64) );
     for j in 0 .. N_SUM {
-        let nv_j  : AD< NumVec<f64> > = AD::from( NumVec::from(j as f64) );
+        let nv_j  : AD< NumVec<f64> > = ad_from_value( NumVec::from(j as f64) );
         sum_sq += &( &nv_j * &nv_j );
     }
     assert!( (N_SUM as f64) < sum_sq.to_value().vec[0] );

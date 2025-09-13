@@ -9,6 +9,7 @@ use std::cell::RefCell;
 //
 use rustad::{
     AD,
+    ad_from_value,
     ADfn,
     start_recording,
     stop_recording,
@@ -162,7 +163,7 @@ fn example_checkpoint() {
     // f
     let x   : Vec<V> = vec![ 1.0 , 2.0 ];
     let ax           = start_recording(x);
-    let mut asumsq : AD<V> = AD::from( 0 as V );
+    let mut asumsq : AD<V> = ad_from_value( 0 as V );
     for j in 0 .. ax.len() {
         let term = &ax[j] * &ax[j];
         asumsq  += &term;
