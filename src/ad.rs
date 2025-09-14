@@ -697,25 +697,3 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
     let vec  = avec.into_iter().map( |ad| ad.value).collect();
     vec
 }
-// ---------------------------------------------------------------------------
-// From
-/// Convert a value to an AD object with no variable information;
-/// i.e., constant.
-///
-/// **See Also** : example in [AD::to_value], [ad_from_vector]
-///
-/// # Example
-/// ```
-/// use rustad::AD;
-/// use rustad::ad_from_value;
-/// let x  : f32  = 3.0;
-/// let ax        = ad_from_value(x);
-/// assert_eq!( ax.to_value(), 3.0 );
-/// ```
-impl<V> From<V> for AD<V> {
-    fn from ( value : V )->AD<V> {
-        let tape_id   = 0;
-        let var_index = 0;
-        AD::new(tape_id, var_index, value)
-    }
-}
