@@ -697,3 +697,80 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
     let vec  = avec.into_iter().map( |ad| ad.value).collect();
     vec
 }
+// -------------------------------------------------------------------------
+// impl_ad_from_f32
+/// Convert an f32 value to an AD object with no variable information;
+/// i.e., constant.
+///
+/// **See Also** : example in [ad_from_value], [ad_from_vector]
+///
+/// # Example
+/// ```
+/// use rustad::AD;
+/// use rustad::NumVec;
+/// let ax : AD< NumVec<f64> >  = (3.0 as f32).into();
+/// let x                       = ax.to_value();
+/// assert_eq!( x.vec[0], 3.0 as f64);
+/// ```
+pub fn doc_impl_ad_from_f32() { }
+//
+/// Implement from f32 for `AD<V>` .
+///
+/// * V : see [doc_generic_v]
+///
+/// This macro must be executed once for any type *V*  where
+/// `AD<V>` is used. The rustad package automatically executes it
+/// for the following types: `f32` , `f64` , `NumVec<f32>`, `NumVec<f64>`.
+///
+/// This macro can be invoked from anywhere.
+macro_rules! impl_ad_from_f32{ ($V:ty) => {
+    impl From<f32> for crate::AD<$V> {
+        fn from( f32_value : f32 ) -> crate::AD<$V> {
+            let tape_id         = 0;
+            let var_index       = 0;
+            let value      : $V = f32_value.into();
+            crate::AD::new(tape_id, var_index, value)
+        }
+    }
+} }
+pub(crate) use impl_ad_from_f32;
+// -------------------------------------------------------------------------
+// impl_ad_from_f64
+/// Convert an f64 value to an AD object with no variable information;
+/// i.e., constant.
+///
+/// Only AD objects with f64 precision are supported; e.g.,
+/// `AD<f32>` is not supported.
+///
+/// **See Also** : example in [ad_from_value], [ad_from_vector]
+///
+/// # Example
+/// ```
+/// use rustad::AD;
+/// use rustad::NumVec;
+/// let ax : AD< NumVec<f64> >  = (3.0 as f64).into();
+/// let x                       = ax.to_value();
+/// assert_eq!( x.vec[0], 3.0 as f64);
+/// ```
+pub fn doc_impl_ad_from_f64() { }
+//
+/// Implement from f64 for `AD<V>` .
+///
+/// * V : see [doc_generic_v]
+///
+/// This macro must be executed once for any type *V*  where
+/// `AD<V>` is used. The rustad package automatically executes it
+/// for the following types: `f64` , `NumVec<f64>` .
+///
+/// This macro can be invoked from anywhere.
+macro_rules! impl_ad_from_f64{ ($V:ty) => {
+    impl From<f64> for crate::AD<$V> {
+        fn from( f64_value : f64 ) -> crate::AD<$V> {
+            let tape_id         = 0;
+            let var_index       = 0;
+            let value      : $V = f64_value.into();
+            crate::AD::new(tape_id, var_index, value)
+        }
+    }
+} }
+pub(crate) use impl_ad_from_f64;

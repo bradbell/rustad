@@ -31,7 +31,7 @@ pub fn normsq_f64()
 //
 // AD<f64>
 pub fn normsq_ad_f64()
-{   let mut sum_sq  : AD<f64> = ad_from_value( 0 as f64 );
+{   let mut sum_sq  : AD<f64> = ( 0 as f64 ).into();
     for j in 0 .. N_SUM {
         let ad_j  : AD<f64> = ad_from_value(j as f64);
         sum_sq += &( &ad_j * &ad_j );
@@ -41,9 +41,9 @@ pub fn normsq_ad_f64()
 //
 // NUMVEC<f64>
 pub fn normsq_nv_f64()
-{   let mut sum_sq  : NumVec<f64> = NumVec::from( 0 as f64 );
+{   let mut sum_sq  : NumVec<f64> = (0 as f64).into();
     for j in 0 .. N_SUM {
-        let nv_j  : NumVec<f64> = NumVec::from(j as f64);
+        let nv_j  : NumVec<f64>   = (j as f64).into();
         sum_sq += &( &nv_j * &nv_j );
     }
     assert!( (N_SUM as f64) < sum_sq.vec[0] );
@@ -51,9 +51,9 @@ pub fn normsq_nv_f64()
 //
 // AD< NUMVEC<f64> >
 pub fn normsq_ad_nv_f64()
-{   let mut sum_sq  : AD< NumVec<f64> > = ad_from_value( NumVec::from(0 as f64) );
+{   let mut sum_sq  : AD< NumVec<f64> > = (0 as f64).into();
     for j in 0 .. N_SUM {
-        let nv_j  : AD< NumVec<f64> > = ad_from_value( NumVec::from(j as f64) );
+        let nv_j  : AD< NumVec<f64> >   = (j as f64).into();
         sum_sq += &( &nv_j * &nv_j );
     }
     assert!( (N_SUM as f64) < sum_sq.to_value().vec[0] );
