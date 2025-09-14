@@ -13,50 +13,50 @@ const N_SUM : usize = 10;
 //
 // f32
 pub fn normsq_f32()
-{   let mut sum_sq  = 0f32;
+{   let mut sumsq  = 0f32;
     for j in 0 .. N_SUM {
-        sum_sq += (j as f32) * (j as f32);
+        sumsq += (j as f32) * (j as f32);
     }
-    assert!( (N_SUM as f32) < sum_sq );
+    assert!( (N_SUM as f32) < sumsq );
 }
 //
 // f64
 pub fn normsq_f64()
-{   let mut sum_sq  = 0f64;
+{   let mut sumsq  = 0f64;
     for j in 0 .. N_SUM {
-        sum_sq += (j as f64) * (j as f64);
+        sumsq += (j as f64) * (j as f64);
     }
-    assert!( (N_SUM as f64) < sum_sq );
+    assert!( (N_SUM as f64) < sumsq );
 }
 //
 // AD<f64>
 pub fn normsq_ad_f64()
-{   let mut sum_sq  : AD<f64> = ( 0 as f64 ).into();
+{   let mut sumsq  : AD<f64> = ( 0 as f64 ).into();
     for j in 0 .. N_SUM {
         let ad_j  : AD<f64> = ad_from_value(j as f64);
-        sum_sq += &( &ad_j * &ad_j );
+        sumsq += &( &ad_j * &ad_j );
     }
-    assert!( (N_SUM as f64) < sum_sq.to_value() );
+    assert!( (N_SUM as f64) < sumsq.to_value() );
 }
 //
 // NUMVEC<f64>
 pub fn normsq_nv_f64()
-{   let mut sum_sq  : NumVec<f64> = (0 as f64).into();
+{   let mut sumsq  : NumVec<f64> = (0 as f64).into();
     for j in 0 .. N_SUM {
         let nv_j  : NumVec<f64>   = (j as f64).into();
-        sum_sq += &( &nv_j * &nv_j );
+        sumsq += &( &nv_j * &nv_j );
     }
-    assert!( (N_SUM as f64) < sum_sq.vec[0] );
+    assert!( (N_SUM as f64) < sumsq.vec[0] );
 }
 //
 // AD< NUMVEC<f64> >
 pub fn normsq_ad_nv_f64()
-{   let mut sum_sq  : AD< NumVec<f64> > = (0 as f64).into();
+{   let mut sumsq  : AD< NumVec<f64> > = (0 as f64).into();
     for j in 0 .. N_SUM {
         let nv_j  : AD< NumVec<f64> >   = (j as f64).into();
-        sum_sq += &( &nv_j * &nv_j );
+        sumsq += &( &nv_j * &nv_j );
     }
-    assert!( (N_SUM as f64) < sum_sq.to_value().vec[0] );
+    assert!( (N_SUM as f64) < sumsq.to_value().vec[0] );
 }
 
 fn bench( name : &String, test_case : fn() ) {
