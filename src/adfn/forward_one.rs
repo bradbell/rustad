@@ -12,7 +12,7 @@
 use crate::AD;
 use crate::ADfn;
 use crate::op::info::GlobalOpInfoVec;
-use crate::adfn::eval_from_f32::eval_from_f32;
+use crate::adfn::eval_from::eval_from_f32;
 //
 #[cfg(doc)]
 use crate::{
@@ -209,7 +209,6 @@ macro_rules! forward_one {
     impl<V> ADfn<V>
     where
         V     : From<f32> + Clone + std::fmt::Display + GlobalOpInfoVec,
-        AD<V> : From<V> ,
     {   //
         // forward_one
         forward_one!( value, V, V );

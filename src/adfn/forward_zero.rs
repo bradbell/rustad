@@ -12,7 +12,8 @@
 use crate::AD;
 use crate::ADfn;
 use crate::op::info::GlobalOpInfoVec;
-use crate::adfn::eval_from_f32::eval_from_f32;
+use crate::adfn::eval_from::eval_from_f32;
+use crate::adfn::eval_from::eval_from_value;
 //
 #[cfg(doc)]
 use crate::{
@@ -188,8 +189,9 @@ macro_rules! forward_zero {
                 if self.range_is_var[i] {
                     range_zero.push( var_zero[index].clone() );
                 } else {
-                    let constant = self.con_all[index].clone();
-                    range_zero.push( constant.into() );
+                    let constant_v = self.con_all[index].clone();
+                    let constant_e = eval_from_value!($suffix, $V, constant_v);
+                    range_zero.push( constant_e );
                 }
             }
             range_zero
@@ -199,7 +201,6 @@ macro_rules! forward_zero {
     impl<V> ADfn<V>
     where
         V     : From<f32> + Clone + std::fmt::Display + GlobalOpInfoVec,
-        AD<V> : From<V> ,
     {   //
         // forward_zero
         forward_zero!( value, V, V );
