@@ -12,6 +12,7 @@
 use crate::AD;
 use crate::ADfn;
 use crate::op::info::GlobalOpInfoVec;
+use crate::adfn::eval_from_f32::eval_from_f32;
 //
 #[cfg(doc)]
 use crate::{
@@ -133,12 +134,10 @@ macro_rules! forward_one {
             let op_info_vec = &*GlobalOpInfoVec::get();
             //
             // zero_e
-            let zero_v        : $V = 0f32.into();
-            let zero_e        : $E = zero_v.into();
+            let zero_e        : $E = eval_from_f32!($suffix, $V, f32::NAN);
             //
             // var_one
-            let nan_v         : $V = f32::NAN.into();
-            let nan_e         : $E = nan_v.into();
+            let nan_e         : $E = eval_from_f32!($suffix, $V, f32::NAN);
             let mut var_one        = domain_one;
             var_one.resize( self.n_var, nan_e );
             //

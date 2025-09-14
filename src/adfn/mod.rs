@@ -14,6 +14,8 @@ pub mod forward_one;
 pub mod reverse_one;
 pub mod sub_sparsity;
 pub mod for_sparsity;
+//
+pub(crate) mod eval_from_f32;
 // ---------------------------------------------------------------------------
 //
 #[cfg(doc)]
