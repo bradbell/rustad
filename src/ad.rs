@@ -93,8 +93,8 @@ impl<V> AD<V> {
     /// let nv                = NumVec::new(v);
     /// let av                = ad_from_value(nv);
     /// let nv                = av.to_value();
-    /// assert_eq!( nv.vec[0], 2.0 );
-    /// assert_eq!( nv.vec[1], 3.0 );
+    /// assert_eq!( nv.get(0), 2.0 );
+    /// assert_eq!( nv.get(1), 3.0 );
     /// ```
     pub fn to_value(self) -> V {
         self.value
@@ -710,7 +710,7 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
 /// use rustad::NumVec;
 /// let ax : AD< NumVec<f64> >  = (3.0 as f32).into();
 /// let x                       = ax.to_value();
-/// assert_eq!( x.vec[0], 3.0 as f64);
+/// assert_eq!( x.get(0), 3.0 as f64);
 /// ```
 pub fn doc_impl_ad_from_f32() { }
 //
@@ -750,7 +750,7 @@ pub(crate) use impl_ad_from_f32;
 /// use rustad::NumVec;
 /// let ax : AD< NumVec<f64> >  = (3.0 as f64).into();
 /// let x                       = ax.to_value();
-/// assert_eq!( x.vec[0], 3.0 as f64);
+/// assert_eq!( x.get(0), 3.0 as f64);
 /// ```
 pub fn doc_impl_ad_from_f64() { }
 //

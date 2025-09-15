@@ -69,7 +69,7 @@ pub fn normsq_nv_f64()
         let nv_j  : NumVec<f64>   = (j as f64).into();
         sumsq += &( &nv_j * &nv_j );
     }
-    assert_eq!( 6.0 * sumsq.vec[0], six_times_normsq() as f64 );
+    assert_eq!( 6.0 * sumsq.get(0), six_times_normsq() as f64 );
 }
 //
 // AD< NUMVEC<f64> >
@@ -79,7 +79,7 @@ pub fn normsq_ad_nv_f64()
         let nv_j  : AD< NumVec<f64> >   = (j as f64).into();
         sumsq += &( &nv_j * &nv_j );
     }
-    assert_eq!( 6.0 * sumsq.to_value().vec[0], six_times_normsq() as f64 );
+    assert_eq!( 6.0 * sumsq.to_value().get(0), six_times_normsq() as f64 );
 }
 
 fn bench( name : &String, test_case : fn() ) {

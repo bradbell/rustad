@@ -25,14 +25,23 @@
 pub struct NumVec<S> {
     /// The elements of this numeric vector
     pub vec : Vec<S> ,
+    /// Value if this vector has only one element
+    pub s   : S ,
 }
 //
 // new
 impl<S> NumVec<S>
+where
+    S : From<f32> + Copy,
 {   //
     /// Create a new numeric vector using the specified data
     pub fn new( v : Vec<S> ) -> Self {
-        Self { vec: v }
+        assert_ne!( v.len(), 0);
+        if v.len() == 1 {
+            Self { vec: Vec::new() , s : v[0]}
+        } else {
+            Self { vec: v , s : f32::NAN.into() }
+        }
     }
 }
 //
@@ -41,7 +50,27 @@ impl<S> NumVec<S>
 {   //
     /// Length of this numeric vector
     pub fn len(self : &NumVec<S> ) -> usize {
-        self.vec.len()
+        if self.vec.len() == 0 {
+            1
+        } else {
+            self.vec.len()
+        }
+    }
+}
+//
+// get
+impl<S> NumVec<S>
+where
+    S : Copy ,
+{   //
+    /// get an element of a numeric vector
+    pub fn get(&self, index : usize) -> S
+    {   if self.len() == 1 {
+            debug_assert!( index == 0);
+            self.s
+        } else {
+            self.vec[index]
+        }
     }
 }
 // ---------------------------------------------------------------------------
@@ -66,12 +95,12 @@ impl<S> NumVec<S>
 ///
 /// let d = &a * &b;
 /// assert_eq!( d.len(), 2);
-/// assert_eq!( d.vec[0], 3f64 );
-/// assert_eq!( d.vec[1], 6f64 );
+/// assert_eq!( d.get(0), 3f64 );
+/// assert_eq!( d.get(1), 6f64 );
 ///
 /// let d = &b - &c;
 /// assert_eq!( d.len(), 1);
-/// assert_eq!( d.vec[0], -1.0f64 );
+/// assert_eq!( d.get(0), -1.0f64 );
 /// ```
 pub fn doc_numvec_binary_op() { }
 //
@@ -85,26 +114,30 @@ macro_rules! numvec_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     )]
     impl<'a, S> std::ops::$Name< &'a NumVec<S> > for &'a NumVec<S>
     where
-        S : Copy + std::ops::$Name<Output=S> ,
+        S : From<f32> + Copy + std::ops::$Name<Output=S> ,
     {   type Output = NumVec<S>;
         //
         fn [< $Name:lower >](self : &'a NumVec<S>, rhs : &'a NumVec<S> )
         -> NumVec<S>
         {   let mut v : Vec<S>;
+            let e     : S;
             if self.len() == 1 {
-                v = rhs.vec.clone();
                 if rhs.len() == 1 {
-                    v[0] = self.vec[0] $Op rhs.vec[0];
+                    e = self.s $Op rhs.s;
+                    v = Vec::new();
                 } else {
+                    e = f32::NAN.into();
+                    v = vec![e; rhs.len() ];
                     for j in 0 .. rhs.len() {
-                        v[j] = self.vec[0] $Op rhs.vec[j];
+                        v[j] = self.s $Op rhs.vec[j];
                     }
                 }
             } else {
-                v = self.vec.clone();
+                e = f32::NAN.into();
+                v = vec![e; self.len() ];
                 if rhs.len() == 1 {
                     for j in 0 .. self.len() {
-                        v[j] = self.vec[j] $Op rhs.vec[0];
+                        v[j] = self.vec[j] $Op rhs.s;
                     }
                 } else {
                     assert_eq!( self.len(), rhs.len() );
@@ -113,7 +146,7 @@ macro_rules! numvec_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                     }
                 }
             }
-            NumVec::new(v)
+            NumVec{ vec : v, s : e }
         }
     }
 } } }
@@ -144,12 +177,12 @@ numvec_binary_op!(Div, /);
 ///
 /// a /= &b;
 /// assert_eq!( a.len(), 2);
-/// assert_eq!( a.vec[0], 4f64 );
-/// assert_eq!( a.vec[1], 2f64 );
+/// assert_eq!( a.get(0), 4f64 );
+/// assert_eq!( a.get(1), 2f64 );
 ///
 /// b += &c;
 /// assert_eq!( b.len(), 1);
-/// assert_eq!( b.vec[0], 7.0f64 );
+/// assert_eq!( b.get(0), 7.0f64 );
 /// ```
 pub fn doc_numvec_compound_op() { }
 //
@@ -169,9 +202,9 @@ macro_rules! numvec_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
         {   //
             if self.len() == 1 {
                 if rhs.len() == 1 {
-                    self.vec[0] $Op rhs.vec[0];
+                    self.s $Op rhs.s;
                 } else {
-                    self.vec = vec![ self.vec[0] ; rhs.len() ];
+                    self.vec = vec![ self.s ; rhs.len() ];
                     for j in 0 .. rhs.len() {
                         self.vec[j] $Op rhs.vec[j];
                     }
@@ -179,7 +212,7 @@ macro_rules! numvec_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             } else {
                 if rhs.len() == 1 {
                     for j in 0 .. self.len() {
-                        self.vec[j] $Op rhs.vec[0];
+                        self.vec[j] $Op rhs.s;
                     }
                 } else {
                     assert_eq!( self.len(), rhs.len() );
@@ -215,8 +248,12 @@ numvec_compound_op!(DivAssign, /=);
 impl<S : std::fmt::Display> std::fmt::Display for NumVec<S> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "[ ")?;
-        for j in 0 .. self.len() {
-            write!(f, "{}, ", self.vec[j])?;
+        if self.len() == 1 {
+            write!(f, "{}, ", self.s)?;
+        } else {
+            for j in 0 .. self.len() {
+                write!(f, "{}, ", self.vec[j])?;
+            }
         }
         write!(f, "]")
     }
@@ -232,33 +269,33 @@ impl<S : std::fmt::Display> std::fmt::Display for NumVec<S> {
 /// // f32 -> NumVec<f32>
 /// let x                  = 3.0 as f32;
 /// let x_nv : NumVec<f32> = NumVec::from(x);
-/// assert_eq!( x_nv.vec.len(), 1 );
-/// assert_eq!( x_nv.vec[0], 3.0 as f32 );
+/// assert_eq!( x_nv.len(), 1 );
+/// assert_eq!( x_nv.get(0), 3.0 as f32 );
 ///
 /// // f32 -> NumVec<f64>
 /// let x                  = 3.0 as f32;
 /// let x_nv : NumVec<f64> = NumVec::from(x);
-/// assert_eq!( x_nv.vec.len(), 1 );
-/// assert_eq!( x_nv.vec[0], 3.0 as f64 );
+/// assert_eq!( x_nv.len(), 1 );
+/// assert_eq!( x_nv.get(0), 3.0 as f64 );
 ///
 /// // f64 -> NumVec<f64>
 /// let x                  = 3.0 as f64;
 /// let x_nv : NumVec<f64> = NumVec::from(x);
-/// assert_eq!( x_nv.vec.len(), 1 );
-/// assert_eq!( x_nv.vec[0], 3.0 as f64 );
+/// assert_eq!( x_nv.len(), 1 );
+/// assert_eq!( x_nv.get(0), 3.0 as f64 );
 /// ```
 impl From<f32> for NumVec<f32> {
     fn from ( scalar : f32 )-> NumVec<f32> {
-        NumVec { vec : vec![ scalar ] }
+        NumVec { vec : Vec::new(), s : scalar }
     }
 }
 impl From<f32> for NumVec<f64> {
     fn from ( scalar : f32 )-> NumVec<f64> {
-        NumVec { vec : vec![ scalar as f64 ] }
+        NumVec { vec : Vec::new(), s : scalar as f64 }
     }
 }
 impl From<f64> for NumVec<f64> {
     fn from ( scalar : f64 )-> NumVec<f64> {
-        NumVec { vec : vec![ scalar ] }
+        NumVec { vec : Vec::new(), s : scalar }
     }
 }
