@@ -13,12 +13,12 @@
 /// * fun :
 /// The function that we are executing.
 ///
-/// * total_seconds :
-/// The execution will be repeated until the total execution time is at least
-/// *total_seconds* .
+/// * min_seconds :
+/// The execution will be repeated until the test execution time is at least
+/// *min_seconds* .
 ///
 /// # return :
-/// The return value is the total execution time, in seconds,
+/// The return value is the test execution time, in seconds,
 /// divided by the number of repeats; i.e, the average per call to *fun* .
 ///
 /// # Example
@@ -31,15 +31,15 @@
 ///     for i in 0 .. 1000 { sum += i; }
 ///     println!( "slower: {},", sum);
 /// };
-/// let total_seconds = 0.5;
-/// let s1 = avg_seconds_to_execute(faster, total_seconds);
-/// let s2 = avg_seconds_to_execute(slower, total_seconds);
+/// let min_seconds = 0.5;
+/// let s1 = avg_seconds_to_execute(faster, min_seconds);
+/// let s2 = avg_seconds_to_execute(slower, min_seconds);
 /// assert!( s1 < s2 / 2.0 );
 /// ```
-pub fn avg_seconds_to_execute( fun : fn() , total_seconds : f64 ) -> f64 {
+pub fn avg_seconds_to_execute( fun : fn() , min_seconds : f64 ) -> f64 {
     let mut repeat : usize = 1;
     let mut duration  = 0.0;
-    while duration < total_seconds {
+    while duration < min_seconds {
         let start = std::time::Instant::now();
         for _i in 0 .. repeat {
             fun();
