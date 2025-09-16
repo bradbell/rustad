@@ -181,7 +181,9 @@ impl<V : std::fmt::Display> std::fmt::Display for AD<V> {
 /// let ax               = ad_from_value(x_nv);
 /// let ay               = ad_from_value(y_nv);
 /// let az               = &ax / &ay;
-/// assert_eq!( az.to_value().vec, vec![0.5f64, 2.0f64] );
+/// let z_nv             = az.to_value();
+/// assert_eq!( z_nv.get(0), 0.5f64 );
+/// assert_eq!( z_nv.get(1), 2.0f64 );
 /// ```
 pub fn doc_ad_binary_op() { }
 //
@@ -365,7 +367,9 @@ ad_binary_op!(Div, /);
 /// let mut ax            = ad_from_value(x_nv);
 /// let ay                = ad_from_value(y_nv);
 /// ax                   *= &ay;
-/// assert_eq!( ax.to_value().vec, vec![2.0f32, 8.0f32] );
+/// let x_nv              = ax.to_value();
+/// assert_eq!( x_nv.get(0), 2.0f32 );
+/// assert_eq!( x_nv.get(1), 8.0f32 );
 /// ```
 pub fn doc_ad_compound_op() { }
 //
@@ -687,10 +691,10 @@ pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
 /// let nv_1              = NumVec::new(v_1);
 /// let av                = ad_from_vector( vec![nv_0, nv_1] );
 /// let v                 = ad_to_vector(av);
-/// assert_eq!( v[0].vec[0], 2.0 );
-/// assert_eq!( v[0].vec[1], 3.0 );
-/// assert_eq!( v[1].vec[0], 4.0 );
-/// assert_eq!( v[1].vec[1], 5.0 );
+/// assert_eq!( v[0].get(0), 2.0 );
+/// assert_eq!( v[0].get(1), 3.0 );
+/// assert_eq!( v[1].get(0), 4.0 );
+/// assert_eq!( v[1].get(1), 5.0 );
 /// ```
 pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
     assert_ne!( avec.len() , 0 );

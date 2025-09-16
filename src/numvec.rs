@@ -24,9 +24,9 @@
 #[derive(Debug,Clone)]
 pub struct NumVec<S> {
     /// The elements of this numeric vector
-    pub vec : Vec<S> ,
+    vec : Vec<S> ,
     /// Value if this vector has only one element
-    pub s   : S ,
+    s   : S ,
 }
 //
 // new

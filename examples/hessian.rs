@@ -140,10 +140,10 @@ fn example_numvec_hessian () {
     for j in 0 .. nx {
         //
         let check  = 3 * (j+1) * (j+1);
-        assert_eq!( y[j].vec[0], check as F );
+        assert_eq!( y[j].get(0), check as F );
         //
         let check  = 3 * (j+2) * (j+2);
-        assert_eq!( y[j].vec[1], check as F );
+        assert_eq!( y[j].get(1), check as F );
     }
     //
     // dy
@@ -156,13 +156,13 @@ fn example_numvec_hessian () {
             if i == j {
                 //
                 let check  = 6 * (j+1);
-                assert_eq!( dy[i].vec[0], check as F );
+                assert_eq!( dy[i].get(0), check as F );
                 //
                 let check  = 6 * (j+2);
-                assert_eq!( dy[i].vec[1], check as F );
+                assert_eq!( dy[i].get(1), check as F );
             } else {
-                for k in 0 .. dy[i].vec.len() {
-                    assert_eq!( dy[i].vec[k] ,  0.0 as F );
+                for k in 0 .. dy[i].len() {
+                    assert_eq!( dy[i].get(k) ,  0.0 as F );
                 }
             }
         }
