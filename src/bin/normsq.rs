@@ -23,6 +23,8 @@ use rustad::{
 //
 // This completes the proof of this claim (by induction).
 //
+// N_SUM
+// number of terms in the sum of squares
 const N_SUM : usize = 10;
 //
 // six_times_normsq

@@ -47,7 +47,8 @@ done
 echo
 echo_eval cargo doc --document-private-items
 echo
-echo_eval cargo run --release
+echo_eval cargo run --release --bin normsq
+echo_eval cargo run --release --bin record
 echo
 echo_eval bin/cargo_test.sh
 echo

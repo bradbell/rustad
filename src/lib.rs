@@ -100,7 +100,7 @@ where
 /// # Example
 /// ```
 /// let date = *rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2025.9.15");
+/// assert_eq!(date, "2025.9.16");
 /// ```
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
-   std::sync::LazyLock::new( || "2025.9.15" );
+   std::sync::LazyLock::new( || "2025.9.16" );
