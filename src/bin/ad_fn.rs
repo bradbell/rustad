@@ -69,8 +69,8 @@ fn record_normsq_f64()
     } );
 }
 //
-// record_normsq_numvec_f64
-fn record_normsq_numvec_f64()
+// record_normsq_nv_f64
+fn record_normsq_nv_f64()
 {   NORMSQ_NUMVEC_F64.with_borrow_mut( |f_static| {
         let mut f = normsq_fn::< NumVec<f64> >();
         f_static.swap(&mut f);
@@ -95,8 +95,8 @@ fn forward_zero_normsq_f64()
     assert_eq!( 6.0 * sumsq, six_times_normsq() as f64);
 }
 //
-// forward_zero_normsq_numvec_f64
-fn forward_zero_normsq_numvec_f64()
+// forward_zero_normsq_nv_f64
+fn forward_zero_normsq_nv_f64()
 {   let zero  : NumVec<f64> = (0 as f64).into();
     let mut x               = vec![zero; N_SUM];
     for j in 0 .. N_SUM {
@@ -113,7 +113,7 @@ fn forward_zero_normsq_numvec_f64()
 }
 //
 // bench
-fn bench( name : &String, test_case : fn() ) {
+fn bench( name : &str, test_case : fn() ) {
     let min_seconds = 0.25;
     let seconds  = avg_seconds_to_execute( test_case, min_seconds );
     let nanos    = (seconds * 1e9 + 0.5) as u64;
@@ -123,8 +123,8 @@ fn bench( name : &String, test_case : fn() ) {
 //
 // main
 fn main() {
-    bench( &"record_normsq_f64".to_string() , record_normsq_f64 );
-    bench( &"record_normsq_numvec_f64".to_string() , record_normsq_numvec_f64 );
-    bench( &"forward_zero_normsq_f64".to_string() , forward_zero_normsq_f64 );
-    bench( &"forward_zero_normsq_numvec_f64".to_string() , forward_zero_normsq_numvec_f64 );
+    bench( "record_normsq_f64" ,          record_normsq_f64 );
+    bench( "record_normsq_nv_f64" ,       record_normsq_nv_f64 );
+    bench( "forward_zero_normsq_f64" ,    forward_zero_normsq_f64 );
+    bench( "forward_zero_normsq_nv_f64" , forward_zero_normsq_nv_f64 );
 }

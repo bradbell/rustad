@@ -84,7 +84,7 @@ pub fn normsq_ad_nv_f64()
     assert_eq!( 6.0 * sumsq.to_value().get(0), six_times_normsq() as f64 );
 }
 
-fn bench( name : &String, test_case : fn() ) {
+fn bench( name : &str, test_case : fn() ) {
     let min_seconds = 0.25;
     let seconds  = avg_seconds_to_execute( test_case, min_seconds );
     let nanos    = (seconds * 1e9 + 0.5) as u64;
@@ -93,9 +93,9 @@ fn bench( name : &String, test_case : fn() ) {
 }
 
 fn main() {
-    bench( &"normsq_f32".to_string() , normsq_f32 );
-    bench( &"normsq_f64".to_string() , normsq_f64 );
-    bench( &"normsq_ad_f64".to_string() , normsq_ad_f64 );
-    bench( &"normsq_nv_f64".to_string() , normsq_nv_f64 );
-    bench( &"normsq_ad_nv_f64".to_string() , normsq_ad_nv_f64 );
+    bench( "normsq_f32" ,       normsq_f32 );
+    bench( "normsq_f64" ,       normsq_f64 );
+    bench( "normsq_ad_f64" ,    normsq_ad_f64 );
+    bench( "normsq_nv_f64" ,    normsq_nv_f64 );
+    bench( "normsq_ad_nv_f64" , normsq_ad_nv_f64 );
 }
