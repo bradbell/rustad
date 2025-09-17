@@ -25,7 +25,7 @@ use rustad::{
 //
 // N_SUM
 // number of terms in the sum of squares
-const N_SUM : usize = 10;
+const N_SUM : usize = 15;
 //
 // six_times_normsq
 // Used to check calculation so that result get uses and is not optimized out.

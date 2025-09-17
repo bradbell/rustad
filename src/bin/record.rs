@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
+use std::cell::RefCell;
+//
 use rustad::utility::avg_seconds_to_execute;
 use rustad::{
     ADfn,
@@ -14,7 +16,16 @@ use rustad::{
 //
 // N_SUM
 // number of terms in the sum of squares
-const N_SUM : usize = 10;
+const N_SUM : usize = 15;
+//
+thread_local! {
+    static NORMSQ_F64 : RefCell< ADfn<f64> > = RefCell::new( ADfn::new() );
+}
+//
+thread_local! {
+    static NORMSQ_NUMVEC_F64 : RefCell< ADfn< NumVec<f64> > > =
+        RefCell::new( ADfn::new() );
+}
 //
 // normsq_fn
 fn normsq_fn<V>()->ADfn<V>
@@ -41,16 +52,22 @@ where
 //
 // record_normsq_f64
 fn record_normsq_f64()
-{   let f  : ADfn<f64> = normsq_fn::<f64>();
-    assert_eq!( f.domain_len(), N_SUM );
-    assert_eq!( f.range_len(), 1 );
+{   NORMSQ_F64.with_borrow_mut( |f_static| {
+        let mut f = normsq_fn::<f64>();
+        f_static.swap(&mut f);
+        assert_eq!( f_static.domain_len(), N_SUM );
+        assert_eq!( f_static.range_len(), 1 );
+    } );
 }
 //
 // record_normsq_numvec_f64
 fn record_normsq_numvec_f64()
-{   let f  : ADfn< NumVec<f64> > = normsq_fn::< NumVec<f64> >();
-    assert_eq!( f.domain_len(), N_SUM );
-    assert_eq!( f.range_len(), 1 );
+{   NORMSQ_NUMVEC_F64.with_borrow_mut( |f_static| {
+        let mut f = normsq_fn::< NumVec<f64> >();
+        f_static.swap(&mut f);
+        assert_eq!( f_static.domain_len(), N_SUM );
+        assert_eq!( f_static.range_len(), 1 );
+    } );
 }
 //
 // bench

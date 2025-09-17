@@ -142,4 +142,20 @@ impl<V> ADfn<V> {
     // range_len
     /// dimension of range space
     pub fn range_len(&self) -> usize { self.range_is_var.len() }
+    //
+    // swap
+    /// exchange the contents of this ADfn with another ADfn.
+    pub fn swap(&mut self, other : &mut ADfn<V>) {
+        std::mem::swap( &mut self.n_domain,      &mut other.n_domain );
+        std::mem::swap( &mut self.n_var,         &mut other.n_var );
+        std::mem::swap( &mut self.id_all,        &mut other.id_all );
+        std::mem::swap( &mut self.flag_all,      &mut other.flag_all );
+        std::mem::swap( &mut self.op2arg,        &mut other.op2arg );
+        std::mem::swap( &mut self.arg_all,       &mut other.arg_all );
+        std::mem::swap( &mut self.con_all,       &mut other.con_all );
+        std::mem::swap( &mut self.range_is_var,  &mut other.range_is_var );
+        std::mem::swap(
+            &mut self.range2tape_index, &mut other.range2tape_index
+        );
+    }
 }
