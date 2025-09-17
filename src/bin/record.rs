@@ -50,6 +50,15 @@ where
     f
 }
 //
+// six_times_normsq
+// This is six times normsq when x[j] = j+1; see normsq.rs.
+fn six_times_normsq() -> usize
+{   let n    = N_SUM;
+    let n2   = n * n;
+    let n3   = n * n * n;
+    2 * n3 + 3 * n2 + n
+}
+//
 // record_normsq_f64
 fn record_normsq_f64()
 {   NORMSQ_F64.with_borrow_mut( |f_static| {
@@ -70,6 +79,39 @@ fn record_normsq_numvec_f64()
     } );
 }
 //
+// forward_zero_normsq_f64
+fn forward_zero_normsq_f64()
+{   let zero   = 0 as f64;
+    let mut x  = vec![zero; N_SUM];
+    for j in 0 .. N_SUM {
+        x[j] = (j + 1) as f64;
+    }
+    let mut var_zero : Vec<f64> = Vec::new();
+    let trace                  = false;
+    let sumsq = NORMSQ_F64.with_borrow_mut( |f_static| {
+        let y = f_static.forward_zero_value(&mut var_zero, x, trace);
+        y[0]
+    } );
+    assert_eq!( 6.0 * sumsq, six_times_normsq() as f64);
+}
+//
+// forward_zero_normsq_numvec_f64
+fn forward_zero_normsq_numvec_f64()
+{   let zero  : NumVec<f64> = (0 as f64).into();
+    let mut x               = vec![zero; N_SUM];
+    for j in 0 .. N_SUM {
+        x[j] = ( (j+1) as f64 ).into();
+    }
+    let mut var_zero : Vec< NumVec<f64> > = Vec::new();
+    let trace                             = false;
+    let sumsq = NORMSQ_NUMVEC_F64.with_borrow_mut( |f_static| {
+        let y         = f_static.forward_zero_value(&mut var_zero, x, trace);
+        let mut y_itr = y.into_iter();
+        y_itr.next().unwrap()
+    } );
+    assert_eq!( 6.0 * sumsq.get(0), six_times_normsq() as f64);
+}
+//
 // bench
 fn bench( name : &String, test_case : fn() ) {
     let min_seconds = 0.25;
@@ -83,4 +125,6 @@ fn bench( name : &String, test_case : fn() ) {
 fn main() {
     bench( &"record_normsq_f64".to_string() , record_normsq_f64 );
     bench( &"record_normsq_numvec_f64".to_string() , record_normsq_numvec_f64 );
+    bench( &"forward_zero_normsq_f64".to_string() , forward_zero_normsq_f64 );
+    bench( &"forward_zero_normsq_numvec_f64".to_string() , forward_zero_normsq_numvec_f64 );
 }
