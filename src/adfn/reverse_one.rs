@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! Implement the [ADfn] methods that compute partial derivatives.
+//! Implement the [ADfn] reverse_one method (partial derivatives).
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------

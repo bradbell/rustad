@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! Implement the [ADfn] methods that compute directional derivatives.
+//! Implement the [ADfn] forward_one method (directional derivatives).
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------

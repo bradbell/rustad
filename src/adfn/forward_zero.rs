@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! Implement the [ADfn] methods that compute function values.
+//! Implement the [ADfn] forward_zero method (function values).
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
