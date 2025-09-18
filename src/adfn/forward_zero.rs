@@ -87,8 +87,8 @@ use crate::{
 /// // y[0] = f(x)
 /// let trace           = true;
 /// let x      : Vec<V> = vec![ 1.0, 2.0, 3.0 ];
-/// let mut c  : Vec<V> = Vec::new();
-/// let y  = f.forward_zero_value(&mut c, x, trace);
+/// let mut v0 : Vec<V> = Vec::new();
+/// let y  = f.forward_zero_value(&mut v0, x, trace);
 /// //
 /// assert_eq!( y[0] , (1 + 2 + 3) as V );
 /// ```
