@@ -14,9 +14,9 @@ use rustad::{
 // V
 type V = f64;
 // -------------------------------------------------------------------------
-// sumsq_forward_zero
+// sumsq_forward_zero_value
 // -------------------------------------------------------------------------
-fn sumsq_forward_zero(
+fn sumsq_forward_zero_value(
     var_zero     : &mut Vec<V> ,
     domain_zero  : Vec<&V>     ,
     call_info    : IndexT      ,
@@ -32,21 +32,21 @@ fn sumsq_forward_zero(
         }
     }
     if trace {
-        println!("Begin Trace: sumsq_forward_zero");
+        println!("Begin Trace: sumsq_forward_zero_value");
         print!("domain_zero = [ ");
         for j in 0 .. domain_zero.len() {
                 print!("{}, ", domain_zero[j]);
         }
         println!("]");
         println!("sumsq_zero = {}", sumsq_zero);
-        println!("End Trace: sumsq_forward_zero");
+        println!("End Trace: sumsq_forward_zero_value");
     }
     vec![ sumsq_zero ]
 }
 // -------------------------------------------------------------------------
-// sumsq_forward_one
+// sumsq_forward_one_value
 // -------------------------------------------------------------------------
-fn sumsq_forward_one(
+fn sumsq_forward_one_value(
     domain_zero  : &Vec<V>     ,
     domain_one   : Vec<&V>     ,
     call_info    : IndexT      ,
@@ -60,21 +60,21 @@ fn sumsq_forward_one(
         sumsq_one += 2.0 * domain_zero[j] * domain_one[j];
     }
     if trace {
-        println!("Begin Trace: sumsq_forward_one");
+        println!("Begin Trace: sumsq_forward_one_value");
         print!("domain_one = [ ");
         for j in 0 .. domain_one.len() {
                 print!("{}, ", domain_one[j]);
         }
         println!("]");
         println!("sumsq_one = {}", sumsq_one);
-        println!("End Trace: sumsq_forward_one");
+        println!("End Trace: sumsq_forward_one_value");
     }
     vec![ sumsq_one ]
 }
 // -------------------------------------------------------------------------
-// sumsq_reverse_one
+// sumsq_reverse_one_value
 // -------------------------------------------------------------------------
-fn sumsq_reverse_one(
+fn sumsq_reverse_one_value(
     domain_zero  : &Vec<V>     ,
     range_one    : Vec<&V>     ,
     call_info    : IndexT      ,
@@ -88,14 +88,14 @@ fn sumsq_reverse_one(
         domain_one.push( 2.0 * domain_zero[j] * range_one[0] );
     }
     if trace {
-        println!("Begin Trace: sumsq_reverse_one");
+        println!("Begin Trace: sumsq_reverse_one_value");
         println!("range_one = [ {} ]", range_one[0]);
         print!("domain_one = [ ");
         for j in 0 .. domain_one.len() {
                 print!("{}, ", range_one[j]);
         }
         println!("]");
-        println!("End Trace: sumsq_reverse_one");
+        println!("End Trace: sumsq_reverse_one_value");
     }
     domain_one
 }
@@ -121,9 +121,9 @@ fn register_sumsq_atom()-> IndexT {
     //
     // sumsq_atom_eval
     let sumsq_atom_eval = AtomEval {
-        forward_zero_value   :  sumsq_forward_zero,
-        forward_one_value    :  sumsq_forward_one,
-        reverse_one_value    :  sumsq_reverse_one,
+        forward_zero_value   :  sumsq_forward_zero_value,
+        forward_one_value    :  sumsq_forward_one_value,
+        reverse_one_value    :  sumsq_reverse_one_value,
         forward_depend       :  sumsq_forward_depend,
     };
     //

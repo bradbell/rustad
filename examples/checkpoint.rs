@@ -27,9 +27,9 @@ thread_local! {
         RefCell::new( Vec::new() );
 }
 // -------------------------------------------------------------------------
-// checkpoint_forward_zero
+// checkpoint_forward_zero_value
 // -------------------------------------------------------------------------
-fn checkpoint_forward_zero(
+fn checkpoint_forward_zero_value(
     var_zero         : &mut Vec<V> ,
     domain_zero_ref  : Vec<&V>     ,
     call_info        : IndexT      ,
@@ -53,9 +53,9 @@ fn checkpoint_forward_zero(
     range_zero
 }
 // -------------------------------------------------------------------------
-// checkpoint_forward_one
+// checkpoint_forward_one_value
 // -------------------------------------------------------------------------
-fn checkpoint_forward_one(
+fn checkpoint_forward_one_value(
     var_zero         : &Vec<V>     ,
     domain_one_ref   : Vec<&V>     ,
     call_info        : IndexT      ,
@@ -79,9 +79,9 @@ fn checkpoint_forward_one(
     range_one
 }
 // -------------------------------------------------------------------------
-// checkpoint_reverse_one
+// checkpoint_reverse_one_value
 // -------------------------------------------------------------------------
-fn checkpoint_reverse_one(
+fn checkpoint_reverse_one_value(
     var_zero         : &Vec<V>     ,
     range_one_ref    : Vec<&V>     ,
     call_info        : IndexT      ,
@@ -138,9 +138,9 @@ fn register_checkpoint_atom()-> IndexT {
     //
     // checkpoint_atom_eval
     let checkpoint_atom_eval = AtomEval {
-        forward_zero_value   :  checkpoint_forward_zero,
-        forward_one_value    :  checkpoint_forward_one,
-        reverse_one_value    :  checkpoint_reverse_one,
+        forward_zero_value   :  checkpoint_forward_zero_value,
+        forward_one_value    :  checkpoint_forward_one_value,
+        reverse_one_value    :  checkpoint_reverse_one_value,
         forward_depend       :  checkpoint_forward_depend,
     };
     //
