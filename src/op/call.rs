@@ -65,15 +65,21 @@ use crate::{
     AtomEval,
 };
 // ----------------------------------------------------------------------
-fn extract_call_arg<'a>( flag : &'a Vec<bool> , arg : &'a [IndexT] ) -> (
+fn extract_call_arg<'a, 'b, V>(
+    var_zero   : &'a Vec<V>    ,
+    con        : &'a Vec<V>    ,
+    flag       : &'b Vec<bool> ,
+    arg        : &'b [IndexT]  ,
+) -> (
     usize      , // atom_id
     IndexT     , // call_info
     usize      , // call_n_arg
     usize      , // call_n_res
     bool       , // trace
-    &'a [bool] , // is_arg_var
-    &'a [bool] ) // is_res_var
-{   // ----------------------------------------------------------------------
+    &'b [bool] , // is_arg_var
+    &'b [bool] , // is_res_var
+    Vec<&'a V> , // call_domain_zero
+) {
     let atom_id    = arg[0] as usize;
     let call_info  = arg[1];
     let call_n_arg = arg[2] as usize;
@@ -87,7 +93,26 @@ fn extract_call_arg<'a>( flag : &'a Vec<bool> , arg : &'a [IndexT] ) -> (
     end             = begin + call_n_res;
     let is_res_var  = &flag[begin .. end];
     //
-    (atom_id, call_info, call_n_arg, call_n_res, trace, is_arg_var, is_res_var)
+    let mut call_domain_zero : Vec<&V> = Vec::with_capacity( call_n_arg );
+    for i_arg in 0 .. call_n_arg {
+        let index = arg[i_arg + 5] as usize;
+        if is_arg_var[i_arg] {
+            call_domain_zero.push( &var_zero[index] );
+        } else {
+            call_domain_zero.push( &con[index] );
+        }
+    }
+    //
+    (
+        atom_id,
+        call_info,
+        call_n_arg,
+        call_n_res,
+        trace,
+        is_arg_var,
+        is_res_var,
+        call_domain_zero
+    )
 }
 // --------------------------------------------------------------------------
 // call_forward_0
@@ -102,23 +127,16 @@ fn call_forward_0<V> (
 where
     V : AtomEvalVec,
 {   // ----------------------------------------------------------------------
-    // Same in call forward zero, forward one, and reverse one
-    //
-    // atom_id, call_info, n_arg, n_res, trace, is_arg_var, is_res_var
     let (
-    atom_id, call_info, call_n_arg, call_n_res, trace, is_arg_var, is_res_var
-    ) = extract_call_arg( flag, arg);
-    //
-    // call_domain_zero
-    let mut call_domain_zero : Vec<&V> = Vec::with_capacity( call_n_arg );
-    for i_arg in 0 .. call_n_arg {
-        let index = arg[i_arg + 5] as usize;
-        if is_arg_var[i_arg] {
-            call_domain_zero.push( &var_zero[index] );
-        } else {
-            call_domain_zero.push( &con[index] );
-        }
-    }
+        atom_id,
+        call_info,
+        _call_n_arg,
+        call_n_res,
+        trace,
+        _is_arg_var,
+        is_res_var,
+        call_domain_zero,
+    ) = extract_call_arg(var_zero, con, flag, arg);
     // ----------------------------------------------------------------------
     //
     // forward_zero
@@ -169,23 +187,16 @@ fn call_forward_1<V> (
 where
     V : AtomEvalVec + From<f32>,
 {   // ----------------------------------------------------------------------
-    // Same in call forward zero, forward one, and reverse one
-    //
-    // atom_id, call_info, n_arg, n_res, trace, is_arg_var, is_res_var
     let (
-    atom_id, call_info, call_n_arg, call_n_res, trace, is_arg_var, is_res_var
-    ) = extract_call_arg( flag, arg);
-    //
-    // call_domain_zero
-    let mut call_domain_zero : Vec<&V> = Vec::with_capacity( call_n_arg );
-    for i_arg in 0 .. call_n_arg {
-        let index = arg[i_arg + 5] as usize;
-        if is_arg_var[i_arg] {
-            call_domain_zero.push( &var_zero[index] );
-        } else {
-            call_domain_zero.push( &con[index] );
-        }
-    }
+        atom_id,
+        call_info,
+        call_n_arg,
+        call_n_res,
+        trace,
+        is_arg_var,
+        is_res_var,
+        call_domain_zero,
+    ) = extract_call_arg(var_zero, con, flag, arg);
     // ----------------------------------------------------------------------
     //
     // forward_zero, forward_one
@@ -252,23 +263,16 @@ fn call_reverse_1<V> (
 where
     for<'a> V : AtomEvalVec + std::ops::AddAssign<&'a V>  + From<f32>,
 {   // ----------------------------------------------------------------------
-    // Same in call forward zero, forward one, and reverse one
-    //
-    // atom_id, call_info, n_arg, n_res, trace, is_arg_var, is_res_var
     let (
-    atom_id, call_info, call_n_arg, call_n_res, trace, is_arg_var, is_res_var
-    ) = extract_call_arg( flag, arg);
-    //
-    // call_domain_zero
-    let mut call_domain_zero : Vec<&V> = Vec::with_capacity( call_n_arg );
-    for i_arg in 0 .. call_n_arg {
-        let index = arg[i_arg + 5] as usize;
-        if is_arg_var[i_arg] {
-            call_domain_zero.push( &var_zero[index] );
-        } else {
-            call_domain_zero.push( &con[index] );
-        }
-    }
+        atom_id,
+        call_info,
+        call_n_arg,
+        call_n_res,
+        trace,
+        is_arg_var,
+        is_res_var,
+        call_domain_zero,
+    ) = extract_call_arg(var_zero, con, flag, arg);
     // ----------------------------------------------------------------------
     //
     // forward_zero, reverse_one
