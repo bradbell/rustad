@@ -115,10 +115,10 @@ fn extract_call_arg<'a, 'b, V>(
     )
 }
 // --------------------------------------------------------------------------
-// call_forward_0
+// call_forward_0_value
 //
 /// zero order forward call operator for atomic functions
-fn call_forward_0<V> (
+fn call_forward_0_value<V> (
     var_zero   : &mut Vec<V>   ,
     con        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
@@ -174,10 +174,10 @@ where
     }
 }
 // --------------------------------------------------------------------------
-// call_forward_1
+// call_forward_1_value
 //
 /// first order forward call operator for atomic functions
-fn call_forward_1<V> (
+fn call_forward_1_value<V> (
     var_zero   : &Vec<V>       ,
     var_one    : &mut Vec<V>   ,
     con        : &Vec<V>       ,
@@ -250,10 +250,10 @@ where
     }
 }
 // --------------------------------------------------------------------------
-// call_reverse_1
+// call_reverse_1_value
 //
 /// first order reverse call operator for atomic functions
-fn call_reverse_1<V> (
+fn call_reverse_1_value<V> (
     var_zero   : &Vec<V>       ,
     var_one    : &mut Vec<V>   ,
     con        : &Vec<V>       ,
@@ -364,11 +364,11 @@ where
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
         name              : "call" ,
-        forward_0_value   : call_forward_0::<V>,
+        forward_0_value   : call_forward_0_value::<V>,
         forward_0_ad      : panic_zero::<V, AD<V> >,
-        forward_1_value   : call_forward_1::<V>,
+        forward_1_value   : call_forward_1_value::<V>,
         forward_1_ad      : panic_one::<V, AD<V> >,
-        reverse_1_value   : call_reverse_1::<V>,
+        reverse_1_value   : call_reverse_1_value::<V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
         arg_var_index     : call_arg_var_index,
     };
