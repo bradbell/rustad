@@ -50,9 +50,9 @@ use crate::op::info::{
     panic_one,
 };
 use crate::atom::{
-    AtomForwardZero,
-    AtomForwardOne,
-    AtomReverseOne,
+    AtomForwardZeroValue,
+    AtomForwardOneValue,
+    AtomReverseOneValue,
     sealed::AtomEvalVec,
 };
 use crate::op::id::{
@@ -140,7 +140,7 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero
-    let forward_zero : AtomForwardZero<V>;
+    let forward_zero : AtomForwardZeroValue<V>;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -200,8 +200,8 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero, forward_one
-    let forward_zero : AtomForwardZero<V>;
-    let forward_one  : AtomForwardOne<V>;
+    let forward_zero : AtomForwardZeroValue<V>;
+    let forward_one  : AtomForwardOneValue<V>;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -276,8 +276,8 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero, reverse_one
-    let forward_zero : AtomForwardZero<V>;
-    let reverse_one  : AtomReverseOne<V>;
+    let forward_zero : AtomForwardZeroValue<V>;
+    let reverse_one  : AtomReverseOneValue<V>;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();

@@ -40,7 +40,7 @@ use crate::adfn::{
 };
 // ---------------------------------------------------------------------------
 //
-// AtomForwardZero
+// AtomForwardZeroValue
 /// Callback to atomic functions during [ADfn::forward_zero_value]
 ///
 /// * var_zero
@@ -61,14 +61,14 @@ use crate::adfn::{
 /// The return value *range_one*
 /// contains the value of the atomic function range variables.
 ///
-pub type AtomForwardZero<V> = fn(
+pub type AtomForwardZeroValue<V> = fn(
     _var_zero      : &mut Vec<V> ,
     _domain_zero   : Vec<&V>     ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
 ) -> Vec<V> ;
 //
-// AtomForwardOne
+// AtomForwardOneValue
 /// Callback to atomic functions during [ADfn::forward_one_value]
 ///
 /// If you do not expect to use an atomic function with forward_one,
@@ -93,14 +93,14 @@ pub type AtomForwardZero<V> = fn(
 /// ```text
 ///     range_one = f'(domain_zero) * domain_one
 /// ```
-pub type AtomForwardOne<V> = fn(
+pub type AtomForwardOneValue<V> = fn(
     _var_zero      : &Vec<V>     ,
     _domain_one    : Vec<&V>     ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
 ) -> Vec<V> ;
 //
-// AtomReverseOne
+// AtomReverseOneValue
 /// Callback to atomic functions during [ADfn::reverse_one_value]
 ///
 /// If you do not expect to use an atomic function with reverse_one,
@@ -125,14 +125,14 @@ pub type AtomForwardOne<V> = fn(
 /// ```text
 ///     domain_one = range_one * f'(domain_zero)
 /// ```
-pub type AtomReverseOne<V> = fn(
+pub type AtomReverseOneValue<V> = fn(
     _var_zero      : &Vec<V>     ,
     _range_one     : Vec<&V>     ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
 ) -> Vec<V> ;
 //
-// ForwardDepend
+// AtomForwardDependValue
 /// Atomic function forward dependency type.
 ///
 /// * is_var_domain :
@@ -151,7 +151,7 @@ pub type AtomReverseOne<V> = fn(
 /// The i-th component is true (false) if the i-th component
 /// of *arange* depends on a variable in *adomaion.
 ///
-pub type ForwardDepend = fn(
+pub type AtomForwardDependValue = fn(
     _is_var_domain  : &Vec<bool> ,
     _call_info      : IndexT     ,
     _trace          : bool       ,
@@ -160,10 +160,10 @@ pub type ForwardDepend = fn(
 // AtomEval
 /// Atomic function evaluation routines.
 pub struct AtomEval<V> {
-    pub forward_zero_value : AtomForwardZero::<V> ,
-    pub forward_one_value  : AtomForwardOne::<V>  ,
-    pub reverse_one_value  : AtomReverseOne::<V>  ,
-    pub forward_depend     : ForwardDepend        ,
+    pub forward_zero_value : AtomForwardZeroValue::<V> ,
+    pub forward_one_value  : AtomForwardOneValue::<V>  ,
+    pub reverse_one_value  : AtomReverseOneValue::<V>  ,
+    pub forward_depend     : AtomForwardDependValue        ,
 }
 // ----------------------------------------------------------------------------
 pub (crate) mod sealed {
@@ -255,7 +255,7 @@ where
 // record_call_atom
 fn record_call_atom<V>(
     tape             : &mut Tape<V>                  ,
-    forward_depend   : ForwardDepend                 ,
+    forward_depend   : AtomForwardDependValue                 ,
     adomain          : Vec< AD<V> >                  ,
     range_zero       : Vec<V>                        ,
     atom_id          : IndexT                        ,
@@ -385,8 +385,8 @@ where
     let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
     //
     // forward_zero, forward_depend
-    let forward_zero   : AtomForwardZero<V>;
-    let forward_depend : ForwardDepend;
+    let forward_zero   : AtomForwardZeroValue<V>;
+    let forward_depend : AtomForwardDependValue;
     {   //
         // read_lock
         let read_lock = rw_lock.read();
