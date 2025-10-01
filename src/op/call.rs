@@ -139,8 +139,8 @@ where
     ) = extract_call_arg(var_zero, con, flag, arg);
     // ----------------------------------------------------------------------
     //
-    // forward_zero
-    let forward_zero : AtomForwardZeroValue<V>;
+    // forward_zero_value
+    let forward_zero_value : AtomForwardZeroValue<V>;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -150,14 +150,14 @@ where
         assert!( read_lock.is_ok() );
         //
         // Rest of this block has a lock, so it should be fast and not fail.
-        let atom_eval_vec = read_lock.unwrap();
-        let atom_eval = &atom_eval_vec[atom_id];
-        forward_zero  = atom_eval.forward_zero_value.clone();
+        let atom_eval_vec   = read_lock.unwrap();
+        let atom_eval       = &atom_eval_vec[atom_id];
+        forward_zero_value  = atom_eval.forward_zero_value.clone();
     }
     //
     // call_range_zero
     let mut call_var_zero  : Vec<V> = Vec::new();
-    let mut call_range_zero = forward_zero(
+    let mut call_range_zero = forward_zero_value(
         &mut call_var_zero, call_domain_zero, call_info, trace
     );
     //
@@ -199,9 +199,9 @@ where
     ) = extract_call_arg(var_zero, con, flag, arg);
     // ----------------------------------------------------------------------
     //
-    // forward_zero, forward_one
-    let forward_zero : AtomForwardZeroValue<V>;
-    let forward_one  : AtomForwardOneValue<V>;
+    // forward_zero_value, forward_one_value
+    let forward_zero_value : AtomForwardZeroValue<V>;
+    let forward_one_value  : AtomForwardOneValue<V>;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -211,15 +211,15 @@ where
         assert!( read_lock.is_ok() );
         //
         // Rest of this block has a lock, so it should be fast and not fail.
-        let atom_eval_vec = read_lock.unwrap();
-        let atom_eval     = &atom_eval_vec[atom_id];
-        forward_zero      = atom_eval.forward_zero_value.clone();
-        forward_one       = atom_eval.forward_one_value.clone();
+        let atom_eval_vec       = read_lock.unwrap();
+        let atom_eval           = &atom_eval_vec[atom_id];
+        forward_zero_value      = atom_eval.forward_zero_value.clone();
+        forward_one_value       = atom_eval.forward_one_value.clone();
     }
     //
     // call_var_zero
     let mut call_var_zero : Vec<V> = Vec::new();
-    forward_zero(&mut call_var_zero, call_domain_zero, call_info, trace);
+    forward_zero_value(&mut call_var_zero, call_domain_zero, call_info, trace);
     //
     // call_domain_one
     let zero_v : V = 0f32.into();
@@ -233,7 +233,7 @@ where
         }
     }
     // call_range_one
-    let mut call_range_one = forward_one(
+    let mut call_range_one = forward_one_value(
         &call_var_zero, call_domain_one, call_info, trace
     );
     //
@@ -275,9 +275,9 @@ where
     ) = extract_call_arg(var_zero, con, flag, arg);
     // ----------------------------------------------------------------------
     //
-    // forward_zero, reverse_one
-    let forward_zero : AtomForwardZeroValue<V>;
-    let reverse_one  : AtomReverseOneValue<V>;
+    // forward_zero_value, reverse_one_value
+    let forward_zero_value : AtomForwardZeroValue<V>;
+    let reverse_one_value  : AtomReverseOneValue<V>;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -287,15 +287,15 @@ where
         assert!( read_lock.is_ok() );
         //
         // Rest of this block has a lock, so it should be fast and not fail.
-        let atom_eval_vec = read_lock.unwrap();
-        let atom_eval     = &atom_eval_vec[atom_id];
-        forward_zero      = atom_eval.forward_zero_value.clone();
-        reverse_one       = atom_eval.reverse_one_value.clone();
+        let atom_eval_vec       = read_lock.unwrap();
+        let atom_eval           = &atom_eval_vec[atom_id];
+        forward_zero_value      = atom_eval.forward_zero_value.clone();
+        reverse_one_value       = atom_eval.reverse_one_value.clone();
     }
     //
     // call_var_zero
     let mut call_var_zero : Vec<V> = Vec::new();
-    forward_zero(&mut call_var_zero, call_domain_zero, call_info, trace);
+    forward_zero_value(&mut call_var_zero, call_domain_zero, call_info, trace);
     //
     // call_range_one
     let zero_v : V = 0f32.into();
@@ -310,7 +310,7 @@ where
         }
     }
     // call_domain_one
-    let call_domain_one = reverse_one(
+    let call_domain_one = reverse_one_value(
         &call_var_zero, call_range_one, call_info, trace
     );
     //
