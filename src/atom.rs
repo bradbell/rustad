@@ -170,10 +170,10 @@ pub type AtomForwardDependValue = fn(
 // AtomEval
 /// Atomic function evaluation routines.
 pub struct AtomEval<V> {
-    pub forward_zero_value : AtomForwardZeroValue::<V> ,
-    pub forward_one_value  : AtomForwardOneValue::<V>  ,
-    pub reverse_one_value  : AtomReverseOneValue::<V>  ,
-    pub forward_depend     : AtomForwardDependValue        ,
+    pub forward_zero_value   : AtomForwardZeroValue::<V> ,
+    pub forward_one_value    : AtomForwardOneValue::<V>  ,
+    pub reverse_one_value    : AtomReverseOneValue::<V>  ,
+    pub forward_depend_value : AtomForwardDependValue    ,
 }
 // ----------------------------------------------------------------------------
 pub (crate) mod sealed {
@@ -264,13 +264,13 @@ where
 // ----------------------------------------------------------------------------
 // record_call_atom
 fn record_call_atom<V>(
-    tape             : &mut Tape<V>                  ,
-    forward_depend   : AtomForwardDependValue                 ,
-    adomain          : Vec< AD<V> >                  ,
-    range_zero       : Vec<V>                        ,
-    atom_id          : IndexT                        ,
-    call_info        : IndexT                        ,
-    trace            : bool                          ,
+    tape                  : &mut Tape<V>                  ,
+    forward_depend_value  : AtomForwardDependValue        ,
+    adomain               : Vec< AD<V> >                  ,
+    range_zero            : Vec<V>                        ,
+    atom_id               : IndexT                        ,
+    call_info             : IndexT                        ,
+    trace                 : bool                          ,
 ) -> Vec< AD<V> >
 where
     V : Clone ,
@@ -291,7 +291,7 @@ where
     ).collect();
     //
     // is_var_res
-    let is_var_res = forward_depend(&is_var_arg, call_info, trace);
+    let is_var_res = forward_depend_value(&is_var_arg, call_info, trace);
     //
     // arange, n_var_res
     let mut n_var_res = 0;
@@ -394,9 +394,9 @@ where
     // rwlock
     let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
     //
-    // forward_zero, forward_depend
+    // forward_zero, forward_depend_value
     let forward_zero   : AtomForwardZeroValue<V>;
-    let forward_depend : AtomForwardDependValue;
+    let forward_depend_value : AtomForwardDependValue;
     {   //
         // read_lock
         let read_lock = rw_lock.read();
@@ -405,8 +405,8 @@ where
         // Rest of this block has a lock, so it should be fast and not fail.
         let atom_eval_vec = read_lock.unwrap();
         let atom_eval     = &atom_eval_vec[atom_id as usize];
-        forward_zero      = atom_eval.forward_zero_value.clone();
-        forward_depend    = atom_eval.forward_depend.clone();
+        forward_zero          = atom_eval.forward_zero_value.clone();
+        forward_depend_value  = atom_eval.forward_depend_value.clone();
     }
     //
     // domain_zero
@@ -429,7 +429,7 @@ where
     } else {
         arange = local_key.with_borrow_mut( |tape| record_call_atom::<V>(
             tape,
-            forward_depend,
+            forward_depend_value,
             adomain,
             range_zero,
             atom_id,
