@@ -43,7 +43,10 @@ use crate::adfn::{
 // AtomForwardZeroValue
 /// Callback to atomic functions during [ADfn::forward_zero_value]
 ///
-/// * var_zero
+/// * Required :
+/// This function is required for all atomic functions.
+///
+/// * var_zero :
 /// This vector will have size zero on input.
 /// It can be used to cache information for use by forward_one
 /// and reverse one (and has no other restrictions).
@@ -71,8 +74,10 @@ pub type AtomForwardZeroValue<V> = fn(
 // AtomForwardOneValue
 /// Callback to atomic functions during [ADfn::forward_one_value]
 ///
-/// If you do not expect to use an atomic function with forward_one,
-/// it can just panic if it gets used.
+/// * Required :
+/// If you will not use this atomic function with
+/// [ADfn::forward_one_value] ,
+/// this function should panic if it gets used.
 ///
 /// * var_zero :
 /// This will contain the values set by forward_zero for the
@@ -103,8 +108,10 @@ pub type AtomForwardOneValue<V> = fn(
 // AtomReverseOneValue
 /// Callback to atomic functions during [ADfn::reverse_one_value]
 ///
-/// If you do not expect to use an atomic function with reverse_one,
-/// it can just panic if it gets used.
+/// * Required :
+/// If you will not use this atomic function with
+/// [ADfn::reverse_one_value] ,
+/// this function should panic if it gets used.
 ///
 /// * var_zero :
 /// This will contain the values set by forward_zero for the
@@ -133,7 +140,10 @@ pub type AtomReverseOneValue<V> = fn(
 ) -> Vec<V> ;
 //
 // AtomForwardDependValue
-/// Atomic function forward dependency type.
+/// Atomic function forward dependency type for value evaluations.
+///
+/// * Required :
+/// This function is required for all atomic functions.
 ///
 /// * is_var_domain :
 /// This has the same length as *adomain* in the corresponding [call_atom].
