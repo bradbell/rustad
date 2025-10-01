@@ -168,7 +168,7 @@ pub type AtomForwardDependValue = fn(
 )-> Vec<bool>;
 //
 // AtomForwardZeroAD
-/// Callback to atomic functions during [ADfn::forward_zero_value]
+/// Callback to atomic functions during [ADfn::forward_zero_ad]
 ///
 /// * Required :
 /// If you will not use this atomic function with
@@ -198,7 +198,7 @@ pub type AtomForwardZeroAD<V> = fn(
     _adomain_zero   : Vec<& AD<V> >     ,
     _call_info     : IndexT             ,
     _trace         : bool               ,
-) -> Vec<V> ;
+) -> Vec< AD<V> > ;
 //
 // AtomForwardDependAD
 /// Atomic function forward dependency type for AD evaluations.

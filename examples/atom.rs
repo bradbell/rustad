@@ -50,7 +50,7 @@ fn sumsq_forward_zero_ad(
     _domain_zero_ref  : Vec<& AD<V> >     ,
     _call_info        : IndexT            ,
     _trace            : bool              ,
-) -> Vec<V>
+) -> Vec< AD<V> >
 {   //
     panic!( "sumsq_forward_zero_ad not implemented");
 }
