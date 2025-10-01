@@ -65,20 +65,17 @@ use crate::{
     AtomEval,
 };
 // ----------------------------------------------------------------------
-fn extract_call_arg<'a, 'b, V>(
-    var_zero   : &'a Vec<V>    ,
-    con        : &'a Vec<V>    ,
-    flag       : &'b Vec<bool> ,
-    arg        : &'b [IndexT]  ,
+fn extract_call_arg<'a>(
+    flag       : &'a Vec<bool> ,
+    arg        : &'a [IndexT]  ,
 ) -> (
     usize      , // atom_id
     IndexT     , // call_info
     usize      , // call_n_arg
     usize      , // call_n_res
     bool       , // trace
-    &'b [bool] , // is_arg_var
-    &'b [bool] , // is_res_var
-    Vec<&'a V> , // call_domain_zero
+    &'a [bool] , // is_arg_var
+    &'a [bool] , // is_res_var
 ) {
     let atom_id    = arg[0] as usize;
     let call_info  = arg[1];
@@ -92,6 +89,25 @@ fn extract_call_arg<'a, 'b, V>(
     begin           = end;
     end             = begin + call_n_res;
     let is_res_var  = &flag[begin .. end];
+    (
+        atom_id,
+        call_info,
+        call_n_arg,
+        call_n_res,
+        trace,
+        is_arg_var,
+        is_res_var,
+    )
+}
+// ----------------------------------------------------------------------
+fn call_domain_zero_value<'a, 'b, V>(
+    var_zero   : &'a Vec<V>    ,
+    con        : &'a Vec<V>    ,
+    arg        : &'b [IndexT]  ,
+    call_n_arg : usize         ,
+    is_arg_var : &'b [bool]    ,
+) -> Vec<&'a V>
+{
     //
     let mut call_domain_zero : Vec<&V> = Vec::with_capacity( call_n_arg );
     for i_arg in 0 .. call_n_arg {
@@ -102,22 +118,12 @@ fn extract_call_arg<'a, 'b, V>(
             call_domain_zero.push( &con[index] );
         }
     }
-    //
-    (
-        atom_id,
-        call_info,
-        call_n_arg,
-        call_n_res,
-        trace,
-        is_arg_var,
-        is_res_var,
-        call_domain_zero
-    )
+    call_domain_zero
 }
 // --------------------------------------------------------------------------
 // call_forward_0_value
 //
-/// zero order forward call operator for atomic functions
+/// V evaluation of zero order forward call operator for atomic functions
 fn call_forward_0_value<V> (
     var_zero   : &mut Vec<V>   ,
     con        : &Vec<V>       ,
@@ -130,13 +136,15 @@ where
     let (
         atom_id,
         call_info,
-        _call_n_arg,
+        call_n_arg,
         call_n_res,
         trace,
-        _is_arg_var,
+        is_arg_var,
         is_res_var,
-        call_domain_zero,
-    ) = extract_call_arg(var_zero, con, flag, arg);
+    ) = extract_call_arg(flag, arg);
+    let call_domain_zero = call_domain_zero_value(
+        var_zero, con, arg, call_n_arg, is_arg_var
+    );
     // ----------------------------------------------------------------------
     //
     // forward_zero_value
@@ -176,7 +184,7 @@ where
 // --------------------------------------------------------------------------
 // call_forward_1_value
 //
-/// first order forward call operator for atomic functions
+/// V evaluation of first order forward call operator for atomic functions
 fn call_forward_1_value<V> (
     var_zero   : &Vec<V>       ,
     var_one    : &mut Vec<V>   ,
@@ -195,8 +203,10 @@ where
         trace,
         is_arg_var,
         is_res_var,
-        call_domain_zero,
-    ) = extract_call_arg(var_zero, con, flag, arg);
+    ) = extract_call_arg(flag, arg);
+    let call_domain_zero = call_domain_zero_value(
+        var_zero, con, arg, call_n_arg, is_arg_var
+    );
     // ----------------------------------------------------------------------
     //
     // forward_zero_value, forward_one_value
@@ -252,7 +262,7 @@ where
 // --------------------------------------------------------------------------
 // call_reverse_1_value
 //
-/// first order reverse call operator for atomic functions
+/// V evaluation of first order reverse call operator for atomic functions
 fn call_reverse_1_value<V> (
     var_zero   : &Vec<V>       ,
     var_one    : &mut Vec<V>   ,
@@ -271,8 +281,10 @@ where
         trace,
         is_arg_var,
         is_res_var,
-        call_domain_zero,
-    ) = extract_call_arg(var_zero, con, flag, arg);
+    ) = extract_call_arg(flag, arg);
+    let call_domain_zero = call_domain_zero_value(
+        var_zero, con, arg, call_n_arg, is_arg_var
+    );
     // ----------------------------------------------------------------------
     //
     // forward_zero_value, reverse_one_value
