@@ -48,8 +48,8 @@ use crate::adfn::{
 ///
 /// * var_zero :
 /// This vector will have size zero on input.
-/// It can be used to cache information for use by forward_one
-/// and reverse one (and has no other restrictions).
+/// It can be used to cache information for use by forward_one_value
+/// and reverse_one_value (and has no other restrictions).
 ///
 /// * domain_zero :
 /// this contains the value of the atomic function domain variables.
@@ -80,7 +80,7 @@ pub type AtomForwardZeroValue<V> = fn(
 /// this function should panic if it gets used.
 ///
 /// * var_zero :
-/// This will contain the values set by forward_zero for the
+/// This will contain the values set by forward_zero_valuew for the
 /// same call to this atomic function; i.e., same [call_atom].
 ///
 /// * domain_one :
@@ -93,7 +93,7 @@ pub type AtomForwardZeroValue<V> = fn(
 /// if true, a trace of the calculations may be printed on stdout.
 ///
 /// * return :
-/// Let *domain_zero* be its value in the call to forward_zero
+/// Let *domain_zero* be its value in the call to forward_zero_valuew
 /// that set *var_zero* . The return value *range_one* is
 /// ```text
 ///     range_one = f'(domain_zero) * domain_one
@@ -114,7 +114,7 @@ pub type AtomForwardOneValue<V> = fn(
 /// this function should panic if it gets used.
 ///
 /// * var_zero :
-/// This will contain the values set by forward_zero for the
+/// This will contain the values set by forward_zero_valuew for the
 /// same call to this atomic function; i.e., same [call_atom].
 ///
 /// * range_one :
@@ -127,7 +127,7 @@ pub type AtomForwardOneValue<V> = fn(
 /// if true, a trace of the calculations may be printed on stdout.
 ///
 /// * return :
-/// Let *domain_zero* be its value in the call to forward_zero
+/// Let *domain_zero* be its value in the call to forward_zero_valuew
 /// that set *var_zero* . The return value *domain_one* is
 /// ```text
 ///     domain_one = range_one * f'(domain_zero)
