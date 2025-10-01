@@ -167,6 +167,70 @@ pub type AtomForwardDependValue = fn(
     _trace          : bool       ,
 )-> Vec<bool>;
 //
+// AtomForwardZeroAD
+/// Callback to atomic functions during [ADfn::forward_zero_value]
+///
+/// * Required :
+/// If you will not use this atomic function with
+/// [ADfn::forward_one_ad] ,
+/// this function should panic if it gets used.
+///
+/// * avar_zero
+/// This vector will have size zero on input.
+/// It can be used to cache information for use by forward_one
+/// and reverse one (and has no other restrictions).
+///
+/// * adomain_zero :
+/// this contains the value of the atomic function domain variables.
+///
+/// * call_info :
+/// is the *call_info* value used when the atomic function was called.
+///
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+///
+/// * return :
+/// The return value *arange_one*
+/// contains the value of the atomic function range variables.
+///
+pub type AtomForwardZeroAD<V> = fn(
+    _avar_zero      : &mut Vec< AD<V> > ,
+    _adomain_zero   : Vec<& AD<V> >     ,
+    _call_info     : IndexT             ,
+    _trace         : bool               ,
+) -> Vec<V> ;
+//
+// AtomForwardDependAD
+/// Atomic function forward dependency type for AD evaluations.
+///
+/// * Required :
+/// If you will not use this atomic function with
+/// [ADfn::forward_one_ad] ,
+/// this function should panic if it gets used.
+///
+/// * is_var_domain :
+/// This has the same length as *adomain* in the corresponding [call_atom].
+/// The j-th component is true (false) if the j-th component
+/// of *adomain* is a variable (constant).
+///
+/// * call_info :
+/// is the *call_info* value used when the atomic function was called.
+///
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+///
+/// * return :
+/// This has the same length as *avar_zero* in the corresponding
+/// [AtomForwardZeroAD].
+/// The i-th component is true (false) if the i-th component
+/// of *avar_zero* depends on a variable in *adomaion.
+///
+pub type AtomForwardDependAD = fn(
+    _is_var_domain  : &Vec<bool> ,
+    _call_info      : IndexT     ,
+    _trace          : bool       ,
+)-> Vec<bool>;
+//
 // AtomEval
 /// Atomic function evaluation routines.
 pub struct AtomEval<V> {
@@ -174,6 +238,9 @@ pub struct AtomEval<V> {
     pub forward_one_value    : AtomForwardOneValue::<V>  ,
     pub reverse_one_value    : AtomReverseOneValue::<V>  ,
     pub forward_depend_value : AtomForwardDependValue    ,
+    //
+    pub forward_zero_ad      : AtomForwardZeroAD::<V>    ,
+    pub forward_depend_ad    : AtomForwardDependAD       ,
 }
 // ----------------------------------------------------------------------------
 pub (crate) mod sealed {

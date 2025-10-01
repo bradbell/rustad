@@ -28,6 +28,7 @@ thread_local! {
 }
 // -------------------------------------------------------------------------
 // checkpoint_forward_zero_value
+// checkpoint_forward_zero_ad
 // -------------------------------------------------------------------------
 fn checkpoint_forward_zero_value(
     var_zero         : &mut Vec<V> ,
@@ -51,6 +52,15 @@ fn checkpoint_forward_zero_value(
        range_zero = f.forward_zero_value(var_zero, domain_zero, trace);
     } );
     range_zero
+}
+fn checkpoint_forward_zero_ad(
+    _var_zero         : &mut Vec< AD<V> > ,
+    _domain_zero_ref  : Vec<& AD<V> >     ,
+    _call_info        : IndexT            ,
+    _trace            : bool              ,
+) -> Vec<V>
+{   //
+    panic!( "checkpoint_forward_zero_ad not implemented");
 }
 // -------------------------------------------------------------------------
 // checkpoint_forward_one_value
@@ -106,6 +116,7 @@ fn checkpoint_reverse_one_value(
 }
 // -------------------------------------------------------------------------
 // checkpoint_forward_depend_value
+// checkpoint_forward_depend_ad
 // -------------------------------------------------------------------------
 fn checkpoint_forward_depend_value(
     is_var_domain  : &Vec<bool> ,
@@ -131,6 +142,15 @@ fn checkpoint_forward_depend_value(
     }
     is_var_range
 }
+//
+fn checkpoint_forward_depend_ad(
+    _is_var_domain  : &Vec<bool> ,
+    _call_info      : IndexT     ,
+    _trace          : bool       ,
+) -> Vec<bool>
+{   //
+    panic!( "checkpoint_forward_depend_ad not implemented");
+}
 // -------------------------------------------------------------------------
 // register_checkpoint_atom
 // -------------------------------------------------------------------------
@@ -139,9 +159,11 @@ fn register_checkpoint_atom()-> IndexT {
     // checkpoint_atom_eval
     let checkpoint_atom_eval = AtomEval {
         forward_zero_value   :  checkpoint_forward_zero_value,
+        forward_zero_ad      :  checkpoint_forward_zero_ad,
         forward_one_value    :  checkpoint_forward_one_value,
         reverse_one_value    :  checkpoint_reverse_one_value,
         forward_depend_value :  checkpoint_forward_depend_value,
+        forward_depend_ad    :  checkpoint_forward_depend_ad,
     };
     //
     // atom_id

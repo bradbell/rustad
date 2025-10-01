@@ -3,6 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
 use rustad::{
+    AD,
     start_recording,
     stop_recording,
     register_atom,
@@ -15,6 +16,7 @@ use rustad::{
 type V = f64;
 // -------------------------------------------------------------------------
 // sumsq_forward_zero_value
+// sumsq_forward_zero_ad
 // -------------------------------------------------------------------------
 fn sumsq_forward_zero_value(
     var_zero     : &mut Vec<V> ,
@@ -42,6 +44,15 @@ fn sumsq_forward_zero_value(
         println!("End Trace: sumsq_forward_zero_value");
     }
     vec![ sumsq_zero ]
+}
+fn sumsq_forward_zero_ad(
+    _var_zero         : &mut Vec< AD<V> > ,
+    _domain_zero_ref  : Vec<& AD<V> >     ,
+    _call_info        : IndexT            ,
+    _trace            : bool              ,
+) -> Vec<V>
+{   //
+    panic!( "sumsq_forward_zero_ad not implemented");
 }
 // -------------------------------------------------------------------------
 // sumsq_forward_one_value
@@ -101,6 +112,7 @@ fn sumsq_reverse_one_value(
 }
 // -------------------------------------------------------------------------
 // sumsq_forward_depend_value
+// sumsq_forward_depend_ad
 // -------------------------------------------------------------------------
 fn sumsq_forward_depend_value(
     is_var_domain  : &Vec<bool> ,
@@ -114,6 +126,15 @@ fn sumsq_forward_depend_value(
     }
     vec![ is_var_range ]
 }
+//
+fn sumsq_forward_depend_ad(
+    _is_var_domain  : &Vec<bool> ,
+    _call_info      : IndexT     ,
+    _trace          : bool       ,
+) -> Vec<bool>
+{   //
+    panic!( "sumsq_forward_depend_ad not implemented");
+}
 // -------------------------------------------------------------------------
 // register_sumsq_atom
 // -------------------------------------------------------------------------
@@ -122,9 +143,11 @@ fn register_sumsq_atom()-> IndexT {
     // sumsq_atom_eval
     let sumsq_atom_eval = AtomEval {
         forward_zero_value   :  sumsq_forward_zero_value,
+        forward_zero_ad      :  sumsq_forward_zero_ad,
         forward_one_value    :  sumsq_forward_one_value,
         reverse_one_value    :  sumsq_reverse_one_value,
         forward_depend_value :  sumsq_forward_depend_value,
+        forward_depend_ad    :  sumsq_forward_depend_ad,
     };
     //
     // sumsq_atom_id
