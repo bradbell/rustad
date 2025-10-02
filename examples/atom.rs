@@ -15,9 +15,10 @@ use rustad::{
 // V
 type V = f64;
 // -------------------------------------------------------------------------
-// sumsq_forward_zero_value
-// sumsq_forward_zero_ad
+// Value Routines
 // -------------------------------------------------------------------------
+//
+// sumsq_forward_zero_value
 fn sumsq_forward_zero_value(
     var_zero     : &mut Vec<V> ,
     domain_zero  : Vec<&V>     ,
@@ -45,18 +46,8 @@ fn sumsq_forward_zero_value(
     }
     vec![ sumsq_zero ]
 }
-fn sumsq_forward_zero_ad(
-    _var_zero         : &mut Vec< AD<V> > ,
-    _domain_zero_ref  : Vec<& AD<V> >     ,
-    _call_info        : IndexT            ,
-    _trace            : bool              ,
-) -> Vec< AD<V> >
-{   //
-    panic!( "sumsq_forward_zero_ad not implemented");
-}
-// -------------------------------------------------------------------------
+//
 // sumsq_forward_one_value
-// -------------------------------------------------------------------------
 fn sumsq_forward_one_value(
     domain_zero  : &Vec<V>     ,
     domain_one   : Vec<&V>     ,
@@ -82,9 +73,8 @@ fn sumsq_forward_one_value(
     }
     vec![ sumsq_one ]
 }
-// -------------------------------------------------------------------------
+//
 // sumsq_reverse_one_value
-// -------------------------------------------------------------------------
 fn sumsq_reverse_one_value(
     domain_zero  : &Vec<V>     ,
     range_one    : Vec<&V>     ,
@@ -110,9 +100,8 @@ fn sumsq_reverse_one_value(
     }
     domain_one
 }
-// -------------------------------------------------------------------------
+//
 // sumsq_forward_depend_value
-// sumsq_forward_depend_ad
 // -------------------------------------------------------------------------
 fn sumsq_forward_depend_value(
     is_var_domain  : &Vec<bool> ,
@@ -125,15 +114,6 @@ fn sumsq_forward_depend_value(
         is_var_range = is_var_range || is_var_domain[j];
     }
     vec![ is_var_range ]
-}
-//
-fn sumsq_forward_depend_ad(
-    _is_var_domain  : &Vec<bool> ,
-    _call_info      : IndexT     ,
-    _trace          : bool       ,
-) -> Vec<bool>
-{   //
-    panic!( "sumsq_forward_depend_ad not implemented");
 }
 // -------------------------------------------------------------------------
 // register_sumsq_atom
@@ -153,6 +133,30 @@ fn register_sumsq_atom()-> IndexT {
     // sumsq_atom_id
     let sumsq_atom_id = register_atom( sumsq_atom_eval );
     sumsq_atom_id
+}
+// -------------------------------------------------------------------------
+// AD Routines
+// -------------------------------------------------------------------------
+//
+// sumsq_forward_zero_ad
+fn sumsq_forward_zero_ad(
+    _var_zero         : &mut Vec< AD<V> > ,
+    _domain_zero_ref  : Vec<& AD<V> >     ,
+    _call_info        : IndexT            ,
+    _trace            : bool              ,
+) -> Vec< AD<V> >
+{   //
+    panic!( "sumsq_forward_zero_ad not implemented");
+}
+//
+// sumsq_forward_depend_ad
+fn sumsq_forward_depend_ad(
+    _is_var_domain  : &Vec<bool> ,
+    _call_info      : IndexT     ,
+    _trace          : bool       ,
+) -> Vec<bool>
+{   //
+    panic!( "sumsq_forward_depend_ad not implemented");
 }
 // -------------------------------------------------------------------------
 // Tests

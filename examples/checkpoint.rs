@@ -27,9 +27,10 @@ thread_local! {
         RefCell::new( Vec::new() );
 }
 // -------------------------------------------------------------------------
-// checkpoint_forward_zero_value
-// checkpoint_forward_zero_ad
+// Value Routines
 // -------------------------------------------------------------------------
+//
+// checkpoint_forward_zero_value
 fn checkpoint_forward_zero_value(
     var_zero         : &mut Vec<V> ,
     domain_zero_ref  : Vec<&V>     ,
@@ -53,18 +54,8 @@ fn checkpoint_forward_zero_value(
     } );
     range_zero
 }
-fn checkpoint_forward_zero_ad(
-    _var_zero         : &mut Vec< AD<V> > ,
-    _domain_zero_ref  : Vec<& AD<V> >     ,
-    _call_info        : IndexT            ,
-    _trace            : bool              ,
-) -> Vec< AD<V> >
-{   //
-    panic!( "checkpoint_forward_zero_ad not implemented");
-}
-// -------------------------------------------------------------------------
+//
 // checkpoint_forward_one_value
-// -------------------------------------------------------------------------
 fn checkpoint_forward_one_value(
     var_zero         : &Vec<V>     ,
     domain_one_ref   : Vec<&V>     ,
@@ -88,9 +79,8 @@ fn checkpoint_forward_one_value(
     } );
     range_one
 }
-// -------------------------------------------------------------------------
+//
 // checkpoint_reverse_one_value
-// -------------------------------------------------------------------------
 fn checkpoint_reverse_one_value(
     var_zero         : &Vec<V>     ,
     range_one_ref    : Vec<&V>     ,
@@ -114,10 +104,8 @@ fn checkpoint_reverse_one_value(
     } );
     domain_one
 }
-// -------------------------------------------------------------------------
+//
 // checkpoint_forward_depend_value
-// checkpoint_forward_depend_ad
-// -------------------------------------------------------------------------
 fn checkpoint_forward_depend_value(
     is_var_domain  : &Vec<bool> ,
     call_info      : IndexT     ,
@@ -143,14 +131,6 @@ fn checkpoint_forward_depend_value(
     is_var_range
 }
 //
-fn checkpoint_forward_depend_ad(
-    _is_var_domain  : &Vec<bool> ,
-    _call_info      : IndexT     ,
-    _trace          : bool       ,
-) -> Vec<bool>
-{   //
-    panic!( "checkpoint_forward_depend_ad not implemented");
-}
 // -------------------------------------------------------------------------
 // register_checkpoint_atom
 // -------------------------------------------------------------------------
@@ -169,6 +149,30 @@ fn register_checkpoint_atom()-> IndexT {
     // atom_id
     let atom_id = register_atom( checkpoint_atom_eval );
     atom_id
+}
+// -------------------------------------------------------------------------
+// AD routines
+// -------------------------------------------------------------------------
+//
+// checkpoint_forward_zero_ad
+fn checkpoint_forward_zero_ad(
+    _var_zero         : &mut Vec< AD<V> > ,
+    _domain_zero_ref  : Vec<& AD<V> >     ,
+    _call_info        : IndexT            ,
+    _trace            : bool              ,
+) -> Vec< AD<V> >
+{   //
+    panic!( "checkpoint_forward_zero_ad not implemented");
+}
+//
+// checkpoint_forward_depend_ad
+fn checkpoint_forward_depend_ad(
+    _is_var_domain  : &Vec<bool> ,
+    _call_info      : IndexT     ,
+    _trace          : bool       ,
+) -> Vec<bool>
+{   //
+    panic!( "checkpoint_forward_depend_ad not implemented");
 }
 // -------------------------------------------------------------------------
 // main
