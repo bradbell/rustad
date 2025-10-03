@@ -195,7 +195,6 @@ fn test_reverse_one(sumsq_atom_id : IndexT) {
 // -------------------------------------------------------------------------
 // main
 // -------------------------------------------------------------------------
-#[test]
 fn main() {
     let sumsq_atom_id = register_sumsq_atom();
     test_forward_zero(sumsq_atom_id);

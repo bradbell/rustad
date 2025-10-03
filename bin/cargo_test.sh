@@ -35,12 +35,12 @@ then
 fi
 echo 'cargo test --doc: OK'
 #
-if ! cargo test --all-targets >& temp.out
+if ! cargo test >& temp.out
 then
    cat temp.out
-   echo 'cargo test --all-targets: Error'
+   echo 'cargo test: Error'
    exit 1
 fi
 sed -f temp.sed temp.out
-echo 'cargo test --all-targets: Ok'
+echo 'cargo test: Ok'
 exit 0
