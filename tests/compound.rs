@@ -4,11 +4,11 @@
 //
 // Testing compoound assignment operators
 //
-use rustad::AD;
+#[cfg(test)]
 use rustad::ad_from_value;
 //
 #[test]
-fn test_compoundd_ad() {
+fn compound() {
     //
     // add
     let mut ax   = ad_from_value( 3.0f64 );

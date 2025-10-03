@@ -7,7 +7,7 @@ use rustad::{
     stop_recording,
 };
 //
-#[test]
+// test_add_vv
 fn test_add_vv() {
     type V      = f64;
     let trace   = false;
@@ -38,7 +38,7 @@ fn test_add_vv() {
     assert_eq!( dx[2], dy[1] );
 }
 //
-#[test]
+// test_add_vc
 fn test_add_vc() {
     type V      = f64;
     let trace   = false;
@@ -68,7 +68,7 @@ fn test_add_vc() {
     assert_eq!( dx[1], dy[1] );
 }
 //
-#[test]
+// test_add_cv
 fn test_add_cv() {
     type V      = f64;
     let trace   = false;
@@ -96,4 +96,10 @@ fn test_add_cv() {
     //
     assert_eq!( dx[0], dy[1] );
     assert_eq!( dx[1], dy[0] );
+}
+#[test]
+fn add_op() {
+    test_add_vv();
+    test_add_vc();
+    test_add_cv();
 }

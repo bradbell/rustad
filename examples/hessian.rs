@@ -15,7 +15,6 @@ use rustad::{
 //
 // example_hessian
 // Simple case where V = f32
-#[test]
 fn example_hessian () {
     //
     type V     = f32;
@@ -86,7 +85,6 @@ fn example_hessian () {
 //
 // example_numvec_hessian
 // Same function where V = NumVec<f64>
-#[test]
 fn example_numvec_hessian () {
     //
     type F     = f64;
@@ -167,4 +165,8 @@ fn example_numvec_hessian () {
             }
         }
     }
+}
+fn main() {
+    example_hessian();
+    example_numvec_hessian();
 }

@@ -7,7 +7,7 @@ use rustad::{
     stop_recording,
 };
 //
-#[test]
+// test_mul_vv
 fn test_mul_vv() {
     type V      = f64;
     let trace   = false;
@@ -38,7 +38,7 @@ fn test_mul_vv() {
     assert_eq!( dx[2], dy[1] * x[1] );
 }
 //
-#[test]
+// test_mul_vc
 fn test_mul_vc() {
     type V      = f64;
     let trace   = false;
@@ -68,7 +68,7 @@ fn test_mul_vc() {
     assert_eq!( dx[1], dy[1] * (5.0 as V) );
 }
 //
-#[test]
+// test_mul_cv
 fn test_mul_cv() {
     type V      = f64;
     let trace   = false;
@@ -96,4 +96,10 @@ fn test_mul_cv() {
     //
     assert_eq!( dx[0], dy[1] * (5.0 as V) );
     assert_eq!( dx[1], dy[0] * (4.0 as V) );
+}
+#[test]
+fn mul_op() {
+    test_mul_vv();
+    test_mul_vc();
+    test_mul_cv();
 }
