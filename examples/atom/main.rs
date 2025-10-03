@@ -3,6 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
 use rustad::{
+    AD,
     ADfn,
     start_recording,
     stop_recording,
@@ -186,6 +187,27 @@ fn test_reverse_one_value(sumsq_atom_id : IndexT, trace : bool) {
     assert_eq!( dx[0], 2.0 * x[0]*dy[0] );
     assert_eq!( dx[1], 2.0 * x[1]*dy[0] );
 }
+// test_forward_zero_ad
+fn test_forward_zero_ad(sumsq_atom_id : IndexT, trace : bool) {
+    //
+    // f
+    let f = call_atomic_fun(sumsq_atom_id, trace);
+    //
+    // g
+    let x      : Vec<V>       = vec![ 3.0 , 4.0 ];
+    let ax                    = start_recording(x);
+    let mut av : Vec< AD<V> > = Vec::new();
+    let ay  = f.forward_zero_ad(&mut av , ax.clone(), trace);
+    let g   = stop_recording(ay);
+    //
+    // x, y
+    let x       : Vec<V> = vec![ 3.0 , 4.0 ];
+    let mut v   : Vec<V> = Vec::new();
+    let y                = g.forward_zero_value(&mut v , x.clone(), trace);
+    assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
+    //
+    assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
+}
 //
 // -------------------------------------------------------------------------
 // main
@@ -193,7 +215,10 @@ fn test_reverse_one_value(sumsq_atom_id : IndexT, trace : bool) {
 fn main() {
     let sumsq_atom_id = register_sumsq_atom();
     let trace         = false;
+    //
     test_forward_zero_value(sumsq_atom_id, trace);
     test_forward_one_value(sumsq_atom_id, trace);
     test_reverse_one_value(sumsq_atom_id, trace);
+    //
+    test_forward_zero_ad(sumsq_atom_id, trace);
 }
