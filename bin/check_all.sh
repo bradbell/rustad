@@ -62,6 +62,7 @@ echo_eval cargo run --release --bin normsq
 echo_eval cargo run --release --bin ad_fn
 echo
 echo_eval bin/cargo_test.sh
+echo_eval bin/cargo_example.sh
 echo
 #
 echo "check_all.sh OK"
