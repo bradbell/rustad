@@ -16,24 +16,21 @@ then
    exit 1
 fi
 cat << EOF > temp.sed
-/Running/! d
+s|^ *\\(Finished.*\\)|\\1\\n|
+/Running/! b end
 : loop
 N
 /\\ntest result:/! b loop
-s|\\n\\n|\\n|
-s|\\n\\n|\\n|
-s|(target/[^)]*)||
-s| *Running *unittests *|\\n|
-s| *Running *|\\n|
-s|running [0-9]* tests*\\n||
+/running 0 tests/d
+#
+s| *Running unittests ||
+s| *Running ||
 s|; 0 measured.*||
+s|\\nrunning [0-9]* test[s]*||
+s|\\n\\n|\\n|g
+#
+: end
 EOF
-if ! cargo test --doc
-then
-   echo 'cargo test --doc: Error'
-   exit 1
-fi
-echo 'cargo test --doc: OK'
 #
 if ! cargo test >& temp.out
 then
