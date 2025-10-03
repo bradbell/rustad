@@ -22,6 +22,17 @@ then
    rm rustad.long-type-*
 fi
 #
+# target/deps/debug
+# target/deps/release
+for build_type in debug release
+do
+   dir="target/$build_type/deps"
+   if [ -e $dir ]
+   then
+      rm $dir/*
+   fi
+done
+#
 # typos
 if ! which typos > /dev/null
 then
@@ -50,7 +61,6 @@ echo
 echo_eval cargo run --release --bin normsq
 echo_eval cargo run --release --bin ad_fn
 echo
-echo_eval bin/cargo_example.sh
 echo_eval bin/cargo_test.sh
 echo
 #
