@@ -8,7 +8,7 @@
 use rustad::ad_from_value;
 //
 #[test]
-fn main() {
+fn compound() {
     //
     // add
     let mut ax   = ad_from_value( 3.0f64 );

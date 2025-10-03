@@ -98,7 +98,7 @@ fn test_add_cv() {
     assert_eq!( dx[1], dy[0] );
 }
 #[test]
-fn main() {
+fn add_op() {
     test_add_vv();
     test_add_vc();
     test_add_cv();

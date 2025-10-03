@@ -98,7 +98,7 @@ fn test_mul_cv() {
     assert_eq!( dx[1], dy[0] * (4.0 as V) );
 }
 #[test]
-fn main() {
+fn mul_op() {
     test_mul_vv();
     test_mul_vc();
     test_mul_cv();
