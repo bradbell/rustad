@@ -2,7 +2,11 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
+use std::cell::RefCell;
+//
 use rustad::{
+    AD,
+    ADfn,
     start_recording,
     stop_recording,
     register_atom,
@@ -13,51 +17,38 @@ use rustad::{
 //
 // V
 type V = f64;
-// -------------------------------------------------------------------------
-// sumsq_forward_zero_value
-// -------------------------------------------------------------------------
-fn sumsq_forward_zero_value(
-    var_zero     : &mut Vec<V> ,
-    domain_zero  : Vec<&V>     ,
-    call_info    : IndexT      ,
-    trace        : bool        ,
-) -> Vec<V>
-{   //
-    assert_eq!( var_zero.len(), 0 );
-    let mut sumsq_zero = 0 as V;
-    for j in 0 .. domain_zero.len() {
-        sumsq_zero += domain_zero[j] * domain_zero[j];
-        if call_info == 1 {
-            var_zero.push( *domain_zero[j] )
-        }
-    }
-    if trace {
-        println!("Begin Trace: sumsq_forward_zero_value");
-        print!("domain_zero = [ ");
-        for j in 0 .. domain_zero.len() {
-                print!("{}, ", domain_zero[j]);
-        }
-        println!("]");
-        println!("sumsq_zero = {}", sumsq_zero);
-        println!("End Trace: sumsq_forward_zero_value");
-    }
-    vec![ sumsq_zero ]
+//
+// ATOM_ID_VEC
+thread_local! {
+    pub static ATOM_ID_VEC : RefCell< Vec<IndexT> > = RefCell::new(Vec::new());
 }
+//
+// sumsq_forward_zero_value
+// sumsq_forward_zero_ad
+mod forward_zero;
+use forward_zero::{
+    sumsq_forward_zero_value,
+    sumsq_forward_zero_ad,
+};
 // -------------------------------------------------------------------------
+// Value Routines
+// -------------------------------------------------------------------------
+//
 // sumsq_forward_one_value
-// -------------------------------------------------------------------------
 fn sumsq_forward_one_value(
-    domain_zero  : &Vec<V>     ,
+    domain_zero  : &Vec<&V>    ,
     domain_one   : Vec<&V>     ,
-    call_info    : IndexT      ,
+    _call_info   : IndexT      ,
     trace        : bool        ,
 ) -> Vec<V>
 {   //
-    assert_eq!( call_info,  1 );
+    // domain_zero
     assert_eq!( domain_zero.len(), domain_one.len() );
-    let mut sumsq_one = 0 as V;
+    //
+    // range_one
+    let mut range_one = 0 as V;
     for j in 0 .. domain_one.len() {
-        sumsq_one += 2.0 * domain_zero[j] * domain_one[j];
+        range_one += 2.0 * domain_zero[j] * domain_one[j];
     }
     if trace {
         println!("Begin Trace: sumsq_forward_one_value");
@@ -66,23 +57,24 @@ fn sumsq_forward_one_value(
                 print!("{}, ", domain_one[j]);
         }
         println!("]");
-        println!("sumsq_one = {}", sumsq_one);
+        println!("range_one = {}", range_one);
         println!("End Trace: sumsq_forward_one_value");
     }
-    vec![ sumsq_one ]
+    vec![ range_one ]
 }
-// -------------------------------------------------------------------------
+//
 // sumsq_reverse_one_value
-// -------------------------------------------------------------------------
 fn sumsq_reverse_one_value(
-    domain_zero  : &Vec<V>     ,
+    domain_zero  : &Vec<&V>    ,
     range_one    : Vec<&V>     ,
-    call_info    : IndexT      ,
+    _call_info   : IndexT      ,
     trace        : bool        ,
 ) -> Vec<V>
 {   //
-    assert_eq!( call_info,  1 );
+    // domain_zero
     assert_eq!( range_one.len(), 1 );
+    //
+    // domain_one
     let mut domain_one : Vec<V> = Vec::new();
     for j in 0 .. domain_zero.len() {
         domain_one.push( 2.0 * domain_zero[j] * range_one[0] );
@@ -99,10 +91,10 @@ fn sumsq_reverse_one_value(
     }
     domain_one
 }
+//
+// sumsq_forward_depend
 // -------------------------------------------------------------------------
-// sumsq_forward_depend_value
-// -------------------------------------------------------------------------
-fn sumsq_forward_depend_value(
+fn sumsq_forward_depend(
     is_var_domain  : &Vec<bool> ,
     _call_info     : IndexT     ,
     _trace         : bool       ,
@@ -122,9 +114,10 @@ fn register_sumsq_atom()-> IndexT {
     // sumsq_atom_eval
     let sumsq_atom_eval = AtomEval {
         forward_zero_value   :  sumsq_forward_zero_value,
+        forward_zero_ad      :  sumsq_forward_zero_ad,
         forward_one_value    :  sumsq_forward_one_value,
         reverse_one_value    :  sumsq_reverse_one_value,
-        forward_depend_value :  sumsq_forward_depend_value,
+        forward_depend       :  sumsq_forward_depend,
     };
     //
     // sumsq_atom_id
@@ -134,17 +127,24 @@ fn register_sumsq_atom()-> IndexT {
 // -------------------------------------------------------------------------
 // Tests
 // -------------------------------------------------------------------------
-fn test_forward_zero(sumsq_atom_id : IndexT) {
+fn call_atomic_fun(
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
+) -> ADfn<V> {
     //
-    // trace
-    let trace            = false;
-    //
-    // ax
     let x       : Vec<V> = vec![ 1.0 , 2.0 ];
     let ax               = start_recording(x);
-    let call_info        = 0 as IndexT;
     let ay               = call_atom(ax, sumsq_atom_id, call_info, trace);
     let f                = stop_recording(ay);
+    f
+}
+fn test_forward_zero_value(
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
+) {
+    //
+    // f
+    let f = call_atomic_fun(sumsq_atom_id, call_info, trace);
+    //
+    // x, y
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
     let mut v   : Vec<V> = Vec::new();
     let y                = f.forward_zero_value(&mut v , x.clone(), trace);
@@ -152,17 +152,14 @@ fn test_forward_zero(sumsq_atom_id : IndexT) {
 }
 //
 // test_forward_one
-fn test_forward_one(sumsq_atom_id : IndexT) {
+fn test_forward_one_value(
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
+) {
     //
-    // trace
-    let trace            = false;
+    // f
+    let f = call_atomic_fun(sumsq_atom_id, call_info, trace);
     //
-    // ax
-    let x       : Vec<V> = vec![ 1.0 , 2.0 ];
-    let ax               = start_recording(x);
-    let call_info        = 1 as IndexT;
-    let ay               = call_atom(ax, sumsq_atom_id, call_info, trace);
-    let f                = stop_recording(ay);
+    // x, dx, dy
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
     let mut v   : Vec<V> = Vec::new();
     f.forward_zero_value(&mut v , x.clone(), trace);
@@ -172,17 +169,14 @@ fn test_forward_one(sumsq_atom_id : IndexT) {
 }
 //
 // test_reverse_one
-fn test_reverse_one(sumsq_atom_id : IndexT) {
+fn test_reverse_one_value(
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
+) {
     //
-    // trace
-    let trace            = false;
+    // f
+    let f = call_atomic_fun(sumsq_atom_id, call_info, trace);
     //
-    // ax
-    let x       : Vec<V> = vec![ 1.0 , 2.0 ];
-    let ax               = start_recording(x);
-    let call_info        = 1 as IndexT;
-    let ay               = call_atom(ax, sumsq_atom_id, call_info, trace);
-    let f                = stop_recording(ay);
+    // x, dy, dx
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
     let mut v   : Vec<V> = Vec::new();
     f.forward_zero_value(&mut v , x.clone(), trace);
@@ -191,13 +185,45 @@ fn test_reverse_one(sumsq_atom_id : IndexT) {
     assert_eq!( dx[0], 2.0 * x[0]*dy[0] );
     assert_eq!( dx[1], 2.0 * x[1]*dy[0] );
 }
+// test_forward_zero_ad
+fn test_forward_zero_ad(
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
+) {
+    //
+    // f
+    let f = call_atomic_fun(sumsq_atom_id, call_info, trace);
+    //
+    // g
+    let x      : Vec<V>       = vec![ 3.0 , 4.0 ];
+    let ax                    = start_recording(x);
+    let mut av : Vec< AD<V> > = Vec::new();
+    let ay  = f.forward_zero_ad(&mut av , ax.clone(), trace);
+    let g   = stop_recording(ay);
+    //
+    // x, y
+    let x       : Vec<V> = vec![ 3.0 , 4.0 ];
+    let mut v   : Vec<V> = Vec::new();
+    let y                = g.forward_zero_value(&mut v , x.clone(), trace);
+    assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
+    //
+    assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
+}
 //
 // -------------------------------------------------------------------------
 // main
 // -------------------------------------------------------------------------
 fn main() {
     let sumsq_atom_id = register_sumsq_atom();
-    test_forward_zero(sumsq_atom_id);
-    test_forward_one(sumsq_atom_id);
-    test_reverse_one(sumsq_atom_id);
+    let call_info     = ATOM_ID_VEC.with_borrow_mut(|atom_id_vec| {
+        let call_info = atom_id_vec.len() as IndexT;
+        atom_id_vec.push( sumsq_atom_id );
+        call_info
+    } );
+    let trace         = false;
+    //
+    test_forward_zero_value(sumsq_atom_id, call_info, trace);
+    test_forward_one_value(sumsq_atom_id,  call_info, trace);
+    test_reverse_one_value(sumsq_atom_id,  call_info, trace);
+    //
+    test_forward_zero_ad(sumsq_atom_id,    call_info, trace);
 }

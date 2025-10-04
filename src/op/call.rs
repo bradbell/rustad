@@ -46,11 +46,11 @@ use std::sync::RwLock;
 //
 use crate::op::info::{
     OpInfo,
-    panic_zero,
     panic_one,
 };
 use crate::atom::{
     AtomForwardZeroValue,
+    AtomForwardZeroAD,
     AtomForwardOneValue,
     AtomReverseOneValue,
     sealed::AtomEvalVec,
@@ -63,22 +63,20 @@ use crate::{
     AD,
     IndexT,
     AtomEval,
+    ad_from_value,
 };
 // ----------------------------------------------------------------------
-fn extract_call_arg<'a, 'b, V>(
-    var_zero   : &'a Vec<V>    ,
-    con        : &'a Vec<V>    ,
-    flag       : &'b Vec<bool> ,
-    arg        : &'b [IndexT]  ,
+fn extract_call_arg<'a>(
+    flag       : &'a Vec<bool> ,
+    arg        : &'a [IndexT]  ,
 ) -> (
     usize      , // atom_id
     IndexT     , // call_info
     usize      , // call_n_arg
     usize      , // call_n_res
     bool       , // trace
-    &'b [bool] , // is_arg_var
-    &'b [bool] , // is_res_var
-    Vec<&'a V> , // call_domain_zero
+    &'a [bool] , // is_arg_var
+    &'a [bool] , // is_res_var
 ) {
     let atom_id    = arg[0] as usize;
     let call_info  = arg[1];
@@ -92,6 +90,25 @@ fn extract_call_arg<'a, 'b, V>(
     begin           = end;
     end             = begin + call_n_res;
     let is_res_var  = &flag[begin .. end];
+    (
+        atom_id,
+        call_info,
+        call_n_arg,
+        call_n_res,
+        trace,
+        is_arg_var,
+        is_res_var,
+    )
+}
+// ----------------------------------------------------------------------
+fn call_domain_zero_value<'a, 'b, V>(
+    var_zero   : &'a Vec<V>    ,
+    con        : &'a Vec<V>    ,
+    arg        : &'b [IndexT]  ,
+    call_n_arg : usize         ,
+    is_arg_var : &'b [bool]    ,
+) -> Vec<&'a V>
+{
     //
     let mut call_domain_zero : Vec<&V> = Vec::with_capacity( call_n_arg );
     for i_arg in 0 .. call_n_arg {
@@ -102,22 +119,56 @@ fn extract_call_arg<'a, 'b, V>(
             call_domain_zero.push( &con[index] );
         }
     }
+    call_domain_zero
+}
+// ----------------------------------------------------------------------
+//
+fn call_domain_acon<'a, 'b, V>(
+    con        : &'a Vec<V>    ,
+    arg        : &'b [IndexT]  ,
+    call_n_arg : usize         ,
+    is_arg_var : &'b [bool]    ,
+) -> Vec< AD<V> >
+where
+    V : Clone,
+{
     //
-    (
-        atom_id,
-        call_info,
-        call_n_arg,
-        call_n_res,
-        trace,
-        is_arg_var,
-        is_res_var,
-        call_domain_zero
-    )
+    let mut acon : Vec< AD<V> > = Vec::new();
+    for i_arg in 0 .. call_n_arg {
+        if ! is_arg_var[i_arg] {
+            let index = arg[i_arg + 5] as usize;
+            acon.push( ad_from_value( con[index].clone() ) );
+        }
+    }
+    acon
+}
+//
+fn call_domain_zero_ad<'a, 'b, V>(
+    avar_zero   : &'a Vec< AD<V> >    ,
+    acon        : &'a Vec< AD<V> >    ,
+    arg         : &'b [IndexT]        ,
+    call_n_arg : usize                ,
+    is_arg_var : &'b [bool]           ,
+) -> Vec<&'a AD<V> >
+{
+    //
+    let mut call_domain_zero : Vec<& AD<V> > = Vec::with_capacity( call_n_arg );
+    let mut i_con : usize = 0;
+    for i_arg in 0 .. call_n_arg {
+        if is_arg_var[i_arg] {
+            let index = arg[i_arg + 5] as usize;
+            call_domain_zero.push( &avar_zero[index] );
+        } else {
+            call_domain_zero.push( &acon[i_con] );
+            i_con += 1;
+        }
+    }
+    call_domain_zero
 }
 // --------------------------------------------------------------------------
 // call_forward_0_value
 //
-/// zero order forward call operator for atomic functions
+/// V evaluation of zero order forward call operator for atomic functions
 fn call_forward_0_value<V> (
     var_zero   : &mut Vec<V>   ,
     con        : &Vec<V>       ,
@@ -130,13 +181,15 @@ where
     let (
         atom_id,
         call_info,
-        _call_n_arg,
+        call_n_arg,
         call_n_res,
         trace,
-        _is_arg_var,
+        is_arg_var,
         is_res_var,
-        call_domain_zero,
-    ) = extract_call_arg(var_zero, con, flag, arg);
+    ) = extract_call_arg(flag, arg);
+    let call_domain_zero = call_domain_zero_value(
+        var_zero, con, arg, call_n_arg, is_arg_var
+    );
     // ----------------------------------------------------------------------
     //
     // forward_zero_value
@@ -156,9 +209,8 @@ where
     }
     //
     // call_range_zero
-    let mut call_var_zero  : Vec<V> = Vec::new();
     let mut call_range_zero = forward_zero_value(
-        &mut call_var_zero, call_domain_zero, call_info, trace
+        &call_domain_zero, call_info, trace
     );
     //
     // var_zero
@@ -176,7 +228,7 @@ where
 // --------------------------------------------------------------------------
 // call_forward_1_value
 //
-/// first order forward call operator for atomic functions
+/// V evaluation of first order forward call operator for atomic functions
 fn call_forward_1_value<V> (
     var_zero   : &Vec<V>       ,
     var_one    : &mut Vec<V>   ,
@@ -195,8 +247,10 @@ where
         trace,
         is_arg_var,
         is_res_var,
-        call_domain_zero,
-    ) = extract_call_arg(var_zero, con, flag, arg);
+    ) = extract_call_arg(flag, arg);
+    let call_domain_zero = call_domain_zero_value(
+        var_zero, con, arg, call_n_arg, is_arg_var
+    );
     // ----------------------------------------------------------------------
     //
     // forward_zero_value, forward_one_value
@@ -218,8 +272,7 @@ where
     }
     //
     // call_var_zero
-    let mut call_var_zero : Vec<V> = Vec::new();
-    forward_zero_value(&mut call_var_zero, call_domain_zero, call_info, trace);
+    forward_zero_value(&call_domain_zero, call_info, trace);
     //
     // call_domain_one
     let zero_v : V = 0f32.into();
@@ -234,7 +287,7 @@ where
     }
     // call_range_one
     let mut call_range_one = forward_one_value(
-        &call_var_zero, call_domain_one, call_info, trace
+        &call_domain_zero, call_domain_one, call_info, trace
     );
     //
     // var_one
@@ -252,7 +305,7 @@ where
 // --------------------------------------------------------------------------
 // call_reverse_1_value
 //
-/// first order reverse call operator for atomic functions
+/// V evaluation of first order reverse call operator for atomic functions
 fn call_reverse_1_value<V> (
     var_zero   : &Vec<V>       ,
     var_one    : &mut Vec<V>   ,
@@ -271,12 +324,13 @@ where
         trace,
         is_arg_var,
         is_res_var,
-        call_domain_zero,
-    ) = extract_call_arg(var_zero, con, flag, arg);
+    ) = extract_call_arg(flag, arg);
+    let call_domain_zero = call_domain_zero_value(
+        var_zero, con, arg, call_n_arg, is_arg_var
+    );
     // ----------------------------------------------------------------------
     //
     // forward_zero_value, reverse_one_value
-    let forward_zero_value : AtomForwardZeroValue<V>;
     let reverse_one_value  : AtomReverseOneValue<V>;
     {   //
         // rw_lock
@@ -289,13 +343,8 @@ where
         // Rest of this block has a lock, so it should be fast and not fail.
         let atom_eval_vec       = read_lock.unwrap();
         let atom_eval           = &atom_eval_vec[atom_id];
-        forward_zero_value      = atom_eval.forward_zero_value.clone();
         reverse_one_value       = atom_eval.reverse_one_value.clone();
     }
-    //
-    // call_var_zero
-    let mut call_var_zero : Vec<V> = Vec::new();
-    forward_zero_value(&mut call_var_zero, call_domain_zero, call_info, trace);
     //
     // call_range_one
     let zero_v : V = 0f32.into();
@@ -311,7 +360,7 @@ where
     }
     // call_domain_one
     let call_domain_one = reverse_one_value(
-        &call_var_zero, call_range_one, call_info, trace
+        &call_domain_zero, call_range_one, call_info, trace
     );
     //
     // var_one
@@ -319,6 +368,68 @@ where
         let index = arg[i_arg + 5] as usize;
         if is_arg_var[i_arg] {
             var_one[index] += &call_domain_one[i_arg];
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// call_forward_0_ad
+//
+/// `AD<V>` evaluation of zero order forward call operator for atomic functions
+fn call_forward_0_ad<V> (
+    avar_zero  : &mut Vec< AD<V> >  ,
+    con        : &Vec<V>             ,
+    flag       : &Vec<bool>          ,
+    arg        : &[IndexT]           ,
+    res        : usize               )
+where
+    V : Clone + AtomEvalVec,
+{   // ----------------------------------------------------------------------
+    let (
+        atom_id,
+        call_info,
+        call_n_arg,
+        call_n_res,
+        trace,
+        is_arg_var,
+        is_res_var,
+    ) = extract_call_arg(flag, arg);
+    let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
+    let call_adomain_zero = call_domain_zero_ad(
+        avar_zero, &acon, arg, call_n_arg, is_arg_var
+    );
+    // ----------------------------------------------------------------------
+    //
+    // forward_zero_ad
+    let forward_zero_ad : AtomForwardZeroAD<V>;
+    {   //
+        // rw_lock
+        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
+        //
+        // read_lock
+        let read_lock = rw_lock.read();
+        assert!( read_lock.is_ok() );
+        //
+        // Rest of this block has a lock, so it should be fast and not fail.
+        let atom_eval_vec   = read_lock.unwrap();
+        let atom_eval       = &atom_eval_vec[atom_id];
+        forward_zero_ad     = atom_eval.forward_zero_ad.clone();
+    }
+    //
+    // call_arange_zero
+    let mut call_arange_zero = forward_zero_ad(
+        &call_adomain_zero, call_info, trace
+    );
+    //
+    // avar_zero
+    let mut j_res = 0;
+    call_arange_zero.reverse();
+    for i_res in (0 .. call_n_res).rev() {
+        let arange_i = call_arange_zero.pop();
+        debug_assert!( arange_i.is_some() );
+        if is_res_var[i_res] {
+            avar_zero[res + j_res] = arange_i.unwrap();
+            j_res += 1;
         }
     }
 }
@@ -360,12 +471,12 @@ fn call_arg_var_index(
 /// The map results for CALL_OP and CALL_RES_OP are set.
 pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    for<'a> V : AtomEvalVec + std::ops::AddAssign<&'a V> + From<f32> ,
+    for<'a> V : Clone + From<f32> + AtomEvalVec + std::ops::AddAssign<&'a V> ,
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
         name              : "call" ,
         forward_0_value   : call_forward_0_value::<V>,
-        forward_0_ad      : panic_zero::<V, AD<V> >,
+        forward_0_ad      : call_forward_0_ad::<V>,
         forward_1_value   : call_forward_1_value::<V>,
         forward_1_ad      : panic_one::<V, AD<V> >,
         reverse_1_value   : call_reverse_1_value::<V>,

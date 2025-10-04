@@ -46,11 +46,6 @@ use crate::adfn::{
 /// * Required :
 /// This function is required for all atomic functions.
 ///
-/// * var_zero :
-/// This vector will have size zero on input.
-/// It can be used to cache information for use by forward_one_value
-/// and reverse_one_value (and has no other restrictions).
-///
 /// * domain_zero :
 /// this contains the value of the atomic function domain variables.
 ///
@@ -65,8 +60,7 @@ use crate::adfn::{
 /// contains the value of the atomic function range variables.
 ///
 pub type AtomForwardZeroValue<V> = fn(
-    _var_zero      : &mut Vec<V> ,
-    _domain_zero   : Vec<&V>     ,
+    _domain_zero   : &Vec<&V>    ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
 ) -> Vec<V> ;
@@ -79,9 +73,8 @@ pub type AtomForwardZeroValue<V> = fn(
 /// [ADfn::forward_one_value] ,
 /// this function should panic if it gets used.
 ///
-/// * var_zero :
-/// This will contain the values set by forward_zero_valuew for the
-/// same call to this atomic function; i.e., same [call_atom].
+/// * domain_zero :
+/// this contains the value of the atomic function domain variables.
 ///
 /// * domain_one :
 /// this contains the direction for the directional derivative.
@@ -99,7 +92,7 @@ pub type AtomForwardZeroValue<V> = fn(
 ///     range_one = f'(domain_zero) * domain_one
 /// ```
 pub type AtomForwardOneValue<V> = fn(
-    _var_zero      : &Vec<V>     ,
+    _domain_zero   : &Vec<&V>    ,
     _domain_one    : Vec<&V>     ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
@@ -113,9 +106,8 @@ pub type AtomForwardOneValue<V> = fn(
 /// [ADfn::reverse_one_value] ,
 /// this function should panic if it gets used.
 ///
-/// * var_zero :
-/// This will contain the values set by forward_zero_valuew for the
-/// same call to this atomic function; i.e., same [call_atom].
+/// * domain_zero :
+/// this contains the value of the atomic function domain variables.
 ///
 /// * range_one :
 /// this contains the function weights for the partial derivatives.
@@ -133,13 +125,13 @@ pub type AtomForwardOneValue<V> = fn(
 ///     domain_one = range_one * f'(domain_zero)
 /// ```
 pub type AtomReverseOneValue<V> = fn(
-    _var_zero      : &Vec<V>     ,
+    _domain_zero   : &Vec<&V>    ,
     _range_one     : Vec<&V>     ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
 ) -> Vec<V> ;
 //
-// AtomForwardDependValue
+// AtomForwardDepend
 /// Atomic function forward dependency type for value evaluations.
 ///
 /// * Required :
@@ -161,11 +153,38 @@ pub type AtomReverseOneValue<V> = fn(
 /// The i-th component is true (false) if the i-th component
 /// of *arange* depends on a variable in *adomaion.
 ///
-pub type AtomForwardDependValue = fn(
+pub type AtomForwardDepend = fn(
     _is_var_domain  : &Vec<bool> ,
     _call_info      : IndexT     ,
     _trace          : bool       ,
 )-> Vec<bool>;
+//
+// AtomForwardZeroAD
+/// Callback to atomic functions during [ADfn::forward_zero_ad]
+///
+/// * Required :
+/// If you will not use this atomic function with
+/// [ADfn::forward_one_ad] ,
+/// this function should panic if it gets used.
+///
+/// * adomain_zero :
+/// this contains the value of the atomic function domain variables.
+///
+/// * call_info :
+/// is the *call_info* value used when the atomic function was called.
+///
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+///
+/// * return :
+/// The return value *arange_one*
+/// contains the value of the atomic function range variables.
+///
+pub type AtomForwardZeroAD<V> = fn(
+    _adomain_zero   : &Vec<& AD<V> >    ,
+    _call_info     : IndexT             ,
+    _trace         : bool               ,
+) -> Vec< AD<V> > ;
 //
 // AtomEval
 /// Atomic function evaluation routines.
@@ -173,7 +192,9 @@ pub struct AtomEval<V> {
     pub forward_zero_value   : AtomForwardZeroValue::<V> ,
     pub forward_one_value    : AtomForwardOneValue::<V>  ,
     pub reverse_one_value    : AtomReverseOneValue::<V>  ,
-    pub forward_depend_value : AtomForwardDependValue    ,
+    pub forward_depend       : AtomForwardDepend         ,
+    //
+    pub forward_zero_ad      : AtomForwardZeroAD::<V>    ,
 }
 // ----------------------------------------------------------------------------
 pub (crate) mod sealed {
@@ -265,7 +286,7 @@ where
 // record_call_atom
 fn record_call_atom<V>(
     tape                  : &mut Tape<V>                  ,
-    forward_depend_value  : AtomForwardDependValue        ,
+    forward_depend        : AtomForwardDepend             ,
     adomain               : Vec< AD<V> >                  ,
     range_zero            : Vec<V>                        ,
     atom_id               : IndexT                        ,
@@ -291,7 +312,7 @@ where
     ).collect();
     //
     // is_var_res
-    let is_var_res = forward_depend_value(&is_var_arg, call_info, trace);
+    let is_var_res = forward_depend(&is_var_arg, call_info, trace);
     //
     // arange, n_var_res
     let mut n_var_res = 0;
@@ -394,9 +415,9 @@ where
     // rwlock
     let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
     //
-    // forward_zero, forward_depend_value
+    // forward_zero, forward_depend
     let forward_zero   : AtomForwardZeroValue<V>;
-    let forward_depend_value : AtomForwardDependValue;
+    let forward_depend : AtomForwardDepend;
     {   //
         // read_lock
         let read_lock = rw_lock.read();
@@ -406,7 +427,7 @@ where
         let atom_eval_vec = read_lock.unwrap();
         let atom_eval     = &atom_eval_vec[atom_id as usize];
         forward_zero          = atom_eval.forward_zero_value.clone();
-        forward_depend_value  = atom_eval.forward_depend_value.clone();
+        forward_depend  = atom_eval.forward_depend.clone();
     }
     //
     // domain_zero
@@ -416,11 +437,7 @@ where
     }
     //
     // range_zero
-    // restore domain_zero using var_zero.
-    let mut var_zero : Vec<V> = Vec::new();
-    let range_zero  = forward_zero(
-        &mut var_zero, domain_zero, call_info, trace
-    );
+    let range_zero  = forward_zero( &domain_zero, call_info, trace );
     //
     // arange
     let arange : Vec< AD<V> >;
@@ -429,7 +446,7 @@ where
     } else {
         arange = local_key.with_borrow_mut( |tape| record_call_atom::<V>(
             tape,
-            forward_depend_value,
+            forward_depend,
             adomain,
             range_zero,
             atom_id,
