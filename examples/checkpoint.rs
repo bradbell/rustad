@@ -105,8 +105,8 @@ fn checkpoint_reverse_one_value(
     domain_one
 }
 //
-// checkpoint_forward_depend_value
-fn checkpoint_forward_depend_value(
+// checkpoint_forward_depend
+fn checkpoint_forward_depend(
     is_var_domain  : &Vec<bool> ,
     call_info      : IndexT     ,
     trace          : bool       ,
@@ -142,7 +142,7 @@ fn register_checkpoint_atom()-> IndexT {
         forward_zero_ad      :  checkpoint_forward_zero_ad,
         forward_one_value    :  checkpoint_forward_one_value,
         reverse_one_value    :  checkpoint_reverse_one_value,
-        forward_depend_value :  checkpoint_forward_depend_value,
+        forward_depend       :  checkpoint_forward_depend,
     };
     //
     // atom_id

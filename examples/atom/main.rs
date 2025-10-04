@@ -94,9 +94,9 @@ fn sumsq_reverse_one_value(
     domain_one
 }
 //
-// sumsq_forward_depend_value
+// sumsq_forward_depend
 // -------------------------------------------------------------------------
-fn sumsq_forward_depend_value(
+fn sumsq_forward_depend(
     is_var_domain  : &Vec<bool> ,
     _call_info     : IndexT     ,
     _trace         : bool       ,
@@ -119,7 +119,7 @@ fn register_sumsq_atom()-> IndexT {
         forward_zero_ad      :  sumsq_forward_zero_ad,
         forward_one_value    :  sumsq_forward_one_value,
         reverse_one_value    :  sumsq_reverse_one_value,
-        forward_depend_value :  sumsq_forward_depend_value,
+        forward_depend       :  sumsq_forward_depend,
     };
     //
     // sumsq_atom_id
