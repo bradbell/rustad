@@ -209,9 +209,8 @@ where
     }
     //
     // call_range_zero
-    let mut call_var_zero  : Vec<V> = Vec::new();
     let mut call_range_zero = forward_zero_value(
-        &mut call_var_zero, call_domain_zero, call_info, trace
+        &call_domain_zero, call_info, trace
     );
     //
     // var_zero
@@ -273,8 +272,7 @@ where
     }
     //
     // call_var_zero
-    let mut call_var_zero : Vec<V> = Vec::new();
-    forward_zero_value(&mut call_var_zero, call_domain_zero, call_info, trace);
+    forward_zero_value(&call_domain_zero, call_info, trace);
     //
     // call_domain_one
     let zero_v : V = 0f32.into();
@@ -289,7 +287,7 @@ where
     }
     // call_range_one
     let mut call_range_one = forward_one_value(
-        &call_var_zero, call_domain_one, call_info, trace
+        &call_domain_zero, call_domain_one, call_info, trace
     );
     //
     // var_one
@@ -333,7 +331,6 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero_value, reverse_one_value
-    let forward_zero_value : AtomForwardZeroValue<V>;
     let reverse_one_value  : AtomReverseOneValue<V>;
     {   //
         // rw_lock
@@ -346,13 +343,8 @@ where
         // Rest of this block has a lock, so it should be fast and not fail.
         let atom_eval_vec       = read_lock.unwrap();
         let atom_eval           = &atom_eval_vec[atom_id];
-        forward_zero_value      = atom_eval.forward_zero_value.clone();
         reverse_one_value       = atom_eval.reverse_one_value.clone();
     }
-    //
-    // call_var_zero
-    let mut call_var_zero : Vec<V> = Vec::new();
-    forward_zero_value(&mut call_var_zero, call_domain_zero, call_info, trace);
     //
     // call_range_one
     let zero_v : V = 0f32.into();
@@ -368,7 +360,7 @@ where
     }
     // call_domain_one
     let call_domain_one = reverse_one_value(
-        &call_var_zero, call_range_one, call_info, trace
+        &call_domain_zero, call_range_one, call_info, trace
     );
     //
     // var_one
@@ -425,9 +417,8 @@ where
     }
     //
     // call_arange_zero
-    let mut call_avar_zero  : Vec< AD<V> > = Vec::new();
     let mut call_arange_zero = forward_zero_ad(
-        &mut call_avar_zero, call_adomain_zero, call_info, trace
+        &call_adomain_zero, call_info, trace
     );
     //
     // avar_zero

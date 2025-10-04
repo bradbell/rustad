@@ -36,14 +36,13 @@ use forward_zero::{
 //
 // sumsq_forward_one_value
 fn sumsq_forward_one_value(
-    var_zero     : &Vec<V>     ,
+    domain_zero  : &Vec<&V>    ,
     domain_one   : Vec<&V>     ,
     _call_info   : IndexT      ,
     trace        : bool        ,
 ) -> Vec<V>
 {   //
     // domain_zero
-    let domain_zero = var_zero;
     assert_eq!( domain_zero.len(), domain_one.len() );
     //
     // range_one
@@ -66,14 +65,13 @@ fn sumsq_forward_one_value(
 //
 // sumsq_reverse_one_value
 fn sumsq_reverse_one_value(
-    var_zero     : &Vec<V>     ,
+    domain_zero  : &Vec<&V>    ,
     range_one    : Vec<&V>     ,
     _call_info   : IndexT      ,
     trace        : bool        ,
 ) -> Vec<V>
 {   //
     // domain_zero
-    let domain_zero = var_zero;
     assert_eq!( range_one.len(), 1 );
     //
     // domain_one
