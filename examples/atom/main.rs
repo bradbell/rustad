@@ -120,7 +120,6 @@ fn register_sumsq_atom()-> IndexT {
         forward_one_value    :  sumsq_forward_one_value,
         reverse_one_value    :  sumsq_reverse_one_value,
         forward_depend_value :  sumsq_forward_depend_value,
-        forward_depend_ad    :  sumsq_forward_depend_ad,
     };
     //
     // sumsq_atom_id
@@ -128,23 +127,10 @@ fn register_sumsq_atom()-> IndexT {
     sumsq_atom_id
 }
 // -------------------------------------------------------------------------
-// AD Routines
-// -------------------------------------------------------------------------
-//
-// sumsq_forward_depend_ad
-fn sumsq_forward_depend_ad(
-    _is_var_domain  : &Vec<bool> ,
-    _call_info      : IndexT     ,
-    _trace          : bool       ,
-) -> Vec<bool>
-{   //
-    panic!( "sumsq_forward_depend_ad not implemented");
-}
-// -------------------------------------------------------------------------
 // Tests
 // -------------------------------------------------------------------------
 fn call_atomic_fun(
-    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool 
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) -> ADfn<V> {
     //
     let x       : Vec<V> = vec![ 1.0 , 2.0 ];
@@ -154,7 +140,7 @@ fn call_atomic_fun(
     f
 }
 fn test_forward_zero_value(
-    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool 
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
     // f
@@ -169,7 +155,7 @@ fn test_forward_zero_value(
 //
 // test_forward_one
 fn test_forward_one_value(
-    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool 
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
     // f
@@ -186,7 +172,7 @@ fn test_forward_one_value(
 //
 // test_reverse_one
 fn test_reverse_one_value(
-    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool 
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
     // f
@@ -203,7 +189,7 @@ fn test_reverse_one_value(
 }
 // test_forward_zero_ad
 fn test_forward_zero_ad(
-    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool 
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
     // f

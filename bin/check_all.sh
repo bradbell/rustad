@@ -27,7 +27,7 @@ fi
 for build_type in debug release
 do
    dir="target/$build_type/deps"
-   if [ -e $dir ]
+   if ls $dir/* > /dev/null
    then
       rm $dir/*
    fi
