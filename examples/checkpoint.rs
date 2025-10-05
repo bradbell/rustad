@@ -246,12 +246,12 @@ fn main() {
     //
     // g.forward_one_value
     let dx      : Vec<V> = vec![ 5.0, 6.0 ];
-    let dy               = g.forward_one_value(&mut v , dx.clone(), trace);
+    let dy               = g.forward_one_value(&v , dx.clone(), trace);
     assert_eq!( dy[0], 2.0 * x[0]*dx[0] + 2.0 * x[1]*dx[1] );
     //
     // g.reverse_one_value
     let dy      : Vec<V> = vec![ 5.0 ];
-    let dx               = g.reverse_one_value(&mut v , dy.clone(), trace);
+    let dx               = g.reverse_one_value(&v , dy.clone(), trace);
     assert_eq!( dx[0], 2.0 * x[0]*dy[0] );
     assert_eq!( dx[1], 2.0 * x[1]*dy[0] );
 }

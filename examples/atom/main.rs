@@ -106,7 +106,7 @@ fn register_sumsq_atom()-> IndexT {
 // -------------------------------------------------------------------------
 // Tests
 // -------------------------------------------------------------------------
-// 
+//
 // value_callback_f
 // f(x) = x[0] * x[0] + x[1] * x[1] + ...
 fn value_callback_f(
@@ -120,8 +120,8 @@ fn value_callback_f(
     f
 }
 //
-// test_forward_zero_value
-fn test_forward_zero_value(
+// callback_forward_zero_value
+fn callback_forward_zero_value(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
@@ -135,8 +135,8 @@ fn test_forward_zero_value(
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
 }
 //
-// test_forward_zero_ad
-fn test_forward_zero_ad(
+// callback_forward_zero_ad
+fn callback_forward_zero_ad(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
@@ -158,8 +158,8 @@ fn test_forward_zero_ad(
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
 }
 //
-// test_forward_one_value
-fn test_forward_one_value(
+// callback_forward_one_value
+fn callback_forward_one_value(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
@@ -171,12 +171,12 @@ fn test_forward_one_value(
     let mut v   : Vec<V> = Vec::new();
     f.forward_zero_value(&mut v , x.clone(), trace);
     let dx      : Vec<V> = vec![ 5.0, 6.0 ];
-    let dy               = f.forward_one_value(&mut v , dx.clone(), trace);
+    let dy               = f.forward_one_value(&v , dx.clone(), trace);
     assert_eq!( dy[0], 2.0 * x[0]*dx[0] + 2.0 * x[1]*dx[1] );
 }
 //
-// test_reverse_one_value
-fn test_reverse_one_value(
+// callback_reverse_one_value
+fn callback_reverse_one_value(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
@@ -188,7 +188,7 @@ fn test_reverse_one_value(
     let mut v   : Vec<V> = Vec::new();
     f.forward_zero_value(&mut v , x.clone(), trace);
     let dy      : Vec<V> = vec![ 5.0 ];
-    let dx               = f.reverse_one_value(&mut v , dy.clone(), trace);
+    let dx               = f.reverse_one_value(&v , dy.clone(), trace);
     assert_eq!( dx[0], 2.0 * x[0]*dy[0] );
     assert_eq!( dx[1], 2.0 * x[1]*dy[0] );
 }
@@ -205,10 +205,10 @@ fn main() {
     } );
     let trace         = false;
     //
-    test_forward_zero_value(sumsq_atom_id, call_info, trace);
-    test_forward_zero_ad(sumsq_atom_id,    call_info, trace);
+    callback_forward_zero_value(sumsq_atom_id, call_info, trace);
+    callback_forward_zero_ad(sumsq_atom_id,    call_info, trace);
     //
-    test_forward_one_value(sumsq_atom_id,  call_info, trace);
+    callback_forward_one_value(sumsq_atom_id,  call_info, trace);
     //
-    test_reverse_one_value(sumsq_atom_id,  call_info, trace);
+    callback_reverse_one_value(sumsq_atom_id,  call_info, trace);
 }
