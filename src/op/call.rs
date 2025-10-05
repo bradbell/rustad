@@ -52,6 +52,7 @@ use crate::atom::{
     AtomForwardZeroValue,
     AtomForwardZeroAD,
     AtomForwardOneValue,
+    AtomForwardOneAD,
     AtomReverseOneValue,
     sealed::AtomEvalVec,
 };
@@ -434,6 +435,85 @@ where
     }
 }
 // --------------------------------------------------------------------------
+// call_forward_1_ad
+//
+/// `AD<V>` evaluation of first order forward call operator for atomic functions
+fn call_forward_1_ad<V> (
+    avar_zero  : &Vec< AD<V> >       ,
+    avar_one   : &mut Vec< AD<V> >   ,
+    con        : &Vec<V>             ,
+    flag       : &Vec<bool>          ,
+    arg        : &[IndexT]           ,
+    res        : usize               )
+where
+    V     : From<f32> + Clone + AtomEvalVec ,
+{   // ----------------------------------------------------------------------
+    let (
+        atom_id,
+        call_info,
+        call_n_arg,
+        call_n_res,
+        trace,
+        is_arg_var,
+        is_res_var,
+    ) = extract_call_arg(flag, arg);
+    let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
+    let call_adomain_zero = call_domain_zero_ad(
+        avar_zero, &acon, arg, call_n_arg, is_arg_var
+    );
+    // ----------------------------------------------------------------------
+    //
+    // forward_zero_ad, forward_one_ad
+    let forward_zero_ad : AtomForwardZeroAD<V>;
+    let forward_one_ad  : AtomForwardOneAD<V>;
+    {   //
+        // rw_lock
+        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
+        //
+        // read_lock
+        let read_lock = rw_lock.read();
+        assert!( read_lock.is_ok() );
+        //
+        // Rest of this block has a lock, so it should be fast and not fail.
+        let atom_eval_vec    = read_lock.unwrap();
+        let atom_eval        = &atom_eval_vec[atom_id];
+        forward_zero_ad      = atom_eval.forward_zero_ad.clone();
+        forward_one_ad       = atom_eval.forward_one_ad.clone();
+    }
+    //
+    // call_avar_zero
+    forward_zero_ad(&call_adomain_zero, call_info, trace);
+    //
+    // call_adomain_one
+    let zero_v : V = 0.0f32.into();
+    let azero      = ad_from_value(zero_v);
+    let mut call_adomain_one : Vec<& AD<V> > = Vec::with_capacity(call_n_arg);
+    for i_arg in 0 .. call_n_arg {
+        let index = arg[i_arg + 5] as usize;
+        if is_arg_var[i_arg] {
+            call_adomain_one.push( &avar_one[index] );
+        } else {
+            call_adomain_one.push( &azero );
+        }
+    }
+    // call_arange_one
+    let mut call_arange_one = forward_one_ad(
+        &call_adomain_zero, call_adomain_one, call_info, trace
+    );
+    //
+    // avar_one
+    let mut j_res = 0;
+    call_arange_one.reverse();
+    for i_res in (0 .. call_n_res).rev() {
+        let arange_i = call_arange_one.pop();
+        debug_assert!( arange_i.is_some() );
+        if is_res_var[i_res] {
+            avar_one[res + j_res] = arange_i.unwrap();
+            j_res += 1;
+        }
+    }
+}
+// --------------------------------------------------------------------------
 //
 // call_arg_var_index
 /// vector of variable indices that are arguments to this call operator
@@ -478,7 +558,7 @@ where
         forward_0_value   : call_forward_0_value::<V>,
         forward_0_ad      : call_forward_0_ad::<V>,
         forward_1_value   : call_forward_1_value::<V>,
-        forward_1_ad      : panic_one::<V, AD<V> >,
+        forward_1_ad      : call_forward_1_ad::<V>,
         reverse_1_value   : call_reverse_1_value::<V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
         arg_var_index     : call_arg_var_index,

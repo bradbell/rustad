@@ -7,6 +7,7 @@ use std::cell::RefCell;
 use rustad::{
     AD,
     ADfn,
+    ad_from_vector,
     start_recording,
     stop_recording,
     register_atom,
@@ -175,6 +176,35 @@ fn callback_forward_one_value(
     assert_eq!( dy[0], 2.0 * x[0]*dx[0] + 2.0 * x[1]*dx[1] );
 }
 //
+// callback_forward_one_ad
+fn callback_forward_one_ad(
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
+) {
+    //
+    // f
+    let f = value_callback_f(sumsq_atom_id, call_info, trace);
+    //
+    // g, dx1
+    // g(x) = f'(x) * dx1 = 2 * ( x[0] * dx1[0] + x[2] * dx1[2] + ... )
+    let x      : Vec<V>       = vec![ 3.0 , 4.0 ];
+    let ax                    = start_recording(x);
+    let mut av : Vec< AD<V> > = Vec::new();
+    f.forward_zero_ad(&mut av , ax, trace);
+    let dx1     : Vec<V> = vec![ 5.0, 6.0 ];
+    let adx1             = ad_from_vector(dx1.clone());
+    let ady              = f.forward_one_ad(&av, adx1, trace);
+    let g                = stop_recording(ady);
+    //
+    // x, dx2, dy
+    let x       : Vec<V> = vec![ 3.0 , 4.0 ];
+    let mut v   : Vec<V> = Vec::new();
+    g.forward_zero_value(&mut v , x.clone(), trace);
+    let dx2     : Vec<V> = vec![ 7.0, 8.0 ];
+    let dy               = g.forward_one_value(&v , dx2.clone(), trace);
+    //
+    assert_eq!( dy[0], 2.0 * dx1[0]*dx2[0] + 2.0 * dx1[1]*dx2[1] );
+}
+//
 // callback_reverse_one_value
 fn callback_reverse_one_value(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
@@ -209,6 +239,7 @@ fn main() {
     callback_forward_zero_ad(sumsq_atom_id,    call_info, trace);
     //
     callback_forward_one_value(sumsq_atom_id,  call_info, trace);
+    callback_forward_one_ad(sumsq_atom_id,  call_info, trace);
     //
     callback_reverse_one_value(sumsq_atom_id,  call_info, trace);
 }
