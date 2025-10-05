@@ -167,7 +167,10 @@ fn register_checkpoint_atom()-> IndexT {
     let checkpoint_atom_eval = AtomEval {
         forward_zero_value   :  checkpoint_forward_zero_value,
         forward_zero_ad      :  checkpoint_forward_zero_ad,
+        //
         forward_one_value    :  checkpoint_forward_one_value,
+        forward_one_ad       :  checkpoint_forward_one_ad,
+        //
         reverse_one_value    :  checkpoint_reverse_one_value,
         forward_depend       :  checkpoint_forward_depend,
     };
@@ -188,6 +191,17 @@ fn checkpoint_forward_zero_ad(
 ) -> Vec< AD<V> >
 {   //
     panic!( "checkpoint_forward_zero_ad not implemented");
+}
+//
+// checkpoint_forward_one_ad
+fn checkpoint_forward_one_ad(
+    _domain_zero      : &Vec<& AD<V> >    ,
+    _domain_one       : Vec<& AD<V> >     ,
+    _call_info        : IndexT            ,
+    _trace            : bool              ,
+) -> Vec< AD<V> >
+{   //
+    panic!( "checkpoint_forward_one_ad not implemented");
 }
 // -------------------------------------------------------------------------
 // main

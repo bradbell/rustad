@@ -86,8 +86,7 @@ pub type AtomForwardZeroValue<V> = fn(
 /// if true, a trace of the calculations may be printed on stdout.
 ///
 /// * return :
-/// Let *domain_zero* be its value in the call to forward_zero_valuew
-/// that set *var_zero* . The return value *range_one* is
+/// The return value *range_one* is
 /// ```text
 ///     range_one = f'(domain_zero) * domain_one
 /// ```
@@ -119,8 +118,7 @@ pub type AtomForwardOneValue<V> = fn(
 /// if true, a trace of the calculations may be printed on stdout.
 ///
 /// * return :
-/// Let *domain_zero* be its value in the call to forward_zero_valuew
-/// that set *var_zero* . The return value *domain_one* is
+/// The return value *domain_one* is
 /// ```text
 ///     domain_one = range_one * f'(domain_zero)
 /// ```
@@ -167,7 +165,7 @@ pub type AtomForwardDepend = fn(
 /// [ADfn::forward_one_ad] ,
 /// this function should panic if it gets used.
 ///
-/// * adomain_zero :
+/// * domain_zero :
 /// this contains the value of the atomic function domain variables.
 ///
 /// * call_info :
@@ -181,20 +179,55 @@ pub type AtomForwardDepend = fn(
 /// contains the value of the atomic function range variables.
 ///
 pub type AtomForwardZeroAD<V> = fn(
-    _adomain_zero   : &Vec<& AD<V> >    ,
+    _domain_zero   : &Vec<& AD<V> >     ,
     _call_info     : IndexT             ,
     _trace         : bool               ,
+) -> Vec< AD<V> > ;
+//
+// AtomForwardOneAD
+/// Callback to atomic functions during [ADfn::forward_one_ad]
+///
+/// * Required :
+/// If you will not use this atomic function with
+/// [ADfn::forward_one_ad] ,
+/// this function should panic if it gets used.
+///
+/// * domain_zero :
+/// this contains the value of the atomic function domain variables.
+///
+/// * domain_one :
+/// this contains the direction for the directional derivative.
+///
+/// * call_info :
+/// is the *call_info* value used when the atomic function was called.
+///
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+///
+/// * return :
+/// The return value *range_one* is
+/// ```text
+///     range_one = f'(domain_zero) * domain_one
+/// ```
+pub type AtomForwardOneAD<V> = fn(
+    _domain_zero   : &Vec<& AD<V> >    ,
+    _domain_one    : Vec<& AD<V> >     ,
+    _call_info     : IndexT            ,
+    _trace         : bool              ,
 ) -> Vec< AD<V> > ;
 //
 // AtomEval
 /// Atomic function evaluation routines.
 pub struct AtomEval<V> {
     pub forward_zero_value   : AtomForwardZeroValue::<V> ,
+    pub forward_zero_ad      : AtomForwardZeroAD::<V>    ,
+    //
     pub forward_one_value    : AtomForwardOneValue::<V>  ,
+    pub forward_one_ad       : AtomForwardOneAD::<V>     ,
+    //
     pub reverse_one_value    : AtomReverseOneValue::<V>  ,
     pub forward_depend       : AtomForwardDepend         ,
     //
-    pub forward_zero_ad      : AtomForwardZeroAD::<V>    ,
 }
 // ----------------------------------------------------------------------------
 pub (crate) mod sealed {
@@ -426,8 +459,8 @@ where
         // Rest of this block has a lock, so it should be fast and not fail.
         let atom_eval_vec = read_lock.unwrap();
         let atom_eval     = &atom_eval_vec[atom_id as usize];
-        forward_zero          = atom_eval.forward_zero_value.clone();
-        forward_depend  = atom_eval.forward_depend.clone();
+        forward_zero      = atom_eval.forward_zero_value.clone();
+        forward_depend    = atom_eval.forward_depend.clone();
     }
     //
     // domain_zero

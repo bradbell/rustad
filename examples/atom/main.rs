@@ -30,38 +30,14 @@ use forward_zero::{
     sumsq_forward_zero_value,
     sumsq_forward_zero_ad,
 };
-// -------------------------------------------------------------------------
-// Value Routines
-// -------------------------------------------------------------------------
 //
 // sumsq_forward_one_value
-fn sumsq_forward_one_value(
-    domain_zero  : &Vec<&V>    ,
-    domain_one   : Vec<&V>     ,
-    _call_info   : IndexT      ,
-    trace        : bool        ,
-) -> Vec<V>
-{   //
-    // domain_zero
-    assert_eq!( domain_zero.len(), domain_one.len() );
-    //
-    // range_one
-    let mut range_one = 0 as V;
-    for j in 0 .. domain_one.len() {
-        range_one += 2.0 * domain_zero[j] * domain_one[j];
-    }
-    if trace {
-        println!("Begin Trace: sumsq_forward_one_value");
-        print!("domain_one = [ ");
-        for j in 0 .. domain_one.len() {
-                print!("{}, ", domain_one[j]);
-        }
-        println!("]");
-        println!("range_one = {}", range_one);
-        println!("End Trace: sumsq_forward_one_value");
-    }
-    vec![ range_one ]
-}
+// sumsq_forward_one_ad
+mod forward_one;
+use forward_one::{
+    sumsq_forward_one_value,
+    sumsq_forward_one_ad,
+};
 //
 // sumsq_reverse_one_value
 fn sumsq_reverse_one_value(
@@ -115,7 +91,10 @@ fn register_sumsq_atom()-> IndexT {
     let sumsq_atom_eval = AtomEval {
         forward_zero_value   :  sumsq_forward_zero_value,
         forward_zero_ad      :  sumsq_forward_zero_ad,
+        //
         forward_one_value    :  sumsq_forward_one_value,
+        forward_one_ad       :  sumsq_forward_one_ad,
+        //
         reverse_one_value    :  sumsq_reverse_one_value,
         forward_depend       :  sumsq_forward_depend,
     };
@@ -127,7 +106,10 @@ fn register_sumsq_atom()-> IndexT {
 // -------------------------------------------------------------------------
 // Tests
 // -------------------------------------------------------------------------
-fn call_atomic_fun(
+// 
+// value_callback_f
+// f(x) = x[0] * x[0] + x[1] * x[1] + ...
+fn value_callback_f(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) -> ADfn<V> {
     //
@@ -137,12 +119,14 @@ fn call_atomic_fun(
     let f                = stop_recording(ay);
     f
 }
+//
+// test_forward_zero_value
 fn test_forward_zero_value(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
     // f
-    let f = call_atomic_fun(sumsq_atom_id, call_info, trace);
+    let f = value_callback_f(sumsq_atom_id, call_info, trace);
     //
     // x, y
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
@@ -151,49 +135,14 @@ fn test_forward_zero_value(
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
 }
 //
-// test_forward_one
-fn test_forward_one_value(
-    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
-) {
-    //
-    // f
-    let f = call_atomic_fun(sumsq_atom_id, call_info, trace);
-    //
-    // x, dx, dy
-    let x       : Vec<V> = vec![ 3.0 , 4.0 ];
-    let mut v   : Vec<V> = Vec::new();
-    f.forward_zero_value(&mut v , x.clone(), trace);
-    let dx      : Vec<V> = vec![ 5.0, 6.0 ];
-    let dy               = f.forward_one_value(&mut v , dx.clone(), trace);
-    assert_eq!( dy[0], 2.0 * x[0]*dx[0] + 2.0 * x[1]*dx[1] );
-}
-//
-// test_reverse_one
-fn test_reverse_one_value(
-    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
-) {
-    //
-    // f
-    let f = call_atomic_fun(sumsq_atom_id, call_info, trace);
-    //
-    // x, dy, dx
-    let x       : Vec<V> = vec![ 3.0 , 4.0 ];
-    let mut v   : Vec<V> = Vec::new();
-    f.forward_zero_value(&mut v , x.clone(), trace);
-    let dy      : Vec<V> = vec![ 5.0 ];
-    let dx               = f.reverse_one_value(&mut v , dy.clone(), trace);
-    assert_eq!( dx[0], 2.0 * x[0]*dy[0] );
-    assert_eq!( dx[1], 2.0 * x[1]*dy[0] );
-}
 // test_forward_zero_ad
 fn test_forward_zero_ad(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
-    // f
-    let f = call_atomic_fun(sumsq_atom_id, call_info, trace);
+    let f = value_callback_f(sumsq_atom_id, call_info, trace);
     //
-    // g
+    // g(x) = f(x)
     let x      : Vec<V>       = vec![ 3.0 , 4.0 ];
     let ax                    = start_recording(x);
     let mut av : Vec< AD<V> > = Vec::new();
@@ -209,6 +158,41 @@ fn test_forward_zero_ad(
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
 }
 //
+// test_forward_one_value
+fn test_forward_one_value(
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
+) {
+    //
+    // f
+    let f = value_callback_f(sumsq_atom_id, call_info, trace);
+    //
+    // x, dx, dy
+    let x       : Vec<V> = vec![ 3.0 , 4.0 ];
+    let mut v   : Vec<V> = Vec::new();
+    f.forward_zero_value(&mut v , x.clone(), trace);
+    let dx      : Vec<V> = vec![ 5.0, 6.0 ];
+    let dy               = f.forward_one_value(&mut v , dx.clone(), trace);
+    assert_eq!( dy[0], 2.0 * x[0]*dx[0] + 2.0 * x[1]*dx[1] );
+}
+//
+// test_reverse_one_value
+fn test_reverse_one_value(
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
+) {
+    //
+    // f
+    let f = value_callback_f(sumsq_atom_id, call_info, trace);
+    //
+    // x, dy, dx
+    let x       : Vec<V> = vec![ 3.0 , 4.0 ];
+    let mut v   : Vec<V> = Vec::new();
+    f.forward_zero_value(&mut v , x.clone(), trace);
+    let dy      : Vec<V> = vec![ 5.0 ];
+    let dx               = f.reverse_one_value(&mut v , dy.clone(), trace);
+    assert_eq!( dx[0], 2.0 * x[0]*dy[0] );
+    assert_eq!( dx[1], 2.0 * x[1]*dy[0] );
+}
+//
 // -------------------------------------------------------------------------
 // main
 // -------------------------------------------------------------------------
@@ -222,8 +206,9 @@ fn main() {
     let trace         = false;
     //
     test_forward_zero_value(sumsq_atom_id, call_info, trace);
-    test_forward_one_value(sumsq_atom_id,  call_info, trace);
-    test_reverse_one_value(sumsq_atom_id,  call_info, trace);
-    //
     test_forward_zero_ad(sumsq_atom_id,    call_info, trace);
+    //
+    test_forward_one_value(sumsq_atom_id,  call_info, trace);
+    //
+    test_reverse_one_value(sumsq_atom_id,  call_info, trace);
 }
