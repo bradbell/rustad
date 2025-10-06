@@ -75,14 +75,14 @@ fn for_sumsq_forward_one_value(
     let domain_zero_one =  &for_domain_one[0 .. n_domain];
     let domain_one_one  =  &for_domain_one[n_domain .. 2 * n_domain];
     //
-    // range_one
-    let mut range_one = 0.0 as V;
+    // rev_range_one
+    let mut rev_range_one = 0.0 as V;
     for j in 0 .. n_domain {
-        range_one += &two_v * &( domain_zero[j] * domain_one_one[j] );
-        range_one += &two_v * &( domain_zero_one[j] * domain_one[j] );
+        rev_range_one += &two_v * &( domain_zero[j] * domain_one_one[j] );
+        rev_range_one += &two_v * &( domain_zero_one[j] * domain_one[j] );
     }
     //
-    vec![ range_one ]
+    vec![ rev_range_one ]
 }
 //
 // for_sumsq_forward_one_ad

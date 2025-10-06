@@ -63,7 +63,7 @@ pub fn sumsq_forward_one_ad(
     //
     // atom_id
     let atom_id = ATOM_ID_VEC.with_borrow( |atom_id_vec|
-        atom_id_vec[2 * (call_info as usize) + 1]
+        atom_id_vec[3 * (call_info as usize) + 1]
     );
     //
     // n_domain 
