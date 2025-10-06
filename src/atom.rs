@@ -216,6 +216,38 @@ pub type AtomForwardOneAD<V> = fn(
     _trace         : bool              ,
 ) -> Vec< AD<V> > ;
 //
+// AtomReverseOneAD
+/// Callback to atomic functions during [ADfn::reverse_one_ad]
+///
+/// * Required :
+/// If you will not use this atomic function with
+/// [ADfn::reverse_one_ad] ,
+/// this function should panic if it gets used.
+///
+/// * domain_zero :
+/// this contains the value of the atomic function domain variables.
+///
+/// * range_one :
+/// this contains the function weights for the partial derivatives.
+///
+/// * call_info :
+/// is the *call_info* value used when the atomic function was called.
+///
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+///
+/// * return :
+/// The return value *domain_one* is
+/// ```text
+///     domain_one = range_one * f'(domain_zero)
+/// ```
+pub type AtomReverseOneAD<V> = fn(
+    _domain_zero   : &Vec<& AD<V> >    ,
+    _range_one     : Vec<& AD<V> >     ,
+    _call_info     : IndexT            ,
+    _trace         : bool              ,
+) -> Vec< AD<V> > ;
+//
 // AtomEval
 /// Atomic function evaluation routines.
 pub struct AtomEval<V> {
@@ -226,8 +258,9 @@ pub struct AtomEval<V> {
     pub forward_one_ad       : AtomForwardOneAD::<V>     ,
     //
     pub reverse_one_value    : AtomReverseOneValue::<V>  ,
-    pub forward_depend       : AtomForwardDepend         ,
+    pub reverse_one_ad       : AtomReverseOneAD::<V>     ,
     //
+    pub forward_depend       : AtomForwardDepend         ,
 }
 // ----------------------------------------------------------------------------
 pub (crate) mod sealed {

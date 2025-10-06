@@ -127,6 +127,16 @@ fn rev_sumsq_reverse_one_value(
     rev_domain_one
 }
 //
+// rev_sumsq_reverse_one_ad
+pub fn rev_sumsq_reverse_one_ad(
+    _rev_domain_zero  : &Vec<& AD<V> >    ,
+    _rev_range_one    : Vec<& AD<V> >     ,
+    _call_info        : IndexT            ,
+    _trace            : bool              ,
+) -> Vec< AD<V> >
+{   panic!("rev_sumsq_reverse_one_ad: not implemented");
+}
+//
 // rev_sumsq_forward_depend
 fn rev_sumsq_forward_depend(
     is_var_rev_domain  : &Vec<bool> ,
@@ -153,6 +163,8 @@ pub fn register_rev_sumsq_atom()-> IndexT {
         forward_one_ad       :  rev_sumsq_forward_one_ad,
         //
         reverse_one_value    :  rev_sumsq_reverse_one_value,
+        reverse_one_ad       :  rev_sumsq_reverse_one_ad,
+        //
         forward_depend       :  rev_sumsq_forward_depend,
     };
     //

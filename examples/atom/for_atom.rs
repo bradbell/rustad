@@ -89,8 +89,8 @@ fn for_sumsq_forward_one_value(
 pub fn for_sumsq_forward_one_ad(
     _for_domain_zero  : &Vec<& AD<V> >    ,
     _for_domain_one   : Vec<& AD<V> >     ,
-    _call_info   : IndexT                 ,
-    _trace        : bool                  ,
+    _call_info        : IndexT            ,
+    _trace            : bool              ,
 ) -> Vec< AD<V> >
 {   panic!("for_sumsq_forward_one_ad: not implemented");
 }
@@ -130,6 +130,16 @@ fn for_sumsq_reverse_one_value(
     for_domain_one
 }
 //
+// for_sumsq_reverse_one_ad
+pub fn for_sumsq_reverse_one_ad(
+    _for_domain_zero  : &Vec<& AD<V> >    ,
+    _for_range_one    : Vec<& AD<V> >     ,
+    _call_info        : IndexT            ,
+    _trace            : bool              ,
+) -> Vec< AD<V> >
+{   panic!("for_sumsq_reverse_one_ad: not implemented");
+}
+//
 // for_sumsq_forward_depend
 fn for_sumsq_forward_depend(
     is_var_for_domain  : &Vec<bool> ,
@@ -156,6 +166,8 @@ pub fn register_for_sumsq_atom()-> IndexT {
         forward_one_ad       :  for_sumsq_forward_one_ad,
         //
         reverse_one_value    :  for_sumsq_reverse_one_value,
+        reverse_one_ad       :  for_sumsq_reverse_one_ad,
+        //
         forward_depend       :  for_sumsq_forward_depend,
     };
     //

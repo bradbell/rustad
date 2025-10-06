@@ -172,6 +172,8 @@ fn register_checkpoint_atom()-> IndexT {
         forward_one_ad       :  checkpoint_forward_one_ad,
         //
         reverse_one_value    :  checkpoint_reverse_one_value,
+        reverse_one_ad       :  checkpoint_reverse_one_ad,
+        //
         forward_depend       :  checkpoint_forward_depend,
     };
     //
@@ -202,6 +204,17 @@ fn checkpoint_forward_one_ad(
 ) -> Vec< AD<V> >
 {   //
     panic!( "checkpoint_forward_one_ad not implemented");
+}
+//
+// checkpoint_reverse_one_ad
+fn checkpoint_reverse_one_ad(
+    _domain_zero      : &Vec<& AD<V> >    ,
+    _range_one        : Vec<& AD<V> >     ,
+    _call_info        : IndexT            ,
+    _trace            : bool              ,
+) -> Vec< AD<V> >
+{   //
+    panic!( "checkpoint_reverse_one_ad not implemented");
 }
 // -------------------------------------------------------------------------
 // main

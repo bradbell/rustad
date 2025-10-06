@@ -144,3 +144,34 @@ pub fn callback_reverse_one_value(
     assert_eq!( dx[0], 2.0 * x[0]*dy[0] );
     assert_eq!( dx[1], 2.0 * x[1]*dy[0] );
 }
+//
+// callback_reverse_one_ad
+pub fn callback_reverse_one_ad(
+    sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
+) {
+    //
+    // f
+    let f = value_callback_f(sumsq_atom_id, call_info, trace);
+    //
+    // av, dy1, ady1
+    let x      : Vec<V>       = vec![ 3.0 , 4.0 ];
+    let ax                    = start_recording(x);
+    let mut av : Vec< AD<V> > = Vec::new();
+    f.forward_zero_ad(&mut av , ax, trace);
+    let dy1     : Vec<V> = vec![ 5.0 ];
+    let ady1             = ad_from_vector(dy1.clone());
+    //
+    // g
+    // callback to sumsq_reverse_one_ad
+    // g(x) = dy1 * f'(x) = 2 * ( dy1[0] * x[0], dy1[0] * x[1], ... )
+    let adx              = f.reverse_one_ad(&av, ady1, trace);
+    let g                = stop_recording(adx);
+    //
+    // x, v, y
+    // check forward_zero_value
+    let x       : Vec<V> = vec![ 3.0 , 4.0 ];
+    let mut v   : Vec<V> = Vec::new();
+    let y                = g.forward_zero_value(&mut v , x.clone(), trace);
+    assert_eq!( y[0], 2.0 * dy1[0] * x[0]  );
+    assert_eq!( y[1], 2.0 * dy1[0] * x[1]  );
+}

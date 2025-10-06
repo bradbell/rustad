@@ -46,14 +46,17 @@ use std::sync::RwLock;
 //
 use crate::op::info::{
     OpInfo,
-    panic_one,
 };
 use crate::atom::{
     AtomForwardZeroValue,
     AtomForwardZeroAD,
+    //
     AtomForwardOneValue,
     AtomForwardOneAD,
+    //
     AtomReverseOneValue,
+    AtomReverseOneAD,
+    //
     sealed::AtomEvalVec,
 };
 use crate::op::id::{
@@ -64,6 +67,7 @@ use crate::{
     AD,
     IndexT,
     AtomEval,
+    ThisThreadTapePublic,
     ad_from_value,
 };
 // ----------------------------------------------------------------------
@@ -514,6 +518,78 @@ where
     }
 }
 // --------------------------------------------------------------------------
+// call_reverse_1_ad
+//
+/// `AD<V>` evaluation of first order reverse call operator (atomic functions)
+fn call_reverse_1_ad<V> (
+    avar_zero   : &Vec< AD<V> >       ,
+    avar_one    : &mut Vec< AD<V> >   ,
+    con         : &Vec<V>             ,
+    flag       : &Vec<bool>           ,
+    arg        : &[IndexT]            ,
+    res        : usize                )
+where
+    V             : AtomEvalVec + Clone + From<f32>,
+    for<'a> AD<V> : std::ops::AddAssign<&'a AD<V> >,
+{   // ---------------------------------------------------------------------
+    let (
+        atom_id,
+        call_info,
+        call_n_arg,
+        call_n_res,
+        trace,
+        is_arg_var,
+        is_res_var,
+    ) = extract_call_arg(flag, arg);
+    let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
+    let call_adomain_zero = call_domain_zero_ad(
+        avar_zero, &acon, arg, call_n_arg, is_arg_var
+    );
+    // ----------------------------------------------------------------------
+    //
+    // forward_zero_value, reverse_one_value
+    let reverse_one_ad  : AtomReverseOneAD<V>;
+    {   //
+        // rw_lock
+        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
+        //
+        // read_lock
+        let read_lock = rw_lock.read();
+        assert!( read_lock.is_ok() );
+        //
+        // Rest of this block has a lock, so it should be fast and not fail.
+        let atom_eval_vec       = read_lock.unwrap();
+        let atom_eval           = &atom_eval_vec[atom_id];
+        reverse_one_ad          = atom_eval.reverse_one_ad.clone();
+    }
+    //
+    // call_range_one
+    let zero_v : V    = 0f32.into();
+    let azero         = ad_from_value(zero_v);
+    let mut call_arange_one : Vec<& AD<V>> = Vec::with_capacity( call_n_res );
+    let mut j_res = 0;
+    for i_res in 0 .. call_n_res {
+        if is_res_var[i_res] {
+            call_arange_one.push( &avar_one[res + j_res] );
+            j_res += 1;
+        } else {
+            call_arange_one.push( &azero );
+        }
+    }
+    // call_adomain_one
+    let call_adomain_one = reverse_one_ad(
+        &call_adomain_zero, call_arange_one, call_info, trace
+    );
+    //
+    // avar_one
+    for i_arg in 0 .. call_n_arg {
+        let index = arg[i_arg + 5] as usize;
+        if is_arg_var[i_arg] {
+            avar_one[index] += &call_adomain_one[i_arg];
+        }
+    }
+}
+// --------------------------------------------------------------------------
 //
 // call_arg_var_index
 /// vector of variable indices that are arguments to this call operator
@@ -542,6 +618,7 @@ fn call_arg_var_index(
     }
     assert_ne!( arg_var_index.len() , 0 );
 }
+// ---------------------------------------------------------------------------
 //
 // set_op_info
 /// Set the operator information for call.
@@ -551,7 +628,8 @@ fn call_arg_var_index(
 /// The map results for CALL_OP and CALL_RES_OP are set.
 pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    for<'a> V : Clone + From<f32> + AtomEvalVec + std::ops::AddAssign<&'a V> ,
+    V         : Clone + From<f32> + AtomEvalVec + ThisThreadTapePublic,
+    for<'a> V : std::ops::AddAssign<&'a V> ,
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
         name              : "call" ,
@@ -560,7 +638,7 @@ where
         forward_1_value   : call_forward_1_value::<V>,
         forward_1_ad      : call_forward_1_ad::<V>,
         reverse_1_value   : call_reverse_1_value::<V>,
-        reverse_1_ad      : panic_one::<V, AD<V> >,
+        reverse_1_ad      : call_reverse_1_ad::<V>,
         arg_var_index     : call_arg_var_index,
     };
     op_info_vec[CALL_RES_OP as usize] = OpInfo{
