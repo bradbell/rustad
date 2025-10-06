@@ -111,7 +111,7 @@ fn main() {
     let sumsq_atom_id     = register_sumsq_atom();
     let for_sumsq_atom_id = for_atom::register_for_sumsq_atom();
     let call_info     = ATOM_ID_VEC.with_borrow_mut(|atom_id_vec| {
-        let call_info = atom_id_vec.len() as IndexT;
+        let call_info = 2 * (atom_id_vec.len() as IndexT);
         atom_id_vec.push( sumsq_atom_id );
         atom_id_vec.push( for_sumsq_atom_id );
         call_info

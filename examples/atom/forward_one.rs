@@ -5,12 +5,13 @@
 use rustad::{
     AD,
     IndexT,
-    ad_from_value,
+    call_atom,
 };
 //
 // V, ATOM_ID_VEC
 use super::{
     V,
+    ATOM_ID_VEC,
 };
 //
 // sumsq_forward_one_value
@@ -53,21 +54,33 @@ pub fn sumsq_forward_one_value(
 pub fn sumsq_forward_one_ad(
     domain_zero  : &Vec<& AD<V> >    ,
     domain_one   : Vec<& AD<V> >     ,
-    _call_info   : IndexT            ,
+    call_info    : IndexT            ,
     trace        : bool              ,
 ) -> Vec< AD<V> >
 {   //
     // domain_zero
     assert_eq!( domain_zero.len(), domain_one.len() );
     //
-    // two_ad
-    let two_ad = ad_from_value(2.0 as V);
+    // atom_id
+    let atom_id = ATOM_ID_VEC.with_borrow( |atom_id_vec|
+        atom_id_vec[2 * (call_info as usize) + 1]
+    );
+    //
+    // n_domain 
+    let n_domain = domain_zero.len();
+    //
+    // for_domain_zero
+    let mut for_domain_zero : Vec< AD<V> > = Vec::with_capacity(2 * n_domain);
+    for j in 0 .. n_domain {
+        for_domain_zero.push( (*domain_zero[j]).clone() );
+    }
+    for j in 0 .. n_domain {
+        for_domain_zero.push( (*domain_one[j]).clone() );
+    }
     //
     // range_one
-    let mut range_one = ad_from_value(0.0 as V);
-    for j in 0 .. domain_one.len() {
-        range_one += &( &two_ad * &( domain_zero[j] * domain_one[j] ) );
-    }
+    let range_one = call_atom(for_domain_zero, atom_id, call_info, trace);
+    //
     if trace {
         println!("Begin Trace: sumsq_forward_one_ad");
         print!("domain_zero = [ ");
@@ -79,8 +92,8 @@ pub fn sumsq_forward_one_ad(
                 print!("{}, ", domain_one[j]);
         }
         println!("]");
-        println!("range_one = {}", range_one);
+        println!("range_one = {}", range_one[0]);
         println!("End Trace: sumsq_forward_one_ad");
     }
-    vec![ range_one ]
+    range_one
 }
