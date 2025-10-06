@@ -167,11 +167,23 @@ pub fn callback_reverse_one_ad(
     let adx              = f.reverse_one_ad(&av, ady1, trace);
     let g                = stop_recording(adx);
     //
-    // x, v, y
+    // x, v
     // check forward_zero_value
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
     let mut v   : Vec<V> = Vec::new();
     let y                = g.forward_zero_value(&mut v , x.clone(), trace);
     assert_eq!( y[0], 2.0 * dy1[0] * x[0]  );
     assert_eq!( y[1], 2.0 * dy1[0] * x[1]  );
+    //
+    // check forward_one_value
+    let dx  : Vec<V> = vec![ 6.0, 7.0 ];
+    let dy           = g.forward_one_value(&v, dx.clone(), trace);
+    assert_eq!( dy[0], 2.0 * dy1[0] * dx[0] );
+    assert_eq!( dy[1], 2.0 * dy1[0] * dx[1] );
+    //
+    // check reverse_one_value
+    let dy2  : Vec<V> = vec![ 8.0, 9.0 ];
+    let dx            = g.reverse_one_value(&v, dy2.clone(), trace);
+    assert_eq!( dx[0], 2.0 * dy1[0] * dy2[0] );
+    assert_eq!( dx[1], 2.0 * dy1[0] * dy2[1] );
 }
