@@ -26,11 +26,14 @@ fi
 # target/deps/release
 for build_type in debug release
 do
-   dir="target/$build_type/deps"
-   if ls $dir/* > /dev/null
-   then
-      rm $dir/*
-   fi
+   for subdir in deps examples incremental
+   do
+      dir="target/$build_type/$subdir"
+      if ls $dir/* > /dev/null
+      then
+         rm -r $dir/*
+      fi
+   done
 done
 #
 # typos

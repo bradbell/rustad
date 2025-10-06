@@ -94,25 +94,37 @@ pub fn callback_forward_one_ad(
     // f
     let f = value_callback_f(sumsq_atom_id, call_info, trace);
     //
-    // g, dx1
-    // g(x) = f'(x) * dx1 = 2 * ( x[0] * dx1[0] + x[2] * dx1[2] + ... )
+    // av, dx1, adx1
     let x      : Vec<V>       = vec![ 3.0 , 4.0 ];
     let ax                    = start_recording(x);
     let mut av : Vec< AD<V> > = Vec::new();
     f.forward_zero_ad(&mut av , ax, trace);
     let dx1     : Vec<V> = vec![ 5.0, 6.0 ];
     let adx1             = ad_from_vector(dx1.clone());
+    //
+    // g
+    // callback to sumsq_forward_one_ad
+    // g(x) = f'(x) * dx1 = 2 * ( x[0] * dx1[0] + x[2] * dx1[2] + ... )
     let ady              = f.forward_one_ad(&av, adx1, trace);
     let g                = stop_recording(ady);
     //
-    // x, dx2, dy
+    // x, v, y
+    // check forward_zero_value
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
     let mut v   : Vec<V> = Vec::new();
-    g.forward_zero_value(&mut v , x.clone(), trace);
+    let y                = g.forward_zero_value(&mut v , x.clone(), trace);
+    assert_eq!( y[0], 2.0 * ( x[0] * dx1[0] + x[1] * dx1[1] ) );
+    //
+    // check forward_one_value
     let dx2     : Vec<V> = vec![ 7.0, 8.0 ];
     let dy               = g.forward_one_value(&v , dx2.clone(), trace);
+    assert_eq!( dy[0], 2.0 * ( dx2[0] * dx1[0] + dx2[1] * dx1[1] ) );
     //
-    assert_eq!( dy[0], 2.0 * dx1[0]*dx2[0] + 2.0 * dx1[1]*dx2[1] );
+    // check reverse_one_value
+    let dy     : Vec<V> = vec![ 9.0 ];
+    let dx              = g.reverse_one_value(&v , dy.clone(), trace);
+    assert_eq!( dx[0], 2.0 * dy[0] * dx1[0] );
+    assert_eq!( dx[1], 2.0 * dy[0] * dx1[1] );
 }
 //
 // callback_reverse_one_value

@@ -121,8 +121,10 @@ fn for_sumsq_reverse_one_value(
     // for_domain_one
     let mut for_domain_one : Vec<V> = Vec::with_capacity( 2 * n_domain );
     for j in 0 .. n_domain {
-        for_domain_one[j]            = &factor * domain_one[j];
-        for_domain_one[j + n_domain] = &factor * domain_zero[j];
+        for_domain_one.push(&factor * domain_one[j]);
+    }
+    for j in 0 .. n_domain {
+        for_domain_one.push(&factor * domain_zero[j]);
     }
     //
     for_domain_one
