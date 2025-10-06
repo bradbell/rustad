@@ -17,14 +17,12 @@ type V = f64;
 thread_local! {
     pub static ATOM_ID_VEC : RefCell< Vec<IndexT> > = RefCell::new(Vec::new());
 }
+//
+// tests
 mod tests;
-use tests::{
-    callback_forward_zero_value,
-    callback_forward_zero_ad,
-    callback_forward_one_value,
-    callback_forward_one_ad,
-    callback_reverse_one_value,
-};
+//
+// for_atom
+mod for_atom;
 //
 // sumsq_forward_zero_value
 // sumsq_forward_zero_ad
@@ -50,11 +48,11 @@ fn sumsq_reverse_one_value(
     trace        : bool        ,
 ) -> Vec<V>
 {   //
-    // domain_zero
+    // range_one
     assert_eq!( range_one.len(), 1 );
     //
     // domain_one
-    let mut domain_one : Vec<V> = Vec::new();
+    let mut domain_one : Vec<V> = Vec::with_capacity( domain_zero.len() );
     for j in 0 .. domain_zero.len() {
         domain_one.push( 2.0 * domain_zero[j] * range_one[0] );
     }
@@ -85,7 +83,7 @@ fn sumsq_forward_depend(
     }
     vec![ is_var_range ]
 }
-// -------------------------------------------------------------------------
+// 
 // register_sumsq_atom
 // -------------------------------------------------------------------------
 fn register_sumsq_atom()-> IndexT {
@@ -110,19 +108,21 @@ fn register_sumsq_atom()-> IndexT {
 // main
 // -------------------------------------------------------------------------
 fn main() {
-    let sumsq_atom_id = register_sumsq_atom();
+    let sumsq_atom_id     = register_sumsq_atom();
+    let for_sumsq_atom_id = for_atom::register_for_sumsq_atom();
     let call_info     = ATOM_ID_VEC.with_borrow_mut(|atom_id_vec| {
         let call_info = atom_id_vec.len() as IndexT;
         atom_id_vec.push( sumsq_atom_id );
+        atom_id_vec.push( for_sumsq_atom_id );
         call_info
     } );
     let trace         = false;
     //
-    callback_forward_zero_value(sumsq_atom_id, call_info, trace);
-    callback_forward_zero_ad(sumsq_atom_id,    call_info, trace);
+    tests::callback_forward_zero_value(sumsq_atom_id, call_info, trace);
+    tests::callback_forward_zero_ad(sumsq_atom_id,    call_info, trace);
     //
-    callback_forward_one_value(sumsq_atom_id,  call_info, trace);
-    callback_forward_one_ad(sumsq_atom_id,  call_info, trace);
+    tests::callback_forward_one_value(sumsq_atom_id,  call_info, trace);
+    tests::callback_forward_one_ad(sumsq_atom_id,  call_info, trace);
     //
-    callback_reverse_one_value(sumsq_atom_id,  call_info, trace);
+    tests::callback_reverse_one_value(sumsq_atom_id,  call_info, trace);
 }
