@@ -11,7 +11,7 @@ dz = g_x(x, y) * dx + g_y(x, y) * dy
 
 rev_sumsq_reverse_one
 dx^T = dz^T * g_x(x, y) = 2 * y * ( dz[0],  dz[1], + ... + )
-dy^T = dz^T * g_y(x, y) = 2 * ( dz[0] * x[0]  + dz[1] * x[1]  + ... )
+dy   = dz^T * g_y(x, y) = 2 * ( dz[0] * x[0]  + dz[1] * x[1]  + ... )
 */
 use rustad::{
     AD,

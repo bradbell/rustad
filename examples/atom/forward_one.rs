@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
+/*
+sumsq_forward_one
+dy = g'(x) * dx = 2 * ( x[0] * dx[0] + x[1] * dx[1] + ... )
+*/
 //
 use rustad::{
     AD,
@@ -66,7 +70,7 @@ pub fn sumsq_forward_one_ad(
         atom_id_vec[3 * (call_info as usize) + 1]
     );
     //
-    // n_domain 
+    // n_domain
     let n_domain = domain_zero.len();
     //
     // for_domain_zero

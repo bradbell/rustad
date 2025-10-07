@@ -2,6 +2,10 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
+/*
+sumsq_forward_zero
+y = g(x) = x[0] * x[0] + x[1] * x[1] + ...
+*/
 use rustad::{
     AD,
     IndexT,

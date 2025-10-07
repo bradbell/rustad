@@ -1,7 +1,22 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
-//
+/*
+sumsq_forward_zero; see forward_zero.rs
+z = g(x) = x[0] * x[0] + x[1] * x[1] + ...
+
+sumsq_forward_one: see forward_one.rs
+dz = g'(x) * dx = 2 * ( x[0] * dx[0] + x[1] * dx[1] + ... )
+
+sumsq_reverse_one; see reverse_one.rs
+dx^T = dz * g'(x) = 2 * dz * ( x[0], x[1], ... )
+
+for_sumsq_forward_zero; see for_atom.rs
+z = g(x, y) = 2 * ( x[0] * y[0] + x[1] * y[1] + ... )
+
+rev_sumsq_forward_zero; see rev_atom.rs
+z = g(x, y) = 2 * y * (x[0], x[1], ... )^T
+*/
 use std::cell::RefCell;
 //
 use rustad::{
@@ -64,7 +79,6 @@ fn sumsq_forward_depend(
 }
 //
 // register_sumsq_atom
-// -------------------------------------------------------------------------
 fn register_sumsq_atom()-> IndexT {
     //
     // sumsq_atom_eval

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
+/*
+sumsq_reverse_one
+dx^T = dy * g'(x) = 2 * dy * ( x[0], x[1], ... )
+*/
 //
 use rustad::{
     AD,
