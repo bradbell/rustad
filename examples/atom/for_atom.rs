@@ -1,7 +1,19 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
-//
+/*
+for_sumsq_forward_zero
+z = g(x, y) = 2 * ( x[0] * y[0] + x[1] * y[1] + ... )
+
+for_sumsq_forward_one
+dz = g_x(x, y) * dx + g_y(x, y) * dy
+   = 2 * ( dx[0] *  y[0] + dx[1] *  y[1] + ... )
+   + 2 * (  x[0] * dy[0] +  x[1] * dy[1] + ... )
+
+for_sumsq_reverse_one
+dx^T = dz * g_x(x, y) = 2 * dz * ( y[0], y[1], ... )
+dy^T = dz * g_y(x, y) = 2 * dz * ( x[0], x[1], ... )
+*/
 use rustad::{
     AD,
     register_atom,
@@ -14,144 +26,154 @@ use super::V;
 //
 // for_sumsq_forward_zero_value
 fn for_sumsq_forward_zero_value(
-    for_domain_zero : &Vec<&V>  ,
-    _call_info      : IndexT    ,
-    _trace           : bool      ,
+    domain_zero : &Vec<&V>  ,
+    _call_info  : IndexT    ,
+    _trace      : bool      ,
 ) -> Vec<V>
 {   //
-    // n_domain
-    let n_domain = for_domain_zero.len() / 2;
-    assert_eq!( 2 * n_domain , for_domain_zero.len() );
+    // nx
+    let nx = domain_zero.len() / 2;
+    assert_eq!( 2 * nx , domain_zero.len() );
     //
     // two_v
     let two_v : V = 2.0 as V;
     //
-    // domain_zero, domain_one
-    let domain_zero =  &for_domain_zero[0 .. n_domain];
-    let domain_one  =  &for_domain_zero[n_domain .. 2 * n_domain];
+    // x, y
+    let x = &domain_zero[0 .. nx];
+    let y = &domain_zero[nx .. 2 * nx];
     //
-    // for_range_zero
-    let mut for_range_zero = 0.0 as V;
-    for j in 0 .. n_domain {
-        for_range_zero += &two_v * &( domain_zero[j] * domain_one[j] );
+    // z
+    let mut z = 0.0 as V;
+    for j in 0 .. nx {
+        z += &two_v * &( x[j] * y[j] );
     }
     //
-    vec![ for_range_zero ]
+    vec![ z ]
 }
 //
 // for_sumsq_forward_zero_ad
 pub fn for_sumsq_forward_zero_ad(
-    _for_domain_zero  : &Vec<& AD<V> >    ,
-    _call_info        : IndexT            ,
-    _trace            : bool              ,
+    _domain_zero  : &Vec<& AD<V> >    ,
+    _call_info    : IndexT            ,
+    _trace        : bool              ,
 ) -> Vec< AD<V> >
 {   panic!("for_sumsq_forward_zero_ad: not implemented");
 }
 //
 // for_sumsq_forward_one_value
 fn for_sumsq_forward_one_value(
-    for_domain_zero : &Vec<&V>  ,
-    for_domain_one  : Vec<&V>   ,
-    _call_info      : IndexT    ,
-    _trace           : bool      ,
+    domain_zero : &Vec<&V>  ,
+    domain_one  : Vec<&V>   ,
+    _call_info  : IndexT    ,
+    _trace      : bool      ,
 ) -> Vec<V>
 {   //
-    // for_domain_zero
-    assert_eq!( for_domain_zero.len(), for_domain_one.len() );
+    // domain_zero, domain_one
+    assert_eq!( domain_zero.len(), domain_one.len() );
     //
-    // n_domain
-    let n_domain = for_domain_zero.len() / 2;
-    assert_eq!( 2 * n_domain , for_domain_zero.len() );
+    // nx
+    let nx = domain_zero.len() / 2;
+    assert_eq!( 2 * nx , domain_zero.len() );
     //
     //
     // two_v
     let two_v : V = 2.0 as V;
     //
-    // domain_zero, domain_one
-    let domain_zero =  &for_domain_zero[0 .. n_domain];
-    let domain_one  =  &for_domain_zero[n_domain .. 2 * n_domain];
+    // x, y
+    let x =  &domain_zero[0 .. nx];
+    let y =  &domain_zero[nx .. 2 * nx];
     //
-    // domain_one_zero, domain_one_one
-    let domain_zero_one =  &for_domain_one[0 .. n_domain];
-    let domain_one_one  =  &for_domain_one[n_domain .. 2 * n_domain];
+    // dx, dy
+    let dx =  &domain_one[0 .. nx];
+    let dy =  &domain_one[nx .. 2 * nx];
     //
-    // rev_range_one
-    let mut rev_range_one = 0.0 as V;
-    for j in 0 .. n_domain {
-        rev_range_one += &two_v * &( domain_zero[j] * domain_one_one[j] );
-        rev_range_one += &two_v * &( domain_zero_one[j] * domain_one[j] );
+    // dz
+    let mut dz = 0.0 as V;
+    for j in 0 .. nx {
+        dz += &two_v * &(  x[j] * dy[j] );
+        dz += &two_v * &( dx[j] * y[j] );
     }
     //
-    vec![ rev_range_one ]
+    vec![ dz ]
 }
 //
 // for_sumsq_forward_one_ad
 pub fn for_sumsq_forward_one_ad(
-    _for_domain_zero  : &Vec<& AD<V> >    ,
-    _for_domain_one   : Vec<& AD<V> >     ,
-    _call_info        : IndexT            ,
-    _trace            : bool              ,
+    _domain_zero  : &Vec<& AD<V> >    ,
+    _domain_one   : Vec<& AD<V> >     ,
+    _call_info    : IndexT            ,
+    _trace        : bool              ,
 ) -> Vec< AD<V> >
 {   panic!("for_sumsq_forward_one_ad: not implemented");
 }
 //
 // for_sumsq_reverse_one_value
 fn for_sumsq_reverse_one_value(
-    for_domain_zero : &Vec<&V>  ,
-    for_range_one   : Vec<&V>   ,
-    _call_info      : IndexT    ,
-    _trace          : bool      ,
+    domain_zero : &Vec<&V>  ,
+    range_one   : Vec<&V>   ,
+    _call_info  : IndexT    ,
+    _trace      : bool      ,
 ) -> Vec<V>
 {   //
-    // for_range_one
-    assert_eq!( for_range_one.len(), 1 );
+    // nx
+    let nx = domain_zero.len() / 2;
+    assert_eq!( 2 * nx , domain_zero.len() );
     //
-    // n_domain
-    let n_domain = for_domain_zero.len() / 2;
-    assert_eq!( 2 * n_domain , for_domain_zero.len() );
-    //
+    // dz
+    assert_eq!( range_one.len(), 1 );
+    let dz = range_one[0];
     //
     // factor
-    let factor : V = (2.0 as V) * for_range_one[0];
+    let factor : V = &(2.0 as V) * dz;
     //
-    // domain_zero, domain_one
-    let domain_zero =  &for_domain_zero[0 .. n_domain];
-    let domain_one  =  &for_domain_zero[n_domain .. 2 * n_domain];
+    // x, y
+    let x =  &domain_zero[0 .. nx];
+    let y =  &domain_zero[nx .. 2 * nx];
     //
-    // for_domain_one
-    let mut for_domain_one : Vec<V> = Vec::with_capacity( 2 * n_domain );
-    for j in 0 .. n_domain {
-        for_domain_one.push(&factor * domain_one[j]);
+    // dx_dy
+    let mut dx_dy : Vec<V> = Vec::with_capacity( 2 * nx );
+    for j in 0 .. nx {
+        dx_dy.push(&factor * y[j]);
     }
-    for j in 0 .. n_domain {
-        for_domain_one.push(&factor * domain_zero[j]);
+    for j in 0 .. nx {
+        dx_dy.push(&factor * x[j]);
     }
     //
-    for_domain_one
+    dx_dy
 }
 //
 // for_sumsq_reverse_one_ad
 pub fn for_sumsq_reverse_one_ad(
-    _for_domain_zero  : &Vec<& AD<V> >    ,
-    _for_range_one    : Vec<& AD<V> >     ,
-    _call_info        : IndexT            ,
-    _trace            : bool              ,
+    _domain_zero  : &Vec<& AD<V> >    ,
+    _range_one    : Vec<& AD<V> >     ,
+    _call_info    : IndexT            ,
+    _trace        : bool              ,
 ) -> Vec< AD<V> >
 {   panic!("for_sumsq_reverse_one_ad: not implemented");
 }
 //
 // for_sumsq_forward_depend
 fn for_sumsq_forward_depend(
-    is_var_for_domain  : &Vec<bool> ,
-    _call_info         : IndexT     ,
-    _trace             : bool       ,
+    is_var_domain  : &Vec<bool> ,
+    _call_info     : IndexT     ,
+    _trace         : bool       ,
 ) -> Vec<bool>
 {
-    let mut is_var_for_range = false;
-    for j in 0 .. is_var_for_domain.len() {
-        is_var_for_range = is_var_for_range || is_var_for_domain[j];
+    // nx
+    let nx = is_var_domain.len() / 2;
+    assert_eq!( 2 * nx , is_var_domain.len() );
+    //
+    // is_var_x, is_var_y
+    let is_var_x = &is_var_domain[0 .. nx];
+    let is_var_y = &is_var_domain[nx .. 2 * nx];
+    //
+    let mut is_var_z = false;
+    for j in 0 .. nx {
+        if is_var_x[j] || is_var_y[j] {
+            is_var_z = true;
+        }
     }
-    vec![ is_var_for_range ]
+    vec![ is_var_z ]
 }
 //
 // register_for_sumsq_atom
