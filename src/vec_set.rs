@@ -83,7 +83,7 @@ impl VecSet {
     // VecSet.singleton
     /// Create a new set with one element.
     ///
-    /// ```test
+    /// ```text
     ///     target = vs.singleton(element)
     /// ```
     ///
@@ -134,7 +134,7 @@ impl VecSet {
     // VecSet.get
     /// Get one set from the vector of sets.
     ///
-    /// ```test
+    /// ```text
     ///     set = vs.get(id_set)
     /// ```
     ///
@@ -191,7 +191,7 @@ impl VecSet {
     // VecSet.n_data
     /// Return the number elements and links used to represent all the sets.
     ///
-    /// ```test
+    /// ```text
     ///     n_data = vs.n_data(element)
     /// ```
     ///

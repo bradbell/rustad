@@ -234,7 +234,7 @@ where
 /// Stops a recordng and moves it to an ADfn object.
 ///
 /// * Syntax :
-/// ```test
+/// ```text
 ///     ad_fn = stop_recording(arange)
 /// ```
 ///

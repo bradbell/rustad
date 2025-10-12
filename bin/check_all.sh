@@ -29,7 +29,7 @@ do
    for subdir in deps examples incremental
    do
       dir="target/$build_type/$subdir"
-      if ls $dir/* > /dev/null
+      if ls $dir/* >& /dev/null
       then
          rm -r $dir/*
       fi
