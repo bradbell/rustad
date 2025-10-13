@@ -14,6 +14,7 @@ pub mod forward_one;
 pub mod reverse_one;
 pub mod sub_sparsity;
 pub mod for_sparsity;
+pub mod rust_src;
 //
 pub(crate) mod eval_from;
 // ---------------------------------------------------------------------------
