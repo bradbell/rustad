@@ -12,6 +12,7 @@
 //
 use std::any::type_name;
 use crate::ADfn;
+use crate::op::info::GlobalOpInfoVec;
 //
 #[cfg(doc)]
 use crate::{
@@ -20,12 +21,12 @@ use crate::{
 };
 // -----------------------------------------------------------------------
 // prototype
-fn prototype<V>(fn_name : &str) -> String {
+fn prototype(fn_name : &str, v_str : &str) -> String {
     let result = String::new();
     let result = result +
         "rustad_src_"  + fn_name + "(\n" +
-        "   domain      : &Vec<&"    + type_name::<V>()  + ">,\n" +
-        "   range       : &mut Vec<" + type_name::<V>()  + ">,\n" +
+        "   domain      : &Vec<&"    + v_str  + ">,\n" +
+        "   range       : &mut Vec<" + v_str  + ">,\n" +
         "   message     : &mut String,\n" +
         ")\n";
     result
@@ -34,6 +35,8 @@ fn prototype<V>(fn_name : &str) -> String {
 // -----------------------------------------------------------------------
 // rust_src
 impl<V> ADfn<V>
+where
+    V : ToString + GlobalOpInfoVec ,
 {
     /// Under Construction:
     /// Rust source code for zero order forward mode evaluation; i.e.,
@@ -72,35 +75,76 @@ impl<V> ADfn<V>
     ///
     pub fn rust_src(&self, fn_name : &str) -> String {
         //
-        // src
-        let mut src    = prototype::<V>(fn_name) + "{\n";
+        // op_info_vec
+        let op_info_vec = &*<V as GlobalOpInfoVec>::get();
         //
-        // src
+        // v_str
+        let v_str   = type_name::<V>();
+        //
+        // prototype
+        let mut src = prototype(fn_name, &v_str);
+        //
+        // begin function body
+        src = src + "{\n";
+        //
+        // check message
         src = src +
             "   // check message\n" +
             "   if message.len() != 0 {\n" +
             "       message = \"On input: message.len() != 0\";\n" +
             "   }\n";
         //
-        // src
+        // check range
         src = src +
             "   // check range\n" +
             "   if range.len() != 0 {\n" +
             "       message = \"On input: range.len() != 0\";\n" +
             "   }\n";
         //
-        // src
-        let expect = self.domain_len().to_string();
+        // check domain
+        let expect = self.n_domain.to_string();
         src = src +
             "   // check domain\n" +
             "   if domain.len() != " + &expect  + " {\n" +
             "       message = \"domain length != " + &expect + "\";\n" +
             "   }\n";
         //
-        // src
+        // con
+        let n_con = self.con_all.len().to_string();
         src = src +
-            "}\n";
+            "   // con\n" +
+            "   let con : Vec<" + v_str + "> = " +
+                    "Vec::with_capacity(" + &n_con + ");\n";
+        for c in self.con_all.iter() {
+            src = src +
+                "   con.push(" + &( c.to_string() ) + " as " + v_str + ");\n";
+        }
+        //
+        // var
+        // Note that rust_src does not include the domain in the var vector
+        assert!( self.n_domain <= self.n_var );
+        let n_var = ( self.n_var - self.n_domain ).to_string();
+        src = src +
+            "   //\n" +
+            "   // var\n" +
+            "   let var : Vec<" + v_str + "> = " +
+                    "Vec::with_capacity(" + &n_var + ");\n";
+        //
+        // var
+        for op_index in 0 .. self.id_all.len() {
+            let op_id = self.id_all[op_index] as usize;
+            let start = self.op2arg[op_index] as usize;
+            let end   = self.op2arg[op_index + 1] as usize;
+            let arg   = &self.arg_all[start .. end];
+            let res   = self.n_domain + op_index;
+            let rust_src  = op_info_vec[op_id].rust_src;
+            src = src + "   " +
+                &rust_src(self.n_domain, &self.flag_all, &arg, res) + "\n";
+        }
+        //
+        // end function body
+        src = src + "}\n";
         //
         src
+        }
     }
-}

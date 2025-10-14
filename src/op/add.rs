@@ -36,6 +36,11 @@ use crate::op::info::{
     ReverseOne,
 };
 // -------------------------------------------------------------------------
+// add_cv_rust_src
+// add_vc_rust_src
+// add_vv_rust_src
+binary::binary_rust_src!(Add, +);
+// -------------------------------------------------------------------------
 // add_cv_forward_0
 // add_vc_forward_0
 // add_vv_forward_0
@@ -184,6 +189,7 @@ where
         reverse_1_value   : add_cv_reverse_1::<V, V>,
         reverse_1_ad      : add_cv_reverse_1::<V, AD<V> >,
         arg_var_index     : binary::binary_cv_arg_var_index,
+        rust_src          : add_cv_rust_src,
     };
     op_info_vec[ADD_VC_OP as usize] = OpInfo{
         name              : "add_vc",
@@ -194,6 +200,7 @@ where
         reverse_1_value   : add_vc_reverse_1::<V, V>,
         reverse_1_ad      : add_vc_reverse_1::<V, AD<V> >,
         arg_var_index     : binary::binary_vc_arg_var_index,
+        rust_src          : add_vc_rust_src,
     };
     op_info_vec[ADD_VV_OP as usize] = OpInfo{
         name              : "add_vv",
@@ -204,5 +211,6 @@ where
         reverse_1_value   : add_vv_reverse_1::<V, V>,
         reverse_1_ad      : add_vv_reverse_1::<V, AD<V> >,
         arg_var_index     : binary::binary_vv_arg_var_index,
+        rust_src          : add_vv_rust_src,
     };
 }

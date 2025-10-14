@@ -62,7 +62,7 @@ pub(crate) fn binary_vv_arg_var_index(
 /// [IndexT] must be defined in any module that uses eval_binary_forward_0
 macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     #[doc = concat!(
-        " zero order forward for constant ", stringify!( $op ),
+        " E zero order forward for constant ", stringify!( $op ),
         " variable; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
     fn [< $Name:lower _cv_forward_0 >] <V, E> (
@@ -80,7 +80,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         var_zero[ res ] = &con[lhs] $op &var_zero[rhs];
     }
     #[doc = concat!(
-        " zero order forward variable ", stringify!( $op ),
+        " E zero order forward variable ", stringify!( $op ),
         " constant; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
     fn [< $Name:lower _vc_forward_0 >] <V, E> (
@@ -117,3 +117,99 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     }
 } } }
 pub(crate) use eval_binary_forward_0;
+// ---------------------------------------------------------------------------
+// binary_rust_src
+/// Rust source code for binary operators.
+///
+/// * Name   :  is Add , Sub , Mul , or Div  ,
+/// * op     : is the corresponding operator; e.g. + for Add.
+///
+/// This defines the following functions in the current module:
+/// ```text
+///     {name}_cv_rust_src
+///     {name}_vc_rust_src
+///     {name}_vv_rust_src
+/// ```
+/// where {name} is a lower case version of Name and
+/// v (c) means the corresponding operand is a variable (constant) .
+///
+/// [IndexT] must be defined in any module that uses binary_rust_src
+macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
+    #[doc = concat!(
+        " rust source code for constant ", stringify!( $op ),
+        " variable; see [ForwardZero](crate::op::info::ForwardZero)"
+    ) ]
+    fn [< $Name:lower _cv_rust_src >] (
+        n_domain    : usize       ,
+        _flag       : &Vec<bool>  ,
+        arg         : &[IndexT]   ,
+        res         : usize       ) -> String
+    {
+        assert_eq!( arg.len(), 2);
+        assert!( n_domain <= res );
+        let lhs     = arg[0] as usize;
+        let mut rhs = arg[1] as usize;
+        let res     = res - n_domain;
+        if rhs < n_domain {
+            format!("var[{res}] = &con[{lhs}] $op domain[{rhs}]")
+        } else {
+            rhs = rhs - n_domain;
+            format!("var[{res}] = &con[{lhs}] $op &var[{rhs}]")
+        }
+    }
+    #[doc = concat!(
+        " rust source code for variable ", stringify!( $op ),
+        " constant; see [ForwardZero](crate::op::info::ForwardZero)"
+    ) ]
+    fn [< $Name:lower _vc_rust_src >] (
+        n_domain    : usize       ,
+        _flag       : &Vec<bool>  ,
+        arg         : &[IndexT]   ,
+        res         : usize       ) -> String
+    {
+        assert_eq!( arg.len(), 2);
+        assert!( n_domain <= res );
+        let mut lhs = arg[0] as usize;
+        let rhs    = arg[1] as usize;
+        let res    = res - n_domain;
+        if lhs < n_domain {
+            format!("var[{res}] = domain[{lhs}] $op &con[{rhs}]")
+        } else {
+            lhs = lhs - n_domain;
+            format!("var[{res}] = &var[{lhs}] $op &con[{rhs}]")
+        }
+    }
+    #[doc = concat!(
+        " rust source code for variable ", stringify!( $op ),
+        " variable; see [ForwardZero](crate::op::info::ForwardZero)"
+    ) ]
+    fn [< $Name:lower _vv_rust_src >] (
+        n_domain    : usize       ,
+        _flag       : &Vec<bool>  ,
+        arg         : &[IndexT]   ,
+        res         : usize       ) -> String
+    {
+        assert_eq!( arg.len(), 2);
+        assert!( n_domain <= res );
+        let mut lhs = arg[0] as usize;
+        let mut rhs = arg[1] as usize;
+        let res     = res - n_domain;
+        if lhs < n_domain {
+            if rhs < n_domain {
+                format!("var[{res}] = domain[{lhs}] $op domain[{rhs}]")
+            } else {
+                rhs = rhs - n_domain;
+                format!("var[{res}] = domain[{lhs}] $op &var[{rhs}]")
+            }
+        } else {
+            lhs = lhs - n_domain;
+            if rhs < n_domain {
+                format!("var[{res}] = &var[{lhs}] $op domain[{rhs}]")
+            } else {
+                rhs = rhs - n_domain;
+                format!("var[{res}] = &var[{lhs}] $op &var[{rhs}]")
+            }
+        }
+    }
+} } }
+pub(crate) use binary_rust_src;

@@ -46,6 +46,7 @@ use std::sync::RwLock;
 //
 use crate::op::info::{
     OpInfo,
+    panic_rust_src,
 };
 use crate::atom::{
     AtomForwardZeroValue,
@@ -640,6 +641,7 @@ where
         reverse_1_value   : call_reverse_1_value::<V>,
         reverse_1_ad      : call_reverse_1_ad::<V>,
         arg_var_index     : call_arg_var_index,
+        rust_src          : panic_rust_src,
     };
     op_info_vec[CALL_RES_OP as usize] = OpInfo{
         name              : "call_res" ,
@@ -650,6 +652,7 @@ where
         reverse_1_value   : no_op_one::<V, V>,
         reverse_1_ad      : no_op_one::<V, AD<V> >,
         arg_var_index     : no_op_arg_var_index,
+        rust_src          : panic_rust_src,
     };
 }
 // ---------------------------------------------------------------------------

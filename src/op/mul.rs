@@ -36,6 +36,13 @@ use crate::op::info::{
         ReverseOne,
 };
 // -------------------------------------------------------------------------
+// rust_src
+// -------------------------------------------------------------------------
+// mul_cv_rust_src
+// mul_vc_rust_src
+// mul_vv_rust_src
+binary::binary_rust_src!(Mul, *);
+// -------------------------------------------------------------------------
 // forward_0
 // -------------------------------------------------------------------------
 // mul_cv_forward_0
@@ -196,6 +203,7 @@ where
         reverse_1_value   : mul_cv_reverse_1::<V, V>,
         reverse_1_ad      : mul_cv_reverse_1::<V, AD<V> >,
         arg_var_index     : binary::binary_cv_arg_var_index,
+        rust_src          : mul_cv_rust_src,
     };
     op_info_vec[MUL_VC_OP as usize] = OpInfo{
         name              : "mul_vc",
@@ -206,6 +214,7 @@ where
         reverse_1_value   : mul_vc_reverse_1::<V, V>,
         reverse_1_ad      : mul_vc_reverse_1::<V, AD<V> >,
         arg_var_index     : binary::binary_vc_arg_var_index,
+        rust_src          : mul_vc_rust_src,
     };
     op_info_vec[MUL_VV_OP as usize] = OpInfo{
         name              : "mul_vv",
@@ -216,5 +225,6 @@ where
         reverse_1_value   : mul_vv_reverse_1::<V, V>,
         reverse_1_ad      : mul_vv_reverse_1::<V, AD<V> >,
         arg_var_index     : binary::binary_vv_arg_var_index,
+        rust_src          : mul_vv_rust_src,
     };
 }

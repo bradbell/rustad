@@ -32,6 +32,11 @@ use crate::op::id::{
     SUB_VV_OP,
 };
 // -------------------------------------------------------------------------
+// sub_cv_rust_src
+// sub_vc_rust_src
+// sub_vv_rust_src
+binary::binary_rust_src!(Sub, -);
+// -------------------------------------------------------------------------
 // sub_cv_forward_0
 // sub_vc_forward_0
 // sub_vv_forward_0
@@ -58,6 +63,7 @@ where
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
         arg_var_index     : binary::binary_cv_arg_var_index,
+        rust_src          : sub_cv_rust_src,
     };
     op_info_vec[SUB_VC_OP as usize] = OpInfo{
         name              : "sub_vc",
@@ -68,6 +74,7 @@ where
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
         arg_var_index     : binary::binary_vc_arg_var_index,
+        rust_src          : sub_vc_rust_src,
     };
     op_info_vec[SUB_VV_OP as usize] = OpInfo{
         name              : "sub_vv",
@@ -78,5 +85,6 @@ where
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
         arg_var_index     : binary::binary_vv_arg_var_index,
+        rust_src          : sub_vv_rust_src,
     };
 }

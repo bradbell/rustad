@@ -145,6 +145,34 @@ fn panic_arg_var_index(
     _arg           : &[IndexT]        ,
 ) { panic!() }
 // ---------------------------------------------------------------------------
+// RustSrc
+/// Generate source code corresponding to forward zero evaluation
+///
+/// * n_domain :
+/// number of domain variables.
+///
+/// * Other Arguments :  see [doc_common_arguments]
+///
+/// * return
+/// The return value is the rust source code from this operation.
+///
+pub type RustSrc = fn(
+    _n_domain : usize       ,
+    _flag     : &Vec<bool>  ,
+    _arg      : &[IndexT]   ,
+    _res      : usize       ,
+) -> String;
+//
+// panic_rust_src
+/// default [RustSrc] function will panic.
+pub fn panic_rust_src(
+    _n_domain : usize       ,
+    _flag     : &Vec<bool>  ,
+    _arg      : &[IndexT]   ,
+    _op_index : usize       ,
+) -> String
+{ panic!() }
+// ---------------------------------------------------------------------------
 /// Information for one operator
 #[derive(Clone)]
 pub struct OpInfo<V> {
@@ -172,6 +200,9 @@ pub struct OpInfo<V> {
     //
     /// get indices for variables that are arguments to this function
     pub arg_var_index   : ArgVarIndex,
+    //
+    /// generate rust source code for this operator
+    pub rust_src        : RustSrc,
 }
 // ---------------------------------------------------------------------------
 // op_info_vec
@@ -206,6 +237,7 @@ where
         reverse_1_value  : panic_one::<V, V>,
         reverse_1_ad     : panic_one::<V, AD<V>>,
         arg_var_index    : panic_arg_var_index,
+        rust_src         : panic_rust_src,
     };
     let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
     crate::op::add::set_op_info::<V>(&mut result);
