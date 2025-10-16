@@ -26,13 +26,16 @@ This package is intended to include most of the features in
 6.  Derivative calculations can be used in the definition of other functions
     that can be differentiated.
 
-## Operations Planned before First Release
+## Goals before First Release
 
 1. Subtraction, multiplication and all the standard math functions.
 
 2. Optimizing the operation sequence.
 
 3. Generating source code for derivative calculations.
+
+4. Dynamic parameters; i.e., function arguments that can change value
+   but act as constants when differentiating.
 
 ## User Documentation
 This package is does not yet have a stable API. 
