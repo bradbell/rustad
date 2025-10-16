@@ -1,7 +1,7 @@
 # A Rust Automatic Differentiation Package
 
 ## Goals
-This package is intended to include many of the features in
+This package is intended to include most of the features in
 [CppAD](https://cppad.readthedocs.io/latest/) in a way that :
 
 1. It is easy to use.
@@ -21,10 +21,18 @@ This package is intended to include many of the features in
 4.  Atomic functions and Checkpointing.
 
 5.  Generic code that is is the same for different floating point types.
-    These types include numerical vectors act element wise.
+    These types include numerical vectors that act element wise.
 
 6.  Derivative calculations can be used in the definition of other functions
     that can be differentiated.
+
+## Operations Planned before First Release
+
+1. Subtraction, multiplication and all the standard math functions.
+
+2. Optimizing the operation sequence.
+
+3. Generating source code for derivative calculations.
 
 ## User Documentation
 This package is does not yet have a stable API. 
