@@ -1,13 +1,24 @@
 # A Rust Automatic Differentiation Package
 
-## Goals
+- [Objective](#objective)
+- [Operations Implemented](#operations-implemented)
+- [Under Construction](#under-construction)
+- [Wish List](#wish-list)
+- [User Documentation](#user-documentation)
+- [Developer Documentation](#developer-documentation)
+- [Testing](#testing)
+- [Contact Us](#contact-us)
+
+## Objective
 This package is intended to include most of the features in
 [CppAD](https://cppad.readthedocs.io/latest/) in a way that :
 
-1. It is easy to use.
-2. Its source code is easy to understand and maintain.
-3. It works well with may threads.
-4. It supports machine learning algorithms.
+1.  It is easy to use.
+2.  Its source code is easy to understand and maintain.
+3.  It works well with may threads.
+4.  It supports machine learning algorithms.
+
+
 
 ## Operations Implemented
 
@@ -18,28 +29,39 @@ This package is intended to include most of the features in
 
 3.  Forward and reverse mode sparsity calculations.
 
-4.  Atomic functions and Checkpointing.
-
-5.  Generic code that is is the same for different floating point types.
+4.  Generic code that is is the same for different floating point types.
     These types include numerical vectors that act element wise.
 
-6.  Derivative calculations can be used in the definition of other functions
-    that can be differentiated.
+5.  Derivative calculations can be used in the definition of new functions
+    (that can be differentiated). 
+    This is called AD evaluation of the original functions.
 
-## Goals before First Release
+6.  Atomic functions and Checkpointing. Atomic function have been extended
+    so that they stay atomic when used in functions that are AD evaluated.
 
-1. Subtraction, multiplication and all the standard math functions.
+## Under Construction
 
-2. Optimizing the operation sequence.
+1.  Generate compile and link source code for derivative calculations.
 
-3. Generating source code for derivative calculations.
+## Goals Before Stable API and First Release
 
-4. Dynamic parameters; i.e., function arguments that can change value
-   but act as constants when differentiating.
+1.  Subtraction, multiplication and all the standard math functions.
+    
+2.  Optimizing the operation sequence.
+
+5.  Add dynamic parameters; i.e., function arguments that can change value
+    but act as constants when differentiating.
+
+## Wish List
+
+1.  Generate llvm, similar to the source code generation and use it
+    to speed up evaluation of ForwardZero, ForwardOne, and ReverseOne
+    for values.
+  
 
 ## User Documentation
-This package is does not yet have a stable API. 
-More work needs to be done to separate the implementation details
+This package does not yet have a stable API. 
+More work needs to be done to separate implementation details
 from the API.
 You can see to current user documentation by executing the following:
 
@@ -61,3 +83,8 @@ The following command should build and run all of the tests on Unix
 The following command will just run the speed test:
 
     cargo run --release
+
+## Contact Us
+
+1.  [Contributing](https://github.com/bradbell/rustad/discussions/categories/contribute)
+2.  [Help](https://github.com/bradbell/rustad/discussions/categories/q-a)
