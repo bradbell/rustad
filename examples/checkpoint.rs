@@ -169,7 +169,7 @@ fn register_checkpoint_atom()-> IndexT {
         forward_depend       :  checkpoint_forward_depend,
         forward_zero_value   :  checkpoint_forward_zero_value,
         //
-        forward_zero_ad      :  checkpoint_forward_zero_ad,
+        forward_zero_ad      :  None,
         //
         forward_one_value    :  checkpoint_forward_one_value,
         forward_one_ad       :  checkpoint_forward_one_ad,
@@ -186,16 +186,6 @@ fn register_checkpoint_atom()-> IndexT {
 // -------------------------------------------------------------------------
 // AD routines
 // -------------------------------------------------------------------------
-//
-// checkpoint_forward_zero_ad
-fn checkpoint_forward_zero_ad(
-    _domain_zero      : &Vec<& AD<V> >    ,
-    _call_info        : IndexT            ,
-    _trace            : bool              ,
-) -> Vec< AD<V> >
-{   //
-    panic!( "checkpoint_forward_zero_ad not implemented");
-}
 //
 // checkpoint_forward_one_ad
 fn checkpoint_forward_one_ad(

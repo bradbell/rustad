@@ -51,15 +51,6 @@ fn for_sumsq_forward_zero_value(
     vec![ z ]
 }
 //
-// for_sumsq_forward_zero_ad
-pub fn for_sumsq_forward_zero_ad(
-    _domain_zero  : &Vec<& AD<V> >    ,
-    _call_info    : IndexT            ,
-    _trace        : bool              ,
-) -> Vec< AD<V> >
-{   panic!("for_sumsq_forward_zero_ad: not implemented");
-}
-//
 // for_sumsq_forward_one_value
 fn for_sumsq_forward_one_value(
     domain_zero : &Vec<&V>  ,
@@ -185,7 +176,7 @@ pub fn register_for_sumsq_atom()-> IndexT {
         forward_depend       :  for_sumsq_forward_depend,
         forward_zero_value   :  for_sumsq_forward_zero_value,
         //
-        forward_zero_ad      :  for_sumsq_forward_zero_ad,
+        forward_zero_ad      :  None,
         //
         forward_one_value    :  for_sumsq_forward_one_value,
         forward_one_ad       :  for_sumsq_forward_one_ad,

@@ -407,7 +407,8 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero_ad
-    let forward_zero_ad : AtomForwardZeroAD<V>;
+    let name            : &'static str;
+    let forward_zero_ad : Option< AtomForwardZeroAD<V> >;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -419,8 +420,16 @@ where
         // Rest of this block has a lock, so it should be fast and not fail.
         let atom_eval_vec   = read_lock.unwrap();
         let atom_eval       = &atom_eval_vec[atom_id];
+        name                = atom_eval.name;
         forward_zero_ad     = atom_eval.forward_zero_ad.clone();
     }
+    if forward_zero_ad.is_none() {
+        panic!(
+            "{} : forward_zero_ad is not implemented for this atomic function",
+            name,
+        );
+    }
+    let forward_zero_ad = forward_zero_ad.unwrap();
     //
     // call_arange_zero
     let mut call_arange_zero = forward_zero_ad(
@@ -469,7 +478,8 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero_ad, forward_one_ad
-    let forward_zero_ad : AtomForwardZeroAD<V>;
+    let name            : &'static str;
+    let forward_zero_ad : Option< AtomForwardZeroAD<V> >;
     let forward_one_ad  : AtomForwardOneAD<V>;
     {   //
         // rw_lock
@@ -482,9 +492,17 @@ where
         // Rest of this block has a lock, so it should be fast and not fail.
         let atom_eval_vec    = read_lock.unwrap();
         let atom_eval        = &atom_eval_vec[atom_id];
+        name                 = atom_eval.name;
         forward_zero_ad      = atom_eval.forward_zero_ad.clone();
         forward_one_ad       = atom_eval.forward_one_ad.clone();
     }
+    if forward_zero_ad.is_none() {
+        panic!(
+            "{} : forward_zero_ad is not implemented for this atomic function",
+            name,
+        );
+    }
+    let forward_zero_ad = forward_zero_ad.unwrap();
     //
     // call_avar_zero
     forward_zero_ad(&call_adomain_zero, call_info, trace);
