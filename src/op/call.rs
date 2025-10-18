@@ -346,7 +346,8 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero_value, reverse_one_value
-    let reverse_one_value  : AtomReverseOneValue<V>;
+    let name               : &'static str;
+    let reverse_one_value  : Option< AtomReverseOneValue<V> >;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -358,8 +359,16 @@ where
         // Rest of this block has a lock, so it should be fast and not fail.
         let atom_eval_vec       = read_lock.unwrap();
         let atom_eval           = &atom_eval_vec[atom_id];
+        name                    = atom_eval.name;
         reverse_one_value       = atom_eval.reverse_one_value.clone();
     }
+    if reverse_one_value.is_none() {
+        panic!(
+            "{}: reverse_one_value not implemented for this atomic function",
+            name,
+        );
+    }
+    let reverse_one_value = reverse_one_value.unwrap();
     //
     // call_range_one
     let zero_v : V = 0f32.into();

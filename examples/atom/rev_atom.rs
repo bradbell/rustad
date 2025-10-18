@@ -166,7 +166,7 @@ pub fn register_rev_sumsq_atom()-> IndexT {
         forward_one_value    :  Some( rev_sumsq_forward_one_value ),
         forward_one_ad       :  None,
         //
-        reverse_one_value    :  rev_sumsq_reverse_one_value,
+        reverse_one_value    :  Some( rev_sumsq_reverse_one_value ),
         reverse_one_ad       :  rev_sumsq_reverse_one_ad,
     };
     //

@@ -174,7 +174,7 @@ fn register_checkpoint_atom()-> IndexT {
         forward_one_value    :  Some(checkpoint_forward_one_value),
         forward_one_ad       :  None,
         //
-        reverse_one_value    :  checkpoint_reverse_one_value,
+        reverse_one_value    :  Some(checkpoint_reverse_one_value),
         reverse_one_ad       :  checkpoint_reverse_one_ad,
         //
     };
