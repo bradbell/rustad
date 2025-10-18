@@ -259,7 +259,7 @@ pub struct AtomEval<V> {
     //
     pub forward_zero_ad      : Option< AtomForwardZeroAD::<V> >,
     //
-    pub forward_one_value    : AtomForwardOneValue::<V>  ,
+    pub forward_one_value    : Option< AtomForwardOneValue::<V> > ,
     pub forward_one_ad       : AtomForwardOneAD::<V>     ,
     //
     pub reverse_one_value    : AtomReverseOneValue::<V>  ,

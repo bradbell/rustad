@@ -260,8 +260,9 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero_value, forward_one_value
+    let  name              : &'static str;
     let forward_zero_value : AtomForwardZeroValue<V>;
-    let forward_one_value  : AtomForwardOneValue<V>;
+    let forward_one_value  : Option< AtomForwardOneValue<V> >;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -274,8 +275,16 @@ where
         let atom_eval_vec       = read_lock.unwrap();
         let atom_eval           = &atom_eval_vec[atom_id];
         forward_zero_value      = atom_eval.forward_zero_value.clone();
+        name                    = atom_eval.name;
         forward_one_value       = atom_eval.forward_one_value.clone();
     }
+    if forward_one_value.is_none() {
+        panic!(
+            "{} : forward_one_value not implemented for this atomic function",
+            name,
+        );
+    }
+    let forward_one_value = forward_one_value.unwrap();
     //
     // call_var_zero
     forward_zero_value(&call_domain_zero, call_info, trace);
