@@ -85,12 +85,12 @@ fn register_sumsq_atom()-> IndexT {
     let sumsq_atom_eval = AtomEval {
         name                 : &"sumsq",
         forward_depend       :  sumsq_forward_depend,
-        forward_zero_value   :  sumsq_forward_zero_value,
         //
+        forward_zero_value   :  sumsq_forward_zero_value,
         forward_zero_ad      :  Some( sumsq_forward_zero_ad ),
         //
         forward_one_value    :  Some( sumsq_forward_one_value ),
-        forward_one_ad       :  sumsq_forward_one_ad,
+        forward_one_ad       :  Some( sumsq_forward_one_ad ),
         //
         reverse_one_value    :  sumsq_reverse_one_value,
         reverse_one_ad       :  sumsq_reverse_one_ad,

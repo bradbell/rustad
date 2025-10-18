@@ -85,16 +85,6 @@ fn rev_sumsq_forward_one_value(
     dz
 }
 //
-// rev_sumsq_forward_one_ad
-pub fn rev_sumsq_forward_one_ad(
-    _domain_zero  : &Vec<& AD<V> >    ,
-    _domain_one   : Vec<& AD<V> >     ,
-    _call_info    : IndexT            ,
-    _trace        : bool             ,
-) -> Vec< AD<V> >
-{   panic!("rev_sumsq_forward_one_ad: not implemented");
-}
-//
 // rev_sumsq_reverse_one_value
 fn rev_sumsq_reverse_one_value(
     domain_zero : &Vec<&V>  ,
@@ -169,12 +159,12 @@ pub fn register_rev_sumsq_atom()-> IndexT {
     let rev_sumsq_atom_eval = AtomEval {
         name                 : &"rev_sumsq",
         forward_depend       :  rev_sumsq_forward_depend,
-        forward_zero_value   :  rev_sumsq_forward_zero_value,
         //
+        forward_zero_value   :  rev_sumsq_forward_zero_value,
         forward_zero_ad      :  None,
         //
         forward_one_value    :  Some( rev_sumsq_forward_one_value ),
-        forward_one_ad       :  rev_sumsq_forward_one_ad,
+        forward_one_ad       :  None,
         //
         reverse_one_value    :  rev_sumsq_reverse_one_value,
         reverse_one_ad       :  rev_sumsq_reverse_one_ad,

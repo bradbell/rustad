@@ -255,12 +255,12 @@ pub struct AtomEval<V> {
     // required
     pub name                 : &'static str              ,
     pub forward_depend       : AtomForwardDepend         ,
-    pub forward_zero_value   : AtomForwardZeroValue::<V> ,
     //
+    pub forward_zero_value   : AtomForwardZeroValue::<V> ,
     pub forward_zero_ad      : Option< AtomForwardZeroAD::<V> >,
     //
     pub forward_one_value    : Option< AtomForwardOneValue::<V> > ,
-    pub forward_one_ad       : AtomForwardOneAD::<V>     ,
+    pub forward_one_ad       : Option< AtomForwardOneAD::<V> >    ,
     //
     pub reverse_one_value    : AtomReverseOneValue::<V>  ,
     pub reverse_one_ad       : AtomReverseOneAD::<V>     ,

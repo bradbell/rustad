@@ -489,7 +489,7 @@ where
     // forward_zero_ad, forward_one_ad
     let name            : &'static str;
     let forward_zero_ad : Option< AtomForwardZeroAD<V> >;
-    let forward_one_ad  : AtomForwardOneAD<V>;
+    let forward_one_ad  : Option< AtomForwardOneAD<V> >;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -512,6 +512,13 @@ where
         );
     }
     let forward_zero_ad = forward_zero_ad.unwrap();
+    if forward_one_ad.is_none() {
+        panic!(
+            "{} : forward_one_ad is not implemented for this atomic function",
+            name,
+        );
+    }
+    let forward_one_ad = forward_one_ad.unwrap();
     //
     // call_avar_zero
     forward_zero_ad(&call_adomain_zero, call_info, trace);
