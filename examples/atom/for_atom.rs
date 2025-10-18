@@ -18,6 +18,8 @@ use rustad::{
     AD,
     register_atom,
     AtomEval,
+    default_atom_callbacks,
+    default_atom_eval,
     IndexT,
 };
 //
@@ -49,15 +51,6 @@ fn for_sumsq_forward_zero_value(
     }
     //
     vec![ z ]
-}
-//
-// for_sumsq_forward_zero_ad
-pub fn for_sumsq_forward_zero_ad(
-    _domain_zero  : &Vec<& AD<V> >    ,
-    _call_info    : IndexT            ,
-    _trace        : bool              ,
-) -> Vec< AD<V> >
-{   panic!("for_sumsq_forward_zero_ad: not implemented");
 }
 //
 // for_sumsq_forward_one_value
@@ -97,16 +90,6 @@ fn for_sumsq_forward_one_value(
     vec![ dz ]
 }
 //
-// for_sumsq_forward_one_ad
-pub fn for_sumsq_forward_one_ad(
-    _domain_zero  : &Vec<& AD<V> >    ,
-    _domain_one   : Vec<& AD<V> >     ,
-    _call_info    : IndexT            ,
-    _trace        : bool              ,
-) -> Vec< AD<V> >
-{   panic!("for_sumsq_forward_one_ad: not implemented");
-}
-//
 // for_sumsq_reverse_one_value
 fn for_sumsq_reverse_one_value(
     domain_zero : &Vec<&V>  ,
@@ -142,16 +125,6 @@ fn for_sumsq_reverse_one_value(
     dx_dy
 }
 //
-// for_sumsq_reverse_one_ad
-pub fn for_sumsq_reverse_one_ad(
-    _domain_zero  : &Vec<& AD<V> >    ,
-    _range_one    : Vec<& AD<V> >     ,
-    _call_info    : IndexT            ,
-    _trace        : bool              ,
-) -> Vec< AD<V> >
-{   panic!("for_sumsq_reverse_one_ad: not implemented");
-}
-//
 // for_sumsq_forward_depend
 fn for_sumsq_forward_depend(
     is_var_domain  : &Vec<bool> ,
@@ -180,20 +153,14 @@ fn for_sumsq_forward_depend(
 pub fn register_for_sumsq_atom()-> IndexT {
     //
     // for_sumsq_atom_eval
-    let for_sumsq_atom_eval = AtomEval {
-        forward_zero_value   :  for_sumsq_forward_zero_value,
-        forward_zero_ad      :  for_sumsq_forward_zero_ad,
-        //
-        forward_one_value    :  for_sumsq_forward_one_value,
-        forward_one_ad       :  for_sumsq_forward_one_ad,
-        //
-        reverse_one_value    :  for_sumsq_reverse_one_value,
-        reverse_one_ad       :  for_sumsq_reverse_one_ad,
-        //
-        forward_depend       :  for_sumsq_forward_depend,
-    };
+    default_atom_callbacks!(for_sumsq, V);
+    let mut atom_eval = default_atom_eval!(for_sumsq);
+    atom_eval.forward_zero_value   =  for_sumsq_forward_zero_value;
+    atom_eval.forward_one_value    =  for_sumsq_forward_one_value;
+    atom_eval.reverse_one_value    =  for_sumsq_reverse_one_value;
+    atom_eval.forward_depend       =  for_sumsq_forward_depend;
     //
     // for_sumsq_atom_id
-    let for_sumsq_atom_id = register_atom( for_sumsq_atom_eval );
+    let for_sumsq_atom_id = register_atom( atom_eval );
     for_sumsq_atom_id
 }

@@ -263,6 +263,139 @@ pub struct AtomEval<V> {
     pub forward_depend       : AtomForwardDepend         ,
 }
 // ----------------------------------------------------------------------------
+//
+// default_atom_callbacks!
+/// see [crate::default_atom_eval] documentation.
+#[macro_export]
+macro_rules! default_atom_callbacks{ ($name:ident, $V:ty) => { paste::paste! {
+    // name_forward_zero_value_default
+    fn [< $name _forward_zero_value_default >] (
+        _domain_zero      : &Vec<&$V>    ,
+        _call_info        : IndexT      ,
+        _trace            : bool        ,
+        ) -> Vec<$V>
+    {   //
+        panic!( concat!(
+            stringify!($name),
+            ": forward_zero_value_is not implemented for this atomic function"
+        ));
+    }
+    // name_forward_one_value_default
+    fn [< $name _forward_one_value_default >] (
+        _domain_zero      : &Vec<&$V>    ,
+        _domain_one       : Vec<&$V>     ,
+        _call_info        : IndexT      ,
+        _trace            : bool        ,
+        ) -> Vec<$V>
+    {   //
+        panic!( concat!(
+            stringify!($name),
+            ": forward_one_value_is not implemented for this atomic function"
+        ));
+    }
+    // name_reverse_one_value_default
+    fn [< $name _reverse_one_value_default >] (
+        _domain_zero      : &Vec<&$V>    ,
+        _range_one        : Vec<&$V>     ,
+        _call_info        : IndexT      ,
+        _trace            : bool        ,
+    ) -> Vec<$V>
+    {   //
+        panic!( concat!(
+            stringify!($name),
+            ": reverse_one_value_is not implemented for this atomic function"
+        ));
+    }
+    // name_forward_zero_ad_default
+    fn [< $name _forward_zero_ad_default >] (
+        _domain_zero      : &Vec<& AD<$V> >    ,
+        _call_info        : IndexT            ,
+        _trace            : bool              ,
+        ) -> Vec< AD<$V> >
+    {   //
+        panic!( concat!(
+            stringify!($name),
+            ": forward_zero_ad is not implemented for this atomic function"
+        ));
+    }
+    // name_forward_one_ad_default
+    fn [< $name _forward_one_ad_default >] (
+        _domain_zero      : &Vec<& AD<$V> >    ,
+        _domain_one       : Vec<& AD<$V> >     ,
+        _call_info        : IndexT            ,
+        _trace            : bool              ,
+        ) -> Vec< AD<$V> >
+    {   //
+        panic!( concat!(
+            stringify!($name),
+            ": forward_one_ad is not implemented for this atomic function"
+        ));
+    }
+    // name_reverse_one_ad_default
+    fn [< $name _reverse_one_ad_default >] (
+        _domain_zero      : &Vec<& AD<$V> >    ,
+        _range_one        : Vec<& AD<$V> >     ,
+        _call_info        : IndexT            ,
+        _trace            : bool              ,
+    ) -> Vec< AD<$V> >
+    {   //
+        panic!( concat!(
+            stringify!($name),
+            ": reverse_one_ad is not implemented for this atomic function"
+        ));
+    }
+    //
+    // name_forward_depend_default
+    fn [< $name _forward_depend_default >] (
+        _is_var_domain  : &Vec<bool> ,
+        _call_info      : IndexT     ,
+        _trace          : bool       ,
+    ) -> Vec<bool>
+    {   //
+        panic!( concat!(
+            stringify!($name),
+            ": forward_depend is not implemented for this atomic function"
+        ));
+    }
+}}}
+//
+// default_atom_eval!
+/// Return an `AtomEval<V>` object with default callbacks
+///
+/// * Syntax :
+/// ```text
+///     default_atom_callbacks(name, V)
+///     let mut atom_eval = default_atom_eval(name)
+/// ```
+///
+/// * name :
+/// is the name used for this atomic function.
+///
+/// * V :
+/// see [doc_generic_v]
+///
+/// * atom_eval :
+/// is the AtomicEval object for this atomic function.
+/// It has been initialized with the default callbacks.
+/// You need to replace the callbacks that get used; e.g.,
+/// if you evalaute first order reverse mode values,
+/// you need to replace the default value for atom_eval.reverse_one_value.
+#[macro_export]
+macro_rules! default_atom_eval{ ($name:ident) => { paste::paste! {
+    AtomEval {
+        forward_zero_value   :  [< $name _forward_zero_value_default >],
+        forward_zero_ad      :  [< $name _forward_zero_ad_default >],
+        //
+        forward_one_value    :  [< $name _forward_one_value_default >],
+        forward_one_ad       :  [< $name _forward_one_ad_default >],
+        //
+        reverse_one_value    :  [< $name _reverse_one_value_default >],
+        reverse_one_ad       :  [< $name _reverse_one_ad_default >],
+        //
+        forward_depend       :  [< $name _forward_depend_default >],
+    }
+}}}
+// ----------------------------------------------------------------------------
 pub (crate) mod sealed {
     //! The sub-module sealed is used to seal traits in this package.
     //
