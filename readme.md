@@ -1,4 +1,4 @@
-# A Rust Automatic Differentiation Package
+# A Rust Automatic Differentiation Library
 
 - [Objective](#objective)
 - [Operations Implemented](#operations-implemented)

@@ -3,9 +3,9 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ----------------------------------------------------------------------------
 //
-//! The rustad Automatic Differentiation Package
+//! A rust Automatic Differentiation library
 //!
-//! This package is Under Construction and its API is not stable; see its
+//! This library is Under Construction and its API is not stable; see its
 //! [readme file](<https://github.com/bradbell/rustad/blob/main/readme.md>)
 // ----------------------------------------------------------------------------
 // sub-modules
