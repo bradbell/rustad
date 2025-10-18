@@ -38,7 +38,7 @@
 //! We use n_var_res for the number of results that are variables.
 //! There are n_var_res - 1 CALL_RES_OP operators directly after each CALL_OP
 //! operator in the sequence of operations. These are place holders so that
-//! there is a direct correpondence between variable and operator indices.
+//! there is a direct correspondence between variable and operator indices.
 // --------------------------------------------------------------------------
 // use
 //

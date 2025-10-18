@@ -101,7 +101,7 @@ pub struct ADfn<V> {
     //
     // range2tape_index
     /// The length of this vector is also the dimension of the range space.
-    /// If range_is_var\[i\] is true (false), range2tape_indx\[i\] is the
+    /// If range_is_var\[i\] is true (false), range2tape_index\[i\] is the
     /// variable (constant) index for the i-th component of the range space.
     pub range2tape_index    : Vec<IndexT>,
 }
