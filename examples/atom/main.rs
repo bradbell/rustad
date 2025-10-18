@@ -93,7 +93,7 @@ fn register_sumsq_atom()-> IndexT {
         forward_one_ad       :  Some( sumsq_forward_one_ad ),
         //
         reverse_one_value    :  Some( sumsq_reverse_one_value ),
-        reverse_one_ad       :  sumsq_reverse_one_ad,
+        reverse_one_ad       :  Some( sumsq_reverse_one_ad ),
     };
     //
     // sumsq_atom_id

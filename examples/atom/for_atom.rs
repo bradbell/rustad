@@ -15,7 +15,6 @@ dx^T = dz * g_x(x, y) = 2 * dz * ( y[0], y[1], ... )
 dy^T = dz * g_y(x, y) = 2 * dz * ( x[0], x[1], ... )
 */
 use rustad::{
-    AD,
     register_atom,
     AtomEval,
     IndexT,
@@ -123,16 +122,6 @@ fn for_sumsq_reverse_one_value(
     dx_dy
 }
 //
-// for_sumsq_reverse_one_ad
-pub fn for_sumsq_reverse_one_ad(
-    _domain_zero  : &Vec<& AD<V> >    ,
-    _range_one    : Vec<& AD<V> >     ,
-    _call_info    : IndexT            ,
-    _trace        : bool              ,
-) -> Vec< AD<V> >
-{   panic!("for_sumsq_reverse_one_ad: not implemented");
-}
-//
 // for_sumsq_forward_depend
 fn for_sumsq_forward_depend(
     is_var_domain  : &Vec<bool> ,
@@ -172,8 +161,7 @@ pub fn register_for_sumsq_atom()-> IndexT {
         forward_one_ad       :  None,
         //
         reverse_one_value    :  Some( for_sumsq_reverse_one_value ),
-        reverse_one_ad       :  for_sumsq_reverse_one_ad,
-        //
+        reverse_one_ad       :  None,
     };
     //
     // for_sumsq_atom_id

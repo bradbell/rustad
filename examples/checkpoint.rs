@@ -175,8 +175,7 @@ fn register_checkpoint_atom()-> IndexT {
         forward_one_ad       :  None,
         //
         reverse_one_value    :  Some(checkpoint_reverse_one_value),
-        reverse_one_ad       :  checkpoint_reverse_one_ad,
-        //
+        reverse_one_ad       :  None,
     };
     //
     // atom_id
@@ -187,16 +186,6 @@ fn register_checkpoint_atom()-> IndexT {
 // AD routines
 // -------------------------------------------------------------------------
 //
-// checkpoint_reverse_one_ad
-fn checkpoint_reverse_one_ad(
-    _domain_zero      : &Vec<& AD<V> >    ,
-    _range_one        : Vec<& AD<V> >     ,
-    _call_info        : IndexT            ,
-    _trace            : bool              ,
-) -> Vec< AD<V> >
-{   //
-    panic!( "checkpoint_reverse_one_ad not implemented");
-}
 // -------------------------------------------------------------------------
 // main
 // -------------------------------------------------------------------------
