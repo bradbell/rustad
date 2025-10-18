@@ -17,8 +17,6 @@ use rustad::{
     call_atom,
     AtomEval,
     IndexT,
-    default_atom_callbacks,
-    default_atom_eval,
 };
 //
 // V
@@ -165,22 +163,59 @@ fn checkpoint_forward_depend(
 // -------------------------------------------------------------------------
 fn register_checkpoint_atom()-> IndexT {
     //
-    // atom_eval
-    default_atom_callbacks!(checkpoint, V);
-    let mut atom_eval = default_atom_eval!(checkpoint);
-    atom_eval.forward_zero_value = checkpoint_forward_zero_value;
-    atom_eval.forward_one_value  = checkpoint_forward_one_value;
-    atom_eval.reverse_one_value  = checkpoint_reverse_one_value;
-    atom_eval.forward_depend     = checkpoint_forward_depend;
+    // checkpoint_atom_eval
+    let checkpoint_atom_eval = AtomEval {
+        forward_zero_value   :  checkpoint_forward_zero_value,
+        forward_zero_ad      :  checkpoint_forward_zero_ad,
+        //
+        forward_one_value    :  checkpoint_forward_one_value,
+        forward_one_ad       :  checkpoint_forward_one_ad,
+        //
+        reverse_one_value    :  checkpoint_reverse_one_value,
+        reverse_one_ad       :  checkpoint_reverse_one_ad,
+        //
+        forward_depend       :  checkpoint_forward_depend,
+    };
     //
     // atom_id
-    let atom_id = register_atom( atom_eval );
+    let atom_id = register_atom( checkpoint_atom_eval );
     atom_id
 }
 // -------------------------------------------------------------------------
 // AD routines
 // -------------------------------------------------------------------------
 //
+// checkpoint_forward_zero_ad
+fn checkpoint_forward_zero_ad(
+    _domain_zero      : &Vec<& AD<V> >    ,
+    _call_info        : IndexT            ,
+    _trace            : bool              ,
+) -> Vec< AD<V> >
+{   //
+    panic!( "checkpoint_forward_zero_ad not implemented");
+}
+//
+// checkpoint_forward_one_ad
+fn checkpoint_forward_one_ad(
+    _domain_zero      : &Vec<& AD<V> >    ,
+    _domain_one       : Vec<& AD<V> >     ,
+    _call_info        : IndexT            ,
+    _trace            : bool              ,
+) -> Vec< AD<V> >
+{   //
+    panic!( "checkpoint_forward_one_ad not implemented");
+}
+//
+// checkpoint_reverse_one_ad
+fn checkpoint_reverse_one_ad(
+    _domain_zero      : &Vec<& AD<V> >    ,
+    _range_one        : Vec<& AD<V> >     ,
+    _call_info        : IndexT            ,
+    _trace            : bool              ,
+) -> Vec< AD<V> >
+{   //
+    panic!( "checkpoint_reverse_one_ad not implemented");
+}
 // -------------------------------------------------------------------------
 // main
 // -------------------------------------------------------------------------
