@@ -165,7 +165,10 @@ fn register_checkpoint_atom()-> IndexT {
     //
     // checkpoint_atom_eval
     let checkpoint_atom_eval = AtomEval {
+        name                 : &"checkpoint",
+        forward_depend       :  checkpoint_forward_depend,
         forward_zero_value   :  checkpoint_forward_zero_value,
+        //
         forward_zero_ad      :  checkpoint_forward_zero_ad,
         //
         forward_one_value    :  checkpoint_forward_one_value,
@@ -174,7 +177,6 @@ fn register_checkpoint_atom()-> IndexT {
         reverse_one_value    :  checkpoint_reverse_one_value,
         reverse_one_ad       :  checkpoint_reverse_one_ad,
         //
-        forward_depend       :  checkpoint_forward_depend,
     };
     //
     // atom_id

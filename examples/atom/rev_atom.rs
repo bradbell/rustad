@@ -176,7 +176,10 @@ pub fn register_rev_sumsq_atom()-> IndexT {
     //
     // rev_sumsq_atom_eval
     let rev_sumsq_atom_eval = AtomEval {
+        name                 : &"rev_sumsq",
+        forward_depend       :  rev_sumsq_forward_depend,
         forward_zero_value   :  rev_sumsq_forward_zero_value,
+        //
         forward_zero_ad      :  rev_sumsq_forward_zero_ad,
         //
         forward_one_value    :  rev_sumsq_forward_one_value,
@@ -184,8 +187,6 @@ pub fn register_rev_sumsq_atom()-> IndexT {
         //
         reverse_one_value    :  rev_sumsq_reverse_one_value,
         reverse_one_ad       :  rev_sumsq_reverse_one_ad,
-        //
-        forward_depend       :  rev_sumsq_forward_depend,
     };
     //
     // rev_sumsq_atom_id

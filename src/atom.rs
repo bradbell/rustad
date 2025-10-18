@@ -251,7 +251,12 @@ pub type AtomReverseOneAD<V> = fn(
 // AtomEval
 /// Atomic function evaluation routines.
 pub struct AtomEval<V> {
+    //
+    // required
+    pub name                 : &'static str              ,
+    pub forward_depend       : AtomForwardDepend         ,
     pub forward_zero_value   : AtomForwardZeroValue::<V> ,
+    //
     pub forward_zero_ad      : AtomForwardZeroAD::<V>    ,
     //
     pub forward_one_value    : AtomForwardOneValue::<V>  ,
@@ -260,7 +265,6 @@ pub struct AtomEval<V> {
     pub reverse_one_value    : AtomReverseOneValue::<V>  ,
     pub reverse_one_ad       : AtomReverseOneAD::<V>     ,
     //
-    pub forward_depend       : AtomForwardDepend         ,
 }
 // ----------------------------------------------------------------------------
 pub (crate) mod sealed {
