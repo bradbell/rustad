@@ -61,7 +61,8 @@ where
     /// <br/> )
     ///
     ///     * domain :
-    ///     is a vector containing the references to the domain variable values.
+    ///     a vector containing the references to the domain variable values;
+    ///     i.e., the independent variables.
     ///
     ///     * range :
     ///     This vector must be empty on input.
@@ -92,6 +93,7 @@ where
             "   // check message\n" +
             "   if message.len() != 0 {\n" +
             "       message = \"On input: message.len() != 0\";\n" +
+            "       return;\n" +
             "   }\n";
         //
         // check range
@@ -99,6 +101,7 @@ where
             "   // check range\n" +
             "   if range.len() != 0 {\n" +
             "       message = \"On input: range.len() != 0\";\n" +
+            "       return;\n" +
             "   }\n";
         //
         // check domain
@@ -107,6 +110,7 @@ where
             "   // check domain\n" +
             "   if domain.len() != " + &expect  + " {\n" +
             "       message = \"domain length != " + &expect + "\";\n" +
+            "       return;\n" +
             "   }\n";
         //
         // con
@@ -120,26 +124,51 @@ where
                 "   con.push(" + &( c.to_string() ) + " as " + v_str + ");\n";
         }
         //
-        // var
-        // Note that rust_src does not include the domain in the var vector
+        // dep
         assert!( self.n_domain <= self.n_var );
-        let n_var = ( self.n_var - self.n_domain ).to_string();
+        let n_dep = ( self.n_var - self.n_domain ).to_string();
         src = src +
             "   //\n" +
-            "   // var\n" +
-            "   let var : Vec<" + v_str + "> = " +
-                    "Vec::with_capacity(" + &n_var + ");\n";
+            "   // dep\n" +
+            "   // vector of dependent variables\n" +
+            "   let dep : Vec<" + v_str + "> = " +
+                    "Vec::with_capacity(" + &n_dep + ");\n";
         //
-        // var
+        // dep
         for op_index in 0 .. self.id_all.len() {
-            let op_id = self.id_all[op_index] as usize;
-            let start = self.op2arg[op_index] as usize;
-            let end   = self.op2arg[op_index + 1] as usize;
-            let arg   = &self.arg_all[start .. end];
-            let res   = self.n_domain + op_index;
-            let rust_src  = op_info_vec[op_id].rust_src;
+            let op_id    = self.id_all[op_index] as usize;
+            let start    = self.op2arg[op_index] as usize;
+            let end      = self.op2arg[op_index + 1] as usize;
+            let arg      = &self.arg_all[start .. end];
+            let res      = self.n_domain + op_index;
+            let rust_src = op_info_vec[op_id].rust_src;
             src = src + "   " +
                 &rust_src(self.n_domain, &self.flag_all, &arg, res) + "\n";
+        }
+        //
+        // range_zero
+        let n_range = self.range_is_var.len();
+        src = src +
+            "   //\n" +
+            "   // range_zero\n" +
+            "   range_zero.reserve(" + &n_range.to_string() + ");\n";
+        for i in 0 .. n_range {
+            let index = self.range2tape_index[i] as usize;
+            if self.range_is_var[i] {
+                if index < self.n_domain {
+                    let i_str = index.to_string();
+                    src = src +
+                        "   range_zero.push( domain[" + &i_str + "] );\n";
+                } else {
+                    let i_str = (index - self.n_domain).to_string();
+                    src = src +
+                        "   range_zero.push( dep[" + &i_str + "] );\n";
+                    }
+            } else {
+                let i_str = index.to_string();
+                 src = src +
+                    "   range_zero.push( con[" + &i_str + "] );\n";
+            }
         }
         //
         // end function body

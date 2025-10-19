@@ -150,11 +150,12 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let lhs     = arg[0] as usize;
         let mut rhs = arg[1] as usize;
         let res     = res - n_domain;
+        let op      = stringify!($op);
         if rhs < n_domain {
-            format!("var[{res}] = &con[{lhs}] $op domain[{rhs}]")
+            format!("dep[{res}] = &con[{lhs}] {op} domain[{rhs}]")
         } else {
             rhs = rhs - n_domain;
-            format!("var[{res}] = &con[{lhs}] $op &var[{rhs}]")
+            format!("dep[{res}] = &con[{lhs}] {op} &dep[{rhs}]")
         }
     }
     #[doc = concat!(
@@ -172,11 +173,12 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let mut lhs = arg[0] as usize;
         let rhs    = arg[1] as usize;
         let res    = res - n_domain;
+        let op     = stringify!($op);
         if lhs < n_domain {
-            format!("var[{res}] = domain[{lhs}] $op &con[{rhs}]")
+            format!("dep[{res}] = domain[{lhs}] {op} &con[{rhs}]")
         } else {
             lhs = lhs - n_domain;
-            format!("var[{res}] = &var[{lhs}] $op &con[{rhs}]")
+            format!("dep[{res}] = &dep[{lhs}] {op} &con[{rhs}]")
         }
     }
     #[doc = concat!(
@@ -194,20 +196,21 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let mut lhs = arg[0] as usize;
         let mut rhs = arg[1] as usize;
         let res     = res - n_domain;
+        let op     = stringify!($op);
         if lhs < n_domain {
             if rhs < n_domain {
-                format!("var[{res}] = domain[{lhs}] $op domain[{rhs}]")
+                format!("dep[{res}] = domain[{lhs}] {op} domain[{rhs}]")
             } else {
                 rhs = rhs - n_domain;
-                format!("var[{res}] = domain[{lhs}] $op &var[{rhs}]")
+                format!("dep[{res}] = domain[{lhs}] {op} &dep[{rhs}]")
             }
         } else {
             lhs = lhs - n_domain;
             if rhs < n_domain {
-                format!("var[{res}] = &var[{lhs}] $op domain[{rhs}]")
+                format!("dep[{res}] = &dep[{lhs}] {op} domain[{rhs}]")
             } else {
                 rhs = rhs - n_domain;
-                format!("var[{res}] = &var[{lhs}] $op &var[{rhs}]")
+                format!("dep[{res}] = &dep[{lhs}] {op} &dep[{rhs}]")
             }
         }
     }
