@@ -28,6 +28,9 @@ pub mod adfn;
 // atom
 pub mod atom;
 //
+// dll_lib
+pub mod dll_lib;
+//
 // vec_set
 pub(crate) mod vec_set;
 //
@@ -67,6 +70,9 @@ pub use atom::{
     call_atom,
     AtomEval,
 };
+pub use dll_lib::{
+    get_lib,
+};
 //
 pub use op::info::{
     OpInfo,
@@ -100,7 +106,7 @@ where
 /// # Example
 /// ```
 /// let date = *rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2025.10.19");
+/// assert_eq!(date, "2025.10.20");
 /// ```
 pub const YEAR_MONTH_DAY: std::sync::LazyLock<&str> =
-   std::sync::LazyLock::new( || "2025.10.19" );
+   std::sync::LazyLock::new( || "2025.10.20" );

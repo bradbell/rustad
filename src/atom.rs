@@ -4,7 +4,7 @@
 // ---------------------------------------------------------------------------
 //! This module implements AD atomic functions
 //!
-//! Then are called atomic functions because they are recorded as a
+//! They are called atomic functions because they are recorded as a
 //! single operation in tapes and ADfn objects.
 //!
 //! Link to [parent module](super)

@@ -1,5 +1,7 @@
 # cargo builds
 /target/
+# used for temporary files
+/tmp/
 # cache git changes here
 /new/
 /new.*/

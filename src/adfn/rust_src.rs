@@ -24,7 +24,8 @@ use crate::{
 fn prototype(fn_name : &str, v_str : &str) -> String {
     let result = String::new();
     let result = result +
-        "rustad_src_"  + fn_name + "(\n" +
+        "#[no_mangle]\n" +
+        "pub fn rustad_src_"  + fn_name + "(\n" +
         "   domain      : &Vec<&"    + v_str  + ">,\n" +
         "   range       : &mut Vec<" + v_str  + ">,\n" +
         "   message     : &mut String,\n" +
@@ -92,7 +93,8 @@ where
         src = src +
             "   // check message\n" +
             "   if message.len() != 0 {\n" +
-            "       message = \"On input: message.len() != 0\";\n" +
+            "       let msg  = \"On input: message.len() != 0\";\n" +
+            "       *message = String::from(msg);\n" +
             "       return;\n" +
             "   }\n";
         //
@@ -100,7 +102,8 @@ where
         src = src +
             "   // check range\n" +
             "   if range.len() != 0 {\n" +
-            "       message = \"On input: range.len() != 0\";\n" +
+            "       let msg  = \"On input: range.len() != 0\";\n" +
+            "       *message = String::from(msg);\n" +
             "       return;\n" +
             "   }\n";
         //
@@ -109,19 +112,28 @@ where
         src = src +
             "   // check domain\n" +
             "   if domain.len() != " + &expect  + " {\n" +
-            "       message = \"domain length != " + &expect + "\";\n" +
+            "       let msg  = \"domain length != " + &expect + "\";\n" +
+            "       *message = String::from(msg);\n" +
             "       return;\n" +
             "   }\n";
+        //
+        // nan
+        src = src +
+            "   //\\n" +
+            "   // nan\n" +
+            "   let nan = " + v_str + "::from( f32::NAN );\n";
         //
         // con
         let n_con = self.con_all.len().to_string();
         src = src +
             "   // con\n" +
-            "   let con : Vec<" + v_str + "> = " +
-                    "Vec::with_capacity(" + &n_con + ");\n";
-        for c in self.con_all.iter() {
+            "   let mut con : Vec<" + v_str + "> = " +
+                    "vec![nan; " + &n_con + "];\n";
+        for i in 0 .. self.con_all.len() {
+            let i_str = i.to_string();
+            let c_str = self.con_all[i].to_string();
             src = src +
-                "   con.push(" + &( c.to_string() ) + " as " + v_str + ");\n";
+                "   con[" + &i_str + "] = " + &c_str + " as " + v_str + ";\n";
         }
         //
         // dep
@@ -131,8 +143,8 @@ where
             "   //\n" +
             "   // dep\n" +
             "   // vector of dependent variables\n" +
-            "   let dep : Vec<" + v_str + "> = " +
-                    "Vec::with_capacity(" + &n_dep + ");\n";
+            "   let mut dep : Vec<" + v_str + "> = " +
+                    "vec![nan; " + &n_dep + "];\n";
         //
         // dep
         for op_index in 0 .. self.id_all.len() {
@@ -146,28 +158,28 @@ where
                 &rust_src(self.n_domain, &self.flag_all, &arg, res) + "\n";
         }
         //
-        // range_zero
+        // range
         let n_range = self.range_is_var.len();
         src = src +
             "   //\n" +
-            "   // range_zero\n" +
-            "   range_zero.reserve(" + &n_range.to_string() + ");\n";
+            "   // range\n" +
+            "   range.reserve(" + &n_range.to_string() + ");\n";
         for i in 0 .. n_range {
             let index = self.range2tape_index[i] as usize;
             if self.range_is_var[i] {
                 if index < self.n_domain {
                     let i_str = index.to_string();
                     src = src +
-                        "   range_zero.push( domain[" + &i_str + "] );\n";
+                        "   range.push( domain[" + &i_str + "] );\n";
                 } else {
                     let i_str = (index - self.n_domain).to_string();
                     src = src +
-                        "   range_zero.push( dep[" + &i_str + "] );\n";
+                        "   range.push( dep[" + &i_str + "] );\n";
                     }
             } else {
                 let i_str = index.to_string();
                  src = src +
-                    "   range_zero.push( con[" + &i_str + "] );\n";
+                    "   range.push( con[" + &i_str + "] );\n";
             }
         }
         //

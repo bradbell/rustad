@@ -20,6 +20,7 @@ include        = ["/src",  "!/src/bin", "/examples" , "/tests" ]
 
 [dependencies]
 paste = "1.0.15"
+libloading = "0.8"
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--cfg", "docsrs"]

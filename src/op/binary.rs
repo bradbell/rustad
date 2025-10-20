@@ -152,10 +152,10 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let res     = res - n_domain;
         let op      = stringify!($op);
         if rhs < n_domain {
-            format!("dep[{res}] = &con[{lhs}] {op} domain[{rhs}]")
+            format!("dep[{res}] = &con[{lhs}] {op} domain[{rhs}];")
         } else {
             rhs = rhs - n_domain;
-            format!("dep[{res}] = &con[{lhs}] {op} &dep[{rhs}]")
+            format!("dep[{res}] = &con[{lhs}] {op} &dep[{rhs}];")
         }
     }
     #[doc = concat!(
@@ -175,10 +175,10 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let res    = res - n_domain;
         let op     = stringify!($op);
         if lhs < n_domain {
-            format!("dep[{res}] = domain[{lhs}] {op} &con[{rhs}]")
+            format!("dep[{res}] = domain[{lhs}] {op} &con[{rhs}];")
         } else {
             lhs = lhs - n_domain;
-            format!("dep[{res}] = &dep[{lhs}] {op} &con[{rhs}]")
+            format!("dep[{res}] = &dep[{lhs}] {op} &con[{rhs}];")
         }
     }
     #[doc = concat!(
@@ -199,18 +199,18 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let op     = stringify!($op);
         if lhs < n_domain {
             if rhs < n_domain {
-                format!("dep[{res}] = domain[{lhs}] {op} domain[{rhs}]")
+                format!("dep[{res}] = domain[{lhs}] {op} domain[{rhs}];")
             } else {
                 rhs = rhs - n_domain;
-                format!("dep[{res}] = domain[{lhs}] {op} &dep[{rhs}]")
+                format!("dep[{res}] = domain[{lhs}] {op} &dep[{rhs}];")
             }
         } else {
             lhs = lhs - n_domain;
             if rhs < n_domain {
-                format!("dep[{res}] = &dep[{lhs}] {op} domain[{rhs}]")
+                format!("dep[{res}] = &dep[{lhs}] {op} domain[{rhs}];")
             } else {
                 rhs = rhs - n_domain;
-                format!("dep[{res}] = &dep[{lhs}] {op} &dep[{rhs}]")
+                format!("dep[{res}] = &dep[{lhs}] {op} &dep[{rhs}];")
             }
         }
     }

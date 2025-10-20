@@ -43,7 +43,7 @@ This package is intended to include most of the features in
 
 1.  Generate compile and link source code for derivative calculations.
 
-## Goals Before Stable API and First Release
+## Goals Before Stable API
 
 1.  Subtraction, multiplication and all the standard math functions.
     
@@ -57,7 +57,10 @@ This package is intended to include most of the features in
 1.  Generate llvm, similar to the source code generation and use it
     to speed up evaluation of ForwardZero, ForwardOne, and ReverseOne
     for values.
-  
+
+2.  In the case of NumVec operations, Generate GPU code and use it
+    to speed up evaluation of ForwardZero, ForwardOne, and ReverseOne
+    for values.
 
 ## User Documentation
 This package does not yet have a stable API. 
