@@ -11,6 +11,8 @@ use rustad::{
     start_recording,
     stop_recording,
     get_lib,
+    RustSrcFn,
+    get_rust_src_fn,
 };
 //
 fn main () {
@@ -52,12 +54,8 @@ fn main () {
     let replace_lib = true;
     let lib         = get_lib(src_file, lib_file, replace_lib);
     //
-    // RustADSrcFn
-    type RustADSrcFn = fn(
-        domain      : &Vec<&V>,
-        range       : &mut Vec<V>,
-        message     : &mut String,
-    );
+    // sumsq_fn
+    let sumsq_fn : RustSrcFn<V> = get_rust_src_fn(&lib, &fn_name);
     //
     // x, y, msg
     let x         : Vec<V>  = vec![ 2.0 as V; nx ];
@@ -66,12 +64,6 @@ fn main () {
     let mut x_ref : Vec<&V> = Vec::new();
     for xj in x.iter() {
         x_ref.push( &xj )
-    }
-    //
-    // sumsq_fn
-    let sumsq_fn : libloading::Symbol<RustADSrcFn>;
-    unsafe {
-        sumsq_fn = lib.get(b"rustad_src_sumsq").expect("Cannot get function");
     }
     sumsq_fn(&x_ref, &mut y, &mut msg);
     //

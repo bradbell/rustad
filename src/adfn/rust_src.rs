@@ -25,7 +25,7 @@ fn prototype(fn_name : &str, v_str : &str) -> String {
     let result = String::new();
     let result = result +
         "#[no_mangle]\n" +
-        "pub fn rustad_src_"  + fn_name + "(\n" +
+        "pub fn rust_src_"  + fn_name + "(\n" +
         "   domain      : &Vec<&"    + v_str  + ">,\n" +
         "   range       : &mut Vec<" + v_str  + ">,\n" +
         "   message     : &mut String,\n" +
@@ -51,7 +51,7 @@ where
     ///
     /// * fn_name :
     /// is the name of the rust function created by this operation.
-    /// The actual function name will be `rust_src` followed by *fn_name* .
+    /// The actual function name will be `rust_src_` followed by *fn_name* .
     ///
     /// * return
     /// The return string contains the source code for the following function:

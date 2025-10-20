@@ -6,6 +6,10 @@
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
+///
+#[cfg(doc)]
+use crate::ADfn;
+//
 // get_lib
 /// Compile and link to a dll library.
 ///
@@ -85,4 +89,49 @@ pub fn get_lib(
         lib  = result.unwrap();
     }
     lib
+}
+//
+// RustScrFn
+/// This type is used for function like objects in a dll library.
+///
+/// If rust_src_fn is a `RustSrcFn<V>` object, it acts like a
+/// [ADfn::rust_src] function.
+pub type RustSrcFn<'a, V> = libloading::Symbol<'a,
+    fn(
+        domain      : &Vec<&V>,
+        range       : &mut Vec<V>,
+        message     : &mut String,
+    )
+>;
+//
+// get_rust_src_fn
+/// Get a link to an [ADfn::rust_src] function.
+///
+/// * lib :
+/// is a lobrary returned by the [get_lib] function.
+///
+/// * fn_name :
+/// is the name of the function without it's leading `rust_src_` .
+///
+///
+pub fn get_rust_src_fn<'a, V>(
+    lib     : &'a libloading::Library,
+    fn_name : &'a str,
+) -> RustSrcFn<'a, V> {
+    //
+    // full_name
+    let full_name = String::from("rust_src_") + fn_name;
+    let full_name = full_name.as_bytes();
+    //
+    // rust_src_fn
+    let rust_src_fn : RustSrcFn<V>;
+    unsafe {
+        let result = lib.get(full_name);
+        if result.is_err() {
+            let full_name = String::from("rust_src_") + fn_name;
+            panic!("get_rust_src_fn: can't find {} in lib", full_name);
+        }
+        rust_src_fn = result.unwrap();
+    }
+    rust_src_fn
 }

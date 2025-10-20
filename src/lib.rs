@@ -72,6 +72,8 @@ pub use atom::{
 };
 pub use dll_lib::{
     get_lib,
+    RustSrcFn,
+    get_rust_src_fn,
 };
 //
 pub use op::info::{
