@@ -22,12 +22,12 @@ This package is intended to include most of the features in
 
 ## Operations Implemented
 
-1.  Addition and subtraction: We have held off on other simple numerical
+1.  Addition and multiplication: We have held off on other simple numerical
     operations while we focus on more complicated features.
 
 2.  Forward and reverse mode derivative calculations.
 
-3.  Forward and reverse mode sparsity calculations.
+3.  Forward and reverse mode sparsity pattern calculations.
 
 4.  Generic code that is is the same for different floating point types.
     These types include numerical vectors that act element wise.
@@ -45,12 +45,15 @@ This package is intended to include most of the features in
 
 ## Goals Before Stable API
 
-1.  Subtraction, multiplication and all the standard math functions.
+1.  Subtraction, division and all the standard math functions.
     
 2.  Optimizing the operation sequence.
 
-5.  Add dynamic parameters; i.e., function arguments that can change value
+3.  Add dynamic parameters; i.e., function arguments that can change value
     but act as constants when differentiating.
+
+4.  Forward and reverse sparse derivative calculations
+    (sparsity patterns are already implemented). 
 
 ## Wish List
 
