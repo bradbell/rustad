@@ -108,11 +108,10 @@ pub type RustSrcFn<'a, V> = libloading::Symbol<'a,
 /// Get a link to an [ADfn::rust_src] function.
 ///
 /// * lib :
-/// is a lobrary returned by the [get_lib] function.
+/// is a library returned by the [get_lib] function.
 ///
 /// * fn_name :
 /// is the name of the function without it's leading `rust_src_` .
-///
 ///
 pub fn get_rust_src_fn<'a, V>(
     lib     : &'a libloading::Library,

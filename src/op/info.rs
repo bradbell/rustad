@@ -61,7 +61,7 @@ pub type ForwardZero<V, E> = fn(
 );
 // panic_zero
 /// default [ForwardZero] function will panic
-pub fn panic_zero<V, E> (
+fn panic_zero<V, E> (
     _var_zero : &mut Vec<E> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
