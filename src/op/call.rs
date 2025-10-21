@@ -222,7 +222,7 @@ where
     // var_zero
     let mut j_res = 0;
     call_range_zero.reverse();
-    for i_res in (0 .. call_n_res).rev() {
+    for i_res in 0 .. call_n_res {
         let range_i = call_range_zero.pop();
         debug_assert!( range_i.is_some() );
         if is_res_var[i_res] {
@@ -308,7 +308,7 @@ where
     // var_one
     let mut j_res = 0;
     call_range_one.reverse();
-    for i_res in (0 .. call_n_res).rev() {
+    for i_res in 0 .. call_n_res {
         let range_i = call_range_one.pop();
         debug_assert!( range_i.is_some() );
         if is_res_var[i_res] {
@@ -457,7 +457,7 @@ where
     // avar_zero
     let mut j_res = 0;
     call_arange_zero.reverse();
-    for i_res in (0 .. call_n_res).rev() {
+    for i_res in 0 .. call_n_res {
         let arange_i = call_arange_zero.pop();
         debug_assert!( arange_i.is_some() );
         if is_res_var[i_res] {
@@ -552,7 +552,7 @@ where
     // avar_one
     let mut j_res = 0;
     call_arange_one.reverse();
-    for i_res in (0 .. call_n_res).rev() {
+    for i_res in 0 .. call_n_res {
         let arange_i = call_arange_one.pop();
         debug_assert!( arange_i.is_some() );
         if is_res_var[i_res] {
