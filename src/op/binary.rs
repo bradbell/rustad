@@ -139,7 +139,8 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         " rust source code for constant ", stringify!( $op ),
         " variable; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
-    fn [< $Name:lower _cv_rust_src >] (
+    fn [< $Name:lower _cv_rust_src >]<V> (
+        _not_used   : V           ,
         n_domain    : usize       ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
@@ -162,7 +163,8 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         " rust source code for variable ", stringify!( $op ),
         " constant; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
-    fn [< $Name:lower _vc_rust_src >] (
+    fn [< $Name:lower _vc_rust_src >]<V> (
+        _not_used   : V           ,
         n_domain    : usize       ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
@@ -185,7 +187,8 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         " rust source code for variable ", stringify!( $op ),
         " variable; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
-    fn [< $Name:lower _vv_rust_src >] (
+    fn [< $Name:lower _vv_rust_src >]<V> (
+        _not_used   : V           ,
         n_domain    : usize       ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,

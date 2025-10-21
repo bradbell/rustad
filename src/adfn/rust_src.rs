@@ -37,7 +37,7 @@ fn prototype(fn_name : &str, v_str : &str) -> String {
 // rust_src
 impl<V> ADfn<V>
 where
-    V : ToString + GlobalOpInfoVec ,
+    V : ToString + From<f32> +  GlobalOpInfoVec ,
 {
     /// Under Construction:
     /// Rust source code for zero order forward mode evaluation; i.e.,
@@ -154,8 +154,10 @@ where
             let arg      = &self.arg_all[start .. end];
             let res      = self.n_domain + op_index;
             let rust_src = op_info_vec[op_id].rust_src;
-            src = src + "   " +
-                &rust_src(self.n_domain, &self.flag_all, &arg, res) + "\n";
+            let not_used = V::from( f32::NAN );
+            src = src + "   " + &rust_src(
+                    not_used, self.n_domain, &self.flag_all, &arg, res
+                ) + "\n";
         }
         //
         // range

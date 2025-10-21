@@ -211,6 +211,10 @@ fn panic_arg_var_index(
 // RustSrc
 /// Generate source code corresponding to forward zero evaluation
 ///
+///
+/// * not_used :
+/// This argument is only used to determine the value type V.
+//
 /// * n_domain :
 /// number of domain variables.
 ///
@@ -219,7 +223,8 @@ fn panic_arg_var_index(
 /// * return
 /// The return value is the rust source code from this operation.
 ///
-pub type RustSrc = fn(
+pub type RustSrc<V> = fn(
+    _not_used : V          ,
     _n_domain : usize       ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
@@ -228,7 +233,8 @@ pub type RustSrc = fn(
 //
 // panic_rust_src
 /// default [RustSrc] function will panic.
-pub fn panic_rust_src(
+pub fn panic_rust_src<V>(
+    _not_used : V           ,
     _n_domain : usize       ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
@@ -265,7 +271,7 @@ pub struct OpInfo<V> {
     pub arg_var_index   : ArgVarIndex,
     //
     /// generate rust source code for this operator
-    pub rust_src        : RustSrc,
+    pub rust_src        : RustSrc<V>,
 }
 // ---------------------------------------------------------------------------
 // op_info_vec

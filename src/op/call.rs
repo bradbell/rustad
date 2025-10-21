@@ -43,11 +43,9 @@
 // use
 //
 use std::sync::RwLock;
+use std::any::type_name;
 //
-use crate::op::info::{
-    OpInfo,
-    panic_rust_src,
-};
+use crate::op::info::OpInfo;
 use crate::atom::{
     AtomForwardZeroValue,
     AtomForwardZeroAD,
@@ -699,7 +697,7 @@ where
         reverse_1_value   : call_reverse_1_value::<V>,
         reverse_1_ad      : call_reverse_1_ad::<V>,
         arg_var_index     : call_arg_var_index,
-        rust_src          : panic_rust_src,
+        rust_src          : call_rust_src::<V>,
     };
     op_info_vec[CALL_RES_OP as usize] = OpInfo{
         name              : "call_res" ,
@@ -710,7 +708,7 @@ where
         reverse_1_value   : no_op_one::<V, V>,
         reverse_1_ad      : no_op_one::<V, AD<V> >,
         arg_var_index     : no_op_arg_var_index,
-        rust_src          : panic_rust_src,
+        rust_src          : no_op_rust_src::<V>,
     };
 }
 // ---------------------------------------------------------------------------
@@ -746,4 +744,125 @@ fn no_op_arg_var_index(
 ) {
     let zero_t = 0 as IndexT;
     arg_var_index.resize(0, zero_t);
+}
+//
+// no_op_rust_src
+fn no_op_rust_src<V> (
+    _not_used  : V             ,
+    _n_domain  : usize         ,
+    _flag      : &Vec<bool>    ,
+    _arg       : &[IndexT]     ,
+    _res       : usize         ,
+) -> String
+{   String::new() }
+// --------------------------------------------------------------------------
+// call_rust_src
+//
+/// Rust source code for the call operator.
+fn call_rust_src<V> (
+    _not_used  : V             ,
+    n_domain   : usize         ,
+    flag       : &Vec<bool>    ,
+    arg        : &[IndexT]     ,
+    res        : usize         ) -> String
+where
+    V : AtomEvalVec,
+{   // ----------------------------------------------------------------------
+    let (
+        atom_id,
+        call_info,
+        call_n_arg,
+        call_n_res,
+        trace,
+        is_arg_var,
+        is_res_var,
+    ) = extract_call_arg(flag, arg);
+    //
+    // src
+    let mut src = String::new();
+    //
+    // v_str
+    let v_str = type_name::<V>();
+    //
+    // name
+    let name : &'static str;
+    {   //
+        // rw_lock
+        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
+        //
+        // read_lock
+        let read_lock = rw_lock.read();
+        assert!( read_lock.is_ok() );
+        //
+        // Rest of this block has a lock, so it should be fast and not fail.
+        let atom_eval_vec       = read_lock.unwrap();
+        let atom_eval           = &atom_eval_vec[atom_id];
+        name                    = atom_eval.name;
+    }
+    //
+    // nan
+    src = src +
+        "   //\n" +
+        "   // nan\n" +
+        "   let nan = " + v_str + "::from( f32::NAN );\n";
+    //
+    // call_domain
+    src = src +
+        "   //\n" +
+        "   // call_domain\n" +
+        "   let mut call_domain : Vec<&" + v_str + "> = " +
+                "vec![nan; " + &(call_n_arg.to_string()) + "];\n";
+    for i_arg in 0 .. call_n_arg {
+        let i_str = i_arg.to_string();
+        let index = arg[i_arg + 5] as usize;
+        if is_arg_var[i_arg] {
+            if index < n_domain {
+                let j_str = index.to_string();
+                src = src +
+                "   call_domain[" + &i_str + "] = &domain[" + &j_str + "];\n";
+            } else {
+                let j_str = (index - n_domain).to_string();
+                src = src +
+                "   call_domain[" + &i_str + "] = &dep[" + &j_str + "];\n";
+            }
+        } else {
+            let j_str = index.to_string();
+            src = src +
+                "   call_domain[" + &i_str + "] = &con[" + &j_str + "];\n";
+        }
+    }
+    //
+    // call_range
+    src = src +
+        "   //\n" +
+        "   // call_range\n" +
+        "   call_info  = " + &call_info.to_string() + ";\n" +
+        "   trace      = " + &trace.to_string() + ";\n" +
+        "   let mut call_range = " +
+                "atom_" + &name + "(call_domain, call_info, trace);\n";
+    // dep
+    src = src +
+        "   //\n" +
+        "   // dep\n" +
+        "   call_range.reverse()\n";
+    let j_res = 0;
+    for i_res in 0 .. call_n_res {
+        if is_res_var[i_res] {
+            let j_str = (res + j_res).to_string();
+            src = src +
+                "   dep[" + &j_str + "] = call_range.pop().unwrap();\n";
+        } else {
+            src = src +
+                "   call_range.pop();\n";
+        }
+    }
+    //
+    // call_domain, call_range
+    src = src +
+        "   //\n" +
+        "   // call_domain, call_range\n" +
+        "   call_domain.drop();\n" +
+        "   call_range.drop();\n" ;
+    //
+    src
 }
