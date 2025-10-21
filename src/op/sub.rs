@@ -24,8 +24,10 @@ use crate::op::binary;
 use crate::tape::sealed::ThisThreadTape;
 use crate::IndexT;
 use crate::ad::AD;
-use crate::op::info::OpInfo;
-use crate::op::info::panic_one;
+use crate::op::info::{
+    OpInfo,
+    operator_does_not_implement,
+};
 use crate::op::id::{
     SUB_CV_OP,
     SUB_VC_OP,
@@ -41,6 +43,12 @@ binary::binary_rust_src!(Sub, -);
 // sub_vc_forward_0
 // sub_vv_forward_0
 binary::eval_binary_forward_0!(Sub, -);
+// ---------------------------------------------------------------------------
+// forward_one_value_not_implemented
+// forward_one_ad_not_implemented
+// reverse_one_value_not_implemented
+// reverse_one_ad_not_implemented
+operator_does_not_implement!(Sub);
 // ---------------------------------------------------------------------------
 // set_op_info
 /// Set the operator information for all the Sub operators.
@@ -58,10 +66,10 @@ where
         name              : "sub_cv",
         forward_0_value   : sub_cv_forward_0::<V, V>,
         forward_0_ad      : sub_cv_forward_0::<V, AD<V> >,
-        forward_1_value   : panic_one::<V, V>,
-        forward_1_ad      : panic_one::<V, AD<V> >,
-        reverse_1_value   : panic_one::<V, V>,
-        reverse_1_ad      : panic_one::<V, AD<V> >,
+        forward_1_value   : forward_one_value_not_implemented::<V>,
+        forward_1_ad      : forward_one_ad_not_implemented::<V>,
+        reverse_1_value   : reverse_one_value_not_implemented::<V>,
+        reverse_1_ad      : reverse_one_ad_not_implemented::<V>,
         arg_var_index     : binary::binary_cv_arg_var_index,
         rust_src          : sub_cv_rust_src,
     };
@@ -69,10 +77,10 @@ where
         name              : "sub_vc",
         forward_0_value   : sub_vc_forward_0::<V, V>,
         forward_0_ad      : sub_vc_forward_0::<V, AD<V> >,
-        forward_1_value   : panic_one::<V, V>,
-        forward_1_ad      : panic_one::<V, AD<V> >,
-        reverse_1_value   : panic_one::<V, V>,
-        reverse_1_ad      : panic_one::<V, AD<V> >,
+        forward_1_value   : forward_one_value_not_implemented::<V>,
+        forward_1_ad      : forward_one_ad_not_implemented::<V>,
+        reverse_1_value   : reverse_one_value_not_implemented::<V>,
+        reverse_1_ad      : reverse_one_ad_not_implemented::<V>,
         arg_var_index     : binary::binary_vc_arg_var_index,
         rust_src          : sub_vc_rust_src,
     };
@@ -80,10 +88,10 @@ where
         name              : "sub_vv",
         forward_0_value   : sub_vv_forward_0::<V, V>,
         forward_0_ad      : sub_vv_forward_0::<V, AD<V> >,
-        forward_1_value   : panic_one::<V, V>,
-        forward_1_ad      : panic_one::<V, AD<V> >,
-        reverse_1_value   : panic_one::<V, V>,
-        reverse_1_ad      : panic_one::<V, AD<V> >,
+        forward_1_value   : forward_one_value_not_implemented::<V>,
+        forward_1_ad      : forward_one_ad_not_implemented::<V>,
+        reverse_1_value   : reverse_one_value_not_implemented::<V>,
+        reverse_1_ad      : reverse_one_ad_not_implemented::<V>,
         arg_var_index     : binary::binary_vv_arg_var_index,
         rust_src          : sub_vv_rust_src,
     };

@@ -107,7 +107,7 @@ pub type ReverseOne<V, E> = fn(
 );
 // panic_one
 /// default [ForwardOne] and [ReverseOne] function will panic
-pub fn panic_one<V, E> (
+fn panic_one<V, E> (
     _var_zero : &Vec<E>     ,
     _var_one  : &mut Vec<E> ,
     _con      : &Vec<V>     ,
@@ -115,6 +115,69 @@ pub fn panic_one<V, E> (
     _arg      : &[IndexT]   ,
     _res      : usize       ,
 ) { panic!(); }
+//
+// operator_does_not_implement
+/// Define functions that report not implemented cases for an operator.
+///
+/// * Name :
+/// is the name of the operator that does not implement the function.
+///
+/// * Functions Defined :
+///
+///     | Function                                | Type                    |
+///     | --------------------------------------- | ----------------------- |
+///     | `forward_one_value_not_implemented<V>`  | `ForwardOne<V,V>`       |
+///     | `forward_one_ad_not_implemented<V>`     | `ForwardOne<V, AD<V> >` |
+///     | `reverse_one_value_not_implemented<V>`  | `ReverseOne<V>`         |
+///     | `reverse_one_ad_not_implemented<V>`     | `ReverseOne<V, AD<V> >` |
+///
+macro_rules! operator_does_not_implement{ ($Name:ident) => {
+    pub fn forward_one_value_not_implemented<V> (
+        _var_zero : &Vec<V>     ,
+        _var_one  : &mut Vec<V> ,
+        _con      : &Vec<V>     ,
+        _flag     : &Vec<bool>  ,
+        _arg      : &[IndexT]   ,
+        _res      : usize       ,
+    ) { panic!( concat!(
+        stringify!($Name) ,
+        ": forward_one_value not implemented for this operator" ,
+    ))}
+    pub fn reverse_one_value_not_implemented<V> (
+        _var_zero : &Vec<V>     ,
+        _var_one  : &mut Vec<V> ,
+        _con      : &Vec<V>     ,
+        _flag     : &Vec<bool>  ,
+        _arg      : &[IndexT]   ,
+        _res      : usize       ,
+    ) { panic!( concat!(
+        stringify!($Name) ,
+        ": forward_one_value not implemented for this operator" ,
+    ))}
+    pub fn forward_one_ad_not_implemented<V> (
+        _var_zero : &Vec< AD<V> >     ,
+        _var_one  : &mut Vec< AD<V> > ,
+        _con      : &Vec<V>           ,
+        _flag     : &Vec<bool>        ,
+        _arg      : &[IndexT]         ,
+        _res      : usize             ,
+    ) { panic!( concat!(
+        stringify!($Name) ,
+        ": forward_one_ad not implemented for this operator" ,
+    ))}
+    pub fn reverse_one_ad_not_implemented<V> (
+        _var_zero : &Vec< AD<V> >     ,
+        _var_one  : &mut Vec< AD<V> > ,
+        _con      : &Vec<V>           ,
+        _flag     : &Vec<bool>        ,
+        _arg      : &[IndexT]         ,
+        _res      : usize             ,
+    ) { panic!( concat!(
+        stringify!($Name) ,
+        ": forward_one_ad not implemented for this operator" ,
+    ))}
+}}
+pub(crate) use operator_does_not_implement;
 // ---------------------------------------------------------------------------
 // ArgVarIndex
 /// Return indices for variables that are arguments for an operation
@@ -206,7 +269,7 @@ pub struct OpInfo<V> {
 }
 // ---------------------------------------------------------------------------
 // op_info_vec
-/// returns the vector of length crate::op::id::NUMBER_OP
+/// returns the vector of length [NUMBER_OP]
 /// that maps each operator id to it's [OpInfo] .
 ///
 pub fn op_info_vec<V>() -> Vec< OpInfo<V> >
