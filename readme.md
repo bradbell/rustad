@@ -18,8 +18,6 @@ This package is intended to include most of the features in
 3.  It works well with may threads.
 4.  It supports machine learning algorithms.
 
-
-
 ## Operations Implemented
 
 1.  Addition and multiplication: We have held off on other simple numerical
