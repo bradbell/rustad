@@ -1,6 +1,7 @@
 # A Rust Automatic Differentiation Library
 
 - [Objective](#objective)
+- [Releases](#releases)
 - [Operations Implemented](#operations-implemented)
 - [Under Construction](#under-construction)
 - [Wish List](#wish-list)
@@ -17,6 +18,11 @@ This package is intended to include most of the features in
 2.  Its source code is easy to understand and maintain.
 3.  It works well with may threads.
 4.  It supports machine learning algorithms.
+
+## Releases
+
+1.  0.0.0 : 2025.10.18 :
+    A preliminary release created so people can find this readme file.
 
 ## Operations Implemented
 
