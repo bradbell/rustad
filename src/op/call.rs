@@ -218,6 +218,7 @@ where
     let mut call_range_zero = forward_zero_value(
         &call_domain_zero, call_info, trace
     );
+    assert_eq!( call_range_zero.len(), call_n_res);
     //
     // var_zero
     let mut j_res = 0;
@@ -304,6 +305,7 @@ where
     let mut call_range_one = forward_one_value(
         &call_domain_zero, call_domain_one, call_info, trace
     );
+    assert_eq!( call_range_one.len(), call_n_res);
     //
     // var_one
     let mut j_res = 0;
@@ -386,6 +388,7 @@ where
     let call_domain_one = reverse_one_value(
         &call_domain_zero, call_range_one, call_info, trace
     );
+    assert_eq!( call_domain_one.len(), call_n_arg);
     //
     // var_one
     for i_arg in 0 .. call_n_arg {
@@ -453,6 +456,7 @@ where
     let mut call_arange_zero = forward_zero_ad(
         &call_adomain_zero, call_info, trace
     );
+    assert_eq!( call_arange_zero.len(), call_n_res);
     //
     // avar_zero
     let mut j_res = 0;
@@ -548,6 +552,7 @@ where
     let mut call_arange_one = forward_one_ad(
         &call_adomain_zero, call_adomain_one, call_info, trace
     );
+    assert_eq!( call_arange_one.len(), call_n_res);
     //
     // avar_one
     let mut j_res = 0;
@@ -633,6 +638,7 @@ where
     let call_adomain_one = reverse_one_ad(
         &call_adomain_zero, call_arange_one, call_info, trace
     );
+    assert_eq!( call_adomain_one.len(), call_n_arg);
     //
     // avar_one
     for i_arg in 0 .. call_n_arg {
