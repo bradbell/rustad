@@ -56,7 +56,6 @@ pub fn doc_generic_e() {}
 /// An operation sequence is a single assignment representation of
 /// a function; i.e., each variable is only assigned once.
 ///
-/// * TODO : Change member variables to pub(crate) (once they get used).
 pub struct ADfn<V> {
     //
     // n_domain
@@ -66,32 +65,32 @@ pub struct ADfn<V> {
     //
     // n_var
     /// The total number of variables in the operation sequence.
-    pub n_var               : usize,
+    pub(crate) n_var               : usize,
     //
     // id_all
     /// This maps each operator's index in the operation sequence
     /// to its operator id; see operator::id.
-    pub id_all              : Vec<u8>,
+    pub(crate) id_all              : Vec<u8>,
     //
     // flag_all
     /// This contains all the boolean flags that are part of
     /// the operator definitions.
-    pub flag_all            : Vec<bool>,
+    pub(crate) flag_all            : Vec<bool>,
     //
     // op2arg
     /// This maps each operator's index in the operation sequence to
     /// the index of its first argument in arg_all.
-    pub op2arg              : Vec<IndexT>,
+    pub(crate) op2arg              : Vec<IndexT>,
     //
     // arg_all
     /// This contains all the arguments for the opereators in the
     /// operatioon sequence.
-    pub arg_all             : Vec<IndexT>,
+    pub(crate) arg_all             : Vec<IndexT>,
     //
     // con_all
     /// This contains the value of all the constants needed
     /// to evaluate the function.
-    pub con_all             : Vec<V>,
+    pub(crate) con_all             : Vec<V>,
     //
     // range_is_var
     /// The length of this vector is the dimension of the range space.
@@ -103,7 +102,7 @@ pub struct ADfn<V> {
     /// The length of this vector is also the dimension of the range space.
     /// If range_is_var\[i\] is true (false), range2tape_index\[i\] is the
     /// variable (constant) index for the i-th component of the range space.
-    pub range2tape_index    : Vec<IndexT>,
+    pub(crate) range2tape_index    : Vec<IndexT>,
 }
 //
 // ---------------------------------------------------------------------------
