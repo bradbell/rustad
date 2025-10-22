@@ -43,7 +43,6 @@
 // use
 //
 use std::sync::RwLock;
-use std::any::type_name;
 //
 use crate::op::info::OpInfo;
 use crate::atom::{
@@ -781,9 +780,6 @@ where
     // src
     let mut src = String::new();
     //
-    // v_str
-    let v_str = type_name::<V>();
-    //
     // name
     let name : &'static str;
     {   //
@@ -800,18 +796,12 @@ where
         name                    = atom_eval.name;
     }
     //
-    // nan
-    src = src +
-        "   //\n" +
-        "   // nan\n" +
-        "   let nan = " + v_str + "::from( f32::NAN );\n";
-    //
     // call_domain
     src = src +
         "   //\n" +
         "   // call_domain\n" +
-        "   let mut call_domain : Vec<&" + v_str + "> = " +
-                "vec![nan; " + &(call_n_arg.to_string()) + "];\n";
+        "   let mut call_domain : Vec<&V> = " +
+                "vec![&nan; " + &(call_n_arg.to_string()) + "];\n";
     for i_arg in 0 .. call_n_arg {
         let i_str = i_arg.to_string();
         let index = arg[i_arg + 5] as usize;
@@ -836,19 +826,20 @@ where
     src = src +
         "   //\n" +
         "   // call_range\n" +
-        "   call_info  = " + &call_info.to_string() + ";\n" +
-        "   trace      = " + &trace.to_string() + ";\n" +
+        "   let call_info  = " + &call_info.to_string() + ";\n" +
+        "   let trace      = " + &trace.to_string() + ";\n" +
         "   let mut call_range = " +
-                "atom_" + &name + "(call_domain, call_info, trace);\n";
+                "atom_" + &name + "(&call_domain, call_info, trace);\n";
     // dep
+    assert!(n_domain <= res);
     src = src +
         "   //\n" +
         "   // dep\n" +
-        "   call_range.reverse()\n";
+        "   call_range.reverse();\n";
     let j_res = 0;
     for i_res in 0 .. call_n_res {
         if is_res_var[i_res] {
-            let j_str = (res + j_res).to_string();
+            let j_str = (res + j_res - n_domain).to_string();
             src = src +
                 "   dep[" + &j_str + "] = call_range.pop().unwrap();\n";
         } else {
@@ -861,8 +852,8 @@ where
     src = src +
         "   //\n" +
         "   // call_domain, call_range\n" +
-        "   call_domain.drop();\n" +
-        "   call_range.drop();\n" ;
+        "   drop(call_domain);\n" +
+        "   drop(call_range);\n" ;
     //
     src
 }

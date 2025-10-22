@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-// Example Hessian
+// Example of computing a Hessian
 //
 use rustad::{
     AD,

@@ -43,15 +43,18 @@ This package is intended to include most of the features in
 6.  Atomic functions and Checkpointing. Atomic function have been extended
     so that they stay atomic when used in functions that are AD evaluated.
 
+7.  Generate compile and link source code for derivative calculations.
+
 ## Under Construction
 
-1.  Generate compile and link source code for derivative calculations.
 
 ## Goals Before Stable API
 
 1.  Subtraction, division and all the standard math functions.
     
-2.  Optimizing the operation sequence.
+2.  Reduce tape size both during recording and by
+    optimizing the operation sequence. For example multiplication
+    by the constants zero and one does not need to be recorded.
 
 3.  Add dynamic parameters; i.e., function arguments that can change value
     but act as constants when differentiating.

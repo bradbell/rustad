@@ -152,12 +152,14 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let mut rhs = arg[1] as usize;
         let res     = res - n_domain;
         let op      = stringify!($op);
-        if rhs < n_domain {
+        let src     = if rhs < n_domain {
             format!("dep[{res}] = &con[{lhs}] {op} domain[{rhs}];")
         } else {
             rhs = rhs - n_domain;
             format!("dep[{res}] = &con[{lhs}] {op} &dep[{rhs}];")
-        }
+        };
+        let src = String::from("   ") + &src + "\n";
+        src
     }
     #[doc = concat!(
         " rust source code for variable ", stringify!( $op ),
@@ -176,12 +178,14 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let rhs    = arg[1] as usize;
         let res    = res - n_domain;
         let op     = stringify!($op);
-        if lhs < n_domain {
+        let src    = if lhs < n_domain {
             format!("dep[{res}] = domain[{lhs}] {op} &con[{rhs}];")
         } else {
             lhs = lhs - n_domain;
             format!("dep[{res}] = &dep[{lhs}] {op} &con[{rhs}];")
-        }
+        };
+        let src = String::from("   ") + &src + "\n";
+        src
     }
     #[doc = concat!(
         " rust source code for variable ", stringify!( $op ),
@@ -200,7 +204,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let mut rhs = arg[1] as usize;
         let res     = res - n_domain;
         let op     = stringify!($op);
-        if lhs < n_domain {
+        let src    = if lhs < n_domain {
             if rhs < n_domain {
                 format!("dep[{res}] = domain[{lhs}] {op} domain[{rhs}];")
             } else {
@@ -215,7 +219,9 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
                 rhs = rhs - n_domain;
                 format!("dep[{res}] = &dep[{lhs}] {op} &dep[{rhs}];")
             }
-        }
+        };
+        let src = String::from("   ") + &src + "\n";
+        src
     }
 } } }
 pub(crate) use binary_rust_src;

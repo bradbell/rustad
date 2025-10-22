@@ -117,23 +117,30 @@ where
             "       return;\n" +
             "   }\n";
         //
+        // V
+        src = src +
+            "   //\n" +
+            "   // V\n" +
+            "   type V = " + v_str + ";\n";
+        //
         // nan
         src = src +
-            "   //\\n" +
+            "   //\n" +
             "   // nan\n" +
-            "   let nan = " + v_str + "::from( f32::NAN );\n";
+            "   let nan = V::from( f32::NAN );\n";
         //
         // con
-        let n_con = self.con_all.len().to_string();
-        src = src +
-            "   // con\n" +
-            "   let mut con : Vec<" + v_str + "> = " +
-                    "vec![nan; " + &n_con + "];\n";
-        for i in 0 .. self.con_all.len() {
-            let i_str = i.to_string();
-            let c_str = self.con_all[i].to_string();
+        if 0 < self.con_all.len() {
+            let n_con = self.con_all.len().to_string();
             src = src +
-                "   con[" + &i_str + "] = " + &c_str + " as " + v_str + ";\n";
+                "   // con\n" +
+                "   let mut con : Vec<V> = " + "vec![nan; " + &n_con + "];\n";
+            for i in 0 .. self.con_all.len() {
+                let i_str = i.to_string();
+                let c_str = self.con_all[i].to_string();
+                src = src +
+                    "   con[" + &i_str + "] = " + &c_str + " as V;\n";
+            }
         }
         //
         // dep
@@ -143,8 +150,7 @@ where
             "   //\n" +
             "   // dep\n" +
             "   // vector of dependent variables\n" +
-            "   let mut dep : Vec<" + v_str + "> = " +
-                    "vec![nan; " + &n_dep + "];\n";
+            "   let mut dep : Vec<V> = vec![nan; " + &n_dep + "];\n";
         //
         // dep
         for op_index in 0 .. self.id_all.len() {
@@ -155,9 +161,9 @@ where
             let res      = self.n_domain + op_index;
             let rust_src = op_info_vec[op_id].rust_src;
             let not_used = V::from( f32::NAN );
-            src = src + "   " + &rust_src(
+            src = src + &rust_src(
                     not_used, self.n_domain, &self.flag_all, &arg, res
-                ) + "\n";
+                );
         }
         //
         // range

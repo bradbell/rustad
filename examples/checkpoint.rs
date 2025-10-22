@@ -3,6 +3,8 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
 // ---------------------------------------------------------------------------
+// Example of doing checkpointing using atomic functions.
+//
 // TODO: convert this example in to a general purpose checkpoint utility.
 // ---------------------------------------------------------------------------
 use std::cell::RefCell;
