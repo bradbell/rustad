@@ -34,45 +34,45 @@ pub struct Tape<V> {
     /// if false (true) a recording is currently in progress on this tape.
     /// If recording is false, all of the tape's index values are zero
     /// and all of its vectors are empty.
-    pub recording      : bool,
+    pub(crate) recording      : bool,
     //
     // tape_id
     /// a different tape_id is chosen for each recording.
-    pub tape_id        : usize,
+    pub(crate) tape_id        : usize,
     //
     // n_domain
     /// is the dimension of the domain space for the operation being recorded.
-    pub n_domain       : usize,
+    pub(crate) n_domain       : usize,
     //
     // n_var
     /// is the number of variables currently in the recording.
-    pub n_var          : usize,
+    pub(crate) n_var          : usize,
     //
     // id_all
     /// For each index in the operation sequence, id_all\[index\]
     /// is the corresponding operator id.
-    pub id_all         : Vec<u8>,
+    pub(crate) id_all         : Vec<u8>,
     //
     // op2arg
     /// For each op_index in the operation sequence, op2arg\[op_index\]
     /// is the index in arg_all of the first argument for the operator.
-    pub op2arg         : Vec<IndexT>,
+    pub(crate) op2arg         : Vec<IndexT>,
     //
     // arg_all
     /// For each op_index in the operation sequence,
     /// the arguments for the operator are a slice of arg_all
     /// starting at op2arg\[index\] .
-    pub arg_all        : Vec<IndexT>,
+    pub(crate) arg_all        : Vec<IndexT>,
     //
     // con_all
     /// is a vector containing the constant values used by the
     /// operation sequence
-    pub con_all        : Vec<V>,
+    pub(crate) con_all        : Vec<V>,
     //
     // flag_all
     /// is a vector containing boolean flags that are part of some
     /// operator definitions.
-    pub flag_all       : Vec<bool>,
+    pub(crate) flag_all       : Vec<bool>,
 }
 // ---------------------------------------------------------------------------
 // GTape::new
