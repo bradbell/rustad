@@ -85,7 +85,7 @@ use crate::{
 /// //
 /// // y
 /// // y[0] = f(x)
-/// let trace           = true;
+/// let trace           = false;
 /// let x      : Vec<V> = vec![ 1.0, 2.0, 3.0 ];
 /// let mut v0 : Vec<V> = Vec::new();
 /// let y  = f.forward_zero_value(&mut v0, x, trace);

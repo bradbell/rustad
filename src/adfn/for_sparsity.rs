@@ -76,7 +76,7 @@ where
     ///     ay.push( &ax[j] * &ax[j] );      // ay[j] is a variable
     /// }
     /// let f           = stop_recording(ay);
-    /// let trace       = true;
+    /// let trace       = false;
     /// let mut pattern = f.for_sparsity(trace);
     /// pattern.sort();
     /// assert_eq!( pattern.len(), nx - 1 );
