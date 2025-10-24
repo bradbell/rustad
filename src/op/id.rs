@@ -44,35 +44,43 @@ macro_rules! set_operator_ids {
 // This ensures that the number of operators is less that u8::MAX.
 set_operator_ids!(
     // ADD
-    /// constant + variable
-    ADD_CV_OP,
-    /// variable + constant
-    ADD_VC_OP,
+    /// parameter + parameter
+    ADD_PP_OP,
+    /// parameter + variable
+    ADD_PV_OP,
+    /// variable + parameter
+    ADD_VP_OP,
     /// variable + variable
     ADD_VV_OP,
     //
     // SUB
-    /// constant + variable
-    SUB_CV_OP,
-    /// variable + constant
-    SUB_VC_OP,
-    /// variable + variable
+    /// parameter - parameter
+    SUB_PP_OP,
+    /// parameter - variable
+    SUB_PV_OP,
+    /// variable - parameter
+    SUB_VP_OP,
+    /// variable - variable
     SUB_VV_OP,
     //
     // MUL
-    /// constant * variable
-    MUL_CV_OP,
-    /// variable * constant
-    MUL_VC_OP,
+    /// parameter * parameter
+    MUL_PP_OP,
+    /// parameter * variable
+    MUL_PV_OP,
+    /// variable * parameter
+    MUL_VP_OP,
     /// variable * variable
     MUL_VV_OP,
     //
     // DIV
-    /// constant * variable
-    DIV_CV_OP,
-    /// variable * constant
-    DIV_VC_OP,
-    /// variable * variable
+    /// parameter / parameter
+    DIV_PP_OP,
+    /// parameter / variable
+    DIV_PV_OP,
+    /// variable / parameter
+    DIV_VP_OP,
+    /// variable / variable
     DIV_VV_OP,
     //
     // CALL

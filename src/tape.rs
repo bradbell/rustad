@@ -21,6 +21,37 @@ use crate::doc_generic_v;
 /// The type is used, instead of usize, to save space in vectors of indices.
 pub type IndexT = u32;
 // ---------------------------------------------------------------------------
+// OpSequence
+/// Information for one operation sequence
+pub(crate) struct OpSequence {
+    //
+    // n_dom
+    /// is the number of independent values in the operation sequence.
+    pub n_dom : usize,
+    //
+    // n_dep
+    /// is the number of dependent values currently in the operation sequence.
+    pub n_dep : usize,
+    //
+    // id_seq
+    /// For each index in the operation sequence, id_seq\[index\]
+    /// is the corresponding operator id.
+    pub(crate) id_seq : Vec<u8>,
+}
+// VarTape::new
+impl OpSequence {
+    //
+    // OpSequence::new
+    /// Sets n_dom, n_dep to zero,
+    pub fn new() -> Self {
+        Self {
+            n_dom     : 0,
+            n_dep     : 0,
+            id_seq    : Vec::new(),
+        }
+    }
+}
+// ---------------------------------------------------------------------------
 // Tape
 ///
 /// `Tape` < *V* > is the type were to an `AD<V>`
@@ -29,6 +60,13 @@ pub type IndexT = u32;
 /// * V : see [doc_generic_v]
 ///
 pub struct Tape<V> {
+    //
+    // dyp
+    /// dynamic parameter specific tape information
+    pub(crate) dyp : OpSequence,
+    //
+    /// variable specific tape information
+    pub(crate) var : OpSequence,
     //
     // recording
     /// if false (true) a recording is currently in progress on this tape.
@@ -40,33 +78,19 @@ pub struct Tape<V> {
     /// a different tape_id is chosen for each recording.
     pub(crate) tape_id        : usize,
     //
-    // n_domain
-    /// is the dimension of the domain space for the operation being recorded.
-    pub(crate) n_domain       : usize,
-    //
-    // n_var
-    /// is the number of variables currently in the recording.
-    pub(crate) n_var          : usize,
-    //
-    // id_all
-    /// For each index in the operation sequence, id_all\[index\]
-    /// is the corresponding operator id.
-    pub(crate) id_all         : Vec<u8>,
-    //
-    // op2arg
-    /// For each op_index in the operation sequence, op2arg\[op_index\]
+    // arg_seq
+    /// For each op_index in the operation sequence, arg_seq\[op_index\]
     /// is the index in arg_all of the first argument for the operator.
-    pub(crate) op2arg         : Vec<IndexT>,
+    pub(crate) arg_seq        : Vec<IndexT>,
     //
     // arg_all
     /// For each op_index in the operation sequence,
     /// the arguments for the operator are a slice of arg_all
-    /// starting at op2arg\[index\] .
+    /// starting at arg_seq\[index\] .
     pub(crate) arg_all        : Vec<IndexT>,
     //
     // con_all
-    /// is a vector containing the constant values used by the
-    /// operation sequence
+    /// is the vector of constant parameters used by the operation sequence.
     pub(crate) con_all        : Vec<V>,
     //
     // flag_all
@@ -80,16 +104,13 @@ pub struct Tape<V> {
 impl<V> Tape<V> {
     //
     // Tape::new
-    /// Sets recording to false, tape_id, n_domain, n_var to zero,
-    /// and the vectors to empty.
     pub fn new() -> Self {
         Self {
+            dyp           : OpSequence::new(),
+            var           : OpSequence::new(),
             recording     : false,
             tape_id       : 0,
-            n_domain      : 0,
-            n_var         : 0,
-            id_all        : Vec::new() ,
-            op2arg        : Vec::new() ,
+            arg_seq       : Vec::new() ,
             arg_all       : Vec::new() ,
             con_all       : Vec::new() ,
             flag_all      : Vec::new() ,
@@ -161,8 +182,8 @@ pub(crate) use impl_this_thread_tape;
 // ----------------------------------------------------------------------------
 // start_recording
 //
-/// This starts recording a new ''AD`` < *V* > operation sequence on
-/// this thead's tape.
+/// This starts recording a new `AD<V>` operation sequence with
+/// no dynamic parameters.
 ///
 /// * Syntax :
 /// ```text
@@ -177,8 +198,8 @@ pub(crate) use impl_this_thread_tape;
 /// The recording is stopped when [stop_recording] is called.
 ///
 /// * domain :
-/// This vector contains the value of the domain variables used during
-/// the recording.
+/// This vector contains the value of the domain variables for use during
+/// the recording. There are no domain parameters when using this call.
 ///
 /// * adomain :
 /// The return is a vector of variables
@@ -189,6 +210,45 @@ pub(crate) use impl_this_thread_tape;
 /// * Example : see [stop_recording]
 ///
 pub fn start_recording<V>(domain : Vec<V> ) -> Vec< AD<V> >
+where
+    V : Clone + Sized + 'static + sealed::ThisThreadTape ,
+{
+    let dom_dyp : Vec<V> = Vec::new();
+    let (_adom_dyp, adomain) = start_recording_both(dom_dyp, domain);
+    adomain
+}
+//
+// start_recording_both
+/// This starts recording a new `AD<V>` operation sequence with
+/// dynamic parameters.
+///
+/// * Syntax :
+/// ```text
+///     (adom_dyp, adom_var) = start_recording(dom_dyp, dom_var)
+/// ```
+///
+/// * V : see [doc_generic_v]
+///
+/// * Recording :
+/// There must not currently be a recording in process on the current thread
+/// when start_recording_both is called.
+/// The recording is stopped when [stop_recording] is called.
+///
+/// * adom_dyp :
+/// This vector contains the value of the domain dynamic parameters
+/// for use during the recording.
+/// The i-th element of adom_dyp corresponds to the i-th element of dom_dyp.
+///
+/// * adom_var :
+/// This vector contains the value of the domain variables for use during
+/// the recording. The i-th element of adom_var corresponds to the i-th element
+/// of dom_var.
+///
+/// * Example : see [stop_recording]
+///
+pub fn start_recording_both<V>(
+    dom_dyp : Vec<V>, dom_var : Vec<V>
+) -> ( Vec< AD<V> >, Vec< AD<V> > )
 where
     V : Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
@@ -209,24 +269,37 @@ where
             "start_recording: This thread's tape is already recording"
         );
         //
-        assert_eq!( tape.id_all.len(),   0 );
-        assert_eq!( tape.op2arg.len(),   0 );
-        assert_eq!( tape.arg_all.len(),  0 );
-        assert_eq!( tape.con_all.len(),  0 );
-        assert_eq!( tape.flag_all.len(), 0 );
+        assert_eq!( tape.dyp.id_seq.len(),  0 );
+        assert_eq!( tape.var.id_seq.len(),  0 );
+        //
+        assert_eq!( tape.arg_seq.len(),      0 );
+        assert_eq!( tape.arg_all.len(),      0 );
+        assert_eq!( tape.con_all.len(),      0 );
+        assert_eq!( tape.flag_all.len(),     0 );
         //
         tape.tape_id     = tape_id;
         tape.recording   = true;
-        tape.n_domain    = domain.len();
-        tape.n_var       = domain.len();
+        //
+        tape.dyp.n_dom   = dom_dyp.len();
+        tape.dyp.n_dep   = 0;
+        //
+        tape.var.n_dom  = dom_var.len();
+        tape.var.n_dep  = 0;
     } );
     //
-    // adomain
-    let adomain = domain.into_iter().enumerate().map(
-        | (index, value) | AD::new(tape_id, index, value)
+    // adom_dyp
+    let is_var  = false;
+    let adom_dyp = dom_dyp.into_iter().enumerate().map(
+        | (index, value) | AD::new(tape_id, index, is_var, value)
     ).collect();
     //
-    adomain
+    // adom_var
+    let is_var  = true;
+    let adom_var = dom_var.into_iter().enumerate().map(
+        | (index, value) | AD::new(tape_id, index , is_var, value)
+    ).collect();
+    //
+    (adom_dyp, adom_var)
 }
 // ----------------------------------------------------------------------------
 // stop_recording
@@ -245,21 +318,21 @@ where
 /// when stop_recording is called.
 ///
 /// * arange :
-/// This is a `Vec< AD<` *V* `> >` vector that specifies
+/// This is a `Vec< AD<V> >` vector that specifies
 /// the range space variables.
 ///
 /// * ad_fn :
-/// The return value is an `ADfn` < *V* > containing the operation sequence
-/// that computed arange as a function of the adomain returned by
-/// [start_recording] .
-/// It can compute the values for the function and its derivative.
+/// The return value is an `ADfn<V>` containing the operation sequence
+/// that computed arange as a function of the domain variables returned by
+/// [start_recording] or [start_recording_both] .
+/// It can be used to compute the values for the function and its derivative.
 ///
 /// * Assumptions :
 /// The following assumptions are checked for the tape for this thread:
 /// ```text
-///     1. tape.arg_all.len()                <= [IndexT]::Max
-///     2. tape.tape_id                      <= IndexT::Max
-///     3. tape.con_all.len() + arange.len() <= IndexT::Max
+///     1. tape.arg_all.len()                              <= [IndexT]::Max
+///     2. tape.tape_id                                    <= IndexT::Max
+///     3. n_con + tape.dyn.n_dom + tape.dyn.n_dep + arange.len() <= IndexT::Max
 /// ```
 /// # Example
 /// ```
@@ -280,7 +353,10 @@ where
     IndexT : TryFrom<usize> ,
     V : Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
+    // ad_fn
     let mut ad_fn : ADfn<V> = ADfn::new();
+    //
+    // tape
     let local_key : &LocalKey< RefCell< Tape<V> > > =
         sealed::ThisThreadTape::get();
     let tape_id : usize = local_key.with_borrow_mut( |tape| {
@@ -300,27 +376,31 @@ where
             Err(_) => panic!( "tape.tape_id > IndexT::MAX" ),
             Ok(_)  => (),
         }
-        let con_all_len = tape.con_all.len() + arange.len();
-        match IndexT::try_from( con_all_len ) {
+        let par_len = tape.con_all.len()
+            + tape.dyp.n_dom + tape.dyp.n_dep + arange.len();
+        match IndexT::try_from( par_len ) {
             Err(_) => panic!(
-                "tape.con_all.len() + arange.len() > IndexT::MAX"
+            "n_con + dyp.n_dom + dyp.n_dep + arange.len() > IndexT::MAX"
             ),
             Ok(_)  => (),
         }
         //
         // more checks
-        assert_eq!( tape.op2arg.len() , tape.id_all.len() );
-        assert_eq!( tape.n_var , tape.n_domain + tape.id_all.len() );
+        assert_eq!( tape.arg_seq.len()  , tape.var.id_seq.len() );
+        assert_eq!( tape.var.n_dep ,      tape.var.id_seq.len());
         //
-        // tape.op2arg
+        // tape.arg_seq
         // end marker for arguments to the last operation
-        tape.op2arg.push( tape.arg_all.len() as IndexT );
+        tape.arg_seq.push( tape.arg_all.len() as IndexT );
         //
-        // swap fields in ad_fn and tape
-        std::mem::swap( &mut ad_fn.n_domain,      &mut tape.n_domain );
-        std::mem::swap( &mut ad_fn.n_var,         &mut tape.n_var );
-        std::mem::swap( &mut ad_fn.id_all,        &mut tape.id_all );
-        std::mem::swap( &mut ad_fn.op2arg,        &mut tape.op2arg );
+        // n_var
+        let mut n_var = tape.var.n_dom + tape.var.n_dep;
+        //
+        // ad_fn, tape
+        std::mem::swap( &mut ad_fn.n_domain,      &mut tape.var.n_dom );
+        std::mem::swap( &mut ad_fn.n_var,         &mut n_var );
+        std::mem::swap( &mut ad_fn.id_all,        &mut tape.var.id_seq );
+        std::mem::swap( &mut ad_fn.op2arg,        &mut tape.arg_seq );
         std::mem::swap( &mut ad_fn.arg_all,       &mut tape.arg_all );
         std::mem::swap( &mut ad_fn.con_all,       &mut tape.con_all );
         std::mem::swap( &mut ad_fn.flag_all,      &mut tape.flag_all );
@@ -328,13 +408,23 @@ where
         // tape_id
         tape.tape_id
     } );
+    /* TODO
+    // ad_fn.arg_all
+    assert_eq!( ad_fn.arg_all.len() , arg_is_dyp.len() );
+    let n_con = ad_fn.con_all.len() as IndexT;
+    for index in 0 .. ad_fn.arg_all.len() {
+        if arg_is_dyp[index] {
+            ad_fn.arg_all[index] += n_con;
+        }
+    }
+    */
     //
     // range_is_var, range2tape_index, con_all
     // TODO: figure out how to do this without any cloning of values.
     for i in 0 .. arange.len() {
         if arange[i].tape_id == tape_id {
             ad_fn.range_is_var.push( true );
-            ad_fn.range2tape_index.push( arange[i].var_index as IndexT );
+            ad_fn.range2tape_index.push( arange[i].index as IndexT );
         } else {
             ad_fn.range_is_var.push( false );
             ad_fn.range2tape_index.push( ad_fn.con_all.len() as IndexT  );

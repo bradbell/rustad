@@ -11,8 +11,8 @@ use crate::IndexT;
 //
 // ---------------------------------------------------------------------------
 //
-// binary_cv_arg_var_index
-pub(crate) fn binary_cv_arg_var_index(
+// binary_pv_arg_var_index
+pub(crate) fn binary_pv_arg_var_index(
     arg_var_index : &mut Vec<IndexT> ,
     _flag         : &Vec<bool>       ,
     arg           : &[IndexT]        ,
@@ -21,8 +21,8 @@ pub(crate) fn binary_cv_arg_var_index(
     arg_var_index[0] = arg[1];
 }
 //
-// binary_vc_arg_var_index
-pub(crate) fn binary_vc_arg_var_index(
+// binary_vp_arg_var_index
+pub(crate) fn binary_vp_arg_var_index(
     arg_var_index : &mut Vec<IndexT> ,
     _flag         : &Vec<bool>       ,
     arg           : &[IndexT]        ,
@@ -52,20 +52,20 @@ pub(crate) fn binary_vv_arg_var_index(
 ///
 /// This defines the following functions in the current module:
 /// ```text
-///     {name}_cv_forward_0<V, E>
-///     {name}_vc_forward_0<V, E>
+///     {name}_pv_forward_0<V, E>
+///     {name}_vp_forward_0<V, E>
 ///     {name}_vv_forward_0<V, E>
 /// ```
 /// where {name} is a lower case version of Name and
-/// v (c) means the corresponding operand is a variable (constant) .
+/// v (p) means the corresponding operand is a variable (parameter) .
 ///
 /// [IndexT] must be defined in any module that uses eval_binary_forward_0
 macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     #[doc = concat!(
-        " E zero order forward for constant ", stringify!( $op ),
+        " E zero order forward for parameter ", stringify!( $op ),
         " variable; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
-    fn [< $Name:lower _cv_forward_0 >] <V, E> (
+    fn [< $Name:lower _pv_forward_0 >] <V, E> (
         var_zero    : &mut Vec<E> ,
         con         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
@@ -81,9 +81,9 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     }
     #[doc = concat!(
         " E zero order forward variable ", stringify!( $op ),
-        " constant; see [ForwardZero](crate::op::info::ForwardZero)"
+        " parameter; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
-    fn [< $Name:lower _vc_forward_0 >] <V, E> (
+    fn [< $Name:lower _vp_forward_0 >] <V, E> (
         var_zero    : &mut Vec<E> ,
         con         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
@@ -126,20 +126,20 @@ pub(crate) use eval_binary_forward_0;
 ///
 /// This defines the following functions in the current module:
 /// ```text
-///     {name}_cv_rust_src
-///     {name}_vc_rust_src
+///     {name}_pv_rust_src
+///     {name}_vp_rust_src
 ///     {name}_vv_rust_src
 /// ```
 /// where {name} is a lower case version of Name and
-/// v (c) means the corresponding operand is a variable (constant) .
+/// v (p) means the corresponding operand is a variable (parameter) .
 ///
 /// [IndexT] must be defined in any module that uses binary_rust_src
 macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
     #[doc = concat!(
-        " rust source code for constant ", stringify!( $op ),
+        " rust source code for parameter ", stringify!( $op ),
         " variable; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
-    fn [< $Name:lower _cv_rust_src >]<V> (
+    fn [< $Name:lower _pv_rust_src >]<V> (
         _not_used   : V           ,
         n_domain    : usize       ,
         _flag       : &Vec<bool>  ,
@@ -163,9 +163,9 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
     }
     #[doc = concat!(
         " rust source code for variable ", stringify!( $op ),
-        " constant; see [ForwardZero](crate::op::info::ForwardZero)"
+        " parameter; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
-    fn [< $Name:lower _vc_rust_src >]<V> (
+    fn [< $Name:lower _vp_rust_src >]<V> (
         _not_used   : V           ,
         n_domain    : usize       ,
         _flag       : &Vec<bool>  ,

@@ -10,13 +10,13 @@
 //! * E : see [doc_generic_e](crate::adfn::doc_generic_e)
 //!
 //! * [op::id](crate::op::id)
-//!     * ADD_CV_OP : constant + variable
-//!     * ADD_VC_OP : variable + constant
+//!     * ADD_PV_OP : parameter + variable
+//!     * ADD_VP_OP : variable + parameter
 //!     * ADD_VV_OP : variable + variable
 //!
 //! * arg
-//!     * arg\[0\]:  Variable or constant index of left operand.
-//!     * arg\[1\]:  Variable or constant index of right operand.
+//!     * arg\[0\]:  Variable or parameter index of left operand.
+//!     * arg\[1\]:  Variable or parameter index of right operand.
 // --------------------------------------------------------------------------
 // use
 //
@@ -26,8 +26,8 @@ use crate::IndexT;
 use crate::ad::AD;
 use crate::op::info::OpInfo;
 use crate::op::id::{
-    ADD_CV_OP,
-    ADD_VC_OP,
+    ADD_PV_OP,
+    ADD_VP_OP,
     ADD_VV_OP,
 };
 #[cfg(doc)]
@@ -36,22 +36,22 @@ use crate::op::info::{
     ReverseOne,
 };
 // -------------------------------------------------------------------------
-// add_cv_rust_src
-// add_vc_rust_src
+// add_pv_rust_src
+// add_vp_rust_src
 // add_vv_rust_src
 binary::binary_rust_src!(Add, +);
 // -------------------------------------------------------------------------
-// add_cv_forward_0
-// add_vc_forward_0
+// add_pv_forward_0
+// add_vp_forward_0
 // add_vv_forward_0
 binary::eval_binary_forward_0!(Add, +);
 // ---------------------------------------------------------------------------
 // forward_1
 // ---------------------------------------------------------------------------
 //
-// add_cv_forward_1
-/// first order forward for constant * variable; see [ForwardOne]
-fn add_cv_forward_1 <V, E>(
+// add_pv_forward_1
+/// first order forward for parameter * variable; see [ForwardOne]
+fn add_pv_forward_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     _con       :   &Vec<V>     ,
@@ -66,9 +66,9 @@ where
     var_one[ res ] = var_one[rhs].clone();
 }
 //
-// add_vc_forward_1
-/// first order forward for variable * constant; see [ForwardOne]
-fn add_vc_forward_1 <V, E>(
+// add_vp_forward_1
+/// first order forward for variable * parameter; see [ForwardOne]
+fn add_vp_forward_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     _con       :   &Vec<V>     ,
@@ -104,9 +104,9 @@ where
 // reverse_1
 // ---------------------------------------------------------------------------
 //
-// add_cv_reverse_1
-/// first order reverse for constant * variable; see [ReverseOne]
-fn add_cv_reverse_1 <V, E>(
+// add_pv_reverse_1
+/// first order reverse for parameter * variable; see [ReverseOne]
+fn add_pv_reverse_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     _con       :   &Vec<V>     ,
@@ -124,9 +124,9 @@ where
     var_one[rhs] = sum;
 }
 //
-// add_vc_reverse_1
-/// first order reverse for variable * constant; see [ReverseOne]
-fn add_vc_reverse_1 <V, E>(
+// add_vp_reverse_1
+/// first order reverse for variable * parameter; see [ReverseOne]
+fn add_vp_reverse_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     _con       :   &Vec<V>     ,
@@ -173,34 +173,34 @@ where
 ///
 /// * op_info_vec :
 /// The map from [op::id](crate::op::id) to operator information.
-/// The the map results for ADD_CV_OP, ADD_VC_OP, and ADD_VV_OP are set.
+/// The the map results for ADD_PV_OP, ADD_VP_OP, and ADD_VV_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
     for<'a> &'a V : std::ops::Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
     for<'a> V     : Clone + ThisThreadTape + std::ops::AddAssign<&'a V>,
 {
-    op_info_vec[ADD_CV_OP as usize] = OpInfo{
+    op_info_vec[ADD_PV_OP as usize] = OpInfo{
         name              : "add_cv",
-        forward_0_value   : add_cv_forward_0::<V, V>,
-        forward_0_ad      : add_cv_forward_0::<V, AD<V> >,
-        forward_1_value   : add_cv_forward_1::<V, V>,
-        forward_1_ad      : add_cv_forward_1::<V, AD<V> >,
-        reverse_1_value   : add_cv_reverse_1::<V, V>,
-        reverse_1_ad      : add_cv_reverse_1::<V, AD<V> >,
-        arg_var_index     : binary::binary_cv_arg_var_index,
-        rust_src          : add_cv_rust_src,
+        forward_0_value   : add_pv_forward_0::<V, V>,
+        forward_0_ad      : add_pv_forward_0::<V, AD<V> >,
+        forward_1_value   : add_pv_forward_1::<V, V>,
+        forward_1_ad      : add_pv_forward_1::<V, AD<V> >,
+        reverse_1_value   : add_pv_reverse_1::<V, V>,
+        reverse_1_ad      : add_pv_reverse_1::<V, AD<V> >,
+        arg_var_index     : binary::binary_pv_arg_var_index,
+        rust_src          : add_pv_rust_src,
     };
-    op_info_vec[ADD_VC_OP as usize] = OpInfo{
+    op_info_vec[ADD_VP_OP as usize] = OpInfo{
         name              : "add_vc",
-        forward_0_value   : add_vc_forward_0::<V, V>,
-        forward_0_ad      : add_vc_forward_0::<V, AD<V> >,
-        forward_1_value   : add_vc_forward_1::<V, V>,
-        forward_1_ad      : add_vc_forward_1::<V, AD<V> >,
-        reverse_1_value   : add_vc_reverse_1::<V, V>,
-        reverse_1_ad      : add_vc_reverse_1::<V, AD<V> >,
-        arg_var_index     : binary::binary_vc_arg_var_index,
-        rust_src          : add_vc_rust_src,
+        forward_0_value   : add_vp_forward_0::<V, V>,
+        forward_0_ad      : add_vp_forward_0::<V, AD<V> >,
+        forward_1_value   : add_vp_forward_1::<V, V>,
+        forward_1_ad      : add_vp_forward_1::<V, AD<V> >,
+        reverse_1_value   : add_vp_reverse_1::<V, V>,
+        reverse_1_ad      : add_vp_reverse_1::<V, AD<V> >,
+        arg_var_index     : binary::binary_vp_arg_var_index,
+        rust_src          : add_vp_rust_src,
     };
     op_info_vec[ADD_VV_OP as usize] = OpInfo{
         name              : "add_vv",

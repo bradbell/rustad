@@ -138,7 +138,7 @@ pub type AtomReverseOneValue<V> = fn(
 /// * is_var_domain :
 /// This has the same length as *adomain* in the corresponding [call_atom].
 /// The j-th component is true (false) if the j-th component
-/// of *adomain* is a variable (constant).
+/// of *adomain* is a variable (parameter).
 ///
 /// * call_info :
 /// is the *call_info* value used when the atomic function was called.
@@ -384,20 +384,21 @@ where
     // is_var_res
     let is_var_res = forward_depend(&is_var_arg, call_info, trace);
     //
-    // arange, n_var_res
-    let mut n_var_res = 0;
+    // arange, n_dep_res
+    let n_var = tape.var.n_dom + tape.var.n_dep;
+    let mut n_dep_res = 0;
     for i in 0 .. call_n_res {
         if is_var_res[i] {
             arange[i].tape_id   = tape.tape_id;
-            arange[i].var_index = tape.n_var + n_var_res;
-            n_var_res += 1;
+            arange[i].index     = n_var + n_dep_res;
+            n_dep_res += 1;
         }
     }
-    if n_var_res > 0 {
+    if n_dep_res > 0 {
         //
-        // tape.id_all, tape.op2arg
-        tape.id_all.push( CALL_OP );
-        tape.op2arg.push( tape.arg_all.len() as IndexT );
+        // tape.var.id_seq, tape.arg_seq
+        tape.var.id_seq.push( CALL_OP );
+        tape.arg_seq.push( tape.arg_all.len() as IndexT );
         //
         // tape.arg_all, tape.con_all
         tape.arg_all.push( atom_id );                        // arg[0]
@@ -409,7 +410,7 @@ where
         // tape.arg_all
         for j in 0 .. call_n_arg {
             let index = if is_var_arg[j] {
-                adomain[j].var_index
+                adomain[j].index
             } else {
                 let con_index = tape.con_all.len();
                 tape.con_all.push( adomain[j].value.clone() );
@@ -427,13 +428,13 @@ where
             tape.flag_all.push( is_var_res[i] );   // flag[ arg[4] + n_res + i]
         }
         //
-        // tape.n_var
-        tape.n_var += n_var_res;
+        // tape.var.n_dep
+        tape.var.n_dep += n_dep_res;
         //
-        // tape.id_all, tape.op2arg
-        for _i in 0 .. (n_var_res - 1) {
-            tape.id_all.push( CALL_RES_OP );
-            tape.op2arg.push( tape.arg_all.len() as IndexT );
+        // tape.var.id_seq, tape.arg_seq
+        for _i in 0 .. (n_dep_res - 1) {
+            tape.var.id_seq.push( CALL_RES_OP );
+            tape.arg_seq.push( tape.arg_all.len() as IndexT );
         }
     }
     arange

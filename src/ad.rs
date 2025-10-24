@@ -25,35 +25,47 @@ use crate::op::id;
 pub fn doc_generic_v() {}
 //
 // AD
-//
 /// AD acts like V but in addition can record a function evaluation.
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * variable :
 /// An AD object is a variable if it one of the domain variables
-/// or its value depends on the value of the domain variables.
+/// or its value depends on the value of a domain variable.
 ///
-/// * constant :
-/// If an AD object is not a variable it is referred to as a constant.
+/// * dynamic parameter :
+/// If an AD object is not a variable,
+/// it is a dynamic parameter if it one of the domain parameters
+/// or its value depends on the value of a domain parameter.
+///
+/// * constant parameter :
+/// If an AD object is not a variable or dynamic parameter
+/// it is a constant parameter.
 ///
 #[derive(Clone, Debug)]
 pub struct AD<V> {
     //
     // tape_id
     ///
-    /// An AD object is a variable if the following two conditions hold:
-    /// 1. This threads tape is currently recording.
-    /// 2. This threads tape and the AD object have the same *tape_id* .
+    /// This is the tape_id that the value of index below corresponds to.
+    /// 1.  The tape_id zero never gets recorded, so the value of index
+    ///     does not matter for that case.
+    /// 2.  This is a constant parameter if its tape_id is different
+    ///     from the tape_id for this thread's tape.
     pub(crate) tape_id   : usize,
     //
-    // var_index
-    /// If this AD object is a variable, *var_index* is its index in the tape.
-    pub(crate) var_index : usize,
+    // index
+    /// is the variable or parameter index for this object.
+    pub(crate) index : usize,
+    //
+    // is_var
+    /// If is_var is true (false), index is a variable
+    /// (dynamic parameter) index.
+    pub is_var : bool,
     //
     // value
-    /// is the value of this AD variable or constant.
-    pub(crate) value     : V,
+    /// is the value of this AD variable or paraemter.
+    pub(crate) value : V,
 }
 //
 // new
@@ -63,14 +75,18 @@ impl<V> AD<V> {
     ///
     /// * new_tape_id : is the [AD::tape_id] for the new object.
     ///
-    /// * new_var_index : is the [AD::var_index] for the new object.
+    /// * new_index : is the [AD::index] for the new object.
     ///
-    /// * new_value : is the [AD::value}} for the new object.
+    /// *is_var : is the [AD::is_var] for the new object.
+    ///
+    /// * new_value : is the [AD::value] for the new object.
     pub(crate) fn new(
-        new_tape_id: usize, new_var_index: usize, new_value: V )-> Self {
+        new_tape_id: usize, new_index: usize, new_is_var : bool, new_value: V
+    )-> Self {
         Self {
             tape_id   : new_tape_id,
-            var_index : new_var_index,
+            index     : new_index,
+            is_var    : new_is_var,
             value     : new_value,
         }
     }
@@ -200,38 +216,40 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         tape: &mut Tape<V> ,
         lhs:       &AD<V>  ,
         rhs:       &AD<V>  ,
-    ) -> (usize, usize)
+    ) -> (usize, usize, bool)
     where
         V : Clone ,
     {
         let mut new_tape_id   = 0;
-        let mut new_var_index = 0;
+        let mut new_index     = 0;
+        let mut new_is_var    = false;
         if tape.recording {
             let var_lhs    = lhs.tape_id == tape.tape_id;
             let var_rhs    = rhs.tape_id == tape.tape_id;
             if var_lhs || var_rhs {
-                new_tape_id   = tape.tape_id;
-                new_var_index = tape.n_var;
-                tape.n_var   += 1;
-                tape.op2arg.push( tape.arg_all.len() as IndexT );
+                new_is_var      = true;
+                new_tape_id     = tape.tape_id;
+                new_index       = tape.var.n_dep + tape.var.n_dom;
+                tape.var.n_dep += 1;
+                tape.arg_seq.push( tape.arg_all.len() as IndexT );
                 if var_lhs && var_rhs {
-                    tape.id_all.push( id::[< $Name:upper _VV_OP >] );
-                    tape.arg_all.push( lhs.var_index as IndexT );
-                    tape.arg_all.push( rhs.var_index as IndexT );
+                    tape.var.id_seq.push( id::[< $Name:upper _VV_OP >] );
+                    tape.arg_all.push( lhs.index as IndexT );
+                    tape.arg_all.push( rhs.index as IndexT );
                 } else if var_lhs {
-                    tape.id_all.push( id::[< $Name:upper _VC_OP >] );
-                    tape.arg_all.push( lhs.var_index as IndexT );
+                    tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
+                    tape.arg_all.push( lhs.index as IndexT );
                     tape.arg_all.push( tape.con_all.len() as IndexT );
                     tape.con_all.push( rhs.value.clone() );
                 } else {
-                    tape.id_all.push( id::[< $Name:upper _CV_OP >] );
+                    tape.var.id_seq.push( id::[< $Name:upper _PV_OP >] );
                     tape.arg_all.push( tape.con_all.len() as IndexT );
                     tape.con_all.push( lhs.value.clone() );
-                    tape.arg_all.push( rhs.var_index as IndexT );
+                    tape.arg_all.push( rhs.index as IndexT );
                 }
             }
         }
-        ( new_tape_id, new_var_index )
+        (new_tape_id, new_index, new_is_var)
     }
     //
     #[doc = concat!(
@@ -253,14 +271,14 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             let local_key : &LocalKey< RefCell< Tape<V> > > =
                 ThisThreadTape::get();
             //
-            // new_tape_id, new_var_index
-            let (new_tape_id, new_var_index) =
+            // new_tape_id, new_index, new_is_var
+            let (new_tape_id, new_index, new_is_var) =
                 local_key.with_borrow_mut( |tape|
                     [< record_ $Name:lower _aa >]::<V> ( tape, &self, &rhs )
             );
             //
             // result
-            AD::new(new_tape_id, new_var_index, new_value)
+            AD::new(new_tape_id, new_index, new_is_var, new_value)
         }
     }
     // -----------------------------------------------------------------------
@@ -268,26 +286,28 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         tape: &mut Tape<V> ,
         lhs:       &AD<V>  ,
         rhs:       &V      ,
-    ) -> (usize, usize)
+    ) -> (usize, usize, bool)
     where
         V : Clone ,
     {
         let mut new_tape_id   = 0;
-        let mut new_var_index = 0;
+        let mut new_index     = 0;
+        let mut new_is_var    = false;
         if tape.recording {
             let var_lhs    = lhs.tape_id == tape.tape_id;
             if var_lhs {
-                new_tape_id   = tape.tape_id;
-                new_var_index = tape.n_var;
-                tape.n_var   += 1;
-                tape.op2arg.push( tape.arg_all.len() as IndexT );
-                tape.id_all.push( id::[< $Name:upper _VC_OP >] );
-                tape.arg_all.push( lhs.var_index as IndexT );
+                new_is_var      = true;
+                new_tape_id     = tape.tape_id;
+                new_index       = tape.var.n_dep + tape.var.n_dom;
+                tape.var.n_dep += 1;
+                tape.arg_seq.push( tape.arg_all.len() as IndexT );
+                tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
+                tape.arg_all.push( lhs.index as IndexT );
                 tape.arg_all.push( tape.con_all.len() as IndexT );
                 tape.con_all.push( rhs.clone() );
             }
         }
-        (new_tape_id, new_var_index)
+        (new_tape_id, new_index, new_is_var)
     }
     //
     #[doc = concat!(
@@ -309,14 +329,14 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             let local_key : &LocalKey< RefCell< Tape<V> > > =
                 ThisThreadTape::get();
             //
-            // new_tape_id, new_var_index
-            let (new_tape_id, new_var_index) =
+            // new_tape_id, new_index, new_is_var
+            let (new_tape_id, new_index, new_is_var) =
                 local_key.with_borrow_mut( |tape|
                     [< record_ $Name:lower _av >]::<V> ( tape, &self, &rhs )
             );
             //
             // result
-            AD::new(new_tape_id, new_var_index, new_value)
+            AD::new(new_tape_id, new_index, new_is_var, new_value)
         }
     }
 } } }
@@ -391,35 +411,35 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
          tape: &mut Tape<V> ,
          lhs:  &mut AD<V>   ,
          rhs:  &    AD<V>   )
-     where
-        V : Clone,
-     {
-         if tape.recording {
-             let var_lhs    = lhs.tape_id == tape.tape_id;
-             let var_rhs    = rhs.tape_id == tape.tape_id;
-             if var_lhs || var_rhs {
-                 tape.op2arg.push( tape.arg_all.len() as IndexT );
-                 if var_lhs && var_rhs {
-                     tape.id_all.push( id::[< $Name:upper _VV_OP >] );
-                     tape.arg_all.push( lhs.var_index as IndexT);
-                     tape.arg_all.push( rhs.var_index as IndexT);
-                 } else if var_lhs {
-                     tape.id_all.push( id::[< $Name:upper _VC_OP >] );
-                     tape.arg_all.push( lhs.var_index as IndexT);
-                     tape.arg_all.push( tape.con_all.len() as IndexT );
-                     tape.con_all.push( rhs.value.clone() );
-                 } else {
-                     tape.id_all.push( id::[< $Name:upper _CV_OP >] );
-                     tape.arg_all.push( tape.con_all.len() as IndexT );
-                     tape.con_all.push( lhs.value.clone() );
-                     tape.arg_all.push( rhs.var_index as IndexT);
-                 }
-                 lhs.tape_id   = tape.tape_id;
-                 lhs.var_index = tape.n_var;
-                 tape.n_var   += 1;
-             }
-         }
-     }
+    where
+       V : Clone,
+    {
+        if tape.recording {
+            let var_lhs    = lhs.tape_id == tape.tape_id;
+            let var_rhs    = rhs.tape_id == tape.tape_id;
+            if var_lhs || var_rhs {
+                tape.arg_seq.push( tape.arg_all.len() as IndexT );
+                if var_lhs && var_rhs {
+                    tape.var.id_seq.push( id::[< $Name:upper _VV_OP >] );
+                    tape.arg_all.push( lhs.index as IndexT);
+                    tape.arg_all.push( rhs.index as IndexT);
+                } else if var_lhs {
+                    tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
+                    tape.arg_all.push( lhs.index as IndexT);
+                    tape.arg_all.push( tape.con_all.len() as IndexT );
+                    tape.con_all.push( rhs.value.clone() );
+                } else {
+                    tape.var.id_seq.push( id::[< $Name:upper _PV_OP >] );
+                    tape.arg_all.push( tape.con_all.len() as IndexT );
+                    tape.con_all.push( lhs.value.clone() );
+                    tape.arg_all.push( rhs.index as IndexT);
+                }
+                lhs.tape_id     = tape.tape_id;
+                lhs.index       = tape.var.n_dep + tape.var.n_dom;
+                tape.var.n_dep += 1;
+            }
+        }
+    }
     //
     #[doc = concat!(
         "`AD<V>` ", stringify!($Op), " & `AD<V>`",
@@ -438,7 +458,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             let local_key : &LocalKey< RefCell< Tape<V> > > =
                 ThisThreadTape::get();
             //
-            // tape, self.tape_id, self.var_index
+            // tape, self.tape_id, self.index
             local_key.with_borrow_mut( |tape|
                 [< record_ $Name:lower _assign_aa >]::<V> ( tape, self, rhs )
             );
@@ -459,14 +479,14 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
          if tape.recording {
              let var_lhs    = lhs.tape_id == tape.tape_id;
              if var_lhs {
-                 tape.op2arg.push( tape.arg_all.len() as IndexT );
-                 tape.id_all.push( id::[< $Name:upper _VC_OP >] );
-                 tape.arg_all.push( lhs.var_index as IndexT);
+                 tape.arg_seq.push( tape.arg_all.len() as IndexT );
+                 tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
+                 tape.arg_all.push( lhs.index as IndexT);
                  tape.arg_all.push( tape.con_all.len() as IndexT );
                  tape.con_all.push( rhs.clone() );
                  //
-                 lhs.var_index = tape.n_var;
-                 tape.n_var   += 1;
+                 lhs.index       = tape.var.n_dep + tape.var.n_dom;
+                 tape.var.n_dep += 1;
              }
          }
      }
@@ -486,7 +506,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             let local_key : &LocalKey< RefCell< Tape<V> > > =
                 ThisThreadTape::get();
             //
-            // tape, self.tape_id, self.var_index
+            // tape, self.tape_id, self.index
             local_key.with_borrow_mut( |tape|
                 [< record_ $Name:lower _assign_av >]::<V> ( tape, self, rhs )
             );
@@ -523,26 +543,28 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
         tape: &mut Tape<V> ,
         lhs:       &V      ,
         rhs:       &AD<V>  ,
-    ) -> (usize, usize)
+    ) -> (usize, usize, bool)
     where
         V : Clone ,
     {
         let mut new_tape_id   = 0;
-        let mut new_var_index = 0;
+        let mut new_index     = 0;
+        let mut new_is_var    = false;
         if tape.recording {
             let var_rhs    = rhs.tape_id == tape.tape_id;
             if var_rhs {
-                new_tape_id   = tape.tape_id;
-                new_var_index = tape.n_var;
-                tape.n_var   += 1;
-                tape.op2arg.push( tape.arg_all.len() as IndexT );
-                tape.id_all.push( id::[< $Name:upper _CV_OP >] );
+                new_is_var      = true;
+                new_tape_id     = tape.tape_id;
+                new_index       = tape.var.n_dep + tape.var.n_dom;
+                tape.var.n_dep += 1;
+                tape.arg_seq.push( tape.arg_all.len() as IndexT );
+                tape.var.id_seq.push( id::[< $Name:upper _PV_OP >] );
                 tape.arg_all.push( tape.con_all.len() as IndexT );
                 tape.con_all.push( lhs.clone() );
-                tape.arg_all.push( rhs.var_index as IndexT );
+                tape.arg_all.push( rhs.index as IndexT );
             }
         }
-        (new_tape_id, new_var_index)
+        (new_tape_id, new_index, new_is_var)
     }
 } } }
 record_value_op_ad!(Add, +=);
@@ -605,15 +627,15 @@ macro_rules! impl_value_op_ad{
                     RefCell< crate::tape::Tape<$V> >
                 > = crate::tape::sealed::ThisThreadTape::get();
                 //
-                // new_tape_id, new_var_index
-                let (new_tape_id, new_var_index) = local_key.with_borrow_mut(
-                    |tape|
-                    crate::ad::[< record_value_ $Name:lower _ad >]::<$V>
+                // new_tape_id, new_index
+                let (new_tape_id, new_index, new_is_var) =
+                    local_key.with_borrow_mut( |tape|
+                        crate::ad::[< record_value_ $Name:lower _ad >]::<$V>
                             ( tape, &self, &rhs )
-                );
+                    );
                 //
                 // result
-                AD::new(new_tape_id, new_var_index, new_value)
+                AD::new(new_tape_id, new_index, new_is_var, new_value)
             }
         }
     } }
@@ -621,8 +643,8 @@ macro_rules! impl_value_op_ad{
 pub(crate) use impl_value_op_ad;
 // ---------------------------------------------------------------------------
 // ad_from_value
-/// Convert a value to an AD object with no variable information;
-/// i.e., a constant
+/// Convert a value to an AD object with no function information;
+/// i.e., a constant parameter.
 ///
 /// # Example
 /// ```
@@ -634,13 +656,14 @@ pub(crate) use impl_value_op_ad;
 /// ```
 pub fn ad_from_value<V>(value : V) -> AD<V> {
     let tape_id   = 0;
-    let var_index = 0;
-    AD::new(tape_id, var_index, value)
+    let index     = 0;
+    let is_var    = false;
+    AD::new(tape_id, index, is_var, value)
 }
 // ---------------------------------------------------------------------------
 // ad_from_vector
-/// Convert a vector to an vector of AD objects with no variable information;
-/// i.e., a vector of constants.
+/// Convert a vector to an vector of AD objects with no function information;
+/// i.e., a vector of constant parameters.
 ///
 /// **See Also** : example in [ad_from_value]
 ///
@@ -656,9 +679,10 @@ pub fn ad_from_value<V>(value : V) -> AD<V> {
 pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
     assert_ne!( vec.len() , 0 );
     let tape_id   = 0;
-    let var_index = 0;
+    let index     = 0;
+    let is_var    = false;
     let avec      = vec.into_iter().map(
-        |value| AD::new(tape_id, var_index, value)
+        |value| AD::new(tape_id, index, is_var, value)
     ).collect();
     avec
 }
@@ -703,8 +727,8 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
 }
 // -------------------------------------------------------------------------
 // impl_ad_from_f32
-/// Convert an f32 value to an AD object with no variable information;
-/// i.e., constant.
+/// Convert an f32 value to an AD object with no function information;
+/// i.e., constant parameter.
 ///
 /// **See Also** : example in [ad_from_value], [ad_from_vector]
 ///
@@ -731,17 +755,18 @@ macro_rules! impl_ad_from_f32{ ($V:ty) => {
     impl From<f32> for crate::AD<$V> {
         fn from( f32_value : f32 ) -> crate::AD<$V> {
             let tape_id         = 0;
-            let var_index       = 0;
+            let index           = 0;
+            let is_var          = false;
             let value      : $V = f32_value.into();
-            crate::AD::new(tape_id, var_index, value)
+            crate::AD::new(tape_id, index, is_var, value)
         }
     }
 } }
 pub(crate) use impl_ad_from_f32;
 // -------------------------------------------------------------------------
 // impl_ad_from_f64
-/// Convert an f64 value to an AD object with no variable information;
-/// i.e., constant.
+/// Convert an f64 value to an AD object with no function information;
+/// i.e., constant parameter.
 ///
 /// Only AD objects with f64 precision are supported; e.g.,
 /// `AD<f32>` is not supported.
@@ -771,9 +796,10 @@ macro_rules! impl_ad_from_f64{ ($V:ty) => {
     impl From<f64> for crate::AD<$V> {
         fn from( f64_value : f64 ) -> crate::AD<$V> {
             let tape_id         = 0;
-            let var_index       = 0;
+            let index           = 0;
+            let is_var          = false;
             let value      : $V = f64_value.into();
-            crate::AD::new(tape_id, var_index, value)
+            crate::AD::new(tape_id, index, is_var, value)
         }
     }
 } }
