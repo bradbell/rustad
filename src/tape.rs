@@ -48,6 +48,13 @@ pub(crate) struct OpSequence {
     /// the arguments for the corresponding operator are a slice of arg_all
     /// starting at arg_seq\[index\] and ending with arg_seq\[index + 1\] .
     pub(crate) arg_all : Vec<IndexT>,
+    //
+    // flag
+    /// is a vector containing boolean flags.
+    /// If an operator has boolean flags, one of its arguments in
+    /// arg_all is the index in flag of its first
+    /// boolean flag.
+    pub(crate) flag : Vec<bool>,
 }
 // VarTape::new
 impl OpSequence {
@@ -61,6 +68,7 @@ impl OpSequence {
             id_seq    : Vec::new(),
             arg_seq   : Vec::new(),
             arg_all   : Vec::new() ,
+            flag      : Vec::new() ,
         }
     }
 }
@@ -94,11 +102,6 @@ pub struct Tape<V> {
     // con_all
     /// is the vector of constant parameters used by the operation sequence.
     pub(crate) con_all        : Vec<V>,
-    //
-    // flag_all
-    /// is a vector containing boolean flags that are part of some
-    /// operator definitions.
-    pub(crate) flag_all       : Vec<bool>,
 }
 // ---------------------------------------------------------------------------
 // GTape::new
@@ -113,7 +116,6 @@ impl<V> Tape<V> {
             recording     : false,
             tape_id       : 0,
             con_all       : Vec::new() ,
-            flag_all      : Vec::new() ,
         }
     }
 }
@@ -278,8 +280,10 @@ where
         assert_eq!( tape.dyp.arg_all.len(),  0 );
         assert_eq!( tape.var.arg_all.len(),  0 );
         //
+        assert_eq!( tape.dyp.flag.len(),     0 );
+        assert_eq!( tape.var.flag.len(),     0 );
+        //
         assert_eq!( tape.con_all.len(),      0 );
-        assert_eq!( tape.flag_all.len(),     0 );
         //
         tape.tape_id     = tape_id;
         tape.recording   = true;
@@ -412,8 +416,8 @@ where
         std::mem::swap( &mut ad_fn.id_all,        &mut tape.var.id_seq );
         std::mem::swap( &mut ad_fn.op2arg,        &mut tape.var.arg_seq );
         std::mem::swap( &mut ad_fn.arg_all,       &mut tape.var.arg_all );
+        std::mem::swap( &mut ad_fn.flag_all,      &mut tape.var.flag );
         std::mem::swap( &mut ad_fn.con_all,       &mut tape.con_all );
-        std::mem::swap( &mut ad_fn.flag_all,      &mut tape.flag_all );
         //
         // tape.dyp
         tape.dyp = OpSequence::new();

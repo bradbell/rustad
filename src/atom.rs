@@ -405,7 +405,7 @@ where
         tape.var.arg_all.push( call_info );                      // arg[1]
         tape.var.arg_all.push( call_n_arg as IndexT );           // arg[2]
         tape.var.arg_all.push( call_n_res as IndexT );           // arg[3]
-        tape.var.arg_all.push( tape.flag_all.len() as IndexT );  // arg[4]
+        tape.var.arg_all.push( tape.var.flag.len() as IndexT );  // arg[4]
         //
         // tape.var.arg_all
         for j in 0 .. call_n_arg {
@@ -419,13 +419,13 @@ where
             tape.var.arg_all.push( index as IndexT );            // arg[5+j]
         }
         //
-        // tape.flag_all
-        tape.flag_all.push( trace );               // flag[ arg[4] ]
+        // tape.var.flag
+        tape.var.flag.push( trace );               // flag[ arg[4] ]
         for j in 0 .. call_n_arg {
-            tape.flag_all.push( is_var_arg[j] );   // flag[ arg[4] + j + 1]
+            tape.var.flag.push( is_var_arg[j] );   // flag[ arg[4] + j + 1]
         }
         for i in 0 .. call_n_res {
-            tape.flag_all.push( is_var_res[i] );   // flag[ arg[4] + n_res + i]
+            tape.var.flag.push( is_var_res[i] );   // flag[ arg[4] + n_res + i]
         }
         //
         // tape.var.n_dep
