@@ -37,6 +37,11 @@ pub(crate) struct OpSequence {
     /// For each index in the operation sequence, id_seq\[index\]
     /// is the corresponding operator id.
     pub(crate) id_seq : Vec<u8>,
+    //
+    // arg_seq
+    /// For each index in the operation sequence, arg_seq\[op_index\]
+    /// is the index in arg_all of the first argument for the operator.
+    pub(crate) arg_seq        : Vec<IndexT>,
 }
 // VarTape::new
 impl OpSequence {
@@ -48,6 +53,7 @@ impl OpSequence {
             n_dom     : 0,
             n_dep     : 0,
             id_seq    : Vec::new(),
+            arg_seq   : Vec::new(),
         }
     }
 }
@@ -78,11 +84,6 @@ pub struct Tape<V> {
     /// a different tape_id is chosen for each recording.
     pub(crate) tape_id        : usize,
     //
-    // arg_seq
-    /// For each op_index in the operation sequence, arg_seq\[op_index\]
-    /// is the index in arg_all of the first argument for the operator.
-    pub(crate) arg_seq        : Vec<IndexT>,
-    //
     // arg_all
     /// For each op_index in the operation sequence,
     /// the arguments for the operator are a slice of arg_all
@@ -110,7 +111,6 @@ impl<V> Tape<V> {
             var           : OpSequence::new(),
             recording     : false,
             tape_id       : 0,
-            arg_seq       : Vec::new() ,
             arg_all       : Vec::new() ,
             con_all       : Vec::new() ,
             flag_all      : Vec::new() ,
@@ -272,7 +272,9 @@ where
         assert_eq!( tape.dyp.id_seq.len(),  0 );
         assert_eq!( tape.var.id_seq.len(),  0 );
         //
-        assert_eq!( tape.arg_seq.len(),      0 );
+        assert_eq!( tape.dyp.arg_seq.len(),  0 );
+        assert_eq!( tape.var.arg_seq.len(),  0 );
+        //
         assert_eq!( tape.arg_all.len(),      0 );
         assert_eq!( tape.con_all.len(),      0 );
         assert_eq!( tape.flag_all.len(),     0 );
@@ -386,12 +388,15 @@ where
         }
         //
         // more checks
-        assert_eq!( tape.arg_seq.len()  , tape.var.id_seq.len() );
-        assert_eq!( tape.var.n_dep ,      tape.var.id_seq.len());
+        assert_eq!( tape.dyp.arg_seq.len()  , tape.dyp.id_seq.len() );
+        assert_eq!( tape.var.arg_seq.len()  , tape.var.id_seq.len() );
         //
-        // tape.arg_seq
+        assert_eq!( tape.dyp.n_dep , tape.dyp.id_seq.len());
+        assert_eq!( tape.var.n_dep , tape.var.id_seq.len());
+        //
+        // tape.var.arg_seq
         // end marker for arguments to the last operation
-        tape.arg_seq.push( tape.arg_all.len() as IndexT );
+        tape.var.arg_seq.push( tape.arg_all.len() as IndexT );
         //
         // n_var
         let mut n_var = tape.var.n_dom + tape.var.n_dep;
@@ -400,7 +405,7 @@ where
         std::mem::swap( &mut ad_fn.n_domain,      &mut tape.var.n_dom );
         std::mem::swap( &mut ad_fn.n_var,         &mut n_var );
         std::mem::swap( &mut ad_fn.id_all,        &mut tape.var.id_seq );
-        std::mem::swap( &mut ad_fn.op2arg,        &mut tape.arg_seq );
+        std::mem::swap( &mut ad_fn.op2arg,        &mut tape.var.arg_seq );
         std::mem::swap( &mut ad_fn.arg_all,       &mut tape.arg_all );
         std::mem::swap( &mut ad_fn.con_all,       &mut tape.con_all );
         std::mem::swap( &mut ad_fn.flag_all,      &mut tape.flag_all );
