@@ -398,16 +398,16 @@ where
         //
         // tape.var.id_seq, tape.var.arg_seq
         tape.var.id_seq.push( CALL_OP );
-        tape.var.arg_seq.push( tape.arg_all.len() as IndexT );
+        tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
         //
-        // tape.arg_all, tape.con_all
-        tape.arg_all.push( atom_id );                        // arg[0]
-        tape.arg_all.push( call_info );                      // arg[1]
-        tape.arg_all.push( call_n_arg as IndexT );           // arg[2]
-        tape.arg_all.push( call_n_res as IndexT );           // arg[3]
-        tape.arg_all.push( tape.flag_all.len() as IndexT );  // arg[4]
+        // tape.var.arg_all, tape.con_all
+        tape.var.arg_all.push( atom_id );                        // arg[0]
+        tape.var.arg_all.push( call_info );                      // arg[1]
+        tape.var.arg_all.push( call_n_arg as IndexT );           // arg[2]
+        tape.var.arg_all.push( call_n_res as IndexT );           // arg[3]
+        tape.var.arg_all.push( tape.flag_all.len() as IndexT );  // arg[4]
         //
-        // tape.arg_all
+        // tape.var.arg_all
         for j in 0 .. call_n_arg {
             let index = if is_var_arg[j] {
                 adomain[j].index
@@ -416,7 +416,7 @@ where
                 tape.con_all.push( adomain[j].value.clone() );
                 con_index
             };
-            tape.arg_all.push( index as IndexT );            // arg[5+j]
+            tape.var.arg_all.push( index as IndexT );            // arg[5+j]
         }
         //
         // tape.flag_all
@@ -434,7 +434,7 @@ where
         // tape.var.id_seq, tape.var.arg_seq
         for _i in 0 .. (n_dep_res - 1) {
             tape.var.id_seq.push( CALL_RES_OP );
-            tape.var.arg_seq.push( tape.arg_all.len() as IndexT );
+            tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
         }
     }
     arange

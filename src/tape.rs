@@ -41,7 +41,13 @@ pub(crate) struct OpSequence {
     // arg_seq
     /// For each index in the operation sequence, arg_seq\[op_index\]
     /// is the index in arg_all of the first argument for the operator.
-    pub(crate) arg_seq        : Vec<IndexT>,
+    pub(crate) arg_seq : Vec<IndexT>,
+    //
+    // arg_all
+    /// For each index in the operation sequence,
+    /// the arguments for the corresponding operator are a slice of arg_all
+    /// starting at arg_seq\[index\] and ending with arg_seq\[index + 1\] .
+    pub(crate) arg_all : Vec<IndexT>,
 }
 // VarTape::new
 impl OpSequence {
@@ -54,6 +60,7 @@ impl OpSequence {
             n_dep     : 0,
             id_seq    : Vec::new(),
             arg_seq   : Vec::new(),
+            arg_all   : Vec::new() ,
         }
     }
 }
@@ -84,12 +91,6 @@ pub struct Tape<V> {
     /// a different tape_id is chosen for each recording.
     pub(crate) tape_id        : usize,
     //
-    // arg_all
-    /// For each op_index in the operation sequence,
-    /// the arguments for the operator are a slice of arg_all
-    /// starting at arg_seq\[index\] .
-    pub(crate) arg_all        : Vec<IndexT>,
-    //
     // con_all
     /// is the vector of constant parameters used by the operation sequence.
     pub(crate) con_all        : Vec<V>,
@@ -111,7 +112,6 @@ impl<V> Tape<V> {
             var           : OpSequence::new(),
             recording     : false,
             tape_id       : 0,
-            arg_all       : Vec::new() ,
             con_all       : Vec::new() ,
             flag_all      : Vec::new() ,
         }
@@ -275,7 +275,9 @@ where
         assert_eq!( tape.dyp.arg_seq.len(),  0 );
         assert_eq!( tape.var.arg_seq.len(),  0 );
         //
-        assert_eq!( tape.arg_all.len(),      0 );
+        assert_eq!( tape.dyp.arg_all.len(),  0 );
+        assert_eq!( tape.var.arg_all.len(),  0 );
+        //
         assert_eq!( tape.con_all.len(),      0 );
         assert_eq!( tape.flag_all.len(),     0 );
         //
@@ -330,11 +332,11 @@ where
 /// It can be used to compute the values for the function and its derivative.
 ///
 /// * Assumptions :
-/// The following assumptions are checked for the tape for this thread:
+/// The following values are checked ensure they are <= IndexT::Max
 /// ```text
-///     1. tape.arg_all.len()                              <= [IndexT]::Max
-///     2. tape.tape_id                                    <= IndexT::Max
-///     3. n_con + tape.dyn.n_dom + tape.dyn.n_dep + arange.len() <= IndexT::Max
+///     tape.tape_id,
+///     tape.dyp.arg_all.len(), tape.var.arg_all.len()
+///     tape.con_all.len() + tape.dyp.n_dom + tape.dyp.n_dep + arange.len()
 /// ```
 /// # Example
 /// ```
@@ -370,20 +372,22 @@ where
         tape.recording = false;
         //
         // check documented assumptions
-        match IndexT::try_from( tape.arg_all.len() ) {
-            Err(_) => panic!( "tape.arg_all.len() > IndexT::MAX" ),
-            Ok(_)  => (),
-        }
         match IndexT::try_from( tape.tape_id ) {
             Err(_) => panic!( "tape.tape_id > IndexT::MAX" ),
+            Ok(_)  => (),
+        }
+        match IndexT::try_from( tape.dyp.arg_all.len() ) {
+            Err(_) => panic!( "tape.dyp.arg_all.len() > IndexT::MAX" ),
+            Ok(_)  => (),
+        }
+        match IndexT::try_from( tape.var.arg_all.len() ) {
+            Err(_) => panic!( "tape.var.arg_all.len() > IndexT::MAX" ),
             Ok(_)  => (),
         }
         let par_len = tape.con_all.len()
             + tape.dyp.n_dom + tape.dyp.n_dep + arange.len();
         match IndexT::try_from( par_len ) {
-            Err(_) => panic!(
-            "n_con + dyp.n_dom + dyp.n_dep + arange.len() > IndexT::MAX"
-            ),
+            Err(_) => panic!( "par_len > IndexT::MAX" ),
             Ok(_)  => (),
         }
         //
@@ -394,21 +398,25 @@ where
         assert_eq!( tape.dyp.n_dep , tape.dyp.id_seq.len());
         assert_eq!( tape.var.n_dep , tape.var.id_seq.len());
         //
-        // tape.var.arg_seq
+        // tape.*.var.arg_seq
         // end marker for arguments to the last operation
-        tape.var.arg_seq.push( tape.arg_all.len() as IndexT );
+        tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
+        tape.dyp.arg_seq.push( tape.dyp.arg_all.len() as IndexT );
         //
         // n_var
-        let mut n_var = tape.var.n_dom + tape.var.n_dep;
+        let mut n_var  = tape.var.n_dom + tape.var.n_dep;
         //
         // ad_fn, tape
         std::mem::swap( &mut ad_fn.n_domain,      &mut tape.var.n_dom );
         std::mem::swap( &mut ad_fn.n_var,         &mut n_var );
         std::mem::swap( &mut ad_fn.id_all,        &mut tape.var.id_seq );
         std::mem::swap( &mut ad_fn.op2arg,        &mut tape.var.arg_seq );
-        std::mem::swap( &mut ad_fn.arg_all,       &mut tape.arg_all );
+        std::mem::swap( &mut ad_fn.arg_all,       &mut tape.var.arg_all );
         std::mem::swap( &mut ad_fn.con_all,       &mut tape.con_all );
         std::mem::swap( &mut ad_fn.flag_all,      &mut tape.flag_all );
+        //
+        // tape.dyp
+        tape.dyp = OpSequence::new();
         //
         // tape_id
         tape.tape_id
