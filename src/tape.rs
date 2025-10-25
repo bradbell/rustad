@@ -24,7 +24,7 @@ pub type IndexT = u32;
 // OpSequence
 /// An operation sequence is a single assignment representation of
 /// a function; i.e., each dependent value is only assigned once.
-pub(crate) struct OpSequence<V> {
+pub(crate) struct OpSequence {
     //
     // n_dom
     /// is the number of independent values in the operation sequence.
@@ -56,13 +56,9 @@ pub(crate) struct OpSequence<V> {
     /// arg_all is the index in flag of its first
     /// boolean flag.
     pub(crate) flag : Vec<bool>,
-    //
-    // cop
-    /// is the vector of constant parameters used by the operation sequence.
-    pub(crate) cop : Vec<V>,
 }
 // VarTape::new
-impl<V> OpSequence<V> {
+impl OpSequence {
     //
     // OpSequence::new
     /// Sets n_dom, n_dep to zero and all the vectors to empty.
@@ -74,7 +70,6 @@ impl<V> OpSequence<V> {
             arg_seq   : Vec::new(),
             arg_all   : Vec::new() ,
             flag      : Vec::new() ,
-            cop       : Vec::new() ,
         }
     }
 }
@@ -90,10 +85,10 @@ pub struct Tape<V> {
     //
     // dyp
     /// dynamic parameter specific tape information
-    pub(crate) dyp : OpSequence<V>,
+    pub(crate) dyp : OpSequence,
     //
     /// variable specific tape information
-    pub(crate) var : OpSequence<V>,
+    pub(crate) var : OpSequence,
     //
     // recording
     /// if false (true) a recording is currently in progress on this tape.
@@ -104,6 +99,10 @@ pub struct Tape<V> {
     // tape_id
     /// a different tape_id is chosen for each recording.
     pub(crate) tape_id        : usize,
+    //
+    // cop
+    /// is the vector of constant parameters used by both operation sequences.
+    pub(crate) cop : Vec<V>,
 }
 // ---------------------------------------------------------------------------
 // GTape::new
@@ -119,6 +118,7 @@ impl<V> Tape<V> {
             var           : OpSequence::new(),
             recording     : false,
             tape_id       : 0,
+            cop           : Vec::new(),
         }
     }
 }
@@ -286,8 +286,7 @@ where
         assert_eq!( tape.dyp.flag.len(),     0 );
         assert_eq!( tape.var.flag.len(),     0 );
         //
-        assert_eq!( tape.dyp.cop.len(),      0 );
-        assert_eq!( tape.var.cop.len(),      0 );
+        assert_eq!( tape.cop.len(),          0 );
         //
         tape.tape_id     = tape_id;
         tape.recording   = true;
@@ -344,7 +343,7 @@ where
 /// ```text
 ///     tape.tape_id,
 ///     tape.dyp.arg_all.len(), tape.var.arg_all.len()
-///     tape.var.cop.len() + tape.dyp.n_dom + tape.dyp.n_dep + arange.len()
+///     tape.cop.len() + tape.dyp.n_dom + tape.dyp.n_dep + arange.len()
 /// ```
 /// # Example
 /// ```
@@ -392,7 +391,7 @@ where
             Err(_) => panic!( "tape.var.arg_all.len() > IndexT::MAX" ),
             Ok(_)  => (),
         }
-        let par_len = tape.var.cop.len()
+        let par_len = tape.cop.len()
             + tape.dyp.n_dom + tape.dyp.n_dep + arange.len();
         match IndexT::try_from( par_len ) {
             Err(_) => panic!( "par_len > IndexT::MAX" ),
@@ -413,6 +412,7 @@ where
         //
         // ad_fn, tape
         std::mem::swap(&mut ad_fn.var,  &mut tape.var);
+        std::mem::swap(&mut ad_fn.cop,  &mut tape.cop);
         //
         // tape.dyp
         tape.dyp = OpSequence::new();
@@ -420,16 +420,6 @@ where
         // tape_id
         tape.tape_id
     } );
-    /* TODO
-    // ad_fn.arg_all
-    assert_eq!( ad_fn.arg_all.len() , arg_is_dyp.len() );
-    let n_cop = ad_fn.cop.len() as IndexT;
-    for index in 0 .. ad_fn.arg_all.len() {
-        if arg_is_dyp[index] {
-            ad_fn.arg_all[index] += n_con;
-        }
-    }
-    */
     //
     // range_is_var, range2tape_index, con_all
     // TODO: figure out how to do this without any cloning of values.
@@ -439,8 +429,8 @@ where
             ad_fn.range2tape_index.push( arange[i].index as IndexT );
         } else {
             ad_fn.range_is_var.push( false );
-            ad_fn.range2tape_index.push( ad_fn.var.cop.len() as IndexT  );
-            ad_fn.var.cop.push( arange[i].value.clone() );
+            ad_fn.range2tape_index.push( ad_fn.cop.len() as IndexT  );
+            ad_fn.cop.push( arange[i].value.clone() );
         }
     }
     ad_fn

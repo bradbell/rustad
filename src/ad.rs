@@ -239,12 +239,12 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 } else if var_lhs {
                     tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
                     tape.var.arg_all.push( lhs.index as IndexT );
-                    tape.var.arg_all.push( tape.var.cop.len() as IndexT );
-                    tape.var.cop.push( rhs.value.clone() );
+                    tape.var.arg_all.push( tape.cop.len() as IndexT );
+                    tape.cop.push( rhs.value.clone() );
                 } else {
                     tape.var.id_seq.push( id::[< $Name:upper _PV_OP >] );
-                    tape.var.arg_all.push( tape.var.cop.len() as IndexT );
-                    tape.var.cop.push( lhs.value.clone() );
+                    tape.var.arg_all.push( tape.cop.len() as IndexT );
+                    tape.cop.push( lhs.value.clone() );
                     tape.var.arg_all.push( rhs.index as IndexT );
                 }
             }
@@ -303,8 +303,8 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
                 tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
                 tape.var.arg_all.push( lhs.index as IndexT );
-                tape.var.arg_all.push( tape.var.cop.len() as IndexT );
-                tape.var.cop.push( rhs.clone() );
+                tape.var.arg_all.push( tape.cop.len() as IndexT );
+                tape.cop.push( rhs.clone() );
             }
         }
         (new_tape_id, new_index, new_is_var)
@@ -426,12 +426,12 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 } else if var_lhs {
                     tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
                     tape.var.arg_all.push( lhs.index as IndexT);
-                    tape.var.arg_all.push( tape.var.cop.len() as IndexT );
-                    tape.var.cop.push( rhs.value.clone() );
+                    tape.var.arg_all.push( tape.cop.len() as IndexT );
+                    tape.cop.push( rhs.value.clone() );
                 } else {
                     tape.var.id_seq.push( id::[< $Name:upper _PV_OP >] );
-                    tape.var.arg_all.push( tape.var.cop.len() as IndexT );
-                    tape.var.cop.push( lhs.value.clone() );
+                    tape.var.arg_all.push( tape.cop.len() as IndexT );
+                    tape.cop.push( lhs.value.clone() );
                     tape.var.arg_all.push( rhs.index as IndexT);
                 }
                 lhs.tape_id     = tape.tape_id;
@@ -482,8 +482,8 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
                  tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
                  tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
                  tape.var.arg_all.push( lhs.index as IndexT);
-                 tape.var.arg_all.push( tape.var.cop.len() as IndexT );
-                 tape.var.cop.push( rhs.clone() );
+                 tape.var.arg_all.push( tape.cop.len() as IndexT );
+                 tape.cop.push( rhs.clone() );
                  //
                  lhs.index       = tape.var.n_dep + tape.var.n_dom;
                  tape.var.n_dep += 1;
@@ -559,8 +559,8 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
                 tape.var.n_dep += 1;
                 tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
                 tape.var.id_seq.push( id::[< $Name:upper _PV_OP >] );
-                tape.var.arg_all.push( tape.var.cop.len() as IndexT );
-                tape.var.cop.push( lhs.clone() );
+                tape.var.arg_all.push( tape.cop.len() as IndexT );
+                tape.cop.push( lhs.clone() );
                 tape.var.arg_all.push( rhs.index as IndexT );
             }
         }

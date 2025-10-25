@@ -130,14 +130,14 @@ where
             "   let nan = V::from( f32::NAN );\n";
         //
         // con
-        if 0 < self.var.cop.len() {
-            let n_con = self.var.cop.len().to_string();
+        if 0 < self.cop.len() {
+            let n_con = self.cop.len().to_string();
             src = src +
                 "   // con\n" +
                 "   let mut con : Vec<V> = " + "vec![nan; " + &n_con + "];\n";
-            for i in 0 .. self.var.cop.len() {
+            for i in 0 .. self.cop.len() {
                 let i_str = i.to_string();
-                let c_str = self.var.cop[i].to_string();
+                let c_str = self.cop[i].to_string();
                 src = src +
                     "   con[" + &i_str + "] = " + &c_str + " as V;\n";
             }

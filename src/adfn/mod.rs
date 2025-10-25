@@ -59,7 +59,7 @@ pub struct ADfn<V> {
     //
     // var
     // The variable operation sequence
-    pub(crate) var : OpSequence<V>,
+    pub(crate) var : OpSequence,
     //
     // range_is_var
     /// The length of this vector is the dimension of the range space.
@@ -72,6 +72,10 @@ pub struct ADfn<V> {
     /// If range_is_var\[i\] is true (false), range2tape_index\[i\] is the
     /// variable (constant) index for the i-th component of the range space.
     pub(crate) range2tape_index    : Vec<IndexT>,
+    //
+    // cop
+    /// is the vector of constant parameters used by both operation sequences.
+    pub(crate) cop : Vec<V>,
 }
 //
 // ---------------------------------------------------------------------------
@@ -95,6 +99,7 @@ impl<V> ADfn<V> {
             var              : OpSequence::new(),
             range_is_var     : Vec::new() ,
             range2tape_index : Vec::new() ,
+            cop             : Vec::new()  ,
         }
     }
     //
@@ -106,10 +111,15 @@ impl<V> ADfn<V> {
     /// dimension of range space
     pub fn range_len(&self) -> usize { self.range_is_var.len() }
     //
+    // cop_len
+    /// number of constant parameters in this function
+    pub fn cop_len(&self) -> usize { self.cop.len() }
+    //
     // swap
     /// exchange the contents of this ADfn with another ADfn.
     pub fn swap(&mut self, other : &mut ADfn<V>) {
         std::mem::swap( &mut self.var,           &mut other.var );
+        std::mem::swap( &mut self.cop,           &mut other.cop );
         std::mem::swap( &mut self.range_is_var,  &mut other.range_is_var );
         std::mem::swap(
             &mut self.range2tape_index, &mut other.range2tape_index

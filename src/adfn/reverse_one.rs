@@ -159,8 +159,8 @@ macro_rules! reverse_one {
                     println!( "{}, {}", j, self.var.flag[j] );
                 }
                 println!( "index, constant" );
-                for j in 0 .. self.var.cop.len() {
-                    println!( "{}, {}", j, self.var.cop[j] );
+                for j in 0 .. self.cop.len() {
+                    println!( "{}, {}", j, self.cop[j] );
                 }
                 println!( "var_index, range_one" );
                 for i in 0 .. self.range_is_var.len() {
@@ -183,7 +183,7 @@ macro_rules! reverse_one {
                 reverse_1(
                     &var_zero,
                     &mut var_one,
-                    &self.var.cop,
+                    &self.cop,
                     &self.var.flag,
                     &arg,
                     res

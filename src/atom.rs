@@ -400,7 +400,7 @@ where
         tape.var.id_seq.push( CALL_OP );
         tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
         //
-        // tape.var.arg_all, tape.var.cop
+        // tape.var.arg_all, tape.cop
         tape.var.arg_all.push( atom_id );                        // arg[0]
         tape.var.arg_all.push( call_info );                      // arg[1]
         tape.var.arg_all.push( call_n_arg as IndexT );           // arg[2]
@@ -412,8 +412,8 @@ where
             let index = if is_var_arg[j] {
                 adomain[j].index
             } else {
-                let cop_index = tape.var.cop.len();
-                tape.var.cop.push( adomain[j].value.clone() );
+                let cop_index = tape.cop.len();
+                tape.cop.push( adomain[j].value.clone() );
                 cop_index
             };
             tape.var.arg_all.push( index as IndexT );            // arg[5+j]

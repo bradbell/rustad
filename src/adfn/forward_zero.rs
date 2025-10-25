@@ -146,8 +146,8 @@ macro_rules! forward_zero {
                     println!( "{}, {}", j, self.var.flag[j] );
                 }
                 println!( "index, constant" );
-                for j in 0 .. self.var.cop.len() {
-                    println!( "{}, {}", j, self.var.cop[j] );
+                for j in 0 .. self.cop.len() {
+                    println!( "{}, {}", j, self.cop[j] );
                 }
                 println!( "var_index, domain_zero" );
                 for j in 0 .. self.var.n_dom {
@@ -163,7 +163,7 @@ macro_rules! forward_zero {
                 let res   = self.var.n_dom + op_index;
                 let forward_0 = op_info_vec[op_id].[< forward_0_ $suffix >];
                 forward_0(var_zero,
-                    &self.var.cop, &self.var.flag, &arg, res
+                    &self.cop, &self.var.flag, &arg, res
                 );
                 if trace {
                     let name = &op_info_vec[op_id].name;
@@ -192,7 +192,7 @@ macro_rules! forward_zero {
                 if self.range_is_var[i] {
                     range_zero.push( var_zero[index].clone() );
                 } else {
-                    let constant_v = self.var.cop[index].clone();
+                    let constant_v = self.cop[index].clone();
                     let constant_e = eval_from_value!($suffix, $V, constant_v);
                     range_zero.push( constant_e );
                 }
