@@ -124,7 +124,7 @@ macro_rules! forward_zero {
                 "f.forward_zero: var_zero  does not have length zero"
             );
             assert_eq!(
-                domain_zero.len(), self.n_domain,
+                domain_zero.len(), self.var.n_dom,
                 "f.forward_zero: domain vector length does not match f"
             );
             //
@@ -132,7 +132,7 @@ macro_rules! forward_zero {
             let op_info_vec = &*GlobalOpInfoVec::get();
             //
             // n_var
-            let n_var = self.n_domain + self.n_dep;
+            let n_var = self.var.n_dom + self.var.n_dep;
             //
             // var_zero
             let nan_e  : $E  = eval_from_f32!($suffix, $V,  f32::NAN);
@@ -142,28 +142,28 @@ macro_rules! forward_zero {
             if trace {
                 println!( "Begin Trace: forward_zero: n_var = {}", n_var);
                 println!( "index, flag" );
-                for j in 0 .. self.flag_all.len() {
-                    println!( "{}, {}", j, self.flag_all[j] );
+                for j in 0 .. self.var.flag.len() {
+                    println!( "{}, {}", j, self.var.flag[j] );
                 }
                 println!( "index, constant" );
-                for j in 0 .. self.con_all.len() {
-                    println!( "{}, {}", j, self.con_all[j] );
+                for j in 0 .. self.var.cop.len() {
+                    println!( "{}, {}", j, self.var.cop[j] );
                 }
                 println!( "var_index, domain_zero" );
-                for j in 0 .. self.n_domain {
+                for j in 0 .. self.var.n_dom {
                     println!( "{}, {}", j, var_zero[j] );
                 }
                 println!( "var_index, var_zero, op_name, arg" );
             }
-            for op_index in 0 .. self.id_all.len() {
-                let op_id = self.id_all[op_index] as usize;
-                let start = self.op2arg[op_index] as usize;
-                let end   = self.op2arg[op_index + 1] as usize;
-                let arg   = &self.arg_all[start .. end];
-                let res   = self.n_domain + op_index;
+            for op_index in 0 .. self.var.id_seq.len() {
+                let op_id = self.var.id_seq[op_index] as usize;
+                let start = self.var.arg_seq[op_index] as usize;
+                let end   = self.var.arg_seq[op_index + 1] as usize;
+                let arg   = &self.var.arg_all[start .. end];
+                let res   = self.var.n_dom + op_index;
                 let forward_0 = op_info_vec[op_id].[< forward_0_ $suffix >];
                 forward_0(var_zero,
-                    &self.con_all, &self.flag_all, &arg, res
+                    &self.var.cop, &self.var.flag, &arg, res
                 );
                 if trace {
                     let name = &op_info_vec[op_id].name;
@@ -192,7 +192,7 @@ macro_rules! forward_zero {
                 if self.range_is_var[i] {
                     range_zero.push( var_zero[index].clone() );
                 } else {
-                    let constant_v = self.con_all[index].clone();
+                    let constant_v = self.var.cop[index].clone();
                     let constant_e = eval_from_value!($suffix, $V, constant_v);
                     range_zero.push( constant_e );
                 }

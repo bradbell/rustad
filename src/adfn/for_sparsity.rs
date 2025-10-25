@@ -92,11 +92,11 @@ where
         //
         // n_domain, n_var, flag_all, arg_all, op2arg,
         // range_is_var, range2tape_index, n_range
-        let n_domain          = self.n_domain;
-        let id_all            = &self.id_all;
-        let flag_all          = &self.flag_all;
-        let arg_all           = &self.arg_all;
-        let op2arg            = &self.op2arg;
+        let n_domain          = self.var.n_dom;
+        let id_all            = &self.var.id_seq;
+        let flag_all          = &self.var.flag;
+        let arg_all           = &self.var.arg_all;
+        let op2arg            = &self.var.arg_seq;
         let range_is_var      = &self.range_is_var;
         let range2tape_index  = &self.range2tape_index;
         let n_range           = range_is_var.len();

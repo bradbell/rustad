@@ -22,7 +22,8 @@ use crate::doc_generic_v;
 pub type IndexT = u32;
 // ---------------------------------------------------------------------------
 // OpSequence
-/// Information for one operation sequence
+/// An operation sequence is a single assignment representation of
+/// a function; i.e., each dependent value is only assigned once.
 pub(crate) struct OpSequence<V> {
     //
     // n_dom
@@ -411,13 +412,7 @@ where
         tape.dyp.arg_seq.push( tape.dyp.arg_all.len() as IndexT );
         //
         // ad_fn, tape
-        std::mem::swap( &mut ad_fn.n_domain,      &mut tape.var.n_dom );
-        std::mem::swap( &mut ad_fn.n_dep,         &mut tape.var.n_dep );
-        std::mem::swap( &mut ad_fn.id_all,        &mut tape.var.id_seq );
-        std::mem::swap( &mut ad_fn.op2arg,        &mut tape.var.arg_seq );
-        std::mem::swap( &mut ad_fn.arg_all,       &mut tape.var.arg_all );
-        std::mem::swap( &mut ad_fn.flag_all,      &mut tape.var.flag );
-        std::mem::swap( &mut ad_fn.con_all,       &mut tape.var.cop );
+        std::mem::swap(&mut ad_fn.var,  &mut tape.var);
         //
         // tape.dyp
         tape.dyp = OpSequence::new();
@@ -444,8 +439,8 @@ where
             ad_fn.range2tape_index.push( arange[i].index as IndexT );
         } else {
             ad_fn.range_is_var.push( false );
-            ad_fn.range2tape_index.push( ad_fn.con_all.len() as IndexT  );
-            ad_fn.con_all.push( arange[i].value.clone() );
+            ad_fn.range2tape_index.push( ad_fn.var.cop.len() as IndexT  );
+            ad_fn.var.cop.push( arange[i].value.clone() );
         }
     }
     ad_fn

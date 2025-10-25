@@ -122,10 +122,10 @@ macro_rules! forward_one {
         ) -> Vec<$E>
         {
             // n_var
-            let n_var = self.n_domain + self.n_dep;
+            let n_var = self.var.n_dom + self.var.n_dep;
             //
             assert_eq!(
-                domain_one.len(), self.n_domain,
+                domain_one.len(), self.var.n_dom,
                 "f.forward_one: domain vector length does not match f"
             );
             assert_eq!(
@@ -147,33 +147,33 @@ macro_rules! forward_one {
             if trace {
                 println!( "Begin Trace: forward_one: n_var = {}", n_var);
                 println!( "index, flag" );
-                for j in 0 .. self.flag_all.len() {
-                    println!( "{}, {}", j, self.flag_all[j] );
+                for j in 0 .. self.var.flag.len() {
+                    println!( "{}, {}", j, self.var.flag[j] );
                 }
                 println!( "index, constant" );
-                for j in 0 .. self.con_all.len() {
-                    println!( "{}, {}", j, self.con_all[j] );
+                for j in 0 .. self.var.cop.len() {
+                    println!( "{}, {}", j, self.var.cop[j] );
                 }
                 println!( "var_index, domain_zero, domain_one" );
-                for j in 0 .. self.n_domain {
+                for j in 0 .. self.var.n_dom {
                     println!( "{}, {}, {}", j, var_zero[j], var_one[j] );
                 }
                 println!( "var_index, var_zero, var_one, op_name, arg" );
             }
             //
             // var_one
-            for op_index in 0 .. self.id_all.len() {
-                let op_id = self.id_all[op_index] as usize;
-                let start = self.op2arg[op_index] as usize;
-                let end   = self.op2arg[op_index + 1] as usize;
-                let arg   = &self.arg_all[start .. end];
-                let res   = self.n_domain + op_index;
+            for op_index in 0 .. self.var.id_seq.len() {
+                let op_id = self.var.id_seq[op_index] as usize;
+                let start = self.var.arg_seq[op_index] as usize;
+                let end   = self.var.arg_seq[op_index + 1] as usize;
+                let arg   = &self.var.arg_all[start .. end];
+                let res   = self.var.n_dom + op_index;
                 let forward_1 = op_info_vec[op_id].[< forward_1_ $suffix >];
                 forward_1(
                     &var_zero,
                     &mut var_one,
-                    &self.con_all,
-                    &self.flag_all,
+                    &self.var.cop,
+                    &self.var.flag,
                     &arg,
                     res
                 );

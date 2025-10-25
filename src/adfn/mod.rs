@@ -28,6 +28,9 @@ use crate::{
 // IndexT
 use crate::IndexT;
 //
+// OpSequence
+use crate::tape::OpSequence;
+//
 // ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter E.
 ///
@@ -52,45 +55,11 @@ pub fn doc_generic_e() {}
 ///
 /// * V : [doc_generic_v]
 ///
-/// * Operation sequence :
-/// An operation sequence is a single assignment representation of
-/// a function; i.e., each variable is only assigned once.
-///
 pub struct ADfn<V> {
     //
-    // n_domain
-    /// The dimension of the domain space for this function.
-    /// The domain variables have index 0 .. n_domain-1.
-    pub(crate) n_domain     : usize,
-    //
-    // n_dep
-    /// The number of dependent variables in the operation sequence.
-    pub(crate) n_dep              : usize,
-    //
-    // id_all
-    /// This maps each operator's index in the operation sequence
-    /// to its operator id; see operator::id.
-    pub(crate) id_all              : Vec<u8>,
-    //
-    // flag_all
-    /// This contains all the boolean flags that are part of
-    /// the operator definitions.
-    pub(crate) flag_all            : Vec<bool>,
-    //
-    // op2arg
-    /// This maps each operator's index in the operation sequence to
-    /// the index of its first argument in arg_all.
-    pub(crate) op2arg              : Vec<IndexT>,
-    //
-    // arg_all
-    /// This contains all the arguments for the opereators in the
-    /// operatioon sequence.
-    pub(crate) arg_all             : Vec<IndexT>,
-    //
-    // con_all
-    /// This contains the value of all the constants needed
-    /// to evaluate the function.
-    pub(crate) con_all             : Vec<V>,
+    // var
+    // The variable operation sequence
+    pub(crate) var : OpSequence<V>,
     //
     // range_is_var
     /// The length of this vector is the dimension of the range space.
@@ -123,13 +92,7 @@ impl<V> ADfn<V> {
     /// ```
     pub fn new() -> Self {
         Self {
-            n_domain         : 0,
-            n_dep            : 0,
-            id_all           : Vec::new() ,
-            flag_all         : Vec::new() ,
-            op2arg           : Vec::new() ,
-            arg_all          : Vec::new() ,
-            con_all          : Vec::new() ,
+            var              : OpSequence::new(),
             range_is_var     : Vec::new() ,
             range2tape_index : Vec::new() ,
         }
@@ -137,7 +100,7 @@ impl<V> ADfn<V> {
     //
     // domain_len
     /// dimension of domain space
-    pub fn domain_len(&self) -> usize { self.n_domain }
+    pub fn domain_len(&self) -> usize { self.var.n_dom }
     //
     // range_len
     /// dimension of range space
@@ -146,13 +109,7 @@ impl<V> ADfn<V> {
     // swap
     /// exchange the contents of this ADfn with another ADfn.
     pub fn swap(&mut self, other : &mut ADfn<V>) {
-        std::mem::swap( &mut self.n_domain,      &mut other.n_domain );
-        std::mem::swap( &mut self.n_dep,         &mut other.n_dep );
-        std::mem::swap( &mut self.id_all,        &mut other.id_all );
-        std::mem::swap( &mut self.flag_all,      &mut other.flag_all );
-        std::mem::swap( &mut self.op2arg,        &mut other.op2arg );
-        std::mem::swap( &mut self.arg_all,       &mut other.arg_all );
-        std::mem::swap( &mut self.con_all,       &mut other.con_all );
+        std::mem::swap( &mut self.var,           &mut other.var );
         std::mem::swap( &mut self.range_is_var,  &mut other.range_is_var );
         std::mem::swap(
             &mut self.range2tape_index, &mut other.range2tape_index

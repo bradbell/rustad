@@ -124,7 +124,7 @@ macro_rules! reverse_one {
         ) -> Vec<$E>
         {
             // n_var
-            let n_var = self.n_domain + self.n_dep;
+            let n_var = self.var.n_dom + self.var.n_dep;
             //
             assert_eq!(
                 range_one.len(), self.range_is_var.len(),
@@ -155,12 +155,12 @@ macro_rules! reverse_one {
             if trace {
                 println!( "Begin Trace: reverse_one: n_var = {}", n_var);
                 println!( "index, flag" );
-                for j in 0 .. self.flag_all.len() {
-                    println!( "{}, {}", j, self.flag_all[j] );
+                for j in 0 .. self.var.flag.len() {
+                    println!( "{}, {}", j, self.var.flag[j] );
                 }
                 println!( "index, constant" );
-                for j in 0 .. self.con_all.len() {
-                    println!( "{}, {}", j, self.con_all[j] );
+                for j in 0 .. self.var.cop.len() {
+                    println!( "{}, {}", j, self.var.cop[j] );
                 }
                 println!( "var_index, range_one" );
                 for i in 0 .. self.range_is_var.len() {
@@ -173,18 +173,18 @@ macro_rules! reverse_one {
             }
             //
             // var_one
-            for op_index in ( 0 .. self.id_all.len() ).rev() {
-                let op_id = self.id_all[op_index] as usize;
-                let start = self.op2arg[op_index] as usize;
-                let end   = self.op2arg[op_index + 1] as usize;
-                let arg   = &self.arg_all[start .. end];
-                let res   = self.n_domain + op_index;
+            for op_index in ( 0 .. self.var.id_seq.len() ).rev() {
+                let op_id = self.var.id_seq[op_index] as usize;
+                let start = self.var.arg_seq[op_index] as usize;
+                let end   = self.var.arg_seq[op_index + 1] as usize;
+                let arg   = &self.var.arg_all[start .. end];
+                let res   = self.var.n_dom + op_index;
                 let reverse_1 = op_info_vec[op_id].[< reverse_1_ $suffix >];
                 reverse_1(
                     &var_zero,
                     &mut var_one,
-                    &self.con_all,
-                    &self.flag_all,
+                    &self.var.cop,
+                    &self.var.flag,
                     &arg,
                     res
                 );
@@ -202,7 +202,7 @@ macro_rules! reverse_one {
             // domain_one
             let nan_e  : $E    = eval_from_f32!($suffix, $V,  f32::NAN);
             let mut domain_one = var_one;
-            domain_one.resize(self.n_domain, nan_e);
+            domain_one.resize(self.var.n_dom, nan_e);
             domain_one.shrink_to_fit();
             domain_one
         }

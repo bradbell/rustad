@@ -108,7 +108,7 @@ where
             "   }\n";
         //
         // check domain
-        let expect = self.n_domain.to_string();
+        let expect = self.var.n_dom.to_string();
         src = src +
             "   // check domain\n" +
             "   if domain.len() != " + &expect  + " {\n" +
@@ -130,21 +130,21 @@ where
             "   let nan = V::from( f32::NAN );\n";
         //
         // con
-        if 0 < self.con_all.len() {
-            let n_con = self.con_all.len().to_string();
+        if 0 < self.var.cop.len() {
+            let n_con = self.var.cop.len().to_string();
             src = src +
                 "   // con\n" +
                 "   let mut con : Vec<V> = " + "vec![nan; " + &n_con + "];\n";
-            for i in 0 .. self.con_all.len() {
+            for i in 0 .. self.var.cop.len() {
                 let i_str = i.to_string();
-                let c_str = self.con_all[i].to_string();
+                let c_str = self.var.cop[i].to_string();
                 src = src +
                     "   con[" + &i_str + "] = " + &c_str + " as V;\n";
             }
         }
         //
         // dep
-        let n_dep = self.n_dep.to_string();
+        let n_dep = self.var.n_dep.to_string();
         src = src +
             "   //\n" +
             "   // dep\n" +
@@ -152,16 +152,16 @@ where
             "   let mut dep : Vec<V> = vec![nan; " + &n_dep + "];\n";
         //
         // dep
-        for op_index in 0 .. self.id_all.len() {
-            let op_id    = self.id_all[op_index] as usize;
-            let start    = self.op2arg[op_index] as usize;
-            let end      = self.op2arg[op_index + 1] as usize;
-            let arg      = &self.arg_all[start .. end];
-            let res      = self.n_domain + op_index;
+        for op_index in 0 .. self.var.id_seq.len() {
+            let op_id    = self.var.id_seq[op_index] as usize;
+            let start    = self.var.arg_seq[op_index] as usize;
+            let end      = self.var.arg_seq[op_index + 1] as usize;
+            let arg      = &self.var.arg_all[start .. end];
+            let res      = self.var.n_dom + op_index;
             let rust_src = op_info_vec[op_id].rust_src;
             let not_used = V::from( f32::NAN );
             src = src + &rust_src(
-                    not_used, self.n_domain, &self.flag_all, &arg, res
+                    not_used, self.var.n_dom, &self.var.flag, &arg, res
                 );
         }
         //
@@ -174,12 +174,12 @@ where
         for i in 0 .. n_range {
             let index = self.range2tape_index[i] as usize;
             if self.range_is_var[i] {
-                if index < self.n_domain {
+                if index < self.var.n_dom {
                     let i_str = index.to_string();
                     src = src +
                         "   range.push( domain[" + &i_str + "] );\n";
                 } else {
-                    let i_str = (index - self.n_domain).to_string();
+                    let i_str = (index - self.var.n_dom).to_string();
                     src = src +
                         "   range.push( dep[" + &i_str + "] );\n";
                     }

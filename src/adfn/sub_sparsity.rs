@@ -96,11 +96,11 @@ where
         let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
         //
         // n_domain ... range2tape_index.
-        let n_domain          = self.n_domain;
-        let n_dep             = self.n_dep;
-        let flag_all          = &self.flag_all;
-        let arg_all           = &self.arg_all;
-        let op2arg            = &self.op2arg;
+        let n_domain          = self.var.n_dom;
+        let n_dep             = self.var.n_dep;
+        let flag_all          = &self.var.flag;
+        let arg_all           = &self.var.arg_all;
+        let op2arg            = &self.var.arg_seq;
         let range_is_var      = &self.range_is_var;
         let range2tape_index  = &self.range2tape_index;
         //
@@ -161,7 +161,7 @@ where
                         let op_index         = var_index - n_domain;
                         //
                         // arv_var_index_fn
-                        let op_id            = self.id_all[op_index] as usize;
+                        let op_id            = self.var.id_seq[op_index] as usize;
                         let op_info          = &op_info_vec[op_id];
                         let arg_var_index_fn = op_info.arg_var_index;
                         //
