@@ -23,7 +23,7 @@ pub type IndexT = u32;
 // ---------------------------------------------------------------------------
 // OpSequence
 /// Information for one operation sequence
-pub(crate) struct OpSequence {
+pub(crate) struct OpSequence<V> {
     //
     // n_dom
     /// is the number of independent values in the operation sequence.
@@ -55,9 +55,13 @@ pub(crate) struct OpSequence {
     /// arg_all is the index in flag of its first
     /// boolean flag.
     pub(crate) flag : Vec<bool>,
+    //
+    // cop
+    /// is the vector of constant parameters used by the operation sequence.
+    pub(crate) cop : Vec<V>,
 }
 // VarTape::new
-impl OpSequence {
+impl<V> OpSequence<V> {
     //
     // OpSequence::new
     /// Sets n_dom, n_dep to zero,
@@ -69,6 +73,7 @@ impl OpSequence {
             arg_seq   : Vec::new(),
             arg_all   : Vec::new() ,
             flag      : Vec::new() ,
+            cop       : Vec::new() ,
         }
     }
 }
@@ -84,10 +89,10 @@ pub struct Tape<V> {
     //
     // dyp
     /// dynamic parameter specific tape information
-    pub(crate) dyp : OpSequence,
+    pub(crate) dyp : OpSequence<V>,
     //
     /// variable specific tape information
-    pub(crate) var : OpSequence,
+    pub(crate) var : OpSequence<V>,
     //
     // recording
     /// if false (true) a recording is currently in progress on this tape.
@@ -98,10 +103,6 @@ pub struct Tape<V> {
     // tape_id
     /// a different tape_id is chosen for each recording.
     pub(crate) tape_id        : usize,
-    //
-    // con_all
-    /// is the vector of constant parameters used by the operation sequence.
-    pub(crate) con_all        : Vec<V>,
 }
 // ---------------------------------------------------------------------------
 // GTape::new
@@ -115,7 +116,6 @@ impl<V> Tape<V> {
             var           : OpSequence::new(),
             recording     : false,
             tape_id       : 0,
-            con_all       : Vec::new() ,
         }
     }
 }
@@ -283,7 +283,8 @@ where
         assert_eq!( tape.dyp.flag.len(),     0 );
         assert_eq!( tape.var.flag.len(),     0 );
         //
-        assert_eq!( tape.con_all.len(),      0 );
+        assert_eq!( tape.dyp.cop.len(),      0 );
+        assert_eq!( tape.var.cop.len(),      0 );
         //
         tape.tape_id     = tape_id;
         tape.recording   = true;
@@ -340,7 +341,7 @@ where
 /// ```text
 ///     tape.tape_id,
 ///     tape.dyp.arg_all.len(), tape.var.arg_all.len()
-///     tape.con_all.len() + tape.dyp.n_dom + tape.dyp.n_dep + arange.len()
+///     tape.var.cop.len() + tape.dyp.n_dom + tape.dyp.n_dep + arange.len()
 /// ```
 /// # Example
 /// ```
@@ -388,7 +389,7 @@ where
             Err(_) => panic!( "tape.var.arg_all.len() > IndexT::MAX" ),
             Ok(_)  => (),
         }
-        let par_len = tape.con_all.len()
+        let par_len = tape.var.cop.len()
             + tape.dyp.n_dom + tape.dyp.n_dep + arange.len();
         match IndexT::try_from( par_len ) {
             Err(_) => panic!( "par_len > IndexT::MAX" ),
@@ -417,7 +418,7 @@ where
         std::mem::swap( &mut ad_fn.op2arg,        &mut tape.var.arg_seq );
         std::mem::swap( &mut ad_fn.arg_all,       &mut tape.var.arg_all );
         std::mem::swap( &mut ad_fn.flag_all,      &mut tape.var.flag );
-        std::mem::swap( &mut ad_fn.con_all,       &mut tape.con_all );
+        std::mem::swap( &mut ad_fn.con_all,       &mut tape.var.cop );
         //
         // tape.dyp
         tape.dyp = OpSequence::new();
@@ -428,7 +429,7 @@ where
     /* TODO
     // ad_fn.arg_all
     assert_eq!( ad_fn.arg_all.len() , arg_is_dyp.len() );
-    let n_con = ad_fn.con_all.len() as IndexT;
+    let n_cop = ad_fn.cop.len() as IndexT;
     for index in 0 .. ad_fn.arg_all.len() {
         if arg_is_dyp[index] {
             ad_fn.arg_all[index] += n_con;
