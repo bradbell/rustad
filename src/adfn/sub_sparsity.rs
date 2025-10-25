@@ -95,14 +95,14 @@ where
         // op_info_vec
         let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
         //
-        // n_domain ... range2tape_index.
+        // n_domain ... range2index.
         let n_domain          = self.var.n_dom;
         let n_dep             = self.var.n_dep;
         let flag_all          = &self.var.flag;
         let arg_all           = &self.var.arg_all;
         let op2arg            = &self.var.arg_seq;
         let range_is_var      = &self.range_is_var;
-        let range2tape_index  = &self.range2tape_index;
+        let range2index       = &self.range2index;
         //
         // n_range
         let n_range           = range_is_var.len();
@@ -127,7 +127,7 @@ where
         for row in 0 .. n_range { if range_is_var[row] {
             //
             // var_index
-            let var_index = range2tape_index[row] as usize;
+            let var_index = range2index[row] as usize;
             if trace {
                 println!( "row = {}", row );
             }

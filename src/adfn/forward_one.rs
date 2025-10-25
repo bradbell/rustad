@@ -187,7 +187,7 @@ macro_rules! forward_one {
             if trace {
                 println!( "range_index, var_index, con_index" );
                 for i in 0 .. self.range_is_var.len() {
-                    let index = self.range2tape_index[i] as usize;
+                    let index = self.range2index[i] as usize;
                     if self.range_is_var[i] {
                         println!( "{}, {}, ----", i, index);
                     } else {
@@ -198,7 +198,7 @@ macro_rules! forward_one {
             }
             let mut range_one : Vec<$E> = Vec::new();
             for i in 0 .. self.range_is_var.len() {
-                let index = self.range2tape_index[i] as usize;
+                let index = self.range2index[i] as usize;
                 if self.range_is_var[i] {
                     range_one.push( var_one[index].clone() );
                 } else {

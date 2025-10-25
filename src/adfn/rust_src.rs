@@ -172,7 +172,7 @@ where
             "   // range\n" +
             "   range.reserve(" + &n_range.to_string() + ");\n";
         for i in 0 .. n_range {
-            let index = self.range2tape_index[i] as usize;
+            let index = self.range2index[i] as usize;
             if self.range_is_var[i] {
                 if index < self.var.n_dom {
                     let i_str = index.to_string();

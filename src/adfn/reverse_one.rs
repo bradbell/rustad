@@ -147,7 +147,7 @@ macro_rules! reverse_one {
             for i in (0 .. self.range_is_var.len()).rev() {
                 let y_i = mut_range_one.pop().unwrap();
                 if self.range_is_var[i] {
-                    let index = self.range2tape_index[i] as usize;
+                    let index = self.range2index[i] as usize;
                     var_one[index] = y_i;
                 }
             }
@@ -165,7 +165,7 @@ macro_rules! reverse_one {
                 println!( "var_index, range_one" );
                 for i in 0 .. self.range_is_var.len() {
                     if self.range_is_var[i] {
-                        let index = self.range2tape_index[i] as usize;
+                        let index = self.range2index[i] as usize;
                         println!( "{}, {}", index,  var_one[index] );
                     }
                 }
