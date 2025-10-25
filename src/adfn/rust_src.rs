@@ -144,8 +144,7 @@ where
         }
         //
         // dep
-        assert!( self.n_domain <= self.n_var );
-        let n_dep = ( self.n_var - self.n_domain ).to_string();
+        let n_dep = self.n_dep.to_string();
         src = src +
             "   //\n" +
             "   // dep\n" +

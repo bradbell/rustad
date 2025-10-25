@@ -64,7 +64,7 @@ pub(crate) struct OpSequence<V> {
 impl<V> OpSequence<V> {
     //
     // OpSequence::new
-    /// Sets n_dom, n_dep to zero,
+    /// Sets n_dom, n_dep to zero and all the vectors to empty.
     pub fn new() -> Self {
         Self {
             n_dom     : 0,
@@ -110,6 +110,8 @@ pub struct Tape<V> {
 impl<V> Tape<V> {
     //
     // Tape::new
+    /// Sets dyp, var to new, recording to false, and tape_id to zero.
+    /// (The tape with tape_id zero never has recording true.)
     pub fn new() -> Self {
         Self {
             dyp           : OpSequence::new(),
@@ -408,12 +410,9 @@ where
         tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
         tape.dyp.arg_seq.push( tape.dyp.arg_all.len() as IndexT );
         //
-        // n_var
-        let mut n_var  = tape.var.n_dom + tape.var.n_dep;
-        //
         // ad_fn, tape
         std::mem::swap( &mut ad_fn.n_domain,      &mut tape.var.n_dom );
-        std::mem::swap( &mut ad_fn.n_var,         &mut n_var );
+        std::mem::swap( &mut ad_fn.n_dep,         &mut tape.var.n_dep );
         std::mem::swap( &mut ad_fn.id_all,        &mut tape.var.id_seq );
         std::mem::swap( &mut ad_fn.op2arg,        &mut tape.var.arg_seq );
         std::mem::swap( &mut ad_fn.arg_all,       &mut tape.var.arg_all );

@@ -123,12 +123,15 @@ macro_rules! reverse_one {
             trace       : bool      ,
         ) -> Vec<$E>
         {
+            // n_var
+            let n_var = self.n_domain + self.n_dep;
+            //
             assert_eq!(
                 range_one.len(), self.range_is_var.len(),
                 "f.reverse_one: range vector length does not match f"
             );
             assert_eq!(
-                 var_zero.len(), self.n_var,
+                 var_zero.len(), n_var,
                 "f.reverse_one:  var_zero does not have the proper length"
             );
             //
@@ -139,7 +142,7 @@ macro_rules! reverse_one {
             let zero_e : $E = eval_from_f32!($suffix, $V, 0 as f32);
             //
             // var_one
-            let mut var_one       = vec![ zero_e; self.n_var ];
+            let mut var_one       = vec![ zero_e; n_var ];
             let mut mut_range_one = range_one;
             for i in (0 .. self.range_is_var.len()).rev() {
                 let y_i = mut_range_one.pop().unwrap();
@@ -150,7 +153,7 @@ macro_rules! reverse_one {
             }
             //
             if trace {
-                println!( "Begin Trace: reverse_one: n_var = {}", self.n_var);
+                println!( "Begin Trace: reverse_one: n_var = {}", n_var);
                 println!( "index, flag" );
                 for j in 0 .. self.flag_all.len() {
                     println!( "{}, {}", j, self.flag_all[j] );

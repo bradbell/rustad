@@ -63,9 +63,9 @@ pub struct ADfn<V> {
     /// The domain variables have index 0 .. n_domain-1.
     pub(crate) n_domain     : usize,
     //
-    // n_var
-    /// The total number of variables in the operation sequence.
-    pub(crate) n_var               : usize,
+    // n_dep
+    /// The number of dependent variables in the operation sequence.
+    pub(crate) n_dep              : usize,
     //
     // id_all
     /// This maps each operator's index in the operation sequence
@@ -124,8 +124,8 @@ impl<V> ADfn<V> {
     pub fn new() -> Self {
         Self {
             n_domain         : 0,
-                             n_var            : 0,
-                             id_all           : Vec::new() ,
+            n_dep            : 0,
+            id_all           : Vec::new() ,
             flag_all         : Vec::new() ,
             op2arg           : Vec::new() ,
             arg_all          : Vec::new() ,
@@ -147,7 +147,7 @@ impl<V> ADfn<V> {
     /// exchange the contents of this ADfn with another ADfn.
     pub fn swap(&mut self, other : &mut ADfn<V>) {
         std::mem::swap( &mut self.n_domain,      &mut other.n_domain );
-        std::mem::swap( &mut self.n_var,         &mut other.n_var );
+        std::mem::swap( &mut self.n_dep,         &mut other.n_dep );
         std::mem::swap( &mut self.id_all,        &mut other.id_all );
         std::mem::swap( &mut self.flag_all,      &mut other.flag_all );
         std::mem::swap( &mut self.op2arg,        &mut other.op2arg );

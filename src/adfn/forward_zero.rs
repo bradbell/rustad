@@ -131,13 +131,16 @@ macro_rules! forward_zero {
             // op_info_vec
             let op_info_vec = &*GlobalOpInfoVec::get();
             //
+            // n_var
+            let n_var = self.n_domain + self.n_dep;
+            //
             // var_zero
             let nan_e  : $E  = eval_from_f32!($suffix, $V,  f32::NAN);
             *var_zero        = domain_zero;
-            var_zero.resize( self.n_var, nan_e );
+            var_zero.resize( n_var, nan_e );
             //
             if trace {
-                println!( "Begin Trace: forward_zero: n_var = {}", self.n_var);
+                println!( "Begin Trace: forward_zero: n_var = {}", n_var);
                 println!( "index, flag" );
                 for j in 0 .. self.flag_all.len() {
                     println!( "{}, {}", j, self.flag_all[j] );

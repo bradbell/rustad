@@ -121,12 +121,15 @@ macro_rules! forward_one {
             trace       : bool         ,
         ) -> Vec<$E>
         {
+            // n_var
+            let n_var = self.n_domain + self.n_dep;
+            //
             assert_eq!(
                 domain_one.len(), self.n_domain,
                 "f.forward_one: domain vector length does not match f"
             );
             assert_eq!(
-                var_zero.len(), self.n_var,
+                var_zero.len(), n_var,
                 "f.forward_one: var_zero does not have the correct length"
             );
             //
@@ -139,10 +142,10 @@ macro_rules! forward_one {
             // var_one
             let nan_e         : $E = eval_from_f32!($suffix, $V, f32::NAN);
             let mut var_one        = domain_one;
-            var_one.resize( self.n_var, nan_e );
+            var_one.resize( n_var, nan_e );
             //
             if trace {
-                println!( "Begin Trace: forward_one: n_var = {}", self.n_var);
+                println!( "Begin Trace: forward_one: n_var = {}", n_var);
                 println!( "index, flag" );
                 for j in 0 .. self.flag_all.len() {
                     println!( "{}, {}", j, self.flag_all[j] );

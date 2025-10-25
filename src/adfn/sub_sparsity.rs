@@ -97,7 +97,7 @@ where
         //
         // n_domain ... range2tape_index.
         let n_domain          = self.n_domain;
-        let n_var             = self.n_var;
+        let n_dep             = self.n_dep;
         let flag_all          = &self.flag_all;
         let arg_all           = &self.arg_all;
         let op2arg            = &self.op2arg;
@@ -109,6 +109,7 @@ where
         //
         // done
         // initialize all elements as n_var (an invalid variable index)
+        let n_var    = n_domain + n_dep;
         let mut done = vec![n_var; n_var];
         //
         // result, arg_var_index, var_index_stack
