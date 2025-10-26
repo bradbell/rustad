@@ -337,7 +337,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             // new_tape_id, new_index, new_ad_type
             let (new_tape_id, new_index, new_ad_type) =
                 local_key.with_borrow_mut( |tape|
-                    [< record_ $Name:lower _aa >]::<V> ( tape, &self, &rhs )
+                    [< record_ $Name:lower _aa >]::<V> ( tape, self, rhs )
             );
             //
             // result
@@ -395,7 +395,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             // new_tape_id, new_index, new_ad_type
             let (new_tape_id, new_index, new_ad_type) =
                 local_key.with_borrow_mut( |tape|
-                    [< record_ $Name:lower _av >]::<V> ( tape, &self, &rhs )
+                    [< record_ $Name:lower _av >]::<V> ( tape, self, rhs )
             );
             //
             // result
