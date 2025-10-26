@@ -18,7 +18,7 @@ use crate::op::id;
 // ---------------------------------------------------------------------------
 //
 // Type
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum ADType {
     // Variable
     /// An AD object is a variable if it one of the domain variables
@@ -233,32 +233,82 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     where
         V : Clone ,
     {
+        // new_tape_id, new_index, new_ad_typ, cop_lhs, cop_rhs
         let mut new_tape_id   = 0;
         let mut new_index     = 0;
         let mut new_ad_type   = ADType::ConstantP;
-        if tape.recording {
-            let var_lhs    = lhs.tape_id == tape.tape_id;
-            let var_rhs    = rhs.tape_id == tape.tape_id;
+        let cop_lhs           = lhs.tape_id != tape.tape_id;
+        let cop_rhs           = rhs.tape_id != tape.tape_id;
+        //
+        if tape.recording && ! (cop_lhs && cop_rhs )
+        {   //
+            // new_tape_id
+            new_tape_id = tape.tape_id;
+            //
+            // TODO: fix so works without commenting out.
+            let var_lhs = (! cop_lhs); // && lhs.ad_type == ADType::Variable;
+            let var_rhs = (! cop_rhs); // && rhs.ad_type == ADType::Variable;
             if var_lhs || var_rhs {
+                //
+                // new_ad_type, new_index, tape.var.arg_seq
                 new_ad_type     = ADType::Variable;
-                new_tape_id     = tape.tape_id;
                 new_index       = tape.var.n_dep + tape.var.n_dom;
-                tape.var.n_dep += 1;
                 tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
+                //
+                // tape.var.n_dep
+                tape.var.n_dep += 1;
+                //
+                // tape.var.id_seq
                 if var_lhs && var_rhs {
                     tape.var.id_seq.push( id::[< $Name:upper _VV_OP >] );
-                    tape.var.arg_all.push( lhs.index as IndexT );
-                    tape.var.arg_all.push( rhs.index as IndexT );
                 } else if var_lhs {
                     tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
+                } else {
+                    tape.var.id_seq.push( id::[< $Name:upper _PV_OP >] );
+                }
+                //
+                // tape.var.arg_all, tape.cop
+                if cop_lhs {
+                    tape.var.arg_all.push( tape.cop.len() as IndexT );
+                    tape.cop.push( lhs.value.clone() );
+                } else {
                     tape.var.arg_all.push( lhs.index as IndexT );
+                }
+                //
+                // tape.var.arg_all, tape.cop
+                if cop_rhs {
                     tape.var.arg_all.push( tape.cop.len() as IndexT );
                     tape.cop.push( rhs.value.clone() );
                 } else {
-                    tape.var.id_seq.push( id::[< $Name:upper _PV_OP >] );
-                    tape.var.arg_all.push( tape.cop.len() as IndexT );
-                    tape.cop.push( lhs.value.clone() );
                     tape.var.arg_all.push( rhs.index as IndexT );
+                }
+            } else {
+                //
+                // new_ad_type, new_index, tape.dyp.arg_seq
+                new_ad_type     = ADType::DynamicP;
+                new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
+                tape.dyp.arg_seq.push( tape.dyp.arg_all.len() as IndexT );
+                //
+                // tape.dyp.n_dep
+                tape.dyp.n_dep += 1;
+                //
+                // tape.dyp.id_seq
+                tape.dyp.id_seq.push( id::[< $Name:upper _PP_OP >] );
+                //
+                // tape.dyp.arg_all, tape.cop
+                if cop_lhs {
+                    tape.dyp.arg_all.push( tape.cop.len() as IndexT );
+                    tape.cop.push( lhs.value.clone() );
+                } else {
+                    tape.dyp.arg_all.push( lhs.index as IndexT );
+                }
+                //
+                // tape.dyp.arg_all, tape.cop
+                if cop_rhs {
+                    tape.dyp.arg_all.push( tape.cop.len() as IndexT );
+                    tape.cop.push( rhs.value.clone() );
+                } else {
+                    tape.dyp.arg_all.push( rhs.index as IndexT );
                 }
             }
         }
