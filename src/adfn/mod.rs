@@ -25,6 +25,9 @@ use crate::{
     AD,
 };
 //
+// ADType
+use crate::ADType;
+//
 // IndexT
 use crate::IndexT;
 //
@@ -61,6 +64,13 @@ pub struct ADfn<V> {
     // The variable operation sequence
     pub(crate) var : OpSequence,
     //
+    // range2ad_type
+    /// The length of this vector is the dimension of the range space.
+    /// If range2ad_type\[i\] is Variable (DynamicP) {ConstantP},
+    /// the i-th range space component is a
+    /// variable (dynamic parameter) {constant parameter}.
+    pub(crate) range2ad_type : Vec<ADType>,
+    //
     // range_is_var
     /// The length of this vector is the dimension of the range space.
     /// If range_is_var\[i\] is true (false), the i-th range space component
@@ -69,8 +79,9 @@ pub struct ADfn<V> {
     //
     // range2index
     /// The length of this vector is also the dimension of the range space.
-    /// If range_is_var\[i\] is true (false), range2index\[i\] is the
-    /// variable (constant) index for the i-th component of the range space.
+    /// If range2ad_type\[i\] is Variable (DynamicP) {ConstantP},
+    /// range2index\[i]\ is a variable index
+    /// (dynamic parameter index) {constant parameter index} .
     pub(crate) range2index         : Vec<IndexT>,
     //
     // cop
@@ -93,13 +104,15 @@ impl<V> ADfn<V> {
     /// let f : ADfn<f32> = ADfn::new();
     /// assert_eq!( f.domain_len(), 0 );
     /// assert_eq!( f.range_len(), 0 );
+    /// assert_eq!( f.cop_len(), 0 );
     /// ```
     pub fn new() -> Self {
         Self {
             var              : OpSequence::new(),
+            range2ad_type    : Vec::new() ,
             range_is_var     : Vec::new() ,
             range2index      : Vec::new() ,
-            cop              : Vec::new()  ,
+            cop              : Vec::new() ,
         }
     }
     //
@@ -109,7 +122,11 @@ impl<V> ADfn<V> {
     //
     // range_len
     /// dimension of range space
-    pub fn range_len(&self) -> usize { self.range_is_var.len() }
+    pub fn range_len(&self) -> usize {
+        assert_eq!( self.range_is_var.len(), self.range2ad_type.len() );
+        assert_eq!( self.range2index.len(), self.range2ad_type.len() );
+        self.range2ad_type.len()
+    }
     //
     // cop_len
     /// number of constant parameters in this function
@@ -120,9 +137,8 @@ impl<V> ADfn<V> {
     pub fn swap(&mut self, other : &mut ADfn<V>) {
         std::mem::swap( &mut self.var,           &mut other.var );
         std::mem::swap( &mut self.cop,           &mut other.cop );
+        std::mem::swap( &mut self.range2ad_type, &mut other.range2ad_type );
         std::mem::swap( &mut self.range_is_var,  &mut other.range_is_var );
-        std::mem::swap(
-            &mut self.range2index, &mut other.range2index
-        );
+        std::mem::swap( &mut self.range2index,   &mut other.range2index );
     }
 }

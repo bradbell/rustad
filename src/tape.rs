@@ -428,13 +428,15 @@ where
         tape.tape_id
     } );
     //
-    // range_is_var, range2index, con_all
+    // range2ad_type, range_is_var, range2index, con_all
     // TODO: figure out how to do this without any cloning of values.
     for i in 0 .. arange.len() {
         if arange[i].tape_id == tape_id {
+            ad_fn.range2ad_type.push( arange[i].ad_type.clone() );
             ad_fn.range_is_var.push( true );
             ad_fn.range2index.push( arange[i].index as IndexT );
         } else {
+            ad_fn.range2ad_type.push( ADType::ConstantP );
             ad_fn.range_is_var.push( false );
             ad_fn.range2index.push( ad_fn.cop.len() as IndexT  );
             ad_fn.cop.push( arange[i].value.clone() );
