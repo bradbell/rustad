@@ -16,6 +16,27 @@ use crate::tape::Tape;
 use crate::tape::sealed::ThisThreadTape;
 use crate::op::id;
 // ---------------------------------------------------------------------------
+//
+// Type
+#[derive(Clone, Debug)]
+pub enum ADType {
+    // Variable
+    /// An AD object is a variable if it one of the domain variables
+    /// or its value depends on the value of a domain variable.
+    Variable,
+    //
+    // DynamicP
+    /// If an AD object is not a variable,
+    /// it is a dynamic parameter if it one of the domain parameters
+    /// or its value depends on the value of a domain parameter.
+    DynamicP,
+    //
+    // ConstantP
+    /// If an AD object is not a variable or dynamic parameter
+    /// it is a constant parameter.
+    ConstantP,
+}
+// ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter V.
 ///
 /// The generic parameter *V* , in ``AD`` < *V* > and other generic types ,
@@ -29,42 +50,31 @@ pub fn doc_generic_v() {}
 ///
 /// * V : see [doc_generic_v]
 ///
-/// * variable :
-/// An AD object is a variable if it one of the domain variables
-/// or its value depends on the value of a domain variable.
-///
-/// * dynamic parameter :
-/// If an AD object is not a variable,
-/// it is a dynamic parameter if it one of the domain parameters
-/// or its value depends on the value of a domain parameter.
-///
-/// * constant parameter :
-/// If an AD object is not a variable or dynamic parameter
-/// it is a constant parameter.
-///
 #[derive(Clone, Debug)]
 pub struct AD<V> {
     //
     // tape_id
     ///
     /// This is the tape_id that the value of index below corresponds to.
-    /// 1.  The tape_id zero never gets recorded, so the value of index
-    ///     does not matter for that case.
-    /// 2.  This is a constant parameter if its tape_id is different
+    /// 1.  The tape_id zero never gets recorded.
+    ///     The value of index and ad_type do not matter for this case.
+    /// 2.  This object is a constant parameter if its tape_id is different
     ///     from the tape_id for this thread's tape.
+    ///     The value of index and ad_type do not matter for this case.
     pub(crate) tape_id   : usize,
     //
     // index
-    /// is the variable or parameter index for this object.
+    /// If this AD object's tape_id is the same as this thread's tape_id,
+    /// *index* is the index in this thread's tape for this AD object.
     pub(crate) index : usize,
     //
-    // is_var
-    /// If is_var is true (false), index is a variable
-    /// (dynamic parameter) index.
-    pub is_var : bool,
+    // ad_type
+    /// If this AD object's tape_id is the same as this thread's tape_id,
+    /// *ad_type* is Variable or DynamicP and is the type of this AD object.
+    pub ad_type : ADType,
     //
     // value
-    /// is the value of this AD variable or paraemter.
+    /// is the value of this AD object.
     pub(crate) value : V,
 }
 //
@@ -77,16 +87,19 @@ impl<V> AD<V> {
     ///
     /// * new_index : is the [AD::index] for the new object.
     ///
-    /// *is_var : is the [AD::is_var] for the new object.
+    /// *ad_type : is the [AD::ad_type] for the new object.
     ///
     /// * new_value : is the [AD::value] for the new object.
     pub(crate) fn new(
-        new_tape_id: usize, new_index: usize, new_is_var : bool, new_value: V
+        new_tape_id   : usize,
+        new_index     : usize,
+        new_ad_type   : ADType,
+        new_value     : V,
     )-> Self {
         Self {
             tape_id   : new_tape_id,
             index     : new_index,
-            is_var    : new_is_var,
+            ad_type   : new_ad_type,
             value     : new_value,
         }
     }
@@ -216,18 +229,18 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         tape: &mut Tape<V> ,
         lhs:       &AD<V>  ,
         rhs:       &AD<V>  ,
-    ) -> (usize, usize, bool)
+    ) -> (usize, usize, ADType)
     where
         V : Clone ,
     {
         let mut new_tape_id   = 0;
         let mut new_index     = 0;
-        let mut new_is_var    = false;
+        let mut new_ad_type   = ADType::ConstantP;
         if tape.recording {
             let var_lhs    = lhs.tape_id == tape.tape_id;
             let var_rhs    = rhs.tape_id == tape.tape_id;
             if var_lhs || var_rhs {
-                new_is_var      = true;
+                new_ad_type     = ADType::Variable;
                 new_tape_id     = tape.tape_id;
                 new_index       = tape.var.n_dep + tape.var.n_dom;
                 tape.var.n_dep += 1;
@@ -249,7 +262,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 }
             }
         }
-        (new_tape_id, new_index, new_is_var)
+        (new_tape_id, new_index, new_ad_type)
     }
     //
     #[doc = concat!(
@@ -271,14 +284,14 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             let local_key : &LocalKey< RefCell< Tape<V> > > =
                 ThisThreadTape::get();
             //
-            // new_tape_id, new_index, new_is_var
-            let (new_tape_id, new_index, new_is_var) =
+            // new_tape_id, new_index, new_ad_type
+            let (new_tape_id, new_index, new_ad_type) =
                 local_key.with_borrow_mut( |tape|
                     [< record_ $Name:lower _aa >]::<V> ( tape, &self, &rhs )
             );
             //
             // result
-            AD::new(new_tape_id, new_index, new_is_var, new_value)
+            AD::new(new_tape_id, new_index, new_ad_type, new_value)
         }
     }
     // -----------------------------------------------------------------------
@@ -286,17 +299,17 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         tape: &mut Tape<V> ,
         lhs:       &AD<V>  ,
         rhs:       &V      ,
-    ) -> (usize, usize, bool)
+    ) -> (usize, usize, ADType)
     where
         V : Clone ,
     {
         let mut new_tape_id   = 0;
         let mut new_index     = 0;
-        let mut new_is_var    = false;
+        let mut new_ad_type   = ADType::ConstantP;
         if tape.recording {
             let var_lhs    = lhs.tape_id == tape.tape_id;
             if var_lhs {
-                new_is_var      = true;
+                new_ad_type     = ADType::Variable;
                 new_tape_id     = tape.tape_id;
                 new_index       = tape.var.n_dep + tape.var.n_dom;
                 tape.var.n_dep += 1;
@@ -307,7 +320,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 tape.cop.push( rhs.clone() );
             }
         }
-        (new_tape_id, new_index, new_is_var)
+        (new_tape_id, new_index, new_ad_type)
     }
     //
     #[doc = concat!(
@@ -329,14 +342,14 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             let local_key : &LocalKey< RefCell< Tape<V> > > =
                 ThisThreadTape::get();
             //
-            // new_tape_id, new_index, new_is_var
-            let (new_tape_id, new_index, new_is_var) =
+            // new_tape_id, new_index, new_ad_type
+            let (new_tape_id, new_index, new_ad_type) =
                 local_key.with_borrow_mut( |tape|
                     [< record_ $Name:lower _av >]::<V> ( tape, &self, &rhs )
             );
             //
             // result
-            AD::new(new_tape_id, new_index, new_is_var, new_value)
+            AD::new(new_tape_id, new_index, new_ad_type, new_value)
         }
     }
 } } }
@@ -543,17 +556,17 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
         tape: &mut Tape<V> ,
         lhs:       &V      ,
         rhs:       &AD<V>  ,
-    ) -> (usize, usize, bool)
+    ) -> (usize, usize, ADType)
     where
         V : Clone ,
     {
         let mut new_tape_id   = 0;
         let mut new_index     = 0;
-        let mut new_is_var    = false;
+        let mut new_ad_type   = ADType::ConstantP;
         if tape.recording {
             let var_rhs    = rhs.tape_id == tape.tape_id;
             if var_rhs {
-                new_is_var      = true;
+                new_ad_type     = ADType::Variable;
                 new_tape_id     = tape.tape_id;
                 new_index       = tape.var.n_dep + tape.var.n_dom;
                 tape.var.n_dep += 1;
@@ -564,7 +577,7 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
                 tape.var.arg_all.push( rhs.index as IndexT );
             }
         }
-        (new_tape_id, new_index, new_is_var)
+        (new_tape_id, new_index, new_ad_type)
     }
 } } }
 record_value_op_ad!(Add, +=);
@@ -628,14 +641,14 @@ macro_rules! impl_value_op_ad{
                 > = crate::tape::sealed::ThisThreadTape::get();
                 //
                 // new_tape_id, new_index
-                let (new_tape_id, new_index, new_is_var) =
+                let (new_tape_id, new_index, new_ad_type) =
                     local_key.with_borrow_mut( |tape|
                         crate::ad::[< record_value_ $Name:lower _ad >]::<$V>
                             ( tape, &self, &rhs )
                     );
                 //
                 // result
-                AD::new(new_tape_id, new_index, new_is_var, new_value)
+                AD::new(new_tape_id, new_index, new_ad_type, new_value)
             }
         }
     } }
@@ -657,8 +670,8 @@ pub(crate) use impl_value_op_ad;
 pub fn ad_from_value<V>(value : V) -> AD<V> {
     let tape_id   = 0;
     let index     = 0;
-    let is_var    = false;
-    AD::new(tape_id, index, is_var, value)
+    let ad_type   = ADType::ConstantP;
+    AD::new(tape_id, index, ad_type, value)
 }
 // ---------------------------------------------------------------------------
 // ad_from_vector
@@ -678,12 +691,12 @@ pub fn ad_from_value<V>(value : V) -> AD<V> {
 /// ```
 pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
     assert_ne!( vec.len() , 0 );
-    let tape_id   = 0;
-    let index     = 0;
-    let is_var    = false;
-    let avec      = vec.into_iter().map(
-        |value| AD::new(tape_id, index, is_var, value)
-    ).collect();
+    let avec      = vec.into_iter().map( |value| {
+        let tape_id   = 0;
+        let index     = 0;
+        let ad_type   = ADType::ConstantP;
+        AD::new(tape_id, index, ad_type, value)
+    } ).collect();
     avec
 }
 // ---------------------------------------------------------------------------
@@ -756,9 +769,9 @@ macro_rules! impl_ad_from_f32{ ($V:ty) => {
         fn from( f32_value : f32 ) -> crate::AD<$V> {
             let tape_id         = 0;
             let index           = 0;
-            let is_var          = false;
+            let ad_type         = crate::ad::ADType::ConstantP;
             let value      : $V = f32_value.into();
-            crate::AD::new(tape_id, index, is_var, value)
+            crate::AD::new(tape_id, index, ad_type, value)
         }
     }
 } }
@@ -797,9 +810,9 @@ macro_rules! impl_ad_from_f64{ ($V:ty) => {
         fn from( f64_value : f64 ) -> crate::AD<$V> {
             let tape_id         = 0;
             let index           = 0;
-            let is_var          = false;
+            let ad_type         = crate::ad::ADType::ConstantP;
             let value      : $V = f64_value.into();
-            crate::AD::new(tape_id, index, is_var, value)
+            crate::AD::new(tape_id, index, ad_type, value)
         }
     }
 } }

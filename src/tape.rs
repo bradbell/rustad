@@ -12,8 +12,11 @@ use std::cell::RefCell;
 use std::thread::LocalKey;
 use std::sync::Mutex;
 //
-use crate::AD;
-use crate::ADfn;
+use crate::{
+    AD,
+    ADType,
+    ADfn,
+};
 //
 #[cfg(doc)]
 use crate::doc_generic_v;
@@ -299,15 +302,19 @@ where
     } );
     //
     // adom_dyp
-    let is_var  = false;
     let adom_dyp = dom_dyp.into_iter().enumerate().map(
-        | (index, value) | AD::new(tape_id, index, is_var, value)
+        | (index, value) | {
+            let ad_type  = ADType::DynamicP;
+            AD::new(tape_id, index, ad_type, value)
+        }
     ).collect();
     //
     // adom_var
-    let is_var  = true;
     let adom_var = dom_var.into_iter().enumerate().map(
-        | (index, value) | AD::new(tape_id, index , is_var, value)
+        | (index, value) | {
+            let ad_type  = ADType::Variable;
+            AD::new(tape_id, index , ad_type, value)
+        }
     ).collect();
     //
     (adom_dyp, adom_var)

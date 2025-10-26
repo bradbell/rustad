@@ -51,6 +51,7 @@ pub use numvec::{
 };
 pub use ad::{
     AD,
+    ADType,
     ad_from_value,
     ad_from_vector,
     ad_to_vector,
