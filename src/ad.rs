@@ -245,9 +245,18 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             // new_tape_id
             new_tape_id = tape.tape_id;
             //
-            // TODO: fix so works without commenting out.
-            let var_lhs = (! cop_lhs); // && lhs.ad_type == ADType::Variable;
-            let var_rhs = (! cop_rhs); // && rhs.ad_type == ADType::Variable;
+            if ! cop_lhs {
+                if lhs.ad_type != ADType::Variable {
+                    assert_eq!( lhs.ad_type , ADType::Variable );
+                }
+            }
+            if ! cop_rhs {
+                if rhs.ad_type != ADType::Variable {
+                    assert_eq!( rhs.ad_type , ADType::Variable );
+                }
+            }
+            let var_lhs = (! cop_lhs) && lhs.ad_type == ADType::Variable;
+            let var_rhs = (! cop_rhs) && rhs.ad_type == ADType::Variable;
             if var_lhs || var_rhs {
                 //
                 // new_ad_type, new_index, tape.var.arg_seq
@@ -499,6 +508,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 }
                 lhs.tape_id     = tape.tape_id;
                 lhs.index       = tape.var.n_dep + tape.var.n_dom;
+                lhs.ad_type     = ADType::Variable;
                 tape.var.n_dep += 1;
             }
         }
@@ -550,6 +560,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
                  //
                  lhs.index       = tape.var.n_dep + tape.var.n_dom;
                  tape.var.n_dep += 1;
+                 debug_assert!( lhs.ad_type == ADType::Variable );
              }
          }
      }
