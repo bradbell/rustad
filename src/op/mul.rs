@@ -195,7 +195,7 @@ where
     V             : Clone + ThisThreadTape ,
 {
     op_info_vec[MUL_PV_OP as usize] = OpInfo{
-        name              : "mul_cv",
+        name              : "mul_pv",
         forward_0_value   : mul_pv_forward_0::<V, V>,
         forward_0_ad      : mul_pv_forward_0::<V, AD<V> >,
         forward_1_value   : mul_pv_forward_1::<V, V>,
@@ -206,7 +206,7 @@ where
         rust_src          : mul_pv_rust_src,
     };
     op_info_vec[MUL_VP_OP as usize] = OpInfo{
-        name              : "mul_vc",
+        name              : "mul_vp",
         forward_0_value   : mul_vp_forward_0::<V, V>,
         forward_0_ad      : mul_vp_forward_0::<V, AD<V> >,
         forward_1_value   : mul_vp_forward_1::<V, V>,

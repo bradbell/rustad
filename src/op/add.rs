@@ -181,7 +181,7 @@ where
     for<'a> V     : Clone + ThisThreadTape + std::ops::AddAssign<&'a V>,
 {
     op_info_vec[ADD_PV_OP as usize] = OpInfo{
-        name              : "add_cv",
+        name              : "add_pv",
         forward_0_value   : add_pv_forward_0::<V, V>,
         forward_0_ad      : add_pv_forward_0::<V, AD<V> >,
         forward_1_value   : add_pv_forward_1::<V, V>,
@@ -192,7 +192,7 @@ where
         rust_src          : add_pv_rust_src,
     };
     op_info_vec[ADD_VP_OP as usize] = OpInfo{
-        name              : "add_vc",
+        name              : "add_vp",
         forward_0_value   : add_vp_forward_0::<V, V>,
         forward_0_ad      : add_vp_forward_0::<V, AD<V> >,
         forward_1_value   : add_vp_forward_1::<V, V>,
