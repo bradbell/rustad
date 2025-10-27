@@ -10,6 +10,7 @@
 //
 use crate::vec_set::VecSet;
 use crate::ADfn;
+use crate::ADType;
 use crate::IndexT;
 use crate::op::info::GlobalOpInfoVec;
 use crate::op::info::OpInfo;
@@ -91,15 +92,15 @@ where
         let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
         //
         // n_domain, n_var, flag_all, arg_all, op2arg,
-        // range_is_var, range2index, n_range
+        // range2ad_type, range2index, n_range
         let n_domain          = self.var.n_dom;
         let id_all            = &self.var.id_seq;
         let flag_all          = &self.var.flag;
         let arg_all           = &self.var.arg_all;
         let op2arg            = &self.var.arg_seq;
-        let range_is_var      = &self.range_is_var;
+        let range2ad_type     = &self.range2ad_type;
         let range2index       = &self.range2index;
-        let n_range           = range_is_var.len();
+        let n_range           = range2ad_type.len();
         //
         // result, arg_var_index, arg_var_usize, set_vec
         let mut result          : Vec< [usize; 2] > = Vec::new();
@@ -115,7 +116,7 @@ where
         if trace {
             let mut range_var_index : Vec<IndexT> = Vec::new();
             for i in 0 .. range2index.len() {
-                if range_is_var[i] {
+                if range2ad_type[i] == ADType::Variable {
                         range_var_index.push(  range2index[i] );
                 }
             }
@@ -165,7 +166,7 @@ where
                 );
             }
         }
-        for i in 0 .. n_range { if range_is_var[i] {
+        for i in 0 .. n_range { if range2ad_type[i] == ADType::Variable {
             let row_var_index = range2index[i] as usize;
             let set           = set_vec.get(row_var_index);
             for j in 0 .. set.len() {

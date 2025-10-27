@@ -9,6 +9,7 @@
 // ---------------------------------------------------------------------------
 //
 use crate::ADfn;
+use crate::ADType;
 use crate::IndexT;
 use crate::op::info::GlobalOpInfoVec;
 use crate::op::info::OpInfo;
@@ -101,11 +102,11 @@ where
         let flag_all          = &self.var.flag;
         let arg_all           = &self.var.arg_all;
         let op2arg            = &self.var.arg_seq;
-        let range_is_var      = &self.range_is_var;
+        let range2ad_type     = &self.range2ad_type;
         let range2index       = &self.range2index;
         //
         // n_range
-        let n_range           = range_is_var.len();
+        let n_range           = range2ad_type.len();
         //
         // done
         // initialize all elements as n_var (an invalid variable index)
@@ -124,7 +125,7 @@ where
         //
         // row
         // determine the variables that range index row depends on
-        for row in 0 .. n_range { if range_is_var[row] {
+        for row in 0 .. n_range { if range2ad_type[row] == ADType::Variable {
             //
             // var_index
             let var_index = range2index[row] as usize;

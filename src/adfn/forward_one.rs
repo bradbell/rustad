@@ -11,6 +11,7 @@
 //
 use crate::AD;
 use crate::ADfn;
+use crate::ADType;
 use crate::op::info::GlobalOpInfoVec;
 use crate::adfn::eval_from::eval_from_f32;
 //
@@ -186,9 +187,9 @@ macro_rules! forward_one {
             }
             if trace {
                 println!( "range_index, var_index, con_index" );
-                for i in 0 .. self.range_is_var.len() {
+                for i in 0 .. self.range2ad_type.len() {
                     let index = self.range2index[i] as usize;
-                    if self.range_is_var[i] {
+                    if self.range2ad_type[i] == ADType::Variable {
                         println!( "{}, {}, ----", i, index);
                     } else {
                         println!( "{}, ---- ,{}", i, index);
@@ -197,9 +198,9 @@ macro_rules! forward_one {
                 println!( "End Trace: forward_one" );
             }
             let mut range_one : Vec<$E> = Vec::new();
-            for i in 0 .. self.range_is_var.len() {
+            for i in 0 .. self.range2ad_type.len() {
                 let index = self.range2index[i] as usize;
-                if self.range_is_var[i] {
+                if self.range2ad_type[i] == ADType::Variable {
                     range_one.push( var_one[index].clone() );
                 } else {
                     range_one.push( zero_e.clone() );
