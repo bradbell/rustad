@@ -22,6 +22,7 @@ use crate::tape::sealed::ThisThreadTape;
 use crate::{
     IndexT,
     AD,
+    ADType,
     ad_from_vector,
     AtomEvalVecPublic,
     ThisThreadTapePublic,
@@ -382,6 +383,7 @@ where
     ).collect();
     //
     // is_var_res
+    // TODO: fix to handle dynamic parameters
     let is_var_res = forward_depend(&is_var_arg, call_info, trace);
     //
     // arange, n_dep_res
@@ -390,6 +392,7 @@ where
     for i in 0 .. call_n_res {
         if is_var_res[i] {
             arange[i].tape_id   = tape.tape_id;
+            arange[i].ad_type   = ADType::Variable;
             arange[i].index     = n_var + n_dep_res;
             n_dep_res += 1;
         }
