@@ -177,9 +177,9 @@ macro_rules! forward_zero {
             // var_one
             if trace {
                 println!( "range_index, var_index, con_index" );
-                for i in 0 .. self.range2ad_type.len() {
-                    let index = self.range2index[i] as usize;
-                    if self.range2ad_type[i] == ADType::Variable {
+                for i in 0 .. self.range_ad_type.len() {
+                    let index = self.range_index[i] as usize;
+                    if self.range_ad_type[i] == ADType::Variable {
                         println!( "{}, {}, ----", i, index);
                     } else {
                         println!( "{}, ---- ,{}", i, index);
@@ -188,9 +188,9 @@ macro_rules! forward_zero {
                 println!( "End Trace: forward_zero" );
             }
             let mut range_zero : Vec<$E> = Vec::new();
-            for i in 0 .. self.range2ad_type.len() {
-                let index = self.range2index[i] as usize;
-                if self.range2ad_type[i] == ADType::Variable {
+            for i in 0 .. self.range_ad_type.len() {
+                let index = self.range_index[i] as usize;
+                if self.range_ad_type[i] == ADType::Variable {
                     range_zero.push( var_zero[index].clone() );
                 } else {
                     let constant_v = self.cop[index].clone();

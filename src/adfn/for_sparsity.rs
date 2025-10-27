@@ -92,15 +92,15 @@ where
         let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
         //
         // n_domain, n_var, flag_all, arg_all, op2arg,
-        // range2ad_type, range2index, n_range
+        // range_ad_type, range_index, n_range
         let n_domain          = self.var.n_dom;
         let id_all            = &self.var.id_seq;
         let flag_all          = &self.var.flag;
         let arg_all           = &self.var.arg_all;
         let op2arg            = &self.var.arg_seq;
-        let range2ad_type     = &self.range2ad_type;
-        let range2index       = &self.range2index;
-        let n_range           = range2ad_type.len();
+        let range_ad_type     = &self.range_ad_type;
+        let range_index       = &self.range_index;
+        let n_range           = range_ad_type.len();
         //
         // result, arg_var_index, arg_var_usize, set_vec
         let mut result          : Vec< [usize; 2] > = Vec::new();
@@ -115,9 +115,9 @@ where
         //
         if trace {
             let mut range_var_index : Vec<IndexT> = Vec::new();
-            for i in 0 .. range2index.len() {
-                if range2ad_type[i] == ADType::Variable {
-                        range_var_index.push(  range2index[i] );
+            for i in 0 .. range_index.len() {
+                if range_ad_type[i] == ADType::Variable {
+                        range_var_index.push(  range_index[i] );
                 }
             }
             println!( "Begin Trace: for_sparisty: n_domain = {}", n_domain);
@@ -166,8 +166,8 @@ where
                 );
             }
         }
-        for i in 0 .. n_range { if range2ad_type[i] == ADType::Variable {
-            let row_var_index = range2index[i] as usize;
+        for i in 0 .. n_range { if range_ad_type[i] == ADType::Variable {
+            let row_var_index = range_index[i] as usize;
             let set           = set_vec.get(row_var_index);
             for j in 0 .. set.len() {
                 let row =  i as usize;

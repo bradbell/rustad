@@ -96,17 +96,17 @@ where
         // op_info_vec
         let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
         //
-        // n_domain ... range2index.
+        // n_domain ... range_index.
         let n_domain          = self.var.n_dom;
         let n_dep             = self.var.n_dep;
         let flag_all          = &self.var.flag;
         let arg_all           = &self.var.arg_all;
         let op2arg            = &self.var.arg_seq;
-        let range2ad_type     = &self.range2ad_type;
-        let range2index       = &self.range2index;
+        let range_ad_type     = &self.range_ad_type;
+        let range_index       = &self.range_index;
         //
         // n_range
-        let n_range           = range2ad_type.len();
+        let n_range           = range_ad_type.len();
         //
         // done
         // initialize all elements as n_var (an invalid variable index)
@@ -125,10 +125,10 @@ where
         //
         // row
         // determine the variables that range index row depends on
-        for row in 0 .. n_range { if range2ad_type[row] == ADType::Variable {
+        for row in 0 .. n_range { if range_ad_type[row] == ADType::Variable {
             //
             // var_index
-            let var_index = range2index[row] as usize;
+            let var_index = range_index[row] as usize;
             if trace {
                 println!( "row = {}", row );
             }

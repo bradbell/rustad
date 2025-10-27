@@ -167,14 +167,14 @@ where
         }
         //
         // range
-        let n_range = self.range2ad_type.len();
+        let n_range = self.range_ad_type.len();
         src = src +
             "   //\n" +
             "   // range\n" +
             "   range.reserve(" + &n_range.to_string() + ");\n";
         for i in 0 .. n_range {
-            let index = self.range2index[i] as usize;
-            if self.range2ad_type[i] == ADType::Variable {
+            let index = self.range_index[i] as usize;
+            if self.range_ad_type[i] == ADType::Variable {
                 if index < self.var.n_dom {
                     let i_str = index.to_string();
                     src = src +

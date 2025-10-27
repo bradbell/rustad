@@ -128,7 +128,7 @@ macro_rules! reverse_one {
             let n_var = self.var.n_dom + self.var.n_dep;
             //
             assert_eq!(
-                range_one.len(), self.range2ad_type.len(),
+                range_one.len(), self.range_ad_type.len(),
                 "f.reverse_one: range vector length does not match f"
             );
             assert_eq!(
@@ -145,10 +145,10 @@ macro_rules! reverse_one {
             // var_one
             let mut var_one       = vec![ zero_e; n_var ];
             let mut mut_range_one = range_one;
-            for i in (0 .. self.range2ad_type.len()).rev() {
+            for i in (0 .. self.range_ad_type.len()).rev() {
                 let y_i = mut_range_one.pop().unwrap();
-                if self.range2ad_type[i] == ADType::Variable {
-                    let index = self.range2index[i] as usize;
+                if self.range_ad_type[i] == ADType::Variable {
+                    let index = self.range_index[i] as usize;
                     var_one[index] = y_i;
                 }
             }
@@ -164,9 +164,9 @@ macro_rules! reverse_one {
                     println!( "{}, {}", j, self.cop[j] );
                 }
                 println!( "var_index, range_one" );
-                for i in 0 .. self.range2ad_type.len() {
-                    if self.range2ad_type[i] == ADType::Variable {
-                        let index = self.range2index[i] as usize;
+                for i in 0 .. self.range_ad_type.len() {
+                    if self.range_ad_type[i] == ADType::Variable {
+                        let index = self.range_index[i] as usize;
                         println!( "{}, {}", index,  var_one[index] );
                     }
                 }
