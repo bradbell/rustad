@@ -480,9 +480,9 @@ pub fn doc_ad_compound_op() { }
 macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     // ------------------------------------------------------------------------
     fn [< record_ $Name:lower _assign_aa >]<V> (
-         tape: &mut Tape<V> ,
-         lhs:  &mut AD<V>   ,
-         rhs:  &    AD<V>   )
+        tape: &mut Tape<V> ,
+        lhs:  &mut AD<V>   ,
+        rhs:  &    AD<V>   )
     where
        V : Clone,
     {
@@ -542,28 +542,28 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
         }
     }
     // ------------------------------------------------------------------------
-     fn [< record_ $Name:lower _assign_av >]<V> (
-         tape: &mut Tape<V> ,
-         lhs:  &mut AD<V>   ,
-         rhs:  &    V       )
-     where
+    fn [< record_ $Name:lower _assign_av >]<V> (
+        tape: &mut Tape<V> ,
+        lhs:  &mut AD<V>   ,
+        rhs:  &    V       )
+    where
         V : Clone,
-     {
-         if tape.recording {
-             let var_lhs    = lhs.tape_id == tape.tape_id;
-             if var_lhs {
-                 tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
-                 tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
-                 tape.var.arg_all.push( lhs.index as IndexT);
-                 tape.var.arg_all.push( tape.cop.len() as IndexT );
-                 tape.cop.push( rhs.clone() );
-                 //
-                 lhs.index       = tape.var.n_dep + tape.var.n_dom;
-                 tape.var.n_dep += 1;
-                 debug_assert!( lhs.ad_type == ADType::Variable );
-             }
-         }
-     }
+    {
+        if tape.recording {
+            let var_lhs    = lhs.tape_id == tape.tape_id;
+            if var_lhs {
+                tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
+                tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
+                tape.var.arg_all.push( lhs.index as IndexT);
+                tape.var.arg_all.push( tape.cop.len() as IndexT );
+                tape.cop.push( rhs.clone() );
+                //
+                lhs.index       = tape.var.n_dep + tape.var.n_dom;
+                tape.var.n_dep += 1;
+                debug_assert!( lhs.ad_type == ADType::Variable );
+            }
+        }
+    }
     //
     #[doc = concat!(
         "`AD<V>` ", stringify!($Op), " & V; see [doc_ad_compound_op]"
