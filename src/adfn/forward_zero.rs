@@ -200,13 +200,14 @@ macro_rules! forward_zero {
             }
             range_zero
         }
-    } } }
-    //
-    impl<V> ADfn<V>
-    where
-        V     : From<f32> + Clone + std::fmt::Display + GlobalOpInfoVec,
-    {   //
-        // forward_zero
-        forward_zero!( value, V, V );
-        forward_zero!( ad,    V, AD::<V> );
     }
+} }
+//
+impl<V> ADfn<V>
+where
+    V     : From<f32> + Clone + std::fmt::Display + GlobalOpInfoVec,
+{   //
+    // forward_zero
+    forward_zero!( value, V, V );
+    forward_zero!( ad,    V, AD::<V> );
+}

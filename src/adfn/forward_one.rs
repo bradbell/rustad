@@ -208,13 +208,14 @@ macro_rules! forward_one {
             }
             range_one
         }
-    } } }
-    //
-    impl<V> ADfn<V>
-    where
-        V     : From<f32> + Clone + std::fmt::Display + GlobalOpInfoVec,
-    {   //
-        // forward_one
-        forward_one!( value, V, V );
-        forward_one!( ad,    V, AD::<V> );
     }
+} }
+//
+impl<V> ADfn<V>
+where
+    V     : From<f32> + Clone + std::fmt::Display + GlobalOpInfoVec,
+{   //
+    // forward_one
+    forward_one!( value, V, V );
+    forward_one!( ad,    V, AD::<V> );
+}

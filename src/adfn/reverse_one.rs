@@ -207,13 +207,14 @@ macro_rules! reverse_one {
             domain_one.shrink_to_fit();
             domain_one
         }
-    } } }
-    //
-    impl<V> ADfn<V>
-    where
-        V     : From<f32> + Clone + std::fmt::Display + GlobalOpInfoVec,
-    {   //
-        // reverse_one
-        reverse_one!( value, V, V );
-        reverse_one!( ad,    V, AD::<V> );
     }
+} }
+//
+impl<V> ADfn<V>
+where
+    V     : From<f32> + Clone + std::fmt::Display + GlobalOpInfoVec,
+{   //
+    // reverse_one
+    reverse_one!( value, V, V );
+    reverse_one!( ad,    V, AD::<V> );
+}

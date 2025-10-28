@@ -232,7 +232,7 @@ where
 ///
 /// * Syntax :
 /// ```text
-///     (adom_dyp, adom_var) = start_recording(dom_dyp, dom_var)
+///     (adom_dyp, adom_var) = start_recording_both(dom_dyp, dom_var)
 /// ```
 ///
 /// * V : see [doc_generic_v]
