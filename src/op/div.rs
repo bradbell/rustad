@@ -80,7 +80,7 @@ where
         forward_1_ad      : forward_one_ad_none::<V>,
         reverse_1_value   : reverse_one_value_none::<V>,
         reverse_1_ad      : reverse_one_ad_none::<V>,
-        rust_src          : rust_src_none::<V>,
+        rust_src          : rust_src_none,
         arg_var_index     : binary::binary_pp_arg_var_index,
     };
     op_info_vec[DIV_PV_OP as usize] = OpInfo{

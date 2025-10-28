@@ -24,8 +24,18 @@ use crate::op::binary;
 use crate::tape::sealed::ThisThreadTape;
 use crate::IndexT;
 use crate::ad::AD;
-use crate::op::info::OpInfo;
+use crate::op::info::{
+    OpInfo,
+    no_forward_zero_value,
+    no_forward_zero_ad,
+    no_forward_one_value,
+    no_forward_one_ad,
+    no_reverse_one_value,
+    no_reverse_one_ad,
+    no_rust_src,
+};
 use crate::op::id::{
+    MUL_PP_OP,
     MUL_PV_OP,
     MUL_VP_OP,
     MUL_VV_OP,
@@ -178,6 +188,15 @@ where
 }
 // ---------------------------------------------------------------------------
 // set_op_info
+//
+no_forward_zero_value!(Mul);
+no_forward_zero_ad!(Mul);
+no_forward_one_value!(Mul);
+no_forward_one_ad!(Mul);
+no_reverse_one_value!(Mul);
+no_reverse_one_ad!(Mul);
+no_rust_src!(Mul);
+//
 /// Set the operator information for all the Mul operators.
 ///
 /// * op_info_vec :
@@ -194,6 +213,17 @@ where
     for<'a> &'a V : std::ops::Mul<&'a V, Output = V> ,
     V             : Clone + ThisThreadTape ,
 {
+    op_info_vec[MUL_PP_OP as usize] = OpInfo{
+        name              : "mul_pp",
+        forward_0_value   : forward_zero_value_none::<V>,
+        forward_0_ad      : forward_zero_ad_none::<V>,
+        forward_1_value   : forward_one_value_none::<V>,
+        forward_1_ad      : forward_one_ad_none::<V>,
+        reverse_1_value   : reverse_one_value_none::<V>,
+        reverse_1_ad      : reverse_one_ad_none::<V>,
+        rust_src          : rust_src_none,
+        arg_var_index     : binary::binary_pp_arg_var_index,
+    };
     op_info_vec[MUL_PV_OP as usize] = OpInfo{
         name              : "mul_pv",
         forward_0_value   : mul_pv_forward_0::<V, V>,
@@ -202,8 +232,8 @@ where
         forward_1_ad      : mul_pv_forward_1::<V, AD<V> >,
         reverse_1_value   : mul_pv_reverse_1::<V, V>,
         reverse_1_ad      : mul_pv_reverse_1::<V, AD<V> >,
-        arg_var_index     : binary::binary_pv_arg_var_index,
         rust_src          : mul_pv_rust_src,
+        arg_var_index     : binary::binary_pv_arg_var_index,
     };
     op_info_vec[MUL_VP_OP as usize] = OpInfo{
         name              : "mul_vp",
@@ -213,8 +243,8 @@ where
         forward_1_ad      : mul_vp_forward_1::<V, AD<V> >,
         reverse_1_value   : mul_vp_reverse_1::<V, V>,
         reverse_1_ad      : mul_vp_reverse_1::<V, AD<V> >,
-        arg_var_index     : binary::binary_vp_arg_var_index,
         rust_src          : mul_vp_rust_src,
+        arg_var_index     : binary::binary_vp_arg_var_index,
     };
     op_info_vec[MUL_VV_OP as usize] = OpInfo{
         name              : "mul_vv",
@@ -224,7 +254,7 @@ where
         forward_1_ad      : mul_vv_forward_1::<V, AD<V> >,
         reverse_1_value   : mul_vv_reverse_1::<V, V>,
         reverse_1_ad      : mul_vv_reverse_1::<V, AD<V> >,
-        arg_var_index     : binary::binary_vv_arg_var_index,
         rust_src          : mul_vv_rust_src,
+        arg_var_index     : binary::binary_vv_arg_var_index,
     };
 }

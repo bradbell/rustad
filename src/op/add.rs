@@ -24,8 +24,18 @@ use crate::op::binary;
 use crate::tape::sealed::ThisThreadTape;
 use crate::IndexT;
 use crate::ad::AD;
-use crate::op::info::OpInfo;
+use crate::op::info::{
+    OpInfo,
+    no_forward_zero_value,
+    no_forward_zero_ad,
+    no_forward_one_value,
+    no_forward_one_ad,
+    no_reverse_one_value,
+    no_reverse_one_ad,
+    no_rust_src,
+};
 use crate::op::id::{
+    ADD_PP_OP,
     ADD_PV_OP,
     ADD_VP_OP,
     ADD_VV_OP,
@@ -169,6 +179,15 @@ where
 }
 // ---------------------------------------------------------------------------
 // set_op_info
+//
+no_forward_zero_value!(Add);
+no_forward_zero_ad!(Add);
+no_forward_one_value!(Add);
+no_forward_one_ad!(Add);
+no_reverse_one_value!(Add);
+no_reverse_one_ad!(Add);
+no_rust_src!(Add);
+//
 /// Set the operator information for all the Add operators.
 ///
 /// * op_info_vec :
@@ -180,6 +199,17 @@ where
     for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
     for<'a> V     : Clone + ThisThreadTape + std::ops::AddAssign<&'a V>,
 {
+    op_info_vec[ADD_PP_OP as usize] = OpInfo{
+        name              : "add_pp",
+        forward_0_value   : forward_zero_value_none::<V>,
+        forward_0_ad      : forward_zero_ad_none::<V>,
+        forward_1_value   : forward_one_value_none::<V>,
+        forward_1_ad      : forward_one_ad_none::<V>,
+        reverse_1_value   : reverse_one_value_none::<V>,
+        reverse_1_ad      : reverse_one_ad_none::<V>,
+        rust_src          : rust_src_none,
+        arg_var_index     : binary::binary_pp_arg_var_index,
+    };
     op_info_vec[ADD_PV_OP as usize] = OpInfo{
         name              : "add_pv",
         forward_0_value   : add_pv_forward_0::<V, V>,
@@ -199,8 +229,8 @@ where
         forward_1_ad      : add_vp_forward_1::<V, AD<V> >,
         reverse_1_value   : add_vp_reverse_1::<V, V>,
         reverse_1_ad      : add_vp_reverse_1::<V, AD<V> >,
-        arg_var_index     : binary::binary_vp_arg_var_index,
         rust_src          : add_vp_rust_src,
+        arg_var_index     : binary::binary_vp_arg_var_index,
     };
     op_info_vec[ADD_VV_OP as usize] = OpInfo{
         name              : "add_vv",
@@ -210,7 +240,7 @@ where
         forward_1_ad      : add_vv_forward_1::<V, AD<V> >,
         reverse_1_value   : add_vv_reverse_1::<V, V>,
         reverse_1_ad      : add_vv_reverse_1::<V, AD<V> >,
-        arg_var_index     : binary::binary_vv_arg_var_index,
         rust_src          : add_vv_rust_src,
+        arg_var_index     : binary::binary_vv_arg_var_index,
     };
 }
