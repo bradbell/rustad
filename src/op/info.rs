@@ -38,10 +38,42 @@ use crate::{
 /// * arg :
 /// The arguments for this operator as a sub-vector of all the arguments.
 ///
+/// * arg_cop :
+/// If arg_cop\[i\], then arg\[i\] is a constant parameter index.
+///
 /// * res :
 /// The variable index corresponding to the first result for this operator.
 #[cfg(doc)]
 pub fn doc_common_arguments() {}
+// ---------------------------------------------------------------------------
+// ForwardDyp
+/// Evaluation of dependent dynamic parameters.
+///
+/// * dyp_zero :
+/// is the vector of the dynamic parameters in the following order:
+/// domain dynamic parameters, dependent dynamic parameters.
+/// This is an input for variable indices less than *res* and an output
+/// for the results of this operator.
+///
+/// * Other Arguments :  see [doc_common_arguments]
+pub type ForwardDyp<V, E> = fn(
+    _dyp_zero : &mut Vec<E> ,
+    _con      : &Vec<V>     ,
+    _flag     : &Vec<bool>  ,
+    _arg      : &[IndexT]   ,
+    _arg_cop  : &[bool]     ,
+    _res      : usize       ,
+);
+// panic_zero
+/// default [ForwardDyp] function will panic
+fn panic_dyp<V, E> (
+    _dyp_zero : &mut Vec<E> ,
+    _con      : &Vec<V>     ,
+    _flag     : &Vec<bool>  ,
+    _arg      : &[IndexT]   ,
+    _arg_cop  : &[bool]     ,
+    _res      : usize       ,
+) { panic!(); }
 // ---------------------------------------------------------------------------
 // ForwardZero
 /// Evaluation of zero order forward mode.
@@ -116,7 +148,42 @@ fn panic_one<V, E> (
     _res      : usize       ,
 ) { panic!(); }
 // --------------------------------------------------------------------------
-// no_forward_one_value
+//
+// no_forward_dyp_value
+/// defines forward_dyp_value_none `<V>`
+macro_rules! no_forward_dyp_value{ ($Op:ident) => {
+    pub fn forward_dyp_value_none<V> (
+        _dyp_zero : &mut Vec<V> ,
+        _con      : &Vec<V>     ,
+        _flag     : &Vec<bool>  ,
+        _arg      : &[IndexT]   ,
+        _arg_cop  : &[bool]     ,
+        _res      : usize       ,
+    ) { panic!( concat!(
+        stringify!($Op) ,
+        ": forward_dyp_value not implemented for this operator" ,
+    ))}
+}}
+pub(crate) use no_forward_dyp_value;
+//
+// no_forward_dyp_ad
+/// defines forward_dyp_ad_none `<V>`
+macro_rules! no_forward_dyp_ad{ ($Op:ident) => {
+    pub fn forward_dyp_ad_none<V> (
+        _dyp_zero : &mut Vec< AD<V> > ,
+        _con      : &Vec<V>           ,
+        _flag     : &Vec<bool>        ,
+        _arg      : &[IndexT]         ,
+        _arg_cop  : &[bool]           ,
+        _res      : usize             ,
+    ) { panic!( concat!(
+        stringify!($Op) ,
+        ": forward_dyp_ad not implemented for this operator" ,
+    ))}
+}}
+pub(crate) use no_forward_dyp_ad;
+//
+// no_forward_zero_value
 /// defines forward_zero_value_none `<V>`
 macro_rules! no_forward_zero_value{ ($Op:ident) => {
     pub fn forward_zero_value_none<V> (
@@ -302,7 +369,13 @@ pub struct OpInfo<V> {
     //
     /// name the user sees for this operator
     pub name : &'static str,
-        //
+    //
+    /// dependent dynamic parameter V evaluation for this operator
+    pub forward_dyp_value : ForwardDyp<V, V>,
+    //
+    /// dependent dynamic parameter `AD<V>` evaluation for this operator
+    pub forward_dyp_ad    : ForwardDyp<V, AD<V> >,
+    //
     /// zero order forward mode V evaluation for this operator
     pub forward_0_value : ForwardZero<V, V>,
     //
@@ -352,15 +425,17 @@ where
     V : Clone + From<f32> + ThisThreadTape + AtomEvalVec
 {
     let empty = OpInfo {
-        name             : &"panic",
-        forward_0_value  : panic_zero::<V, V>,
-        forward_0_ad     : panic_zero::<V, AD<V>>,
-        forward_1_value  : panic_one::<V, V>,
-        forward_1_ad     : panic_one::<V, AD<V>>,
-        reverse_1_value  : panic_one::<V, V>,
-        reverse_1_ad     : panic_one::<V, AD<V>>,
-        arg_var_index    : panic_arg_var_index,
-        rust_src         : panic_rust_src,
+        name               : &"panic",
+        forward_dyp_value  : panic_dyp::<V, V>,
+        forward_dyp_ad     : panic_dyp::<V, AD<V>>,
+        forward_0_value    : panic_zero::<V, V>,
+        forward_0_ad       : panic_zero::<V, AD<V>>,
+        forward_1_value    : panic_one::<V, V>,
+        forward_1_ad       : panic_one::<V, AD<V>>,
+        reverse_1_value    : panic_one::<V, V>,
+        reverse_1_ad       : panic_one::<V, AD<V>>,
+        rust_src           : panic_rust_src,
+        arg_var_index      : panic_arg_var_index,
     };
     let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
     crate::op::add::set_op_info::<V>(&mut result);

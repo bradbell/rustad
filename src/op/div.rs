@@ -26,6 +26,8 @@ use crate::IndexT;
 use crate::ad::AD;
 use crate::op::info::{
     OpInfo,
+    no_forward_dyp_value,
+    no_forward_dyp_ad,
     no_forward_zero_value,
     no_forward_zero_ad,
     no_forward_one_value,
@@ -53,6 +55,8 @@ binary::eval_binary_forward_0!(Div, /);
 // ---------------------------------------------------------------------------
 // set_op_info
 //
+no_forward_dyp_value!(Div);
+no_forward_dyp_ad!(Div);
 no_forward_zero_value!(Div);
 no_forward_zero_ad!(Div);
 no_forward_one_value!(Div);
@@ -74,6 +78,8 @@ where
 {
     op_info_vec[DIV_PP_OP as usize] = OpInfo{
         name              : "div_pp",
+        forward_dyp_value : forward_dyp_value_none::<V>,
+        forward_dyp_ad    : forward_dyp_ad_none::<V>,
         forward_0_value   : forward_zero_value_none::<V>,
         forward_0_ad      : forward_zero_ad_none::<V>,
         forward_1_value   : forward_one_value_none::<V>,
@@ -85,6 +91,8 @@ where
     };
     op_info_vec[DIV_PV_OP as usize] = OpInfo{
         name              : "div_pv",
+        forward_dyp_value : forward_dyp_value_none::<V>,
+        forward_dyp_ad    : forward_dyp_ad_none::<V>,
         forward_0_value   : div_pv_forward_0::<V, V>,
         forward_0_ad      : div_pv_forward_0::<V, AD<V> >,
         forward_1_value   : forward_one_value_none::<V>,
@@ -96,6 +104,8 @@ where
     };
     op_info_vec[DIV_VP_OP as usize] = OpInfo{
         name              : "div_vp",
+        forward_dyp_value : forward_dyp_value_none::<V>,
+        forward_dyp_ad    : forward_dyp_ad_none::<V>,
         forward_0_value   : div_vp_forward_0::<V, V>,
         forward_0_ad      : div_vp_forward_0::<V, AD<V> >,
         forward_1_value   : forward_one_value_none::<V>,
@@ -107,6 +117,8 @@ where
     };
     op_info_vec[DIV_VV_OP as usize] = OpInfo{
         name              : "div_vv",
+        forward_dyp_value : forward_dyp_value_none::<V>,
+        forward_dyp_ad    : forward_dyp_ad_none::<V>,
         forward_0_value   : div_vv_forward_0::<V, V>,
         forward_0_ad      : div_vv_forward_0::<V, AD<V> >,
         forward_1_value   : forward_one_value_none::<V>,

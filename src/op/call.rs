@@ -61,6 +61,10 @@ use crate::op::id::{
         CALL_OP,
         CALL_RES_OP,
 };
+use crate::op::info::{
+    no_forward_dyp_value,
+    no_forward_dyp_ad,
+};
 use crate::{
     AD,
     IndexT,
@@ -145,6 +149,7 @@ where
     }
     acon
 }
+// ----------------------------------------------------------------------
 //
 fn call_domain_zero_ad<'a, 'b, V>(
     avar_zero   : &'a Vec< AD<V> >    ,
@@ -677,6 +682,9 @@ fn call_arg_var_index(
 // ---------------------------------------------------------------------------
 //
 // set_op_info
+no_forward_dyp_value!(Call);
+no_forward_dyp_ad!(Call);
+//
 /// Set the operator information for call.
 ///
 /// * op_info_vec :
@@ -689,28 +697,43 @@ where
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
         name              : "call" ,
+        forward_dyp_value : forward_dyp_value_none::<V>,
+        forward_dyp_ad    : forward_dyp_ad_none::<V>,
         forward_0_value   : call_forward_0_value::<V>,
         forward_0_ad      : call_forward_0_ad::<V>,
         forward_1_value   : call_forward_1_value::<V>,
         forward_1_ad      : call_forward_1_ad::<V>,
         reverse_1_value   : call_reverse_1_value::<V>,
         reverse_1_ad      : call_reverse_1_ad::<V>,
-        arg_var_index     : call_arg_var_index,
         rust_src          : call_rust_src::<V>,
+        arg_var_index     : call_arg_var_index,
     };
     op_info_vec[CALL_RES_OP as usize] = OpInfo{
         name              : "call_res" ,
+        forward_dyp_value : no_op_dyp::<V, V>,
+        forward_dyp_ad    : no_op_dyp::<V, AD<V> >,
         forward_0_value   : no_op_zero::<V, V>,
         forward_0_ad      : no_op_zero::<V, AD<V> >,
         forward_1_value   : no_op_one::<V, V>,
         forward_1_ad      : no_op_one::<V, AD<V> >,
         reverse_1_value   : no_op_one::<V, V>,
         reverse_1_ad      : no_op_one::<V, AD<V> >,
-        arg_var_index     : no_op_arg_var_index,
         rust_src          : no_op_rust_src::<V>,
+        arg_var_index     : no_op_arg_var_index,
     };
 }
 // ---------------------------------------------------------------------------
+//
+// no_op_dyp
+/// [ForwardDyp](crate::op::info::ForwardDyp) function
+fn no_op_dyp<V, E>(
+    _dyp_zero : &mut Vec<E> ,
+    _con      : &Vec<V>     ,
+    _flag     : &Vec<bool>  ,
+    _arg      : &[IndexT]   ,
+    _arg_cop  : &[bool]     ,
+    _res      : usize       ,
+) { }
 //
 // no_op_zero
 /// [ForwardZero](crate::op::info::ForwardZero) function

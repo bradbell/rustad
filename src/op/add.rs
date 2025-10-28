@@ -26,6 +26,8 @@ use crate::IndexT;
 use crate::ad::AD;
 use crate::op::info::{
     OpInfo,
+    no_forward_dyp_value,
+    no_forward_dyp_ad,
     no_forward_zero_value,
     no_forward_zero_ad,
     no_forward_one_value,
@@ -180,6 +182,8 @@ where
 // ---------------------------------------------------------------------------
 // set_op_info
 //
+no_forward_dyp_value!(Add);
+no_forward_dyp_ad!(Add);
 no_forward_zero_value!(Add);
 no_forward_zero_ad!(Add);
 no_forward_one_value!(Add);
@@ -201,6 +205,8 @@ where
 {
     op_info_vec[ADD_PP_OP as usize] = OpInfo{
         name              : "add_pp",
+        forward_dyp_value : forward_dyp_value_none::<V>,
+        forward_dyp_ad    : forward_dyp_ad_none::<V>,
         forward_0_value   : forward_zero_value_none::<V>,
         forward_0_ad      : forward_zero_ad_none::<V>,
         forward_1_value   : forward_one_value_none::<V>,
@@ -212,6 +218,8 @@ where
     };
     op_info_vec[ADD_PV_OP as usize] = OpInfo{
         name              : "add_pv",
+        forward_dyp_value : forward_dyp_value_none::<V>,
+        forward_dyp_ad    : forward_dyp_ad_none::<V>,
         forward_0_value   : add_pv_forward_0::<V, V>,
         forward_0_ad      : add_pv_forward_0::<V, AD<V> >,
         forward_1_value   : add_pv_forward_1::<V, V>,
@@ -223,6 +231,8 @@ where
     };
     op_info_vec[ADD_VP_OP as usize] = OpInfo{
         name              : "add_vp",
+        forward_dyp_value : forward_dyp_value_none::<V>,
+        forward_dyp_ad    : forward_dyp_ad_none::<V>,
         forward_0_value   : add_vp_forward_0::<V, V>,
         forward_0_ad      : add_vp_forward_0::<V, AD<V> >,
         forward_1_value   : add_vp_forward_1::<V, V>,
@@ -234,6 +244,8 @@ where
     };
     op_info_vec[ADD_VV_OP as usize] = OpInfo{
         name              : "add_vv",
+        forward_dyp_value : forward_dyp_value_none::<V>,
+        forward_dyp_ad    : forward_dyp_ad_none::<V>,
         forward_0_value   : add_vv_forward_0::<V, V>,
         forward_0_ad      : add_vv_forward_0::<V, AD<V> >,
         forward_1_value   : add_vv_forward_1::<V, V>,
