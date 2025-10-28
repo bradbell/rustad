@@ -501,38 +501,16 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 local_key.with_borrow_mut( |tape|
                     [< record_ $Name:lower _aa >]::<V> ( tape, self, rhs )
             );
+            //
+            // self
             self.tape_id   = new_tape_id;
             self.index     = new_index;
             self.ad_type   = new_ad_type;
             //
-            // self.value
             self.value $Op &rhs.value;
         }
     }
     // ------------------------------------------------------------------------
-    fn [< record_ $Name:lower _assign_av >]<V> (
-        tape: &mut Tape<V> ,
-        lhs:  &mut AD<V>   ,
-        rhs:  &    V       )
-    where
-        V : Clone,
-    {
-        if tape.recording {
-            let var_lhs    = lhs.tape_id == tape.tape_id;
-            if var_lhs {
-                tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
-                tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
-                tape.var.arg_all.push( lhs.index as IndexT);
-                tape.var.arg_all.push( tape.cop.len() as IndexT );
-                tape.cop.push( rhs.clone() );
-                //
-                lhs.index       = tape.var.n_dep + tape.var.n_dom;
-                tape.var.n_dep += 1;
-                debug_assert!( lhs.ad_type == ADType::Variable );
-            }
-        }
-    }
-    //
     #[doc = concat!(
         "`AD<V>` ", stringify!($Op), " & V; see [doc_ad_compound_op]"
     )]
@@ -549,12 +527,16 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 ThisThreadTape::get();
             //
             // tape, self.tape_id, self.index
-            local_key.with_borrow_mut( |tape|
-                [< record_ $Name:lower _assign_av >]::<V> ( tape, self, rhs )
+            let (new_tape_id, new_index, new_ad_type) =
+                local_key.with_borrow_mut( |tape|
+                    [< record_ $Name:lower _av >]::<V> ( tape, self, rhs )
             );
             //
-            // self.value
-            // record above assuees that self.value is its value before this op
+            // self
+            self.tape_id   = new_tape_id;
+            self.index     = new_index;
+            self.ad_type   = new_ad_type;
+            //
             self.value $Op &rhs;
         }
     }
