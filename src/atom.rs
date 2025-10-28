@@ -409,12 +409,17 @@ where
         tape.var.arg_all.push( call_n_arg as IndexT );           // arg[2]
         tape.var.arg_all.push( call_n_res as IndexT );           // arg[3]
         tape.var.arg_all.push( tape.var.flag.len() as IndexT );  // arg[4]
+        for _j in 0 .. 5 {
+            tape.var.arg_cop.push( false );
+        }
         //
         // tape.var.arg_all
         for j in 0 .. call_n_arg {
             let index = if is_var_arg[j] {
+                tape.var.arg_cop.push( false );
                 adomain[j].index
             } else {
+                tape.var.arg_cop.push( false );
                 let cop_index = tape.cop.len();
                 tape.cop.push( adomain[j].value.clone() );
                 cop_index

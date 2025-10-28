@@ -53,6 +53,11 @@ pub(crate) struct OpSequence {
     /// starting at arg_seq\[index\] and ending with arg_seq\[index + 1\] .
     pub(crate) arg_all : Vec<IndexT>,
     //
+    // arg_cop
+    /// For each index in arg_all, the value arg_cop\[index\] is true (false),
+    /// if the value arg_all\[index\] is (is not) a constant parameter index.
+    pub(crate) arg_cop : Vec<bool>,
+    //
     // flag
     /// is a vector containing boolean flags.
     /// If an operator has boolean flags, one of its arguments in
@@ -72,6 +77,7 @@ impl OpSequence {
             id_seq    : Vec::new(),
             arg_seq   : Vec::new(),
             arg_all   : Vec::new() ,
+            arg_cop   : Vec::new() ,
             flag      : Vec::new() ,
         }
     }
@@ -408,6 +414,9 @@ where
         // more checks
         assert_eq!( tape.dyp.arg_seq.len()  , tape.dyp.id_seq.len() );
         assert_eq!( tape.var.arg_seq.len()  , tape.var.id_seq.len() );
+        //
+        assert_eq!( tape.dyp.arg_all.len()  , tape.dyp.arg_cop.len() );
+        assert_eq!( tape.var.arg_all.len()  , tape.var.arg_cop.len() );
         //
         assert_eq!( tape.dyp.n_dep , tape.dyp.id_seq.len());
         assert_eq!( tape.var.n_dep , tape.var.id_seq.len());
