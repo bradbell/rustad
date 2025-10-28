@@ -26,7 +26,10 @@ use crate::IndexT;
 use crate::ad::AD;
 use crate::op::info::{
     OpInfo,
-    operator_does_not_implement,
+    no_forward_one_value,
+    no_forward_one_ad,
+    no_reverse_one_value,
+    no_reverse_one_ad,
 };
 use crate::op::id::{
     DIV_PV_OP,
@@ -44,13 +47,13 @@ binary::binary_rust_src!(Div, /);
 // div_vv_forward_0
 binary::eval_binary_forward_0!(Div, /);
 // ---------------------------------------------------------------------------
-// forward_one_value_not_implemented
-// forward_one_ad_not_implemented
-// reverse_one_value_not_implemented
-// reverse_one_ad_not_implemented
-operator_does_not_implement!(Sub);
-// ---------------------------------------------------------------------------
 // set_op_info
+//
+no_forward_one_value!(Div);
+no_reverse_one_value!(Div);
+no_forward_one_ad!(Div);
+no_reverse_one_ad!(Div);
+//
 /// Set the operator information for all the Div operators.
 ///
 /// * op_info_vec :
@@ -66,10 +69,10 @@ where
         name              : "div_pv",
         forward_0_value   : div_pv_forward_0::<V, V>,
         forward_0_ad      : div_pv_forward_0::<V, AD<V> >,
-        forward_1_value   : forward_one_value_not_implemented::<V>,
-        forward_1_ad      : forward_one_ad_not_implemented::<V>,
-        reverse_1_value   : reverse_one_value_not_implemented::<V>,
-        reverse_1_ad      : reverse_one_ad_not_implemented::<V>,
+        forward_1_value   : forward_one_value_none::<V>,
+        forward_1_ad      : forward_one_ad_none::<V>,
+        reverse_1_value   : reverse_one_value_none::<V>,
+        reverse_1_ad      : reverse_one_ad_none::<V>,
         arg_var_index     : binary::binary_pv_arg_var_index,
         rust_src          : div_pv_rust_src,
     };
@@ -77,10 +80,10 @@ where
         name              : "div_vp",
         forward_0_value   : div_vp_forward_0::<V, V>,
         forward_0_ad      : div_vp_forward_0::<V, AD<V> >,
-        forward_1_value   : forward_one_value_not_implemented::<V>,
-        forward_1_ad      : forward_one_ad_not_implemented::<V>,
-        reverse_1_value   : reverse_one_value_not_implemented::<V>,
-        reverse_1_ad      : reverse_one_ad_not_implemented::<V>,
+        forward_1_value   : forward_one_value_none::<V>,
+        forward_1_ad      : forward_one_ad_none::<V>,
+        reverse_1_value   : reverse_one_value_none::<V>,
+        reverse_1_ad      : reverse_one_ad_none::<V>,
         arg_var_index     : binary::binary_vp_arg_var_index,
         rust_src          : div_vp_rust_src,
     };
@@ -88,10 +91,10 @@ where
         name              : "div_vv",
         forward_0_value   : div_vv_forward_0::<V, V>,
         forward_0_ad      : div_vv_forward_0::<V, AD<V> >,
-        forward_1_value   : forward_one_value_not_implemented::<V>,
-        forward_1_ad      : forward_one_ad_not_implemented::<V>,
-        reverse_1_value   : reverse_one_value_not_implemented::<V>,
-        reverse_1_ad      : reverse_one_ad_not_implemented::<V>,
+        forward_1_value   : forward_one_value_none::<V>,
+        forward_1_ad      : forward_one_ad_none::<V>,
+        reverse_1_value   : reverse_one_value_none::<V>,
+        reverse_1_ad      : reverse_one_ad_none::<V>,
         arg_var_index     : binary::binary_vv_arg_var_index,
         rust_src          : div_vv_rust_src,
     };
