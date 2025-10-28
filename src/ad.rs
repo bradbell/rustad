@@ -478,41 +478,6 @@ pub fn doc_ad_compound_op() { }
 //
 /// see [doc_ad_compound_op]
 macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
-    // ------------------------------------------------------------------------
-    fn [< record_ $Name:lower _assign_aa >]<V> (
-        tape: &mut Tape<V> ,
-        lhs:  &mut AD<V>   ,
-        rhs:  &    AD<V>   )
-    where
-       V : Clone,
-    {
-        if tape.recording {
-            let var_lhs    = lhs.tape_id == tape.tape_id;
-            let var_rhs    = rhs.tape_id == tape.tape_id;
-            if var_lhs || var_rhs {
-                tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
-                if var_lhs && var_rhs {
-                    tape.var.id_seq.push( id::[< $Name:upper _VV_OP >] );
-                    tape.var.arg_all.push( lhs.index as IndexT);
-                    tape.var.arg_all.push( rhs.index as IndexT);
-                } else if var_lhs {
-                    tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
-                    tape.var.arg_all.push( lhs.index as IndexT);
-                    tape.var.arg_all.push( tape.cop.len() as IndexT );
-                    tape.cop.push( rhs.value.clone() );
-                } else {
-                    tape.var.id_seq.push( id::[< $Name:upper _PV_OP >] );
-                    tape.var.arg_all.push( tape.cop.len() as IndexT );
-                    tape.cop.push( lhs.value.clone() );
-                    tape.var.arg_all.push( rhs.index as IndexT);
-                }
-                lhs.tape_id     = tape.tape_id;
-                lhs.index       = tape.var.n_dep + tape.var.n_dom;
-                lhs.ad_type     = ADType::Variable;
-                tape.var.n_dep += 1;
-            }
-        }
-    }
     //
     #[doc = concat!(
         "`AD<V>` ", stringify!($Op), " & `AD<V>`",
@@ -532,12 +497,15 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 ThisThreadTape::get();
             //
             // tape, self.tape_id, self.index
-            local_key.with_borrow_mut( |tape|
-                [< record_ $Name:lower _assign_aa >]::<V> ( tape, self, rhs )
+            let (new_tape_id, new_index, new_ad_type) =
+                local_key.with_borrow_mut( |tape|
+                    [< record_ $Name:lower _aa >]::<V> ( tape, self, rhs )
             );
+            self.tape_id   = new_tape_id;
+            self.index     = new_index;
+            self.ad_type   = new_ad_type;
             //
             // self.value
-            // record above assuees that self.value is its value before this op
             self.value $Op &rhs.value;
         }
     }
