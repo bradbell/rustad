@@ -11,6 +11,15 @@ use crate::IndexT;
 //
 // ---------------------------------------------------------------------------
 //
+// binary_pp_arg_var_index
+pub(crate) fn binary_pp_arg_var_index(
+    arg_var_index : &mut Vec<IndexT> ,
+    _flag         : &Vec<bool>       ,
+    _arg          : &[IndexT]        ,
+) {
+    arg_var_index.resize(0, 0 as IndexT);
+}
+//
 // binary_pv_arg_var_index
 pub(crate) fn binary_pv_arg_var_index(
     arg_var_index : &mut Vec<IndexT> ,

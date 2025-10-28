@@ -26,12 +26,16 @@ use crate::IndexT;
 use crate::ad::AD;
 use crate::op::info::{
     OpInfo,
+    no_forward_zero_value,
+    no_forward_zero_ad,
     no_forward_one_value,
     no_forward_one_ad,
     no_reverse_one_value,
     no_reverse_one_ad,
+    no_rust_src,
 };
 use crate::op::id::{
+    SUB_PP_OP,
     SUB_PV_OP,
     SUB_VP_OP,
     SUB_VV_OP,
@@ -49,10 +53,13 @@ binary::eval_binary_forward_0!(Sub, -);
 // ---------------------------------------------------------------------------
 // set_op_info
 //
+no_forward_zero_value!(Sub);
+no_forward_zero_ad!(Sub);
 no_forward_one_value!(Sub);
-no_reverse_one_value!(Sub);
 no_forward_one_ad!(Sub);
+no_reverse_one_value!(Sub);
 no_reverse_one_ad!(Sub);
+no_rust_src!(Sub);
 //
 /// Set the operator information for all the Sub operators.
 ///
@@ -65,6 +72,17 @@ where
     for<'a> &'a V : std::ops::Sub<&'a V, Output = V>          ,
     V             : Clone + ThisThreadTape                    ,
 {
+    op_info_vec[SUB_PP_OP as usize] = OpInfo{
+        name              : "sub_pp",
+        forward_0_value   : forward_zero_value_none::<V>,
+        forward_0_ad      : forward_zero_ad_none::<V>,
+        forward_1_value   : forward_one_value_none::<V>,
+        forward_1_ad      : forward_one_ad_none::<V>,
+        reverse_1_value   : reverse_one_value_none::<V>,
+        reverse_1_ad      : reverse_one_ad_none::<V>,
+        rust_src          : rust_src_none,
+        arg_var_index     : binary::binary_pp_arg_var_index,
+    };
     op_info_vec[SUB_PV_OP as usize] = OpInfo{
         name              : "sub_pv",
         forward_0_value   : sub_pv_forward_0::<V, V>,
@@ -73,8 +91,8 @@ where
         forward_1_ad      : forward_one_ad_none::<V>,
         reverse_1_value   : reverse_one_value_none::<V>,
         reverse_1_ad      : reverse_one_ad_none::<V>,
-        arg_var_index     : binary::binary_pv_arg_var_index,
         rust_src          : sub_pv_rust_src,
+        arg_var_index     : binary::binary_pv_arg_var_index,
     };
     op_info_vec[SUB_VP_OP as usize] = OpInfo{
         name              : "sub_vp",
@@ -84,8 +102,8 @@ where
         forward_1_ad      : forward_one_ad_none::<V>,
         reverse_1_value   : reverse_one_value_none::<V>,
         reverse_1_ad      : reverse_one_ad_none::<V>,
-        arg_var_index     : binary::binary_vp_arg_var_index,
         rust_src          : sub_vp_rust_src,
+        arg_var_index     : binary::binary_vp_arg_var_index,
     };
     op_info_vec[SUB_VV_OP as usize] = OpInfo{
         name              : "sub_vv",
@@ -95,7 +113,7 @@ where
         forward_1_ad      : forward_one_ad_none::<V>,
         reverse_1_value   : reverse_one_value_none::<V>,
         reverse_1_ad      : reverse_one_ad_none::<V>,
-        arg_var_index     : binary::binary_vv_arg_var_index,
         rust_src          : sub_vv_rust_src,
+        arg_var_index     : binary::binary_vv_arg_var_index,
     };
 }

@@ -115,6 +115,38 @@ fn panic_one<V, E> (
     _arg      : &[IndexT]   ,
     _res      : usize       ,
 ) { panic!(); }
+// --------------------------------------------------------------------------
+// no_forward_one_value
+/// defines forward_zero_value_none `<V>`
+macro_rules! no_forward_zero_value{ ($Op:ident) => {
+    pub fn forward_zero_value_none<V> (
+        _var_zero : &mut Vec<V> ,
+        _con      : &Vec<V>     ,
+        _flag     : &Vec<bool>  ,
+        _arg      : &[IndexT]   ,
+        _res      : usize       ,
+    ) { panic!( concat!(
+        stringify!($Op) ,
+        ": forward_zero_value not implemented for this operator" ,
+    ))}
+}}
+pub(crate) use no_forward_zero_value;
+//
+// no_forward_zero_ad
+/// defines forward_zero_ad_none `<V>`
+macro_rules! no_forward_zero_ad{ ($Op:ident) => {
+    pub fn forward_zero_ad_none<V> (
+        _var_zero : &mut Vec< AD<V> > ,
+        _con      : &Vec<V>           ,
+        _flag     : &Vec<bool>        ,
+        _arg      : &[IndexT]         ,
+        _res      : usize             ,
+    ) { panic!( concat!(
+        stringify!($Op) ,
+        ": forward_zero_ad not implemented for this operator" ,
+    ))}
+}}
+pub(crate) use no_forward_zero_ad;
 //
 // no_forward_one_value
 /// defines forward_one_value_none `<V>`
@@ -133,23 +165,6 @@ macro_rules! no_forward_one_value{ ($Op:ident) => {
 }}
 pub(crate) use no_forward_one_value;
 //
-// no_reverse_one_value
-/// defines reverse_one_value_none `<V>`
-macro_rules! no_reverse_one_value{ ($Op:ident) => {
-    pub fn reverse_one_value_none<V> (
-        _var_zero : &Vec<V>     ,
-        _var_one  : &mut Vec<V> ,
-        _con      : &Vec<V>     ,
-        _flag     : &Vec<bool>  ,
-        _arg      : &[IndexT]   ,
-        _res      : usize       ,
-    ) { panic!( concat!(
-        stringify!($Name) ,
-        ": forward_one_value not implemented for this operator" ,
-    ))}
-}}
-pub(crate) use no_reverse_one_value;
-//
 // no_forward_one_ad
 /// defines forward_one_ad_none `<V>`
 macro_rules! no_forward_one_ad{ ($Op:ident) => {
@@ -161,11 +176,28 @@ macro_rules! no_forward_one_ad{ ($Op:ident) => {
         _arg      : &[IndexT]         ,
         _res      : usize             ,
     ) { panic!( concat!(
-        stringify!($Name) ,
+        stringify!($Op) ,
         ": forward_one_ad not implemented for this operator" ,
     ))}
 }}
 pub(crate) use no_forward_one_ad;
+//
+// no_reverse_one_value
+/// defines reverse_one_value_none `<V>`
+macro_rules! no_reverse_one_value{ ($Op:ident) => {
+    pub fn reverse_one_value_none<V> (
+        _var_zero : &Vec<V>     ,
+        _var_one  : &mut Vec<V> ,
+        _con      : &Vec<V>     ,
+        _flag     : &Vec<bool>  ,
+        _arg      : &[IndexT]   ,
+        _res      : usize       ,
+    ) { panic!( concat!(
+        stringify!($Op) ,
+        ": forward_one_value not implemented for this operator" ,
+    ))}
+}}
+pub(crate) use no_reverse_one_value;
 //
 // no_reverse_one_ad
 /// defines reverse_one_ad_none `<V>`
@@ -178,11 +210,28 @@ macro_rules! no_reverse_one_ad{ ($Op:ident) => {
         _arg      : &[IndexT]         ,
         _res      : usize             ,
     ) { panic!( concat!(
-        stringify!($Name) ,
+        stringify!($Op) ,
         ": forward_one_ad not implemented for this operator" ,
     ))}
 }}
 pub(crate) use no_reverse_one_ad;
+//
+// no_rust_src
+/// defines rust_src_none `<V>`
+macro_rules! no_rust_src{ ($Op:ident) => {
+    pub fn rust_src_none<V>(
+        _not_used : V           ,
+        _n_domain : usize       ,
+        _flag     : &Vec<bool>  ,
+        _arg      : &[IndexT]   ,
+        _op_index : usize       ,
+    ) -> String
+    { panic!( concat!(
+        stringify!($Op) ,
+        ": rust_src not implemented for this operator" ,
+    ))}
+}}
+pub(crate) use no_rust_src;
 // ---------------------------------------------------------------------------
 // ArgVarIndex
 /// Return indices for variables that are arguments for an operation
@@ -272,11 +321,11 @@ pub struct OpInfo<V> {
     /// first order reverse mode `AD<V>` evaluation for this operator
     pub reverse_1_ad    : ReverseOne<V, AD<V> >,
     //
-    /// get indices for variables that are arguments to this function
-    pub arg_var_index   : ArgVarIndex,
-    //
     /// generate rust source code for this operator
     pub rust_src        : RustSrc<V>,
+    //
+    /// get indices for variables that are arguments to this function
+    pub arg_var_index   : ArgVarIndex,
 }
 // ---------------------------------------------------------------------------
 // op_info_vec
