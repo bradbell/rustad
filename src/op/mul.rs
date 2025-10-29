@@ -219,8 +219,8 @@ where
 {
     op_info_vec[MUL_PP_OP as usize] = OpInfo{
         name              : "mul_pp",
-        forward_dyp_value : forward_dyp_value_none::<V>,
-        forward_dyp_ad    : forward_dyp_ad_none::<V>,
+        forward_dyp_value : mul_forward_dyp::<V, V>,
+        forward_dyp_ad    : mul_forward_dyp::<V, AD<V> >,
         forward_0_value   : forward_zero_value_none::<V>,
         forward_0_ad      : forward_zero_ad_none::<V>,
         forward_1_value   : forward_one_value_none::<V>,

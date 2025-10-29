@@ -72,6 +72,34 @@ pub(crate) fn binary_vv_arg_var_index(
 macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     #[doc = concat!(
         " E zero order forward for parameter ", stringify!( $op ),
+        " parameter; see [ForwardDyp](crate::op::info::ForwardDyp)"
+    ) ]
+    fn [< $Name:lower _forward_dyp >] <V, E> (
+        dyp_zero    : &mut Vec<E> ,
+        con         : &Vec<V>     ,
+        _flag       : &Vec<bool>  ,
+        arg         : &[IndexT]   ,
+        arg_cop     : &[bool]     ,
+        res         : usize       )
+    where
+        for<'a> &'a V : std::ops::$Name<&'a E, Output = E> ,
+        for<'a> &'a E : std::ops::$Name<&'a V, Output = E> ,
+        for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,
+    {
+        assert_eq!( arg.len(), 2);
+        let lhs       = arg[0] as usize;
+        let rhs       = arg[1] as usize;
+        if arg_cop[0] {
+            debug_assert!( ! arg_cop[1] );
+            dyp_zero[ res ] = &con[lhs] $op &dyp_zero[rhs];
+        } else if arg_cop[1] {
+            dyp_zero[ res ] = &dyp_zero[lhs] $op &con[rhs];
+        } else {
+            dyp_zero[ res ] = &dyp_zero[lhs] $op &dyp_zero[rhs];
+        };
+    }
+    #[doc = concat!(
+        " E zero order forward for parameter ", stringify!( $op ),
         " variable; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
     fn [< $Name:lower _pv_forward_0 >] <V, E> (

@@ -9,6 +9,7 @@
 // ---------------------------------------------------------------------------
 // sub-modules
 //
+pub mod forward_dyp;
 pub mod forward_zero;
 pub mod forward_one;
 pub mod reverse_one;
@@ -60,6 +61,10 @@ pub fn doc_generic_e() {}
 ///
 pub struct ADfn<V> {
     //
+    // dyp
+    // The dynamic parameeter operation sequence
+    pub(crate) dyp : OpSequence,
+    //
     // var
     // The variable operation sequence
     pub(crate) var : OpSequence,
@@ -102,6 +107,7 @@ impl<V> ADfn<V> {
     /// ```
     pub fn new() -> Self {
         Self {
+            dyp              : OpSequence::new(),
             var              : OpSequence::new(),
             range_ad_type    : Vec::new() ,
             range_index      : Vec::new() ,

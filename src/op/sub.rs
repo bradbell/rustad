@@ -48,6 +48,7 @@ use crate::op::id::{
 // sub_vv_rust_src
 binary::binary_rust_src!(Sub, -);
 // -------------------------------------------------------------------------
+// sub_forward_dyp
 // sub_pv_forward_0
 // sub_vp_forward_0
 // sub_vv_forward_0
@@ -78,8 +79,8 @@ where
 {
     op_info_vec[SUB_PP_OP as usize] = OpInfo{
         name              : "sub_pp",
-        forward_dyp_value : forward_dyp_value_none::<V>,
-        forward_dyp_ad    : forward_dyp_ad_none::<V>,
+        forward_dyp_value : sub_forward_dyp::<V, V>,
+        forward_dyp_ad    : sub_forward_dyp::<V, AD<V> >,
         forward_0_value   : forward_zero_value_none::<V>,
         forward_0_ad      : forward_zero_ad_none::<V>,
         forward_1_value   : forward_one_value_none::<V>,

@@ -301,17 +301,21 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 // tape.dyp.arg_all, tape.cop
                 if cop_lhs {
                     tape.dyp.arg_all.push( tape.cop.len() as IndexT );
+                    tape.dyp.arg_cop.push( true );
                     tape.cop.push( lhs.value.clone() );
                 } else {
                     tape.dyp.arg_all.push( lhs.index as IndexT );
+                    tape.dyp.arg_cop.push( false );
                 }
                 //
                 // tape.dyp.arg_all, tape.cop
                 if cop_rhs {
                     tape.dyp.arg_all.push( tape.cop.len() as IndexT );
+                    tape.dyp.arg_cop.push( true );
                     tape.cop.push( rhs.value.clone() );
                 } else {
                     tape.dyp.arg_all.push( rhs.index as IndexT );
+                    tape.dyp.arg_cop.push( false );
                 }
             }
         }

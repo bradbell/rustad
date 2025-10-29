@@ -53,6 +53,7 @@ use crate::op::info::{
 // add_vv_rust_src
 binary::binary_rust_src!(Add, +);
 // -------------------------------------------------------------------------
+// add_forward_dyp
 // add_pv_forward_0
 // add_vp_forward_0
 // add_vv_forward_0
@@ -205,8 +206,8 @@ where
 {
     op_info_vec[ADD_PP_OP as usize] = OpInfo{
         name              : "add_pp",
-        forward_dyp_value : forward_dyp_value_none::<V>,
-        forward_dyp_ad    : forward_dyp_ad_none::<V>,
+        forward_dyp_value : add_forward_dyp::<V, V>,
+        forward_dyp_ad    : add_forward_dyp::<V, AD<V> >,
         forward_0_value   : forward_zero_value_none::<V>,
         forward_0_ad      : forward_zero_ad_none::<V>,
         forward_1_value   : forward_one_value_none::<V>,

@@ -427,6 +427,7 @@ where
         tape.dyp.arg_seq.push( tape.dyp.arg_all.len() as IndexT );
         //
         // ad_fn, tape
+        std::mem::swap(&mut ad_fn.dyp,  &mut tape.dyp);
         std::mem::swap(&mut ad_fn.var,  &mut tape.var);
         std::mem::swap(&mut ad_fn.cop,  &mut tape.cop);
         //
