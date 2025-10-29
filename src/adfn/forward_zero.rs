@@ -129,6 +129,9 @@ macro_rules! forward_zero {
                 "f.forward_zero: domain vector length does not match f"
             );
             //
+            // dyp_zero
+            let dyp_zero : Vec<$E> = Vec::new();
+            //
             // op_info_vec
             let op_info_vec = &*GlobalOpInfoVec::get();
             //
@@ -157,14 +160,21 @@ macro_rules! forward_zero {
                 println!( "var_index, var_zero, op_name, arg" );
             }
             for op_index in 0 .. self.var.id_seq.len() {
-                let op_id = self.var.id_seq[op_index] as usize;
-                let start = self.var.arg_seq[op_index] as usize;
-                let end   = self.var.arg_seq[op_index + 1] as usize;
-                let arg   = &self.var.arg_all[start .. end];
-                let res   = self.var.n_dom + op_index;
+                let op_id     = self.var.id_seq[op_index] as usize;
+                let start     = self.var.arg_seq[op_index] as usize;
+                let end       = self.var.arg_seq[op_index + 1] as usize;
+                let arg       = &self.var.arg_all[start .. end];
+                let arg_cop   = &self.var.arg_cop[start .. end];
+                let res       = self.var.n_dom + op_index;
                 let forward_0 = op_info_vec[op_id].[< forward_0_ $suffix >];
-                forward_0(var_zero,
-                    &self.cop, &self.var.flag, &arg, res
+                forward_0(
+                    &dyp_zero,
+                    var_zero,
+                    &self.cop,
+                    &self.var.flag,
+                    &arg,
+                    &arg_cop,
+                    res
                 );
                 if trace {
                     let name = &op_info_vec[op_id].name;

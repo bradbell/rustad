@@ -177,11 +177,15 @@ fn call_domain_zero_ad<'a, 'b, V>(
 // call_forward_0_value
 //
 /// V evaluation of zero order forward call operator for atomic functions
+///
+/// TODO : Extend this routine to work with dynamic parameters
 fn call_forward_0_value<V> (
+    _dyn_zero  : &Vec<V>       ,
     var_zero   : &mut Vec<V>   ,
     con        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
     arg        : &[IndexT]     ,
+    _arg_cop   : &[bool]       ,
     res        : usize         )
 where
     V : AtomEvalVec,
@@ -405,11 +409,15 @@ where
 // call_forward_0_ad
 //
 /// `AD<V>` evaluation of zero order forward call operator for atomic functions
+///
+/// TODO : Extend this routine to work with dynamic parameters
 fn call_forward_0_ad<V> (
-    avar_zero  : &mut Vec< AD<V> >  ,
+    _adyp_zero : &Vec< AD<V> >       ,
+    avar_zero  : &mut Vec< AD<V> >   ,
     con        : &Vec<V>             ,
     flag       : &Vec<bool>          ,
     arg        : &[IndexT]           ,
+    _arg_cop   : &[bool]             ,
     res        : usize               )
 where
     V : Clone + AtomEvalVec,
@@ -738,10 +746,12 @@ fn no_op_dyp<V, E>(
 // no_op_zero
 /// [ForwardZero](crate::op::info::ForwardZero) function
 fn no_op_zero<V, E>(
+    _dyp_zero : &Vec<E>     ,
     _var_zero : &mut Vec<E> ,
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
+    _arg_cop  : &[bool]     ,
     _res      : usize       ,
 ) { }
 //

@@ -26,8 +26,13 @@ use crate::{
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
 ///
+/// * dyp_zero :
+/// vector of all the dynamic parameters in the following order:
+/// the domain dynamic parameters followed by the dependent dynamic parameters.
+///
 /// * var_zero :
-/// vector of zero order results for all the variable by variable index.
+/// vector of all the variables in the following order:
+/// the domain variables followed by the dependent variables.
 ///
 /// * cop :
 /// vector of all the constant values used by operators.
@@ -49,13 +54,13 @@ pub fn doc_common_arguments() {}
 // ForwardDyp
 /// Evaluation of dependent dynamic parameters.
 ///
+/// * Arguments :  see [doc_common_arguments] .
+/// In addition, there is the following extra condition:
+///
 /// * dyp_zero :
-/// is the vector of the dynamic parameters in the following order:
-/// domain dynamic parameters, dependent dynamic parameters.
-/// This is an input for variable indices less than *res* and an output
+/// This is an input for dynamic parameters less than *res* and an output
 /// for the results of this operator.
 ///
-/// * Other Arguments :  see [doc_common_arguments]
 pub type ForwardDyp<V, E> = fn(
     _dyp_zero : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
@@ -76,28 +81,33 @@ fn panic_dyp<V, E> (
 ) { panic!(); }
 // ---------------------------------------------------------------------------
 // ForwardZero
-/// Evaluation of zero order forward mode.
+/// Evaluation of variables.
+///
+/// * Arguments :  see [doc_common_arguments] .
+/// In addition, there is the following extra condition:
 ///
 /// * var_zero :
-/// is the vector of zero order variable values.
 /// This is an input for variable indices less than *res* and an output
 /// for the results of this operator.
 ///
-/// * Other Arguments :  see [doc_common_arguments]
 pub type ForwardZero<V, E> = fn(
+    _dyp_zero : &Vec<E>     ,
     _var_zero : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
+    _arg_cop  : &[bool]     ,
     _res      : usize       ,
 );
 // panic_zero
 /// default [ForwardZero] function will panic
 fn panic_zero<V, E> (
+    _dyp_zero : &Vec<E>     ,
     _var_zero : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
+    _arg_cop  : &[bool]     ,
     _res      : usize       ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
@@ -187,10 +197,12 @@ pub(crate) use no_forward_dyp_ad;
 /// defines forward_zero_value_none `<V>`
 macro_rules! no_forward_zero_value{ ($Op:ident) => {
     pub fn forward_zero_value_none<V> (
+        _dyp_zero : &Vec<V>     ,
         _var_zero : &mut Vec<V> ,
         _cop      : &Vec<V>     ,
         _flag     : &Vec<bool>  ,
         _arg      : &[IndexT]   ,
+        _arg_cop  : &[bool]     ,
         _res      : usize       ,
     ) { panic!( concat!(
         stringify!($Op) ,
@@ -203,10 +215,12 @@ pub(crate) use no_forward_zero_value;
 /// defines forward_zero_ad_none `<V>`
 macro_rules! no_forward_zero_ad{ ($Op:ident) => {
     pub fn forward_zero_ad_none<V> (
+        _dyp_zero : &Vec< AD<V> >     ,
         _var_zero : &mut Vec< AD<V> > ,
         _cop      : &Vec<V>           ,
         _flag     : &Vec<bool>        ,
         _arg      : &[IndexT]         ,
+        _arg_cop  : &[bool]           ,
         _res      : usize             ,
     ) { panic!( concat!(
         stringify!($Op) ,

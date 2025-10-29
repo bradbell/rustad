@@ -86,11 +86,11 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         for<'a> &'a E : std::ops::$Name<&'a V, Output = E> ,
         for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,
     {
-        assert_eq!( arg.len(), 2);
+        debug_assert!( arg.len() == 2);
+        debug_assert!( ! ( arg_cop[0] && arg_cop[1] ) );
         let lhs       = arg[0] as usize;
         let rhs       = arg[1] as usize;
         if arg_cop[0] {
-            debug_assert!( ! arg_cop[1] );
             dyp_zero[ res ] = &cop[lhs] $op &dyp_zero[rhs];
         } else if arg_cop[1] {
             dyp_zero[ res ] = &dyp_zero[lhs] $op &cop[rhs];
@@ -103,51 +103,69 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         " variable; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
     fn [< $Name:lower _pv_forward_0 >] <V, E> (
+        dyp_zero    : &Vec<E>     ,
         var_zero    : &mut Vec<E> ,
         cop         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
+        arg_cop     : &[bool]     ,
         res         : usize       )
     where
         for<'a> &'a V : std::ops::$Name<&'a E, Output = E> ,
+        for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,
     {
-        assert_eq!( arg.len(), 2);
+        debug_assert!( arg.len() == 2);
+        debug_assert!( ! arg_cop[1] );
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
-        var_zero[ res ] = &cop[lhs] $op &var_zero[rhs];
+        if arg_cop[0] {
+            var_zero[ res ] = &cop[lhs] $op &var_zero[rhs];
+        } else {
+            var_zero[ res ] = &dyp_zero[lhs] $op &var_zero[rhs];
+        }
     }
     #[doc = concat!(
         " E zero order forward variable ", stringify!( $op ),
         " parameter; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
     fn [< $Name:lower _vp_forward_0 >] <V, E> (
+        dyp_zero    : &Vec<E>     ,
         var_zero    : &mut Vec<E> ,
         cop         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
+        arg_cop     : &[bool]     ,
         res         : usize       )
     where
         for<'a> &'a E : std::ops::$Name<&'a V, Output = E> ,
+        for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,
     {
-        assert_eq!( arg.len(), 2);
+        debug_assert!( arg.len() == 2);
+        debug_assert!( ! arg_cop[0] );
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
-        var_zero[ res ] = &var_zero[lhs] $op &cop[rhs];
+        if arg_cop[1] {
+            var_zero[ res ] = &var_zero[lhs] $op &cop[rhs];
+        } else {
+            var_zero[ res ] = &var_zero[lhs] $op &dyp_zero[rhs];
+        }
     }
     #[doc = concat!(
         " E zero order forward variable ", stringify!( $op ),
         " variable; see [ForwardZero](crate::op::info::ForwardZero)"
     ) ]
     fn [< $Name:lower _vv_forward_0 >] <V, E> (
+        _dyp_zero   : &Vec<E>     ,
         var_zero    : &mut Vec<E> ,
         _cop        : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
+        _arg_cop    : &[bool]     ,
         res         : usize       )
     where
         for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,
     {
-        assert_eq!( arg.len(), 2);
+        debug_assert!( arg.len() == 2);
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
         var_zero[ res ] = &var_zero[lhs] $op &var_zero[rhs];
