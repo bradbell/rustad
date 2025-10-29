@@ -66,12 +66,10 @@ but act as constants when differentiating.
 ## Wish List
 
 1.  Generate llvm, similar to the source code generation and use it
-    to speed up evaluation of ForwardZero, ForwardOne, and ReverseOne
-    for values.
+    to speed up evaluation of function values and derivatives.
 
 2.  In the case of NumVec operations, Generate GPU code and use it
-    to speed up evaluation of ForwardZero, ForwardOne, and ReverseOne
-    for values.
+    to speed up evaluation of function values and derivatives.
 
 ## User Documentation
 This package does not yet have a stable API. 

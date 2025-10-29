@@ -41,7 +41,7 @@ use crate::adfn::{
 };
 // ---------------------------------------------------------------------------
 //
-// AtomForwardZeroValue
+// AtomForwardVarValue
 /// Callback to atomic functions during [ADfn::forward_zero_value]
 ///
 /// * Required :
@@ -60,7 +60,7 @@ use crate::adfn::{
 /// The return value *range_one*
 /// contains the value of the atomic function range variables.
 ///
-pub type AtomForwardZeroValue<V> = fn(
+pub type AtomForwardVarValue<V> = fn(
     _domain_zero   : &Vec<&V>    ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
@@ -158,7 +158,7 @@ pub type AtomForwardDepend = fn(
     _trace          : bool       ,
 )-> Vec<bool>;
 //
-// AtomForwardZeroAD
+// AtomForwardVarAD
 /// Callback to atomic functions during [ADfn::forward_zero_ad]
 ///
 /// * Required :
@@ -179,7 +179,7 @@ pub type AtomForwardDepend = fn(
 /// The return value *arange_one*
 /// contains the value of the atomic function range variables.
 ///
-pub type AtomForwardZeroAD<V> = fn(
+pub type AtomForwardVarAD<V> = fn(
     _domain_zero   : &Vec<& AD<V> >     ,
     _call_info     : IndexT             ,
     _trace         : bool               ,
@@ -257,8 +257,8 @@ pub struct AtomEval<V> {
     pub name                 : &'static str              ,
     pub forward_depend       : AtomForwardDepend         ,
     //
-    pub forward_zero_value   : AtomForwardZeroValue::<V> ,
-    pub forward_zero_ad      : Option< AtomForwardZeroAD::<V> >,
+    pub forward_zero_value   : AtomForwardVarValue::<V> ,
+    pub forward_zero_ad      : Option< AtomForwardVarAD::<V> >,
     //
     pub forward_one_value    : Option< AtomForwardOneValue::<V> > ,
     pub forward_one_ad       : Option< AtomForwardOneAD::<V> >    ,
@@ -495,7 +495,7 @@ where
     let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
     //
     // forward_zero, forward_depend
-    let forward_zero   : AtomForwardZeroValue<V>;
+    let forward_zero   : AtomForwardVarValue<V>;
     let forward_depend : AtomForwardDepend;
     {   //
         // read_lock

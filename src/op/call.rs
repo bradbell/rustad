@@ -46,8 +46,8 @@ use std::sync::RwLock;
 //
 use crate::op::info::OpInfo;
 use crate::atom::{
-    AtomForwardZeroValue,
-    AtomForwardZeroAD,
+    AtomForwardVarValue,
+    AtomForwardVarAD,
     //
     AtomForwardOneValue,
     AtomForwardOneAD,
@@ -205,7 +205,7 @@ where
     // ----------------------------------------------------------------------
     //
     // forward_zero_value
-    let forward_zero_value : AtomForwardZeroValue<V>;
+    let forward_zero_value : AtomForwardVarValue<V>;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -268,7 +268,7 @@ where
     //
     // forward_zero_value, forward_one_value
     let  name              : &'static str;
-    let forward_zero_value : AtomForwardZeroValue<V>;
+    let forward_zero_value : AtomForwardVarValue<V>;
     let forward_one_value  : Option< AtomForwardOneValue<V> >;
     {   //
         // rw_lock
@@ -439,7 +439,7 @@ where
     //
     // forward_zero_ad
     let name            : &'static str;
-    let forward_zero_ad : Option< AtomForwardZeroAD<V> >;
+    let forward_zero_ad : Option< AtomForwardVarAD<V> >;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -511,7 +511,7 @@ where
     //
     // forward_zero_ad, forward_one_ad
     let name            : &'static str;
-    let forward_zero_ad : Option< AtomForwardZeroAD<V> >;
+    let forward_zero_ad : Option< AtomForwardVarAD<V> >;
     let forward_one_ad  : Option< AtomForwardOneAD<V> >;
     {   //
         // rw_lock
@@ -744,7 +744,7 @@ fn no_op_dyp<V, E>(
 ) { }
 //
 // no_op_zero
-/// [ForwardZero](crate::op::info::ForwardZero) function
+/// [ForwardVar](crate::op::info::ForwardVar) function
 fn no_op_zero<V, E>(
     _dyp_zero : &Vec<E>     ,
     _var_zero : &mut Vec<E> ,

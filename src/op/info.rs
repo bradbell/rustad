@@ -80,7 +80,7 @@ fn panic_dyp<V, E> (
     _res      : usize       ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
-// ForwardZero
+// ForwardVar
 /// Evaluation of variables.
 ///
 /// * Arguments :  see [doc_common_arguments] .
@@ -90,7 +90,7 @@ fn panic_dyp<V, E> (
 /// This is an input for variable indices less than *res* and an output
 /// for the results of this operator.
 ///
-pub type ForwardZero<V, E> = fn(
+pub type ForwardVar<V, E> = fn(
     _dyp_zero : &Vec<E>     ,
     _var_zero : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
@@ -100,7 +100,7 @@ pub type ForwardZero<V, E> = fn(
     _res      : usize       ,
 );
 // panic_zero
-/// default [ForwardZero] function will panic
+/// default [ForwardVar] function will panic
 fn panic_zero<V, E> (
     _dyp_zero : &Vec<E>     ,
     _var_zero : &mut Vec<E> ,
@@ -391,10 +391,10 @@ pub struct OpInfo<V> {
     pub forward_dyp_ad    : ForwardDyp<V, AD<V> >,
     //
     /// zero order forward mode V evaluation for this operator
-    pub forward_0_value : ForwardZero<V, V>,
+    pub forward_0_value : ForwardVar<V, V>,
     //
     /// zero order forward mode `AD<V>` evaluation for this operator
-    pub forward_0_ad    : ForwardZero<V, AD<V> >,
+    pub forward_0_ad    : ForwardVar<V, AD<V> >,
     //
     /// first order forward mode V evaluation for this operator
     pub forward_1_value : ForwardOne<V, V>,

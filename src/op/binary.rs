@@ -100,7 +100,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     }
     #[doc = concat!(
         " E zero order forward for parameter ", stringify!( $op ),
-        " variable; see [ForwardZero](crate::op::info::ForwardZero)"
+        " variable; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _pv_forward_0 >] <V, E> (
         dyp_zero    : &Vec<E>     ,
@@ -126,7 +126,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     }
     #[doc = concat!(
         " E zero order forward variable ", stringify!( $op ),
-        " parameter; see [ForwardZero](crate::op::info::ForwardZero)"
+        " parameter; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _vp_forward_0 >] <V, E> (
         dyp_zero    : &Vec<E>     ,
@@ -152,7 +152,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     }
     #[doc = concat!(
         " E zero order forward variable ", stringify!( $op ),
-        " variable; see [ForwardZero](crate::op::info::ForwardZero)"
+        " variable; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _vv_forward_0 >] <V, E> (
         _dyp_zero   : &Vec<E>     ,
@@ -192,7 +192,7 @@ pub(crate) use eval_binary_forward_0;
 macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
     #[doc = concat!(
         " rust source code for parameter ", stringify!( $op ),
-        " variable; see [ForwardZero](crate::op::info::ForwardZero)"
+        " variable; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _pv_rust_src >]<V> (
         _not_used   : V           ,
@@ -218,7 +218,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
     }
     #[doc = concat!(
         " rust source code for variable ", stringify!( $op ),
-        " parameter; see [ForwardZero](crate::op::info::ForwardZero)"
+        " parameter; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _vp_rust_src >]<V> (
         _not_used   : V           ,
@@ -244,7 +244,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
     }
     #[doc = concat!(
         " rust source code for variable ", stringify!( $op ),
-        " variable; see [ForwardZero](crate::op::info::ForwardZero)"
+        " variable; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _vv_rust_src >]<V> (
         _not_used   : V           ,
