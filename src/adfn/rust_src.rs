@@ -130,17 +130,17 @@ where
             "   // nan\n" +
             "   let nan = V::from( f32::NAN );\n";
         //
-        // con
+        // cop
         if 0 < self.cop.len() {
-            let n_con = self.cop.len().to_string();
+            let n_cop = self.cop.len().to_string();
             src = src +
-                "   // con\n" +
-                "   let mut con : Vec<V> = " + "vec![nan; " + &n_con + "];\n";
+                "   // cop\n" +
+                "   let mut cop : Vec<V> = " + "vec![nan; " + &n_cop + "];\n";
             for i in 0 .. self.cop.len() {
                 let i_str = i.to_string();
                 let c_str = self.cop[i].to_string();
                 src = src +
-                    "   con[" + &i_str + "] = " + &c_str + " as V;\n";
+                    "   cop[" + &i_str + "] = " + &c_str + " as V;\n";
             }
         }
         //
@@ -187,7 +187,7 @@ where
             } else {
                 let i_str = index.to_string();
                  src = src +
-                    "   range.push( con[" + &i_str + "] );\n";
+                    "   range.push( cop[" + &i_str + "] );\n";
             }
         }
         //

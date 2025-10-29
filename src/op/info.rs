@@ -29,7 +29,7 @@ use crate::{
 /// * var_zero :
 /// vector of zero order results for all the variable by variable index.
 ///
-/// * con :
+/// * cop :
 /// vector of all the constant values used by operators.
 ///
 /// * flag :
@@ -58,7 +58,7 @@ pub fn doc_common_arguments() {}
 /// * Other Arguments :  see [doc_common_arguments]
 pub type ForwardDyp<V, E> = fn(
     _dyp_zero : &mut Vec<E> ,
-    _con      : &Vec<V>     ,
+    _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _arg_cop  : &[bool]     ,
@@ -68,7 +68,7 @@ pub type ForwardDyp<V, E> = fn(
 /// default [ForwardDyp] function will panic
 fn panic_dyp<V, E> (
     _dyp_zero : &mut Vec<E> ,
-    _con      : &Vec<V>     ,
+    _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _arg_cop  : &[bool]     ,
@@ -86,7 +86,7 @@ fn panic_dyp<V, E> (
 /// * Other Arguments :  see [doc_common_arguments]
 pub type ForwardZero<V, E> = fn(
     _var_zero : &mut Vec<E> ,
-    _con      : &Vec<V>     ,
+    _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _res      : usize       ,
@@ -95,7 +95,7 @@ pub type ForwardZero<V, E> = fn(
 /// default [ForwardZero] function will panic
 fn panic_zero<V, E> (
     _var_zero : &mut Vec<E> ,
-    _con      : &Vec<V>     ,
+    _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _res      : usize       ,
@@ -113,7 +113,7 @@ fn panic_zero<V, E> (
 pub type ForwardOne<V, E> = fn(
     _var_zero : &Vec<E>     ,
     _var_one  : &mut Vec<E> ,
-    _con      : &Vec<V>     ,
+    _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _res      : usize       ,
@@ -132,7 +132,7 @@ pub type ForwardOne<V, E> = fn(
 pub type ReverseOne<V, E> = fn(
     _var_zero : &Vec<E>     ,
     _var_one  : &mut Vec<E> ,
-    _con      : &Vec<V>     ,
+    _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _res      : usize       ,
@@ -142,7 +142,7 @@ pub type ReverseOne<V, E> = fn(
 fn panic_one<V, E> (
     _var_zero : &Vec<E>     ,
     _var_one  : &mut Vec<E> ,
-    _con      : &Vec<V>     ,
+    _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _res      : usize       ,
@@ -154,7 +154,7 @@ fn panic_one<V, E> (
 macro_rules! no_forward_dyp_value{ ($Op:ident) => {
     pub fn forward_dyp_value_none<V> (
         _dyp_zero : &mut Vec<V> ,
-        _con      : &Vec<V>     ,
+        _cop      : &Vec<V>     ,
         _flag     : &Vec<bool>  ,
         _arg      : &[IndexT]   ,
         _arg_cop  : &[bool]     ,
@@ -171,7 +171,7 @@ pub(crate) use no_forward_dyp_value;
 macro_rules! no_forward_dyp_ad{ ($Op:ident) => {
     pub fn forward_dyp_ad_none<V> (
         _dyp_zero : &mut Vec< AD<V> > ,
-        _con      : &Vec<V>           ,
+        _cop      : &Vec<V>           ,
         _flag     : &Vec<bool>        ,
         _arg      : &[IndexT]         ,
         _arg_cop  : &[bool]           ,
@@ -188,7 +188,7 @@ pub(crate) use no_forward_dyp_ad;
 macro_rules! no_forward_zero_value{ ($Op:ident) => {
     pub fn forward_zero_value_none<V> (
         _var_zero : &mut Vec<V> ,
-        _con      : &Vec<V>     ,
+        _cop      : &Vec<V>     ,
         _flag     : &Vec<bool>  ,
         _arg      : &[IndexT]   ,
         _res      : usize       ,
@@ -204,7 +204,7 @@ pub(crate) use no_forward_zero_value;
 macro_rules! no_forward_zero_ad{ ($Op:ident) => {
     pub fn forward_zero_ad_none<V> (
         _var_zero : &mut Vec< AD<V> > ,
-        _con      : &Vec<V>           ,
+        _cop      : &Vec<V>           ,
         _flag     : &Vec<bool>        ,
         _arg      : &[IndexT]         ,
         _res      : usize             ,
@@ -221,7 +221,7 @@ macro_rules! no_forward_one_value{ ($Op:ident) => {
     pub fn forward_one_value_none<V> (
         _var_zero : &Vec<V>     ,
         _var_one  : &mut Vec<V> ,
-        _con      : &Vec<V>     ,
+        _cop      : &Vec<V>     ,
         _flag     : &Vec<bool>  ,
         _arg      : &[IndexT]   ,
         _res      : usize       ,
@@ -238,7 +238,7 @@ macro_rules! no_forward_one_ad{ ($Op:ident) => {
     pub fn forward_one_ad_none<V> (
         _var_zero : &Vec< AD<V> >     ,
         _var_one  : &mut Vec< AD<V> > ,
-        _con      : &Vec<V>           ,
+        _cop      : &Vec<V>           ,
         _flag     : &Vec<bool>        ,
         _arg      : &[IndexT]         ,
         _res      : usize             ,
@@ -255,7 +255,7 @@ macro_rules! no_reverse_one_value{ ($Op:ident) => {
     pub fn reverse_one_value_none<V> (
         _var_zero : &Vec<V>     ,
         _var_one  : &mut Vec<V> ,
-        _con      : &Vec<V>     ,
+        _cop      : &Vec<V>     ,
         _flag     : &Vec<bool>  ,
         _arg      : &[IndexT]   ,
         _res      : usize       ,
@@ -272,7 +272,7 @@ macro_rules! no_reverse_one_ad{ ($Op:ident) => {
     pub fn reverse_one_ad_none<V> (
         _var_zero : &Vec< AD<V> >     ,
         _var_one  : &mut Vec< AD<V> > ,
-        _con      : &Vec<V>           ,
+        _cop      : &Vec<V>           ,
         _flag     : &Vec<bool>        ,
         _arg      : &[IndexT]         ,
         _res      : usize             ,

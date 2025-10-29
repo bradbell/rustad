@@ -76,7 +76,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     ) ]
     fn [< $Name:lower _forward_dyp >] <V, E> (
         dyp_zero    : &mut Vec<E> ,
-        con         : &Vec<V>     ,
+        cop         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
         arg_cop     : &[bool]     ,
@@ -91,9 +91,9 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         let rhs       = arg[1] as usize;
         if arg_cop[0] {
             debug_assert!( ! arg_cop[1] );
-            dyp_zero[ res ] = &con[lhs] $op &dyp_zero[rhs];
+            dyp_zero[ res ] = &cop[lhs] $op &dyp_zero[rhs];
         } else if arg_cop[1] {
-            dyp_zero[ res ] = &dyp_zero[lhs] $op &con[rhs];
+            dyp_zero[ res ] = &dyp_zero[lhs] $op &cop[rhs];
         } else {
             dyp_zero[ res ] = &dyp_zero[lhs] $op &dyp_zero[rhs];
         };
@@ -104,7 +104,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     ) ]
     fn [< $Name:lower _pv_forward_0 >] <V, E> (
         var_zero    : &mut Vec<E> ,
-        con         : &Vec<V>     ,
+        cop         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
         res         : usize       )
@@ -114,7 +114,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         assert_eq!( arg.len(), 2);
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
-        var_zero[ res ] = &con[lhs] $op &var_zero[rhs];
+        var_zero[ res ] = &cop[lhs] $op &var_zero[rhs];
     }
     #[doc = concat!(
         " E zero order forward variable ", stringify!( $op ),
@@ -122,7 +122,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     ) ]
     fn [< $Name:lower _vp_forward_0 >] <V, E> (
         var_zero    : &mut Vec<E> ,
-        con         : &Vec<V>     ,
+        cop         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
         res         : usize       )
@@ -132,7 +132,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         assert_eq!( arg.len(), 2);
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
-        var_zero[ res ] = &var_zero[lhs] $op &con[rhs];
+        var_zero[ res ] = &var_zero[lhs] $op &cop[rhs];
     }
     #[doc = concat!(
         " E zero order forward variable ", stringify!( $op ),
@@ -140,7 +140,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     ) ]
     fn [< $Name:lower _vv_forward_0 >] <V, E> (
         var_zero    : &mut Vec<E> ,
-        _con        : &Vec<V>     ,
+        _cop        : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
         res         : usize       )
@@ -190,10 +190,10 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let res     = res - n_domain;
         let op      = stringify!($op);
         let src     = if rhs < n_domain {
-            format!("dep[{res}] = &con[{lhs}] {op} domain[{rhs}];")
+            format!("dep[{res}] = &cop[{lhs}] {op} domain[{rhs}];")
         } else {
             rhs = rhs - n_domain;
-            format!("dep[{res}] = &con[{lhs}] {op} &dep[{rhs}];")
+            format!("dep[{res}] = &cop[{lhs}] {op} &dep[{rhs}];")
         };
         let src = String::from("   ") + &src + "\n";
         src
@@ -216,10 +216,10 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let res    = res - n_domain;
         let op     = stringify!($op);
         let src    = if lhs < n_domain {
-            format!("dep[{res}] = domain[{lhs}] {op} &con[{rhs}];")
+            format!("dep[{res}] = domain[{lhs}] {op} &cop[{rhs}];")
         } else {
             lhs = lhs - n_domain;
-            format!("dep[{res}] = &dep[{lhs}] {op} &con[{rhs}];")
+            format!("dep[{res}] = &dep[{lhs}] {op} &cop[{rhs}];")
         };
         let src = String::from("   ") + &src + "\n";
         src

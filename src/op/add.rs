@@ -67,7 +67,7 @@ binary::eval_binary_forward_0!(Add, +);
 fn add_pv_forward_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
-    _con       :   &Vec<V>     ,
+    _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     res        :       usize   )
@@ -84,7 +84,7 @@ where
 fn add_vp_forward_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
-    _con       :   &Vec<V>     ,
+    _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     res        :       usize   )
@@ -101,7 +101,7 @@ where
 fn add_vv_forward_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
-    _con       :   &Vec<V>     ,
+    _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     res        :       usize   )
@@ -122,7 +122,7 @@ where
 fn add_pv_reverse_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
-    _con       :   &Vec<V>     ,
+    _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     res        :       usize   )
@@ -142,7 +142,7 @@ where
 fn add_vp_reverse_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
-    _con       :   &Vec<V>     ,
+    _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     res        :       usize   )
@@ -162,7 +162,7 @@ where
 fn add_vv_reverse_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
-    _con       :   &Vec<V>     ,
+    _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     res        :       usize   )

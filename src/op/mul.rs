@@ -70,7 +70,7 @@ binary::eval_binary_forward_0!(Mul, *);
 fn mul_pv_forward_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
-    con        :   &Vec<V>     ,
+    cop        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     res        :       usize   )
@@ -80,7 +80,7 @@ where
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
-    var_one[ res ] = &con[lhs] * &var_one[rhs];
+    var_one[ res ] = &cop[lhs] * &var_one[rhs];
 }
 //
 // mul_vp_forward_1
@@ -88,7 +88,7 @@ where
 fn mul_vp_forward_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
-    con        :   &Vec<V>     ,
+    cop        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     res        :       usize   )
@@ -98,7 +98,7 @@ where
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
-    var_one[ res ] = &var_one[lhs] * &con[rhs];
+    var_one[ res ] = &var_one[lhs] * &cop[rhs];
 }
 //
 // mul_vv_forward_1
@@ -106,7 +106,7 @@ where
 fn mul_vv_forward_1 <V, E>(
     var_zero   :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
-    _con       :   &Vec<V>     ,
+    _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     res        :       usize   )
@@ -130,7 +130,7 @@ where
 fn mul_pv_reverse_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
-    con        :   &Vec<V>     ,
+    cop        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     res        :       usize   )
@@ -141,7 +141,7 @@ where
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
-    let term      = &var_one[res] * &con[lhs];
+    let term      = &var_one[res] * &cop[lhs];
     var_one[rhs] += &term;
 }
 //
@@ -150,7 +150,7 @@ where
 fn mul_vp_reverse_1 <V, E>(
     _var_zero  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
-    con        :   &Vec<V>     ,
+    cop        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     res        :       usize   )
@@ -161,7 +161,7 @@ where
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
-    let term      = &var_one[res] * &con[rhs];
+    let term      = &var_one[res] * &cop[rhs];
     var_one[lhs] += &term;
 }
 //
@@ -170,7 +170,7 @@ where
 fn mul_vv_reverse_1 <V, E>(
     var_zero   :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
-    _con       :   &Vec<V>     ,
+    _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     res        :       usize   )
