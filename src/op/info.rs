@@ -391,10 +391,10 @@ pub struct OpInfo<V> {
     pub forward_dyp_ad    : ForwardDyp<V, AD<V> >,
     //
     /// zero order forward mode V evaluation for this operator
-    pub forward_0_value : ForwardVar<V, V>,
+    pub forward_var_value : ForwardVar<V, V>,
     //
     /// zero order forward mode `AD<V>` evaluation for this operator
-    pub forward_0_ad    : ForwardVar<V, AD<V> >,
+    pub forward_var_ad  : ForwardVar<V, AD<V> >,
     //
     /// first order forward mode V evaluation for this operator
     pub forward_1_value : ForwardOne<V, V>,
@@ -442,8 +442,8 @@ where
         name               : &"panic",
         forward_dyp_value  : panic_dyp::<V, V>,
         forward_dyp_ad     : panic_dyp::<V, AD<V>>,
-        forward_0_value    : panic_zero::<V, V>,
-        forward_0_ad       : panic_zero::<V, AD<V>>,
+        forward_var_value  : panic_zero::<V, V>,
+        forward_var_ad     : panic_zero::<V, AD<V>>,
         forward_1_value    : panic_one::<V, V>,
         forward_1_ad       : panic_one::<V, AD<V>>,
         reverse_1_value    : panic_one::<V, V>,

@@ -174,12 +174,12 @@ fn call_domain_zero_ad<'a, 'b, V>(
     call_domain_zero
 }
 // --------------------------------------------------------------------------
-// call_forward_0_value
+// call_forward_var_value
 //
 /// V evaluation of zero order forward call operator for atomic functions
 ///
 /// TODO : Extend this routine to work with dynamic parameters
-fn call_forward_0_value<V> (
+fn call_forward_var_value<V> (
     _dyn_zero  : &Vec<V>       ,
     var_zero   : &mut Vec<V>   ,
     con        : &Vec<V>       ,
@@ -406,12 +406,12 @@ where
 }
 
 // --------------------------------------------------------------------------
-// call_forward_0_ad
+// call_forward_var_ad
 //
 /// `AD<V>` evaluation of zero order forward call operator for atomic functions
 ///
 /// TODO : Extend this routine to work with dynamic parameters
-fn call_forward_0_ad<V> (
+fn call_forward_var_ad<V> (
     _adyp_zero : &Vec< AD<V> >       ,
     avar_zero  : &mut Vec< AD<V> >   ,
     con        : &Vec<V>             ,
@@ -707,8 +707,8 @@ where
         name              : "call" ,
         forward_dyp_value : forward_dyp_value_none::<V>,
         forward_dyp_ad    : forward_dyp_ad_none::<V>,
-        forward_0_value   : call_forward_0_value::<V>,
-        forward_0_ad      : call_forward_0_ad::<V>,
+        forward_var_value : call_forward_var_value::<V>,
+        forward_var_ad    : call_forward_var_ad::<V>,
         forward_1_value   : call_forward_1_value::<V>,
         forward_1_ad      : call_forward_1_ad::<V>,
         reverse_1_value   : call_reverse_1_value::<V>,
@@ -720,8 +720,8 @@ where
         name              : "call_res" ,
         forward_dyp_value : no_op_dyp::<V, V>,
         forward_dyp_ad    : no_op_dyp::<V, AD<V> >,
-        forward_0_value   : no_op_zero::<V, V>,
-        forward_0_ad      : no_op_zero::<V, AD<V> >,
+        forward_var_value : no_op_zero::<V, V>,
+        forward_var_ad    : no_op_zero::<V, AD<V> >,
         forward_1_value   : no_op_one::<V, V>,
         forward_1_ad      : no_op_one::<V, AD<V> >,
         reverse_1_value   : no_op_one::<V, V>,

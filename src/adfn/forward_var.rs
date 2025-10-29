@@ -192,8 +192,8 @@ macro_rules! forward_var {
                 let arg       = &self.var.arg_all[start .. end];
                 let arg_cop   = &self.var.arg_cop[start .. end];
                 let res       = self.var.n_dom + op_index;
-                let forward_0 = op_info_vec[op_id].[< forward_0_ $suffix >];
-                forward_0(
+                let forward_var = op_info_vec[op_id].[< forward_var_ $suffix >];
+                forward_var(
                     &dyp_zero,
                     &mut var_zero,
                     &self.cop,
