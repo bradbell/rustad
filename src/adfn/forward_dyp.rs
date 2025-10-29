@@ -46,11 +46,9 @@ use crate::{
 /// specifies the domain space dynamic parameter values.
 ///
 /// * dyp_zero :
-/// The return contains the dependent dynamic parameters
-/// in an unspecified manner. Even the type of dyp_zero is unspecified; i.e.,
-/// it may change in the future. 
-/// This vector is used as an input to other *f* member functions.
-/// member functions.
+/// is the dynamic parameter vector in the following order:
+/// the domain dynamic parameters followed by the dependent dynamic parameters.
+/// Note that *dyp_dom* gets moved to the beginning of *dyp_zero* .
 ///
 pub fn doc_forward_dyp() { }
 //
@@ -79,7 +77,7 @@ macro_rules! forward_dyp {
         {   // dyp_dom
             assert_eq!(
                 dyp_dom.len(), self.dyp.n_dom,
-                "f.forward_dyp: dyp_dom  vector length does not match f"
+                "f.forward_dyp: dyp_dom vector length does not match f"
             );
             //
             // op_info_vec
@@ -90,10 +88,8 @@ macro_rules! forward_dyp {
             //
             // dyp_zero
             let nan_e  : $E  = eval_from_f32!($suffix, $V,  f32::NAN);
-            let mut dyp_zero = vec![ nan_e; n_dyp ];
-            for j in 0 .. self.dyp.n_dom {
-                dyp_zero[j] = dyp_dom[j].clone();
-            }
+            let mut dyp_zero = dyp_dom;
+            dyp_zero.resize(n_dyp, nan_e );
             //
             if trace {
                 println!( "Begin Trace: forward_dyp: n_dyp = {}", n_dyp);
@@ -105,9 +101,9 @@ macro_rules! forward_dyp {
                 for j in 0 .. self.cop.len() {
                     println!( "{}, {}", j, self.cop[j] );
                 }
-                println!( "dyp_index, dyp_dom" );
+                println!( "dyp_index, dyp_zero" );
                 for j in 0 .. self.dyp.n_dom {
-                    println!( "{}, {}", j, dyp_dom[j] );
+                    println!( "{}, {}", j, dyp_zero[j] );
                 }
                 println!( "dyp_index, dyp_zero, op_name, arg, arg_cop" );
             }

@@ -117,7 +117,7 @@ impl<V> ADfn<V> {
     //
     // domain_len
     /// dimension of domain space
-    pub fn domain_len(&self) -> usize { self.var.n_dom }
+    pub fn domain_len(&self) -> usize { self.dyp.n_dom + self.var.n_dom }
     //
     // range_len
     /// dimension of range space
@@ -129,6 +129,11 @@ impl<V> ADfn<V> {
     // cop_len
     /// number of constant parameters in this function
     pub fn cop_len(&self) -> usize { self.cop.len() }
+    //
+    // range_ad_type
+    /// Type corresponding to the i-th element of the range vector
+    pub fn range_ad_type(&self, i : usize) -> ADType
+    {   self.range_ad_type[i].clone() }
     //
     // swap
     /// exchange the contents of this ADfn with another ADfn.

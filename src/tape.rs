@@ -252,11 +252,13 @@ where
 /// This vector contains the value of the domain dynamic parameters
 /// for use during the recording.
 /// The i-th element of adom_dyp corresponds to the i-th element of dom_dyp.
+/// This vector can be empty in which case there are no dynamic parameters.
 ///
 /// * adom_var :
 /// This vector contains the value of the domain variables for use during
 /// the recording. The i-th element of adom_var corresponds to the i-th element
 /// of dom_var.
+/// This vector must not be empty.
 ///
 /// * Example : see [stop_recording]
 ///
@@ -266,6 +268,7 @@ pub fn start_recording_both<V>(
 where
     V : Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
+    assert_ne!( dom_var.len(), 0 );
     //
     // tape_id
     let tape_id : usize;

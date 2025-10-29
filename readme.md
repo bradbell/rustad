@@ -29,9 +29,11 @@ This package is intended to include most of the features in
 1.  Addition and multiplication: We have held off on other simple numerical
     operations while we focus on more complicated features.
 
-2.  Forward and reverse mode derivative calculations.
+2.  Forward and reverse mode derivatives with optional tracing
+    of the computation.
 
-3.  Forward and reverse mode sparsity pattern calculations.
+3.  Forward and reverse mode sparsity patterns with optional tracing
+    of the computation.
 
 4.  Generic code that is is the same for different floating point types.
     These types include numerical vectors that act element wise.
