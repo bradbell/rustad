@@ -46,6 +46,8 @@ This package is intended to include most of the features in
 7.  Generate compile and link source code for derivative calculations.
 
 ## Under Construction
+Add dynamic parameters; i.e., function arguments that can change value
+but act as constants when differentiating.
 
 
 ## Goals Before Stable API
@@ -53,13 +55,10 @@ This package is intended to include most of the features in
 1.  Subtraction, division and all the standard math functions.
     
 2.  Reduce tape size both during recording and by
-    optimizing the operation sequence. For example multiplication
-    by the constants zero and one does not need to be recorded.
+    optimizing the operation sequence. For example:
+    multiplication by the constants zero and one and addition by zero does not need to be recorded.
 
-3.  Add dynamic parameters; i.e., function arguments that can change value
-    but act as constants when differentiating.
-
-4.  Forward and reverse sparse derivative calculations
+3.  Forward and reverse sparse derivative calculations
     (sparsity patterns are already implemented). 
 
 ## Wish List
