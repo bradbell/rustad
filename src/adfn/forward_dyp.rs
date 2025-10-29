@@ -101,11 +101,11 @@ macro_rules! forward_dyp {
                 for j in 0 .. self.cop.len() {
                     println!( "{}, {}", j, self.cop[j] );
                 }
-                println!( "dyp_index, dyp_zero" );
+                println!( "dyp_index, dyp_dom" );
                 for j in 0 .. self.dyp.n_dom {
                     println!( "{}, {}", j, dyp_zero[j] );
                 }
-                println!( "dyp_index, dyp_zero, op_name, arg, arg_cop" );
+                println!( "index, dyp_zero, op_name, arg, arg_cop" );
             }
             //
             // dyp_zero
