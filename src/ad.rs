@@ -17,24 +17,37 @@ use crate::tape::sealed::ThisThreadTape;
 use crate::op::id;
 // ---------------------------------------------------------------------------
 //
-// Type
-#[derive(Clone, Debug, PartialEq)]
+// ADType
+/// The AD types satisfy the following order ConstantP < DynamicP < Variable.
+///
+/// If a result depends on two arguments, the type of the result is the
+/// maximum of the type of its arguments.
+///
+/// # Example
+/// ```
+/// use rustad::ADType;
+/// assert!( ADType::ConstantP < ADType::DynamicP );
+/// assert!( ADType::DynamicP  < ADType::Variable );
+/// ```
+#[derive(Clone, Debug, PartialOrd, PartialEq)]
 pub enum ADType {
-    // Variable
-    /// An AD object is a variable if it one of the domain variables
-    /// or its value depends on the value of a domain variable.
-    Variable,
-    //
-    // DynamicP
-    /// If an AD object is not a variable,
-    /// it is a dynamic parameter if it one of the domain parameters
-    /// or its value depends on the value of a domain parameter.
-    DynamicP,
     //
     // ConstantP
-    /// If an AD object is not a variable or dynamic parameter
+    /// If the value of an AD object does not depend on the value of
+    /// the domain variables or domain dynamic parameters,
     /// it is a constant parameter.
     ConstantP,
+    //
+    // DynaDynam
+    /// If the value of an AD object depends (does not depend)
+    /// on the value of the domain dynamic parameters (domain variables)
+    /// it is a dynamic parameter.
+    DynamicP,
+    //
+    // Variable
+    /// If the value of an AD object depends on
+    /// the value of the domain variables, it is variable.
+    Variable,
 }
 // ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter V.
