@@ -31,11 +31,11 @@ pub(crate) struct OpSequence {
     //
     // n_dom
     /// is the number of independent values in the operation sequence.
-    pub n_dom : usize,
+    pub(crate) n_dom : usize,
     //
     // n_dep
     /// is the number of dependent values currently in the operation sequence.
-    pub n_dep : usize,
+    pub(crate) n_dep : usize,
     //
     // id_seq
     /// For each index in the operation sequence, id_seq\[index\]

@@ -15,6 +15,7 @@ use std::sync::RwLock;
 use std::thread::LocalKey;
 use std::cell::RefCell;
 //
+use crate::tape::OpSequence;
 use crate::op::id::CALL_OP;
 use crate::op::id::CALL_RES_OP;
 use crate::tape::Tape;
@@ -40,6 +41,44 @@ use crate::adfn::{
     reverse_one::doc_reverse_one,
 };
 // ---------------------------------------------------------------------------
+//
+// AtomForwardType
+/// Callback to atomic functions to determine ADType of results.
+///
+/// * Required :
+/// This function is required for all atomic functions.
+///
+/// * Syntax :
+/// ```text
+///     range_ad_type = atom_forward_type(domain_ad_type, call_info, trace)
+/// ```
+///
+/// forward_ad_type :
+/// is the AtomForwardType callback for this atomic function.
+///
+/// * domain_ad_type :
+/// This has the same length as *adomain* in the corresponding [call_atom].
+/// The j-th component is the [ADType] of the j-th component
+/// of *adomain* .
+///
+/// * call_info :
+/// is the *call_info* value used when the atomic function was called.
+///
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+///
+/// * range_ad_type :
+/// This has the same length as *arange* in the corresponding [call_atom].
+/// The i-th component is the [ADType] of the i-th component
+/// of *arange* .
+/// Note that if a result depends on two values, the ADType of the result
+/// is the maximum of the ADType for the two values.
+///
+pub type AtomForwardType = fn(
+    _domain_ad_type  : &Vec<ADType> ,
+    _call_info       : IndexT       ,
+    _trace           : bool         ,
+)-> Vec<ADType>;
 //
 // AtomForwardVarValue
 /// Callback to atomic functions during [ADfn::forward_zero_value]
@@ -129,34 +168,6 @@ pub type AtomReverseOneValue<V> = fn(
     _call_info     : IndexT      ,
     _trace         : bool        ,
 ) -> Vec<V> ;
-//
-// AtomForwardDepend
-/// Atomic function forward dependency type for value evaluations.
-///
-/// * Required :
-/// This function is required for all atomic functions.
-///
-/// * is_var_domain :
-/// This has the same length as *adomain* in the corresponding [call_atom].
-/// The j-th component is true (false) if the j-th component
-/// of *adomain* is a variable (parameter).
-///
-/// * call_info :
-/// is the *call_info* value used when the atomic function was called.
-///
-/// * trace :
-/// if true, a trace of the calculations may be printed on stdout.
-///
-/// * return :
-/// This has the same length as *arange* in the corresponding [call_atom].
-/// The i-th component is true (false) if the i-th component
-/// of *arange* depends on a variable in *adomaion.
-///
-pub type AtomForwardDepend = fn(
-    _is_var_domain  : &Vec<bool> ,
-    _call_info      : IndexT     ,
-    _trace          : bool       ,
-)-> Vec<bool>;
 //
 // AtomForwardVarAD
 /// Callback to atomic functions during [ADfn::forward_zero_ad]
@@ -255,7 +266,7 @@ pub struct AtomEval<V> {
     //
     // required
     pub name                 : &'static str              ,
-    pub forward_depend       : AtomForwardDepend         ,
+    pub forward_type         : AtomForwardType           ,
     //
     pub forward_zero_value   : AtomForwardVarValue::<V> ,
     pub forward_zero_ad      : Option< AtomForwardVarAD::<V> >,
@@ -357,7 +368,7 @@ where
 // record_call_atom
 fn record_call_atom<V>(
     tape                  : &mut Tape<V>                  ,
-    forward_depend        : AtomForwardDepend             ,
+    forward_type          : AtomForwardType               ,
     adomain               : Vec< AD<V> >                  ,
     range_zero            : Vec<V>                        ,
     atom_id               : IndexT                        ,
@@ -377,72 +388,101 @@ where
     // arange
     let mut arange : Vec< AD<V> > = ad_from_vector(range_zero);
     //
-    // is_var_arg
-    let is_var_arg : Vec<bool> = adomain.iter().map(
-        |adomain_j| (*adomain_j).tape_id == tape.tape_id
+    // domain_ad_type
+    let domain_ad_type : Vec<ADType> = adomain.iter().map(
+        |adomain_j| adomain_j.ad_type.clone()
     ).collect();
     //
-    // is_var_res
-    // TODO: fix to handle dynamic parameters
-    let is_var_res = forward_depend(&is_var_arg, call_info, trace);
+    // range_ad_type
+    let range_ad_type = forward_type(&domain_ad_type, call_info, trace);
     //
-    // arange, n_dep_res
+    // n_dyp, n_var
+    let n_dyp = tape.dyp.n_dom + tape.dyp.n_dep;
     let n_var = tape.var.n_dom + tape.var.n_dep;
-    let mut n_dep_res = 0;
+    //
+    // arange, n_dyp_res, n_var_res
+    let mut n_dyp_res = 0;
+    let mut n_var_res = 0;
     for i in 0 .. call_n_res {
-        if is_var_res[i] {
-            arange[i].tape_id   = tape.tape_id;
-            arange[i].ad_type   = ADType::Variable;
-            arange[i].index     = n_var + n_dep_res;
-            n_dep_res += 1;
+        match range_ad_type[i] {
+            ADType::Variable =>  {
+                arange[i].tape_id   = tape.tape_id;
+                arange[i].ad_type   = ADType::Variable;
+                arange[i].index     = n_var + n_var_res;
+                n_var_res += 1;
+            },
+            ADType::DynamicP =>  {
+                arange[i].tape_id   = tape.tape_id;
+                arange[i].ad_type   = ADType::DynamicP;
+                arange[i].index     = n_dyp + n_dyp_res;
+                n_dyp_res += 1;
+            },
+            ADType::ConstantP =>  { },
         }
     }
-    if n_dep_res > 0 {
+    for k in 0 .. 2 {
         //
-        // tape.var.id_seq, tape.var.arg_seq
-        tape.var.id_seq.push( CALL_OP );
-        tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
-        //
-        // tape.var.arg_all, tape.cop
-        tape.var.arg_all.push( atom_id );                        // arg[0]
-        tape.var.arg_all.push( call_info );                      // arg[1]
-        tape.var.arg_all.push( call_n_arg as IndexT );           // arg[2]
-        tape.var.arg_all.push( call_n_res as IndexT );           // arg[3]
-        tape.var.arg_all.push( tape.var.flag.len() as IndexT );  // arg[4]
-        for _j in 0 .. 5 {
-            tape.var.arg_cop.push( false );
+        // n_res, sub_tape
+        let n_res    : usize;
+        let sub_tape : &mut OpSequence;
+        if k == 0 {
+            sub_tape = &mut tape.dyp;
+            n_res    = n_dyp_res;
+        } else {
+            sub_tape = &mut tape.var;
+            n_res    = n_var_res;
         }
         //
-        // tape.var.arg_all
-        for j in 0 .. call_n_arg {
-            let index = if is_var_arg[j] {
-                tape.var.arg_cop.push( false );
-                adomain[j].index
-            } else {
-                tape.var.arg_cop.push( false );
-                let cop_index = tape.cop.len();
-                tape.cop.push( adomain[j].value.clone() );
-                cop_index
-            };
-            tape.var.arg_all.push( index as IndexT );            // arg[5+j]
-        }
-        //
-        // tape.var.flag
-        tape.var.flag.push( trace );               // flag[ arg[4] ]
-        for j in 0 .. call_n_arg {
-            tape.var.flag.push( is_var_arg[j] );   // flag[ arg[4] + j + 1]
-        }
-        for i in 0 .. call_n_res {
-            tape.var.flag.push( is_var_res[i] );   // flag[ arg[4] + n_res + i]
-        }
-        //
-        // tape.var.n_dep
-        tape.var.n_dep += n_dep_res;
-        //
-        // tape.var.id_seq, tape.var.arg_seq
-        for _i in 0 .. (n_dep_res - 1) {
-            tape.var.id_seq.push( CALL_RES_OP );
-            tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
+        // sub_tape
+        if n_res > 0 {
+            //
+            // sub_tape.id_seq, sub_tape.arg_seq
+            sub_tape.id_seq.push( CALL_OP );
+            sub_tape.arg_seq.push( sub_tape.arg_all.len() as IndexT );
+            //
+            // sub_tape.arg_all, tape.cop
+            sub_tape.arg_all.push( atom_id );                        // arg[0]
+            sub_tape.arg_all.push( call_info );                      // arg[1]
+            sub_tape.arg_all.push( call_n_arg as IndexT );           // arg[2]
+            sub_tape.arg_all.push( call_n_res as IndexT );           // arg[3]
+            sub_tape.arg_all.push( sub_tape.flag.len() as IndexT );  // arg[4]
+            for _j in 0 .. 5 {
+                sub_tape.arg_cop.push( false );
+            }
+            //
+            // sub_tape.arg_all
+            for j in 0 .. call_n_arg {
+                if domain_ad_type[j] == ADType::ConstantP {
+                    let index = tape.cop.len();
+                    tape.cop.push( adomain[j].value.clone() );
+                    sub_tape.arg_all.push( index as IndexT );   // arg[5+j]
+                    sub_tape.arg_cop.push( true );
+                } else {
+                    let index = adomain[j].index;
+                    sub_tape.arg_all.push( index as IndexT );   // arg[5+j]
+                    sub_tape.arg_cop.push( false );
+                }
+            }
+            //
+            // sub_tape.flag
+            sub_tape.flag.push( trace );          // flag[ arg[4] ]
+            for j in 0 .. call_n_arg {
+                let flag_j = domain_ad_type[j] == ADType::Variable;
+                sub_tape.flag.push( flag_j );     // flag[ arg[4] + j + 1]
+            }
+            for i in 0 .. call_n_res {
+                let flag_i = range_ad_type[i] == ADType::Variable;
+                sub_tape.flag.push( flag_i );     // flag[ arg[4] + n_res + i]
+            }
+            //
+            // sub_tape.n_dep
+            sub_tape.n_dep += n_res;
+            //
+            // sub_tape.id_seq, sub_tape.arg_seq
+            for _i in 0 .. (n_res - 1) {
+                sub_tape.id_seq.push( CALL_RES_OP );
+                sub_tape.arg_seq.push( sub_tape.arg_all.len() as IndexT );
+            }
         }
     }
     arange
@@ -494,9 +534,9 @@ where
     // rwlock
     let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
     //
-    // forward_zero, forward_depend
+    // forward_zero, forward_type
     let forward_zero   : AtomForwardVarValue<V>;
-    let forward_depend : AtomForwardDepend;
+    let forward_type   : AtomForwardType;
     {   //
         // read_lock
         let read_lock = rw_lock.read();
@@ -506,7 +546,7 @@ where
         let atom_eval_vec = read_lock.unwrap();
         let atom_eval     = &atom_eval_vec[atom_id as usize];
         forward_zero      = atom_eval.forward_zero_value.clone();
-        forward_depend    = atom_eval.forward_depend.clone();
+        forward_type      = atom_eval.forward_type.clone();
     }
     //
     // domain_zero
@@ -525,7 +565,7 @@ where
     } else {
         arange = local_key.with_borrow_mut( |tape| record_call_atom::<V>(
             tape,
-            forward_depend,
+            forward_type,
             adomain,
             range_zero,
             atom_id,

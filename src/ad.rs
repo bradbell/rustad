@@ -29,7 +29,7 @@ use crate::op::id;
 /// assert!( ADType::ConstantP < ADType::DynamicP );
 /// assert!( ADType::DynamicP  < ADType::Variable );
 /// ```
-#[derive(Clone, Debug, PartialOrd, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ADType {
     //
     // ConstantP

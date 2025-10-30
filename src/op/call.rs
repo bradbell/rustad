@@ -17,28 +17,29 @@
 //! | 2        | Number of arguments to the function being called (n_arg) |
 //! | 3        | Number of results for the function being called  (n_res) |
 //! | 4        | Index of the first boolean for this operator             |
-//! | 5        | Variable or constant index for first argument to call    |
-//! | 6        | Variable or constant index for second argument to call   |
+//! | 5        | Variable or parameter index for first argument to call   |
+//! | 6        | Variable or parameter index for second argument to call  |
 //! | ...      | ... |
-//! | 4+n_arg  | Variable or constant index for last argument to call     |
+//! | 4+n_arg  | Variable or parameter index for last argument to call    |
 //!
 //! # Operator Booleans
 //! | Index    | Meaning |
 //! | -------- | ------- |
-//! | 0        | is the value of the trace argument of this call           |
-//! | 1        | true (false) if first argument is a variable (constant)   |
-//! | 2        | true (false) if second argument is a variable (constant)  |
+//! | 0        | is the value of the trace argument of this call            |
+//! | 1        | true (false) if first argument is a variable (parameter)   |
+//! | 2        | true (false) if second argument is a variable (parameter)  |
 //! | ...      | ... |
-//! | n_arg    | true (false) if last argument is a variable (constant)    |
-//! | n_arg+1  | true (false) if first result is a variable (constant)     |
-//! | n_arg+2  | true (false) if second result is a variable (constant)    |
-//! | n_arg+n_res | true (false) if last result is a variable (constant)   |
+//! | n_arg    | true (false) if last argument is a variable (parameter)    |
+//! | n_arg+1  | true (false) if first result is a variable (parameter)     |
+//! | n_arg+2  | true (false) if second result is a variable (parameter)    |
+//! | n_arg+n_res | true (false) if last result is a variable (parameter)   |
 //!
 //! # Operator Results
-//! We use n_var_res for the number of results that are variables.
-//! There are n_var_res - 1 CALL_RES_OP operators directly after each CALL_OP
+//! We use n_res for the number of results that are variables.
+//! There are n_res - 1 CALL_RES_OP directly after each CALL_OP
 //! operator in the sequence of operations. These are place holders so that
-//! there is a direct correspondence between variable and operator indices.
+//! there is a direct correspondence between variable, or dynamic parameter,
+//! and operator indices.
 // --------------------------------------------------------------------------
 // use
 //

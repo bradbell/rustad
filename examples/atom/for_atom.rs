@@ -15,6 +15,7 @@ dx^T = dz * g_x(x, y) = 2 * dz * ( y[0], y[1], ... )
 dy^T = dz * g_y(x, y) = 2 * dz * ( x[0], x[1], ... )
 */
 use rustad::{
+    ADType,
     register_atom,
     AtomEval,
     IndexT,
@@ -122,28 +123,18 @@ fn for_sumsq_reverse_one_value(
     dx_dy
 }
 //
-// for_sumsq_forward_depend
-fn for_sumsq_forward_depend(
-    is_var_domain  : &Vec<bool> ,
-    _call_info     : IndexT     ,
-    _trace         : bool       ,
-) -> Vec<bool>
+// for_sumsq_forward_type
+fn for_sumsq_forward_type(
+    domain_ad_type  : &Vec<ADType> ,
+    _call_info      : IndexT       ,
+    _trace          : bool         ,
+) -> Vec<ADType>
 {
-    // nx
-    let nx = is_var_domain.len() / 2;
-    assert_eq!( 2 * nx , is_var_domain.len() );
-    //
-    // is_var_x, is_var_y
-    let is_var_x = &is_var_domain[0 .. nx];
-    let is_var_y = &is_var_domain[nx .. 2 * nx];
-    //
-    let mut is_var_z = false;
-    for j in 0 .. nx {
-        if is_var_x[j] || is_var_y[j] {
-            is_var_z = true;
-        }
+    let mut max_ad_type = ADType::ConstantP;
+    for ad_type in domain_ad_type.iter() {
+        max_ad_type = std::cmp::max( max_ad_type, ad_type.clone() );
     }
-    vec![ is_var_z ]
+    vec![ max_ad_type ]
 }
 //
 // register_for_sumsq_atom
@@ -152,7 +143,7 @@ pub fn register_for_sumsq_atom()-> IndexT {
     // for_sumsq_atom_eval
     let for_sumsq_atom_eval = AtomEval {
         name                 : &"for_sumsq",
-        forward_depend       :  for_sumsq_forward_depend,
+        forward_type         :  for_sumsq_forward_type,
         //
         forward_zero_value   :  for_sumsq_forward_zero_value,
         forward_zero_ad      :  None,

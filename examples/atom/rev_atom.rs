@@ -14,6 +14,7 @@ dx^T = dz^T * g_x(x, y) = 2 * y * ( dz[0],  dz[1], + ... + )
 dy   = dz^T * g_y(x, y) = 2 * ( dz[0] * x[0]  + dz[1] * x[1]  + ... )
 */
 use rustad::{
+    ADType,
     register_atom,
     AtomEval,
     IndexT,
@@ -118,27 +119,28 @@ fn rev_sumsq_reverse_one_value(
     dx_dy
 }
 //
-// rev_sumsq_forward_depend
-fn rev_sumsq_forward_depend(
-    is_var_domain  : &Vec<bool> ,
-    _call_info     : IndexT     ,
-    _trace         : bool       ,
-) -> Vec<bool>
-{   //
+// rev_sumsq_forward_type
+fn rev_sumsq_forward_type(
+    domain_ad_type  : &Vec<ADType> ,
+    _call_info      : IndexT       ,
+    _trace          : bool         ,
+) -> Vec<ADType>
+{
+    //
     // nx
-    assert!( is_var_domain.len() > 1 );
-    let nx = is_var_domain.len() - 1;
+    assert!( domain_ad_type.len() > 1 );
+    let nx = domain_ad_type.len() - 1;
     //
-    // is_var_x, is_var_y
-    let is_var_x = &is_var_domain[0 .. nx];
-    let is_var_y = is_var_domain[nx];
+    // x_ad_type, y_ad_type
+    let x_ad_type = &domain_ad_type[0 .. nx];
+    let y_ad_type = &domain_ad_type[nx];
     //
-    // is_var_z
-    let mut is_var_z : Vec<bool> = Vec::with_capacity(nx);
+    let mut z_ad_type : Vec<ADType> = Vec::with_capacity(nx);
     for j in 0 .. nx {
-        is_var_z.push( is_var_y || is_var_x[j] );
+        let ad_type = std::cmp::max(y_ad_type.clone(), x_ad_type[j].clone());
+        z_ad_type.push( ad_type );
     }
-    is_var_z
+    z_ad_type
 }
 //
 // register_rev_sumsq_atom
@@ -147,7 +149,7 @@ pub fn register_rev_sumsq_atom()-> IndexT {
     // rev_sumsq_atom_eval
     let rev_sumsq_atom_eval = AtomEval {
         name                 : &"rev_sumsq",
-        forward_depend       :  rev_sumsq_forward_depend,
+        forward_type         :  rev_sumsq_forward_type,
         //
         forward_zero_value   :  rev_sumsq_forward_zero_value,
         forward_zero_ad      :  None,

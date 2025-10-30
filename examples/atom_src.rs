@@ -8,6 +8,7 @@ sumsq_forward_zero;
 z = g(x) = x[0] * x[0] + x[1] * x[1] + ...
 */
 use rustad::{
+    ADType,
     register_atom,
     AtomEval,
     IndexT,
@@ -22,18 +23,18 @@ use rustad::{
 // V
 type V = f64;
 //
-// sumsq_forward_depend
-fn sumsq_forward_depend(
-    is_var_domain  : &Vec<bool> ,
-    _call_info     : IndexT     ,
-    _trace         : bool       ,
-) -> Vec<bool>
+// sumsq_forward_type
+fn sumsq_forward_type(
+    domain_ad_type  : &Vec<ADType> ,
+    _call_info      : IndexT       ,
+    _trace          : bool         ,
+) -> Vec<ADType>
 {
-    let mut is_var_range = false;
-    for j in 0 .. is_var_domain.len() {
-        is_var_range = is_var_range || is_var_domain[j];
+    let mut max_ad_type = ADType::ConstantP;
+    for ad_type in domain_ad_type.iter() {
+        max_ad_type = std::cmp::max( max_ad_type, ad_type.clone() );
     }
-    vec![ is_var_range ]
+    vec![ max_ad_type ]
 }
 //
 // register_sumsq_atom
@@ -42,7 +43,7 @@ fn register_sumsq_atom()-> IndexT {
     // sumsq_atom_eval
     let sumsq_atom_eval = AtomEval {
         name                 : &"sumsq",
-        forward_depend       :  sumsq_forward_depend,
+        forward_type         :  sumsq_forward_type,
         //
         forward_zero_value   :  sumsq_forward_zero_value,
         forward_zero_ad      :  None,

@@ -11,6 +11,7 @@ use std::cell::RefCell;
 //
 use rustad::{
     AD,
+    ADType,
     ad_from_value,
     ADfn,
     start_recording,
@@ -134,12 +135,12 @@ fn checkpoint_reverse_one_value(
     domain_one
 }
 //
-// checkpoint_forward_depend
-fn checkpoint_forward_depend(
-    is_var_domain  : &Vec<bool> ,
-    call_info      : IndexT     ,
-    trace          : bool       ,
-) -> Vec<bool>
+// checkpoint_forward_type
+fn checkpoint_forward_type(
+    domain_ad_type : &Vec<ADType> ,
+    call_info      : IndexT       ,
+    trace          : bool         ,
+) -> Vec<ADType>
 {   //
     // dependency
     let mut dependency : Vec< [usize; 2] > = Vec::new();
@@ -151,13 +152,13 @@ fn checkpoint_forward_depend(
     } );
     //
     // is_var_range
-    let mut is_var_range = vec![false; call_n_res];
+    let mut range_ad_type = vec![ADType::ConstantP; call_n_res];
     for [i,j] in dependency {
-        if is_var_domain[j] {
-            is_var_range[i] = true;
-        }
+        range_ad_type[i] = std::cmp::max(
+            range_ad_type[i].clone(), domain_ad_type[j].clone()
+        );
     }
-    is_var_range
+    range_ad_type
 }
 //
 // -------------------------------------------------------------------------
@@ -168,7 +169,7 @@ fn register_checkpoint_atom()-> IndexT {
     // checkpoint_atom_eval
     let checkpoint_atom_eval = AtomEval {
         name                 : &"checkpoint",
-        forward_depend       :  checkpoint_forward_depend,
+        forward_type         :  checkpoint_forward_type,
         //
         forward_zero_value   :  checkpoint_forward_zero_value,
         forward_zero_ad      :  None,
