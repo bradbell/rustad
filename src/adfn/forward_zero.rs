@@ -9,12 +9,11 @@
 // ---------------------------------------------------------------------------
 // use
 //
-use crate::AD;
-use crate::ADfn;
-use crate::ADType;
+use crate::{
+    AD,
+    ADfn
+};
 use crate::op::info::GlobalOpInfoVec;
-use crate::adfn::eval_from::eval_from_f32;
-use crate::adfn::eval_from::eval_from_value;
 //
 #[cfg(doc)]
 use crate::{
@@ -132,82 +131,16 @@ macro_rules! forward_zero {
             // dyp_zero
             let dyp_zero : Vec<$E> = Vec::new();
             //
-            // op_info_vec
-            let op_info_vec = &*GlobalOpInfoVec::get();
-            //
-            // n_var
-            let n_var = self.var.n_dom + self.var.n_dep;
+            // range_zero, var_zero_tmp
+            let (range_zero, mut var_zero_tmp) =
+                self. [< forward_var_ $suffix >]  (
+                    &dyp_zero, domain_zero, trace
+            );
             //
             // var_zero
-            let nan_e  : $E  = eval_from_f32!($suffix, $V,  f32::NAN);
-            *var_zero        = domain_zero;
-            var_zero.resize( n_var, nan_e );
+            std::mem::swap(var_zero, &mut var_zero_tmp);
             //
-            if trace {
-                println!( "Begin Trace: forward_zero: n_var = {}", n_var);
-                println!( "index, flag" );
-                for j in 0 .. self.var.flag.len() {
-                    println!( "{}, {}", j, self.var.flag[j] );
-                }
-                println!( "index, constant" );
-                for j in 0 .. self.cop.len() {
-                    println!( "{}, {}", j, self.cop[j] );
-                }
-                println!( "var_index, domain_zero" );
-                for j in 0 .. self.var.n_dom {
-                    println!( "{}, {}", j, var_zero[j] );
-                }
-                println!( "var_index, var_zero, op_name, arg" );
-            }
-            for op_index in 0 .. self.var.id_seq.len() {
-                let op_id     = self.var.id_seq[op_index] as usize;
-                let start     = self.var.arg_seq[op_index] as usize;
-                let end       = self.var.arg_seq[op_index + 1] as usize;
-                let arg       = &self.var.arg_all[start .. end];
-                let arg_cop   = &self.var.arg_cop[start .. end];
-                let res       = self.var.n_dom + op_index;
-                let forward_var = op_info_vec[op_id].[< forward_var_ $suffix >];
-                forward_var(
-                    &dyp_zero,
-                    var_zero,
-                    &self.cop,
-                    &self.var.flag,
-                    &arg,
-                    &arg_cop,
-                    res
-                );
-                if trace {
-                    let name = &op_info_vec[op_id].name;
-                    println!( "{}, {}, {}, {:?}",
-                        res, var_zero[res], name, arg
-                    );
-                }
-            }
-            //
-            // var_one
-            if trace {
-                println!( "range_index, var_index, con_index" );
-                for i in 0 .. self.range_ad_type.len() {
-                    let index = self.range_index[i] as usize;
-                    if self.range_ad_type[i] == ADType::Variable {
-                        println!( "{}, {}, ----", i, index);
-                    } else {
-                        println!( "{}, ---- ,{}", i, index);
-                    }
-                }
-                println!( "End Trace: forward_zero" );
-            }
-            let mut range_zero : Vec<$E> = Vec::new();
-            for i in 0 .. self.range_ad_type.len() {
-                let index = self.range_index[i] as usize;
-                if self.range_ad_type[i] == ADType::Variable {
-                    range_zero.push( var_zero[index].clone() );
-                } else {
-                    let constant_v = self.cop[index].clone();
-                    let constant_e = eval_from_value!($suffix, $V, constant_v);
-                    range_zero.push( constant_e );
-                }
-            }
+            // range_zero
             range_zero
         }
     }
