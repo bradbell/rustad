@@ -11,7 +11,6 @@
 //
 use crate::AD;
 use crate::ADfn;
-use crate::ADType;
 use crate::op::info::GlobalOpInfoVec;
 use crate::adfn::eval_from::eval_from_f32;
 //
@@ -147,7 +146,7 @@ macro_rules! reverse_one {
             let mut mut_range_one = range_one;
             for i in (0 .. self.range_ad_type.len()).rev() {
                 let y_i = mut_range_one.pop().unwrap();
-                if self.range_ad_type[i] == ADType::Variable {
+                if self.range_ad_type[i].is_variable() {
                     let index = self.range_index[i] as usize;
                     var_one[index] = y_i;
                 }
@@ -165,7 +164,7 @@ macro_rules! reverse_one {
                 }
                 println!( "var_index, range_one" );
                 for i in 0 .. self.range_ad_type.len() {
-                    if self.range_ad_type[i] == ADType::Variable {
+                    if self.range_ad_type[i].is_variable() {
                         let index = self.range_index[i] as usize;
                         println!( "{}, {}", index,  var_one[index] );
                     }

@@ -9,7 +9,6 @@
 // ---------------------------------------------------------------------------
 //
 use crate::ADfn;
-use crate::ADType;
 use crate::IndexT;
 use crate::op::info::GlobalOpInfoVec;
 use crate::op::info::OpInfo;
@@ -125,7 +124,7 @@ where
         //
         // row
         // determine the variables that range index row depends on
-        for row in 0 .. n_range { if range_ad_type[row] == ADType::Variable {
+        for row in 0 .. n_range { if range_ad_type[row].is_variable() {
             //
             // var_index
             let var_index = range_index[row] as usize;

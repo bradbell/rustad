@@ -18,7 +18,8 @@ use crate::op::id;
 // ---------------------------------------------------------------------------
 //
 // ADType
-/// The AD types satisfy the following order ConstantP < DynamicP < Variable.
+/// The AD types satisfy the following order:
+/// constants < dynamic parameters < variables.
 ///
 /// If a result depends on two arguments, the type of the result is the
 /// maximum of the type of its arguments.
@@ -26,28 +27,52 @@ use crate::op::id;
 /// # Example
 /// ```
 /// use rustad::ADType;
-/// assert!( ADType::ConstantP < ADType::DynamicP );
-/// assert!( ADType::DynamicP  < ADType::Variable );
+/// assert!( ADType::ConstantP   < ADType::DomainP );
+/// assert!( ADType::DomainP     < ADType::DependentP );
+/// assert!( ADType::DependentP  < ADType::DomainV );
+/// assert!( ADType::DomainV     < ADType::DependentV );
 /// ```
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ADType {
     //
     // ConstantP
-    /// If the value of an AD object does not depend on the value of
+    /// This type is used for the constant parameters.
+    /// An AD object does not depend on the value of
     /// the domain variables or domain dynamic parameters,
     /// it is a constant parameter.
     ConstantP,
     //
-    // DynaDynam
-    /// If the value of an AD object depends (does not depend)
-    /// on the value of the domain dynamic parameters (domain variables)
-    /// it is a dynamic parameter.
-    DynamicP,
+    // DomainP
+    /// This type is used for the domain dynamic parameters.
+    DomainP,
     //
-    // Variable
-    /// If the value of an AD object depends on
-    /// the value of the domain variables, it is variable.
-    Variable,
+    // DependentP
+    /// This type is used for the dependent dynamic parameters.
+    /// An AD object that depends (does not depend)
+    /// on the value of the domain dynamic parameters (domain variables)
+    /// it is a dependent dynamic parameter.
+    DependentP,
+    //
+    // DomainV
+    /// This type is used for the domain variables.
+    DomainV,
+    //
+    // DependentV
+    /// This type is used for the dependent variables.
+    /// An AD object that depends on the value of the domain variables,
+    /// it is a dependent variable.
+    DependentV,
+}
+impl ADType {
+    /// is a constante parameter
+    pub fn is_constant(&self) -> bool
+    {   *self == ADType::ConstantP }
+    /// is a dynamic parameter
+    pub fn is_dynamic(&self) -> bool
+    {   *self == ADType::DomainP || *self == ADType::DependentP }
+    /// is a variable
+    pub fn is_variable(&self) -> bool
+    {   *self == ADType::DomainV || *self == ADType::DependentV }
 }
 // ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter V.
@@ -258,12 +283,12 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             // new_tape_id
             new_tape_id = tape.tape_id;
             //
-            let var_lhs = (! cop_lhs) && lhs.ad_type == ADType::Variable;
-            let var_rhs = (! cop_rhs) && rhs.ad_type == ADType::Variable;
+            let var_lhs = (! cop_lhs) && lhs.ad_type.is_variable();
+            let var_rhs = (! cop_rhs) && rhs.ad_type.is_variable();
             if var_lhs || var_rhs {
                 //
                 // new_ad_type, new_index, tape.var.arg_seq
-                new_ad_type     = ADType::Variable;
+                new_ad_type     = ADType::DependentV;
                 new_index       = tape.var.n_dep + tape.var.n_dom;
                 tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
                 //
@@ -301,7 +326,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             } else {
                 //
                 // new_ad_type, new_index, tape.dyp.arg_seq
-                new_ad_type     = ADType::DynamicP;
+                new_ad_type     = ADType::DependentP;
                 new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
                 tape.dyp.arg_seq.push( tape.dyp.arg_all.len() as IndexT );
                 //
@@ -384,11 +409,11 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             // new_tape_id
             new_tape_id = tape.tape_id;
             //
-            let var_lhs = (! cop_lhs) && lhs.ad_type == ADType::Variable;
+            let var_lhs = (! cop_lhs) && lhs.ad_type.is_variable();
             if var_lhs {
                 //
                 // new_ad_type, new_index, tape.var.arg_seq
-                new_ad_type     = ADType::Variable;
+                new_ad_type     = ADType::DependentV;
                 new_index       = tape.var.n_dep + tape.var.n_dom;
                 tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
                 //
@@ -407,10 +432,10 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 tape.var.arg_cop.push( true );
                 tape.cop.push( rhs.clone() );
             } else {
-                assert_eq!( lhs.ad_type, ADType::DynamicP );
+                lhs.ad_type.is_dynamic();
                 //
                 // new_ad_type, new_index, tape.dyp.arg_seq
-                new_ad_type     = ADType::DynamicP;
+                new_ad_type     = ADType::DependentP;
                 new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
                 tape.dyp.arg_seq.push( tape.dyp.arg_all.len() as IndexT );
                 //
@@ -633,11 +658,11 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
             // new_tape_id
             new_tape_id = tape.tape_id;
             //
-            let var_rhs  = (! cop_rhs) && rhs.ad_type == ADType::Variable;
+            let var_rhs  = (! cop_rhs) && rhs.ad_type.is_variable();
             if var_rhs {
                 //
                 // new_ad_type, new_index, tape.var.arg_seq
-                new_ad_type     = ADType::Variable;
+                new_ad_type     = ADType::DependentV;
                 new_index       = tape.var.n_dep + tape.var.n_dom;
                 tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
                 //
@@ -656,7 +681,7 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
             } else {
                 //
                 // new_ad_type, new_index, tape.dyp.arg_seq
-                new_ad_type     = ADType::DynamicP;
+                new_ad_type     = ADType::DependentP;
                 new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
                 tape.dyp.arg_seq.push( tape.dyp.arg_all.len() as IndexT );
                 //

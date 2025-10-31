@@ -215,18 +215,11 @@ macro_rules! forward_var {
             //
             // range_zero
             if trace {
-                println!( "range_index, var_index, dyp_index, cop_index" );
+                println!( "range_index, ad_type, index" );
                 for i in 0 .. n_range {
                     let ad_type = self.range_ad_type[i].clone();
                     let index   = self.range_index[i] as usize;
-                    match ad_type {
-                        ADType::Variable =>
-                            println!( "{}, {}, ----, ----", i, index) ,
-                        ADType::DynamicP =>
-                            println!( "{}, ----, {}, ----", i, index) ,
-                        ADType::ConstantP =>
-                            println!( "{}, ----, ----, {}", i, index) ,
-                    }
+                    println!( "{}, {:?}, {}", i, ad_type, index);
                 }
                 println!( "End Trace: forward_var" );
             }
@@ -235,17 +228,23 @@ macro_rules! forward_var {
                 let ad_type = self.range_ad_type[i].clone();
                 let index   = self.range_index[i] as usize;
                 match ad_type {
-                    ADType::Variable =>
+                    ADType::DependentV =>
                         range_zero.push( var_zero[index].clone() )
                     ,
-                    ADType::DynamicP =>
+                    ADType::DomainV =>
+                        range_zero.push( var_zero[index].clone() )
+                    ,
+                    ADType::DependentP =>
+                        range_zero.push( dyp_zero[index].clone() )
+                    ,
+                    ADType::DomainP =>
                         range_zero.push( dyp_zero[index].clone() )
                     ,
                     ADType::ConstantP => {
                         let cop_v = self.cop[index].clone();
                         let cop_e = eval_from_value!($suffix, $V, cop_v);
                         range_zero.push( cop_e )
-                    } ,
+                    },
                 }
             }
             ( range_zero, var_zero )

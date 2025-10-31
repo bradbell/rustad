@@ -405,19 +405,22 @@ where
     let mut n_var_res = 0;
     for i in 0 .. call_n_res {
         match range_ad_type[i] {
-            ADType::Variable =>  {
+            ADType::DependentV =>  {
                 arange[i].tape_id   = tape.tape_id;
-                arange[i].ad_type   = ADType::Variable;
+                arange[i].ad_type   = ADType::DependentV;
                 arange[i].index     = n_var + n_var_res;
                 n_var_res += 1;
             },
-            ADType::DynamicP =>  {
+            ADType::DependentP =>  {
                 arange[i].tape_id   = tape.tape_id;
-                arange[i].ad_type   = ADType::DynamicP;
+                arange[i].ad_type   = ADType::DependentP;
                 arange[i].index     = n_dyp + n_dyp_res;
                 n_dyp_res += 1;
             },
             ADType::ConstantP =>  { },
+            _ => { panic!( "record_call_atom: unexpected range ad_type" ) } ,
+
+
         }
     }
     for k in 0 .. 2 {
@@ -467,11 +470,11 @@ where
             // sub_tape.flag
             sub_tape.flag.push( trace );          // flag[ arg[4] ]
             for j in 0 .. call_n_arg {
-                let flag_j = domain_ad_type[j] == ADType::Variable;
+                let flag_j = domain_ad_type[j].is_variable();
                 sub_tape.flag.push( flag_j );     // flag[ arg[4] + j + 1]
             }
             for i in 0 .. call_n_res {
-                let flag_i = range_ad_type[i] == ADType::Variable;
+                let flag_i = range_ad_type[i].is_variable();
                 sub_tape.flag.push( flag_i );     // flag[ arg[4] + n_res + i]
             }
             //

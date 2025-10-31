@@ -12,7 +12,6 @@
 //
 use std::any::type_name;
 use crate::ADfn;
-use crate::ADType;
 use crate::op::info::GlobalOpInfoVec;
 //
 #[cfg(doc)]
@@ -174,7 +173,7 @@ where
             "   range.reserve(" + &n_range.to_string() + ");\n";
         for i in 0 .. n_range {
             let index = self.range_index[i] as usize;
-            if self.range_ad_type[i] == ADType::Variable {
+            if self.range_ad_type[i].is_variable() {
                 if index < self.var.n_dom {
                     let i_str = index.to_string();
                     src = src +

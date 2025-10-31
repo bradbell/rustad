@@ -10,7 +10,6 @@
 //
 use crate::vec_set::VecSet;
 use crate::ADfn;
-use crate::ADType;
 use crate::IndexT;
 use crate::op::info::GlobalOpInfoVec;
 use crate::op::info::OpInfo;
@@ -116,7 +115,7 @@ where
         if trace {
             let mut range_var_index : Vec<IndexT> = Vec::new();
             for i in 0 .. range_index.len() {
-                if range_ad_type[i] == ADType::Variable {
+                if range_ad_type[i].is_variable() {
                         range_var_index.push(  range_index[i] );
                 }
             }
@@ -166,7 +165,7 @@ where
                 );
             }
         }
-        for i in 0 .. n_range { if range_ad_type[i] == ADType::Variable {
+        for i in 0 .. n_range { if range_ad_type[i].is_variable() {
             let row_var_index = range_index[i] as usize;
             let set           = set_vec.get(row_var_index);
             for j in 0 .. set.len() {
