@@ -23,6 +23,7 @@ use crate::op::id;
 ///
 /// If a result depends on two arguments, the type of the result is the
 /// maximum of the type of its arguments.
+/// The type NoType is greater than any other type.
 ///
 /// # Example
 /// ```
@@ -31,6 +32,7 @@ use crate::op::id;
 /// assert!( ADType::DomainP     < ADType::DependentP );
 /// assert!( ADType::DependentP  < ADType::DomainV );
 /// assert!( ADType::DomainV     < ADType::DependentV );
+/// assert!( ADType::DependentV  < ADType::NoType );
 /// ```
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ADType {
@@ -62,6 +64,10 @@ pub enum ADType {
     /// An AD object that depends on the value of the domain variables,
     /// it is a dependent variable.
     DependentV,
+    //
+    // NoType
+    /// This is used for the case where this is not an AD type.
+    NoType,
 }
 impl ADType {
     /// is a constante parameter

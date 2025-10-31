@@ -79,7 +79,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         cop         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
-        arg_cop     : &[bool]     ,
+        arg_type    : &[ADType]   ,
         res         : usize       )
     where
         for<'a> &'a V : std::ops::$Name<&'a E, Output = E> ,
@@ -87,12 +87,14 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,
     {
         debug_assert!( arg.len() == 2);
-        debug_assert!( ! ( arg_cop[0] && arg_cop[1] ) );
+        debug_assert!(
+            ! ( arg_type[0].is_constant() && arg_type[1].is_constant() )
+        );
         let lhs       = arg[0] as usize;
         let rhs       = arg[1] as usize;
-        if arg_cop[0] {
+        if arg_type[0].is_constant() {
             dyp_zero[ res ] = &cop[lhs] $op &dyp_zero[rhs];
-        } else if arg_cop[1] {
+        } else if arg_type[1].is_constant() {
             dyp_zero[ res ] = &dyp_zero[lhs] $op &cop[rhs];
         } else {
             dyp_zero[ res ] = &dyp_zero[lhs] $op &dyp_zero[rhs];
@@ -108,17 +110,17 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         cop         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
-        arg_cop     : &[bool]     ,
+        arg_type    : &[ADType]   ,
         res         : usize       )
     where
         for<'a> &'a V : std::ops::$Name<&'a E, Output = E> ,
         for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,
     {
         debug_assert!( arg.len() == 2);
-        debug_assert!( ! arg_cop[1] );
+        debug_assert!( ! arg_type[1].is_constant() );
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
-        if arg_cop[0] {
+        if arg_type[0].is_constant() {
             var_zero[ res ] = &cop[lhs] $op &var_zero[rhs];
         } else {
             var_zero[ res ] = &dyp_zero[lhs] $op &var_zero[rhs];
@@ -134,17 +136,17 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         cop         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
-        arg_cop     : &[bool]     ,
+        arg_type    : &[ADType]   ,
         res         : usize       )
     where
         for<'a> &'a E : std::ops::$Name<&'a V, Output = E> ,
         for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,
     {
         debug_assert!( arg.len() == 2);
-        debug_assert!( ! arg_cop[0] );
+        debug_assert!( ! arg_type[0].is_constant() );
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
-        if arg_cop[1] {
+        if arg_type[1].is_constant() {
             var_zero[ res ] = &var_zero[lhs] $op &cop[rhs];
         } else {
             var_zero[ res ] = &var_zero[lhs] $op &dyp_zero[rhs];
@@ -160,7 +162,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         _cop        : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
-        _arg_cop    : &[bool]     ,
+        _arg_type   : &[ADType]   ,
         res         : usize       )
     where
         for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,

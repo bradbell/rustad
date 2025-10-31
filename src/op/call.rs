@@ -68,6 +68,7 @@ use crate::op::info::{
 };
 use crate::{
     AD,
+    ADType,
     IndexT,
     AtomEval,
     ThisThreadTapePublic,
@@ -186,7 +187,7 @@ fn call_forward_var_value<V> (
     con        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
     arg        : &[IndexT]     ,
-    _arg_cop   : &[bool]       ,
+    _arg_type  : &[ADType]     ,
     res        : usize         )
 where
     V : AtomEvalVec,
@@ -418,7 +419,7 @@ fn call_forward_var_ad<V> (
     con        : &Vec<V>             ,
     flag       : &Vec<bool>          ,
     arg        : &[IndexT]           ,
-    _arg_cop   : &[bool]             ,
+    _arg_type  : &[ADType]           ,
     res        : usize               )
 where
     V : Clone + AtomEvalVec,
@@ -740,7 +741,7 @@ fn no_op_dyp<V, E>(
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
-    _arg_cop  : &[bool]     ,
+    _arg_type : &[ADType]   ,
     _res      : usize       ,
 ) { }
 //
@@ -752,7 +753,7 @@ fn no_op_zero<V, E>(
     _con      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
-    _arg_cop  : &[bool]     ,
+    _arg_type : &[ADType]   ,
     _res      : usize       ,
 ) { }
 //

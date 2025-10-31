@@ -193,13 +193,23 @@ macro_rules! forward_var {
                 let arg_cop   = &self.var.arg_cop[start .. end];
                 let res       = self.var.n_dom + op_index;
                 let forward_var = op_info_vec[op_id].[< forward_var_ $suffix >];
+                //
+                // TODO: convert arg_cop above to arg_type
+                let mut arg_type : Vec<ADType> = Vec::new();
+                for k in 0 .. arg_cop.len() {
+                    if arg_cop[k] {
+                        arg_type.push( ADType::ConstantP );
+                    } else {
+                        arg_type.push( ADType::NoType );
+                    }
+                }
                 forward_var(
                     &dyp_zero,
                     &mut var_zero,
                     &self.cop,
                     &self.var.flag,
                     &arg,
-                    &arg_cop,
+                    &arg_type,
                     res
                 );
                 if trace {
@@ -244,6 +254,9 @@ macro_rules! forward_var {
                         let cop_v = self.cop[index].clone();
                         let cop_e = eval_from_value!($suffix, $V, cop_v);
                         range_zero.push( cop_e )
+                    },
+                    ADType::NoType => {
+                        panic!( "forward_var: ADType::NoTYpe not expected" );
                     },
                 }
             }

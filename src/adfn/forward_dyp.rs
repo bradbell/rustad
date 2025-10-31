@@ -12,6 +12,7 @@
 use crate::{
     AD,
     ADfn,
+    ADType,
 };
 use crate::op::info::GlobalOpInfoVec;
 use crate::adfn::eval_from::eval_from_f32;
@@ -117,12 +118,23 @@ macro_rules! forward_dyp {
                 let arg_cop = &self.dyp.arg_cop[start .. end];
                 let res     = self.dyp.n_dom + op_index;
                 let forward_dyp = op_info_vec[op_id].[< forward_dyp_ $suffix >];
+                //
+                // TODO: convert arg_cop above to arg_type
+                let mut arg_type : Vec<ADType> = Vec::new();
+                for k in 0 .. arg_cop.len() {
+                    if arg_cop[k] {
+                        arg_type.push( ADType::ConstantP );
+                    } else {
+                        arg_type.push( ADType::NoType );
+                    }
+                }
+                //
                 forward_dyp(
                     &mut dyp_zero,
                     &self.cop,
                     &self.dyp.flag,
                     &arg,
-                    &arg_cop,
+                    &arg_type,
                     res
                 );
                 if trace {

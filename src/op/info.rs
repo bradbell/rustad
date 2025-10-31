@@ -8,9 +8,12 @@
 // ---------------------------------------------------------------------------
 // use
 //
-use crate::ad::AD;
+use crate::{
+    AD,
+    ADType,
+    IndexT,
+};
 use crate::op::id::NUMBER_OP;
-use crate::IndexT;
 use crate::tape::sealed::ThisThreadTape;
 use crate::atom::sealed::AtomEvalVec;
 //
@@ -66,7 +69,7 @@ pub type ForwardDyp<V, E> = fn(
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
-    _arg_cop  : &[bool]     ,
+    _arg_type : &[ADType]   ,
     _res      : usize       ,
 );
 // panic_zero
@@ -76,7 +79,7 @@ fn panic_dyp<V, E> (
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
-    _arg_cop  : &[bool]     ,
+    _arg_type : &[ADType]   ,
     _res      : usize       ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
@@ -96,7 +99,7 @@ pub type ForwardVar<V, E> = fn(
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
-    _arg_cop  : &[bool]     ,
+    _arg_type : &[ADType]   ,
     _res      : usize       ,
 );
 // panic_zero
@@ -107,7 +110,7 @@ fn panic_zero<V, E> (
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
-    _arg_cop  : &[bool]     ,
+    _arg_type : &[ADType]   ,
     _res      : usize       ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
@@ -161,13 +164,15 @@ fn panic_one<V, E> (
 //
 // no_forward_dyp_value
 /// defines forward_dyp_value_none `<V>`
+///
+/// The types IndexT and ADType must be in scope where this macro is used.
 macro_rules! no_forward_dyp_value{ ($Op:ident) => {
     pub fn forward_dyp_value_none<V> (
         _dyp_zero : &mut Vec<V> ,
         _cop      : &Vec<V>     ,
         _flag     : &Vec<bool>  ,
         _arg      : &[IndexT]   ,
-        _arg_cop  : &[bool]     ,
+        _arg_type : &[ADType]   ,
         _res      : usize       ,
     ) { panic!( concat!(
         stringify!($Op) ,
@@ -178,13 +183,15 @@ pub(crate) use no_forward_dyp_value;
 //
 // no_forward_dyp_ad
 /// defines forward_dyp_ad_none `<V>`
+///
+/// The types IndexT and ADType must be in scope where this macro is used.
 macro_rules! no_forward_dyp_ad{ ($Op:ident) => {
     pub fn forward_dyp_ad_none<V> (
         _dyp_zero : &mut Vec< AD<V> > ,
         _cop      : &Vec<V>           ,
         _flag     : &Vec<bool>        ,
         _arg      : &[IndexT]         ,
-        _arg_cop  : &[bool]           ,
+        _arg_type : &[ADType]         ,
         _res      : usize             ,
     ) { panic!( concat!(
         stringify!($Op) ,
@@ -195,6 +202,8 @@ pub(crate) use no_forward_dyp_ad;
 //
 // no_forward_zero_value
 /// defines forward_zero_value_none `<V>`
+///
+/// The types IndexT and ADType must be in scope where this macro is used.
 macro_rules! no_forward_zero_value{ ($Op:ident) => {
     pub fn forward_zero_value_none<V> (
         _dyp_zero : &Vec<V>     ,
@@ -202,7 +211,7 @@ macro_rules! no_forward_zero_value{ ($Op:ident) => {
         _cop      : &Vec<V>     ,
         _flag     : &Vec<bool>  ,
         _arg      : &[IndexT]   ,
-        _arg_cop  : &[bool]     ,
+        _arg_type : &[ADType]   ,
         _res      : usize       ,
     ) { panic!( concat!(
         stringify!($Op) ,
@@ -213,6 +222,8 @@ pub(crate) use no_forward_zero_value;
 //
 // no_forward_zero_ad
 /// defines forward_zero_ad_none `<V>`
+///
+/// The types IndexT and ADType must be in scope where this macro is used.
 macro_rules! no_forward_zero_ad{ ($Op:ident) => {
     pub fn forward_zero_ad_none<V> (
         _dyp_zero : &Vec< AD<V> >     ,
@@ -220,7 +231,7 @@ macro_rules! no_forward_zero_ad{ ($Op:ident) => {
         _cop      : &Vec<V>           ,
         _flag     : &Vec<bool>        ,
         _arg      : &[IndexT]         ,
-        _arg_cop  : &[bool]           ,
+        _arg_type : &[ADType]         ,
         _res      : usize             ,
     ) { panic!( concat!(
         stringify!($Op) ,
@@ -231,6 +242,8 @@ pub(crate) use no_forward_zero_ad;
 //
 // no_forward_one_value
 /// defines forward_one_value_none `<V>`
+///
+/// The type IndexT must be in scope where this macro is used.
 macro_rules! no_forward_one_value{ ($Op:ident) => {
     pub fn forward_one_value_none<V> (
         _var_zero : &Vec<V>     ,
@@ -248,6 +261,8 @@ pub(crate) use no_forward_one_value;
 //
 // no_forward_one_ad
 /// defines forward_one_ad_none `<V>`
+///
+/// The type IndexT must be in scope where this macro is used.
 macro_rules! no_forward_one_ad{ ($Op:ident) => {
     pub fn forward_one_ad_none<V> (
         _var_zero : &Vec< AD<V> >     ,
@@ -265,6 +280,8 @@ pub(crate) use no_forward_one_ad;
 //
 // no_reverse_one_value
 /// defines reverse_one_value_none `<V>`
+///
+/// The type IndexT must be in scope where this macro is used.
 macro_rules! no_reverse_one_value{ ($Op:ident) => {
     pub fn reverse_one_value_none<V> (
         _var_zero : &Vec<V>     ,
@@ -282,6 +299,8 @@ pub(crate) use no_reverse_one_value;
 //
 // no_reverse_one_ad
 /// defines reverse_one_ad_none `<V>`
+///
+/// The type IndexT must be in scope where this macro is used.
 macro_rules! no_reverse_one_ad{ ($Op:ident) => {
     pub fn reverse_one_ad_none<V> (
         _var_zero : &Vec< AD<V> >     ,
@@ -299,6 +318,8 @@ pub(crate) use no_reverse_one_ad;
 //
 // no_rust_src
 /// defines rust_src_none `<V>`
+///
+/// The type IndexT must be in scope where this macro is used.
 macro_rules! no_rust_src{ ($Op:ident) => {
     pub fn rust_src_none<V>(
         _not_used : V           ,

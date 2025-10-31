@@ -20,10 +20,14 @@
 // --------------------------------------------------------------------------
 // use
 //
+use crate::{
+    IndexT,
+    AD,
+    ADType
+};
+//
 use crate::op::binary;
 use crate::tape::sealed::ThisThreadTape;
-use crate::IndexT;
-use crate::ad::AD;
 use crate::op::info::{
     OpInfo,
     no_forward_dyp_value,
