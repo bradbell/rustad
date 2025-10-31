@@ -404,24 +404,18 @@ where
     let mut n_dyp_res = 0;
     let mut n_var_res = 0;
     for i in 0 .. call_n_res {
-        match range_ad_type[i] {
-            ADType::DependentV =>  {
-                arange[i].tape_id   = tape.tape_id;
-                arange[i].ad_type   = ADType::DependentV;
-                arange[i].index     = n_var + n_var_res;
-                n_var_res += 1;
-            },
-            ADType::DependentP =>  {
-                arange[i].tape_id   = tape.tape_id;
-                arange[i].ad_type   = ADType::DependentP;
-                arange[i].index     = n_dyp + n_dyp_res;
-                n_dyp_res += 1;
-            },
-            ADType::ConstantP =>  { },
-            _ => { panic!( "record_call_atom: unexpected range ad_type" ) } ,
-
-
-        }
+        if range_ad_type[i].is_variable() {
+            arange[i].tape_id   = tape.tape_id;
+            arange[i].ad_type   = ADType::DependentV;
+            arange[i].index     = n_var + n_var_res;
+            n_var_res += 1;
+         } else {
+            debug_assert!( range_ad_type[i].is_dynamic() );
+            arange[i].tape_id   = tape.tape_id;
+            arange[i].ad_type   = ADType::DependentP;
+            arange[i].index     = n_dyp + n_dyp_res;
+            n_dyp_res += 1;
+         }
     }
     for k in 0 .. 2 {
         //
@@ -450,7 +444,7 @@ where
             sub_tape.arg_all.push( call_n_res as IndexT );           // arg[3]
             sub_tape.arg_all.push( sub_tape.flag.len() as IndexT );  // arg[4]
             for _j in 0 .. 5 {
-                sub_tape.arg_cop.push( false );
+                sub_tape.arg_type.push( ADType::NoType );
             }
             //
             // sub_tape.arg_all
@@ -459,11 +453,11 @@ where
                     let index = tape.cop.len();
                     tape.cop.push( adomain[j].value.clone() );
                     sub_tape.arg_all.push( index as IndexT );   // arg[5+j]
-                    sub_tape.arg_cop.push( true );
+                    sub_tape.arg_type.push( ADType::ConstantP );
                 } else {
                     let index = adomain[j].index;
                     sub_tape.arg_all.push( index as IndexT );   // arg[5+j]
-                    sub_tape.arg_cop.push( false );
+                    sub_tape.arg_type.push( ADType::NoType );
                 }
             }
             //

@@ -46,8 +46,8 @@ use crate::{
 /// * arg :
 /// The arguments for this operator as a sub-vector of all the arguments.
 ///
-/// * arg_cop :
-/// If arg_cop\[i\], then arg\[i\] is a constant parameter index.
+/// * arg_type :
+/// If arg_type\[i\] == ConstantP, then arg\[i\] is a constant parameter index.
 ///
 /// * res :
 /// The variable index corresponding to the first result for this operator.

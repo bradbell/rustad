@@ -12,7 +12,6 @@
 use crate::{
     AD,
     ADfn,
-    ADType,
 };
 use crate::op::info::GlobalOpInfoVec;
 use crate::adfn::eval_from::eval_from_f32;
@@ -106,28 +105,18 @@ macro_rules! forward_dyp {
                 for j in 0 .. self.dyp.n_dom {
                     println!( "{}, {}", j, dyp_zero[j] );
                 }
-                println!( "index, dyp_zero, op_name, arg, arg_cop" );
+                println!( "index, dyp_zero, op_name, arg, arg_type" );
             }
             //
             // dyp_zero
             for op_index in 0 .. self.dyp.id_seq.len() {
-                let op_id   = self.dyp.id_seq[op_index] as usize;
-                let start   = self.dyp.arg_seq[op_index] as usize;
-                let end     = self.dyp.arg_seq[op_index + 1] as usize;
-                let arg     = &self.dyp.arg_all[start .. end];
-                let arg_cop = &self.dyp.arg_cop[start .. end];
-                let res     = self.dyp.n_dom + op_index;
+                let op_id    = self.dyp.id_seq[op_index] as usize;
+                let start    = self.dyp.arg_seq[op_index] as usize;
+                let end      = self.dyp.arg_seq[op_index + 1] as usize;
+                let arg      = &self.dyp.arg_all[start .. end];
+                let arg_type = &self.dyp.arg_type[start .. end];
+                let res      = self.dyp.n_dom + op_index;
                 let forward_dyp = op_info_vec[op_id].[< forward_dyp_ $suffix >];
-                //
-                // TODO: convert arg_cop above to arg_type
-                let mut arg_type : Vec<ADType> = Vec::new();
-                for k in 0 .. arg_cop.len() {
-                    if arg_cop[k] {
-                        arg_type.push( ADType::ConstantP );
-                    } else {
-                        arg_type.push( ADType::NoType );
-                    }
-                }
                 //
                 forward_dyp(
                     &mut dyp_zero,
@@ -140,7 +129,7 @@ macro_rules! forward_dyp {
                 if trace {
                     let name = &op_info_vec[op_id].name;
                     println!( "{}, {}, {}, {:?}, {:?}",
-                        res, dyp_zero[res], name, arg, arg_cop
+                        res, dyp_zero[res], name, arg, arg_type
                     );
                 }
             }

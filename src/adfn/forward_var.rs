@@ -9,8 +9,10 @@
 // ---------------------------------------------------------------------------
 // use
 //
-use crate::AD;
-use crate::ADfn;
+use crate::{
+    AD,
+    ADfn,
+};
 use crate::ADType;
 use crate::op::info::GlobalOpInfoVec;
 use crate::adfn::eval_from::eval_from_f32;
@@ -183,26 +185,17 @@ macro_rules! forward_var {
                 for j in 0 .. self.var.n_dom {
                     println!( "{}, {}", j, dyp_zero[j] );
                 }
-                println!( "index, var_zero, op_name, arg, arg_cop" );
+                println!( "index, var_zero, op_name, arg, arg_type" );
             }
             for op_index in 0 .. self.var.id_seq.len() {
                 let op_id     = self.var.id_seq[op_index] as usize;
                 let start     = self.var.arg_seq[op_index] as usize;
                 let end       = self.var.arg_seq[op_index + 1] as usize;
                 let arg       = &self.var.arg_all[start .. end];
-                let arg_cop   = &self.var.arg_cop[start .. end];
+                let arg_type  = &self.var.arg_type[start .. end];
                 let res       = self.var.n_dom + op_index;
                 let forward_var = op_info_vec[op_id].[< forward_var_ $suffix >];
                 //
-                // TODO: convert arg_cop above to arg_type
-                let mut arg_type : Vec<ADType> = Vec::new();
-                for k in 0 .. arg_cop.len() {
-                    if arg_cop[k] {
-                        arg_type.push( ADType::ConstantP );
-                    } else {
-                        arg_type.push( ADType::NoType );
-                    }
-                }
                 forward_var(
                     &dyp_zero,
                     &mut var_zero,
@@ -215,7 +208,7 @@ macro_rules! forward_var {
                 if trace {
                     let name = &op_info_vec[op_id].name;
                     println!( "{}, {}, {}, {:?}, {:?}",
-                        res, var_zero[res], name, arg, arg_cop
+                        res, var_zero[res], name, arg, arg_type
                     );
                 }
             }
