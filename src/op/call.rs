@@ -205,9 +205,6 @@ where
         is_arg_var,
         is_res_var,
     ) = extract_flag_arg(flag, arg);
-    let call_domain_zero = call_domain_zero_value(
-        var_zero, con, arg, call_n_arg, is_arg_var
-    );
     // ----------------------------------------------------------------------
     //
     // forward_var_value
@@ -234,6 +231,11 @@ where
         );
     }
     let forward_zero_value = forward_zero_value.unwrap();
+    //
+    // call_domain_zero
+    let call_domain_zero = call_domain_zero_value(
+        var_zero, con, arg, call_n_arg, is_arg_var
+    );
     //
     // call_range_zero
     let mut call_range_zero = forward_zero_value(
@@ -453,10 +455,6 @@ where
         is_arg_var,
         is_res_var,
     ) = extract_flag_arg(flag, arg);
-    let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
-    let call_adomain_zero = call_domain_zero_ad(
-        avar_zero, &acon, arg, call_n_arg, is_arg_var
-    );
     // ----------------------------------------------------------------------
     //
     // forward_zero_ad
@@ -483,6 +481,12 @@ where
         );
     }
     let forward_zero_ad = forward_zero_ad.unwrap();
+    //
+    // call_domain_zero
+    let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
+    let call_adomain_zero = call_domain_zero_ad(
+        avar_zero, &acon, arg, call_n_arg, is_arg_var
+    );
     //
     // call_arange_zero
     let mut call_arange_zero = forward_zero_ad(
