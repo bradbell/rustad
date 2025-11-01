@@ -128,7 +128,7 @@ where
 // ----------------------------------------------------------------------
 fn call_domain_zero_value<'a, 'b, V>(
     var_zero   : &'a Vec<V>    ,
-    con        : &'a Vec<V>    ,
+    cop        : &'a Vec<V>    ,
     arg        : &'b [IndexT]  ,
     n_arg      : usize         ,
     is_arg_var : &'b [bool]    ,
@@ -141,15 +141,15 @@ fn call_domain_zero_value<'a, 'b, V>(
         if is_arg_var[i_arg] {
             call_domain_zero.push( &var_zero[index] );
         } else {
-            call_domain_zero.push( &con[index] );
+            call_domain_zero.push( &cop[index] );
         }
     }
     call_domain_zero
 }
 // ----------------------------------------------------------------------
 //
-fn call_domain_acon<'a, 'b, V>(
-    con        : &'a Vec<V>    ,
+fn call_domain_acop<'a, 'b, V>(
+    cop        : &'a Vec<V>    ,
     arg        : &'b [IndexT]  ,
     n_arg      : usize         ,
     is_arg_var : &'b [bool]    ,
@@ -158,20 +158,20 @@ where
     V : Clone,
 {
     //
-    let mut acon : Vec< AD<V> > = Vec::new();
+    let mut acop : Vec< AD<V> > = Vec::new();
     for i_arg in 0 .. n_arg {
         if ! is_arg_var[i_arg] {
             let index = arg[i_arg + 5] as usize;
-            acon.push( ad_from_value( con[index].clone() ) );
+            acop.push( ad_from_value( cop[index].clone() ) );
         }
     }
-    acon
+    acop
 }
 // ----------------------------------------------------------------------
 //
 fn call_domain_zero_ad<'a, 'b, V>(
     avar_zero   : &'a Vec< AD<V> >    ,
-    acon        : &'a Vec< AD<V> >    ,
+    acop        : &'a Vec< AD<V> >    ,
     arg         : &'b [IndexT]        ,
     n_arg      : usize                ,
     is_arg_var : &'b [bool]           ,
@@ -179,14 +179,14 @@ fn call_domain_zero_ad<'a, 'b, V>(
 {
     //
     let mut call_domain_zero : Vec<& AD<V> > = Vec::with_capacity( n_arg );
-    let mut i_con : usize = 0;
+    let mut i_cop : usize = 0;
     for i_arg in 0 .. n_arg {
         if is_arg_var[i_arg] {
             let index = arg[i_arg + 5] as usize;
             call_domain_zero.push( &avar_zero[index] );
         } else {
-            call_domain_zero.push( &acon[i_con] );
-            i_con += 1;
+            call_domain_zero.push( &acop[i_cop] );
+            i_cop += 1;
         }
     }
     call_domain_zero
@@ -200,7 +200,7 @@ fn call_domain_zero_ad<'a, 'b, V>(
 fn call_forward_var_value<V> (
     _dyn_zero  : &Vec<V>       ,
     var_zero   : &mut Vec<V>   ,
-    con        : &Vec<V>       ,
+    cop        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
     arg        : &[IndexT]     ,
     _arg_type  : &[ADType]     ,
@@ -232,7 +232,7 @@ where
     //
     // call_domain_zero
     let call_domain_zero = call_domain_zero_value(
-        var_zero, con, arg, n_arg, is_arg_var
+        var_zero, cop, arg, n_arg, is_arg_var
     );
     //
     // call_range_zero
@@ -260,7 +260,7 @@ where
 fn call_forward_1_value<V> (
     var_zero   : &Vec<V>       ,
     var_one    : &mut Vec<V>   ,
-    con        : &Vec<V>       ,
+    cop        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
     arg        : &[IndexT]     ,
     res        : usize         )
@@ -298,7 +298,7 @@ where
     //
     // call_domain_zero
     let call_domain_zero = call_domain_zero_value(
-        var_zero, con, arg, n_arg, is_arg_var
+        var_zero, cop, arg, n_arg, is_arg_var
     );
     // ----------------------------------------------------------------------
     //
@@ -341,7 +341,7 @@ where
 fn call_reverse_1_value<V> (
     var_zero   : &Vec<V>       ,
     var_one    : &mut Vec<V>   ,
-    con        : &Vec<V>       ,
+    cop        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
     arg        : &[IndexT]     ,
     res        : usize         )
@@ -371,7 +371,7 @@ where
     //
     // call_domain_zero
     let call_domain_zero = call_domain_zero_value(
-        var_zero, con, arg, n_arg, is_arg_var
+        var_zero, cop, arg, n_arg, is_arg_var
     );
     //
     // call_range_one
@@ -410,7 +410,7 @@ where
 fn call_forward_var_ad<V> (
     _adyp_zero : &Vec< AD<V> >       ,
     avar_zero  : &mut Vec< AD<V> >   ,
-    con        : &Vec<V>             ,
+    cop        : &Vec<V>             ,
     flag       : &Vec<bool>          ,
     arg        : &[IndexT]           ,
     _arg_type  : &[ADType]           ,
@@ -440,9 +440,9 @@ where
     let forward_zero_ad = forward_zero_ad.unwrap();
     //
     // call_domain_zero
-    let acon = call_domain_acon(con, arg, n_arg, is_arg_var);
+    let acop = call_domain_acop(cop, arg, n_arg, is_arg_var);
     let call_adomain_zero = call_domain_zero_ad(
-        avar_zero, &acon, arg, n_arg, is_arg_var
+        avar_zero, &acop, arg, n_arg, is_arg_var
     );
     //
     // call_arange_zero
@@ -470,7 +470,7 @@ where
 fn call_forward_1_ad<V> (
     avar_zero  : &Vec< AD<V> >       ,
     avar_one   : &mut Vec< AD<V> >   ,
-    con        : &Vec<V>             ,
+    cop        : &Vec<V>             ,
     flag       : &Vec<bool>          ,
     arg        : &[IndexT]           ,
     res        : usize               )
@@ -507,9 +507,9 @@ where
     let forward_one_ad = forward_one_ad.unwrap();
     //
     // call_adomain_zero
-    let acon = call_domain_acon(con, arg, n_arg, is_arg_var);
+    let acop = call_domain_acop(cop, arg, n_arg, is_arg_var);
     let call_adomain_zero = call_domain_zero_ad(
-        avar_zero, &acon, arg, n_arg, is_arg_var
+        avar_zero, &acop, arg, n_arg, is_arg_var
     );
     //
     // call_avar_zero
@@ -552,7 +552,7 @@ where
 fn call_reverse_1_ad<V> (
     avar_zero   : &Vec< AD<V> >       ,
     avar_one    : &mut Vec< AD<V> >   ,
-    con         : &Vec<V>             ,
+    cop         : &Vec<V>             ,
     flag       : &Vec<bool>           ,
     arg        : &[IndexT]            ,
     res        : usize                )
@@ -582,9 +582,9 @@ where
     let reverse_one_ad = reverse_one_ad.unwrap();
     //
     // call_adomain_zero
-    let acon = call_domain_acon(con, arg, n_arg, is_arg_var);
+    let acop = call_domain_acop(cop, arg, n_arg, is_arg_var);
     let call_adomain_zero = call_domain_zero_ad(
-        avar_zero, &acon, arg, n_arg, is_arg_var
+        avar_zero, &acop, arg, n_arg, is_arg_var
     );
     //
     // call_range_one
@@ -692,7 +692,7 @@ where
 /// [ForwardDyp](crate::op::info::ForwardDyp) function
 fn no_op_dyp<V, E>(
     _dyp_zero : &mut Vec<E> ,
-    _con      : &Vec<V>     ,
+    _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
@@ -704,7 +704,7 @@ fn no_op_dyp<V, E>(
 fn no_op_var<V, E>(
     _dyp_zero : &Vec<E>     ,
     _var_zero : &mut Vec<E> ,
-    _con      : &Vec<V>     ,
+    _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
@@ -717,7 +717,7 @@ fn no_op_var<V, E>(
 fn no_op_one<V, E>(
     _var_zero : &Vec<E>     ,
     _var_one  : &mut Vec<E> ,
-    _con      : &Vec<V>     ,
+    _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _res      : usize       ,
@@ -795,7 +795,7 @@ where
         } else {
             let j_str = index.to_string();
             src = src +
-                "   call_domain[" + &i_str + "] = &con[" + &j_str + "];\n";
+                "   call_domain[" + &i_str + "] = &cop[" + &j_str + "];\n";
         }
     }
     //
