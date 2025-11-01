@@ -130,13 +130,13 @@ fn call_domain_zero_value<'a, 'b, V>(
     var_zero   : &'a Vec<V>    ,
     con        : &'a Vec<V>    ,
     arg        : &'b [IndexT]  ,
-    call_n_arg : usize         ,
+    n_arg      : usize         ,
     is_arg_var : &'b [bool]    ,
 ) -> Vec<&'a V>
 {
     //
-    let mut call_domain_zero : Vec<&V> = Vec::with_capacity( call_n_arg );
-    for i_arg in 0 .. call_n_arg {
+    let mut call_domain_zero : Vec<&V> = Vec::with_capacity( n_arg );
+    for i_arg in 0 .. n_arg {
         let index = arg[i_arg + 5] as usize;
         if is_arg_var[i_arg] {
             call_domain_zero.push( &var_zero[index] );
@@ -151,7 +151,7 @@ fn call_domain_zero_value<'a, 'b, V>(
 fn call_domain_acon<'a, 'b, V>(
     con        : &'a Vec<V>    ,
     arg        : &'b [IndexT]  ,
-    call_n_arg : usize         ,
+    n_arg      : usize         ,
     is_arg_var : &'b [bool]    ,
 ) -> Vec< AD<V> >
 where
@@ -159,7 +159,7 @@ where
 {
     //
     let mut acon : Vec< AD<V> > = Vec::new();
-    for i_arg in 0 .. call_n_arg {
+    for i_arg in 0 .. n_arg {
         if ! is_arg_var[i_arg] {
             let index = arg[i_arg + 5] as usize;
             acon.push( ad_from_value( con[index].clone() ) );
@@ -173,14 +173,14 @@ fn call_domain_zero_ad<'a, 'b, V>(
     avar_zero   : &'a Vec< AD<V> >    ,
     acon        : &'a Vec< AD<V> >    ,
     arg         : &'b [IndexT]        ,
-    call_n_arg : usize                ,
+    n_arg      : usize                ,
     is_arg_var : &'b [bool]           ,
 ) -> Vec<&'a AD<V> >
 {
     //
-    let mut call_domain_zero : Vec<& AD<V> > = Vec::with_capacity( call_n_arg );
+    let mut call_domain_zero : Vec<& AD<V> > = Vec::with_capacity( n_arg );
     let mut i_con : usize = 0;
-    for i_arg in 0 .. call_n_arg {
+    for i_arg in 0 .. n_arg {
         if is_arg_var[i_arg] {
             let index = arg[i_arg + 5] as usize;
             call_domain_zero.push( &avar_zero[index] );
@@ -211,8 +211,8 @@ where
 {   // ----------------------------------------------------------------------
     let (
         call_info,
-        call_n_arg,
-        call_n_res,
+        n_arg,
+        n_res,
         trace,
         is_arg_var,
         is_res_var,
@@ -232,19 +232,19 @@ where
     //
     // call_domain_zero
     let call_domain_zero = call_domain_zero_value(
-        var_zero, con, arg, call_n_arg, is_arg_var
+        var_zero, con, arg, n_arg, is_arg_var
     );
     //
     // call_range_zero
     let mut call_range_zero = forward_zero_value(
         &call_domain_zero, call_info, trace
     );
-    assert_eq!( call_range_zero.len(), call_n_res);
+    assert_eq!( call_range_zero.len(), n_res);
     //
     // var_zero
     let mut j_res = 0;
     call_range_zero.reverse();
-    for i_res in 0 .. call_n_res {
+    for i_res in 0 .. n_res {
         let range_i = call_range_zero.pop();
         debug_assert!( range_i.is_some() );
         if is_res_var[i_res] {
@@ -270,8 +270,8 @@ where
 {   // ----------------------------------------------------------------------
     let (
         call_info,
-        call_n_arg,
-        call_n_res,
+        n_arg,
+        n_res,
         trace,
         is_arg_var,
         is_res_var,
@@ -298,7 +298,7 @@ where
     //
     // call_domain_zero
     let call_domain_zero = call_domain_zero_value(
-        var_zero, con, arg, call_n_arg, is_arg_var
+        var_zero, con, arg, n_arg, is_arg_var
     );
     // ----------------------------------------------------------------------
     //
@@ -307,8 +307,8 @@ where
     //
     // call_domain_one
     let zero_v : V = 0f32.into();
-    let mut call_domain_one : Vec<&V> = Vec::with_capacity( call_n_arg );
-    for i_arg in 0 .. call_n_arg {
+    let mut call_domain_one : Vec<&V> = Vec::with_capacity( n_arg );
+    for i_arg in 0 .. n_arg {
         let index = arg[i_arg + 5] as usize;
         if is_arg_var[i_arg] {
             call_domain_one.push( &var_one[index] );
@@ -320,12 +320,12 @@ where
     let mut call_range_one = forward_one_value(
         &call_domain_zero, call_domain_one, call_info, trace
     );
-    assert_eq!( call_range_one.len(), call_n_res);
+    assert_eq!( call_range_one.len(), n_res);
     //
     // var_one
     let mut j_res = 0;
     call_range_one.reverse();
-    for i_res in 0 .. call_n_res {
+    for i_res in 0 .. n_res {
         let range_i = call_range_one.pop();
         debug_assert!( range_i.is_some() );
         if is_res_var[i_res] {
@@ -351,8 +351,8 @@ where
 {   // ----------------------------------------------------------------------
     let (
         call_info,
-        call_n_arg,
-        call_n_res,
+        n_arg,
+        n_res,
         trace,
         is_arg_var,
         is_res_var,
@@ -371,14 +371,14 @@ where
     //
     // call_domain_zero
     let call_domain_zero = call_domain_zero_value(
-        var_zero, con, arg, call_n_arg, is_arg_var
+        var_zero, con, arg, n_arg, is_arg_var
     );
     //
     // call_range_one
     let zero_v : V = 0f32.into();
-    let mut call_range_one : Vec<&V> = Vec::with_capacity( call_n_res );
+    let mut call_range_one : Vec<&V> = Vec::with_capacity( n_res );
     let mut j_res = 0;
-    for i_res in 0 .. call_n_res {
+    for i_res in 0 .. n_res {
         if is_res_var[i_res] {
             call_range_one.push( &var_one[res + j_res] );
             j_res += 1;
@@ -390,10 +390,10 @@ where
     let call_domain_one = reverse_one_value(
         &call_domain_zero, call_range_one, call_info, trace
     );
-    assert_eq!( call_domain_one.len(), call_n_arg);
+    assert_eq!( call_domain_one.len(), n_arg);
     //
     // var_one
-    for i_arg in 0 .. call_n_arg {
+    for i_arg in 0 .. n_arg {
         let index = arg[i_arg + 5] as usize;
         if is_arg_var[i_arg] {
             var_one[index] += &call_domain_one[i_arg];
@@ -421,8 +421,8 @@ where
 {   // ----------------------------------------------------------------------
     let (
         call_info,
-        call_n_arg,
-        call_n_res,
+        n_arg,
+        n_res,
         trace,
         is_arg_var,
         is_res_var,
@@ -440,21 +440,21 @@ where
     let forward_zero_ad = forward_zero_ad.unwrap();
     //
     // call_domain_zero
-    let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
+    let acon = call_domain_acon(con, arg, n_arg, is_arg_var);
     let call_adomain_zero = call_domain_zero_ad(
-        avar_zero, &acon, arg, call_n_arg, is_arg_var
+        avar_zero, &acon, arg, n_arg, is_arg_var
     );
     //
     // call_arange_zero
     let mut call_arange_zero = forward_zero_ad(
         &call_adomain_zero, call_info, trace
     );
-    assert_eq!( call_arange_zero.len(), call_n_res);
+    assert_eq!( call_arange_zero.len(), n_res);
     //
     // avar_zero
     let mut j_res = 0;
     call_arange_zero.reverse();
-    for i_res in 0 .. call_n_res {
+    for i_res in 0 .. n_res {
         let arange_i = call_arange_zero.pop();
         debug_assert!( arange_i.is_some() );
         if is_res_var[i_res] {
@@ -480,8 +480,8 @@ where
 {   // ----------------------------------------------------------------------
     let (
         call_info,
-        call_n_arg,
-        call_n_res,
+        n_arg,
+        n_res,
         trace,
         is_arg_var,
         is_res_var,
@@ -507,9 +507,9 @@ where
     let forward_one_ad = forward_one_ad.unwrap();
     //
     // call_adomain_zero
-    let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
+    let acon = call_domain_acon(con, arg, n_arg, is_arg_var);
     let call_adomain_zero = call_domain_zero_ad(
-        avar_zero, &acon, arg, call_n_arg, is_arg_var
+        avar_zero, &acon, arg, n_arg, is_arg_var
     );
     //
     // call_avar_zero
@@ -518,8 +518,8 @@ where
     // call_adomain_one
     let zero_v : V = 0.0f32.into();
     let azero      = ad_from_value(zero_v);
-    let mut call_adomain_one : Vec<& AD<V> > = Vec::with_capacity(call_n_arg);
-    for i_arg in 0 .. call_n_arg {
+    let mut call_adomain_one : Vec<& AD<V> > = Vec::with_capacity(n_arg);
+    for i_arg in 0 .. n_arg {
         let index = arg[i_arg + 5] as usize;
         if is_arg_var[i_arg] {
             call_adomain_one.push( &avar_one[index] );
@@ -531,12 +531,12 @@ where
     let mut call_arange_one = forward_one_ad(
         &call_adomain_zero, call_adomain_one, call_info, trace
     );
-    assert_eq!( call_arange_one.len(), call_n_res);
+    assert_eq!( call_arange_one.len(), n_res);
     //
     // avar_one
     let mut j_res = 0;
     call_arange_one.reverse();
-    for i_res in 0 .. call_n_res {
+    for i_res in 0 .. n_res {
         let arange_i = call_arange_one.pop();
         debug_assert!( arange_i.is_some() );
         if is_res_var[i_res] {
@@ -563,8 +563,8 @@ where
 {   // ----------------------------------------------------------------------
     let (
         call_info,
-        call_n_arg,
-        call_n_res,
+        n_arg,
+        n_res,
         trace,
         is_arg_var,
         is_res_var,
@@ -582,17 +582,17 @@ where
     let reverse_one_ad = reverse_one_ad.unwrap();
     //
     // call_adomain_zero
-    let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
+    let acon = call_domain_acon(con, arg, n_arg, is_arg_var);
     let call_adomain_zero = call_domain_zero_ad(
-        avar_zero, &acon, arg, call_n_arg, is_arg_var
+        avar_zero, &acon, arg, n_arg, is_arg_var
     );
     //
     // call_range_one
     let zero_v : V    = 0f32.into();
     let azero         = ad_from_value(zero_v);
-    let mut call_arange_one : Vec<& AD<V>> = Vec::with_capacity( call_n_res );
+    let mut call_arange_one : Vec<& AD<V>> = Vec::with_capacity( n_res );
     let mut j_res = 0;
-    for i_res in 0 .. call_n_res {
+    for i_res in 0 .. n_res {
         if is_res_var[i_res] {
             call_arange_one.push( &avar_one[res + j_res] );
             j_res += 1;
@@ -604,10 +604,10 @@ where
     let call_adomain_one = reverse_one_ad(
         &call_adomain_zero, call_arange_one, call_info, trace
     );
-    assert_eq!( call_adomain_one.len(), call_n_arg);
+    assert_eq!( call_adomain_one.len(), n_arg);
     //
     // avar_one
-    for i_arg in 0 .. call_n_arg {
+    for i_arg in 0 .. n_arg {
         let index = arg[i_arg + 5] as usize;
         if is_arg_var[i_arg] {
             avar_one[index] += &call_adomain_one[i_arg];
@@ -625,18 +625,18 @@ fn call_arg_var_index(
 )
 {
     //
-    // call_n_arg
-    let call_n_arg = arg[2] as usize;
+    // n_arg
+    let n_arg = arg[2] as usize;
     //
     // is_var
     let begin    = arg[3] as usize;
-    let end      = begin + call_n_arg;
+    let end      = begin + n_arg;
     let is_var   = &flag[begin .. end];
     //
     // arg_var_index
     let zero_t = 0 as IndexT;
     arg_var_index.resize(0, zero_t);
-    for call_i_arg in 0 .. call_n_arg {
+    for call_i_arg in 0 .. n_arg {
         if is_var[call_i_arg] {
             arg_var_index.push( arg[5 + call_i_arg]  );
         }
@@ -759,8 +759,8 @@ where
 {   // ----------------------------------------------------------------------
     let (
         call_info,
-        call_n_arg,
-        call_n_res,
+        n_arg,
+        n_res,
         trace,
         is_arg_var,
         is_res_var,
@@ -778,8 +778,8 @@ where
         "   //\n" +
         "   // call_domain\n" +
         "   let mut call_domain : Vec<&V> = " +
-                "vec![&nan; " + &(call_n_arg.to_string()) + "];\n";
-    for i_arg in 0 .. call_n_arg {
+                "vec![&nan; " + &(n_arg.to_string()) + "];\n";
+    for i_arg in 0 .. n_arg {
         let i_str = i_arg.to_string();
         let index = arg[i_arg + 5] as usize;
         if is_arg_var[i_arg] {
@@ -814,7 +814,7 @@ where
         "   // dep\n" +
         "   call_range.reverse();\n";
     let j_res = 0;
-    for i_res in 0 .. call_n_res {
+    for i_res in 0 .. n_res {
         if is_res_var[i_res] {
             let j_str = (res + j_res - n_domain).to_string();
             src = src +
