@@ -51,9 +51,6 @@ use std::sync::RwLock;
 //
 use crate::op::info::OpInfo;
 use crate::atom::{
-    AtomForwardVarAd,
-    //
-    AtomForwardOneAD,
     //
     AtomReverseOneAD,
     //
@@ -516,49 +513,33 @@ fn call_forward_1_ad<V> (
     arg        : &[IndexT]           ,
     res        : usize               )
 where
-    V     : From<f32> + Clone + AtomEvalVec ,
+    V           : From<f32> + Clone + AtomEvalVec ,
+    AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
-        atom_id,
         call_info,
         call_n_arg,
         call_n_res,
         trace,
         is_arg_var,
         is_res_var,
-    ) = extract_flag_arg(flag, arg);
-    // ----------------------------------------------------------------------
+        atom_eval,
+    ) = extract_call_info(arg, flag);
     //
     // forward_zero_ad, forward_one_ad
-    let name            : &'static str;
-    let forward_zero_ad : Option< AtomForwardVarAd<V> >;
-    let forward_one_ad  : Option< AtomForwardOneAD<V> >;
-    {   //
-        // rw_lock
-        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
-        //
-        // read_lock
-        let read_lock = rw_lock.read();
-        assert!( read_lock.is_ok() );
-        //
-        // Rest of this block has a lock, so it should be fast and not fail.
-        let atom_eval_vec    = read_lock.unwrap();
-        let atom_eval        = &atom_eval_vec[atom_id];
-        name                 = atom_eval.name;
-        forward_zero_ad      = atom_eval.forward_zero_ad.clone();
-        forward_one_ad       = atom_eval.forward_one_ad.clone();
-    }
+    let forward_zero_ad      = atom_eval.forward_zero_ad.clone();
+    let forward_one_ad       = atom_eval.forward_one_ad.clone();
     if forward_zero_ad.is_none() {
         panic!(
             "{} : forward_zero_ad is not implemented for this atomic function",
-            name,
+            atom_eval.name,
         );
     }
     let forward_zero_ad = forward_zero_ad.unwrap();
     if forward_one_ad.is_none() {
         panic!(
             "{} : forward_one_ad is not implemented for this atomic function",
-            name,
+            atom_eval.name,
         );
     }
     let forward_one_ad = forward_one_ad.unwrap();
