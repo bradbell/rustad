@@ -447,17 +447,16 @@ where
                 sub_tape.arg_type.push( ADType::NoType );
             }
             //
-            // sub_tape.arg_all
+            // sub_tape.arg_type, sub_tape.arg_all
             for j in 0 .. call_n_arg {
-                if domain_ad_type[j] == ADType::ConstantP {
+                sub_tape.arg_type.push( domain_ad_type[j].clone() );
+                if domain_ad_type[j].is_constant() {
                     let index = tape.cop.len();
                     tape.cop.push( adomain[j].value.clone() );
                     sub_tape.arg_all.push( index as IndexT );   // arg[5+j]
-                    sub_tape.arg_type.push( ADType::ConstantP );
                 } else {
                     let index = adomain[j].index;
                     sub_tape.arg_all.push( index as IndexT );   // arg[5+j]
-                    sub_tape.arg_type.push( ADType::NoType );
                 }
             }
             //

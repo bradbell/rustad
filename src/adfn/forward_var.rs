@@ -100,7 +100,7 @@ use crate::{
 /// let f  = stop_recording(ay);
 /// //
 /// // trace, p, x
-/// let trace           = true;
+/// let trace           = false;
 /// let mut p : Vec<V> = Vec::new();
 /// for j in 1 .. np+1 {
 ///     p.push(j as V);
@@ -168,7 +168,7 @@ macro_rules! forward_var {
             var_zero.resize( n_var, nan_e );
             //
             if trace {
-                println!( "Begin Trace: forward_var: n_var = {}", n_var);
+                println!( "Begin Trace: forward_var_{}", stringify!($suffix) );
                 println!( "index, flag" );
                 for j in 0 .. self.var.flag.len() {
                     println!( "{}, {}", j, self.var.flag[j] );
@@ -183,7 +183,7 @@ macro_rules! forward_var {
                 }
                 println!( "index, var_dom" );
                 for j in 0 .. self.var.n_dom {
-                    println!( "{}, {}", j, dyp_zero[j] );
+                    println!( "{}, {}", j, var_zero[j] );
                 }
                 println!( "index, var_zero, op_name, arg, arg_type" );
             }

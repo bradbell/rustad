@@ -92,7 +92,7 @@ macro_rules! forward_dyp {
             dyp_zero.resize(n_dyp, nan_e );
             //
             if trace {
-                println!( "Begin Trace: forward_dyp: n_dyp = {}", n_dyp);
+                println!( "Begin Trace: forward_dyp_{}", stringify!($suffix) );
                 println!( "index, flag" );
                 for j in 0 .. self.dyp.flag.len() {
                     println!( "{}, {}", j, self.dyp.flag[j] );

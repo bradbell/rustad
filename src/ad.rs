@@ -70,12 +70,15 @@ pub enum ADType {
     NoType,
 }
 impl ADType {
-    /// is a constante parameter
+    //
+    /// is a constant parameter
     pub fn is_constant(&self) -> bool
     {   *self == ADType::ConstantP }
+    //
     /// is a dynamic parameter
     pub fn is_dynamic(&self) -> bool
     {   *self == ADType::DomainP || *self == ADType::DependentP }
+    //
     /// is a variable
     pub fn is_variable(&self) -> bool
     {   *self == ADType::DomainV || *self == ADType::DependentV }

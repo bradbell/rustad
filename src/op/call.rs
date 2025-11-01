@@ -6,6 +6,10 @@
 //!
 //! Link to [parent module](super)
 //!
+//! # TODO
+//! Remove the argument flags because arg_type yields the type of each argument.
+//! In addition, change the result flags to ADType for the results.
+//!
 //! # Operator Id
 //!  CALL_OP
 //!
