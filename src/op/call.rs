@@ -320,10 +320,6 @@ where
         is_arg_var,
         is_res_var,
     ) = extract_flag_arg(flag, arg);
-    let call_domain_zero = call_domain_zero_value(
-        var_zero, con, arg, call_n_arg, is_arg_var
-    );
-    // ----------------------------------------------------------------------
     //
     // forward_zero_value, forward_one_value
     let  name              : &'static str;
@@ -358,6 +354,12 @@ where
     }
     let forward_zero_value = forward_zero_value.unwrap();
     let forward_one_value  = forward_one_value.unwrap();
+    //
+    // call_domain_zero
+    let call_domain_zero = call_domain_zero_value(
+        var_zero, con, arg, call_n_arg, is_arg_var
+    );
+    // ----------------------------------------------------------------------
     //
     // call_var_zero
     forward_zero_value(&call_domain_zero, call_info, trace);
@@ -414,9 +416,6 @@ where
         is_arg_var,
         is_res_var,
     ) = extract_flag_arg(flag, arg);
-    let call_domain_zero = call_domain_zero_value(
-        var_zero, con, arg, call_n_arg, is_arg_var
-    );
     // ----------------------------------------------------------------------
     //
     // forward_zero_value, reverse_one_value
@@ -443,6 +442,11 @@ where
         );
     }
     let reverse_one_value = reverse_one_value.unwrap();
+    //
+    // call_domain_zero
+    let call_domain_zero = call_domain_zero_value(
+        var_zero, con, arg, call_n_arg, is_arg_var
+    );
     //
     // call_range_one
     let zero_v : V = 0f32.into();
@@ -571,10 +575,6 @@ where
         is_arg_var,
         is_res_var,
     ) = extract_flag_arg(flag, arg);
-    let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
-    let call_adomain_zero = call_domain_zero_ad(
-        avar_zero, &acon, arg, call_n_arg, is_arg_var
-    );
     // ----------------------------------------------------------------------
     //
     // forward_zero_ad, forward_one_ad
@@ -610,6 +610,12 @@ where
         );
     }
     let forward_one_ad = forward_one_ad.unwrap();
+    //
+    // call_adomain_zero
+    let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
+    let call_adomain_zero = call_domain_zero_ad(
+        avar_zero, &acon, arg, call_n_arg, is_arg_var
+    );
     //
     // call_avar_zero
     forward_zero_ad(&call_adomain_zero, call_info, trace);
@@ -668,10 +674,6 @@ where
         is_arg_var,
         is_res_var,
     ) = extract_flag_arg(flag, arg);
-    let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
-    let call_adomain_zero = call_domain_zero_ad(
-        avar_zero, &acon, arg, call_n_arg, is_arg_var
-    );
     // ----------------------------------------------------------------------
     //
     // forward_zero_value, reverse_one_value
@@ -698,6 +700,12 @@ where
         );
     }
     let reverse_one_ad = reverse_one_ad.unwrap();
+    //
+    // call_adomain_zero
+    let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
+    let call_adomain_zero = call_domain_zero_ad(
+        avar_zero, &acon, arg, call_n_arg, is_arg_var
+    );
     //
     // call_range_one
     let zero_v : V    = 0f32.into();
