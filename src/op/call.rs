@@ -79,6 +79,62 @@ use crate::{
     ad_from_value,
 };
 // ----------------------------------------------------------------------
+fn extract_call_info<'a, V>(
+    arg        : &'a [IndexT]  ,
+    flag       : &'a Vec<bool> ,
+) -> (
+    IndexT       , // call_info
+    usize        , // n_arg
+    usize        , // n_res
+    bool         , // trace
+    &'a [bool]   , // is_arg_var
+    &'a [bool]   , // is_res_var
+    AtomEval<V>  , // atom_eval
+)
+where
+    V           : AtomEvalVec,
+    AtomEval<V> : Clone,
+{
+    // atom_id, call_info, n_arg, n_res,
+    let atom_id    = arg[0] as usize;
+    let call_info  = arg[1];
+    let n_arg      = arg[2] as usize;
+    let n_res      = arg[3] as usize;
+    let trace      = flag[ arg[4] as usize ];
+    //
+    // is_arg_var, is_res_var
+    let mut begin  = (arg[4] as usize) + 1;
+    let mut end     = begin + n_arg;
+    let is_arg_var  = &flag[begin .. end];
+    begin           = end;
+    end             = begin + n_res;
+    let is_res_var  = &flag[begin .. end];
+    //
+    // atom_eval
+    let atom_eval : AtomEval<V>;
+    {   //
+        // rw_lock
+        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
+        //
+        // read_lock
+        let read_lock = rw_lock.read();
+        assert!( read_lock.is_ok() );
+        //
+        // Rest of this block has a lock, so it should be fast and not fail.
+        let atom_eval_vec  = read_lock.unwrap();
+        atom_eval          = atom_eval_vec[atom_id].clone();
+    }
+    (
+        call_info,
+        n_arg,
+        n_res,
+        trace,
+        is_arg_var,
+        is_res_var,
+        atom_eval,
+    )
+}
+// ----------------------------------------------------------------------
 fn extract_flag_arg<'a>(
     flag       : &'a Vec<bool> ,
     arg        : &'a [IndexT]  ,
@@ -194,40 +250,26 @@ fn call_forward_var_value<V> (
     _arg_type  : &[ADType]     ,
     res        : usize         )
 where
-    V : AtomEvalVec,
+    V           : AtomEvalVec,
+    AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
-        atom_id,
         call_info,
         call_n_arg,
         call_n_res,
         trace,
         is_arg_var,
         is_res_var,
-    ) = extract_flag_arg(flag, arg);
+        atom_eval,
+    ) = extract_call_info(arg, flag);
     // ----------------------------------------------------------------------
     //
     // forward_var_value
-    let name               : &'static str;
-    let forward_zero_value : Option< AtomForwardVarValue<V> >;
-    {   //
-        // rw_lock
-        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
-        //
-        // read_lock
-        let read_lock = rw_lock.read();
-        assert!( read_lock.is_ok() );
-        //
-        // Rest of this block has a lock, so it should be fast and not fail.
-        let atom_eval_vec   = read_lock.unwrap();
-        let atom_eval       = &atom_eval_vec[atom_id];
-        name                = atom_eval.name;
-        forward_zero_value  = atom_eval.forward_zero_value.clone();
-    }
+    let forward_zero_value = &atom_eval.forward_zero_value;
     if forward_zero_value.is_none() {
         panic!(
         "{} : forward_zero_value is not implemented for this atomic function",
-            name,
+            atom_eval.name,
         );
     }
     let forward_zero_value = forward_zero_value.unwrap();

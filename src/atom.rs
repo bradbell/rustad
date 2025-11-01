@@ -262,6 +262,7 @@ pub type AtomReverseOneAD<V> = fn(
 //
 // AtomEval
 /// Atomic function evaluation routines.
+#[derive(Clone)]
 pub struct AtomEval<V> {
     //
     // required
