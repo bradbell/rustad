@@ -51,10 +51,8 @@ use std::sync::RwLock;
 //
 use crate::op::info::OpInfo;
 use crate::atom::{
-    AtomForwardVarValue,
     AtomForwardVarAd,
     //
-    AtomForwardOneValue,
     AtomForwardOneAD,
     //
     AtomReverseOneValue,
@@ -309,47 +307,32 @@ fn call_forward_1_value<V> (
     arg        : &[IndexT]     ,
     res        : usize         )
 where
-    V : AtomEvalVec + From<f32>,
+    V           : AtomEvalVec + From<f32>,
+    AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
-        atom_id,
         call_info,
         call_n_arg,
         call_n_res,
         trace,
         is_arg_var,
         is_res_var,
-    ) = extract_flag_arg(flag, arg);
+        atom_eval,
+    ) = extract_call_info(arg, flag);
     //
     // forward_zero_value, forward_one_value
-    let  name              : &'static str;
-    let forward_zero_value : Option< AtomForwardVarValue<V> >;
-    let forward_one_value  : Option< AtomForwardOneValue<V> >;
-    {   //
-        // rw_lock
-        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
-        //
-        // read_lock
-        let read_lock = rw_lock.read();
-        assert!( read_lock.is_ok() );
-        //
-        // Rest of this block has a lock, so it should be fast and not fail.
-        let atom_eval_vec       = read_lock.unwrap();
-        let atom_eval           = &atom_eval_vec[atom_id];
-        forward_zero_value      = atom_eval.forward_zero_value.clone();
-        name                    = atom_eval.name;
-        forward_one_value       = atom_eval.forward_one_value.clone();
-    }
+    let forward_zero_value = &atom_eval.forward_zero_value;
+    let forward_one_value  = &atom_eval.forward_one_value;
     if forward_zero_value.is_none() {
         panic!(
             "{} : forward_zero_value not implemented for this atomic function",
-            name,
+            atom_eval.name,
         );
     }
     if forward_one_value.is_none() {
         panic!(
             "{} : forward_one_value not implemented for this atomic function",
-            name,
+            atom_eval.name,
         );
     }
     let forward_zero_value = forward_zero_value.unwrap();
