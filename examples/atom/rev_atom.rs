@@ -151,7 +151,7 @@ pub fn register_rev_sumsq_atom()-> IndexT {
         name                 : &"rev_sumsq",
         forward_type         :  rev_sumsq_forward_type,
         //
-        forward_zero_value   :  rev_sumsq_forward_zero_value,
+        forward_zero_value   :  Some(rev_sumsq_forward_zero_value),
         forward_zero_ad      :  None,
         //
         forward_one_value    :  Some( rev_sumsq_forward_one_value ),

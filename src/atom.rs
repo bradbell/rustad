@@ -46,7 +46,7 @@ use crate::adfn::{
 /// Callback to atomic functions to determine ADType of results.
 ///
 /// * Required :
-/// This function is required for all atomic functions.
+/// This callback is required for all atomic functions.
 ///
 /// * Syntax :
 /// ```text
@@ -84,7 +84,7 @@ pub type AtomForwardType = fn(
 /// Callback to atomic functions during [ADfn::forward_zero_value]
 ///
 /// * Required :
-/// This function is required for all atomic functions.
+/// This callback is required for all atomic functions.
 ///
 /// * domain_zero :
 /// this contains the value of the atomic function domain variables.
@@ -110,8 +110,8 @@ pub type AtomForwardVarValue<V> = fn(
 ///
 /// * Required :
 /// If you will not use this atomic function with
-/// [ADfn::forward_one_value] ,
-/// this function should panic if it gets used.
+/// [ADfn::forward_one_value], its corresponding value in
+/// [AtomEval] can be None.
 ///
 /// * domain_zero :
 /// this contains the value of the atomic function domain variables.
@@ -142,8 +142,8 @@ pub type AtomForwardOneValue<V> = fn(
 ///
 /// * Required :
 /// If you will not use this atomic function with
-/// [ADfn::reverse_one_value] ,
-/// this function should panic if it gets used.
+/// [ADfn::reverse_one_value],
+/// this callbacks value in [AtomEval] can be None.
 ///
 /// * domain_zero :
 /// this contains the value of the atomic function domain variables.
@@ -175,7 +175,7 @@ pub type AtomReverseOneValue<V> = fn(
 /// * Required :
 /// If you will not use this atomic function with
 /// [ADfn::forward_one_ad] ,
-/// this function should panic if it gets used.
+/// this callbacks value in [AtomEval] can be None.
 ///
 /// * domain_zero :
 /// this contains the value of the atomic function domain variables.
@@ -202,7 +202,7 @@ pub type AtomForwardVarAd<V> = fn(
 /// * Required :
 /// If you will not use this atomic function with
 /// [ADfn::forward_one_ad] ,
-/// this function should panic if it gets used.
+/// this callbacks value in [AtomEval] can be None.
 ///
 /// * domain_zero :
 /// this contains the value of the atomic function domain variables.
@@ -234,7 +234,7 @@ pub type AtomForwardOneAD<V> = fn(
 /// * Required :
 /// If you will not use this atomic function with
 /// [ADfn::reverse_one_ad] ,
-/// this function should panic if it gets used.
+/// this callbacks value in [AtomEval] can be None.
 ///
 /// * domain_zero :
 /// this contains the value of the atomic function domain variables.
@@ -268,7 +268,7 @@ pub struct AtomEval<V> {
     pub name                 : &'static str              ,
     pub forward_type         : AtomForwardType           ,
     //
-    pub forward_zero_value   : AtomForwardVarValue::<V> ,
+    pub forward_zero_value   : Option< AtomForwardVarValue::<V> >,
     pub forward_zero_ad      : Option< AtomForwardVarAd::<V> >,
     //
     pub forward_one_value    : Option< AtomForwardOneValue::<V> > ,
@@ -531,7 +531,8 @@ where
     let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
     //
     // forward_zero, forward_type
-    let forward_zero   : AtomForwardVarValue<V>;
+    let name           : &'static str;
+    let forward_zero   : Option< AtomForwardVarValue<V> >;
     let forward_type   : AtomForwardType;
     {   //
         // read_lock
@@ -542,8 +543,14 @@ where
         let atom_eval_vec = read_lock.unwrap();
         let atom_eval     = &atom_eval_vec[atom_id as usize];
         forward_zero      = atom_eval.forward_zero_value.clone();
+        name              = atom_eval.name;
         forward_type      = atom_eval.forward_type.clone();
     }
+    if forward_zero.is_none() { panic!(
+        "{} : forward_zero_value is not implemented for this atomic function",
+        name,
+    ); }
+    let forward_zero = forward_zero.unwrap();
     //
     // domain_zero
     let mut domain_zero : Vec<&V> = Vec::with_capacity( adomain.len() );

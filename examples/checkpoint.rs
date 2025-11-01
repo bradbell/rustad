@@ -171,7 +171,7 @@ fn register_checkpoint_atom()-> IndexT {
         name                 : &"checkpoint",
         forward_type         :  checkpoint_forward_type,
         //
-        forward_zero_value   :  checkpoint_forward_zero_value,
+        forward_zero_value   :  Some(checkpoint_forward_zero_value),
         forward_zero_ad      :  None,
         //
         forward_one_value    :  Some(checkpoint_forward_one_value),

@@ -145,7 +145,7 @@ pub fn register_for_sumsq_atom()-> IndexT {
         name                 : &"for_sumsq",
         forward_type         :  for_sumsq_forward_type,
         //
-        forward_zero_value   :  for_sumsq_forward_zero_value,
+        forward_zero_value   :  Some(for_sumsq_forward_zero_value),
         forward_zero_ad      :  None,
         //
         forward_one_value    :  Some( for_sumsq_forward_one_value ),

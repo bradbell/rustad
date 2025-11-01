@@ -87,7 +87,7 @@ fn register_sumsq_atom()-> IndexT {
         name                 : &"sumsq",
         forward_type         :  sumsq_forward_type,
         //
-        forward_zero_value   :  sumsq_forward_zero_value,
+        forward_zero_value   :  Some(sumsq_forward_zero_value),
         forward_zero_ad      :  Some( sumsq_forward_zero_ad ),
         //
         forward_one_value    :  Some( sumsq_forward_one_value ),

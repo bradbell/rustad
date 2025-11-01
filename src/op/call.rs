@@ -210,8 +210,9 @@ where
     );
     // ----------------------------------------------------------------------
     //
-    // forward_zero_value
-    let forward_zero_value : AtomForwardVarValue<V>;
+    // forward_var_value
+    let name               : &'static str;
+    let forward_zero_value : Option< AtomForwardVarValue<V> >;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -223,8 +224,16 @@ where
         // Rest of this block has a lock, so it should be fast and not fail.
         let atom_eval_vec   = read_lock.unwrap();
         let atom_eval       = &atom_eval_vec[atom_id];
+        name                = atom_eval.name;
         forward_zero_value  = atom_eval.forward_zero_value.clone();
     }
+    if forward_zero_value.is_none() {
+        panic!(
+        "{} : forward_zero_value is not implemented for this atomic function",
+            name,
+        );
+    }
+    let forward_zero_value = forward_zero_value.unwrap();
     //
     // call_range_zero
     let mut call_range_zero = forward_zero_value(
@@ -274,7 +283,7 @@ where
     //
     // forward_zero_value, forward_one_value
     let  name              : &'static str;
-    let forward_zero_value : AtomForwardVarValue<V>;
+    let forward_zero_value : Option< AtomForwardVarValue<V> >;
     let forward_one_value  : Option< AtomForwardOneValue<V> >;
     {   //
         // rw_lock
@@ -291,13 +300,20 @@ where
         name                    = atom_eval.name;
         forward_one_value       = atom_eval.forward_one_value.clone();
     }
+    if forward_zero_value.is_none() {
+        panic!(
+            "{} : forward_zero_value not implemented for this atomic function",
+            name,
+        );
+    }
     if forward_one_value.is_none() {
         panic!(
             "{} : forward_one_value not implemented for this atomic function",
             name,
         );
     }
-    let forward_one_value = forward_one_value.unwrap();
+    let forward_zero_value = forward_zero_value.unwrap();
+    let forward_one_value  = forward_one_value.unwrap();
     //
     // call_var_zero
     forward_zero_value(&call_domain_zero, call_info, trace);
