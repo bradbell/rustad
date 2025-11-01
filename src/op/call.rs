@@ -52,7 +52,7 @@ use std::sync::RwLock;
 use crate::op::info::OpInfo;
 use crate::atom::{
     AtomForwardVarValue,
-    AtomForwardVarAD,
+    AtomForwardVarAd,
     //
     AtomForwardOneValue,
     AtomForwardOneAD,
@@ -445,7 +445,7 @@ where
     //
     // forward_zero_ad
     let name            : &'static str;
-    let forward_zero_ad : Option< AtomForwardVarAD<V> >;
+    let forward_zero_ad : Option< AtomForwardVarAd<V> >;
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
@@ -517,7 +517,7 @@ where
     //
     // forward_zero_ad, forward_one_ad
     let name            : &'static str;
-    let forward_zero_ad : Option< AtomForwardVarAD<V> >;
+    let forward_zero_ad : Option< AtomForwardVarAd<V> >;
     let forward_one_ad  : Option< AtomForwardOneAD<V> >;
     {   //
         // rw_lock

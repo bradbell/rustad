@@ -169,7 +169,7 @@ pub type AtomReverseOneValue<V> = fn(
     _trace         : bool        ,
 ) -> Vec<V> ;
 //
-// AtomForwardVarAD
+// AtomForwardVarAd
 /// Callback to atomic functions during [ADfn::forward_zero_ad]
 ///
 /// * Required :
@@ -190,7 +190,7 @@ pub type AtomReverseOneValue<V> = fn(
 /// The return value *arange_one*
 /// contains the value of the atomic function range variables.
 ///
-pub type AtomForwardVarAD<V> = fn(
+pub type AtomForwardVarAd<V> = fn(
     _domain_zero   : &Vec<& AD<V> >     ,
     _call_info     : IndexT             ,
     _trace         : bool               ,
@@ -269,7 +269,7 @@ pub struct AtomEval<V> {
     pub forward_type         : AtomForwardType           ,
     //
     pub forward_zero_value   : AtomForwardVarValue::<V> ,
-    pub forward_zero_ad      : Option< AtomForwardVarAD::<V> >,
+    pub forward_zero_ad      : Option< AtomForwardVarAd::<V> >,
     //
     pub forward_one_value    : Option< AtomForwardOneValue::<V> > ,
     pub forward_one_ad       : Option< AtomForwardOneAD::<V> >    ,
