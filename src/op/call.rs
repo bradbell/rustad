@@ -51,9 +51,6 @@ use std::sync::RwLock;
 //
 use crate::op::info::OpInfo;
 use crate::atom::{
-    //
-    AtomReverseOneAD,
-    //
     sealed::AtomEvalVec,
 };
 use crate::op::id::{
@@ -597,39 +594,24 @@ fn call_reverse_1_ad<V> (
 where
     V             : AtomEvalVec + Clone + From<f32>,
     for<'a> AD<V> : std::ops::AddAssign<&'a AD<V> >,
-{   // ---------------------------------------------------------------------
+    AtomEval<V>   : Clone,
+{   // ----------------------------------------------------------------------
     let (
-        atom_id,
         call_info,
         call_n_arg,
         call_n_res,
         trace,
         is_arg_var,
         is_res_var,
-    ) = extract_flag_arg(flag, arg);
-    // ----------------------------------------------------------------------
+        atom_eval,
+    ) = extract_call_info(arg, flag);
     //
-    // forward_zero_value, reverse_one_value
-    let name            : &'static str;
-    let reverse_one_ad  : Option< AtomReverseOneAD<V> >;
-    {   //
-        // rw_lock
-        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
-        //
-        // read_lock
-        let read_lock = rw_lock.read();
-        assert!( read_lock.is_ok() );
-        //
-        // Rest of this block has a lock, so it should be fast and not fail.
-        let atom_eval_vec       = read_lock.unwrap();
-        let atom_eval           = &atom_eval_vec[atom_id];
-        name                    = atom_eval.name;
-        reverse_one_ad          = atom_eval.reverse_one_ad.clone();
-    }
+    // reverse_one_ad
+    let reverse_one_ad = &atom_eval.reverse_one_ad;
     if reverse_one_ad.is_none() {
         panic!(
             "{}: reverse_one_ad not implemented for this atomic function",
-            name,
+            atom_eval.name,
         );
     }
     let reverse_one_ad = reverse_one_ad.unwrap();
