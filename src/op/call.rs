@@ -126,41 +126,6 @@ where
     )
 }
 // ----------------------------------------------------------------------
-fn extract_flag_arg<'a>(
-    flag       : &'a Vec<bool> ,
-    arg        : &'a [IndexT]  ,
-) -> (
-    usize      , // atom_id
-    IndexT     , // call_info
-    usize      , // call_n_arg
-    usize      , // call_n_res
-    bool       , // trace
-    &'a [bool] , // is_arg_var
-    &'a [bool] , // is_res_var
-) {
-    let atom_id    = arg[0] as usize;
-    let call_info  = arg[1];
-    let call_n_arg = arg[2] as usize;
-    let call_n_res = arg[3] as usize;
-    let trace      = flag[ arg[4] as usize ];
-    //
-    let mut begin  = (arg[4] as usize) + 1;
-    let mut end     = begin + call_n_arg;
-    let is_arg_var  = &flag[begin .. end];
-    begin           = end;
-    end             = begin + call_n_res;
-    let is_res_var  = &flag[begin .. end];
-    (
-        atom_id,
-        call_info,
-        call_n_arg,
-        call_n_res,
-        trace,
-        is_arg_var,
-        is_res_var,
-    )
-}
-// ----------------------------------------------------------------------
 fn call_domain_zero_value<'a, 'b, V>(
     var_zero   : &'a Vec<V>    ,
     con        : &'a Vec<V>    ,
@@ -790,35 +755,23 @@ fn call_rust_src<V> (
     res        : usize         ) -> String
 where
     V : AtomEvalVec,
+    AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
-        atom_id,
         call_info,
         call_n_arg,
         call_n_res,
         trace,
         is_arg_var,
         is_res_var,
-    ) = extract_flag_arg(flag, arg);
+        atom_eval,
+    ) = extract_call_info(arg, flag);
     //
     // src
     let mut src = String::new();
     //
     // name
-    let name : &'static str;
-    {   //
-        // rw_lock
-        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
-        //
-        // read_lock
-        let read_lock = rw_lock.read();
-        assert!( read_lock.is_ok() );
-        //
-        // Rest of this block has a lock, so it should be fast and not fail.
-        let atom_eval_vec       = read_lock.unwrap();
-        let atom_eval           = &atom_eval_vec[atom_id];
-        name                    = atom_eval.name;
-    }
+    let name = &atom_eval.name;
     //
     // call_domain
     src = src +
