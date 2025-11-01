@@ -79,7 +79,7 @@ use crate::{
     ad_from_value,
 };
 // ----------------------------------------------------------------------
-fn extract_call_arg<'a>(
+fn extract_flag_arg<'a>(
     flag       : &'a Vec<bool> ,
     arg        : &'a [IndexT]  ,
 ) -> (
@@ -204,7 +204,7 @@ where
         trace,
         is_arg_var,
         is_res_var,
-    ) = extract_call_arg(flag, arg);
+    ) = extract_flag_arg(flag, arg);
     let call_domain_zero = call_domain_zero_value(
         var_zero, con, arg, call_n_arg, is_arg_var
     );
@@ -266,7 +266,7 @@ where
         trace,
         is_arg_var,
         is_res_var,
-    ) = extract_call_arg(flag, arg);
+    ) = extract_flag_arg(flag, arg);
     let call_domain_zero = call_domain_zero_value(
         var_zero, con, arg, call_n_arg, is_arg_var
     );
@@ -353,7 +353,7 @@ where
         trace,
         is_arg_var,
         is_res_var,
-    ) = extract_call_arg(flag, arg);
+    ) = extract_flag_arg(flag, arg);
     let call_domain_zero = call_domain_zero_value(
         var_zero, con, arg, call_n_arg, is_arg_var
     );
@@ -436,7 +436,7 @@ where
         trace,
         is_arg_var,
         is_res_var,
-    ) = extract_call_arg(flag, arg);
+    ) = extract_flag_arg(flag, arg);
     let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
     let call_adomain_zero = call_domain_zero_ad(
         avar_zero, &acon, arg, call_n_arg, is_arg_var
@@ -508,7 +508,7 @@ where
         trace,
         is_arg_var,
         is_res_var,
-    ) = extract_call_arg(flag, arg);
+    ) = extract_flag_arg(flag, arg);
     let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
     let call_adomain_zero = call_domain_zero_ad(
         avar_zero, &acon, arg, call_n_arg, is_arg_var
@@ -605,7 +605,7 @@ where
         trace,
         is_arg_var,
         is_res_var,
-    ) = extract_call_arg(flag, arg);
+    ) = extract_flag_arg(flag, arg);
     let acon = call_domain_acon(con, arg, call_n_arg, is_arg_var);
     let call_adomain_zero = call_domain_zero_ad(
         avar_zero, &acon, arg, call_n_arg, is_arg_var
@@ -726,8 +726,8 @@ where
         name              : "call_res" ,
         forward_dyp_value : no_op_dyp::<V, V>,
         forward_dyp_ad    : no_op_dyp::<V, AD<V> >,
-        forward_var_value : no_op_zero::<V, V>,
-        forward_var_ad    : no_op_zero::<V, AD<V> >,
+        forward_var_value : no_op_var::<V, V>,
+        forward_var_ad    : no_op_var::<V, AD<V> >,
         forward_1_value   : no_op_one::<V, V>,
         forward_1_ad      : no_op_one::<V, AD<V> >,
         reverse_1_value   : no_op_one::<V, V>,
@@ -749,9 +749,9 @@ fn no_op_dyp<V, E>(
     _res      : usize       ,
 ) { }
 //
-// no_op_zero
+// no_op_var
 /// [ForwardVar](crate::op::info::ForwardVar) function
-fn no_op_zero<V, E>(
+fn no_op_var<V, E>(
     _dyp_zero : &Vec<E>     ,
     _var_zero : &mut Vec<E> ,
     _con      : &Vec<V>     ,
@@ -814,7 +814,7 @@ where
         trace,
         is_arg_var,
         is_res_var,
-    ) = extract_call_arg(flag, arg);
+    ) = extract_flag_arg(flag, arg);
     //
     // src
     let mut src = String::new();
