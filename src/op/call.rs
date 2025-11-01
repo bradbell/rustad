@@ -191,9 +191,11 @@ fn call_domain_zero_ad<'a, 'b, V>(
     }
     call_domain_zero
 }
-// --------------------------------------------------------------------------
-// call_forward_var_value
+// ==========================================================================
+// call_forward_var
+// ==========================================================================
 //
+// call_forward_value
 /// V evaluation of zero order forward call operator for atomic functions
 ///
 /// TODO : Extend this routine to work with dynamic parameters
@@ -253,7 +255,68 @@ where
         }
     }
 }
-// --------------------------------------------------------------------------
+//
+// call_forward_var_ad
+/// `AD<V>` evaluation of zero order forward call operator for atomic functions
+///
+/// TODO : Extend this routine to work with dynamic parameters
+fn call_forward_var_ad<V> (
+    _adyp_zero : &Vec< AD<V> >       ,
+    avar_zero  : &mut Vec< AD<V> >   ,
+    cop        : &Vec<V>             ,
+    flag       : &Vec<bool>          ,
+    arg        : &[IndexT]           ,
+    _arg_type  : &[ADType]           ,
+    res        : usize               )
+where
+    V           : Clone + AtomEvalVec,
+    AtomEval<V> : Clone,
+{   // ----------------------------------------------------------------------
+    let (
+        call_info,
+        n_arg,
+        n_res,
+        trace,
+        is_arg_var,
+        is_res_var,
+        atom_eval,
+    ) = extract_call_info(arg, flag);
+    //
+    // forward_zero_ad
+    let forward_zero_ad = &atom_eval.forward_zero_ad;
+    if forward_zero_ad.is_none() {
+        panic!(
+            "{} : forward_zero_ad is not implemented for this atomic function",
+            atom_eval.name,
+        );
+    }
+    let forward_zero_ad = forward_zero_ad.unwrap();
+    //
+    // call_domain_zero
+    let acop = call_domain_acop(cop, arg, n_arg, is_arg_var);
+    let call_adomain_zero = call_domain_zero_ad(
+        avar_zero, &acop, arg, n_arg, is_arg_var
+    );
+    //
+    // call_arange_zero
+    let mut call_arange_zero = forward_zero_ad(
+        &call_adomain_zero, call_info, trace
+    );
+    assert_eq!( call_arange_zero.len(), n_res);
+    //
+    // avar_zero
+    let mut j_res = 0;
+    call_arange_zero.reverse();
+    for i_res in 0 .. n_res {
+        let arange_i = call_arange_zero.pop();
+        debug_assert!( arange_i.is_some() );
+        if is_res_var[i_res] {
+            avar_zero[res + j_res] = arange_i.unwrap();
+            j_res += 1;
+        }
+    }
+}
+// ==========================================================================
 // call_forward_1_value
 //
 /// V evaluation of first order forward call operator for atomic functions
@@ -397,69 +460,6 @@ where
         let index = arg[i_arg + 5] as usize;
         if is_arg_var[i_arg] {
             var_one[index] += &call_domain_one[i_arg];
-        }
-    }
-}
-
-// --------------------------------------------------------------------------
-// call_forward_var_ad
-//
-/// `AD<V>` evaluation of zero order forward call operator for atomic functions
-///
-/// TODO : Extend this routine to work with dynamic parameters
-fn call_forward_var_ad<V> (
-    _adyp_zero : &Vec< AD<V> >       ,
-    avar_zero  : &mut Vec< AD<V> >   ,
-    cop        : &Vec<V>             ,
-    flag       : &Vec<bool>          ,
-    arg        : &[IndexT]           ,
-    _arg_type  : &[ADType]           ,
-    res        : usize               )
-where
-    V           : Clone + AtomEvalVec,
-    AtomEval<V> : Clone,
-{   // ----------------------------------------------------------------------
-    let (
-        call_info,
-        n_arg,
-        n_res,
-        trace,
-        is_arg_var,
-        is_res_var,
-        atom_eval,
-    ) = extract_call_info(arg, flag);
-    //
-    // forward_zero_ad
-    let forward_zero_ad = &atom_eval.forward_zero_ad;
-    if forward_zero_ad.is_none() {
-        panic!(
-            "{} : forward_zero_ad is not implemented for this atomic function",
-            atom_eval.name,
-        );
-    }
-    let forward_zero_ad = forward_zero_ad.unwrap();
-    //
-    // call_domain_zero
-    let acop = call_domain_acop(cop, arg, n_arg, is_arg_var);
-    let call_adomain_zero = call_domain_zero_ad(
-        avar_zero, &acop, arg, n_arg, is_arg_var
-    );
-    //
-    // call_arange_zero
-    let mut call_arange_zero = forward_zero_ad(
-        &call_adomain_zero, call_info, trace
-    );
-    assert_eq!( call_arange_zero.len(), n_res);
-    //
-    // avar_zero
-    let mut j_res = 0;
-    call_arange_zero.reverse();
-    for i_res in 0 .. n_res {
-        let arange_i = call_arange_zero.pop();
-        debug_assert!( arange_i.is_some() );
-        if is_res_var[i_res] {
-            avar_zero[res + j_res] = arange_i.unwrap();
-            j_res += 1;
         }
     }
 }
