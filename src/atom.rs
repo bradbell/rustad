@@ -75,7 +75,7 @@ use crate::adfn::{
 /// is the maximum of the ADType for the two values.
 ///
 pub type AtomForwardType = fn(
-    _domain_ad_type  : &Vec<ADType> ,
+    _domain_ad_type  : &[ADType]    ,
     _call_info       : IndexT       ,
     _trace           : bool         ,
 )-> Vec<ADType>;

@@ -67,7 +67,7 @@ use reverse_one::{
 //
 // sumsq_forward_type
 fn sumsq_forward_type(
-    domain_ad_type  : &Vec<ADType> ,
+    domain_ad_type  : &[ADType]    ,
     _call_info      : IndexT       ,
     _trace          : bool         ,
 ) -> Vec<ADType>

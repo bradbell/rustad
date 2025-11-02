@@ -137,7 +137,7 @@ fn checkpoint_reverse_one_value(
 //
 // checkpoint_forward_type
 fn checkpoint_forward_type(
-    domain_ad_type : &Vec<ADType> ,
+    domain_ad_type : &[ADType]    ,
     call_info      : IndexT       ,
     trace          : bool         ,
 ) -> Vec<ADType>

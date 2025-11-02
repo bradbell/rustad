@@ -121,7 +121,7 @@ fn rev_sumsq_reverse_one_value(
 //
 // rev_sumsq_forward_type
 fn rev_sumsq_forward_type(
-    domain_ad_type  : &Vec<ADType> ,
+    domain_ad_type  : &[ADType]    ,
     _call_info      : IndexT       ,
     _trace          : bool         ,
 ) -> Vec<ADType>
