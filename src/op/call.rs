@@ -176,6 +176,28 @@ fn call_domain_zero_value<'a, 'b, V>(
 }
 // ----------------------------------------------------------------------
 //
+// domain_acop
+fn domain_acop <'a, 'b, V>(
+    cop        : &'a [V]       ,
+    arg        : &'b [IndexT]  ,
+    arg_type   : &'b [ADType]  ,
+) -> Vec< AD<V> >
+where
+    V : Clone,
+{   //
+    let n_arg = arg.len();
+    let mut acop : Vec< AD<V> > = Vec::new();
+    for i_arg in 0 .. n_arg {
+        let ad_type = &arg_type[5 + i_arg];
+        if ad_type.is_constant() {
+            let index = arg[5 + i_arg] as usize;
+            acop.push( ad_from_value( cop[index].clone() ) );
+        }
+    }
+    acop
+}
+//
+// call_domain_acop
 fn call_domain_acop<'a, 'b, V>(
     cop        : &'a Vec<V>    ,
     arg        : &'b [IndexT]  ,
@@ -197,6 +219,36 @@ where
 }
 // ----------------------------------------------------------------------
 //
+// domain_zero_ad
+fn domain_zero_ad<'a, 'b, V>(
+    dyp_zero   : &'a [AD<V>]    ,
+    var_zero   : &'a [AD<V>]    ,
+    acop       : &'a [AD<V>]    ,
+    arg        : &'b [IndexT]   ,
+    arg_type   : &'b [ADType]   ,
+) -> Vec<&'a AD<V> >
+{
+    //
+    let n_arg = arg.len();
+    let mut domain_zero : Vec<& AD<V> > = Vec::with_capacity( n_arg );
+    let mut j_cop : usize = 0;
+    for j_arg in 0 .. n_arg {
+        let index   = arg[5 + j_arg] as usize;
+        let ad_type = &arg_type[5 + j_arg];
+        if ad_type.is_constant() {
+            domain_zero.push( &acop[j_cop] );
+            j_cop += 1;
+        } else if ad_type.is_dynamic() {
+            domain_zero.push( &dyp_zero[index] );
+        } else {
+            debug_assert!( ad_type.is_variable() );
+            domain_zero.push( &var_zero[index] );
+        }
+    }
+    domain_zero
+}
+//
+// call_domain_zero_ad
 fn call_domain_zero_ad<'a, 'b, V>(
     avar_zero   : &'a Vec< AD<V> >    ,
     acop        : &'a Vec< AD<V> >    ,
@@ -224,16 +276,14 @@ fn call_domain_zero_ad<'a, 'b, V>(
 // ==========================================================================
 //
 // call_forward_value
-/// V evaluation of zero order forward call operator for atomic functions
-///
-/// TODO : Extend this routine to work with dynamic parameters
+/// atomic function callback for V evaluation of variables.
 fn call_forward_var_value<V> (
     dyp_zero   : &Vec<V>       ,
     var_zero   : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
     arg        : &[IndexT]     ,
-    arg_type  : &[ADType]      ,
+    arg_type   : &[ADType]     ,
     res        : usize         )
 where
     V           : AtomEvalVec,
@@ -292,12 +342,12 @@ where
 ///
 /// TODO : Extend this routine to work with dynamic parameters
 fn call_forward_var_ad<V> (
-    _adyp_zero : &Vec< AD<V> >       ,
+    adyp_zero  : &Vec< AD<V> >       ,
     avar_zero  : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
     flag       : &Vec<bool>          ,
     arg        : &[IndexT]           ,
-    _arg_type  : &[ADType]           ,
+    arg_type   : &[ADType]           ,
     res        : usize               )
 where
     V           : Clone + AtomEvalVec,
@@ -305,13 +355,15 @@ where
 {   // ----------------------------------------------------------------------
     let (
         call_info,
-        n_arg,
+        _n_arg,
         n_res,
         trace,
-        is_arg_var,
-        is_res_var,
+        _is_arg_var,
+        _is_res_var,
         atom_eval,
     ) = extract_call_info(arg, flag);
+    let forward_type = &atom_eval.forward_type;
+    let res_ad_type  = forward_type(arg_type, call_info, trace);
     //
     // forward_zero_ad
     let forward_zero_ad = &atom_eval.forward_zero_ad;
@@ -323,25 +375,26 @@ where
     }
     let forward_zero_ad = forward_zero_ad.unwrap();
     //
-    // call_domain_zero
-    let acop = call_domain_acop(cop, arg, n_arg, is_arg_var);
-    let call_adomain_zero = call_domain_zero_ad(
-        avar_zero, &acop, arg, n_arg, is_arg_var
+    // domain_zero
+    let acop = domain_acop(cop, arg, arg_type);
+    let adomain_zero = domain_zero_ad(
+        adyp_zero, avar_zero, &acop, arg, arg_type
     );
     //
     // call_arange_zero
     let mut call_arange_zero = forward_zero_ad(
-        &call_adomain_zero, call_info, trace
+        &adomain_zero, call_info, trace
     );
     assert_eq!( call_arange_zero.len(), n_res);
     //
     // avar_zero
     let mut j_res = 0;
     call_arange_zero.reverse();
-    for i_res in 0 .. n_res {
-        let arange_i = call_arange_zero.pop();
+    for i_res in (0 .. n_res).rev() {
+        let ad_type_i = &res_ad_type[i_res];
+        let arange_i  = call_arange_zero.pop();
         debug_assert!( arange_i.is_some() );
-        if is_res_var[i_res] {
+        if ad_type_i.is_variable() {
             avar_zero[res + j_res] = arange_i.unwrap();
             j_res += 1;
         }
