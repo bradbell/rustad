@@ -126,6 +126,34 @@ where
     )
 }
 // ----------------------------------------------------------------------
+//
+// domain_zero_value
+fn domain_zero_value<'a, 'b, V>(
+    dyp_zero   : &'a [V]       ,
+    var_zero   : &'a [V]       ,
+    cop        : &'a [V]       ,
+    arg        : &'b [IndexT]  ,
+    arg_type   : &'b [ADType]  ,
+) -> Vec<&'a V>
+{   //
+    let n_arg = arg.len();
+    let mut domain_zero : Vec<&V> = Vec::with_capacity( n_arg );
+    for j_arg in 0 .. n_arg {
+        let index   = arg[5 + j_arg] as usize;
+        let ad_type = &arg_type[5 + j_arg];
+        if ad_type.is_constant() {
+            domain_zero.push( &cop[index] );
+        } else if ad_type.is_dynamic() {
+            domain_zero.push( &dyp_zero[index] );
+        } else {
+            debug_assert!( ad_type.is_variable() );
+            domain_zero.push( &var_zero[index] );
+        }
+    }
+    domain_zero
+}
+//
+// call_domain_zero_value
 fn call_domain_zero_value<'a, 'b, V>(
     var_zero   : &'a Vec<V>    ,
     cop        : &'a Vec<V>    ,
@@ -200,12 +228,12 @@ fn call_domain_zero_ad<'a, 'b, V>(
 ///
 /// TODO : Extend this routine to work with dynamic parameters
 fn call_forward_var_value<V> (
-    _dyn_zero  : &Vec<V>       ,
+    dyp_zero   : &Vec<V>       ,
     var_zero   : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
     arg        : &[IndexT]     ,
-    _arg_type  : &[ADType]     ,
+    arg_type  : &[ADType]      ,
     res        : usize         )
 where
     V           : AtomEvalVec,
@@ -213,13 +241,15 @@ where
 {   // ----------------------------------------------------------------------
     let (
         call_info,
-        n_arg,
+        _n_arg,
         n_res,
         trace,
-        is_arg_var,
-        is_res_var,
+        _is_arg_var,
+        _is_res_var,
         atom_eval,
     ) = extract_call_info(arg, flag);
+    let forward_type = &atom_eval.forward_type;
+    let res_ad_type  = forward_type(arg_type, call_info, trace);
     // ----------------------------------------------------------------------
     //
     // forward_var_value
@@ -232,24 +262,25 @@ where
     }
     let forward_zero_value = forward_zero_value.unwrap();
     //
-    // call_domain_zero
-    let call_domain_zero = call_domain_zero_value(
-        var_zero, cop, arg, n_arg, is_arg_var
+    // domain_zero
+    let domain_zero = domain_zero_value(
+        dyp_zero, var_zero, cop, arg, arg_type
     );
     //
     // call_range_zero
     let mut call_range_zero = forward_zero_value(
-        &call_domain_zero, call_info, trace
+        &domain_zero, call_info, trace
     );
     assert_eq!( call_range_zero.len(), n_res);
     //
     // var_zero
     let mut j_res = 0;
     call_range_zero.reverse();
-    for i_res in 0 .. n_res {
-        let range_i = call_range_zero.pop();
+    for i_res in (0 .. n_res).rev() {
+        let ad_type_i = &res_ad_type[i_res];
+        let range_i   = call_range_zero.pop();
         debug_assert!( range_i.is_some() );
-        if is_res_var[i_res] {
+        if ad_type_i.is_variable() {
             var_zero[res + j_res] = range_i.unwrap();
             j_res += 1;
         }
