@@ -8,6 +8,8 @@
 // ---------------------------------------------------------------------------
 // use
 //
+use std::cmp::PartialEq;
+//
 use crate::{
     AD,
     ADType,
@@ -457,7 +459,7 @@ where
     for<'a> &'a V : std::ops::Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Div<&'a V, Output = V> ,
     //
-    V : Clone + From<f32> + ThisThreadTape + AtomEvalVec
+    V : Clone + From<f32> + PartialEq + ThisThreadTape + AtomEvalVec
 {
     let empty = OpInfo {
         name               : &"panic",

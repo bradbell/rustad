@@ -299,3 +299,48 @@ impl From<f64> for NumVec<f64> {
         NumVec { vec : Vec::new(), s : scalar }
     }
 }
+// ----------------------------------------------------------------------------`
+// PartialEq
+/// PartialEq `NumVec<S>` operator
+///
+/// S : is the type of the elements of the numeric vector.
+///
+/// Two NumVec object are equal it they have the same length
+/// and their corresponding elements are equal.
+///
+/// Prototype:
+/// <br/>
+/// & `NumVec` < *S* > == & `NumVec` < *S* >
+///
+/// # Example
+/// ```
+/// use rustad::NumVec;
+///
+/// let a = NumVec::new( vec![ 2 as f64, 2 as f64 ] );
+/// let b = NumVec::from(2 as f64 );
+/// let c = NumVec::new( vec![ 2 as f64, 3 as f64 ] );
+/// assert_eq!(a, a);
+/// assert_eq!(b, b);
+/// assert_eq!(c, c);
+/// assert_ne!(a, b);
+/// assert_ne!(a, c);
+/// ```
+///
+impl<S> PartialEq for NumVec<S>
+where
+    S : PartialEq,
+{
+    fn eq(&self, rhs : &Self) -> bool
+    {   let mut result = true;
+        if self.len() != rhs.len()  {
+            result = false;
+        } else if self.len() == 1 {
+            result = self.s == rhs.s;
+        } else {
+            for j in 0 .. self.len() {
+                result = result && self.vec[j] == rhs.vec[j];
+            }
+        }
+        result
+    }
+}

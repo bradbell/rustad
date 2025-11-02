@@ -72,7 +72,9 @@ use crate::adfn::{
 /// The i-th component is the [ADType] of the i-th component
 /// of *arange* .
 /// Note that if a result depends on two values, the ADType of the result
-/// is the maximum of the ADType for the two values.
+/// is the maximum of the ADType for the two values. Also note that
+/// DomainP and DomainV results automatically get converted to DependentP
+/// and DependentV respectively.
 ///
 pub type AtomForwardType = fn(
     _domain_ad_type  : &[ADType]    ,

@@ -48,6 +48,7 @@
 // use
 //
 use std::sync::RwLock;
+use std::cmp::PartialEq;
 //
 use crate::op::info::OpInfo;
 use crate::atom::{
@@ -135,7 +136,14 @@ fn domain_zero_value<'a, 'b, V>(
     arg        : &'b [IndexT]  ,
     arg_type   : &'b [ADType]  ,
 ) -> Vec<&'a V>
+where
+    V : PartialEq,
 {   //
+    // no_var_zero
+    // This case is used during zero forward mode for dynamic parameters.
+    // If no_var_zero, then var_zero[0] is nan.
+    let no_var_zero = var_zero.len() == 1 && var_zero[0] != var_zero[0];
+    //
     let n_arg = arg.len();
     let mut domain_zero : Vec<&V> = Vec::with_capacity( n_arg );
     for j_arg in 0 .. n_arg {
@@ -147,7 +155,11 @@ fn domain_zero_value<'a, 'b, V>(
             domain_zero.push( &dyp_zero[index] );
         } else {
             debug_assert!( ad_type.is_variable() );
-            domain_zero.push( &var_zero[index] );
+            if no_var_zero {
+                domain_zero.push( &var_zero[0] );
+            } else {
+                domain_zero.push( &var_zero[index] );
+            }
         }
     }
     domain_zero
@@ -286,7 +298,7 @@ fn call_forward_var_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    V           : AtomEvalVec,
+    V           : AtomEvalVec + PartialEq,
     AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -302,7 +314,7 @@ where
     let res_ad_type  = forward_type(arg_type, call_info, trace);
     // ----------------------------------------------------------------------
     //
-    // forward_var_value
+    // forward_zero_value
     let forward_zero_value = &atom_eval.forward_zero_value;
     if forward_zero_value.is_none() {
         panic!(
@@ -740,7 +752,7 @@ no_forward_dyp_ad!(Call);
 /// The map results for CALL_OP and CALL_RES_OP are set.
 pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    V         : Clone + From<f32> + AtomEvalVec + ThisThreadTapePublic,
+    V : Clone + From<f32> + PartialEq + AtomEvalVec + ThisThreadTapePublic,
     for<'a> V : std::ops::AddAssign<&'a V> ,
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
