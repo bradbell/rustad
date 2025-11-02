@@ -59,7 +59,6 @@ use crate::op::id::{
         CALL_RES_OP,
 };
 use crate::op::info::{
-    no_forward_dyp_value,
     no_forward_dyp_ad,
 };
 use crate::{
@@ -282,6 +281,72 @@ fn call_domain_zero_ad<'a, 'b, V>(
         }
     }
     call_domain_zero
+}
+// ==========================================================================
+// call_forward_dyp
+// ==========================================================================
+//
+// call_forward_value
+/// atomic function callback for V evaluation of variables.
+fn call_forward_dyp_value<V> (
+    dyp_zero   : &mut Vec<V>   ,
+    cop        : &Vec<V>       ,
+    flag       : &Vec<bool>    ,
+    arg        : &[IndexT]     ,
+    arg_type   : &[ADType]     ,
+    res        : usize         )
+where
+    V           : AtomEvalVec + From<f32> + PartialEq,
+    AtomEval<V> : Clone,
+{   // ----------------------------------------------------------------------
+    let (
+        call_info,
+        _n_arg,
+        n_res,
+        trace,
+        _is_arg_var,
+        _is_res_var,
+        atom_eval,
+    ) = extract_call_info(arg, flag);
+    let forward_type = &atom_eval.forward_type;
+    let res_ad_type  = forward_type(arg_type, call_info, trace);
+    // ----------------------------------------------------------------------
+    //
+    // forward_zero_value
+    let forward_zero_value = &atom_eval.forward_zero_value;
+    if forward_zero_value.is_none() {
+        panic!(
+        "{} : forward_zero_value is not implemented for this atomic function",
+            atom_eval.name,
+        );
+    }
+    let forward_zero_value = forward_zero_value.unwrap();
+    //
+    // domain_zero
+    let nan_v    : V      = f32::NAN.into();
+    let var_zero : Vec<V> = vec![ nan_v ];
+    let domain_zero = domain_zero_value(
+        dyp_zero, &var_zero, cop, arg, arg_type
+    );
+    //
+    // call_range_zero
+    let mut call_range_zero = forward_zero_value(
+        &domain_zero, call_info, trace
+    );
+    assert_eq!( call_range_zero.len(), n_res);
+    //
+    // dyp_zero
+    let mut j_res = 0;
+    call_range_zero.reverse();
+    for i_res in (0 .. n_res).rev() {
+        let ad_type_i = &res_ad_type[i_res];
+        let range_i   = call_range_zero.pop();
+        debug_assert!( range_i.is_some() );
+        if ad_type_i.is_dynamic() {
+            dyp_zero[res + j_res] = range_i.unwrap();
+            j_res += 1;
+        }
+    }
 }
 // ==========================================================================
 // call_forward_var
@@ -742,7 +807,6 @@ fn call_arg_var_index(
 // ---------------------------------------------------------------------------
 //
 // set_op_info
-no_forward_dyp_value!(Call);
 no_forward_dyp_ad!(Call);
 //
 /// Set the operator information for call.
@@ -757,7 +821,7 @@ where
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
         name              : "call" ,
-        forward_dyp_value : forward_dyp_value_none::<V>,
+        forward_dyp_value : call_forward_dyp_value::<V>,
         forward_dyp_ad    : forward_dyp_ad_none::<V>,
         forward_var_value : call_forward_var_value::<V>,
         forward_var_ad    : call_forward_var_ad::<V>,
