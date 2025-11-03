@@ -329,18 +329,25 @@ where
         dyp_zero, &var_zero, cop, arg, arg_type, n_dom
     );
     //
-    // call_range_zero
-    let mut call_range_zero = forward_zero_value(
+    // range_zero
+    let mut range_zero = forward_zero_value(
         &domain_zero, call_info, trace
     );
-    assert_eq!( call_range_zero.len(), n_res);
+    assert_eq!(
+        n_res,
+        range_zero.len(),
+        "atom {} forward_zero_value return length: expected {}, found {}",
+        atom_eval.name,
+        n_res,
+        range_zero.len(),
+    );
     //
     // dyp_zero
     let mut j_res = 0;
-    call_range_zero.reverse();
+    range_zero.reverse();
     for i_res in (0 .. n_res).rev() {
         let ad_type_i = &res_ad_type[i_res];
-        let range_i   = call_range_zero.pop();
+        let range_i   = range_zero.pop();
         debug_assert!( range_i.is_some() );
         if ad_type_i.is_dynamic() {
             dyp_zero[res + j_res] = range_i.unwrap();
@@ -396,18 +403,25 @@ where
         dyp_zero, var_zero, cop, arg, arg_type, n_dom
     );
     //
-    // call_range_zero
-    let mut call_range_zero = forward_zero_value(
+    // range_zero
+    let mut range_zero = forward_zero_value(
         &domain_zero, call_info, trace
     );
-    assert_eq!( call_range_zero.len(), n_res);
+    assert_eq!(
+        n_res,
+        range_zero.len(),
+        "atom {} forward_zero_value return length: expected {}, found {}",
+        atom_eval.name,
+        n_res,
+        range_zero.len(),
+    );
     //
     // var_zero
     let mut j_res = 0;
-    call_range_zero.reverse();
+    range_zero.reverse();
     for i_res in (0 .. n_res).rev() {
         let ad_type_i = &res_ad_type[i_res];
-        let range_i   = call_range_zero.pop();
+        let range_i   = range_zero.pop();
         debug_assert!( range_i.is_some() );
         if ad_type_i.is_variable() {
             var_zero[res + j_res] = range_i.unwrap();
@@ -417,9 +431,7 @@ where
 }
 //
 // call_forward_var_ad
-/// `AD<V>` evaluation of zero order forward call operator for atomic functions
-///
-/// TODO : Extend this routine to work with dynamic parameters
+/// atomic function callback for `AD<V>` evaluation of variables.
 fn call_forward_var_ad<V> (
     adyp_zero  : &Vec< AD<V> >       ,
     avar_zero  : &mut Vec< AD<V> >   ,
@@ -461,18 +473,25 @@ where
         adyp_zero, avar_zero, &acop, arg, arg_type, n_dom
     );
     //
-    // call_arange_zero
-    let mut call_arange_zero = forward_zero_ad(
+    // arange_zero
+    let mut arange_zero = forward_zero_ad(
         &adomain_zero, call_info, trace
     );
-    assert_eq!( call_arange_zero.len(), n_res);
+    assert_eq!(
+        n_res,
+        arange_zero.len(),
+        "atom {} forward_zero_ad return length: expected {}, found {}",
+        atom_eval.name,
+        n_res,
+        arange_zero.len(),
+    );
     //
     // avar_zero
     let mut j_res = 0;
-    call_arange_zero.reverse();
+    arange_zero.reverse();
     for i_res in (0 .. n_res).rev() {
         let ad_type_i = &res_ad_type[i_res];
-        let arange_i  = call_arange_zero.pop();
+        let arange_i  = arange_zero.pop();
         debug_assert!( arange_i.is_some() );
         if ad_type_i.is_variable() {
             avar_zero[res + j_res] = arange_i.unwrap();
