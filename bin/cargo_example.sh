@@ -31,10 +31,11 @@ for example in $list
 do
    if cargo run --example $example >& temp.out
    then
-      echo "example $example: OK"
+      echo "cargo run --example $example: OK"
    else
       cat temp.out
-      echo "example $example: Error"
+      echo "cargom run --example $example: Error"
+      exit 1
    fi
 done
 echo 'cargo_example.sh: OK'
