@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 /*
-This atomic example uses all the possibe AtomEval callback functionn.
+This atomic example uses all the possible AtomEval callback function.
 The sumsq_forward_one_ad and reverse_forward_one_ad callbacks each
-require defining another atomic funciton to evaluate thier derivatives.
+require defining another atomic function to evaluate their derivatives.
 
 sumsq_forward_zero; see forward_zero.rs
 z = g(x) = x[0] * x[0] + x[1] * x[1] + ...

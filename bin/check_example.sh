@@ -10,9 +10,9 @@ echo_eval() {
    eval $*
 }
 # -----------------------------------------------------------------------------
-if [ "$0" != "bin/cargo_example.sh" ]
+if [ "$0" != "bin/check_example.sh" ]
 then
-   echo "bin/cargo_example.sh: must be executed from its parent directory"
+   echo "bin/check_example.sh: must be executed from its parent directory"
    exit 1
 fi
 cat << EOF > temp.sed
@@ -38,5 +38,5 @@ do
       exit 1
    fi
 done
-echo 'cargo_example.sh: OK'
+echo 'check_example.sh: OK'
 exit 0

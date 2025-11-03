@@ -15,6 +15,8 @@ then
    echo "bin/check_all.sh: must be executed from its parent directory"
    exit 1
 fi
+# sed
+source bin/grep_and_sed.sh
 #
 # rustad.long-types-*
 if ls rustad.long-type-* >& /dev/null
@@ -44,9 +46,6 @@ then
 fi
 echo_eval typos
 #
-# sed
-source bin/grep_and_sed.sh
-#
 # check_list
 check_list=$(ls bin/check_* | $sed \
    -e '/^bin[/]check_xrst.sh/d' \
@@ -63,9 +62,6 @@ echo_eval cargo doc --document-private-items
 echo
 echo_eval cargo run --release --bin normsq
 echo_eval cargo run --release --bin ad_fn
-echo
-echo_eval bin/cargo_test.sh
-echo_eval bin/cargo_example.sh
 echo
 #
 echo "check_all.sh OK"
