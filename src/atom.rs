@@ -384,9 +384,9 @@ where
     // tape.recordng
     debug_assert!( tape.recording );
     //
-    // call_n_arg, call_n_res
-    let call_n_arg = adomain.len();
-    let call_n_res = range_zero.len();
+    // n_dom, n_res
+    let n_dom = adomain.len();
+    let n_res = range_zero.len();
     //
     // arange
     let mut arange : Vec< AD<V> > = ad_from_vector(range_zero);
@@ -403,38 +403,38 @@ where
     let n_dyp = tape.dyp.n_dom + tape.dyp.n_dep;
     let n_var = tape.var.n_dom + tape.var.n_dep;
     //
-    // arange, n_dyp_res, n_var_res
-    let mut n_dyp_res = 0;
-    let mut n_var_res = 0;
-    for i in 0 .. call_n_res {
+    // arange, n_dyp_dep, n_var_dep
+    let mut n_dyp_dep = 0;
+    let mut n_var_dep = 0;
+    for i in 0 .. n_res {
         if range_ad_type[i].is_variable() {
             arange[i].tape_id   = tape.tape_id;
             arange[i].ad_type   = ADType::DependentV;
-            arange[i].index     = n_var + n_var_res;
-            n_var_res += 1;
+            arange[i].index     = n_var + n_var_dep;
+            n_var_dep += 1;
          } else {
             debug_assert!( range_ad_type[i].is_dynamic() );
             arange[i].tape_id   = tape.tape_id;
             arange[i].ad_type   = ADType::DependentP;
-            arange[i].index     = n_dyp + n_dyp_res;
-            n_dyp_res += 1;
+            arange[i].index     = n_dyp + n_dyp_dep;
+            n_dyp_dep += 1;
          }
     }
     for k in 0 .. 2 {
         //
-        // n_res, sub_tape
-        let n_res    : usize;
+        // n_dep, sub_tape
+        let n_dep    : usize;
         let sub_tape : &mut OpSequence;
         if k == 0 {
             sub_tape = &mut tape.dyp;
-            n_res    = n_dyp_res;
+            n_dep    = n_dyp_dep;
         } else {
             sub_tape = &mut tape.var;
-            n_res    = n_var_res;
+            n_dep    = n_var_dep;
         }
         //
         // sub_tape
-        if n_res > 0 {
+        if n_dep > 0 {
             //
             // sub_tape.id_seq, sub_tape.arg_seq
             sub_tape.id_seq.push( CALL_OP );
@@ -443,15 +443,15 @@ where
             // sub_tape.arg_all, tape.cop
             sub_tape.arg_all.push( atom_id );                        // arg[0]
             sub_tape.arg_all.push( call_info );                      // arg[1]
-            sub_tape.arg_all.push( call_n_arg as IndexT );           // arg[2]
-            sub_tape.arg_all.push( call_n_res as IndexT );           // arg[3]
+            sub_tape.arg_all.push( n_dom as IndexT );                // arg[2]
+            sub_tape.arg_all.push( n_dep as IndexT );                // arg[3]
             sub_tape.arg_all.push( sub_tape.flag.len() as IndexT );  // arg[4]
             for _j in 0 .. 5 {
                 sub_tape.arg_type.push( ADType::NoType );
             }
             //
             // sub_tape.arg_type, sub_tape.arg_all
-            for j in 0 .. call_n_arg {
+            for j in 0 .. n_dom {
                 sub_tape.arg_type.push( domain_ad_type[j].clone() );
                 if domain_ad_type[j].is_constant() {
                     let index = tape.cop.len();
@@ -465,20 +465,20 @@ where
             //
             // sub_tape.flag
             sub_tape.flag.push( trace );          // flag[ arg[4] ]
-            for j in 0 .. call_n_arg {
+            for j in 0 .. n_dom {
                 let flag_j = domain_ad_type[j].is_variable();
                 sub_tape.flag.push( flag_j );     // flag[ arg[4] + j + 1]
             }
-            for i in 0 .. call_n_res {
+            for i in 0 .. n_res {
                 let flag_i = range_ad_type[i].is_variable();
                 sub_tape.flag.push( flag_i );     // flag[ arg[4] + n_res + i]
             }
             //
             // sub_tape.n_dep
-            sub_tape.n_dep += n_res;
+            sub_tape.n_dep += n_dep;
             //
             // sub_tape.id_seq, sub_tape.arg_seq
-            for _i in 0 .. (n_res - 1) {
+            for _i in 0 .. (n_dep - 1) {
                 sub_tape.id_seq.push( CALL_RES_OP );
                 sub_tape.arg_seq.push( sub_tape.arg_all.len() as IndexT );
             }
