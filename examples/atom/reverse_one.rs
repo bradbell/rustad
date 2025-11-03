@@ -42,7 +42,7 @@ pub fn sumsq_reverse_one_value(
         println!("range_one = [ {} ]", range_one[0]);
         print!("domain_one = [ ");
         for j in 0 .. domain_one.len() {
-                print!("{}, ", range_one[j]);
+                print!("{}, ", domain_one[j]);
         }
         println!("]");
         println!("End Trace: sumsq_reverse_one_value");
