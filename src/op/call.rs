@@ -70,7 +70,71 @@ use crate::{
     ad_from_value,
 };
 // ----------------------------------------------------------------------
-fn extract_call_info<'a, V>(
+//
+// extract_call_info
+fn extract_call_info<V>(
+    arg        : &[IndexT] ,
+    arg_type   : &[ADType] ,
+    flag       : &[bool]   ,
+) -> (
+    IndexT       , // call_info
+    usize        , // n_dom
+    usize        , // n_res
+    bool         , // trace
+    AtomEval<V>  , // atom_eval
+    Vec<ADType>  , // res_ad_type
+)
+where
+    V           : AtomEvalVec,
+    AtomEval<V> : Clone,
+{
+    // atom_id, call_info, n_dom, n_res,
+    let atom_id    = arg[0] as usize;
+    let call_info  = arg[1];
+    let n_dom      = arg[2] as usize;
+    let n_res      = arg[3] as usize;
+    let trace      = flag[ arg[4] as usize ];
+    //
+    // atom_eval
+    let atom_eval : AtomEval<V>;
+    {   //
+        // rw_lock
+        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
+        //
+        // read_lock
+        let read_lock = rw_lock.read();
+        assert!( read_lock.is_ok() );
+        //
+        // Rest of this block has a lock, so it should be fast and not fail.
+        let atom_eval_vec  = read_lock.unwrap();
+        atom_eval          = atom_eval_vec[atom_id].clone();
+    }
+    //
+    // res_ad_type
+    let forward_type = &atom_eval.forward_type;
+    let dom_ad_type  = &arg_type[5 .. 5 + n_dom];
+    let res_ad_type  = forward_type(dom_ad_type, call_info, trace);
+    assert_eq!(
+        n_res,
+        res_ad_type.len(),
+        "atom {} forward_type return length: expected {}, found {}",
+        atom_eval.name,
+        n_res,
+        res_ad_type.len(),
+    );
+    //
+    (
+        call_info,
+        n_dom,
+        n_res,
+        trace,
+        atom_eval,
+        res_ad_type,
+    )
+}
+//
+// extract_call_info_old
+fn extract_call_info_old<'a, V>(
     arg        : &'a [IndexT]  ,
     flag       : &'a Vec<bool> ,
 ) -> (
@@ -304,13 +368,9 @@ where
         n_dom,
         n_res,
         trace,
-        _is_arg_var,
-        _is_res_var,
         atom_eval,
-    ) = extract_call_info(arg, flag);
-    let forward_type = &atom_eval.forward_type;
-    let res_ad_type  = forward_type(arg_type, call_info, trace);
-    // ----------------------------------------------------------------------
+        res_ad_type,
+    ) = extract_call_info(arg, arg_type, flag);
     //
     // forward_zero_value
     let forward_zero_value = &atom_eval.forward_zero_value;
@@ -378,15 +438,9 @@ where
         n_dom,
         n_res,
         trace,
-        _is_arg_var,
-        _is_res_var,
         atom_eval,
-    ) = extract_call_info(arg, flag);
-    let forward_type = &atom_eval.forward_type;
-    let dom_ad_type  = &arg_type[5 .. 5 + n_dom];
-    let res_ad_type  = forward_type(dom_ad_type, call_info, trace);
-    //
-    // ----------------------------------------------------------------------
+        res_ad_type,
+    ) = extract_call_info(arg, arg_type, flag);
     //
     // forward_zero_value
     let forward_zero_value = &atom_eval.forward_zero_value;
@@ -449,13 +503,9 @@ where
         n_dom,
         n_res,
         trace,
-        _is_arg_var,
-        _is_res_var,
         atom_eval,
-    ) = extract_call_info(arg, flag);
-    let forward_type = &atom_eval.forward_type;
-    let dom_ad_type  = &arg_type[5 .. 5 + n_dom];
-    let res_ad_type  = forward_type(dom_ad_type, call_info, trace);
+        res_ad_type,
+    ) = extract_call_info(arg, arg_type, flag);
     //
     // forward_zero_ad
     let forward_zero_ad = &atom_eval.forward_zero_ad;
@@ -522,7 +572,7 @@ where
         is_arg_var,
         is_res_var,
         atom_eval,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info_old(arg, flag);
     //
     // forward_zero_value, forward_one_value
     let forward_zero_value = &atom_eval.forward_zero_value;
@@ -603,7 +653,7 @@ where
         is_arg_var,
         is_res_var,
         atom_eval,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info_old(arg, flag);
     //
     // reverse_one_value
     let reverse_one_value = &atom_eval.reverse_one_value;
@@ -669,7 +719,7 @@ where
         is_arg_var,
         is_res_var,
         atom_eval,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info_old(arg, flag);
     //
     // forward_zero_ad, forward_one_ad
     let forward_zero_ad      = atom_eval.forward_zero_ad.clone();
@@ -752,7 +802,7 @@ where
         is_arg_var,
         is_res_var,
         atom_eval,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info_old(arg, flag);
     //
     // reverse_one_ad
     let reverse_one_ad = &atom_eval.reverse_one_ad;
@@ -947,7 +997,7 @@ where
         is_arg_var,
         is_res_var,
         atom_eval,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info_old(arg, flag);
     //
     // src
     let mut src = String::new();
