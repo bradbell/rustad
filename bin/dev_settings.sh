@@ -79,7 +79,8 @@ invisible_and_tab_ok='
 '
 #
 # check_git_commit
-# These files may have automatic changes that should not be committed every time.
+# These files may have automatic changes that should not
+# be committed every time.
 # Including them in this list gives the user the option to abort their changes.
 check_git_commit='
 '

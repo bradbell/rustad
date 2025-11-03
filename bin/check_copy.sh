@@ -50,7 +50,10 @@ fi
 username='bradbell'
 fullname='Bradley M. Bell'
 # ---------------------------------------------------------------------------
-echo "#" > temp.sed
+if [ -e temp.sed ]
+then
+   rm temp.sed
+fi
 for name in $no_copyright_list
 do
    if [ -f $name ]
@@ -68,21 +71,23 @@ missing='no'
 changed='no'
 for file_name in $(git ls-files | $sed -f temp.sed)
 do
-   if [ -e $file_name ]
+   if ! $grep "$spdx_license_id\$" $file_name > /dev/null
    then
-      if ! $grep "$spdx_license_id\$" $file_name > /dev/null
+      if [ "$missing" == 'no' ]
       then
-         if [ "$missing" == 'no' ]
-         then
-            echo "Cannot find line that ends with:"
-            echo "   $spdx_license_id"
-            echo "In the following files:"
-         fi
-         echo "$file_name"
-         missing='yes'
+         echo "Cannot find line that ends with:"
+         echo "   $spdx_license_id"
+         echo "In the following files:"
       fi
+      echo "$file_name"
+      missing='yes'
    fi
 done
+if [ "$missing" == 'yes' ]
+then
+   echo 'bin/check_copy.sh: Error'
+   exit 1
+fi
 # ---------------------------------------------------------------------------
 cat << EOF > temp.sed
 s|\\(SPDX-FileContributor: *[0-9]\\{4\\}\\)[-0-9]* $fullname|\\1-$yy $fullname|

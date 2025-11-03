@@ -35,6 +35,7 @@ source bin/dev_settings.sh
 # sed.$$
 cat << EOF > sed.$$
 s|.*-> *||
+/sed.$$/d
 EOF
 for name in $invisible_and_tab_ok
 do
@@ -63,7 +64,7 @@ fi
 ok='yes'
 for file in $file_list
 do
-   echo $file
+   echo "check tab: $file"
    if $grep -P '\t' $file > /dev/null
    then
       echo "$file has a tab"
