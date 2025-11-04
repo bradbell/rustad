@@ -405,7 +405,7 @@ where
     // dyp_zero
     let mut j_res = 0;
     range_zero.reverse();
-    for i_res in (0 .. n_res).rev() {
+    for i_res in 0 .. n_res {
         let ad_type_i = &res_ad_type[i_res];
         let range_i   = range_zero.pop();
         debug_assert!( range_i.is_some() );
@@ -473,7 +473,7 @@ where
     // var_zero
     let mut j_res = 0;
     range_zero.reverse();
-    for i_res in (0 .. n_res).rev() {
+    for i_res in 0 .. n_res {
         let ad_type_i = &res_ad_type[i_res];
         let range_i   = range_zero.pop();
         debug_assert!( range_i.is_some() );
@@ -539,7 +539,7 @@ where
     // avar_zero
     let mut j_res = 0;
     arange_zero.reverse();
-    for i_res in (0 .. n_res).rev() {
+    for i_res in 0 .. n_res {
         let ad_type_i = &res_ad_type[i_res];
         let arange_i  = arange_zero.pop();
         debug_assert!( arange_i.is_some() );

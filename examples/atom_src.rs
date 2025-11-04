@@ -68,7 +68,7 @@ pub fn sumsq_forward_zero_value(
     trace        : bool        ,
 ) -> Vec<V>
 {   //
-    // var_zero, sumsq_zero
+    // sumsq_zero
     let mut sumsq_zero = 0 as V;
     for j in 0 .. domain_zero.len() {
         sumsq_zero += &( domain_zero[j] * domain_zero[j] );

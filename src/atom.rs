@@ -412,13 +412,14 @@ where
             arange[i].ad_type   = ADType::DependentV;
             arange[i].index     = n_var + n_var_dep;
             n_var_dep += 1;
-         } else {
-            debug_assert!( range_ad_type[i].is_dynamic() );
+         } else if range_ad_type[i].is_dynamic() {
             arange[i].tape_id   = tape.tape_id;
             arange[i].ad_type   = ADType::DependentP;
             arange[i].index     = n_dyp + n_dyp_dep;
             n_dyp_dep += 1;
-         }
+         } else {
+            assert!( range_ad_type[i].is_constant() );
+        }
     }
     for k in 0 .. 2 {
         //
@@ -444,7 +445,7 @@ where
             sub_tape.arg_all.push( atom_id );                        // arg[0]
             sub_tape.arg_all.push( call_info );                      // arg[1]
             sub_tape.arg_all.push( n_dom as IndexT );                // arg[2]
-            sub_tape.arg_all.push( n_dep as IndexT );                // arg[3]
+            sub_tape.arg_all.push( n_res as IndexT );                // arg[3]
             sub_tape.arg_all.push( sub_tape.flag.len() as IndexT );  // arg[4]
             for _j in 0 .. 5 {
                 sub_tape.arg_type.push( ADType::NoType );
