@@ -414,6 +414,9 @@ where
             j_res += 1;
         }
     }
+    // There must be at least one dynamic parameter result,
+    // or this call would not be in the dyp operation sequence:
+    assert!( 0 < j_res );
 }
 // ==========================================================================
 // call_forward_var
@@ -482,6 +485,9 @@ where
             j_res += 1;
         }
     }
+    // There must be at least one variable result,
+    // or this call would not be in the variable operation sequence:
+    assert!( 0 < j_res );
 }
 //
 // call_forward_var_ad
@@ -548,6 +554,9 @@ where
             j_res += 1;
         }
     }
+    // There must be at least one variable result,
+    // or this call would not be in the variable operation sequence:
+    assert!( 0 < j_res );
 }
 // ==========================================================================
 // call_forward_1_value
@@ -629,6 +638,9 @@ where
             j_res += 1;
         }
     }
+    // There must be at least one variable result,
+    // or this call would not be in the variable operation sequence:
+    assert!( 0 < j_res );
 }
 // --------------------------------------------------------------------------
 // call_reverse_1_value
@@ -682,6 +694,10 @@ where
             call_range_one.push( &zero_v );
         }
     }
+    // There must be at least one variable result,
+    // or this call would not be in the variable operation sequence:
+    assert!( 0 < j_res );
+    //
     // call_domain_one
     let call_domain_one = reverse_one_value(
         &call_domain_zero, call_range_one, call_info, trace
@@ -777,6 +793,9 @@ where
             j_res += 1;
         }
     }
+    // There must be at least one variable result,
+    // or this call would not be in the variable operation sequence:
+    assert!( 0 < j_res );
 }
 // --------------------------------------------------------------------------
 // call_reverse_1_ad
@@ -833,6 +852,10 @@ where
             call_arange_one.push( &azero );
         }
     }
+    // There must be at least one variable result,
+    // or this call would not be in the variable operation sequence:
+    assert!( 0 < j_res );
+    //
     // call_adomain_one
     let call_adomain_one = reverse_one_ad(
         &call_adomain_zero, call_arange_one, call_info, trace
