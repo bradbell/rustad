@@ -444,8 +444,9 @@ where
             sub_tape.arg_all.push( call_info );                      // arg[1]
             sub_tape.arg_all.push( n_dom as IndexT );                // arg[2]
             sub_tape.arg_all.push( n_res as IndexT );                // arg[3]
-            sub_tape.arg_all.push( sub_tape.flag.len() as IndexT );  // arg[4]
-            for _j in 0 .. 5 {
+            sub_tape.arg_all.push( n_dep as IndexT );                // arg[4]
+            sub_tape.arg_all.push( sub_tape.flag.len() as IndexT );  // arg[5]
+            for _j in 0 .. 6 {
                 sub_tape.arg_type.push( ADType::NoType );
             }
             //
@@ -455,22 +456,22 @@ where
                 if domain_ad_type[j].is_constant() {
                     let index = tape.cop.len();
                     tape.cop.push( adomain[j].value.clone() );
-                    sub_tape.arg_all.push( index as IndexT );   // arg[5+j]
+                    sub_tape.arg_all.push( index as IndexT );   // arg[6+j]
                 } else {
                     let index = adomain[j].index;
-                    sub_tape.arg_all.push( index as IndexT );   // arg[5+j]
+                    sub_tape.arg_all.push( index as IndexT );   // arg[6+j]
                 }
             }
             //
             // sub_tape.flag
-            sub_tape.flag.push( trace );          // flag[ arg[4] ]
+            sub_tape.flag.push( trace );          // flag[ arg[5] ]
             for j in 0 .. n_dom {
                 let flag_j = domain_ad_type[j].is_variable();
-                sub_tape.flag.push( flag_j );     // flag[ arg[4] + j + 1]
+                sub_tape.flag.push( flag_j );     // flag[ arg[5] + j + 1]
             }
             for i in 0 .. n_res {
                 let flag_i = range_ad_type[i].is_variable();
-                sub_tape.flag.push( flag_i );     // flag[ arg[4] + n_res + i]
+                sub_tape.flag.push( flag_i );     // flag[ arg[5] + n_res + i]
             }
             //
             // sub_tape.n_dep

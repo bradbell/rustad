@@ -11,9 +11,10 @@
 //
 use crate::{
     AD,
+    ADType,
     ADfn,
 };
-use crate::ADType;
+use crate::op::id::CALL_OP;
 use crate::op::info::GlobalOpInfoVec;
 use crate::adfn::eval_from::eval_from_f32;
 use crate::adfn::eval_from::eval_from_value;
@@ -210,6 +211,12 @@ macro_rules! forward_var {
                     println!( "{}, {}, {}, {:?}, {:?}",
                         res, var_zero[res], name, arg, arg_type
                     );
+                    if op_id as u8 == CALL_OP {
+                        let n_dep = arg[4] as usize;
+                        for j in 1 .. n_dep {
+                            println!( "{}, {}", res + j, dyp_zero[res + j]);
+                        }
+                    }
                 }
             }
             //

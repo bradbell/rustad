@@ -20,11 +20,12 @@
 //! | 1        | Extra information about this call; i.e. call_info        |
 //! | 2        | Domain space dimension for function being called (n_dom) |
 //! | 3        | Number of results for the function being called  (n_res) |
-//! | 4        | Index of the first boolean for this operator             |
-//! | 5        | Variable or parameter index for first argument to call   |
-//! | 6        | Variable or parameter index for second argument to call  |
+//! | 4        | Number of results that are dependents            (n_dep) |
+//! | 5        | Index of the first boolean for this operator             |
+//! | 6        | Variable or parameter index for first argument to call   |
+//! | 7        | Variable or parameter index for second argument to call  |
 //! | ...      | ... |
-//! | 4+n_dom  | Variable or parameter index for last argument to call    |
+//! | 5+n_dom  | Variable or parameter index for last argument to call    |
 //!
 //! # Operator Booleans
 //! | Index    | Meaning |
@@ -77,6 +78,7 @@ fn extract_call_info<V>(
     IndexT       , // call_info
     usize        , // n_dom
     usize        , // n_res
+    usize        , // n_dep
     bool         , // trace
     AtomEval<V>  , // atom_eval
     Vec<ADType>  , // res_ad_type
@@ -90,7 +92,8 @@ where
     let call_info  = arg[1];
     let n_dom      = arg[2] as usize;
     let n_res      = arg[3] as usize;
-    let trace      = flag[ arg[4] as usize ];
+    let n_dep      = arg[4] as usize;
+    let trace      = flag[ arg[5] as usize ];
     //
     // atom_eval
     let atom_eval : AtomEval<V>;
@@ -109,7 +112,7 @@ where
     //
     // res_ad_type
     let forward_type = &atom_eval.forward_type;
-    let dom_ad_type  = &arg_type[5 .. 5 + n_dom];
+    let dom_ad_type  = &arg_type[6 .. 6 + n_dom];
     let res_ad_type  = forward_type(dom_ad_type, call_info, trace);
     assert_eq!(
         n_res,
@@ -124,6 +127,7 @@ where
         call_info,
         n_dom,
         n_res,
+        n_dep,
         trace,
         atom_eval,
         res_ad_type,
@@ -152,10 +156,10 @@ where
     let call_info  = arg[1];
     let n_dom      = arg[2] as usize;
     let n_res      = arg[3] as usize;
-    let trace      = flag[ arg[4] as usize ];
+    let trace      = flag[ arg[5] as usize ];
     //
     // is_arg_var, is_res_var
-    let mut begin  = (arg[4] as usize) + 1;
+    let mut begin  = (arg[5] as usize) + 1;
     let mut end     = begin + n_dom;
     let is_arg_var  = &flag[begin .. end];
     begin           = end;
@@ -207,8 +211,8 @@ where
     //
     let mut domain_zero : Vec<&V> = Vec::with_capacity( n_dom );
     for j_arg in 0 .. n_dom {
-        let index   = arg[5 + j_arg] as usize;
-        let ad_type = &arg_type[5 + j_arg];
+        let index   = arg[6 + j_arg] as usize;
+        let ad_type = &arg_type[6 + j_arg];
         if ad_type.is_constant() {
             domain_zero.push( &cop[index] );
         } else if ad_type.is_dynamic() {
@@ -237,7 +241,7 @@ fn call_domain_zero_value<'a, 'b, V>(
     //
     let mut call_domain_zero : Vec<&V> = Vec::with_capacity( n_dom );
     for i_arg in 0 .. n_dom {
-        let index = arg[i_arg + 5] as usize;
+        let index = arg[6 + i_arg] as usize;
         if is_arg_var[i_arg] {
             call_domain_zero.push( &var_zero[index] );
         } else {
@@ -260,9 +264,9 @@ where
 {   //
     let mut acop : Vec< AD<V> > = Vec::new();
     for i_arg in 0 .. n_dom {
-        let ad_type = &arg_type[5 + i_arg];
+        let ad_type = &arg_type[6 + i_arg];
         if ad_type.is_constant() {
-            let index = arg[5 + i_arg] as usize;
+            let index = arg[6 + i_arg] as usize;
             acop.push( ad_from_value( cop[index].clone() ) );
         }
     }
@@ -283,7 +287,7 @@ where
     let mut acop : Vec< AD<V> > = Vec::new();
     for i_arg in 0 .. n_dom {
         if ! is_arg_var[i_arg] {
-            let index = arg[i_arg + 5] as usize;
+            let index = arg[6 + i_arg] as usize;
             acop.push( ad_from_value( cop[index].clone() ) );
         }
     }
@@ -313,8 +317,8 @@ where
     let mut domain_zero : Vec<& AD<V> > = Vec::with_capacity( n_dom );
     let mut j_cop : usize = 0;
     for j_arg in 0 .. n_dom {
-        let index   = arg[5 + j_arg] as usize;
-        let ad_type = &arg_type[5 + j_arg];
+        let index   = arg[6 + j_arg] as usize;
+        let ad_type = &arg_type[6 + j_arg];
         if ad_type.is_constant() {
             domain_zero.push( &acop[j_cop] );
             j_cop += 1;
@@ -346,7 +350,7 @@ fn call_domain_zero_ad<'a, 'b, V>(
     let mut i_cop : usize = 0;
     for i_arg in 0 .. n_dom {
         if is_arg_var[i_arg] {
-            let index = arg[i_arg + 5] as usize;
+            let index = arg[6 + i_arg] as usize;
             call_domain_zero.push( &avar_zero[index] );
         } else {
             call_domain_zero.push( &acop[i_cop] );
@@ -376,6 +380,7 @@ where
         call_info,
         n_dom,
         n_res,
+        _n_dep,
         trace,
         atom_eval,
         res_ad_type,
@@ -445,6 +450,7 @@ where
         call_info,
         n_dom,
         n_res,
+        _n_dep,
         trace,
         atom_eval,
         res_ad_type,
@@ -520,6 +526,7 @@ where
         call_info,
         n_dom,
         n_res,
+        _n_dep,
         trace,
         atom_eval,
         res_ad_type,
@@ -588,6 +595,7 @@ where
         call_info,
         n_dom,
         n_res,
+        _n_dep,
         trace,
         atom_eval,
         res_ad_type,
@@ -694,7 +702,7 @@ where
     let zero_v : V = 0f32.into();
     let mut call_domain_one : Vec<&V> = Vec::with_capacity( n_dom );
     for i_arg in 0 .. n_dom {
-        let index = arg[i_arg + 5] as usize;
+        let index = arg[6 + i_arg] as usize;
         if is_arg_var[i_arg] {
             call_domain_one.push( &var_one[index] );
         } else {
@@ -786,7 +794,7 @@ where
     //
     // var_one
     for i_arg in 0 .. n_dom {
-        let index = arg[i_arg + 5] as usize;
+        let index = arg[6 + i_arg] as usize;
         if is_arg_var[i_arg] {
             var_one[index] += &call_domain_one[i_arg];
         }
@@ -849,7 +857,7 @@ where
     let azero      = ad_from_value(zero_v);
     let mut call_adomain_one : Vec<& AD<V> > = Vec::with_capacity(n_dom);
     for i_arg in 0 .. n_dom {
-        let index = arg[i_arg + 5] as usize;
+        let index = arg[6 + i_arg] as usize;
         if is_arg_var[i_arg] {
             call_adomain_one.push( &avar_one[index] );
         } else {
@@ -944,7 +952,7 @@ where
     //
     // avar_one
     for i_arg in 0 .. n_dom {
-        let index = arg[i_arg + 5] as usize;
+        let index = arg[6 + i_arg] as usize;
         if is_arg_var[i_arg] {
             avar_one[index] += &call_adomain_one[i_arg];
         }
@@ -1114,7 +1122,7 @@ where
                 "vec![&nan; " + &(n_dom.to_string()) + "];\n";
     for i_arg in 0 .. n_dom {
         let i_str = i_arg.to_string();
-        let index = arg[i_arg + 5] as usize;
+        let index = arg[6 + i_arg] as usize;
         if is_arg_var[i_arg] {
             if index < n_domain {
                 let j_str = index.to_string();
