@@ -31,11 +31,11 @@ use crate::{
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
 ///
-/// * dyp_zero :
+/// * dyp_both :
 /// vector of all the dynamic parameters in the following order:
 /// the domain dynamic parameters followed by the dependent dynamic parameters.
 ///
-/// * var_zero :
+/// * var_both :
 /// vector of all the variables in the following order:
 /// the domain variables followed by the dependent variables.
 ///
@@ -62,12 +62,12 @@ pub fn doc_common_arguments() {}
 /// * Arguments :  see [doc_common_arguments] .
 /// In addition, there is the following extra condition:
 ///
-/// * dyp_zero :
+/// * dyp_both :
 /// This is an input for dynamic parameters less than *res* and an output
 /// for the results of this operator.
 ///
 pub type ForwardDyp<V, E> = fn(
-    _dyp_zero : &mut Vec<E> ,
+    _dyp_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
@@ -80,7 +80,7 @@ pub type ForwardDyp<V, E> = fn(
 /// that only have a variable argument (because they should not be in the
 /// dynamic parameter operation sequence).
 pub fn panic_dyp<V, E> (
-    _dyp_zero : &mut Vec<E> ,
+    _dyp_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
@@ -94,13 +94,13 @@ pub fn panic_dyp<V, E> (
 /// * Arguments :  see [doc_common_arguments] .
 /// In addition, there is the following extra condition:
 ///
-/// * var_zero :
+/// * var_both :
 /// This is an input for variable indices less than *res* and an output
 /// for the results of this operator.
 ///
 pub type ForwardVar<V, E> = fn(
-    _dyp_zero : &Vec<E>     ,
-    _var_zero : &mut Vec<E> ,
+    _dyp_both : &Vec<E>     ,
+    _var_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
@@ -113,8 +113,8 @@ pub type ForwardVar<V, E> = fn(
 /// that only have parameter arguments (because they should not be in the
 /// variable operation sequence).
 pub fn panic_var<V, E> (
-    _dyp_zero : &Vec<E>     ,
-    _var_zero : &mut Vec<E> ,
+    _dyp_both : &Vec<E>     ,
+    _var_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
@@ -132,7 +132,7 @@ pub fn panic_var<V, E> (
 ///
 /// * Other Arguments :  see [doc_common_arguments]
 pub type ForwardOne<V, E> = fn(
-    _var_zero : &Vec<E>     ,
+    _var_both : &Vec<E>     ,
     _var_one  : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
@@ -151,7 +151,7 @@ pub type ForwardOne<V, E> = fn(
 ///
 /// * Other Arguments :  see [doc_common_arguments]
 pub type ReverseOne<V, E> = fn(
-    _var_zero : &Vec<E>     ,
+    _var_both : &Vec<E>     ,
     _var_one  : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
@@ -164,7 +164,7 @@ pub type ReverseOne<V, E> = fn(
 /// that only have parameter arguments (because they should not be in the
 /// variable operation sequence).
 pub fn panic_one<V, E> (
-    _var_zero : &Vec<E>     ,
+    _var_both : &Vec<E>     ,
     _var_one  : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
@@ -178,7 +178,7 @@ pub fn panic_one<V, E> (
 /// The type IndexT must be in scope where this macro is used.
 macro_rules! no_forward_one_value{ ($Op:ident) => {
     pub fn forward_one_value_none<V> (
-        _var_zero : &Vec<V>     ,
+        _var_both : &Vec<V>     ,
         _var_one  : &mut Vec<V> ,
         _cop      : &Vec<V>     ,
         _flag     : &Vec<bool>  ,
@@ -197,7 +197,7 @@ pub(crate) use no_forward_one_value;
 /// The type IndexT must be in scope where this macro is used.
 macro_rules! no_forward_one_ad{ ($Op:ident) => {
     pub fn forward_one_ad_none<V> (
-        _var_zero : &Vec< AD<V> >     ,
+        _var_both : &Vec< AD<V> >     ,
         _var_one  : &mut Vec< AD<V> > ,
         _cop      : &Vec<V>           ,
         _flag     : &Vec<bool>        ,
@@ -216,7 +216,7 @@ pub(crate) use no_forward_one_ad;
 /// The type IndexT must be in scope where this macro is used.
 macro_rules! no_reverse_one_value{ ($Op:ident) => {
     pub fn reverse_one_value_none<V> (
-        _var_zero : &Vec<V>     ,
+        _var_both : &Vec<V>     ,
         _var_one  : &mut Vec<V> ,
         _cop      : &Vec<V>     ,
         _flag     : &Vec<bool>  ,
@@ -235,7 +235,7 @@ pub(crate) use no_reverse_one_value;
 /// The type IndexT must be in scope where this macro is used.
 macro_rules! no_reverse_one_ad{ ($Op:ident) => {
     pub fn reverse_one_ad_none<V> (
-        _var_zero : &Vec< AD<V> >     ,
+        _var_both : &Vec< AD<V> >     ,
         _var_one  : &mut Vec< AD<V> > ,
         _cop      : &Vec<V>           ,
         _flag     : &Vec<bool>        ,

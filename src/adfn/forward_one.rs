@@ -28,8 +28,8 @@ use crate::adfn::forward_zero::doc_forward_zero;
 ///
 /// * Syntax :
 /// ```text
-///     range_one = f.forward_one_value(&var_zero, domain_one, trace)
-///     range_one = f.forward_one_ad(   &var_zero, domain_one, trace)
+///     range_one = f.forward_one_value(&var_both, domain_one, trace)
+///     range_one = f.forward_one_ad(   &var_both, domain_one, trace)
 /// ```
 ///
 /// * Prototype :
@@ -41,8 +41,8 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// ## f
 /// is an [ADfn] object.
 ///
-/// ## var_zero
-/// must be the *var_zero* computed a the previous call to forward_zero.
+/// ## var_both
+/// must be the *var_both* computed a the previous call to forward_zero.
 ///
 /// ## domain_one
 /// specifies the domain space direction along which the directional
@@ -58,7 +58,7 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// ```
 /// Here `f'` is the derivative of the function and
 /// [domain_zero](doc_forward_zero#domain_zero) is its value in the call to
-/// forward_zero that created the *var_zero* .
+/// forward_zero that created the *var_both* .
 ///
 /// # Example
 /// Computing one partial derivative using forward_one :
@@ -116,7 +116,7 @@ macro_rules! forward_one {
         )]
         pub fn [< forward_one_ $suffix >] (
             &self,
-            var_zero    : &Vec<$E>     ,
+            var_both    : &Vec<$E>     ,
             domain_one  : Vec<$E>      ,
             trace       : bool         ,
         ) -> Vec<$E>
@@ -129,8 +129,8 @@ macro_rules! forward_one {
                 "f.forward_one: domain vector length does not match f"
             );
             assert_eq!(
-                var_zero.len(), n_var,
-                "f.forward_one: var_zero does not have the correct length"
+                var_both.len(), n_var,
+                "f.forward_one: var_both does not have the correct length"
             );
             //
             // op_info_vec
@@ -156,9 +156,9 @@ macro_rules! forward_one {
                 }
                 println!( "var_index, domain_zero, domain_one" );
                 for j in 0 .. self.var.n_dom {
-                    println!( "{}, {}, {}", j, var_zero[j], var_one[j] );
+                    println!( "{}, {}, {}", j, var_both[j], var_one[j] );
                 }
-                println!( "var_index, var_zero, var_one, op_name, arg" );
+                println!( "var_index, var_both, var_one, op_name, arg" );
             }
             //
             // var_one
@@ -170,7 +170,7 @@ macro_rules! forward_one {
                 let res   = self.var.n_dom + op_index;
                 let forward_1 = op_info_vec[op_id].[< forward_1_ $suffix >];
                 forward_1(
-                    &var_zero,
+                    &var_both,
                     &mut var_one,
                     &self.cop,
                     &self.var.flag,
@@ -180,7 +180,7 @@ macro_rules! forward_one {
                 if trace {
                     let name = &op_info_vec[op_id].name;
                     println!( "{}, {}, {}, {}, {:?}",
-                        res, var_zero[res], var_one[res], name, arg
+                        res, var_both[res], var_one[res], name, arg
                     );
                 }
             }

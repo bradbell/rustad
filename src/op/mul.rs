@@ -67,7 +67,7 @@ binary::eval_binary_forward_0!(Mul, *);
 // mul_pv_forward_1
 /// first order forward for parameter * variable; see [ForwardOne]
 fn mul_pv_forward_1 <V, E>(
-    _var_zero  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     cop        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
@@ -85,7 +85,7 @@ where
 // mul_vp_forward_1
 /// first order forward for variable * parameter; see [ForwardOne]
 fn mul_vp_forward_1 <V, E>(
-    _var_zero  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     cop        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
@@ -103,7 +103,7 @@ where
 // mul_vv_forward_1
 /// first order forward for variable * variable; see [ForwardOne]
 fn mul_vv_forward_1 <V, E>(
-    var_zero   :   &Vec<E>     ,
+    var_both   :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
@@ -116,8 +116,8 @@ where
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
-    let term1    = &var_zero[lhs]  * &var_one[rhs];
-    let term2    = &var_one[lhs]   * &var_zero[rhs];
+    let term1    = &var_both[lhs]  * &var_one[rhs];
+    let term2    = &var_one[lhs]   * &var_both[rhs];
     var_one[res] = &term1 + &term2;
 }
 // ---------------------------------------------------------------------------
@@ -127,7 +127,7 @@ where
 // mul_pv_reverse_1
 /// first order reverse for parameter * variable; see [ReverseOne]
 fn mul_pv_reverse_1 <V, E>(
-    _var_zero  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     cop        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
@@ -147,7 +147,7 @@ where
 // mul_vp_reverse_1
 /// first order reverse for variable * parameter; see [ReverseOne]
 fn mul_vp_reverse_1 <V, E>(
-    _var_zero  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     cop        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
@@ -167,7 +167,7 @@ where
 // mul_vv_reverse_1
 /// first order reverse for variable * variable; see [ReverseOne]
 fn mul_vv_reverse_1 <V, E>(
-    var_zero   :   &Vec<E>     ,
+    var_both   :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
@@ -181,10 +181,10 @@ where
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
     //
-    let term      = &var_one[res] * &var_zero[rhs];
+    let term      = &var_one[res] * &var_both[rhs];
     var_one[lhs] += &term;
     //
-    let term      = &var_one[res] * &var_zero[lhs];
+    let term      = &var_one[res] * &var_both[lhs];
     var_one[rhs] += &term;
 }
 // ---------------------------------------------------------------------------

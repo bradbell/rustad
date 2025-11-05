@@ -194,8 +194,8 @@ where
 //
 // domain_zero_value
 fn domain_zero_value<'a, 'b, V>(
-    dyp_zero   : &'a [V]       ,
-    var_zero   : &'a [V]       ,
+    dyp_both   : &'a [V]       ,
+    var_both   : &'a [V]       ,
     cop        : &'a [V]       ,
     arg        : &'b [IndexT]  ,
     arg_type   : &'b [ADType]  ,
@@ -204,10 +204,10 @@ fn domain_zero_value<'a, 'b, V>(
 where
     V : PartialEq,
 {   //
-    // no_var_zero
+    // no_var_both
     // This case is used during zero forward mode for dynamic parameters.
-    // If no_var_zero, then var_zero[0] is nan.
-    let no_var_zero = var_zero.len() == 1 && var_zero[0] != var_zero[0];
+    // If no_var_both, then var_both[0] is nan.
+    let no_var_both = var_both.len() == 1 && var_both[0] != var_both[0];
     //
     let mut domain_zero : Vec<&V> = Vec::with_capacity( n_dom );
     for j_arg in 0 .. n_dom {
@@ -216,13 +216,13 @@ where
         if ad_type.is_constant() {
             domain_zero.push( &cop[index] );
         } else if ad_type.is_dynamic() {
-            domain_zero.push( &dyp_zero[index] );
+            domain_zero.push( &dyp_both[index] );
         } else {
             debug_assert!( ad_type.is_variable() );
-            if no_var_zero {
-                domain_zero.push( &var_zero[0] );
+            if no_var_both {
+                domain_zero.push( &var_both[0] );
             } else {
-                domain_zero.push( &var_zero[index] );
+                domain_zero.push( &var_both[index] );
             }
         }
     }
@@ -231,7 +231,7 @@ where
 //
 // call_domain_zero_value
 fn call_domain_zero_value<'a, 'b, V>(
-    var_zero   : &'a Vec<V>    ,
+    var_both   : &'a Vec<V>    ,
     cop        : &'a Vec<V>    ,
     arg        : &'b [IndexT]  ,
     n_dom      : usize         ,
@@ -243,7 +243,7 @@ fn call_domain_zero_value<'a, 'b, V>(
     for i_arg in 0 .. n_dom {
         let index = arg[6 + i_arg] as usize;
         if is_arg_var[i_arg] {
-            call_domain_zero.push( &var_zero[index] );
+            call_domain_zero.push( &var_both[index] );
         } else {
             call_domain_zero.push( &cop[index] );
         }
@@ -297,8 +297,8 @@ where
 //
 // domain_zero_ad
 fn domain_zero_ad<'a, 'b, V>(
-    dyp_zero   : &'a [AD<V>]    ,
-    var_zero   : &'a [AD<V>]    ,
+    dyp_both   : &'a [AD<V>]    ,
+    var_both   : &'a [AD<V>]    ,
     acop       : &'a [AD<V>]    ,
     arg        : &'b [IndexT]   ,
     arg_type   : &'b [ADType]   ,
@@ -307,11 +307,11 @@ fn domain_zero_ad<'a, 'b, V>(
 where
     V : PartialEq,
 {
-    // no_var_zero
+    // no_var_both
     // This case is used during zero forward mode for dynamic parameters.
-    // If no_var_zero, then var_zero[0] is nan.
-    let no_var_zero = var_zero.len() == 1 &&
-        var_zero[0].value != var_zero[0].value;
+    // If no_var_both, then var_both[0] is nan.
+    let no_var_both = var_both.len() == 1 &&
+        var_both[0].value != var_both[0].value;
     //
     //
     let mut domain_zero : Vec<& AD<V> > = Vec::with_capacity( n_dom );
@@ -323,13 +323,13 @@ where
             domain_zero.push( &acop[j_cop] );
             j_cop += 1;
         } else if ad_type.is_dynamic() {
-            domain_zero.push( &dyp_zero[index] );
+            domain_zero.push( &dyp_both[index] );
         } else {
             debug_assert!( ad_type.is_variable() );
-            if no_var_zero {
-                domain_zero.push( &var_zero[0] );
+            if no_var_both {
+                domain_zero.push( &var_both[0] );
             } else {
-                domain_zero.push( &var_zero[index] );
+                domain_zero.push( &var_both[index] );
             }
         }
     }
@@ -338,7 +338,7 @@ where
 //
 // call_domain_zero_ad
 fn call_domain_zero_ad<'a, 'b, V>(
-    avar_zero   : &'a Vec< AD<V> >    ,
+    avar_both   : &'a Vec< AD<V> >    ,
     acop        : &'a Vec< AD<V> >    ,
     arg         : &'b [IndexT]        ,
     n_dom      : usize                ,
@@ -351,7 +351,7 @@ fn call_domain_zero_ad<'a, 'b, V>(
     for i_arg in 0 .. n_dom {
         if is_arg_var[i_arg] {
             let index = arg[6 + i_arg] as usize;
-            call_domain_zero.push( &avar_zero[index] );
+            call_domain_zero.push( &avar_both[index] );
         } else {
             call_domain_zero.push( &acop[i_cop] );
             i_cop += 1;
@@ -366,7 +366,7 @@ fn call_domain_zero_ad<'a, 'b, V>(
 // call_forward_dyp_value
 /// atomic function callback for V evaluation of variables.
 fn call_forward_dyp_value<V> (
-    dyp_zero   : &mut Vec<V>   ,
+    dyp_both   : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
     arg        : &[IndexT]     ,
@@ -398,9 +398,9 @@ where
     //
     // domain_zero
     let nan_v    : V      = f32::NAN.into();
-    let var_zero : Vec<V> = vec![ nan_v ];
+    let var_both : Vec<V> = vec![ nan_v ];
     let domain_zero = domain_zero_value(
-        dyp_zero, &var_zero, cop, arg, arg_type, n_dom
+        dyp_both, &var_both, cop, arg, arg_type, n_dom
     );
     //
     // range_zero
@@ -416,7 +416,7 @@ where
         range_zero.len(),
     );
     //
-    // dyp_zero
+    // dyp_both
     let mut j_res = 0;
     range_zero.reverse();
     for i_res in 0 .. n_res {
@@ -424,7 +424,7 @@ where
         let range_i   = range_zero.pop();
         debug_assert!( range_i.is_some() );
         if ad_type_i.is_dynamic() {
-            dyp_zero[res + j_res] = range_i.unwrap();
+            dyp_both[res + j_res] = range_i.unwrap();
             j_res += 1;
         }
     }
@@ -436,7 +436,7 @@ where
 // call_forward_dyp_ad
 /// atomic function callback for `AD<V>` evaluation of dynamic parameters.
 fn call_forward_dyp_ad<V> (
-    adyp_zero  : &mut Vec< AD<V> >   ,
+    adyp_both  : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
     flag       : &Vec<bool>          ,
     arg        : &[IndexT]           ,
@@ -470,9 +470,9 @@ where
     let acop     = domain_acop(cop, arg, arg_type, n_dom);
     let nan_v : V = f32::NAN.into();
     let anan      = ad_from_value( nan_v );
-    let avar_zero = vec! [ anan ];
+    let avar_both = vec! [ anan ];
     let adomain_zero = domain_zero_ad(
-        adyp_zero, &avar_zero, &acop, arg, arg_type, n_dom
+        adyp_both, &avar_both, &acop, arg, arg_type, n_dom
     );
     //
     // arange_zero
@@ -488,7 +488,7 @@ where
         arange_zero.len(),
     );
     //
-    // avar_zero
+    // avar_both
     let mut j_res = 0;
     arange_zero.reverse();
     for i_res in 0 .. n_res {
@@ -496,7 +496,7 @@ where
         let arange_i  = arange_zero.pop();
         debug_assert!( arange_i.is_some() );
         if ad_type_i.is_dynamic() {
-            adyp_zero[res + j_res] = arange_i.unwrap();
+            adyp_both[res + j_res] = arange_i.unwrap();
             j_res += 1;
         }
     }
@@ -511,8 +511,8 @@ where
 // call_forward_var_value
 /// atomic function callback for V evaluation of variables.
 fn call_forward_var_value<V> (
-    dyp_zero   : &Vec<V>       ,
-    var_zero   : &mut Vec<V>   ,
+    dyp_both   : &Vec<V>       ,
+    var_both   : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
     arg        : &[IndexT]     ,
@@ -544,7 +544,7 @@ where
     //
     // domain_zero
     let domain_zero = domain_zero_value(
-        dyp_zero, var_zero, cop, arg, arg_type, n_dom
+        dyp_both, var_both, cop, arg, arg_type, n_dom
     );
     //
     // range_zero
@@ -560,7 +560,7 @@ where
         range_zero.len(),
     );
     //
-    // var_zero
+    // var_both
     let mut j_res = 0;
     range_zero.reverse();
     for i_res in 0 .. n_res {
@@ -568,7 +568,7 @@ where
         let range_i   = range_zero.pop();
         debug_assert!( range_i.is_some() );
         if ad_type_i.is_variable() {
-            var_zero[res + j_res] = range_i.unwrap();
+            var_both[res + j_res] = range_i.unwrap();
             j_res += 1;
         }
     }
@@ -580,8 +580,8 @@ where
 // call_forward_var_ad
 /// atomic function callback for `AD<V>` evaluation of variables.
 fn call_forward_var_ad<V> (
-    adyp_zero  : &Vec< AD<V> >       ,
-    avar_zero  : &mut Vec< AD<V> >   ,
+    adyp_both  : &Vec< AD<V> >       ,
+    avar_both  : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
     flag       : &Vec<bool>          ,
     arg        : &[IndexT]           ,
@@ -614,7 +614,7 @@ where
     // adomain_zero
     let acop = domain_acop(cop, arg, arg_type, n_dom);
     let adomain_zero = domain_zero_ad(
-        adyp_zero, avar_zero, &acop, arg, arg_type, n_dom
+        adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
     // arange_zero
@@ -630,7 +630,7 @@ where
         arange_zero.len(),
     );
     //
-    // avar_zero
+    // avar_both
     let mut j_res = 0;
     arange_zero.reverse();
     for i_res in 0 .. n_res {
@@ -638,7 +638,7 @@ where
         let arange_i  = arange_zero.pop();
         debug_assert!( arange_i.is_some() );
         if ad_type_i.is_variable() {
-            avar_zero[res + j_res] = arange_i.unwrap();
+            avar_both[res + j_res] = arange_i.unwrap();
             j_res += 1;
         }
     }
@@ -651,7 +651,7 @@ where
 //
 /// V evaluation of first order forward call operator for atomic functions
 fn call_forward_1_value<V> (
-    var_zero   : &Vec<V>       ,
+    var_both   : &Vec<V>       ,
     var_one    : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
@@ -691,11 +691,11 @@ where
     //
     // call_domain_zero
     let call_domain_zero = call_domain_zero_value(
-        var_zero, cop, arg, n_dom, is_arg_var
+        var_both, cop, arg, n_dom, is_arg_var
     );
     // ----------------------------------------------------------------------
     //
-    // call_var_zero
+    // call_var_both
     forward_zero_value(&call_domain_zero, call_info, trace);
     //
     // call_domain_one
@@ -735,7 +735,7 @@ where
 //
 /// V evaluation of first order reverse call operator for atomic functions
 fn call_reverse_1_value<V> (
-    var_zero   : &Vec<V>       ,
+    var_both   : &Vec<V>       ,
     var_one    : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
@@ -767,7 +767,7 @@ where
     //
     // call_domain_zero
     let call_domain_zero = call_domain_zero_value(
-        var_zero, cop, arg, n_dom, is_arg_var
+        var_both, cop, arg, n_dom, is_arg_var
     );
     //
     // call_range_one
@@ -805,7 +805,7 @@ where
 //
 /// `AD<V>` evaluation of first order forward call operator for atomic functions
 fn call_forward_1_ad<V> (
-    avar_zero  : &Vec< AD<V> >       ,
+    avar_both  : &Vec< AD<V> >       ,
     avar_one   : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
     flag       : &Vec<bool>          ,
@@ -846,10 +846,10 @@ where
     // call_adomain_zero
     let acop = call_domain_acop(cop, arg, n_dom, is_arg_var);
     let call_adomain_zero = call_domain_zero_ad(
-        avar_zero, &acop, arg, n_dom, is_arg_var
+        avar_both, &acop, arg, n_dom, is_arg_var
     );
     //
-    // call_avar_zero
+    // call_avar_both
     forward_zero_ad(&call_adomain_zero, call_info, trace);
     //
     // call_adomain_one
@@ -890,7 +890,7 @@ where
 //
 /// `AD<V>` evaluation of first order reverse call operator (atomic functions)
 fn call_reverse_1_ad<V> (
-    avar_zero   : &Vec< AD<V> >       ,
+    avar_both   : &Vec< AD<V> >       ,
     avar_one    : &mut Vec< AD<V> >   ,
     cop         : &Vec<V>             ,
     flag       : &Vec<bool>           ,
@@ -924,7 +924,7 @@ where
     // call_adomain_zero
     let acop = call_domain_acop(cop, arg, n_dom, is_arg_var);
     let call_adomain_zero = call_domain_zero_ad(
-        avar_zero, &acop, arg, n_dom, is_arg_var
+        avar_both, &acop, arg, n_dom, is_arg_var
     );
     //
     // call_range_one
@@ -1032,7 +1032,7 @@ where
 // no_op_dyp
 /// [ForwardDyp](crate::op::info::ForwardDyp) function
 fn no_op_dyp<V, E>(
-    _dyp_zero : &mut Vec<E> ,
+    _dyp_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
@@ -1043,8 +1043,8 @@ fn no_op_dyp<V, E>(
 // no_op_var
 /// [ForwardVar](crate::op::info::ForwardVar) function
 fn no_op_var<V, E>(
-    _dyp_zero : &Vec<E>     ,
-    _var_zero : &mut Vec<E> ,
+    _dyp_both : &Vec<E>     ,
+    _var_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
@@ -1056,7 +1056,7 @@ fn no_op_var<V, E>(
 /// [ForwardOne](crate::op::info::ForwardOne) or
 /// [ReverseOne](crate::op::info::ReverseOne) function
 fn no_op_one<V, E>(
-    _var_zero : &Vec<E>     ,
+    _var_both : &Vec<E>     ,
     _var_one  : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,

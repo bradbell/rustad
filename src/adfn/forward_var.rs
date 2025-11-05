@@ -31,8 +31,8 @@ use crate::{
 ///
 /// * Syntax :
 /// ```text
-///     (range_zero, var_zero) = f.forward_var_value(&dyp_zero, var_dom, trace)
-///     (range_zero, var_zero)  = f.forward_var_ad(&dyp_zero, var_dom, trace)
+///     (range_zero, var_both) = f.forward_var_value(&dyp_both, var_dom, trace)
+///     (range_zero, var_both)  = f.forward_var_ad(&dyp_both, var_dom, trace)
 /// ```
 /// * Prototype :
 /// see [ADfn::forward_var_value] and [ADfn::forward_var_ad]
@@ -41,13 +41,13 @@ use crate::{
 /// * E : see [doc_generic_e]
 /// * f : is an [ADfn] object.
 ///
-/// * dyp_zero :
-/// is the dynamic parameter vector in the following order:
+/// * dyp_both :
+/// is both the dynamic parameter sub-vectors in the following order:
 /// the domain dynamic parameters followed by the dependent dynamic parameters.
 /// This is normally computed by
 /// [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
 /// In the special case where there are no dynamic parameters,
-/// *dyp_zero* can be set to the empty vector
+/// *dyp_both* can be set to the empty vector
 /// ( it is not necessary to call `forward_dyp` ).
 ///
 /// * var_dom :
@@ -64,10 +64,10 @@ use crate::{
 /// variable, a dynamic parameter, or a constant parameter;
 /// see [ADfn::range_ad_type] .
 ///
-/// * var_zero :
-/// is the variable vector in the following order:
+/// * var_both :
+/// is both the variable sub-vectors in the following order:
 /// the domain variables followed by the dependent variables.
-/// Note that *dym_var* gets moved to the beginning of *var_zero* .
+/// Note that *var_dom* gets moved to the beginning of *var_both* .
 ///
 /// # Example
 /// Computing function values using forward_var :
@@ -112,8 +112,8 @@ use crate::{
 /// }
 /// //
 /// // y = f(p, x)
-/// let dyp_zero      = f.forward_dyp_value(p.clone(), trace);
-/// let (y, var_zero) = f.forward_var_value(&dyp_zero, x.clone(), trace);
+/// let dyp_both      = f.forward_dyp_value(p.clone(), trace);
+/// let (y, var_both) = f.forward_var_value(&dyp_both, x.clone(), trace);
 /// //
 /// // check
 /// let p_sum = ( np * (np + 1) ) / 2;
@@ -143,7 +143,7 @@ macro_rules! forward_var {
         )]
         pub fn [< forward_var_ $suffix >] (
             &self,
-            dyp_zero    : &Vec<$E>     ,
+            dyp_both    : &Vec<$E>     ,
             var_dom     : Vec<$E>      ,
             trace       : bool         ,
         ) -> ( Vec<$E> , Vec<$E> )
@@ -163,10 +163,10 @@ macro_rules! forward_var {
             // n_var
             let n_var = self.var.n_dom + self.var.n_dep;
             //
-            // var_zero
+            // var_both
             let nan_e  : $E  = eval_from_f32!($suffix, $V,  f32::NAN);
-            let mut var_zero = var_dom;
-            var_zero.resize( n_var, nan_e );
+            let mut var_both = var_dom;
+            var_both.resize( n_var, nan_e );
             //
             if trace {
                 println!( "Begin Trace: forward_var_{}", stringify!($suffix) );
@@ -178,15 +178,15 @@ macro_rules! forward_var {
                 for j in 0 .. self.cop.len() {
                     println!( "{}, {}", j, self.cop[j] );
                 }
-                println!( "index, dyp_zero" );
+                println!( "index, dyp_both" );
                 for j in 0 .. n_dyp {
-                    println!( "{}, {}", j, dyp_zero[j] );
+                    println!( "{}, {}", j, dyp_both[j] );
                 }
                 println!( "index, var_dom" );
                 for j in 0 .. self.var.n_dom {
-                    println!( "{}, {}", j, var_zero[j] );
+                    println!( "{}, {}", j, var_both[j] );
                 }
-                println!( "index, var_zero, op_name, arg, arg_type" );
+                println!( "index, var_both, op_name, arg, arg_type" );
             }
             for op_index in 0 .. self.var.id_seq.len() {
                 let op_id     = self.var.id_seq[op_index] as usize;
@@ -198,8 +198,8 @@ macro_rules! forward_var {
                 let forward_var = op_info_vec[op_id].[< forward_var_ $suffix >];
                 //
                 forward_var(
-                    &dyp_zero,
-                    &mut var_zero,
+                    &dyp_both,
+                    &mut var_both,
                     &self.cop,
                     &self.var.flag,
                     &arg,
@@ -209,12 +209,12 @@ macro_rules! forward_var {
                 if trace {
                     let name = &op_info_vec[op_id].name;
                     println!( "{}, {}, {}, {:?}, {:?}",
-                        res, var_zero[res], name, arg, arg_type
+                        res, var_both[res], name, arg, arg_type
                     );
                     if op_id as u8 == CALL_OP {
                         let n_dep = arg[4] as usize;
                         for j in 1 .. n_dep {
-                            println!( "{}, {}", res + j, dyp_zero[res + j]);
+                            println!( "{}, {}", res + j, dyp_both[res + j]);
                         }
                     }
                 }
@@ -239,10 +239,10 @@ macro_rules! forward_var {
                 let index   = self.range_index[i] as usize;
                 match ad_type {
                     ADType::Variable =>
-                        range_zero.push( var_zero[index].clone() )
+                        range_zero.push( var_both[index].clone() )
                     ,
                     ADType::DynamicP =>
-                        range_zero.push( dyp_zero[index].clone() )
+                        range_zero.push( dyp_both[index].clone() )
                     ,
                     ADType::ConstantP => {
                         let cop_v = self.cop[index].clone();
@@ -254,7 +254,7 @@ macro_rules! forward_var {
                     },
                 }
             }
-            ( range_zero, var_zero )
+            ( range_zero, var_both )
         }
     }
 } }

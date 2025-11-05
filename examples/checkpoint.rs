@@ -48,11 +48,11 @@ fn checkpoint_forward_zero_value(
     }
     //
     // range_zero
-    let mut var_zero  : Vec<V> = Vec::new();
+    let mut var_both  : Vec<V> = Vec::new();
     let range_zero    = ADFN_VEC.with_borrow( |f_vec| {
        let f          = &f_vec[call_info as usize];
        let range_zero = f.forward_zero_value(
-            &mut var_zero, domain_zero_clone, trace
+            &mut var_both, domain_zero_clone, trace
         );
        range_zero
     } );
@@ -76,11 +76,11 @@ fn checkpoint_forward_one_value(
         domain_zero_clone.push( (*domain_zero[j]).clone() );
     }
     //
-    // var_zero
-    let mut var_zero  : Vec<V> = Vec::new();
+    // var_both
+    let mut var_both  : Vec<V> = Vec::new();
     ADFN_VEC.with_borrow( |f_vec| {
        let f          = &f_vec[call_info as usize];
-       f.forward_zero_value(&mut var_zero, domain_zero_clone, trace);
+       f.forward_zero_value(&mut var_both, domain_zero_clone, trace);
     } );
     //
     // domain_one
@@ -93,7 +93,7 @@ fn checkpoint_forward_one_value(
     let mut range_one : Vec<V> = Vec::new();
     ADFN_VEC.with_borrow( |f_vec| {
        let f     = &f_vec[call_info as usize];
-       range_one = f.forward_one_value(&var_zero, domain_one_clone, trace);
+       range_one = f.forward_one_value(&var_both, domain_one_clone, trace);
     } );
     range_one
 }
@@ -113,11 +113,11 @@ fn checkpoint_reverse_one_value(
         domain_zero_clone.push( (*domain_zero[j]).clone() );
     }
     //
-    // var_zero
-    let mut var_zero  : Vec<V> = Vec::new();
+    // var_both
+    let mut var_both  : Vec<V> = Vec::new();
     ADFN_VEC.with_borrow( |f_vec| {
        let f          = &f_vec[call_info as usize];
-       f.forward_zero_value(&mut var_zero, domain_zero_clone, trace);
+       f.forward_zero_value(&mut var_both, domain_zero_clone, trace);
     } );
     //
     // range_one_clone
@@ -130,7 +130,7 @@ fn checkpoint_reverse_one_value(
     let mut domain_one : Vec<V> = Vec::new();
     ADFN_VEC.with_borrow( |f_vec| {
        let f      = &f_vec[call_info as usize];
-       domain_one = f.reverse_one_value(&var_zero, range_one_clone, trace);
+       domain_one = f.reverse_one_value(&var_both, range_one_clone, trace);
     } );
     domain_one
 }

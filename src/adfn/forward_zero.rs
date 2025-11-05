@@ -27,8 +27,8 @@ use crate::{
 ///
 /// * Syntax :
 /// ```text
-///     range_zero = f.forward_zero_value(&mut var_zero, domain_zero, trace)
-///     range_zero = f.forward_zero_ad(   &mut var_zero, domain_zero, trace)
+///     range_zero = f.forward_zero_value(&mut var_both, domain_zero, trace)
+///     range_zero = f.forward_zero_ad(   &mut var_both, domain_zero, trace)
 /// ```
 /// * Prototype :
 /// see [ADfn::forward_zero_value] and [ADfn::forward_zero_ad]
@@ -39,13 +39,13 @@ use crate::{
 /// ## f
 /// is an [ADfn] object.
 ///
-/// ## var_zero
+/// ## var_both
 /// The input value of this vector should have length zero.
 /// Upon return it has the zero order forward mode values for all
 /// the variables in the operation sequence.
 /// This begins with *domain.zero* ; i.e.,
 /// ```text
-///     var_zero[ 0 .. domain_zero.len() ] == domain_zero
+///     var_both[ 0 .. domain_zero.len() ] == domain_zero
 /// ```
 /// It may be useful to know this because domain_zero is consumed by
 /// this operation.
@@ -115,30 +115,30 @@ macro_rules! forward_zero {
         )]
         pub fn [< forward_zero_ $suffix >] (
             &self,
-            var_zero    : &mut Vec<$E> ,
+            var_both    : &mut Vec<$E> ,
             domain_zero : Vec<$E>      ,
             trace       : bool         ,
         ) -> Vec<$E>
         {   assert_eq!(
-                var_zero.len(), 0,
-                "f.forward_zero: var_zero  does not have length zero"
+                var_both.len(), 0,
+                "f.forward_zero: var_both  does not have length zero"
             );
             assert_eq!(
                 domain_zero.len(), self.var.n_dom,
                 "f.forward_zero: domain vector length does not match f"
             );
             //
-            // dyp_zero
-            let dyp_zero : Vec<$E> = Vec::new();
+            // dyp_both
+            let dyp_both : Vec<$E> = Vec::new();
             //
-            // range_zero, var_zero_tmp
-            let (range_zero, mut var_zero_tmp) =
+            // range_zero, var_both_tmp
+            let (range_zero, mut var_both_tmp) =
                 self. [< forward_var_ $suffix >]  (
-                    &dyp_zero, domain_zero, trace
+                    &dyp_both, domain_zero, trace
             );
             //
-            // var_zero
-            std::mem::swap(var_zero, &mut var_zero_tmp);
+            // var_both
+            std::mem::swap(var_both, &mut var_both_tmp);
             //
             // range_zero
             range_zero

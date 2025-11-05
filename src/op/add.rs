@@ -64,7 +64,7 @@ binary::eval_binary_forward_0!(Add, +);
 // add_pv_forward_1
 /// first order forward for parameter * variable; see [ForwardOne]
 fn add_pv_forward_1 <V, E>(
-    _var_zero  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
@@ -81,7 +81,7 @@ where
 // add_vp_forward_1
 /// first order forward for variable * parameter; see [ForwardOne]
 fn add_vp_forward_1 <V, E>(
-    _var_zero  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
@@ -98,7 +98,7 @@ where
 // add_vv_forward_1
 /// first order forward for variable * variable; see [ForwardOne]
 fn add_vv_forward_1 <V, E>(
-    _var_zero  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
@@ -119,7 +119,7 @@ where
 // add_pv_reverse_1
 /// first order reverse for parameter * variable; see [ReverseOne]
 fn add_pv_reverse_1 <V, E>(
-    _var_zero  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
@@ -139,7 +139,7 @@ where
 // add_vp_reverse_1
 /// first order reverse for variable * parameter; see [ReverseOne]
 fn add_vp_reverse_1 <V, E>(
-    _var_zero  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
@@ -159,7 +159,7 @@ where
 // add_vv_reverse_1
 /// first order reverse for variable * variable; see [ReverseOne]
 fn add_vv_reverse_1 <V, E>(
-    _var_zero  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,

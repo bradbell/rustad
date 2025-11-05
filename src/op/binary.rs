@@ -75,7 +75,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         " parameter; see [ForwardDyp](crate::op::info::ForwardDyp)"
     ) ]
     fn [< $Name:lower _forward_dyp >] <V, E> (
-        dyp_zero    : &mut Vec<E> ,
+        dyp_both    : &mut Vec<E> ,
         cop         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
@@ -93,11 +93,11 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         let lhs       = arg[0] as usize;
         let rhs       = arg[1] as usize;
         if arg_type[0].is_constant() {
-            dyp_zero[ res ] = &cop[lhs] $op &dyp_zero[rhs];
+            dyp_both[ res ] = &cop[lhs] $op &dyp_both[rhs];
         } else if arg_type[1].is_constant() {
-            dyp_zero[ res ] = &dyp_zero[lhs] $op &cop[rhs];
+            dyp_both[ res ] = &dyp_both[lhs] $op &cop[rhs];
         } else {
-            dyp_zero[ res ] = &dyp_zero[lhs] $op &dyp_zero[rhs];
+            dyp_both[ res ] = &dyp_both[lhs] $op &dyp_both[rhs];
         };
     }
     #[doc = concat!(
@@ -105,8 +105,8 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         " variable; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _pv_forward_0 >] <V, E> (
-        dyp_zero    : &Vec<E>     ,
-        var_zero    : &mut Vec<E> ,
+        dyp_both    : &Vec<E>     ,
+        var_both    : &mut Vec<E> ,
         cop         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
@@ -121,9 +121,9 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
         if arg_type[0].is_constant() {
-            var_zero[ res ] = &cop[lhs] $op &var_zero[rhs];
+            var_both[ res ] = &cop[lhs] $op &var_both[rhs];
         } else {
-            var_zero[ res ] = &dyp_zero[lhs] $op &var_zero[rhs];
+            var_both[ res ] = &dyp_both[lhs] $op &var_both[rhs];
         }
     }
     #[doc = concat!(
@@ -131,8 +131,8 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         " parameter; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _vp_forward_0 >] <V, E> (
-        dyp_zero    : &Vec<E>     ,
-        var_zero    : &mut Vec<E> ,
+        dyp_both    : &Vec<E>     ,
+        var_both    : &mut Vec<E> ,
         cop         : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
@@ -147,9 +147,9 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
         if arg_type[1].is_constant() {
-            var_zero[ res ] = &var_zero[lhs] $op &cop[rhs];
+            var_both[ res ] = &var_both[lhs] $op &cop[rhs];
         } else {
-            var_zero[ res ] = &var_zero[lhs] $op &dyp_zero[rhs];
+            var_both[ res ] = &var_both[lhs] $op &dyp_both[rhs];
         }
     }
     #[doc = concat!(
@@ -157,8 +157,8 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         " variable; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _vv_forward_0 >] <V, E> (
-        _dyp_zero   : &Vec<E>     ,
-        var_zero    : &mut Vec<E> ,
+        _dyp_both   : &Vec<E>     ,
+        var_both    : &mut Vec<E> ,
         _cop        : &Vec<V>     ,
         _flag       : &Vec<bool>  ,
         arg         : &[IndexT]   ,
@@ -170,7 +170,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         debug_assert!( arg.len() == 2);
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
-        var_zero[ res ] = &var_zero[lhs] $op &var_zero[rhs];
+        var_both[ res ] = &var_both[lhs] $op &var_both[rhs];
     }
 } } }
 pub(crate) use eval_binary_forward_0;
