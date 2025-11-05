@@ -30,10 +30,9 @@ use crate::op::binary;
 use crate::tape::sealed::ThisThreadTape;
 use crate::op::info::{
     OpInfo,
+    panic_dyp,
     panic_var,
     panic_one,
-    no_forward_dyp_value,
-    no_forward_dyp_ad,
     no_rust_src,
 };
 use crate::op::id::{
@@ -191,8 +190,6 @@ where
 // ---------------------------------------------------------------------------
 // set_op_info
 //
-no_forward_dyp_value!(Mul);
-no_forward_dyp_ad!(Mul);
 no_rust_src!(Mul);
 //
 /// Set the operator information for all the Mul operators.
@@ -226,8 +223,8 @@ where
     };
     op_info_vec[MUL_PV_OP as usize] = OpInfo{
         name              : "mul_pv",
-        forward_dyp_value : forward_dyp_value_none::<V>,
-        forward_dyp_ad    : forward_dyp_ad_none::<V>,
+        forward_dyp_value : panic_dyp::<V, V>,
+        forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : mul_pv_forward_0::<V, V>,
         forward_var_ad    : mul_pv_forward_0::<V, AD<V> >,
         forward_1_value   : mul_pv_forward_1::<V, V>,
@@ -239,8 +236,8 @@ where
     };
     op_info_vec[MUL_VP_OP as usize] = OpInfo{
         name              : "mul_vp",
-        forward_dyp_value : forward_dyp_value_none::<V>,
-        forward_dyp_ad    : forward_dyp_ad_none::<V>,
+        forward_dyp_value : panic_dyp::<V, V>,
+        forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : mul_vp_forward_0::<V, V>,
         forward_var_ad    : mul_vp_forward_0::<V, AD<V> >,
         forward_1_value   : mul_vp_forward_1::<V, V>,
@@ -252,8 +249,8 @@ where
     };
     op_info_vec[MUL_VV_OP as usize] = OpInfo{
         name              : "mul_vv",
-        forward_dyp_value : forward_dyp_value_none::<V>,
-        forward_dyp_ad    : forward_dyp_ad_none::<V>,
+        forward_dyp_value : panic_dyp::<V, V>,
+        forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : mul_vv_forward_0::<V, V>,
         forward_var_ad    : mul_vv_forward_0::<V, AD<V> >,
         forward_1_value   : mul_vv_forward_1::<V, V>,

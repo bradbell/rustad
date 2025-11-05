@@ -74,9 +74,12 @@ pub type ForwardDyp<V, E> = fn(
     _arg_type : &[ADType]   ,
     _res      : usize       ,
 );
-// panic_zero
-/// default [ForwardDyp] function will panic
-fn panic_dyp<V, E> (
+// panic_dyp
+/// Default [ForwardDyp] function will panic.
+/// This can be used for dynamic parameter calculations by operators
+/// that only have a variable argument (because they should not be in the
+/// dynamic parameter operation sequence).
+pub fn panic_dyp<V, E> (
     _dyp_zero : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
@@ -105,7 +108,7 @@ pub type ForwardVar<V, E> = fn(
     _res      : usize       ,
 );
 // panic_var
-/// default [ForwardVar] function will panic.
+/// Default [ForwardVar] function will panic.
 /// This can be used for variable calculations by operators
 /// that only have parameter arguments (because they should not be in the
 /// variable operation sequence).
@@ -156,7 +159,7 @@ pub type ReverseOne<V, E> = fn(
     _res      : usize       ,
 );
 // panic_one
-/// default [ForwardOne] and [ReverseOne] function will panic.
+/// Default [ForwardOne] and [ReverseOne] function will panic.
 /// This can be used for variable calculations by operators
 /// that only have parameter arguments (because they should not be in the
 /// variable operation sequence).
@@ -169,25 +172,6 @@ pub fn panic_one<V, E> (
     _res      : usize       ,
 ) { panic!(); }
 // --------------------------------------------------------------------------
-//
-// no_forward_dyp_value
-/// defines forward_dyp_value_none `<V>`
-///
-/// The types IndexT and ADType must be in scope where this macro is used.
-macro_rules! no_forward_dyp_value{ ($Op:ident) => {
-    pub fn forward_dyp_value_none<V> (
-        _dyp_zero : &mut Vec<V> ,
-        _cop      : &Vec<V>     ,
-        _flag     : &Vec<bool>  ,
-        _arg      : &[IndexT]   ,
-        _arg_type : &[ADType]   ,
-        _res      : usize       ,
-    ) { panic!( concat!(
-        stringify!($Op) ,
-        ": forward_dyp_value not implemented for this operator" ,
-    ))}
-}}
-pub(crate) use no_forward_dyp_value;
 //
 // no_forward_dyp_ad
 /// defines forward_dyp_ad_none `<V>`
@@ -325,7 +309,7 @@ pub type ArgVarIndex = fn(
     _arg           : &[IndexT]        ,
 );
 // panic_arg_var_index
-/// default [ArgVarIndex] function will panic.
+/// Default [ArgVarIndex] function will panic.
 fn panic_arg_var_index(
     _arg_var_index : &mut Vec<IndexT> ,
     _flag          : &Vec<bool>       ,
@@ -356,7 +340,7 @@ pub type RustSrc<V> = fn(
 ) -> String;
 //
 // panic_rust_src
-/// default [RustSrc] function will panic.
+/// Default [RustSrc] function will panic.
 pub fn panic_rust_src<V>(
     _not_used : V           ,
     _n_domain : usize       ,

@@ -30,10 +30,9 @@ use crate::op::binary;
 use crate::tape::sealed::ThisThreadTape;
 use crate::op::info::{
     OpInfo,
+    panic_dyp,
     panic_var,
     panic_one,
-    no_forward_dyp_value,
-    no_forward_dyp_ad,
     no_forward_one_value,
     no_forward_one_ad,
     no_reverse_one_value,
@@ -59,8 +58,6 @@ binary::eval_binary_forward_0!(Div, /);
 // ---------------------------------------------------------------------------
 // set_op_info
 //
-no_forward_dyp_value!(Div);
-no_forward_dyp_ad!(Div);
 no_forward_one_value!(Div);
 no_forward_one_ad!(Div);
 no_reverse_one_value!(Div);
@@ -93,8 +90,8 @@ where
     };
     op_info_vec[DIV_PV_OP as usize] = OpInfo{
         name              : "div_pv",
-        forward_dyp_value : forward_dyp_value_none::<V>,
-        forward_dyp_ad    : forward_dyp_ad_none::<V>,
+        forward_dyp_value : panic_dyp::<V, V>,
+        forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : div_pv_forward_0::<V, V>,
         forward_var_ad    : div_pv_forward_0::<V, AD<V> >,
         forward_1_value   : forward_one_value_none::<V>,
@@ -106,8 +103,8 @@ where
     };
     op_info_vec[DIV_VP_OP as usize] = OpInfo{
         name              : "div_vp",
-        forward_dyp_value : forward_dyp_value_none::<V>,
-        forward_dyp_ad    : forward_dyp_ad_none::<V>,
+        forward_dyp_value : panic_dyp::<V, V>,
+        forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : div_vp_forward_0::<V, V>,
         forward_var_ad    : div_vp_forward_0::<V, AD<V> >,
         forward_1_value   : forward_one_value_none::<V>,
@@ -119,8 +116,8 @@ where
     };
     op_info_vec[DIV_VV_OP as usize] = OpInfo{
         name              : "div_vv",
-        forward_dyp_value : forward_dyp_value_none::<V>,
-        forward_dyp_ad    : forward_dyp_ad_none::<V>,
+        forward_dyp_value : panic_dyp::<V, V>,
+        forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : div_vv_forward_0::<V, V>,
         forward_var_ad    : div_vv_forward_0::<V, AD<V> >,
         forward_1_value   : forward_one_value_none::<V>,
