@@ -172,26 +172,6 @@ pub fn panic_one<V, E> (
     _res      : usize       ,
 ) { panic!(); }
 // --------------------------------------------------------------------------
-//
-// no_forward_dyp_ad
-/// defines forward_dyp_ad_none `<V>`
-///
-/// The types IndexT and ADType must be in scope where this macro is used.
-macro_rules! no_forward_dyp_ad{ ($Op:ident) => {
-    pub fn forward_dyp_ad_none<V> (
-        _dyp_zero : &mut Vec< AD<V> > ,
-        _cop      : &Vec<V>           ,
-        _flag     : &Vec<bool>        ,
-        _arg      : &[IndexT]         ,
-        _arg_type : &[ADType]         ,
-        _res      : usize             ,
-    ) { panic!( concat!(
-        stringify!($Op) ,
-        ": forward_dyp_ad not implemented for this operator" ,
-    ))}
-}}
-pub(crate) use no_forward_dyp_ad;
-//
 // no_forward_one_value
 /// defines forward_one_value_none `<V>`
 ///

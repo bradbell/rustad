@@ -58,9 +58,6 @@ use crate::op::id::{
         CALL_OP,
         CALL_RES_OP,
 };
-use crate::op::info::{
-    no_forward_dyp_ad,
-};
 use crate::{
     AD,
     ADType,
@@ -303,7 +300,15 @@ fn domain_zero_ad<'a, 'b, V>(
     arg_type   : &'b [ADType]   ,
     n_dom      : usize          ,
 ) -> Vec<&'a AD<V> >
+where
+    V : PartialEq,
 {
+    // no_var_zero
+    // This case is used during zero forward mode for dynamic parameters.
+    // If no_var_zero, then var_zero[0] is nan.
+    let no_var_zero = var_zero.len() == 1 &&
+        var_zero[0].value != var_zero[0].value;
+    //
     //
     let mut domain_zero : Vec<& AD<V> > = Vec::with_capacity( n_dom );
     let mut j_cop : usize = 0;
@@ -317,7 +322,11 @@ fn domain_zero_ad<'a, 'b, V>(
             domain_zero.push( &dyp_zero[index] );
         } else {
             debug_assert!( ad_type.is_variable() );
-            domain_zero.push( &var_zero[index] );
+            if no_var_zero {
+                domain_zero.push( &var_zero[0] );
+            } else {
+                domain_zero.push( &var_zero[index] );
+            }
         }
     }
     domain_zero
@@ -350,7 +359,7 @@ fn call_domain_zero_ad<'a, 'b, V>(
 // call_forward_dyp
 // ==========================================================================
 //
-// call_forward_value
+// call_forward_dyp_value
 /// atomic function callback for V evaluation of variables.
 fn call_forward_dyp_value<V> (
     dyp_zero   : &mut Vec<V>   ,
@@ -418,11 +427,82 @@ where
     // or this call would not be in the dyp operation sequence:
     assert!( 0 < j_res );
 }
+//
+// call_forward_dyp_ad
+/// atomic function callback for `AD<V>` evaluation of dynamic parameters.
+fn call_forward_dyp_ad<V> (
+    adyp_zero  : &mut Vec< AD<V> >   ,
+    cop        : &Vec<V>             ,
+    flag       : &Vec<bool>          ,
+    arg        : &[IndexT]           ,
+    arg_type   : &[ADType]           ,
+    res        : usize               )
+where
+    V           : PartialEq + Clone + From<f32> + AtomEvalVec,
+    AtomEval<V> : Clone,
+{   // ----------------------------------------------------------------------
+    let (
+        call_info,
+        n_dom,
+        n_res,
+        trace,
+        atom_eval,
+        res_ad_type,
+    ) = extract_call_info(arg, arg_type, flag);
+    //
+    // forward_zero_ad
+    let forward_zero_ad = &atom_eval.forward_zero_ad;
+    if forward_zero_ad.is_none() {
+        panic!(
+            "{} : forward_zero_ad is not implemented for this atomic function",
+            atom_eval.name,
+        );
+    }
+    let forward_zero_ad = forward_zero_ad.unwrap();
+    //
+    // adomain_zero
+    let acop     = domain_acop(cop, arg, arg_type, n_dom);
+    let nan_v : V = f32::NAN.into();
+    let anan      = ad_from_value( nan_v );
+    let avar_zero = vec! [ anan ];
+    let adomain_zero = domain_zero_ad(
+        adyp_zero, &avar_zero, &acop, arg, arg_type, n_dom
+    );
+    //
+    // arange_zero
+    let mut arange_zero = forward_zero_ad(
+        &adomain_zero, call_info, trace
+    );
+    assert_eq!(
+        n_res,
+        arange_zero.len(),
+        "atom {} forward_zero_ad return length: expected {}, found {}",
+        atom_eval.name,
+        n_res,
+        arange_zero.len(),
+    );
+    //
+    // avar_zero
+    let mut j_res = 0;
+    arange_zero.reverse();
+    for i_res in 0 .. n_res {
+        let ad_type_i = &res_ad_type[i_res];
+        let arange_i  = arange_zero.pop();
+        debug_assert!( arange_i.is_some() );
+        if ad_type_i.is_dynamic() {
+            adyp_zero[res + j_res] = arange_i.unwrap();
+            j_res += 1;
+        }
+    }
+    // There must be at least one dynamic parameter result,
+    // or this call would not be in the variable operation sequence:
+    assert!( 0 < j_res );
+}
 // ==========================================================================
 // call_forward_var
 // ==========================================================================
 //
-// call_forward_value
+// call_forward_var_value
 /// atomic function callback for V evaluation of variables.
 fn call_forward_var_value<V> (
     dyp_zero   : &Vec<V>       ,
@@ -501,7 +581,7 @@ fn call_forward_var_ad<V> (
     arg_type   : &[ADType]           ,
     res        : usize               )
 where
-    V           : Clone + AtomEvalVec,
+    V           : PartialEq + Clone + AtomEvalVec,
     AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -523,7 +603,7 @@ where
     }
     let forward_zero_ad = forward_zero_ad.unwrap();
     //
-    // domain_zero
+    // adomain_zero
     let acop = domain_acop(cop, arg, arg_type, n_dom);
     let adomain_zero = domain_zero_ad(
         adyp_zero, avar_zero, &acop, arg, arg_type, n_dom
@@ -902,8 +982,6 @@ fn call_arg_var_index(
 // ---------------------------------------------------------------------------
 //
 // set_op_info
-no_forward_dyp_ad!(Call);
-//
 /// Set the operator information for call.
 ///
 /// * op_info_vec :
@@ -917,7 +995,7 @@ where
     op_info_vec[CALL_OP as usize] = OpInfo{
         name              : "call" ,
         forward_dyp_value : call_forward_dyp_value::<V>,
-        forward_dyp_ad    : forward_dyp_ad_none::<V>,
+        forward_dyp_ad    : call_forward_dyp_ad::<V>,
         forward_var_value : call_forward_var_value::<V>,
         forward_var_ad    : call_forward_var_ad::<V>,
         forward_1_value   : call_forward_1_value::<V>,
