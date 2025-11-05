@@ -28,45 +28,32 @@ use crate::op::id;
 /// # Example
 /// ```
 /// use rustad::ADType;
-/// assert!( ADType::ConstantP   < ADType::DomainP );
-/// assert!( ADType::DomainP     < ADType::DependentP );
-/// assert!( ADType::DependentP  < ADType::DomainV );
-/// assert!( ADType::DomainV     < ADType::DependentV );
-/// assert!( ADType::DependentV  < ADType::NoType );
+/// assert!( ADType::ConstantP < ADType::DynamicP );
+/// assert!( ADType::DynamicP  < ADType::Variable );
+/// assert!( ADType::Variable  < ADType::NoType );
 /// ```
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ADType {
     //
     // ConstantP
-    /// This type is used for the constant parameters.
-    /// An AD object does not depend on the value of
-    /// the domain variables or domain dynamic parameters,
-    /// it is a constant parameter.
+    /// An AD object is a constant parameter if
+    /// it does not depend on the value of
+    /// the domain variables or domain dynamic parameters.
     ConstantP,
     //
-    // DomainP
-    /// This type is used for the domain dynamic parameters.
-    DomainP,
+    // DynamicP
+    /// An AD object is a dynamic parameter if
+    /// it depends (does not depend) on the value of the
+    /// domain dynamic parameters (domain variables).
+    DynamicP,
     //
-    // DependentP
-    /// This type is used for the dependent dynamic parameters.
-    /// An AD object that depends (does not depend)
-    /// on the value of the domain dynamic parameters (domain variables)
-    /// it is a dependent dynamic parameter.
-    DependentP,
-    //
-    // DomainV
-    /// This type is used for the domain variables.
-    DomainV,
-    //
-    // DependentV
-    /// This type is used for the dependent variables.
-    /// An AD object that depends on the value of the domain variables,
-    /// it is a dependent variable.
-    DependentV,
+    // Variable
+    /// An AD object is a variable if
+    /// it depends on the value of the domain variables.
+    Variable,
     //
     // NoType
-    /// This is used for the case where this is not an AD type.
+    /// This is used for the case where this is not the type of an AD object.
     NoType,
 }
 impl ADType {
@@ -77,11 +64,11 @@ impl ADType {
     //
     /// is a dynamic parameter
     pub fn is_dynamic(&self) -> bool
-    {   *self == ADType::DomainP || *self == ADType::DependentP }
+    {   *self == ADType::DynamicP }
     //
     /// is a variable
     pub fn is_variable(&self) -> bool
-    {   *self == ADType::DomainV || *self == ADType::DependentV }
+    {   *self == ADType::Variable }
 }
 // ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter V.
@@ -326,7 +313,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             if var_lhs || var_rhs {
                 //
                 // new_ad_type, new_index
-                new_ad_type     = ADType::DependentV;
+                new_ad_type     = ADType::Variable;
                 new_index       = tape.var.n_dep + tape.var.n_dom;
                 //
                 // tape.var: n_dep, arg_seq, arg_type
@@ -361,7 +348,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             } else {
                 //
                 // new_ad_type, new_index
-                new_ad_type     = ADType::DependentP;
+                new_ad_type     = ADType::DynamicP;
                 new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
                 //
                 // tape.dyp: n_dep, arg_seq, arg_type
@@ -461,7 +448,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             if var_lhs {
                 //
                 // new_ad_type, new_index
-                new_ad_type     = ADType::DependentV;
+                new_ad_type     = ADType::Variable;
                 new_index       = tape.var.n_dep + tape.var.n_dom;
                 //
                 // tape.var: n_dep, arg_seq, arg_type
@@ -481,7 +468,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 debug_assert!( lhs.ad_type.is_dynamic() );
                 //
                 // new_ad_type, new_index
-                new_ad_type     = ADType::DependentP;
+                new_ad_type     = ADType::DynamicP;
                 new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
                 //
                 // tape.dyp: n_dep, arg_seq, arg_type
@@ -722,7 +709,7 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
             if var_rhs {
                 //
                 // new_ad_type, new_index
-                new_ad_type     = ADType::DependentV;
+                new_ad_type     = ADType::Variable;
                 new_index       = tape.var.n_dep + tape.var.n_dom;
                 //
                 // tape.var: n_dep, arg_seq, arg_type
@@ -741,7 +728,7 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
             } else {
                 //
                 // new_ad_type, new_index
-                new_ad_type     = ADType::DependentP;
+                new_ad_type     = ADType::DynamicP;
                 new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
                 //
                 // tape.dyp: n_dep, arg_seq, arg_type

@@ -231,16 +231,10 @@ macro_rules! forward_var {
                 let ad_type = self.range_ad_type[i].clone();
                 let index   = self.range_index[i] as usize;
                 match ad_type {
-                    ADType::DependentV =>
+                    ADType::Variable =>
                         range_zero.push( var_zero[index].clone() )
                     ,
-                    ADType::DomainV =>
-                        range_zero.push( var_zero[index].clone() )
-                    ,
-                    ADType::DependentP =>
-                        range_zero.push( dyp_zero[index].clone() )
-                    ,
-                    ADType::DomainP =>
+                    ADType::DynamicP =>
                         range_zero.push( dyp_zero[index].clone() )
                     ,
                     ADType::ConstantP => {

@@ -71,10 +71,8 @@ use crate::adfn::{
 /// This has the same length as *arange* in the corresponding [call_atom].
 /// The i-th component is the [ADType] of the i-th component
 /// of *arange* .
-/// Note that if a result depends on two values, the ADType of the result
-/// is the maximum of the ADType for the two values. Also note that
-/// DomainP and DomainV results automatically get converted to DependentP
-/// and DependentV respectively.
+/// Note that if a result depends on two arguments, the ADType of the result
+/// is the maximum of the ADType for the two arguments.
 ///
 pub type AtomForwardType = fn(
     _domain_ad_type  : &[ADType]    ,
@@ -409,12 +407,12 @@ where
     for i in 0 .. n_res {
         if range_ad_type[i].is_variable() {
             arange[i].tape_id   = tape.tape_id;
-            arange[i].ad_type   = ADType::DependentV;
+            arange[i].ad_type   = ADType::Variable;
             arange[i].index     = n_var + n_var_dep;
             n_var_dep += 1;
          } else if range_ad_type[i].is_dynamic() {
             arange[i].tape_id   = tape.tape_id;
-            arange[i].ad_type   = ADType::DependentP;
+            arange[i].ad_type   = ADType::DynamicP;
             arange[i].index     = n_dyp + n_dyp_dep;
             n_dyp_dep += 1;
          } else {

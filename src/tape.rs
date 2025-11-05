@@ -314,7 +314,7 @@ where
     // adom_dyp
     let adom_dyp = dom_dyp.into_iter().enumerate().map(
         | (index, value) | {
-            let ad_type  = ADType::DomainP;
+            let ad_type  = ADType::DynamicP;
             AD::new(tape_id, index, ad_type, value)
         }
     ).collect();
@@ -322,7 +322,7 @@ where
     // adom_var
     let adom_var = dom_var.into_iter().enumerate().map(
         | (index, value) | {
-            let ad_type  = ADType::DomainV;
+            let ad_type  = ADType::Variable;
             AD::new(tape_id, index , ad_type, value)
         }
     ).collect();
