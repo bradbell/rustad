@@ -39,7 +39,6 @@ impl<V> ADfn<V>
 where
     V : ToString + From<f32> +  GlobalOpInfoVec ,
 {
-    /// Under Construction:
     /// Rust source code for zero order forward mode evaluation; i.e.,
     /// function value.
     ///

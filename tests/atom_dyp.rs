@@ -19,6 +19,7 @@ f(p, x) = [ p[1] * x[0] ]
 */
 use std::cmp::max;
 use rustad::{
+    AD,
     ad_from_value,
     ADType,
     register_atom,
@@ -79,6 +80,32 @@ pub fn h_forward_zero_value(
     range
 }
 //
+// h_forward_zero_ad
+pub fn h_forward_zero_ad(
+    dom_zero     : &Vec<& AD<V> >    ,
+    _call_info   : IndexT            ,
+    trace        : bool              ,
+) -> Vec< AD<V> >
+{
+    // range
+    let mut range : Vec< AD<V> > = Vec::new();
+    range.push( dom_zero[0] * dom_zero[1] );
+    range.push( dom_zero[1] * dom_zero[2] );
+    range.push( dom_zero[3].clone() );
+    //
+    if trace {
+        println!("Begin Trace: h_forward_zero_ad");
+        print!("dom_zero = [ ");
+        for j in 0 .. dom_zero.len() {
+                print!("{}, ", dom_zero[j]);
+        }
+        println!("]");
+        println!("range = {:?}", range);
+        println!("End Trace: h_forward_zero_ad");
+    }
+    range
+}
+//
 // register_h
 fn register_h()-> IndexT {
     //
@@ -88,7 +115,7 @@ fn register_h()-> IndexT {
         forward_type         :  h_forward_type,
         //
         forward_zero_value   :  Some( h_forward_zero_value ),
-        forward_zero_ad      :  None,
+        forward_zero_ad      :  Some( h_forward_zero_ad ),
         //
         forward_one_value    :  None,
         forward_one_ad       :  None,
@@ -107,9 +134,9 @@ fn register_h()-> IndexT {
 fn atom_dyp() {
     let h_atom_id  = register_h();
     let call_info      = 0;
-    let trace          = true;
+    let trace          = false;
     //
-    // p, x
+    // f
     let p   : Vec<V> = vec![ 1.0; 2];
     let x   : Vec<V> = vec![ 1.0; 1];
     let (ap, ax)     = start_recording_both(p, x);
@@ -126,6 +153,26 @@ fn atom_dyp() {
     let q            = f.forward_dyp_value(p.clone(), trace);
     let (y, _v)      = f.forward_var_value(&q, x.clone(), trace);
     //
+    // check h_forward_zero_value
+    assert_eq!( y.len(), 3 );
+    assert_eq!( y[0], p[0] * p[1] );
+    assert_eq!( y[1], p[1] * x[0] );
+    assert_eq!( y[2], 5.0  );
+    //
+    // f
+    let p   : Vec<V> = vec![ 1.0; 2];
+    let x   : Vec<V> = vec![ 1.0; 1];
+    let (ap, ax)     = start_recording_both(p.clone(), x.clone());
+    let aq           = f.forward_dyp_ad(ap, trace);
+    let (ay, _av)    = f.forward_var_ad(&aq, ax, trace);
+    let g            = stop_recording(ay);
+    //
+    let p   : Vec<V> = vec![ 2.0, 3.0 ];
+    let x   : Vec<V> = vec![ 4.0 ];
+    let q            = g.forward_dyp_value(p.clone(), trace);
+    let (y, _v)      = g.forward_var_value(&q, x.clone(), trace);
+    //
+    // check h_forward_zero_ad
     assert_eq!( y.len(), 3 );
     assert_eq!( y[0], p[0] * p[1] );
     assert_eq!( y[1], p[1] * x[0] );
