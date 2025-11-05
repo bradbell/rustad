@@ -30,14 +30,10 @@ use crate::op::binary;
 use crate::tape::sealed::ThisThreadTape;
 use crate::op::info::{
     OpInfo,
+    panic_var,
+    panic_one,
     no_forward_dyp_value,
     no_forward_dyp_ad,
-    no_forward_zero_value,
-    no_forward_zero_ad,
-    no_forward_one_value,
-    no_forward_one_ad,
-    no_reverse_one_value,
-    no_reverse_one_ad,
     no_rust_src,
 };
 use crate::op::id::{
@@ -197,12 +193,6 @@ where
 //
 no_forward_dyp_value!(Mul);
 no_forward_dyp_ad!(Mul);
-no_forward_zero_value!(Mul);
-no_forward_zero_ad!(Mul);
-no_forward_one_value!(Mul);
-no_forward_one_ad!(Mul);
-no_reverse_one_value!(Mul);
-no_reverse_one_ad!(Mul);
 no_rust_src!(Mul);
 //
 /// Set the operator information for all the Mul operators.
@@ -225,12 +215,12 @@ where
         name              : "mul_pp",
         forward_dyp_value : mul_forward_dyp::<V, V>,
         forward_dyp_ad    : mul_forward_dyp::<V, AD<V> >,
-        forward_var_value : forward_zero_value_none::<V>,
-        forward_var_ad    : forward_zero_ad_none::<V>,
-        forward_1_value   : forward_one_value_none::<V>,
-        forward_1_ad      : forward_one_ad_none::<V>,
-        reverse_1_value   : reverse_one_value_none::<V>,
-        reverse_1_ad      : reverse_one_ad_none::<V>,
+        forward_var_value : panic_var::<V, V>,
+        forward_var_ad    : panic_var::<V, AD<V> >,
+        forward_1_value   : panic_one::<V, V>,
+        forward_1_ad      : panic_one::<V, AD<V> >,
+        reverse_1_value   : panic_one::<V, V>,
+        reverse_1_ad      : panic_one::<V, AD<V> >,
         rust_src          : rust_src_none,
         arg_var_index     : binary::binary_pp_arg_var_index,
     };

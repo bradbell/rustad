@@ -104,9 +104,12 @@ pub type ForwardVar<V, E> = fn(
     _arg_type : &[ADType]   ,
     _res      : usize       ,
 );
-// panic_zero
-/// default [ForwardVar] function will panic
-fn panic_zero<V, E> (
+// panic_var
+/// default [ForwardVar] function will panic.
+/// This can be used for variable calculations by operators
+/// that only have parameter arguments (because they should not be in the
+/// variable operation sequence).
+pub fn panic_var<V, E> (
     _dyp_zero : &Vec<E>     ,
     _var_zero : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
@@ -153,8 +156,11 @@ pub type ReverseOne<V, E> = fn(
     _res      : usize       ,
 );
 // panic_one
-/// default [ForwardOne] and [ReverseOne] function will panic
-fn panic_one<V, E> (
+/// default [ForwardOne] and [ReverseOne] function will panic.
+/// This can be used for variable calculations by operators
+/// that only have parameter arguments (because they should not be in the
+/// variable operation sequence).
+pub fn panic_one<V, E> (
     _var_zero : &Vec<E>     ,
     _var_one  : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
@@ -201,46 +207,6 @@ macro_rules! no_forward_dyp_ad{ ($Op:ident) => {
     ))}
 }}
 pub(crate) use no_forward_dyp_ad;
-//
-// no_forward_zero_value
-/// defines forward_zero_value_none `<V>`
-///
-/// The types IndexT and ADType must be in scope where this macro is used.
-macro_rules! no_forward_zero_value{ ($Op:ident) => {
-    pub fn forward_zero_value_none<V> (
-        _dyp_zero : &Vec<V>     ,
-        _var_zero : &mut Vec<V> ,
-        _cop      : &Vec<V>     ,
-        _flag     : &Vec<bool>  ,
-        _arg      : &[IndexT]   ,
-        _arg_type : &[ADType]   ,
-        _res      : usize       ,
-    ) { panic!( concat!(
-        stringify!($Op) ,
-        ": forward_zero_value not implemented for this operator" ,
-    ))}
-}}
-pub(crate) use no_forward_zero_value;
-//
-// no_forward_zero_ad
-/// defines forward_zero_ad_none `<V>`
-///
-/// The types IndexT and ADType must be in scope where this macro is used.
-macro_rules! no_forward_zero_ad{ ($Op:ident) => {
-    pub fn forward_zero_ad_none<V> (
-        _dyp_zero : &Vec< AD<V> >     ,
-        _var_zero : &mut Vec< AD<V> > ,
-        _cop      : &Vec<V>           ,
-        _flag     : &Vec<bool>        ,
-        _arg      : &[IndexT]         ,
-        _arg_type : &[ADType]         ,
-        _res      : usize             ,
-    ) { panic!( concat!(
-        stringify!($Op) ,
-        ": forward_zero_ad not implemented for this operator" ,
-    ))}
-}}
-pub(crate) use no_forward_zero_ad;
 //
 // no_forward_one_value
 /// defines forward_one_value_none `<V>`
@@ -465,8 +431,8 @@ where
         name               : &"panic",
         forward_dyp_value  : panic_dyp::<V, V>,
         forward_dyp_ad     : panic_dyp::<V, AD<V>>,
-        forward_var_value  : panic_zero::<V, V>,
-        forward_var_ad     : panic_zero::<V, AD<V>>,
+        forward_var_value  : panic_var::<V, V>,
+        forward_var_ad     : panic_var::<V, AD<V>>,
         forward_1_value    : panic_one::<V, V>,
         forward_1_ad       : panic_one::<V, AD<V>>,
         reverse_1_value    : panic_one::<V, V>,
