@@ -228,8 +228,8 @@ pub fn start_recording<V>(domain : Vec<V> ) -> Vec< AD<V> >
 where
     V : Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
-    let dom_dyp : Vec<V> = Vec::new();
-    let (_adom_dyp, adomain) = start_recording_both(dom_dyp, domain);
+    let dyp_dom : Vec<V> = Vec::new();
+    let (_adyp_dom, adomain) = start_recording_both(dyp_dom, domain);
     adomain
 }
 //
@@ -239,7 +239,7 @@ where
 ///
 /// * Syntax :
 /// ```text
-///     (adom_dyp, adom_var) = start_recording_both(dom_dyp, dom_var)
+///     (adyp_dom, avar_dom) = start_recording_both(dyp_dom, var_dom)
 /// ```
 ///
 /// * V : see [doc_generic_v]
@@ -249,27 +249,27 @@ where
 /// when start_recording_both is called.
 /// The recording is stopped when [stop_recording] is called.
 ///
-/// * adom_dyp :
+/// * adyp_dom :
 /// This vector contains the value of the domain dynamic parameters
 /// for use during the recording.
-/// The i-th element of adom_dyp corresponds to the i-th element of dom_dyp.
+/// The i-th element of adyp_dom corresponds to the i-th element of dyp_dom.
 /// This vector can be empty in which case there are no dynamic parameters.
 ///
-/// * adom_var :
+/// * avar_dom :
 /// This vector contains the value of the domain variables for use during
-/// the recording. The i-th element of adom_var corresponds to the i-th element
-/// of dom_var.
+/// the recording. The i-th element of avar_dom corresponds to the i-th element
+/// of var_dom.
 /// This vector must not be empty.
 ///
 /// * Example : see [stop_recording]
 ///
 pub fn start_recording_both<V>(
-    dom_dyp : Vec<V>, dom_var : Vec<V>
+    dyp_dom : Vec<V>, var_dom : Vec<V>
 ) -> ( Vec< AD<V> >, Vec< AD<V> > )
 where
     V : Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
-    assert_ne!( dom_var.len(), 0 );
+    assert_ne!( var_dom.len(), 0 );
     //
     // tape_id
     let tape_id : usize;
@@ -304,30 +304,30 @@ where
         tape.tape_id     = tape_id;
         tape.recording   = true;
         //
-        tape.dyp.n_dom   = dom_dyp.len();
+        tape.dyp.n_dom   = dyp_dom.len();
         tape.dyp.n_dep   = 0;
         //
-        tape.var.n_dom  = dom_var.len();
+        tape.var.n_dom  = var_dom.len();
         tape.var.n_dep  = 0;
     } );
     //
-    // adom_dyp
-    let adom_dyp = dom_dyp.into_iter().enumerate().map(
+    // adyp_dom
+    let adyp_dom = dyp_dom.into_iter().enumerate().map(
         | (index, value) | {
             let ad_type  = ADType::DynamicP;
             AD::new(tape_id, index, ad_type, value)
         }
     ).collect();
     //
-    // adom_var
-    let adom_var = dom_var.into_iter().enumerate().map(
+    // avar_dom
+    let avar_dom = var_dom.into_iter().enumerate().map(
         | (index, value) | {
             let ad_type  = ADType::Variable;
             AD::new(tape_id, index , ad_type, value)
         }
     ).collect();
     //
-    (adom_dyp, adom_var)
+    (adyp_dom, avar_dom)
 }
 // ----------------------------------------------------------------------------
 // stop_recording
