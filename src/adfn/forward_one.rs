@@ -170,8 +170,8 @@ macro_rules! forward_one {
                 let arg      = &self.var.arg_all[start .. end];
                 let arg_type = &self.var.arg_type[start .. end];
                 let res      = self.var.n_dom + op_index;
-                let forward_1 = op_info_vec[op_id].[< forward_1_ $suffix >];
-                forward_1(
+                let forward_der = op_info_vec[op_id].[< forward_der_ $suffix >];
+                forward_der(
                     &dyn_both,
                     &var_both,
                     &mut var_one,

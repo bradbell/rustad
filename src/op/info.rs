@@ -404,10 +404,10 @@ pub struct OpInfo<V> {
     pub forward_var_ad  : ForwardVar<V, AD<V> >,
     //
     /// first order forward mode V evaluation for this operator
-    pub forward_1_value : ForwardDer<V, V>,
+    pub forward_der_value : ForwardDer<V, V>,
     //
     /// first order forward mode `AD<V>` evaluation for this operator
-    pub forward_1_ad    : ForwardDer<V, AD<V> >,
+    pub forward_der_ad  : ForwardDer<V, AD<V> >,
     //
     /// first order reverse mode V evaluation for this operator
     pub reverse_1_value : ReverseOne<V, V>,
@@ -451,8 +451,8 @@ where
         forward_dyp_ad     : panic_dyp::<V, AD<V>>,
         forward_var_value  : panic_var::<V, V>,
         forward_var_ad     : panic_var::<V, AD<V>>,
-        forward_1_value    : panic_der::<V, V>,
-        forward_1_ad       : panic_der::<V, AD<V>>,
+        forward_der_value  : panic_der::<V, V>,
+        forward_der_ad     : panic_der::<V, AD<V>>,
         reverse_1_value    : panic_one::<V, V>,
         reverse_1_ad       : panic_one::<V, AD<V>>,
         rust_src           : panic_rust_src,
