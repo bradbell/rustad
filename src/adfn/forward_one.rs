@@ -12,7 +12,6 @@
 use crate::AD;
 use crate::ADfn;
 use crate::op::info::GlobalOpInfoVec;
-use crate::adfn::eval_from::eval_from_f32;
 //
 #[cfg(doc)]
 use crate::{
@@ -133,82 +132,13 @@ macro_rules! forward_one {
                 "f.forward_one: var_both does not have the correct length"
             );
             //
-            // op_info_vec
-            let op_info_vec = &*GlobalOpInfoVec::get();
+            // dyp_both
+            let dyp_both : Vec<$E> = Vec::new();
             //
-            // zero_e
-            let zero_e        : $E = eval_from_f32!($suffix, $V, f32::NAN);
-            //
-            // var_one
-            let nan_e         : $E = eval_from_f32!($suffix, $V, f32::NAN);
-            let mut var_one        = domain_one;
-            var_one.resize( n_var, nan_e );
-            //
-            if trace {
-                println!( "Begin Trace: forward_one: n_var = {}", n_var);
-                println!( "index, flag" );
-                for j in 0 .. self.var.flag.len() {
-                    println!( "{}, {}", j, self.var.flag[j] );
-                }
-                println!( "index, constant" );
-                for j in 0 .. self.cop.len() {
-                    println!( "{}, {}", j, self.cop[j] );
-                }
-                println!( "var_index, domain_zero, domain_one" );
-                for j in 0 .. self.var.n_dom {
-                    println!( "{}, {}, {}", j, var_both[j], var_one[j] );
-                }
-                println!( "var_index, var_both, var_one, op_name, arg" );
-            }
-            //
-            // var_one
-            let dyn_both : Vec<$E> = Vec::new();
-            for op_index in 0 .. self.var.id_seq.len() {
-                let op_id    = self.var.id_seq[op_index] as usize;
-                let start    = self.var.arg_seq[op_index] as usize;
-                let end      = self.var.arg_seq[op_index + 1] as usize;
-                let arg      = &self.var.arg_all[start .. end];
-                let arg_type = &self.var.arg_type[start .. end];
-                let res      = self.var.n_dom + op_index;
-                let forward_der = op_info_vec[op_id].[< forward_der_ $suffix >];
-                forward_der(
-                    &dyn_both,
-                    &var_both,
-                    &mut var_one,
-                    &self.cop,
-                    &self.var.flag,
-                    &arg,
-                    &arg_type,
-                    res
-                );
-                if trace {
-                    let name = &op_info_vec[op_id].name;
-                    println!( "{}, {}, {}, {}, {:?}",
-                        res, var_both[res], var_one[res], name, arg
-                    );
-                }
-            }
-            if trace {
-                println!( "range_index, var_index, con_index" );
-                for i in 0 .. self.range_ad_type.len() {
-                    let index = self.range_index[i] as usize;
-                    if self.range_ad_type[i].is_variable() {
-                        println!( "{}, {}, ----", i, index);
-                    } else {
-                        println!( "{}, ---- ,{}", i, index);
-                    }
-                }
-                println!( "End Trace: forward_one" );
-            }
-            let mut range_one : Vec<$E> = Vec::new();
-            for i in 0 .. self.range_ad_type.len() {
-                let index = self.range_index[i] as usize;
-                if self.range_ad_type[i].is_variable() {
-                    range_one.push( var_one[index].clone() );
-                } else {
-                    range_one.push( zero_e.clone() );
-                }
-            }
+            // range_one
+            let range_one = self.[< forward_der_ $suffix >] (
+                &dyp_both, var_both, domain_one, trace
+            );
             range_one
         }
     }

@@ -133,16 +133,8 @@ pub fn panic_var<V, E> (
 /// Evaluation of first order forward mode.
 ///
 /// * var_der :
-///     is the vector of directional derivatives.
-///
-///     * n_var : is the number of variables; i.e, var_both.len() .
-///     * i_var : is a variable index; 0 <= i_var < n_var .
-///     * n_dir : is the number of directions; i.e, var_der.len() / n_var .
-///     * j_dir : is a direction index; 0 <= j_dir < n_dir .
-///
-///     The element var_dir\[ i_var * n_dir + j_dir]
-///     is the component of the directional derivative corresponding to
-///     variable i_var and direction j_dir.
+///     The element var_dir\[ i_var \]
+///     is the component of the directional derivative for variable i_var.
 ///     This is an input for i_var <= res and an output for the results
 ///     of this operator.
 ///
