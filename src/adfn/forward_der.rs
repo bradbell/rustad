@@ -67,8 +67,10 @@ use crate::adfn::forward_zero::doc_forward_zero;
 ///     range_der = f_var (dyp_dom, var_dom )  * domain_der
 /// ```
 /// Here `f_var` is the derivative of f with respect to the variables,
-/// `dyp_dom` is its value in the call to [forward_dyp](doc_forward_dyp) , and
-/// `var_dom` is its value in the call to [forward_var](doc_forward_var) .
+/// `dyp_dom` is its value in the call to
+/// [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) , and
+/// `var_dom` is its value in the call to
+/// [forward_var](crate::adfn::forward_var::doc_forward_var) .
 ///
 /// # Example
 /// Computing one partial derivative using forward_der :
@@ -82,30 +84,32 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// type V = f64;
 /// //
 /// // f
-/// // f(x) = x[0] * x[1] * x[2]
-/// let p    : Vec<V>       = Vec::new();
-/// let x    : Vec<V>       = vec![ 1.0, 1.0, 1.0 ];
-/// let (ap, ax )           = start_recording_both(p, x);
-/// let mut aprod           = ad_from_value( V::from(1.0) );
-/// for j in 0 .. ax.len() {
-///     aprod *= &ax[j];
-/// }
-/// let ay = vec![ aprod ];
-/// let f  = stop_recording(ay);
+/// // f(x) = p[0] * p[1] * x[0] * x[1] * x[2]
+/// let p    : Vec<V>   = vec![ 1.0 , 1.0 ];
+/// let x    : Vec<V>   = vec![ 1.0, 1.0, 1.0 ];
+/// let (ap, ax )       = start_recording_both(p, x);
+/// let aterm1          = &ap[0] * &ap[1];
+/// let aterm2          = &( &ax[0] * &ax[1] ) * &ax[2];
+/// let aprod           = &aterm1 * &aterm2;
+/// let ay              = vec![ aprod ];
+/// let f               = stop_recording(ay);
 /// //
 /// // y
 /// // y[0] = f(x)
 /// let trace           = false;
-/// let dyp    : Vec<V> = Vec::new();
+/// let p      : Vec<V> = vec![ 2.0, 3.0 ];
 /// let x      : Vec<V> = vec![ 4.0, 5.0, 6.0 ];
+/// let dyp             = f.forward_dyp_value(p, trace);
 /// let (y, var)        = f.forward_var_value(&dyp, x, trace);
 /// let dx     : Vec<V> = vec![ 1.0, 0.0, 0.0 ];
 /// let dy              = f.forward_der_value(&dyp, &var, dx,  trace);
 /// //
-/// assert_eq!( dy[0] , 5.0 * 6.0 );
+/// // check
+/// // derivative w.r.t x[0] is p[0] * p[1] * x[1] * x[2] * x[3]
+/// assert_eq!( dy[0] , 2.0 * 3.0 * 5.0 * 6.0 );
 /// ```
 ///
-pub fn doc_forward_var() { }
+pub fn doc_forward_der() { }
 //
 /// Create the first order forward mode member functions.
 ///

@@ -31,8 +31,8 @@ use crate::{
 ///
 /// * Syntax :
 /// ```text
-///     (range_zero, var_both) = f.forward_var_value(&dyp_both, var_dom, trace)
-///     (range_zero, var_both)  = f.forward_var_ad(&dyp_both, var_dom, trace)
+///     (range, var_both) = f.forward_var_value(&dyp_both, var_dom, trace)
+///     (range, var_both)  = f.forward_var_ad(&dyp_both, var_dom, trace)
 /// ```
 /// * Prototype :
 /// see [ADfn::forward_var_value] and [ADfn::forward_var_ad]
@@ -56,7 +56,7 @@ use crate::{
 /// * trace :
 /// if true, a trace of the calculation is printed on stdout.
 ///
-/// * range_zero :
+/// * range :
 /// is the range vector corresponding to the
 /// domain variable and parameter values;
 /// i.e., the value of the function correspdong the operation sequence in f.
@@ -223,7 +223,7 @@ macro_rules! forward_var {
             // n_range
             let n_range = self.range_ad_type.len();
             //
-            // range_zero
+            // range
             if trace {
                 println!( "range_index, ad_type, index" );
                 for i in 0 .. n_range {
@@ -233,28 +233,28 @@ macro_rules! forward_var {
                 }
                 println!( "End Trace: forward_var" );
             }
-            let mut range_zero : Vec<$E> = Vec::with_capacity(n_range);
+            let mut range : Vec<$E> = Vec::with_capacity(n_range);
             for i in 0 .. n_range {
                 let ad_type = self.range_ad_type[i].clone();
                 let index   = self.range_index[i] as usize;
                 match ad_type {
                     ADType::Variable =>
-                        range_zero.push( var_both[index].clone() )
+                        range.push( var_both[index].clone() )
                     ,
                     ADType::DynamicP =>
-                        range_zero.push( dyp_both[index].clone() )
+                        range.push( dyp_both[index].clone() )
                     ,
                     ADType::ConstantP => {
                         let cop_v = self.cop[index].clone();
                         let cop_e = eval_from_value!($suffix, $V, cop_v);
-                        range_zero.push( cop_e )
+                        range.push( cop_e )
                     },
                     ADType::NoType => {
                         panic!( "forward_var: ADType::NoTYpe not expected" );
                     },
                 }
             }
-            ( range_zero, var_both )
+            ( range, var_both )
         }
     }
 } }
