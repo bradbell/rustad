@@ -10,14 +10,19 @@
 // ---------------------------------------------------------------------------
 // use
 //
+use crate::{
+    ADType,
+    ADfn,
+};
+//
 use std::any::type_name;
-use crate::ADfn;
 use crate::op::info::GlobalOpInfoVec;
 //
 #[cfg(doc)]
 use crate::{
     doc_generic_v,
     doc_generic_e,
+    RustSrcFn,
 };
 // -----------------------------------------------------------------------
 // prototype
@@ -26,10 +31,9 @@ fn prototype(fn_name : &str, v_str : &str) -> String {
     let result = result +
         "#[no_mangle]\n" +
         "pub fn rust_src_"  + fn_name + "(\n" +
-        "   domain      : &Vec<&"    + v_str  + ">,\n" +
-        "   range       : &mut Vec<" + v_str  + ">,\n" +
-        "   message     : &mut String,\n" +
-        ")\n";
+        "   dyp_dom     : &Vec<&"    + v_str  + ">,\n" +
+        "   var_dom     : &Vec<&"    + v_str  + ">,\n" +
+        ") -> Result< Vec<" + v_str  + ">, String >\n" ;
     result
 }
 //
@@ -52,27 +56,27 @@ where
     /// is the name of the rust function created by this operation.
     /// The actual function name will be `rust_src_` followed by *fn_name* .
     ///
-    /// * return
-    /// The return string contains the source code for the following function:
-    /// <br/> `rust_src_` *fn_name* (
-    /// <br/> `    domain      : &Vec<&V>,`
-    /// <br/> `    range       : &mut Vec<V>,`
-    /// <br/> `    message     : &mut String,`
-    /// <br/> )
+    /// * Syntax :
+    /// <br/> rust_src_ *fn_name* ( *dyp_dom*  , *var_dom* ) 
+    /// -> Result< *range* , *msg*  >
     ///
-    ///     * domain :
-    ///     a vector containing the references to the domain variable values;
-    ///     i.e., the independent variables.
+    /// * dyp_dom :
+    /// a vector containing the references to the
+    /// domain dynamic parameter values;
     ///
-    ///     * range :
-    ///     This vector must be empty on input.
-    ///     Upon return it contains the range variable values
-    ///     corresponding to the domain variable values.
+    /// * var_dom :
+    /// a vector containing the references to the
+    /// domain variable values;
     ///
-    ///     * message :
-    ///     This string must be empty on input.
-    ///     If is empty upon return, no error was detected.
-    ///     Otherwise it contains an error message.
+    /// * range :
+    /// If the return matches Ok, range contains the range vector
+    /// corresponding to the domain sub-vectors.
+    ///
+    /// * msg :
+    /// If the return matches Err, msg is the corresponding error message.
+    ///
+    /// * Prototype :
+    /// see [RustSrcFn] .
     ///
     pub fn rust_src(&self, fn_name : &str) -> String {
         //
@@ -88,32 +92,24 @@ where
         // begin function body
         src = src + "{\n";
         //
-        // check message
+        // check dyp_dom
+        let expect = self.dyp.n_dom.to_string();
         src = src +
-            "   // check message\n" +
-            "   if message.len() != 0 {\n" +
-            "       let msg  = \"On input: message.len() != 0\";\n" +
-            "       *message = String::from(msg);\n" +
-            "       return;\n" +
+            "   // check dyp_dom\n" +
+            "   if dyp_dom.len() != " + &expect  + " {\n" +
+            "       let msg  = \"dyp_dom length != " + &expect + "\";\n" +
+            "       let msg  = String::from(msg);\n" +
+            "       return Err(msg);\n" +
             "   }\n";
         //
-        // check range
-        src = src +
-            "   // check range\n" +
-            "   if range.len() != 0 {\n" +
-            "       let msg  = \"On input: range.len() != 0\";\n" +
-            "       *message = String::from(msg);\n" +
-            "       return;\n" +
-            "   }\n";
-        //
-        // check domain
+        // check var_dom
         let expect = self.var.n_dom.to_string();
         src = src +
-            "   // check domain\n" +
-            "   if domain.len() != " + &expect  + " {\n" +
-            "       let msg  = \"domain length != " + &expect + "\";\n" +
-            "       *message = String::from(msg);\n" +
-            "       return;\n" +
+            "   // check var_dom\n" +
+            "   if var_dom.len() != " + &expect  + " {\n" +
+            "       let msg  = \"var_dom length != " + &expect + "\";\n" +
+            "       let msg  = String::from(msg);\n" +
+            "       return Err(msg);\n" +
             "   }\n";
         //
         // V
@@ -142,26 +138,66 @@ where
             }
         }
         //
-        // dep
-        let n_dep = self.var.n_dep.to_string();
-        src = src +
-            "   //\n" +
-            "   // dep\n" +
-            "   // vector of dependent variables\n" +
-            "   let mut dep : Vec<V> = vec![nan; " + &n_dep + "];\n";
+        // dyp_dep
+        if self.dyp.n_dep > 0 {
+            let n_dep = self.dyp.n_dep.to_string();
+            src = src +
+                "   //\n" +
+                "   // dep_dep\n" +
+                "   // vector of dependent variables\n" +
+                "   let mut dep_dep : Vec<V> = vec![nan; " + &n_dep + "];\n";
+            //
+            // dyp_dep
+            for op_index in 0 .. self.dyp.id_seq.len() {
+                let op_id    = self.dyp.id_seq[op_index] as usize;
+                let start    = self.dyp.arg_seq[op_index] as usize;
+                let end      = self.dyp.arg_seq[op_index + 1] as usize;
+                let arg      = &self.dyp.arg_all[start .. end];
+                let arg_type = &self.dyp.arg_type[start .. end];
+                let res      = self.dyp.n_dom + op_index;
+                let rust_src = op_info_vec[op_id].rust_src;
+                let not_used = V::from( f32::NAN );
+                src = src + &rust_src(
+                        not_used, 
+                        ADType::DynamicP,
+                        self.dyp.n_dom, 
+                        self.var.n_dom, 
+                        &self.dyp.flag, 
+                        arg, 
+                        arg_type,
+                        res
+                    );
+            }
+        }
         //
-        // dep
-        for op_index in 0 .. self.var.id_seq.len() {
-            let op_id    = self.var.id_seq[op_index] as usize;
-            let start    = self.var.arg_seq[op_index] as usize;
-            let end      = self.var.arg_seq[op_index + 1] as usize;
-            let arg      = &self.var.arg_all[start .. end];
-            let res      = self.var.n_dom + op_index;
-            let rust_src = op_info_vec[op_id].rust_src;
-            let not_used = V::from( f32::NAN );
-            src = src + &rust_src(
-                    not_used, self.var.n_dom, &self.var.flag, &arg, res
-                );
+        // var_dep
+        if self.var.n_dep > 0 {
+            let n_dep = self.var.n_dep.to_string();
+            src = src +
+                "   //\n" +
+                "   // var_dep\n" +
+                "   // vector of dependent variables\n" +
+                "   let mut var_dep : Vec<V> = vec![nan; " + &n_dep + "];\n";
+            for op_index in 0 .. self.var.id_seq.len() {
+                let op_id    = self.var.id_seq[op_index] as usize;
+                let start    = self.var.arg_seq[op_index] as usize;
+                let end      = self.var.arg_seq[op_index + 1] as usize;
+                let arg      = &self.var.arg_all[start .. end];
+                let arg_type = &self.var.arg_type[start .. end];
+                let res      = self.var.n_dom + op_index;
+                let rust_src = op_info_vec[op_id].rust_src;
+                let not_used = V::from( f32::NAN );
+                src = src + &rust_src(
+                        not_used, 
+                        ADType::Variable,
+                        self.dyp.n_dom, 
+                        self.var.n_dom, 
+                        &self.var.flag, 
+                        arg, 
+                        arg_type,
+                        res
+                    );
+            }
         }
         //
         // range
@@ -169,29 +205,45 @@ where
         src = src +
             "   //\n" +
             "   // range\n" +
-            "   range.reserve(" + &n_range.to_string() + ");\n";
+            "   let mut range : Vec<V> = " +
+                     "Vec::with_capacity(" + &n_range.to_string() + ");\n";
         for i in 0 .. n_range {
             let index = self.range_index[i] as usize;
             if self.range_ad_type[i].is_variable() {
                 if index < self.var.n_dom {
                     let i_str = index.to_string();
                     src = src +
-                        "   range.push( domain[" + &i_str + "] );\n";
+                        "   range.push( var_dom[" + &i_str + "].clone() );\n";
                 } else {
                     let i_str = (index - self.var.n_dom).to_string();
                     src = src +
-                        "   range.push( dep[" + &i_str + "] );\n";
+                        "   range.push( var_dep[" + &i_str + "].clone() );\n";
                     }
+            } else if self.range_ad_type[i].is_dynamic() {
+                if index < self.dyp.n_dom {
+                    let i_str = index.to_string();
+                    src = src +
+                        "   range.push( dyp_dom[" + &i_str + "].clone() );\n";
+                } else {
+                    let i_str = (index - self.dyp.n_dom).to_string();
+                    src = src +
+                        "   range.push( dyp_dep[" + &i_str + "].clone() );\n";
+               }
             } else {
+                assert!( self.range_ad_type[i].is_constant() );
+                //
                 let i_str = index.to_string();
                  src = src +
-                    "   range.push( cop[" + &i_str + "] );\n";
+                    "   range.push( cop[" + &i_str + "].clone() );\n";
             }
         }
         //
         // end function body
-        src = src + "}\n";
+        src = src + 
+            "   //\n" +
+            "   Ok(range)\n" +
+           "}\n";
         //
         src
-        }
     }
+}

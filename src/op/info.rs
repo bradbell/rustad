@@ -52,7 +52,9 @@ use crate::{
 /// If arg_type\[i\] == ConstantP, then arg\[i\] is a constant parameter index.
 ///
 /// * res :
-/// The variable index corresponding to the first result for this operator.
+/// If this is a dynamic parameter operator (variable operator),
+/// res is the dyp_both (var_both) index for the value being computed.
+///  
 #[cfg(doc)]
 pub fn doc_common_arguments() {}
 // ---------------------------------------------------------------------------
@@ -255,10 +257,13 @@ pub(crate) use no_reverse_one_ad;
 macro_rules! no_rust_src{ ($Op:ident) => {
     pub fn rust_src_none<V>(
         _not_used : V           ,
-        _n_domain : usize       ,
-        _flag     : &Vec<bool>  ,
-        _arg      : &[IndexT]   ,
-        _op_index : usize       ,
+        _res_type  : ADType      ,
+        _dyp_n_dom : usize       ,
+        _var_n_dom : usize       ,
+        _flag      : &Vec<bool>  ,
+        _arg       : &[IndexT]   ,
+        _arg_type  : &[ADType]   ,
+        _res       : usize       ,
     ) -> String
     { panic!( concat!(
         stringify!($Op) ,
@@ -297,14 +302,21 @@ fn panic_arg_var_index(
 ) { panic!() }
 // ---------------------------------------------------------------------------
 // RustSrc
-/// Generate source code corresponding to forward zero evaluation
-///
+/// Generate source code corresponding to forward_dyp and forward_var
+/// evaluation.
 ///
 /// * not_used :
 /// This argument is only used to determine the value type V.
-//
-/// * n_domain :
-/// number of domain variables.
+///
+/// * res_type :
+/// This is the type of the dependent object being computed and must be
+/// ADType::DynamicP or ADType::Variable.
+///
+/// * dyp_n_dom :
+/// is the number of domain dynamic parameters. 
+///
+/// * var_n_dom :
+/// is the number of domain variables.
 ///
 /// * Other Arguments :  see [doc_common_arguments]
 ///
@@ -312,21 +324,27 @@ fn panic_arg_var_index(
 /// The return value is the rust source code from this operation.
 ///
 pub type RustSrc<V> = fn(
-    _not_used : V          ,
-    _n_domain : usize       ,
-    _flag     : &Vec<bool>  ,
-    _arg      : &[IndexT]   ,
-    _res      : usize       ,
+    _not_used : V           ,
+    _res_type  : ADType      ,
+    _dyp_n_dom : usize       ,
+    _var_n_dom : usize       ,
+    _flag      : &Vec<bool>  ,
+    _arg       : &[IndexT]   ,
+    _arg_type  : &[ADType]   ,
+    _res       : usize       ,
 ) -> String;
 //
 // panic_rust_src
 /// Default [RustSrc] function will panic.
 pub fn panic_rust_src<V>(
-    _not_used : V           ,
-    _n_domain : usize       ,
-    _flag     : &Vec<bool>  ,
-    _arg      : &[IndexT]   ,
-    _op_index : usize       ,
+    _not_used   : V           ,
+    _res_type   : ADType      ,
+    _dyp_n_dom  : usize       ,
+    _var_n_dom  : usize       ,
+    _flag       : &Vec<bool>  ,
+    _arg        : &[IndexT]   ,
+    _arg_type   : &[ADType]   ,
+    _op_index   : usize       ,
 ) -> String
 { panic!() }
 // ---------------------------------------------------------------------------

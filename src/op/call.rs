@@ -1077,11 +1077,14 @@ fn no_op_arg_var_index(
 //
 // no_op_rust_src
 fn no_op_rust_src<V> (
-    _not_used  : V             ,
-    _n_domain  : usize         ,
-    _flag      : &Vec<bool>    ,
-    _arg       : &[IndexT]     ,
-    _res       : usize         ,
+    _not_used : V           ,
+    _res_type  : ADType      ,
+    _dyp_n_dom : usize       ,
+    _var_n_dom : usize       ,
+    _flag      : &Vec<bool>  ,
+    _arg       : &[IndexT]   ,
+    _arg_type  : &[ADType]   ,
+    _res       : usize       ,
 ) -> String
 {   String::new() }
 // --------------------------------------------------------------------------
@@ -1089,24 +1092,29 @@ fn no_op_rust_src<V> (
 //
 /// Rust source code for the call operator.
 fn call_rust_src<V> (
-    _not_used  : V             ,
-    n_domain   : usize         ,
-    flag       : &Vec<bool>    ,
-    arg        : &[IndexT]     ,
-    res        : usize         ) -> String
+    _not_used : V           ,
+    res_type  : ADType      ,
+    dyp_n_dom : usize       ,
+    var_n_dom : usize       ,
+    flag      : &Vec<bool>  ,
+    arg       : &[IndexT]   ,
+    arg_type  : &[ADType]   ,
+    res       : usize       ) -> String
 where
     V : AtomEvalVec,
     AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
+    debug_assert!( res_type.is_dynamic() || res_type.is_variable() );
+    //
     let (
         call_info,
         n_dom,
         n_res,
+        n_dep,
         trace,
-        is_arg_var,
-        is_res_var,
         atom_eval,
-    ) = extract_call_info_old(arg, flag);
+        res_ad_type,
+    ) = extract_call_info(arg, arg_type, flag);
     //
     // src
     let mut src = String::new();
@@ -1114,29 +1122,40 @@ where
     // name
     let name = &atom_eval.name;
     //
-    // call_domain
+    // call_dom
     src = src +
         "   //\n" +
-        "   // call_domain\n" +
-        "   let mut call_domain : Vec<&V> = " +
+        "   // call_dom\n" +
+        "   let mut call_dom : Vec<&V> = " +
                 "vec![&nan; " + &(n_dom.to_string()) + "];\n";
-    for i_arg in 0 .. n_dom {
-        let i_str = i_arg.to_string();
-        let index = arg[6 + i_arg] as usize;
-        if is_arg_var[i_arg] {
-            if index < n_domain {
-                let j_str = index.to_string();
-                src = src +
-                "   call_domain[" + &i_str + "] = &domain[" + &j_str + "];\n";
+    for j_dom in 0 .. n_dom {
+        let mut index   = arg[6 + j_dom] as usize;
+        let ad_type     = arg_type[6 + j_dom].clone();
+        if ad_type.is_constant() {
+            src = src + "   " + 
+                &format!("call_dom[{j_dom}] = &cop[{index}];\n");
+        } else if ad_type.is_dynamic() {
+            if index < dyp_n_dom {
+                src = src + "   " + 
+                    &format!("call_dom[{j_dom}] = dyp_dom[{index}];\n");
             } else {
-                let j_str = (index - n_domain).to_string();
-                src = src +
-                "   call_domain[" + &i_str + "] = &dep[" + &j_str + "];\n";
+                index = index - dyp_n_dom;
+                src = src + "   " + 
+                    &format!("call_dom[{j_dom}] = &dyp_dep[{index}];\n");
             }
         } else {
-            let j_str = index.to_string();
-            src = src +
-                "   call_domain[" + &i_str + "] = &cop[" + &j_str + "];\n";
+            debug_assert!( ad_type.is_variable() );
+            if res_type.is_dynamic() {
+                src = src + "   " + 
+                    &format!("call_dom[{j_dom}] = &nan;\n");
+            } else if index < var_n_dom {
+                src = src + "   " + 
+                    &format!("call_dom[{j_dom}] = var_dom[{index}];\n");
+            } else {
+                index = index - var_n_dom;
+                src = src + "   " + 
+                    &format!("call_dom[{j_dom}] = &var_dep[{index}];\n");
+            }
         }
     }
     //
@@ -1147,30 +1166,37 @@ where
         "   let call_info  = " + &call_info.to_string() + ";\n" +
         "   let trace      = " + &trace.to_string() + ";\n" +
         "   let mut call_range = " +
-                "atom_" + &name + "(&call_domain, call_info, trace);\n";
-    // dep
-    assert!(n_domain <= res);
+                "atom_" + &name + "(&call_dom, call_info, trace);\n";
+    //
+    // res_name
+    assert!(n_dom <= res);
+    let res_name = if res_type.is_dynamic() {
+        "dyp_dep"
+    } else {
+        "var_dep"
+    };
     src = src +
         "   //\n" +
-        "   // dep\n" +
+        "   // " + res_name + "\n";
         "   call_range.reverse();\n";
-    let j_res = 0;
+    let mut j_res = 0;
     for i_res in 0 .. n_res {
-        if is_res_var[i_res] {
-            let j_str = (res + j_res - n_domain).to_string();
-            src = src +
-                "   dep[" + &j_str + "] = call_range.pop().unwrap();\n";
+        if res_ad_type[i_res] == res_type {
+            let j_dep = res + j_res - n_dom;
+            src = src + "   " +
+                &format!("{res_name}[{j_dep}] = call_range.pop().unwrap();\n");
+            j_res += 1;
         } else {
-            src = src +
-                "   call_range.pop();\n";
+            src = src + "   call_range.pop();\n";
         }
     }
+    debug_assert!( j_res == n_dep );
     //
     // call_domain, call_range
     src = src +
         "   //\n" +
-        "   // call_domain, call_range\n" +
-        "   drop(call_domain);\n" +
+        "   // call_dom, call_range\n" +
+        "   drop(call_dom);\n" +
         "   drop(call_range);\n" ;
     //
     src

@@ -149,16 +149,18 @@ fn main() {
     // sumsq_fn
     let sumsq_fn : RustSrcFn<V> = get_rust_src_fn(&lib, &fn_name);
     //
-    // x, y, msg
-    let x         : Vec<V>  = vec![ 2.0 as V; nx ];
-    let mut y     : Vec<V>  = Vec::new();
-    let mut msg             = String::new();
+    // p_ref, x_ref
+    let p_ref     : Vec<&V> = Vec::new();
+    let x         : Vec<V>  = vec![ 3.0 as V; nx ];
     let mut x_ref : Vec<&V> = Vec::new();
-    for xj in x.iter() {
-        x_ref.push( &xj )
+        for x_j in x.iter() {
+        x_ref.push( &x_j )
     }
-    sumsq_fn(&x_ref, &mut y, &mut msg);
     //
-    assert_eq!( y.len(), 1 );
-    assert_eq!( y[0], (nx as V) * 4.0 );
+    // check result
+    let result = sumsq_fn(&p_ref, &x_ref);
+    let sumsq  = result.unwrap();
+    //
+    assert_eq!( sumsq.len(), 1 );
+    assert_eq!( sumsq[0], (nx as V) * 3.0 * 3.0 );
 }

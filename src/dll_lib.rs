@@ -91,17 +91,16 @@ pub fn get_lib(
     lib
 }
 //
-// RustScrFn
+// RustSrcFn
 /// This type is used for function like objects in a dll library.
 ///
 /// If rust_src_fn is a `RustSrcFn<V>` object, it acts like a
 /// [ADfn::rust_src] function.
 pub type RustSrcFn<'a, V> = libloading::Symbol<'a,
     fn(
-        domain      : &Vec<&V>,
-        range       : &mut Vec<V>,
-        message     : &mut String,
-    )
+        dom_dyp      : &Vec<&V>,
+        dom_var      : &Vec<&V>,
+    ) -> Result< Vec<V>, String >
 >;
 //
 // get_rust_src_fn

@@ -66,6 +66,10 @@ impl ADType {
     pub fn is_dynamic(&self) -> bool
     {   *self == ADType::DynamicP }
     //
+    /// is a parameter
+    pub fn is_parameter(&self) -> bool
+    {   *self == ADType::ConstantP ||  *self == ADType::DynamicP }
+    //
     /// is a variable
     pub fn is_variable(&self) -> bool
     {   *self == ADType::Variable }

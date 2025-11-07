@@ -71,17 +71,17 @@ fn main () {
     // sumsq_fn
     let sumsq_reverse_one_fn : RustSrcFn<V> = get_rust_src_fn(&lib, &gn_name);
     //
-    // x, y, msg
-    let x         : Vec<V>  = vec![ 2.0 as V; nx ];
-    let mut dx    : Vec<V>  = Vec::new();
-    let mut msg             = String::new();
+    // p_ref, x_ref
+    let p_ref     : Vec<&V> = Vec::new(); 
+    let x         : Vec<V>  = vec![ 3.0 as V; nx ];
     let mut x_ref : Vec<&V> = Vec::new();
-    for xj in x.iter() {
-        x_ref.push( &xj )
+    for x_j in x.iter() {
+        x_ref.push( &x_j )
     }
-    sumsq_reverse_one_fn(&x_ref, &mut dx, &mut msg);
-    assert_eq!( &msg, "");
     //
+    // check result
+    let result = sumsq_reverse_one_fn(&p_ref, &x_ref);
+    let dx     = result.unwrap();
     assert_eq!( dx.len(), nx);
     for j in 0 .. nx {
         assert_eq!( dx[j], 2.0 * x[j] );
