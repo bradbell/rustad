@@ -57,7 +57,7 @@ where
     /// The actual function name will be `rust_src_` followed by *fn_name* .
     ///
     /// * Syntax :
-    /// <br/> rust_src_ *fn_name* ( *dyp_dom*  , *var_dom* ) 
+    /// <br/> rust_src_ *fn_name* ( *dyp_dom*  , *var_dom* )
     /// -> Result< *range* , *msg*  >
     ///
     /// * dyp_dom :
@@ -143,9 +143,9 @@ where
             let n_dep = self.dyp.n_dep.to_string();
             src = src +
                 "   //\n" +
-                "   // dep_dep\n" +
+                "   // dyp_dep\n" +
                 "   // vector of dependent variables\n" +
-                "   let mut dep_dep : Vec<V> = vec![nan; " + &n_dep + "];\n";
+                "   let mut dyp_dep : Vec<V> = vec![nan; " + &n_dep + "];\n";
             //
             // dyp_dep
             for op_index in 0 .. self.dyp.id_seq.len() {
@@ -158,12 +158,12 @@ where
                 let rust_src = op_info_vec[op_id].rust_src;
                 let not_used = V::from( f32::NAN );
                 src = src + &rust_src(
-                        not_used, 
+                        not_used,
                         ADType::DynamicP,
-                        self.dyp.n_dom, 
-                        self.var.n_dom, 
-                        &self.dyp.flag, 
-                        arg, 
+                        self.dyp.n_dom,
+                        self.var.n_dom,
+                        &self.dyp.flag,
+                        arg,
                         arg_type,
                         res
                     );
@@ -188,12 +188,12 @@ where
                 let rust_src = op_info_vec[op_id].rust_src;
                 let not_used = V::from( f32::NAN );
                 src = src + &rust_src(
-                        not_used, 
+                        not_used,
                         ADType::Variable,
-                        self.dyp.n_dom, 
-                        self.var.n_dom, 
-                        &self.var.flag, 
-                        arg, 
+                        self.dyp.n_dom,
+                        self.var.n_dom,
+                        &self.var.flag,
+                        arg,
                         arg_type,
                         res
                     );
@@ -239,7 +239,7 @@ where
         }
         //
         // end function body
-        src = src + 
+        src = src +
             "   //\n" +
             "   Ok(range)\n" +
            "}\n";

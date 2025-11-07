@@ -1108,7 +1108,7 @@ where
     //
     let (
         call_info,
-        n_dom,
+        call_n_dom,
         n_res,
         n_dep,
         trace,
@@ -1127,33 +1127,33 @@ where
         "   //\n" +
         "   // call_dom\n" +
         "   let mut call_dom : Vec<&V> = " +
-                "vec![&nan; " + &(n_dom.to_string()) + "];\n";
-    for j_dom in 0 .. n_dom {
+                "vec![&nan; " + &(call_n_dom.to_string()) + "];\n";
+    for j_dom in 0 .. call_n_dom {
         let mut index   = arg[6 + j_dom] as usize;
         let ad_type     = arg_type[6 + j_dom].clone();
         if ad_type.is_constant() {
-            src = src + "   " + 
+            src = src + "   " +
                 &format!("call_dom[{j_dom}] = &cop[{index}];\n");
         } else if ad_type.is_dynamic() {
             if index < dyp_n_dom {
-                src = src + "   " + 
+                src = src + "   " +
                     &format!("call_dom[{j_dom}] = dyp_dom[{index}];\n");
             } else {
                 index = index - dyp_n_dom;
-                src = src + "   " + 
+                src = src + "   " +
                     &format!("call_dom[{j_dom}] = &dyp_dep[{index}];\n");
             }
         } else {
             debug_assert!( ad_type.is_variable() );
             if res_type.is_dynamic() {
-                src = src + "   " + 
+                src = src + "   " +
                     &format!("call_dom[{j_dom}] = &nan;\n");
             } else if index < var_n_dom {
-                src = src + "   " + 
+                src = src + "   " +
                     &format!("call_dom[{j_dom}] = var_dom[{index}];\n");
             } else {
                 index = index - var_n_dom;
-                src = src + "   " + 
+                src = src + "   " +
                     &format!("call_dom[{j_dom}] = &var_dep[{index}];\n");
             }
         }
@@ -1169,20 +1169,25 @@ where
                 "atom_" + &name + "(&call_dom, call_info, trace);\n";
     //
     // res_name
-    assert!(n_dom <= res);
-    let res_name = if res_type.is_dynamic() {
-        "dyp_dep"
+    let res_name   : &str;
+    let res_dep    : usize;
+    if res_type.is_dynamic() {
+        res_name = "dyp_dep";
+        assert!( dyp_n_dom <= res );
+        res_dep  = res - dyp_n_dom;
     } else {
-        "var_dep"
+        res_name = "var_dep";
+        assert!( var_n_dom <= res );
+        res_dep  = res - var_n_dom;
     };
     src = src +
         "   //\n" +
-        "   // " + res_name + "\n";
+        "   // " + res_name + "\n" +
         "   call_range.reverse();\n";
     let mut j_res = 0;
     for i_res in 0 .. n_res {
         if res_ad_type[i_res] == res_type {
-            let j_dep = res + j_res - n_dom;
+            let j_dep = res_dep + j_res;
             src = src + "   " +
                 &format!("{res_name}[{j_dep}] = call_range.pop().unwrap();\n");
             j_res += 1;

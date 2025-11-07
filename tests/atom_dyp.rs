@@ -28,6 +28,9 @@ use rustad::{
     start_recording_both,
     stop_recording,
     call_atom,
+    get_lib,
+    RustSrcFn,
+    get_rust_src_fn,
 };
 //
 // V
@@ -54,7 +57,7 @@ fn h_forward_type(
     res_ad_type
 }
 //
-// h_forward_zero_value
+// BEGIN h_forward_zero_value
 pub fn h_forward_zero_value(
     dom_zero     : &Vec<&V>    ,
     _call_info   : IndexT      ,
@@ -79,6 +82,7 @@ pub fn h_forward_zero_value(
     }
     range
 }
+// END h_forward_zero_value
 //
 // h_forward_zero_ad
 pub fn h_forward_zero_ad(
@@ -129,6 +133,53 @@ fn register_h()-> IndexT {
     h_atom_id
 }
 //
+// dll_src
+fn dll_src() -> String {
+    //
+    // atom_name
+    let atom_name = "h";
+    //
+    // v_str
+    let v_str = std::any::type_name::<V>();
+    //
+    // i_str
+    let i_str = std::any::type_name::<IndexT>();
+    //
+    // this_src
+    let this_file = file!();
+    let this_src  = std::fs::read_to_string(this_file).unwrap();
+    //
+    // begin_comment, end_comment
+    // use concat so that this text does not match during the find below
+    let begin_comment = String::new() +
+        "// BEGIN " + &atom_name + "_forward_zero_value\n";
+    let end_comment = String::new() +
+        "// END " + &atom_name + "_forward_zero_value\n";
+    //
+    // atom_src
+    let start      = this_src.find(&begin_comment).unwrap();
+    let end        = this_src.find(&end_comment).unwrap();
+    let atom_src   = String::from( &this_src[start .. end] );
+    let atom_src   = atom_src.replace( &begin_comment, "//\n");
+    //
+    // atom_src
+    let old_name   = String::new() + &atom_name + "_forward_zero_value";
+    let new_name   = String::new() + "atom_" + &atom_name;
+    let atom_src   = atom_src.replace(&old_name, &new_name);
+    //
+    // atom_src
+        let atom_src = atom_src.replace("pub fn", "fn");
+    let atom_src = atom_src.replace("IndexT", i_str);
+    //
+    // atom_src
+    let atom_src = atom_src.replace("<V>", "<v_str>");
+    let atom_src = atom_src.replace("<&V>", "<&v_str>");
+    let atom_src = atom_src.replace("as V", "as v_str");
+    let atom_src = atom_src.replace("v_str", v_str);
+    //
+    atom_src
+}
+//
 // atom_dyp
 #[test]
 fn atom_dyp() {
@@ -173,6 +224,49 @@ fn atom_dyp() {
     let (y, _v)      = g.forward_var_value(&q, x.clone(), trace);
     //
     // check h_forward_zero_ad
+    assert_eq!( y.len(), 3 );
+    assert_eq!( y[0], p[0] * p[1] );
+    assert_eq!( y[1], p[1] * x[0] );
+    assert_eq!( y[2], 5.0  );
+    //
+    // atom_src
+    let atom_src  = dll_src();
+    //
+    // rust_src
+    let fn_name   = "h";
+    let rust_src  = f.rust_src(fn_name);
+    //
+    // src_file
+    let src_file  = "tmp/test_atom_dyp.rs";
+    let src       = atom_src + &rust_src;
+    let result    = std::fs::write(src_file, src);
+    if result.is_err() {
+        panic!( "Cannot write {src_file}"  );
+    }
+    //
+    // lib
+    let lib_file    = "tmp/test_atom_dyp.so";
+    let replace_lib = true;
+    let lib         = get_lib(src_file, lib_file, replace_lib);
+    //
+    // h_fn
+    let h_fn : RustSrcFn<V> = get_rust_src_fn(&lib, &fn_name);
+    //
+    // p_ref, x_ref
+    let mut p_ref : Vec<&V> = Vec::new();
+    for p_j in p.iter() {
+        p_ref.push( &p_j );
+    }
+    let mut x_ref : Vec<&V> = Vec::new();
+    for x_j in x.iter() {
+        x_ref.push( &x_j )
+    }
+    //
+    // check result
+    let result = h_fn(&p_ref, &x_ref);
+    let y      = result.unwrap();
+    //
+    // check rust_src
     assert_eq!( y.len(), 3 );
     assert_eq!( y[0], p[0] * p[1] );
     assert_eq!( y[1], p[1] * x[0] );

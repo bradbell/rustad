@@ -136,7 +136,7 @@ fn main() {
     // src_file
     let src_file  = "tmp/example_atom_src.rs";
     let src       = atom_src + &rust_src;
-    let result = std::fs::write(src_file, src);
+    let result    = std::fs::write(src_file, src);
     if result.is_err() {
         panic!( "Cannot write {src_file}"  );
     }
@@ -153,7 +153,7 @@ fn main() {
     let p_ref     : Vec<&V> = Vec::new();
     let x         : Vec<V>  = vec![ 3.0 as V; nx ];
     let mut x_ref : Vec<&V> = Vec::new();
-        for x_j in x.iter() {
+    for x_j in x.iter() {
         x_ref.push( &x_j )
     }
     //

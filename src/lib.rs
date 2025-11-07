@@ -110,6 +110,6 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2025.11.5");
+/// assert_eq!(date, "2025.11.7");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2025.11.5";
+pub const YEAR_MONTH_DAY : &str = "2025.11.7";
