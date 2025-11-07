@@ -49,12 +49,17 @@ use crate::{
 /// The arguments for this operator as a sub-vector of all the arguments.
 ///
 /// * arg_type :
-/// If arg_type\[i\] == ConstantP, then arg\[i\] is a constant parameter index.
+///     *   If arg_type\[i\] is ConstantP, then arg\[i\]
+///         is an index in the  constant parameter vector.
+///     *   If arg_type\[i\] is DynamicP, then arg\[i\]
+///         is an index in dyp_both.
+///     *   If arg_type\[i\] is Variable, then arg\[i\]
+///         is an index in var_both.
 ///
 /// * res :
 /// If this is a dynamic parameter operator (variable operator),
 /// res is the dyp_both (var_both) index for the value being computed.
-///  
+///
 #[cfg(doc)]
 pub fn doc_common_arguments() {}
 // ---------------------------------------------------------------------------
@@ -124,23 +129,50 @@ pub fn panic_var<V, E> (
     _res      : usize       ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
-// ForwardOne
+// ForwardDer
 /// Evaluation of first order forward mode.
 ///
-/// * var_one :
-/// is the vector of directional derivative for each variable.
-/// This is an input for variable indices less than *res* and an output
-/// for the result of this operator; i.e. index *res* .
+/// * var_der :
+///     is the vector of directional derivatives.
+///
+///     * n_var : is the number of variables; i.e, var_both.len() .
+///     * i_var : is a variable index; 0 <= i_var < n_var .
+///     * n_dir : is the number of directions; i.e, var_der.len() / n_var .
+///     * j_dir : is a direction index; 0 <= j_dir < n_dir .
+///
+///     The element var_dir\[ i_var * n_dir + j_dir]
+///     is the component of the directional derivative corresponding to
+///     variable i_var and direction j_dir.
+///     This is an input for i_var <= res and an output for the results
+///     of this operator.
 ///
 /// * Other Arguments :  see [doc_common_arguments]
-pub type ForwardOne<V, E> = fn(
+pub type ForwardDer<V, E> = fn(
+    _dyp_both : &Vec<E>     ,
     _var_both : &Vec<E>     ,
-    _var_one  : &mut Vec<E> ,
+    _var_der  : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
+    _arg_type : &[ADType]   ,
     _res      : usize       ,
 );
+// panic_der
+/// Default [ForwardDer] function will panic.
+/// This can be used for variable calculations by operators
+/// that only have parameter arguments (because they should not be in the
+/// variable operation sequence).
+pub fn panic_der<V, E>  (
+    _dyp_both : &Vec<E>     ,
+    _var_both : &Vec<E>     ,
+    _var_der  : &mut Vec<E> ,
+    _cop      : &Vec<V>     ,
+    _flag     : &Vec<bool>  ,
+    _arg      : &[IndexT]   ,
+    _arg_type : &[ADType]   ,
+    _res      : usize       ,
+) { panic!(); }
+//
 // ReverseOne
 /// Evaluation of first order reverse mode.
 ///
@@ -161,7 +193,7 @@ pub type ReverseOne<V, E> = fn(
     _res      : usize       ,
 );
 // panic_one
-/// Default [ForwardOne] and [ReverseOne] function will panic.
+/// Default [ForwardDer] and [ReverseOne] function will panic.
 /// This can be used for variable calculations by operators
 /// that only have parameter arguments (because they should not be in the
 /// variable operation sequence).
@@ -174,43 +206,47 @@ pub fn panic_one<V, E> (
     _res      : usize       ,
 ) { panic!(); }
 // --------------------------------------------------------------------------
-// no_forward_one_value
-/// defines forward_one_value_none `<V>`
+// no_forward_der_value
+/// defines forward_der_value_none `<V>`
 ///
-/// The type IndexT must be in scope where this macro is used.
-macro_rules! no_forward_one_value{ ($Op:ident) => {
-    pub fn forward_one_value_none<V> (
+/// The types IndexT and ADType must be in scope where this macro is used.
+macro_rules! no_forward_der_value{ ($Op:ident) => {
+    pub fn forward_der_value_none<V> (
+        _dyp_both : &Vec<V>     ,
         _var_both : &Vec<V>     ,
         _var_one  : &mut Vec<V> ,
         _cop      : &Vec<V>     ,
         _flag     : &Vec<bool>  ,
         _arg      : &[IndexT]   ,
+        _arg_type : &[ADType]   ,
         _res      : usize       ,
     ) { panic!( concat!(
         stringify!($Op) ,
-        ": forward_one_value not implemented for this operator" ,
+        ": forward_der_value not implemented for this operator" ,
     ))}
 }}
-pub(crate) use no_forward_one_value;
+pub(crate) use no_forward_der_value;
 //
-// no_forward_one_ad
-/// defines forward_one_ad_none `<V>`
+// no_forward_der_ad
+/// defines forward_der_ad_none `<V>`
 ///
-/// The type IndexT must be in scope where this macro is used.
-macro_rules! no_forward_one_ad{ ($Op:ident) => {
-    pub fn forward_one_ad_none<V> (
+/// The types IndexT and ADType must be in scope where this macro is used.
+macro_rules! no_forward_der_ad{ ($Op:ident) => {
+    pub fn forward_der_ad_none<V> (
+        _dyp_both : &Vec< AD<V> >     ,
         _var_both : &Vec< AD<V> >     ,
-        _var_one  : &mut Vec< AD<V> > ,
+        _var_der  : &mut Vec< AD<V> > ,
         _cop      : &Vec<V>           ,
         _flag     : &Vec<bool>        ,
         _arg      : &[IndexT]         ,
+        _arg_type : &[ADType]         ,
         _res      : usize             ,
     ) { panic!( concat!(
         stringify!($Op) ,
-        ": forward_one_ad not implemented for this operator" ,
+        ": forward_der_ad not implemented for this operator" ,
     ))}
 }}
-pub(crate) use no_forward_one_ad;
+pub(crate) use no_forward_der_ad;
 //
 // no_reverse_one_value
 /// defines reverse_one_value_none `<V>`
@@ -313,7 +349,7 @@ fn panic_arg_var_index(
 /// ADType::DynamicP or ADType::Variable.
 ///
 /// * dyp_n_dom :
-/// is the number of domain dynamic parameters. 
+/// is the number of domain dynamic parameters.
 ///
 /// * var_n_dom :
 /// is the number of domain variables.
@@ -368,10 +404,10 @@ pub struct OpInfo<V> {
     pub forward_var_ad  : ForwardVar<V, AD<V> >,
     //
     /// first order forward mode V evaluation for this operator
-    pub forward_1_value : ForwardOne<V, V>,
+    pub forward_1_value : ForwardDer<V, V>,
     //
     /// first order forward mode `AD<V>` evaluation for this operator
-    pub forward_1_ad    : ForwardOne<V, AD<V> >,
+    pub forward_1_ad    : ForwardDer<V, AD<V> >,
     //
     /// first order reverse mode V evaluation for this operator
     pub reverse_1_value : ReverseOne<V, V>,
@@ -415,8 +451,8 @@ where
         forward_dyp_ad     : panic_dyp::<V, AD<V>>,
         forward_var_value  : panic_var::<V, V>,
         forward_var_ad     : panic_var::<V, AD<V>>,
-        forward_1_value    : panic_one::<V, V>,
-        forward_1_ad       : panic_one::<V, AD<V>>,
+        forward_1_value    : panic_der::<V, V>,
+        forward_1_ad       : panic_der::<V, AD<V>>,
         reverse_1_value    : panic_one::<V, V>,
         reverse_1_ad       : panic_one::<V, AD<V>>,
         rust_src           : panic_rust_src,

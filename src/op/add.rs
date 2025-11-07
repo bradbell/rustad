@@ -32,6 +32,7 @@ use crate::op::info::{
     OpInfo,
     panic_dyp,
     panic_var,
+    panic_der,
     panic_one,
     no_rust_src,
 };
@@ -43,7 +44,7 @@ use crate::op::id::{
 };
 #[cfg(doc)]
 use crate::op::info::{
-    ForwardOne,
+    ForwardDer,
     ReverseOne,
 };
 // -------------------------------------------------------------------------
@@ -62,62 +63,68 @@ binary::eval_binary_forward_0!(Add, +);
 // ---------------------------------------------------------------------------
 //
 // add_pv_forward_1
-/// first order forward for parameter * variable; see [ForwardOne]
+/// first order forward for parameter + variable; see [ForwardDer]
 fn add_pv_forward_1 <V, E>(
+    _dyp_both  :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
-    var_one    :   &mut Vec<E> ,
+    var_der    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
-    res        :       usize   )
+    _arg_type  :   &[ADType]   ,
+    res        :   usize       )
 where
     E             : Clone,
 {
     debug_assert!( arg.len() == 2);
     let rhs = arg[1] as usize;
-    var_one[ res ] = var_one[rhs].clone();
+    var_der[ res ] = var_der[rhs].clone();
 }
 //
 // add_vp_forward_1
-/// first order forward for variable * parameter; see [ForwardOne]
+/// first order forward for variable + parameter; see [ForwardDer]
 fn add_vp_forward_1 <V, E>(
+    _dyp_both  :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
-    var_one    :   &mut Vec<E> ,
+    var_der    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
-    res        :       usize   )
+    _arg_type  :   &[ADType]   ,
+    res        :   usize       )
 where
     E             : Clone,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
-    var_one[ res ] = var_one[lhs].clone();
+    var_der[ res ] = var_der[lhs].clone();
 }
 //
 // add_vv_forward_1
-/// first order forward for variable * variable; see [ForwardOne]
+/// first order forward for variable + variable; see [ForwardDer]
 fn add_vv_forward_1 <V, E>(
+    _dyp_both  :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
-    var_one    :   &mut Vec<E> ,
+    var_der    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
-    res        :       usize   )
+    _arg_type  :   &[ADType]   ,
+    res        :   usize       )
 where
     for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
-    var_one[res] = &var_one[lhs]  + &var_one[rhs];
+    var_der[res] = &var_der[lhs]  + &var_der[rhs];
 }
 // ---------------------------------------------------------------------------
 // reverse_1
 // ---------------------------------------------------------------------------
 //
 // add_pv_reverse_1
-/// first order reverse for parameter * variable; see [ReverseOne]
+/// first order reverse for parameter + variable; see [ReverseOne]
 fn add_pv_reverse_1 <V, E>(
     _var_both  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
@@ -137,7 +144,7 @@ where
 }
 //
 // add_vp_reverse_1
-/// first order reverse for variable * parameter; see [ReverseOne]
+/// first order reverse for variable + parameter; see [ReverseOne]
 fn add_vp_reverse_1 <V, E>(
     _var_both  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
@@ -157,7 +164,7 @@ where
 }
 //
 // add_vv_reverse_1
-/// first order reverse for variable * variable; see [ReverseOne]
+/// first order reverse for variable + variable; see [ReverseOne]
 fn add_vv_reverse_1 <V, E>(
     _var_both  :   &Vec<E>     ,
     var_one    :   &mut Vec<E> ,
@@ -201,8 +208,8 @@ where
         forward_dyp_ad    : add_forward_dyp::<V, AD<V> >,
         forward_var_value : panic_var::<V, V>,
         forward_var_ad    : panic_var::<V, AD<V> >,
-        forward_1_value   : panic_one::<V, V>,
-        forward_1_ad      : panic_one::<V, AD<V> >,
+        forward_1_value   : panic_der::<V, V>,
+        forward_1_ad      : panic_der::<V, AD<V> >,
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
         rust_src          : rust_src_none,

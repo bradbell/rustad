@@ -162,19 +162,23 @@ macro_rules! forward_one {
             }
             //
             // var_one
+            let dyn_both : Vec<$E> = Vec::new();
             for op_index in 0 .. self.var.id_seq.len() {
-                let op_id = self.var.id_seq[op_index] as usize;
-                let start = self.var.arg_seq[op_index] as usize;
-                let end   = self.var.arg_seq[op_index + 1] as usize;
-                let arg   = &self.var.arg_all[start .. end];
-                let res   = self.var.n_dom + op_index;
+                let op_id    = self.var.id_seq[op_index] as usize;
+                let start    = self.var.arg_seq[op_index] as usize;
+                let end      = self.var.arg_seq[op_index + 1] as usize;
+                let arg      = &self.var.arg_all[start .. end];
+                let arg_type = &self.var.arg_type[start .. end];
+                let res      = self.var.n_dom + op_index;
                 let forward_1 = op_info_vec[op_id].[< forward_1_ $suffix >];
                 forward_1(
+                    &dyn_both,
                     &var_both,
                     &mut var_one,
                     &self.cop,
                     &self.var.flag,
                     &arg,
+                    &arg_type,
                     res
                 );
                 if trace {

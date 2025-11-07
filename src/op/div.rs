@@ -32,9 +32,10 @@ use crate::op::info::{
     OpInfo,
     panic_dyp,
     panic_var,
+    panic_der,
     panic_one,
-    no_forward_one_value,
-    no_forward_one_ad,
+    no_forward_der_value,
+    no_forward_der_ad,
     no_reverse_one_value,
     no_reverse_one_ad,
     no_rust_src,
@@ -58,8 +59,8 @@ binary::eval_binary_forward_0!(Div, /);
 // ---------------------------------------------------------------------------
 // set_op_info
 //
-no_forward_one_value!(Div);
-no_forward_one_ad!(Div);
+no_forward_der_value!(Div);
+no_forward_der_ad!(Div);
 no_reverse_one_value!(Div);
 no_reverse_one_ad!(Div);
 no_rust_src!(Div);
@@ -81,8 +82,8 @@ where
         forward_dyp_ad    : div_forward_dyp::<V, AD<V> >,
         forward_var_value : panic_var::<V, V>,
         forward_var_ad    : panic_var::<V, AD<V> >,
-        forward_1_value   : panic_one::<V, V>,
-        forward_1_ad      : panic_one::<V, AD<V> >,
+        forward_1_value   : panic_der::<V, V>,
+        forward_1_ad      : panic_der::<V, AD<V> >,
         reverse_1_value   : panic_one::<V, V>,
         reverse_1_ad      : panic_one::<V, AD<V> >,
         rust_src          : rust_src_none,
@@ -94,8 +95,8 @@ where
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : div_pv_forward_0::<V, V>,
         forward_var_ad    : div_pv_forward_0::<V, AD<V> >,
-        forward_1_value   : forward_one_value_none::<V>,
-        forward_1_ad      : forward_one_ad_none::<V>,
+        forward_1_value   : forward_der_value_none::<V>,
+        forward_1_ad      : forward_der_ad_none::<V>,
         reverse_1_value   : reverse_one_value_none::<V>,
         reverse_1_ad      : reverse_one_ad_none::<V>,
         rust_src          : div_pv_rust_src,
@@ -107,8 +108,8 @@ where
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : div_vp_forward_0::<V, V>,
         forward_var_ad    : div_vp_forward_0::<V, AD<V> >,
-        forward_1_value   : forward_one_value_none::<V>,
-        forward_1_ad      : forward_one_ad_none::<V>,
+        forward_1_value   : forward_der_value_none::<V>,
+        forward_1_ad      : forward_der_ad_none::<V>,
         reverse_1_value   : reverse_one_value_none::<V>,
         reverse_1_ad      : reverse_one_ad_none::<V>,
         rust_src          : div_vp_rust_src,
@@ -120,8 +121,8 @@ where
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : div_vv_forward_0::<V, V>,
         forward_var_ad    : div_vv_forward_0::<V, AD<V> >,
-        forward_1_value   : forward_one_value_none::<V>,
-        forward_1_ad      : forward_one_ad_none::<V>,
+        forward_1_value   : forward_der_value_none::<V>,
+        forward_1_ad      : forward_der_ad_none::<V>,
         reverse_1_value   : reverse_one_value_none::<V>,
         reverse_1_ad      : reverse_one_ad_none::<V>,
         rust_src          : div_vv_rust_src,

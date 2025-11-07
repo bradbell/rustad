@@ -651,78 +651,68 @@ where
 //
 /// V evaluation of first order forward call operator for atomic functions
 fn call_forward_1_value<V> (
+    dyp_both   : &Vec<V>       ,
     var_both   : &Vec<V>       ,
-    var_one    : &mut Vec<V>   ,
+    var_der    : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
     arg        : &[IndexT]     ,
+    arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    V           : AtomEvalVec + From<f32>,
+    V           : PartialEq + AtomEvalVec + From<f32>,
     AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
         call_info,
         n_dom,
         n_res,
+        _n_dep,
         trace,
-        is_arg_var,
-        is_res_var,
         atom_eval,
-    ) = extract_call_info_old(arg, flag);
+        res_ad_type,
+    ) = extract_call_info(arg, arg_type, flag);
     //
-    // forward_zero_value, forward_one_value
-    let forward_zero_value = &atom_eval.forward_zero_value;
+    // forward_one_value
     let forward_one_value  = &atom_eval.forward_one_value;
-    if forward_zero_value.is_none() {
+    if forward_one_value.is_none() {
         panic!(
             "{} : forward_zero_value not implemented for this atomic function",
             atom_eval.name,
         );
     }
-    if forward_one_value.is_none() {
-        panic!(
-            "{} : forward_one_value not implemented for this atomic function",
-            atom_eval.name,
-        );
-    }
-    let forward_zero_value = forward_zero_value.unwrap();
     let forward_one_value  = forward_one_value.unwrap();
     //
-    // call_domain_zero
-    let call_domain_zero = call_domain_zero_value(
-        var_both, cop, arg, n_dom, is_arg_var
+    // domain_zero
+    let domain_zero = domain_zero_value(
+        dyp_both, var_both, cop, arg, arg_type, n_dom
     );
-    // ----------------------------------------------------------------------
-    //
-    // call_var_both
-    forward_zero_value(&call_domain_zero, call_info, trace);
-    //
-    // call_domain_one
+    // domain_one
     let zero_v : V = 0f32.into();
-    let mut call_domain_one : Vec<&V> = Vec::with_capacity( n_dom );
-    for i_arg in 0 .. n_dom {
-        let index = arg[6 + i_arg] as usize;
-        if is_arg_var[i_arg] {
-            call_domain_one.push( &var_one[index] );
+    let mut domain_one : Vec<&V> = Vec::with_capacity( n_dom );
+    for i_dom in 0 .. n_dom {
+        let index   = arg[6 + i_dom] as usize;
+        let ad_type = arg_type[6 + i_dom].clone();
+        if ad_type.is_variable() {
+            domain_one.push( &var_der[index] );
         } else {
-            call_domain_one.push( &zero_v );
+            domain_one.push( &zero_v );
         }
     }
-    // call_range_one
-    let mut call_range_one = forward_one_value(
-        &call_domain_zero, call_domain_one, call_info, trace
+    // range_one
+    let mut range_one = forward_one_value(
+        &domain_zero, domain_one, call_info, trace
     );
-    assert_eq!( call_range_one.len(), n_res);
+    assert_eq!( range_one.len(), n_res);
     //
-    // var_one
+    // var_der
     let mut j_res = 0;
-    call_range_one.reverse();
+    range_one.reverse();
     for i_res in 0 .. n_res {
-        let range_i = call_range_one.pop();
+        let range_i = range_one.pop();
         debug_assert!( range_i.is_some() );
-        if is_res_var[i_res] {
-            var_one[res + j_res] = range_i.unwrap();
+        if res_ad_type[i_res].is_variable() {
+            var_der[res + j_res] = range_i.unwrap();
             j_res += 1;
         }
     }
@@ -731,6 +721,83 @@ where
     assert!( 0 < j_res );
 }
 // --------------------------------------------------------------------------
+// call_forward_1_ad
+//
+/// `AD<V>` evaluation of first order forward call operator for atomic functions
+fn call_forward_1_ad<V> (
+    adyp_both  : &Vec< AD<V> >       ,
+    avar_both  : &Vec< AD<V> >       ,
+    avar_der   : &mut Vec< AD<V> >   ,
+    cop        : &Vec<V>             ,
+    flag       : &Vec<bool>          ,
+    arg        : &[IndexT]           ,
+    arg_type   : &[ADType]           ,
+    res        : usize               )
+where
+    V           : PartialEq + From<f32> + Clone + AtomEvalVec ,
+    AtomEval<V> : Clone,
+{   // ----------------------------------------------------------------------
+    let (
+        call_info,
+        n_dom,
+        n_res,
+        _n_dep,
+        trace,
+        atom_eval,
+        res_ad_type,
+    ) = extract_call_info(arg, arg_type, flag);
+    //
+    // forward_one_ad
+    let forward_one_ad       = atom_eval.forward_one_ad.clone();
+    if forward_one_ad.is_none() {
+        panic!(
+            "{} : forward_one_ad is not implemented for this atomic function",
+            atom_eval.name,
+        );
+    }
+    let forward_one_ad = forward_one_ad.unwrap();
+    //
+    // adomain_zero
+    let acop = domain_acop(cop, arg, arg_type, n_dom);
+    let adomain_zero = domain_zero_ad(
+        adyp_both, avar_both, &acop, arg, arg_type, n_dom
+    );
+    //
+    // adomain_der
+    let zero_v : V = 0.0f32.into();
+    let azero      = ad_from_value(zero_v);
+    let mut adomain_der : Vec<& AD<V> > = Vec::with_capacity(n_dom);
+    for i_dom in 0 .. n_dom {
+        let index   = arg[6 + i_dom] as usize;
+        let ad_type = arg_type[6 + i_dom].clone();
+        if ad_type.is_variable() {
+            adomain_der.push( &avar_der[index] );
+        } else {
+            adomain_der.push( &azero );
+        }
+    }
+    // arange_der
+    let mut arange_der = forward_one_ad(
+        &adomain_zero, adomain_der, call_info, trace
+    );
+    assert_eq!( arange_der.len(), n_res);
+    //
+    // avar_der
+    let mut j_res = 0;
+    arange_der.reverse();
+    for i_res in 0 .. n_res {
+        let arange_i = arange_der.pop();
+        debug_assert!( arange_i.is_some() );
+        if res_ad_type[i_res].is_variable() {
+            avar_der[res + j_res] = arange_i.unwrap();
+            j_res += 1;
+        }
+    }
+    // There must be at least one variable result,
+    // or this call would not be in the variable operation sequence:
+    assert!( 0 < j_res );
+}
+// ==========================================================================
 // call_reverse_1_value
 //
 /// V evaluation of first order reverse call operator for atomic functions
@@ -799,91 +866,6 @@ where
             var_one[index] += &call_domain_one[i_arg];
         }
     }
-}
-// --------------------------------------------------------------------------
-// call_forward_1_ad
-//
-/// `AD<V>` evaluation of first order forward call operator for atomic functions
-fn call_forward_1_ad<V> (
-    avar_both  : &Vec< AD<V> >       ,
-    avar_one   : &mut Vec< AD<V> >   ,
-    cop        : &Vec<V>             ,
-    flag       : &Vec<bool>          ,
-    arg        : &[IndexT]           ,
-    res        : usize               )
-where
-    V           : From<f32> + Clone + AtomEvalVec ,
-    AtomEval<V> : Clone,
-{   // ----------------------------------------------------------------------
-    let (
-        call_info,
-        n_dom,
-        n_res,
-        trace,
-        is_arg_var,
-        is_res_var,
-        atom_eval,
-    ) = extract_call_info_old(arg, flag);
-    //
-    // forward_zero_ad, forward_one_ad
-    let forward_zero_ad      = atom_eval.forward_zero_ad.clone();
-    let forward_one_ad       = atom_eval.forward_one_ad.clone();
-    if forward_zero_ad.is_none() {
-        panic!(
-            "{} : forward_zero_ad is not implemented for this atomic function",
-            atom_eval.name,
-        );
-    }
-    let forward_zero_ad = forward_zero_ad.unwrap();
-    if forward_one_ad.is_none() {
-        panic!(
-            "{} : forward_one_ad is not implemented for this atomic function",
-            atom_eval.name,
-        );
-    }
-    let forward_one_ad = forward_one_ad.unwrap();
-    //
-    // call_adomain_zero
-    let acop = call_domain_acop(cop, arg, n_dom, is_arg_var);
-    let call_adomain_zero = call_domain_zero_ad(
-        avar_both, &acop, arg, n_dom, is_arg_var
-    );
-    //
-    // call_avar_both
-    forward_zero_ad(&call_adomain_zero, call_info, trace);
-    //
-    // call_adomain_one
-    let zero_v : V = 0.0f32.into();
-    let azero      = ad_from_value(zero_v);
-    let mut call_adomain_one : Vec<& AD<V> > = Vec::with_capacity(n_dom);
-    for i_arg in 0 .. n_dom {
-        let index = arg[6 + i_arg] as usize;
-        if is_arg_var[i_arg] {
-            call_adomain_one.push( &avar_one[index] );
-        } else {
-            call_adomain_one.push( &azero );
-        }
-    }
-    // call_arange_one
-    let mut call_arange_one = forward_one_ad(
-        &call_adomain_zero, call_adomain_one, call_info, trace
-    );
-    assert_eq!( call_arange_one.len(), n_res);
-    //
-    // avar_one
-    let mut j_res = 0;
-    call_arange_one.reverse();
-    for i_res in 0 .. n_res {
-        let arange_i = call_arange_one.pop();
-        debug_assert!( arange_i.is_some() );
-        if is_res_var[i_res] {
-            avar_one[res + j_res] = arange_i.unwrap();
-            j_res += 1;
-        }
-    }
-    // There must be at least one variable result,
-    // or this call would not be in the variable operation sequence:
-    assert!( 0 < j_res );
 }
 // --------------------------------------------------------------------------
 // call_reverse_1_ad
@@ -1019,8 +1001,8 @@ where
         forward_dyp_ad    : no_op_dyp::<V, AD<V> >,
         forward_var_value : no_op_var::<V, V>,
         forward_var_ad    : no_op_var::<V, AD<V> >,
-        forward_1_value   : no_op_one::<V, V>,
-        forward_1_ad      : no_op_one::<V, AD<V> >,
+        forward_1_value   : no_op_der::<V, V>,
+        forward_1_ad      : no_op_der::<V, AD<V> >,
         reverse_1_value   : no_op_one::<V, V>,
         reverse_1_ad      : no_op_one::<V, AD<V> >,
         rust_src          : no_op_rust_src::<V>,
@@ -1052,8 +1034,21 @@ fn no_op_var<V, E>(
     _res      : usize       ,
 ) { }
 //
+// no_op_der
+/// [ForwardVar](crate::op::info::ForwardVar) function
+fn no_op_der<V, E>(
+    _dyp_both : &Vec<E>     ,
+    _var_both : &Vec<E>     ,
+    _var_der  : &mut Vec<E> ,
+    _cop      : &Vec<V>     ,
+    _flag     : &Vec<bool>  ,
+    _arg      : &[IndexT]   ,
+    _arg_type : &[ADType]   ,
+    _res      : usize       ,
+) { }
+//
 // no_op_one
-/// [ForwardOne](crate::op::info::ForwardOne) or
+/// [ForwardDer](crate::op::info::ForwardDer) or
 /// [ReverseOne](crate::op::info::ReverseOne) function
 fn no_op_one<V, E>(
     _var_both : &Vec<E>     ,
