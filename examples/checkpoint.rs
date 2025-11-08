@@ -33,8 +33,8 @@ thread_local! {
 // Value Routines
 // -------------------------------------------------------------------------
 //
-// checkpoint_forward_zero_value
-fn checkpoint_forward_zero_value(
+// checkpoint_forward_fun_value
+fn checkpoint_forward_fun_value(
     domain_zero      : &Vec<&V>     ,
     call_info        : IndexT      ,
     trace            : bool        ,
@@ -171,8 +171,8 @@ fn register_checkpoint_atom()-> IndexT {
         name                 : &"checkpoint",
         forward_type         :  checkpoint_forward_type,
         //
-        forward_zero_value   :  Some(checkpoint_forward_zero_value),
-        forward_zero_ad      :  None,
+        forward_fun_value    :  Some(checkpoint_forward_fun_value),
+        forward_fun_ad       :  None,
         //
         forward_one_value    :  Some(checkpoint_forward_one_value),
         forward_one_ad       :  None,

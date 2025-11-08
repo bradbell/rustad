@@ -57,8 +57,8 @@ fn h_forward_type(
     res_ad_type
 }
 //
-// BEGIN h_forward_zero_value
-pub fn h_forward_zero_value(
+// BEGIN h_forward_fun_value
+pub fn h_forward_fun_value(
     dom_zero     : &Vec<&V>    ,
     _call_info   : IndexT      ,
     trace        : bool        ,
@@ -71,21 +71,21 @@ pub fn h_forward_zero_value(
     range.push( dom_zero[3].clone() );
     //
     if trace {
-        println!("Begin Trace: h_forward_zero_value");
+        println!("Begin Trace: h_forward_fun_value");
         print!("dom_zero = [ ");
         for j in 0 .. dom_zero.len() {
                 print!("{}, ", dom_zero[j]);
         }
         println!("]");
         println!("range = {:?}", range);
-        println!("End Trace: h_forward_zero_value");
+        println!("End Trace: h_forward_fun_value");
     }
     range
 }
-// END h_forward_zero_value
+// END h_forward_fun_value
 //
-// h_forward_zero_ad
-pub fn h_forward_zero_ad(
+// h_forward_fun_ad
+pub fn h_forward_fun_ad(
     dom_zero     : &Vec<& AD<V> >    ,
     _call_info   : IndexT            ,
     trace        : bool              ,
@@ -98,14 +98,14 @@ pub fn h_forward_zero_ad(
     range.push( dom_zero[3].clone() );
     //
     if trace {
-        println!("Begin Trace: h_forward_zero_ad");
+        println!("Begin Trace: h_forward_fun_ad");
         print!("dom_zero = [ ");
         for j in 0 .. dom_zero.len() {
                 print!("{}, ", dom_zero[j]);
         }
         println!("]");
         println!("range = {:?}", range);
-        println!("End Trace: h_forward_zero_ad");
+        println!("End Trace: h_forward_fun_ad");
     }
     range
 }
@@ -118,8 +118,8 @@ fn register_h()-> IndexT {
         name                 : &"h",
         forward_type         :  h_forward_type,
         //
-        forward_zero_value   :  Some( h_forward_zero_value ),
-        forward_zero_ad      :  Some( h_forward_zero_ad ),
+        forward_fun_value    :  Some( h_forward_fun_value ),
+        forward_fun_ad       :  Some( h_forward_fun_ad ),
         //
         forward_one_value    :  None,
         forward_one_ad       :  None,
@@ -152,9 +152,9 @@ fn dll_src() -> String {
     // begin_comment, end_comment
     // use concat so that this text does not match during the find below
     let begin_comment = String::new() +
-        "// BEGIN " + &atom_name + "_forward_zero_value\n";
+        "// BEGIN " + &atom_name + "_forward_fun_value\n";
     let end_comment = String::new() +
-        "// END " + &atom_name + "_forward_zero_value\n";
+        "// END " + &atom_name + "_forward_fun_value\n";
     //
     // atom_src
     let start      = this_src.find(&begin_comment).unwrap();
@@ -163,7 +163,7 @@ fn dll_src() -> String {
     let atom_src   = atom_src.replace( &begin_comment, "//\n");
     //
     // atom_src
-    let old_name   = String::new() + &atom_name + "_forward_zero_value";
+    let old_name   = String::new() + &atom_name + "_forward_fun_value";
     let new_name   = String::new() + "atom_" + &atom_name;
     let atom_src   = atom_src.replace(&old_name, &new_name);
     //
@@ -204,7 +204,7 @@ fn atom_dyp() {
     let q            = f.forward_dyp_value(p.clone(), trace);
     let (y, _v)      = f.forward_var_value(&q, x.clone(), trace);
     //
-    // check h_forward_zero_value
+    // check h_forward_fun_value
     assert_eq!( y.len(), 3 );
     assert_eq!( y[0], p[0] * p[1] );
     assert_eq!( y[1], p[1] * x[0] );
@@ -223,7 +223,7 @@ fn atom_dyp() {
     let q            = g.forward_dyp_value(p.clone(), trace);
     let (y, _v)      = g.forward_var_value(&q, x.clone(), trace);
     //
-    // check h_forward_zero_ad
+    // check h_forward_fun_ad
     assert_eq!( y.len(), 3 );
     assert_eq!( y[0], p[0] * p[1] );
     assert_eq!( y[1], p[1] * x[0] );

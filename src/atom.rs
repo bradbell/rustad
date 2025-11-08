@@ -242,8 +242,8 @@ pub struct AtomEval<V> {
     pub name                 : &'static str              ,
     pub forward_type         : AtomForwardType           ,
     //
-    pub forward_zero_value   : Option< AtomForwardVarValue::<V> >,
-    pub forward_zero_ad      : Option< AtomForwardVarAd::<V> >,
+    pub forward_fun_value    : Option< AtomForwardVarValue::<V> >,
+    pub forward_fun_ad       : Option< AtomForwardVarAd::<V> >,
     //
     pub forward_one_value    : Option< AtomForwardOneValue::<V> > ,
     pub forward_one_ad       : Option< AtomForwardOneAD::<V> >    ,
@@ -510,12 +510,12 @@ where
         // Rest of this block has a lock, so it should be fast and not fail.
         let atom_eval_vec = read_lock.unwrap();
         let atom_eval     = &atom_eval_vec[atom_id as usize];
-        forward_zero      = atom_eval.forward_zero_value.clone();
+        forward_zero      = atom_eval.forward_fun_value.clone();
         name              = atom_eval.name;
         forward_type      = atom_eval.forward_type.clone();
     }
     if forward_zero.is_none() { panic!(
-        "{} : forward_zero_value is not implemented for this atomic function",
+        "{} : forward_fun_value is not implemented for this atomic function",
         name,
     ); }
     let forward_zero = forward_zero.unwrap();

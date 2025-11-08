@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 /*
-for_sumsq_forward_zero
+for_sumsq_forward_fun
 z = g(x, y) = 2 * ( x[0] * y[0] + x[1] * y[1] + ... )
 
 for_sumsq_forward_one
@@ -24,8 +24,8 @@ use rustad::{
 // V
 use super::V;
 //
-// for_sumsq_forward_zero_value
-fn for_sumsq_forward_zero_value(
+// for_sumsq_forward_fun_value
+fn for_sumsq_forward_fun_value(
     domain_zero : &Vec<&V>  ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
@@ -145,8 +145,8 @@ pub fn register_for_sumsq_atom()-> IndexT {
         name                 : &"for_sumsq",
         forward_type         :  for_sumsq_forward_type,
         //
-        forward_zero_value   :  Some(for_sumsq_forward_zero_value),
-        forward_zero_ad      :  None,
+        forward_fun_value    :  Some(for_sumsq_forward_fun_value),
+        forward_fun_ad       :  None,
         //
         forward_one_value    :  Some( for_sumsq_forward_one_value ),
         forward_one_ad       :  None,

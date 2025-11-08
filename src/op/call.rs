@@ -256,15 +256,15 @@ where
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
-    // forward_zero_value
-    let forward_zero_value = &atom_eval.forward_zero_value;
-    if forward_zero_value.is_none() {
+    // forward_fun_value
+    let forward_fun_value = &atom_eval.forward_fun_value;
+    if forward_fun_value.is_none() {
         panic!(
-        "{} : forward_zero_value is not implemented for this atomic function",
+        "{} : forward_fun_value is not implemented for this atomic function",
             atom_eval.name,
         );
     }
-    let forward_zero_value = forward_zero_value.unwrap();
+    let forward_fun_value = forward_fun_value.unwrap();
     //
     // domain_zero
     let nan_v    : V      = f32::NAN.into();
@@ -274,13 +274,13 @@ where
     );
     //
     // range_zero
-    let mut range_zero = forward_zero_value(
+    let mut range_zero = forward_fun_value(
         &domain_zero, call_info, trace
     );
     assert_eq!(
         n_res,
         range_zero.len(),
-        "atom {} forward_zero_value return length: expected {}, found {}",
+        "atom {} forward_fun_value return length: expected {}, found {}",
         atom_eval.name,
         n_res,
         range_zero.len(),
@@ -326,15 +326,15 @@ where
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
-    // forward_zero_ad
-    let forward_zero_ad = &atom_eval.forward_zero_ad;
-    if forward_zero_ad.is_none() {
+    // forward_fun_ad
+    let forward_fun_ad = &atom_eval.forward_fun_ad;
+    if forward_fun_ad.is_none() {
         panic!(
-            "{} : forward_zero_ad is not implemented for this atomic function",
+            "{} : forward_fun_ad is not implemented for this atomic function",
             atom_eval.name,
         );
     }
-    let forward_zero_ad = forward_zero_ad.unwrap();
+    let forward_fun_ad = forward_fun_ad.unwrap();
     //
     // adomain_zero
     let acop     = domain_acop(cop, arg, arg_type, n_dom);
@@ -346,13 +346,13 @@ where
     );
     //
     // arange_zero
-    let mut arange_zero = forward_zero_ad(
+    let mut arange_zero = forward_fun_ad(
         &adomain_zero, call_info, trace
     );
     assert_eq!(
         n_res,
         arange_zero.len(),
-        "atom {} forward_zero_ad return length: expected {}, found {}",
+        "atom {} forward_fun_ad return length: expected {}, found {}",
         atom_eval.name,
         n_res,
         arange_zero.len(),
@@ -402,15 +402,15 @@ where
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
-    // forward_zero_value
-    let forward_zero_value = &atom_eval.forward_zero_value;
-    if forward_zero_value.is_none() {
+    // forward_fun_value
+    let forward_fun_value = &atom_eval.forward_fun_value;
+    if forward_fun_value.is_none() {
         panic!(
-        "{} : forward_zero_value is not implemented for this atomic function",
+        "{} : forward_fun_value is not implemented for this atomic function",
             atom_eval.name,
         );
     }
-    let forward_zero_value = forward_zero_value.unwrap();
+    let forward_fun_value = forward_fun_value.unwrap();
     //
     // domain_zero
     let domain_zero = domain_zero_value(
@@ -418,13 +418,13 @@ where
     );
     //
     // range_zero
-    let mut range_zero = forward_zero_value(
+    let mut range_zero = forward_fun_value(
         &domain_zero, call_info, trace
     );
     assert_eq!(
         n_res,
         range_zero.len(),
-        "atom {} forward_zero_value return length: expected {}, found {}",
+        "atom {} forward_fun_value return length: expected {}, found {}",
         atom_eval.name,
         n_res,
         range_zero.len(),
@@ -471,15 +471,15 @@ where
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
-    // forward_zero_ad
-    let forward_zero_ad = &atom_eval.forward_zero_ad;
-    if forward_zero_ad.is_none() {
+    // forward_fun_ad
+    let forward_fun_ad = &atom_eval.forward_fun_ad;
+    if forward_fun_ad.is_none() {
         panic!(
-            "{} : forward_zero_ad is not implemented for this atomic function",
+            "{} : forward_fun_ad is not implemented for this atomic function",
             atom_eval.name,
         );
     }
-    let forward_zero_ad = forward_zero_ad.unwrap();
+    let forward_fun_ad = forward_fun_ad.unwrap();
     //
     // adomain_zero
     let acop = domain_acop(cop, arg, arg_type, n_dom);
@@ -488,13 +488,13 @@ where
     );
     //
     // arange_zero
-    let mut arange_zero = forward_zero_ad(
+    let mut arange_zero = forward_fun_ad(
         &adomain_zero, call_info, trace
     );
     assert_eq!(
         n_res,
         arange_zero.len(),
-        "atom {} forward_zero_ad return length: expected {}, found {}",
+        "atom {} forward_fun_ad return length: expected {}, found {}",
         atom_eval.name,
         n_res,
         arange_zero.len(),

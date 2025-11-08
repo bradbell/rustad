@@ -6,7 +6,7 @@ This atomic example uses all the possible AtomEval callback function.
 The sumsq_forward_one_ad and reverse_forward_one_ad callbacks each
 require defining another atomic function to evaluate their derivatives.
 
-sumsq_forward_zero; see forward_zero.rs
+sumsq_forward_fun; see forward_zero.rs
 z = g(x) = x[0] * x[0] + x[1] * x[1] + ...
 
 sumsq_forward_one: see forward_one.rs
@@ -15,10 +15,10 @@ dz = g'(x) * dx = 2 * ( x[0] * dx[0] + x[1] * dx[1] + ... )
 sumsq_reverse_one; see reverse_one.rs
 dx^T = dz * g'(x) = 2 * dz * ( x[0], x[1], ... )
 
-for_sumsq_forward_zero; see for_atom.rs
+for_sumsq_forward_fun; see for_atom.rs
 z = g(x, y) = 2 * ( x[0] * y[0] + x[1] * y[1] + ... )
 
-rev_sumsq_forward_zero; see rev_atom.rs
+rev_sumsq_forward_fun; see rev_atom.rs
 z = g(x, y) = 2 * y * (x[0], x[1], ... )^T
 */
 use std::cell::RefCell;
@@ -45,12 +45,12 @@ mod tests;
 mod for_atom;
 mod rev_atom;
 //
-// sumsq_forward_zero_value
-// sumsq_forward_zero_ad
-mod forward_zero;
-use forward_zero::{
-    sumsq_forward_zero_value,
-    sumsq_forward_zero_ad,
+// sumsq_forward_fun_value
+// sumsq_forward_fun_ad
+mod forward_fun;
+use forward_fun::{
+    sumsq_forward_fun_value,
+    sumsq_forward_fun_ad,
 };
 //
 // sumsq_forward_one_value
@@ -91,8 +91,8 @@ fn register_sumsq_atom()-> IndexT {
         name                 : &"sumsq",
         forward_type         :  sumsq_forward_type,
         //
-        forward_zero_value   :  Some(sumsq_forward_zero_value),
-        forward_zero_ad      :  Some( sumsq_forward_zero_ad ),
+        forward_fun_value    :  Some(sumsq_forward_fun_value),
+        forward_fun_ad       :  Some( sumsq_forward_fun_ad ),
         //
         forward_one_value    :  Some( sumsq_forward_one_value ),
         forward_one_ad       :  Some( sumsq_forward_one_ad ),
@@ -121,8 +121,8 @@ fn main() {
     } );
     let trace         = false;
     //
-    tests::callback_forward_zero_value(sumsq_atom_id, call_info, trace);
-    tests::callback_forward_zero_ad(sumsq_atom_id,    call_info, trace);
+    tests::callback_forward_fun_value(sumsq_atom_id, call_info, trace);
+    tests::callback_forward_fun_ad(sumsq_atom_id,    call_info, trace);
     //
     tests::callback_forward_one_value(sumsq_atom_id,  call_info, trace);
     tests::callback_forward_one_ad(sumsq_atom_id,  call_info, trace);

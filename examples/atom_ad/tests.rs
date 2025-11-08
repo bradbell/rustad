@@ -31,8 +31,8 @@ fn value_callback_f(
     f
 }
 //
-// callback_forward_zero_value
-pub fn callback_forward_zero_value(
+// callback_forward_fun_value
+pub fn callback_forward_fun_value(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
@@ -46,8 +46,8 @@ pub fn callback_forward_zero_value(
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
 }
 //
-// callback_forward_zero_ad
-pub fn callback_forward_zero_ad(
+// callback_forward_fun_ad
+pub fn callback_forward_fun_ad(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
@@ -109,7 +109,7 @@ pub fn callback_forward_one_ad(
     let g                = stop_recording(ady);
     //
     // x, v, y
-    // check forward_zero_value
+    // check forward_fun_value
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
     let mut v   : Vec<V> = Vec::new();
     let y                = g.forward_zero_value(&mut v , x.clone(), trace);
@@ -168,7 +168,7 @@ pub fn callback_reverse_one_ad(
     let g                = stop_recording(adx);
     //
     // x, v
-    // check forward_zero_value
+    // check forward_fun_value
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
     let mut v   : Vec<V> = Vec::new();
     let y                = g.forward_zero_value(&mut v , x.clone(), trace);

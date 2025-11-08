@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
 /*
-sumsq_forward_zero
+sumsq_forward_fun
 y = g(x) = x[0] * x[0] + x[1] * x[1] + ...
 */
 use rustad::{
@@ -18,8 +18,8 @@ use super::{
     ATOM_ID_VEC
 };
 //
-// sumsq_forward_zero_value
-pub fn sumsq_forward_zero_value(
+// sumsq_forward_fun_value
+pub fn sumsq_forward_fun_value(
     domain_zero  : &Vec<&V>    ,
     _call_info   : IndexT      ,
     trace        : bool        ,
@@ -31,20 +31,20 @@ pub fn sumsq_forward_zero_value(
         sumsq_zero += &( domain_zero[j] * domain_zero[j] );
     }
     if trace {
-        println!("Begin Trace: sumsq_forward_zero_value");
+        println!("Begin Trace: sumsq_forward_fun_value");
         print!("domain_zero = [ ");
         for j in 0 .. domain_zero.len() {
                 print!("{}, ", domain_zero[j]);
         }
         println!("]");
         println!("sumsq_zero = {}", sumsq_zero);
-        println!("End Trace: sumsq_forward_zero_value");
+        println!("End Trace: sumsq_forward_fun_value");
     }
     vec![ sumsq_zero ]
 }
 //
-// sumsq_forward_zero_ad
-pub fn sumsq_forward_zero_ad(
+// sumsq_forward_fun_ad
+pub fn sumsq_forward_fun_ad(
     domain_zero  : &Vec<& AD<V> >    ,
     call_info    : IndexT            ,
     trace        : bool              ,
@@ -68,14 +68,14 @@ pub fn sumsq_forward_zero_ad(
     let sumsq_zero = call_atom(domain_zero_clone, atom_id, call_info, trace);
     //
     if trace {
-        println!("Begin Trace: sumsq_forward_zero_value");
+        println!("Begin Trace: sumsq_forward_fun_value");
         print!("domain_zero = [ ");
         for j in 0 .. n_domain {
                 print!("{}, ", domain_zero[j]);
         }
         println!("]");
         println!("sumsq_zero = {:?}", sumsq_zero);
-        println!("End Trace: sumsq_forward_zero_value");
+        println!("End Trace: sumsq_forward_fun_value");
     }
     sumsq_zero
 }

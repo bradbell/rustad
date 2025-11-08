@@ -4,7 +4,7 @@
 /*
 Example converting an ADfn, that has an atomic function, call to source code.
 
-sumsq_forward_zero;
+sumsq_forward_fun;
 z = g(x) = x[0] * x[0] + x[1] * x[1] + ...
 */
 use rustad::{
@@ -45,8 +45,8 @@ fn register_sumsq_atom()-> IndexT {
         name                 : &"sumsq",
         forward_type         :  sumsq_forward_type,
         //
-        forward_zero_value   :  Some( sumsq_forward_zero_value ),
-        forward_zero_ad      :  None,
+        forward_fun_value    :  Some( sumsq_forward_fun_value ),
+        forward_fun_ad       :  None,
         //
         forward_one_value    :  None,
         forward_one_ad       :  None,
@@ -61,8 +61,8 @@ fn register_sumsq_atom()-> IndexT {
 }
 //
 // BEGIN atom_src
-// sumsq_forward_zero_value
-pub fn sumsq_forward_zero_value(
+// sumsq_forward_fun_value
+pub fn sumsq_forward_fun_value(
     domain_zero  : &Vec<&V>    ,
     _call_info   : IndexT      ,
     trace        : bool        ,
@@ -74,14 +74,14 @@ pub fn sumsq_forward_zero_value(
         sumsq_zero += &( domain_zero[j] * domain_zero[j] );
     }
     if trace {
-        println!("Begin Trace: sumsq_forward_zero_value");
+        println!("Begin Trace: sumsq_forward_fun_value");
         print!("domain_zero = [ ");
         for j in 0 .. domain_zero.len() {
                 print!("{}, ", domain_zero[j]);
         }
         println!("]");
         println!("sumsq_zero = {}", sumsq_zero);
-        println!("End Trace: sumsq_forward_zero_value");
+        println!("End Trace: sumsq_forward_fun_value");
     }
     vec![ sumsq_zero ]
 }
@@ -120,7 +120,7 @@ fn main() {
     let atom_src = atom_src.replace("// BEGIN atom_src\n", "//\n");
     //
     // atom_src
-    let atom_src = atom_src.replace("sumsq_forward_zero_value", "atom_sumsq");
+    let atom_src = atom_src.replace("sumsq_forward_fun_value", "atom_sumsq");
     let atom_src = atom_src.replace("pub fn", "fn");
     let atom_src = atom_src.replace("IndexT", i_str);
     //
