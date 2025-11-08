@@ -86,10 +86,9 @@ fn forward_zero_normsq_f64()
     for j in 0 .. N_SUM {
         x[j] = (j + 1) as f64;
     }
-    let mut var_both : Vec<f64> = Vec::new();
     let trace                  = false;
     let sumsq = NORMSQ_F64.with_borrow_mut( |f_static| {
-        let y = f_static.forward_zero_value(&mut var_both, x, trace);
+        let (y, _) = f_static.forward_zero_value(x, trace);
         y[0]
     } );
     assert_eq!( 6.0 * sumsq, six_times_normsq() as f64);
@@ -102,10 +101,9 @@ fn forward_zero_normsq_nv_f64()
     for j in 0 .. N_SUM {
         x[j] = ( (j+1) as f64 ).into();
     }
-    let mut var_both : Vec< NumVec<f64> > = Vec::new();
     let trace                             = false;
     let sumsq = NORMSQ_NUMVEC_F64.with_borrow_mut( |f_static| {
-        let y         = f_static.forward_zero_value(&mut var_both, x, trace);
+        let (y, _) = f_static.forward_zero_value(x, trace);
         let mut y_itr = y.into_iter();
         y_itr.next().unwrap()
     } );

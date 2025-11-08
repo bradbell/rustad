@@ -48,11 +48,10 @@ fn checkpoint_forward_fun_value(
     }
     //
     // range_zero
-    let mut var_both  : Vec<V> = Vec::new();
     let range_zero    = ADFN_VEC.with_borrow( |f_vec| {
        let f          = &f_vec[call_info as usize];
-       let range_zero = f.forward_zero_value(
-            &mut var_both, domain_zero_clone, trace
+       let (range_zero, _) = f.forward_zero_value(
+            domain_zero_clone, trace
         );
        range_zero
     } );
@@ -79,8 +78,8 @@ fn checkpoint_forward_der_value(
     // var_both
     let mut var_both  : Vec<V> = Vec::new();
     ADFN_VEC.with_borrow( |f_vec| {
-       let f          = &f_vec[call_info as usize];
-       f.forward_zero_value(&mut var_both, domain_zero_clone, trace);
+       let f         = &f_vec[call_info as usize];
+       (_, var_both) = f.forward_zero_value(domain_zero_clone, trace);
     } );
     //
     // domain_one
@@ -117,7 +116,7 @@ fn checkpoint_reverse_der_value(
     let mut var_both  : Vec<V> = Vec::new();
     ADFN_VEC.with_borrow( |f_vec| {
        let f          = &f_vec[call_info as usize];
-       f.forward_zero_value(&mut var_both, domain_zero_clone, trace);
+       (_, var_both)  = f.forward_zero_value(domain_zero_clone, trace);
     } );
     //
     // range_one_clone
@@ -226,8 +225,7 @@ fn main() {
     //
     // g.forward_zero_value
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
-    let mut v   : Vec<V> = Vec::new();
-    let y                = g.forward_zero_value(&mut v , x.clone(), trace);
+    let (y, v)           = g.forward_zero_value(x.clone(), trace);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
     //
     // g.forward_one_value

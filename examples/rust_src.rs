@@ -40,9 +40,8 @@ fn main () {
     //
     // av
     let x  : Vec<V> = vec![ 2.0 as V; nx ];
-    let ax                    = start_recording(x);
-    let mut av : Vec< AD<V> > = Vec::new();
-    f.forward_zero_ad(&mut av, ax, trace);
+    let ax      = start_recording(x);
+    let (_, av) = f.forward_zero_ad(ax, trace);
     //
        //
     // g

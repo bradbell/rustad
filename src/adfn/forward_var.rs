@@ -27,7 +27,7 @@ use crate::{
 //
 // -----------------------------------------------------------------------
 // forward_var
-/// Zero order forward mode evaluation; i.e., function values.
+/// Zero order forward mode variable evaluation with dynamic parameters.
 ///
 /// * Syntax :
 /// ```text
@@ -124,7 +124,7 @@ use crate::{
 ///
 pub fn doc_forward_var() { }
 //
-/// Create the zero order forward mode member functions.
+/// Create the zero order forward mode member functions with dynamic parameters.
 ///
 /// * suffix : is either `value` or `ad` ;
 ///

@@ -40,9 +40,8 @@ fn example_hessian () {
     let f  = stop_recording(ay);
     //
     // av
-    let ax                     = start_recording(x);
-    let mut av  : Vec< AD<V> > = Vec::new();
-    f.forward_zero_ad(&mut av, ax, trace);
+    let ax       = start_recording(x);
+    let (_, av)  = f.forward_zero_ad(ax, trace);
     //
     // g
     // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
@@ -59,8 +58,7 @@ fn example_hessian () {
     }
     //
     // v, y
-    let mut v  : Vec<V> = Vec::new();
-    let y               = g.forward_zero_value(&mut v, x, trace);
+    let (y, v) = g.forward_zero_value(x, trace);
     for j in 0 .. nx {
         let check  = 3 * (j+2) * (j+2);
         assert_eq!( y[j], check as V );
@@ -114,9 +112,8 @@ fn example_numvec_hessian () {
     let f  = stop_recording(ay);
     //
     // av
-    let ax                     = start_recording(x);
-    let mut av  : Vec< AD<V> > = Vec::new();
-    f.forward_zero_ad(&mut av, ax, trace);
+    let ax      = start_recording(x);
+    let (_, av) = f.forward_zero_ad(ax, trace);
     //
     // g
     // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
@@ -132,9 +129,8 @@ fn example_numvec_hessian () {
         x.push( NumVec::new( vec![ (j+1) as F, (j+2) as F ] ) );
     }
     //
-    // v, y
-    let mut v  : Vec<V> = Vec::new();
-    let y               = g.forward_zero_value(&mut v, x, trace);
+    // y, v
+    let (y, v)  = g.forward_zero_value(x, trace);
     for j in 0 .. nx {
         //
         let check  = 3 * (j+1) * (j+1);

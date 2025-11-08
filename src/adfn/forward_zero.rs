@@ -23,43 +23,24 @@ use crate::{
 //
 // -----------------------------------------------------------------------
 // forward_zero
-/// Zero order forward mode evaluation; i.e., function values.
+/// Zero order forward mode variable evaluation with no dynamic parameters.
 ///
 /// * Syntax :
 /// ```text
-///     range_zero = f.forward_zero_value(&mut var_both, domain_zero, trace)
-///     range_zero = f.forward_zero_ad(   &mut var_both, domain_zero, trace)
+///     (range, var_both) = f.forward_zero_value(var_dom, trace)
+///     (range, var_both) = f.forward_zero_ad(var_dom, trace)
 /// ```
 /// * Prototype :
 /// see [ADfn::forward_zero_value] and [ADfn::forward_zero_ad]
 ///
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
+/// * f is an [ADfn] object.
 ///
-/// ## f
-/// is an [ADfn] object.
-///
-/// ## var_both
-/// The input value of this vector should have length zero.
-/// Upon return it has the zero order forward mode values for all
-/// the variables in the operation sequence.
-/// This begins with *domain.zero* ; i.e.,
-/// ```text
-///     var_both[ 0 .. domain_zero.len() ] == domain_zero
-/// ```
-/// It may be useful to know this because domain_zero is consumed by
-/// this operation.
-///
-/// ## trace
-/// if true, a trace of the calculation is printed on stdout.
-///
-/// ## range_zero
-/// The first return
-/// is the range vector corresponding to the domain space variable values;
-/// i.e., the value of the function correspdong the operation sequence in f.
-///
-/// ## domain_zero
-/// specifies the domain space variable values.
+/// * Other Arguments :
+/// This is a wrapper for
+/// [forward_var](crate::adfn::forward_var::doc_forward_var)
+/// that fills in an empty vector for dyp_both .
 ///
 /// # Example
 /// Computing function values using forward_zero :
@@ -87,15 +68,14 @@ use crate::{
 /// // y[0] = f(x)
 /// let trace           = false;
 /// let x      : Vec<V> = vec![ 1.0, 2.0, 3.0 ];
-/// let mut v0 : Vec<V> = Vec::new();
-/// let y  = f.forward_zero_value(&mut v0, x, trace);
+/// let (y, _v)  = f.forward_zero_value(x, trace);
 /// //
 /// assert_eq!( y[0] , (1 + 2 + 3) as V );
 /// ```
 ///
 pub fn doc_forward_zero() { }
 //
-/// Create the zero order forward mode member functions.
+/// Create the no dynamic parameter zero order forward mode member functions.
 ///
 /// * suffix :
 /// is either `value` or `ad` ;
@@ -115,33 +95,23 @@ macro_rules! forward_zero {
         )]
         pub fn [< forward_zero_ $suffix >] (
             &self,
-            var_both    : &mut Vec<$E> ,
-            domain_zero : Vec<$E>      ,
-            trace       : bool         ,
-        ) -> Vec<$E>
+            var_dom : Vec<$E>      ,
+            trace   : bool         ,
+        ) -> ( Vec<$E>, Vec<$E> )
         {   assert_eq!(
-                var_both.len(), 0,
-                "f.forward_zero: var_both  does not have length zero"
-            );
-            assert_eq!(
-                domain_zero.len(), self.var.n_dom,
-                "f.forward_zero: domain vector length does not match f"
+                var_dom.len(), self.var.n_dom,
+                "f.forward_zero: var_dom length does not match f"
             );
             //
             // dyp_both
             let dyp_both : Vec<$E> = Vec::new();
             //
-            // range_zero, var_both_tmp
-            let (range_zero, mut var_both_tmp) =
+            // range, var_both
+            let (range, var_both) =
                 self. [< forward_var_ $suffix >]  (
-                    &dyp_both, domain_zero, trace
+                    &dyp_both, var_dom, trace
             );
-            //
-            // var_both
-            std::mem::swap(var_both, &mut var_both_tmp);
-            //
-            // range_zero
-            range_zero
+            (range, var_both)
         }
     }
 } }

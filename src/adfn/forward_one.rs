@@ -85,8 +85,7 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// // y[0] = f(x)
 /// let trace           = false;
 /// let x0     : Vec<V> = vec![ 4.0, 5.0, 6.0 ];
-/// let mut v0 : Vec<V> = Vec::new();
-/// let y0              = f.forward_zero_value(&mut v0, x0, trace);
+/// let (_, v0)         = f.forward_zero_value(x0, trace);
 /// let x1     : Vec<V> = vec![ 1.0, 0.0, 0.0 ];
 /// let y1              = f.forward_one_value(&v0, x1,  trace);
 /// //

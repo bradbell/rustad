@@ -5,7 +5,6 @@
 // -------------------------------------------------------------------------
 //
 use rustad::{
-    AD,
     ADfn,
     ad_from_vector,
     start_recording,
@@ -41,8 +40,7 @@ pub fn callback_forward_fun_value(
     //
     // x, y
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
-    let mut v   : Vec<V> = Vec::new();
-    let y                = f.forward_zero_value(&mut v , x.clone(), trace);
+    let (y, _)           = f.forward_zero_value(x.clone(), trace);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
 }
 //
@@ -54,18 +52,14 @@ pub fn callback_forward_fun_ad(
     let f = value_callback_f(sumsq_atom_id, call_info, trace);
     //
     // g(x) = f(x)
-    let x      : Vec<V>       = vec![ 3.0 , 4.0 ];
-    let ax                    = start_recording(x);
-    let mut av : Vec< AD<V> > = Vec::new();
-    let ay  = f.forward_zero_ad(&mut av , ax.clone(), trace);
-    let g   = stop_recording(ay);
+    let x      : Vec<V>   = vec![ 3.0 , 4.0 ];
+    let ax                = start_recording(x);
+    let (ay, _)           = f.forward_zero_ad(ax.clone(), trace);
+    let g                 = stop_recording(ay);
     //
     // x, y
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
-    let mut v   : Vec<V> = Vec::new();
-    let y                = g.forward_zero_value(&mut v , x.clone(), trace);
-    assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
-    //
+    let (y, _)            = g.forward_zero_value(x.clone(), trace);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
 }
 //
@@ -79,8 +73,7 @@ pub fn callback_forward_der_value(
     //
     // x, dx, dy
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
-    let mut v   : Vec<V> = Vec::new();
-    f.forward_zero_value(&mut v , x.clone(), trace);
+    let (_, v)           = f.forward_zero_value(x.clone(), trace);
     let dx      : Vec<V> = vec![ 5.0, 6.0 ];
     let dy               = f.forward_one_value(&v , dx.clone(), trace);
     assert_eq!( dy[0], 2.0 * x[0]*dx[0] + 2.0 * x[1]*dx[1] );
@@ -95,10 +88,9 @@ pub fn callback_forward_der_ad(
     let f = value_callback_f(sumsq_atom_id, call_info, trace);
     //
     // av, dx1, adx1
-    let x      : Vec<V>       = vec![ 3.0 , 4.0 ];
-    let ax                    = start_recording(x);
-    let mut av : Vec< AD<V> > = Vec::new();
-    f.forward_zero_ad(&mut av , ax, trace);
+    let x      : Vec<V>  = vec![ 3.0 , 4.0 ];
+    let ax               = start_recording(x);
+    let (_, av)          = f.forward_zero_ad(ax, trace);
     let dx1     : Vec<V> = vec![ 5.0, 6.0 ];
     let adx1             = ad_from_vector(dx1.clone());
     //
@@ -111,8 +103,7 @@ pub fn callback_forward_der_ad(
     // x, v, y
     // check forward_fun_value
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
-    let mut v   : Vec<V> = Vec::new();
-    let y                = g.forward_zero_value(&mut v , x.clone(), trace);
+    let (y, v)           = g.forward_zero_value(x.clone(), trace);
     assert_eq!( y[0], 2.0 * ( x[0] * dx1[0] + x[1] * dx1[1] ) );
     //
     // check forward_der_value
@@ -135,10 +126,9 @@ pub fn callback_reverse_der_value(
     // f
     let f = value_callback_f(sumsq_atom_id, call_info, trace);
     //
-    // x, dy, dx
+    // v, x, dy, dx
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
-    let mut v   : Vec<V> = Vec::new();
-    f.forward_zero_value(&mut v , x.clone(), trace);
+    let (_, v)           = f.forward_zero_value(x.clone(), trace);
     let dy      : Vec<V> = vec![ 5.0 ];
     let dx               = f.reverse_one_value(&v , dy.clone(), trace);
     assert_eq!( dx[0], 2.0 * x[0]*dy[0] );
@@ -156,8 +146,7 @@ pub fn callback_reverse_der_ad(
     // av, dy1, ady1
     let x      : Vec<V>       = vec![ 3.0 , 4.0 ];
     let ax                    = start_recording(x);
-    let mut av : Vec< AD<V> > = Vec::new();
-    f.forward_zero_ad(&mut av , ax, trace);
+    let (_, av)               = f.forward_zero_ad(ax, trace);
     let dy1     : Vec<V> = vec![ 5.0 ];
     let ady1             = ad_from_vector(dy1.clone());
     //
@@ -170,8 +159,7 @@ pub fn callback_reverse_der_ad(
     // x, v
     // check forward_fun_value
     let x       : Vec<V> = vec![ 3.0 , 4.0 ];
-    let mut v   : Vec<V> = Vec::new();
-    let y                = g.forward_zero_value(&mut v , x.clone(), trace);
+    let (y, v)           = g.forward_zero_value(x.clone(), trace);
     assert_eq!( y[0], 2.0 * dy1[0] * x[0]  );
     assert_eq!( y[1], 2.0 * dy1[0] * x[1]  );
     //
