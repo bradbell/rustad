@@ -15,16 +15,17 @@ This package is intended to include most of the features in
 [CppAD](https://cppad.readthedocs.io/latest/) in a way that :
 
 1.  It is easy to use.
-2.  Its source code is easy to understand and maintain.
-3.  It works well with may threads.
-4.  It supports machine learning algorithms.
+2.  The source code is easy to understand and helps developers
+    of other AD packages.
+3.  It works well with many threads.
+5.  It supports machine learning algorithms.
 
 ## Releases
 
 1.  0.0.0 : 2025.10.18 :
     A preliminary release created so people can find this readme file.
 
-## Operations Implemented
+## Features Implemented
 
 1.  Addition and multiplication: We have held off on other simple numerical
     operations while we focus on more complicated features.
@@ -36,20 +37,22 @@ This package is intended to include most of the features in
     of the computation.
 
 4.  Generic code that is is the same for different floating point types.
-    These types include numerical vectors that act element wise.
+    These types include numerical vectors that act element wise
+    (for machine learning) .
 
 5.  Derivative calculations can be used in the definition of new functions
     (that can be differentiated). 
-    This is called AD evaluation of the original functions.
+    This uses called AD evaluation of the derivatives.
 
 6.  Atomic functions and Checkpointing. Atomic function have been extended
     so that they stay atomic when used in functions that are AD evaluated.
 
 7.  Generate compile and link source code for derivative calculations.
 
+8.  Dynamic parameters; i.e., function arguments that are treated as constant
+    during differeniation.
+
 ## Under Construction
-Add dynamic parameters; i.e., function arguments that can change value
-but act as constants when differentiating.
 
 
 ## Goals Before Stable API
@@ -73,8 +76,6 @@ but act as constants when differentiating.
 
 ## User Documentation
 This package does not yet have a stable API. 
-More work needs to be done to separate implementation details
-from the API.
 You can see to current user documentation by executing the following:
 
     cargo doc
