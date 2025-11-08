@@ -158,7 +158,7 @@ where
 mod tests {
     use crate::{
         ad_from_value,
-        start_recording_both,
+        start_recording_dyp,
         stop_recording,
     };
     //
@@ -173,7 +173,7 @@ mod tests {
         let nx         = 1;
         let p : Vec<V> = vec![1.0 as V; np ];
         let x : Vec<V> = vec![1.0 as V; nx ];
-        let (ap, ax)   = start_recording_both(p.clone(), x.clone());
+        let (ap, ax)   = start_recording_dyp(p.clone(), x.clone());
 
         let mut asum   = ad_from_value( V::from(0.0) );
         for j in 0 .. np {

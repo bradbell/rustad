@@ -72,7 +72,7 @@ use crate::{
 /// # Example
 /// Computing function values using forward_var :
 /// ```
-/// use rustad::start_recording_both;
+/// use rustad::start_recording_dyp;
 /// use rustad::stop_recording;
 /// use rustad::AD;
 /// use rustad::ad_from_value;
@@ -88,7 +88,7 @@ use crate::{
 /// // f(p, x) = (p[0] + ... + p[np-1]) * (x[0] + ... + x[nx-1])
 /// let p        : Vec<V> = vec![ 1.0; np];
 /// let x        : Vec<V> = vec![ 1.0; nx];
-/// let (ap, ax)          = start_recording_both(p, x);
+/// let (ap, ax)          = start_recording_dyp(p, x);
 /// let mut ap_sum        = ad_from_value( V::from(0.0) );
 /// for j in 0 .. np {
 ///     ap_sum += &ap[j];

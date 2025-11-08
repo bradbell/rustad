@@ -229,24 +229,24 @@ where
     V : Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
     let dyp_dom : Vec<V> = Vec::new();
-    let (_adyp_dom, adomain) = start_recording_both(dyp_dom, domain);
+    let (_adyp_dom, adomain) = start_recording_dyp(dyp_dom, domain);
     adomain
 }
 //
-// start_recording_both
+// start_recording_dyp
 /// This starts recording a new `AD<V>` operation sequence with
 /// dynamic parameters.
 ///
 /// * Syntax :
 /// ```text
-///     (adyp_dom, avar_dom) = start_recording_both(dyp_dom, var_dom)
+///     (adyp_dom, avar_dom) = start_recording_dyp(dyp_dom, var_dom)
 /// ```
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * Recording :
 /// There must not currently be a recording in process on the current thread
-/// when start_recording_both is called.
+/// when start_recording_dyp is called.
 /// The recording is stopped when [stop_recording] is called.
 ///
 /// * adyp_dom :
@@ -263,7 +263,7 @@ where
 ///
 /// * Example : see [stop_recording]
 ///
-pub fn start_recording_both<V>(
+pub fn start_recording_dyp<V>(
     dyp_dom : Vec<V>, var_dom : Vec<V>
 ) -> ( Vec< AD<V> >, Vec< AD<V> > )
 where
@@ -352,7 +352,7 @@ where
 /// * ad_fn :
 /// The return value is an `ADfn<V>` containing the operation sequence
 /// that computed arange as a function of the domain variables returned by
-/// [start_recording] or [start_recording_both] .
+/// [start_recording] or [start_recording_dyp] .
 /// It can be used to compute the values for the function and its derivative.
 ///
 /// * Assumptions :

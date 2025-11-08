@@ -25,7 +25,7 @@ use rustad::{
     register_atom,
     AtomEval,
     IndexT,
-    start_recording_both,
+    start_recording_dyp,
     stop_recording,
     call_atom,
     get_lib,
@@ -190,7 +190,7 @@ fn atom_dyp() {
     // f
     let p   : Vec<V> = vec![ 1.0; 2];
     let x   : Vec<V> = vec![ 1.0; 1];
-    let (ap, ax)     = start_recording_both(p, x);
+    let (ap, ax)     = start_recording_dyp(p, x);
     let z0           = ap[0].clone();
     let z1           = ap[1].clone();
     let z2           = ax[0].clone();
@@ -213,7 +213,7 @@ fn atom_dyp() {
     // f
     let p   : Vec<V> = vec![ 1.0; 2];
     let x   : Vec<V> = vec![ 1.0; 1];
-    let (ap, ax)     = start_recording_both(p.clone(), x.clone());
+    let (ap, ax)     = start_recording_dyp(p.clone(), x.clone());
     let aq           = f.forward_dyp_ad(ap, trace);
     let (ay, _av)    = f.forward_var_ad(&aq, ax, trace);
     let g            = stop_recording(ay);

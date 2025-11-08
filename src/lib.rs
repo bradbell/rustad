@@ -64,7 +64,7 @@ pub use adfn::{
 pub use tape::{
     IndexT,
     start_recording,
-    start_recording_both,
+    start_recording_dyp,
     stop_recording,
 };
 pub use atom::{
