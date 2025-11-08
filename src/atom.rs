@@ -465,14 +465,6 @@ where
             //
             // sub_tape.flag
             sub_tape.flag.push( trace );          // flag[ arg[5] ]
-            for j in 0 .. n_dom {
-                let flag_j = domain_ad_type[j].is_variable();
-                sub_tape.flag.push( flag_j );     // flag[ arg[5] + j + 1]
-            }
-            for i in 0 .. n_res {
-                let flag_i = range_ad_type[i].is_variable();
-                sub_tape.flag.push( flag_i );     // flag[ arg[5] + n_res + i]
-            }
             //
             // sub_tape.n_dep
             sub_tape.n_dep += n_dep;

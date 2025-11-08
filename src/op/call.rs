@@ -31,13 +31,6 @@
 //! | Index    | Meaning |
 //! | -------- | ------- |
 //! | 0        | is the value of the trace argument of this call            |
-//! | 1        | true (false) if first argument is a variable (parameter)   |
-//! | 2        | true (false) if second argument is a variable (parameter)  |
-//! | ...      | ... |
-//! | n_dom    | true (false) if last argument is a variable (parameter)    |
-//! | n_dom+1  | true (false) if first result is a variable (parameter)     |
-//! | n_dom+2  | true (false) if second result is a variable (parameter)    |
-//! | n_dom+n_res | true (false) if last result is a variable (parameter)   |
 //!
 //! # Operator Results
 //! We use n_res for the number of results that are variables.
@@ -754,7 +747,7 @@ where
 fn call_reverse_1_ad<V> (
     adyp_both   : &Vec< AD<V> >       ,
     avar_both   : &Vec< AD<V> >       ,
-    avar_one    : &mut Vec< AD<V> >   ,
+    avar_der    : &mut Vec< AD<V> >   ,
     cop         : &Vec<V>             ,
     flag       : &Vec<bool>           ,
     arg        : &[IndexT]            ,
@@ -798,7 +791,7 @@ where
     let mut j_res = 0;
     for i_res in 0 .. n_res {
         if res_ad_type[i_res].is_variable() {
-            arange_one.push( &avar_one[res + j_res] );
+            arange_one.push( &avar_der[res + j_res] );
             j_res += 1;
         } else {
             arange_one.push( &azero );
@@ -814,12 +807,12 @@ where
     );
     assert_eq!( adomain_one.len(), n_dom);
     //
-    // avar_one
+    // avar_der
     for i_arg in 0 .. n_dom {
         let index   = arg[6 + i_arg] as usize;
         let ad_type = arg_type[6 + i_arg].clone();
         if ad_type.is_variable() {
-            avar_one[index] += &adomain_one[i_arg];
+            avar_der[index] += &adomain_one[i_arg];
         }
     }
 }
