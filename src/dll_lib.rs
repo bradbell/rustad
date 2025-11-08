@@ -7,9 +7,8 @@
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
 ///
-#[cfg(doc)]
-use crate::ADfn;
-//
+use crate::adfn::rust_src::RustSrcFn;
+///
 // get_lib
 /// Compile and link to a dll library.
 ///
@@ -95,16 +94,11 @@ pub fn get_lib(
 /// This type is used for function like objects in a dll library.
 ///
 /// If rust_src_fn is a `RustSrcLink<V>` object, it acts like a
-/// [ADfn::rust_src] function.
-pub type RustSrcLink<'a, V> = libloading::Symbol<'a,
-    fn(
-        dyp_dom      : &Vec<&V>,
-        var_dom      : &Vec<&V>,
-    ) -> Result< Vec<V>, String >
->;
+/// [RustSrcFn] function.
+pub type RustSrcLink<'a, V> = libloading::Symbol<'a, RustSrcFn<V> >;
 //
 // get_rust_src_fn
-/// Get a link to an [ADfn::rust_src] function.
+/// Get a link to an [RustSrcFn] function.
 ///
 /// * lib :
 /// is a library returned by the [get_lib] function.
