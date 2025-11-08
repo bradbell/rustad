@@ -59,8 +59,8 @@ fn checkpoint_forward_fun_value(
     range_zero
 }
 //
-// checkpoint_forward_one_value
-fn checkpoint_forward_one_value(
+// checkpoint_forward_der_value
+fn checkpoint_forward_der_value(
     domain_zero      : &Vec<&V>    ,
     domain_one       : Vec<&V>     ,
     call_info        : IndexT      ,
@@ -174,8 +174,8 @@ fn register_checkpoint_atom()-> IndexT {
         forward_fun_value    :  Some(checkpoint_forward_fun_value),
         forward_fun_ad       :  None,
         //
-        forward_one_value    :  Some(checkpoint_forward_one_value),
-        forward_one_ad       :  None,
+        forward_der_value    :  Some(checkpoint_forward_der_value),
+        forward_der_ad       :  None,
         //
         reverse_one_value    :  Some(checkpoint_reverse_one_value),
         reverse_one_ad       :  None,

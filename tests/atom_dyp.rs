@@ -121,8 +121,8 @@ fn register_h()-> IndexT {
         forward_fun_value    :  Some( h_forward_fun_value ),
         forward_fun_ad       :  Some( h_forward_fun_ad ),
         //
-        forward_one_value    :  None,
-        forward_one_ad       :  None,
+        forward_der_value    :  None,
+        forward_der_ad       :  None,
         //
         reverse_one_value    :  None,
         reverse_one_ad       :  None,

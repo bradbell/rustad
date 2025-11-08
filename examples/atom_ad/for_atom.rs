@@ -5,7 +5,7 @@
 for_sumsq_forward_fun
 z = g(x, y) = 2 * ( x[0] * y[0] + x[1] * y[1] + ... )
 
-for_sumsq_forward_one
+for_sumsq_forward_der
 dz = g_x(x, y) * dx + g_y(x, y) * dy
    = 2 * ( dx[0] *  y[0] + dx[1] *  y[1] + ... )
    + 2 * (  x[0] * dy[0] +  x[1] * dy[1] + ... )
@@ -51,8 +51,8 @@ fn for_sumsq_forward_fun_value(
     vec![ z ]
 }
 //
-// for_sumsq_forward_one_value
-fn for_sumsq_forward_one_value(
+// for_sumsq_forward_der_value
+fn for_sumsq_forward_der_value(
     domain_zero : &Vec<&V>  ,
     domain_one  : Vec<&V>   ,
     _call_info  : IndexT    ,
@@ -148,8 +148,8 @@ pub fn register_for_sumsq_atom()-> IndexT {
         forward_fun_value    :  Some(for_sumsq_forward_fun_value),
         forward_fun_ad       :  None,
         //
-        forward_one_value    :  Some( for_sumsq_forward_one_value ),
-        forward_one_ad       :  None,
+        forward_der_value    :  Some( for_sumsq_forward_der_value ),
+        forward_der_ad       :  None,
         //
         reverse_one_value    :  Some( for_sumsq_reverse_one_value ),
         reverse_one_ad       :  None,

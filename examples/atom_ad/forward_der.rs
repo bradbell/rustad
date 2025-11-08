@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 /*
-sumsq_forward_one
+sumsq_forward_der
 dy = g'(x) * dx = 2 * ( x[0] * dx[0] + x[1] * dx[1] + ... )
 */
 //
@@ -18,8 +18,8 @@ use super::{
     ATOM_ID_VEC,
 };
 //
-// sumsq_forward_one_value
-pub fn sumsq_forward_one_value(
+// sumsq_forward_der_value
+pub fn sumsq_forward_der_value(
     domain_zero  : &Vec<&V>    ,
     domain_one   : Vec<&V>     ,
     _call_info   : IndexT      ,
@@ -38,7 +38,7 @@ pub fn sumsq_forward_one_value(
         range_one += &( &two_v * &( domain_zero[j] * domain_one[j] ) );
     }
     if trace {
-        println!("Begin Trace: sumsq_forward_one_value");
+        println!("Begin Trace: sumsq_forward_der_value");
         print!("domain_zero = [ ");
         for j in 0 .. domain_zero.len() {
                 print!("{}, ", domain_zero[j]);
@@ -49,13 +49,13 @@ pub fn sumsq_forward_one_value(
         }
         println!("]");
         println!("range_one = {}", range_one);
-        println!("End Trace: sumsq_forward_one_value");
+        println!("End Trace: sumsq_forward_der_value");
     }
     vec![ range_one ]
 }
 //
-// sumsq_forward_one_ad
-pub fn sumsq_forward_one_ad(
+// sumsq_forward_der_ad
+pub fn sumsq_forward_der_ad(
     domain_zero  : &Vec<& AD<V> >    ,
     domain_one   : Vec<& AD<V> >     ,
     call_info    : IndexT            ,
@@ -86,7 +86,7 @@ pub fn sumsq_forward_one_ad(
     let range_one = call_atom(for_domain_zero, atom_id, call_info, trace);
     //
     if trace {
-        println!("Begin Trace: sumsq_forward_one_ad");
+        println!("Begin Trace: sumsq_forward_der_ad");
         print!("domain_zero = [ ");
         for j in 0 .. domain_zero.len() {
                 print!("{}, ", domain_zero[j]);
@@ -97,7 +97,7 @@ pub fn sumsq_forward_one_ad(
         }
         println!("]");
         println!("range_one = {}", range_one[0]);
-        println!("End Trace: sumsq_forward_one_ad");
+        println!("End Trace: sumsq_forward_der_ad");
     }
     range_one
 }

@@ -543,15 +543,15 @@ where
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
-    // forward_one_value
-    let forward_one_value  = &atom_eval.forward_one_value;
-    if forward_one_value.is_none() {
+    // forward_der_value
+    let forward_der_value  = &atom_eval.forward_der_value;
+    if forward_der_value.is_none() {
         panic!(
-            "{} : forward_one_value not implemented for this atomic function",
+            "{} : forward_der_value not implemented for this atomic function",
             atom_eval.name,
         );
     }
-    let forward_one_value  = forward_one_value.unwrap();
+    let forward_der_value  = forward_der_value.unwrap();
     //
     // domain_zero
     let domain_zero = domain_zero_value(
@@ -570,7 +570,7 @@ where
         }
     }
     // range_one
-    let mut range_one = forward_one_value(
+    let mut range_one = forward_der_value(
         &domain_zero, domain_one, call_info, trace
     );
     assert_eq!( range_one.len(), n_res);
@@ -617,15 +617,15 @@ where
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
-    // forward_one_ad
-    let forward_one_ad       = atom_eval.forward_one_ad.clone();
-    if forward_one_ad.is_none() {
+    // forward_der_ad
+    let forward_der_ad       = atom_eval.forward_der_ad.clone();
+    if forward_der_ad.is_none() {
         panic!(
-            "{} : forward_one_ad is not implemented for this atomic function",
+            "{} : forward_der_ad is not implemented for this atomic function",
             atom_eval.name,
         );
     }
-    let forward_one_ad = forward_one_ad.unwrap();
+    let forward_der_ad = forward_der_ad.unwrap();
     //
     // adomain_zero
     let acop = domain_acop(cop, arg, arg_type, n_dom);
@@ -647,7 +647,7 @@ where
         }
     }
     // arange_der
-    let mut arange_der = forward_one_ad(
+    let mut arange_der = forward_der_ad(
         &adomain_zero, adomain_der, call_info, trace
     );
     assert_eq!( arange_der.len(), n_res);

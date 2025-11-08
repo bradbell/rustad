@@ -48,8 +48,8 @@ fn register_sumsq_atom()-> IndexT {
         forward_fun_value    :  Some( sumsq_forward_fun_value ),
         forward_fun_ad       :  None,
         //
-        forward_one_value    :  None,
-        forward_one_ad       :  None,
+        forward_der_value    :  None,
+        forward_der_ad       :  None,
         //
         reverse_one_value    :  None,
         reverse_one_ad       :  None,

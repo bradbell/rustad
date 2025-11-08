@@ -3,13 +3,13 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 /*
 This atomic example uses all the possible AtomEval callback function.
-The sumsq_forward_one_ad and reverse_forward_one_ad callbacks each
+The sumsq_forward_der_ad and reverse_forward_der_ad callbacks each
 require defining another atomic function to evaluate their derivatives.
 
 sumsq_forward_fun; see forward_zero.rs
 z = g(x) = x[0] * x[0] + x[1] * x[1] + ...
 
-sumsq_forward_one: see forward_one.rs
+sumsq_forward_der: see forward_one.rs
 dz = g'(x) * dx = 2 * ( x[0] * dx[0] + x[1] * dx[1] + ... )
 
 sumsq_reverse_one; see reverse_one.rs
@@ -53,12 +53,12 @@ use forward_fun::{
     sumsq_forward_fun_ad,
 };
 //
-// sumsq_forward_one_value
-// sumsq_forward_one_ad
-mod forward_one;
-use forward_one::{
-    sumsq_forward_one_value,
-    sumsq_forward_one_ad,
+// sumsq_forward_der_value
+// sumsq_forward_der_ad
+mod forward_der;
+use forward_der::{
+    sumsq_forward_der_value,
+    sumsq_forward_der_ad,
 };
 //
 // sumsq_reverse_one_value
@@ -94,8 +94,8 @@ fn register_sumsq_atom()-> IndexT {
         forward_fun_value    :  Some(sumsq_forward_fun_value),
         forward_fun_ad       :  Some( sumsq_forward_fun_ad ),
         //
-        forward_one_value    :  Some( sumsq_forward_one_value ),
-        forward_one_ad       :  Some( sumsq_forward_one_ad ),
+        forward_der_value    :  Some( sumsq_forward_der_value ),
+        forward_der_ad       :  Some( sumsq_forward_der_ad ),
         //
         reverse_one_value    :  Some( sumsq_reverse_one_value ),
         reverse_one_ad       :  Some( sumsq_reverse_one_ad ),
@@ -124,8 +124,8 @@ fn main() {
     tests::callback_forward_fun_value(sumsq_atom_id, call_info, trace);
     tests::callback_forward_fun_ad(sumsq_atom_id,    call_info, trace);
     //
-    tests::callback_forward_one_value(sumsq_atom_id,  call_info, trace);
-    tests::callback_forward_one_ad(sumsq_atom_id,  call_info, trace);
+    tests::callback_forward_der_value(sumsq_atom_id,  call_info, trace);
+    tests::callback_forward_der_ad(sumsq_atom_id,  call_info, trace);
     //
     tests::callback_reverse_one_value(sumsq_atom_id,  call_info, trace);
     tests::callback_reverse_one_ad(sumsq_atom_id,  call_info, trace);
