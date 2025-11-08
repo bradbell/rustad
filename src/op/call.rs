@@ -866,8 +866,8 @@ where
         forward_var_ad    : call_forward_var_ad::<V>,
         forward_der_value : call_forward_1_value::<V>,
         forward_der_ad    : call_forward_1_ad::<V>,
-        reverse_1_value   : call_reverse_1_value::<V>,
-        reverse_1_ad      : call_reverse_1_ad::<V>,
+        reverse_der_value : call_reverse_1_value::<V>,
+        reverse_der_ad    : call_reverse_1_ad::<V>,
         rust_src          : call_rust_src::<V>,
         arg_var_index     : call_arg_var_index,
     };
@@ -879,8 +879,8 @@ where
         forward_var_ad    : no_op_var::<V, AD<V> >,
         forward_der_value : no_op_der::<V, V>,
         forward_der_ad    : no_op_der::<V, AD<V> >,
-        reverse_1_value   : no_op_der::<V, V>,
-        reverse_1_ad      : no_op_der::<V, AD<V> >,
+        reverse_der_value : no_op_der::<V, V>,
+        reverse_der_ad    : no_op_der::<V, AD<V> >,
         rust_src          : no_op_rust_src::<V>,
         arg_var_index     : no_op_arg_var_index,
     };

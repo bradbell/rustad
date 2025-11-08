@@ -215,8 +215,8 @@ where
         forward_var_ad    : panic_var::<V, AD<V> >,
         forward_der_value : panic_der::<V, V>,
         forward_der_ad    : panic_der::<V, AD<V> >,
-        reverse_1_value   : panic_der::<V, V>,
-        reverse_1_ad      : panic_der::<V, AD<V> >,
+        reverse_der_value : panic_der::<V, V>,
+        reverse_der_ad    : panic_der::<V, AD<V> >,
         rust_src          : rust_src_none,
         arg_var_index     : binary::binary_pp_arg_var_index,
     };
@@ -228,8 +228,8 @@ where
         forward_var_ad    : add_pv_forward_0::<V, AD<V> >,
         forward_der_value : add_pv_forward_1::<V, V>,
         forward_der_ad    : add_pv_forward_1::<V, AD<V> >,
-        reverse_1_value   : add_pv_reverse_1::<V, V>,
-        reverse_1_ad      : add_pv_reverse_1::<V, AD<V> >,
+        reverse_der_value : add_pv_reverse_1::<V, V>,
+        reverse_der_ad    : add_pv_reverse_1::<V, AD<V> >,
         arg_var_index     : binary::binary_pv_arg_var_index,
         rust_src          : add_pv_rust_src,
     };
@@ -241,8 +241,8 @@ where
         forward_var_ad    : add_vp_forward_0::<V, AD<V> >,
         forward_der_value : add_vp_forward_1::<V, V>,
         forward_der_ad    : add_vp_forward_1::<V, AD<V> >,
-        reverse_1_value   : add_vp_reverse_1::<V, V>,
-        reverse_1_ad      : add_vp_reverse_1::<V, AD<V> >,
+        reverse_der_value : add_vp_reverse_1::<V, V>,
+        reverse_der_ad    : add_vp_reverse_1::<V, AD<V> >,
         rust_src          : add_vp_rust_src,
         arg_var_index     : binary::binary_vp_arg_var_index,
     };
@@ -254,8 +254,8 @@ where
         forward_var_ad    : add_vv_forward_0::<V, AD<V> >,
         forward_der_value : add_vv_forward_1::<V, V>,
         forward_der_ad    : add_vv_forward_1::<V, AD<V> >,
-        reverse_1_value   : add_vv_reverse_1::<V, V>,
-        reverse_1_ad      : add_vv_reverse_1::<V, AD<V> >,
+        reverse_der_value : add_vv_reverse_1::<V, V>,
+        reverse_der_ad    : add_vv_reverse_1::<V, AD<V> >,
         rust_src          : add_vv_rust_src,
         arg_var_index     : binary::binary_vv_arg_var_index,
     };

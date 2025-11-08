@@ -83,8 +83,8 @@ where
         forward_var_ad    : panic_var::<V, AD<V> >,
         forward_der_value : panic_der::<V, V>,
         forward_der_ad    : panic_der::<V, AD<V> >,
-        reverse_1_value   : panic_der::<V, V>,
-        reverse_1_ad      : panic_der::<V, AD<V> >,
+        reverse_der_value : panic_der::<V, V>,
+        reverse_der_ad    : panic_der::<V, AD<V> >,
         rust_src          : rust_src_none,
         arg_var_index     : binary::binary_pp_arg_var_index,
     };
@@ -96,8 +96,8 @@ where
         forward_var_ad    : div_pv_forward_0::<V, AD<V> >,
         forward_der_value : forward_der_value_none::<V>,
         forward_der_ad    : forward_der_ad_none::<V>,
-        reverse_1_value   : reverse_der_value_none::<V>,
-        reverse_1_ad      : reverse_der_ad_none::<V>,
+        reverse_der_value : reverse_der_value_none::<V>,
+        reverse_der_ad    : reverse_der_ad_none::<V>,
         rust_src          : div_pv_rust_src,
         arg_var_index     : binary::binary_pv_arg_var_index,
     };
@@ -109,8 +109,8 @@ where
         forward_var_ad    : div_vp_forward_0::<V, AD<V> >,
         forward_der_value : forward_der_value_none::<V>,
         forward_der_ad    : forward_der_ad_none::<V>,
-        reverse_1_value   : reverse_der_value_none::<V>,
-        reverse_1_ad      : reverse_der_ad_none::<V>,
+        reverse_der_value : reverse_der_value_none::<V>,
+        reverse_der_ad    : reverse_der_ad_none::<V>,
         rust_src          : div_vp_rust_src,
         arg_var_index     : binary::binary_vp_arg_var_index,
     };
@@ -122,8 +122,8 @@ where
         forward_var_ad    : div_vv_forward_0::<V, AD<V> >,
         forward_der_value : forward_der_value_none::<V>,
         forward_der_ad    : forward_der_ad_none::<V>,
-        reverse_1_value   : reverse_der_value_none::<V>,
-        reverse_1_ad      : reverse_der_ad_none::<V>,
+        reverse_der_value : reverse_der_value_none::<V>,
+        reverse_der_ad    : reverse_der_ad_none::<V>,
         rust_src          : div_vv_rust_src,
         arg_var_index     : binary::binary_vv_arg_var_index,
     };

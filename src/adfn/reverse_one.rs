@@ -183,7 +183,7 @@ macro_rules! reverse_one {
                 let arg   = &self.var.arg_all[start .. end];
                 let arg_type = &self.var.arg_type[start .. end];
                 let res   = self.var.n_dom + op_index;
-                let reverse_1 = op_info_vec[op_id].[< reverse_1_ $suffix >];
+                let reverse_1 = op_info_vec[op_id].[< reverse_der_ $suffix >];
                 reverse_1(
                     &dyp_both,
                     &var_both,

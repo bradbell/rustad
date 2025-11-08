@@ -398,10 +398,10 @@ pub struct OpInfo<V> {
     pub forward_der_ad  : ForwardDer<V, AD<V> >,
     //
     /// first order reverse mode V evaluation for this operator
-    pub reverse_1_value : ReverseDer<V, V>,
+    pub reverse_der_value : ReverseDer<V, V>,
     //
     /// first order reverse mode `AD<V>` evaluation for this operator
-    pub reverse_1_ad    : ReverseDer<V, AD<V> >,
+    pub reverse_der_ad  : ReverseDer<V, AD<V> >,
     //
     /// generate rust source code for this operator
     pub rust_src        : RustSrc<V>,
@@ -441,8 +441,8 @@ where
         forward_var_ad     : panic_var::<V, AD<V>>,
         forward_der_value  : panic_der::<V, V>,
         forward_der_ad     : panic_der::<V, AD<V>>,
-        reverse_1_value    : panic_der::<V, V>,
-        reverse_1_ad       : panic_der::<V, AD<V>>,
+        reverse_der_value  : panic_der::<V, V>,
+        reverse_der_ad     : panic_der::<V, AD<V>>,
         rust_src           : panic_rust_src,
         arg_var_index      : panic_arg_var_index,
     };
