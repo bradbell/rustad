@@ -9,10 +9,11 @@
 // ---------------------------------------------------------------------------
 // use
 //
-use crate::AD;
-use crate::ADfn;
+use crate::{
+    AD,
+    ADfn,
+};
 use crate::op::info::GlobalOpInfoVec;
-use crate::adfn::eval_from::eval_from_f32;
 //
 #[cfg(doc)]
 use crate::{
@@ -135,81 +136,13 @@ macro_rules! reverse_one {
                 "f.reverse_one:  var_both does not have the proper length"
             );
             //
-            // op_info_vec
-            let op_info_vec = &*GlobalOpInfoVec::get();
-            //
-            // zero_e
-            let zero_e : $E = eval_from_f32!($suffix, $V, 0 as f32);
-            //
-            // var_one
-            let mut var_one       = vec![ zero_e; n_var ];
-            let mut mut_range_one = range_one;
-            for i in (0 .. self.range_ad_type.len()).rev() {
-                let y_i = mut_range_one.pop().unwrap();
-                if self.range_ad_type[i].is_variable() {
-                    let index = self.range_index[i] as usize;
-                    var_one[index] = y_i;
-                }
-            }
-            //
-            if trace {
-                println!( "Begin Trace: reverse_one: n_var = {}", n_var);
-                println!( "index, flag" );
-                for j in 0 .. self.var.flag.len() {
-                    println!( "{}, {}", j, self.var.flag[j] );
-                }
-                println!( "index, constant" );
-                for j in 0 .. self.cop.len() {
-                    println!( "{}, {}", j, self.cop[j] );
-                }
-                println!( "var_index, range_one" );
-                for i in 0 .. self.range_ad_type.len() {
-                    if self.range_ad_type[i].is_variable() {
-                        let index = self.range_index[i] as usize;
-                        println!( "{}, {}", index,  var_one[index] );
-                    }
-                }
-                println!( "var_index, var_both, var_one, op_name, arg" );
-            }
-            //
             // dyp_both
             let dyp_both : Vec<$E> = Vec::new();
             //
-            // var_one
-            for op_index in ( 0 .. self.var.id_seq.len() ).rev() {
-                let op_id = self.var.id_seq[op_index] as usize;
-                let start = self.var.arg_seq[op_index] as usize;
-                let end   = self.var.arg_seq[op_index + 1] as usize;
-                let arg   = &self.var.arg_all[start .. end];
-                let arg_type = &self.var.arg_type[start .. end];
-                let res   = self.var.n_dom + op_index;
-                let reverse_1 = op_info_vec[op_id].[< reverse_der_ $suffix >];
-                reverse_1(
-                    &dyp_both,
-                    &var_both,
-                    &mut var_one,
-                    &self.cop,
-                    &self.var.flag,
-                    &arg,
-                    &arg_type,
-                    res
-                );
-                if trace {
-                    let name = &op_info_vec[op_id].name;
-                    println!( "{}, {}, {}, {}, {:?}",
-                        res, var_both[res], var_one[res], name, arg
-                    );
-                }
-            }
-            if trace {
-                println!( "End Trace: reverse_one" );
-            }
-            //
             // domain_one
-            let nan_e  : $E    = eval_from_f32!($suffix, $V,  f32::NAN);
-            let mut domain_one = var_one;
-            domain_one.resize(self.var.n_dom, nan_e);
-            domain_one.shrink_to_fit();
+            let domain_one = self.[< reverse_der_ $suffix >](
+                &dyp_both, &var_both, range_one, trace
+            );
             domain_one
         }
     }
