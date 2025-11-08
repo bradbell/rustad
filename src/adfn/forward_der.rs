@@ -179,7 +179,7 @@ macro_rules! forward_der {
                 for j in 0 .. n_dyp {
                     println!( "{}, {}", j, dyp_both[j] );
                 }
-                println!( "var_index, dom_var, dom_der" );
+                println!( "var_index, var_dom, dom_der" );
                 for j in 0 .. self.var.n_dom {
                     println!( "{}, {}, {}", j, var_both[j], var_der[j] );
                 }

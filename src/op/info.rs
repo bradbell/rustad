@@ -198,7 +198,7 @@ macro_rules! no_forward_der_value{ ($Op:ident) => {
     pub fn forward_der_value_none<V> (
         _dyp_both : &Vec<V>     ,
         _var_both : &Vec<V>     ,
-        _var_one  : &mut Vec<V> ,
+        _var_der  : &mut Vec<V> ,
         _cop      : &Vec<V>     ,
         _flag     : &Vec<bool>  ,
         _arg      : &[IndexT]   ,

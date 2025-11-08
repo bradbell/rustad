@@ -98,8 +98,8 @@ pub fn get_lib(
 /// [ADfn::rust_src] function.
 pub type RustSrcFn<'a, V> = libloading::Symbol<'a,
     fn(
-        dom_dyp      : &Vec<&V>,
-        dom_var      : &Vec<&V>,
+        dyp_dom      : &Vec<&V>,
+        var_dom      : &Vec<&V>,
     ) -> Result< Vec<V>, String >
 >;
 //
