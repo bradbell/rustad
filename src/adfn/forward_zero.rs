@@ -35,7 +35,7 @@ use crate::{
 ///
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
-/// * f is an [ADfn] object.
+/// * f : is an [ADfn] object.
 ///
 /// * Other Arguments :
 /// This is a wrapper for

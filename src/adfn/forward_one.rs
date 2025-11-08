@@ -23,12 +23,12 @@ use crate::adfn::forward_zero::doc_forward_zero;
 //
 // -----------------------------------------------------------------------
 // forward_one
-/// First order forward mode evaluation; i.e., directional derivatives.
+/// First order forward mode evaluation with no dynamic parameters.
 ///
 /// * Syntax :
 /// ```text
-///     range_one = f.forward_one_value(&var_both, domain_one, trace)
-///     range_one = f.forward_one_ad(   &var_both, domain_one, trace)
+///     range_der = f.forward_one_value(&var_both, dom_der, trace)
+///     range_der = f.forward_one_ad(&var_both, dom_der, trace)
 /// ```
 ///
 /// * Prototype :
@@ -36,28 +36,12 @@ use crate::adfn::forward_zero::doc_forward_zero;
 ///
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
+/// * f : is an [ADfn] object.
 ///
-/// ## f
-/// is an [ADfn] object.
-///
-/// ## var_both
-/// must be the *var_both* computed a the previous call to forward_zero.
-///
-/// ## domain_one
-/// specifies the domain space direction along which the directional
-/// derivative is evaluated.
-///
-/// ## trace
-/// if true, a trace of the calculations is printed on stdout.
-///
-/// ## range_one
-/// The return value is the directional derivative
-/// ```text
-///     range_one = f'(domain_zero) * domain_one
-/// ```
-/// Here `f'` is the derivative of the function and
-/// [domain_zero](doc_forward_zero#domain_zero) is its value in the call to
-/// forward_zero that created the *var_both* .
+/// * Other Arguments :
+/// This is a wrapper for
+/// [forward_der](crate::adfn::forward_der::doc_forward_der)
+/// that fills in an empty vector for dyp_both .
 ///
 /// # Example
 /// Computing one partial derivative using forward_one :
@@ -115,7 +99,7 @@ macro_rules! forward_one {
         pub fn [< forward_one_ $suffix >] (
             &self,
             var_both    : &Vec<$E>     ,
-            domain_one  : Vec<$E>      ,
+            dom_der     : Vec<$E>      ,
             trace       : bool         ,
         ) -> Vec<$E>
         {
@@ -123,7 +107,7 @@ macro_rules! forward_one {
             let n_var = self.var.n_dom + self.var.n_dep;
             //
             assert_eq!(
-                domain_one.len(), self.var.n_dom,
+                dom_der.len(), self.var.n_dom,
                 "f.forward_one: domain vector length does not match f"
             );
             assert_eq!(
@@ -134,11 +118,11 @@ macro_rules! forward_one {
             // dyp_both
             let dyp_both : Vec<$E> = Vec::new();
             //
-            // range_one
-            let range_one = self.[< forward_der_ $suffix >] (
-                &dyp_both, var_both, domain_one, trace
+            // range_der
+            let range_der = self.[< forward_der_ $suffix >] (
+                &dyp_both, var_both, dom_der, trace
             );
-            range_one
+            range_der
         }
     }
 } }

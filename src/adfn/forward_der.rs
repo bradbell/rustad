@@ -24,7 +24,7 @@ use crate::adfn::forward_zero::doc_forward_zero;
 //
 // -----------------------------------------------------------------------
 // forward_der
-/// First order forward mode evaluation; i.e., directional derivatives.
+/// First order forward mode evaluation with dynamic parameters.
 ///
 /// * Syntax :
 /// ```text
