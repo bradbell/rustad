@@ -86,7 +86,7 @@ pub type AtomForwardType = fn(
 /// * Required :
 /// This callback is required for all atomic functions.
 ///
-/// * domain_zero :
+/// * domain      :
 /// this contains the value of the atomic function domain variables.
 ///
 /// * call_info :
@@ -96,11 +96,11 @@ pub type AtomForwardType = fn(
 /// if true, a trace of the calculations may be printed on stdout.
 ///
 /// * return :
-/// The return value *range_one*
+/// The return value *range_der*
 /// contains the value of the atomic function range variables.
 ///
 pub type AtomForwardVarValue<V> = fn(
-    _domain_zero   : &Vec<&V>    ,
+    _domain        : &Vec<&V>    ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
 ) -> Vec<V> ;
@@ -113,10 +113,10 @@ pub type AtomForwardVarValue<V> = fn(
 /// [ADfn::forward_one_value], its corresponding value in
 /// [AtomEval] can be None.
 ///
-/// * domain_zero :
+/// * domain      :
 /// this contains the value of the atomic function domain variables.
 ///
-/// * domain_one :
+/// * dom_der    :
 /// this contains the direction for the directional derivative.
 ///
 /// * call_info :
@@ -126,13 +126,13 @@ pub type AtomForwardVarValue<V> = fn(
 /// if true, a trace of the calculations may be printed on stdout.
 ///
 /// * return :
-/// The return value *range_one* is
+/// The return value *range_der* is
 /// ```text
-///     range_one = f'(domain_zero) * domain_one
+///     range_der = f'(domain) * dom_der
 /// ```
 pub type AtomForwardOneValue<V> = fn(
-    _domain_zero   : &Vec<&V>    ,
-    _domain_one    : Vec<&V>     ,
+    _domain        : &Vec<&V>    ,
+    _dom_der       : Vec<&V>     ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
 ) -> Vec<V> ;
@@ -145,10 +145,10 @@ pub type AtomForwardOneValue<V> = fn(
 /// [ADfn::reverse_one_value],
 /// this callbacks value in [AtomEval] can be None.
 ///
-/// * domain_zero :
+/// * domain      :
 /// this contains the value of the atomic function domain variables.
 ///
-/// * range_one :
+/// * range_der :
 /// this contains the function weights for the partial derivatives.
 ///
 /// * call_info :
@@ -158,13 +158,13 @@ pub type AtomForwardOneValue<V> = fn(
 /// if true, a trace of the calculations may be printed on stdout.
 ///
 /// * return :
-/// The return value *domain_one* is
+/// The return value *dom_der* is
 /// ```text
-///     domain_one = range_one * f'(domain_zero)
+///     dom_der = range_der * f'(domain)
 /// ```
 pub type AtomReverseOneValue<V> = fn(
-    _domain_zero   : &Vec<&V>    ,
-    _range_one     : Vec<&V>     ,
+    _domain        : &Vec<&V>    ,
+    _range_der     : Vec<&V>     ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
 ) -> Vec<V> ;
@@ -177,7 +177,7 @@ pub type AtomReverseOneValue<V> = fn(
 /// [ADfn::forward_one_ad] ,
 /// this callbacks value in [AtomEval] can be None.
 ///
-/// * domain_zero :
+/// * domain      :
 /// this contains the value of the atomic function domain variables.
 ///
 /// * call_info :
@@ -187,11 +187,11 @@ pub type AtomReverseOneValue<V> = fn(
 /// if true, a trace of the calculations may be printed on stdout.
 ///
 /// * return :
-/// The return value *arange_one*
+/// The return value *arange_der*
 /// contains the value of the atomic function range variables.
 ///
 pub type AtomForwardVarAd<V> = fn(
-    _domain_zero   : &Vec<& AD<V> >     ,
+    _domain        : &Vec<& AD<V> >     ,
     _call_info     : IndexT             ,
     _trace         : bool               ,
 ) -> Vec< AD<V> > ;
@@ -204,10 +204,10 @@ pub type AtomForwardVarAd<V> = fn(
 /// [ADfn::forward_one_ad] ,
 /// this callbacks value in [AtomEval] can be None.
 ///
-/// * domain_zero :
+/// * domain      :
 /// this contains the value of the atomic function domain variables.
 ///
-/// * domain_one :
+/// * dom_der    :
 /// this contains the direction for the directional derivative.
 ///
 /// * call_info :
@@ -217,13 +217,13 @@ pub type AtomForwardVarAd<V> = fn(
 /// if true, a trace of the calculations may be printed on stdout.
 ///
 /// * return :
-/// The return value *range_one* is
+/// The return value *range_der* is
 /// ```text
-///     range_one = f'(domain_zero) * domain_one
+///     range_der = f'(domain) * dom_der
 /// ```
 pub type AtomForwardOneAD<V> = fn(
-    _domain_zero   : &Vec<& AD<V> >    ,
-    _domain_one    : Vec<& AD<V> >     ,
+    _domain        : &Vec<& AD<V> >    ,
+    _dom_der       : Vec<& AD<V> >     ,
     _call_info     : IndexT            ,
     _trace         : bool              ,
 ) -> Vec< AD<V> > ;
@@ -236,10 +236,10 @@ pub type AtomForwardOneAD<V> = fn(
 /// [ADfn::reverse_one_ad] ,
 /// this callbacks value in [AtomEval] can be None.
 ///
-/// * domain_zero :
+/// * domain      :
 /// this contains the value of the atomic function domain variables.
 ///
-/// * range_one :
+/// * range_der :
 /// this contains the function weights for the partial derivatives.
 ///
 /// * call_info :
@@ -249,13 +249,13 @@ pub type AtomForwardOneAD<V> = fn(
 /// if true, a trace of the calculations may be printed on stdout.
 ///
 /// * return :
-/// The return value *domain_one* is
+/// The return value *dom_der* is
 /// ```text
-///     domain_one = range_one * f'(domain_zero)
+///     dom_der = range_der * f'(domain)
 /// ```
 pub type AtomReverseOneAD<V> = fn(
-    _domain_zero   : &Vec<& AD<V> >    ,
-    _range_one     : Vec<& AD<V> >     ,
+    _domain        : &Vec<& AD<V> >    ,
+    _range_der     : Vec<& AD<V> >     ,
     _call_info     : IndexT            ,
     _trace         : bool              ,
 ) -> Vec< AD<V> > ;
@@ -371,7 +371,7 @@ fn record_call_atom<V>(
     tape                  : &mut Tape<V>                  ,
     forward_type          : AtomForwardType               ,
     adomain               : Vec< AD<V> >                  ,
-    range_zero            : Vec<V>                        ,
+    range                 : Vec<V>                        ,
     atom_id               : IndexT                        ,
     call_info             : IndexT                        ,
     trace                 : bool                          ,
@@ -384,10 +384,10 @@ where
     //
     // n_dom, n_res
     let n_dom = adomain.len();
-    let n_res = range_zero.len();
+    let n_res = range.len();
     //
     // arange
-    let mut arange : Vec< AD<V> > = ad_from_vector(range_zero);
+    let mut arange : Vec< AD<V> > = ad_from_vector(range);
     //
     // domain_ad_type
     let domain_ad_type : Vec<ADType> = adomain.iter().map(
@@ -547,25 +547,25 @@ where
     ); }
     let forward_zero = forward_zero.unwrap();
     //
-    // domain_zero
-    let mut domain_zero : Vec<&V> = Vec::with_capacity( adomain.len() );
+    // domain
+    let mut domain      : Vec<&V> = Vec::with_capacity( adomain.len() );
     for j in 0 .. adomain.len() {
-        domain_zero.push( &adomain[j].value );
+        domain.push( &adomain[j].value );
     }
     //
-    // range_zero
-    let range_zero  = forward_zero( &domain_zero, call_info, trace );
+    // range
+    let range  = forward_zero( &domain, call_info, trace );
     //
     // arange
     let arange : Vec< AD<V> >;
     if ! recording {
-        arange = ad_from_vector(range_zero);
+        arange = ad_from_vector(range);
     } else {
         arange = local_key.with_borrow_mut( |tape| record_call_atom::<V>(
             tape,
             forward_type,
             adomain,
-            range_zero,
+            range,
             atom_id,
             call_info,
             trace,
