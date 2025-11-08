@@ -33,7 +33,6 @@ use crate::op::info::{
     panic_dyp,
     panic_var,
     panic_der,
-    panic_one,
     no_rust_src,
 };
 use crate::op::id::{
@@ -45,7 +44,7 @@ use crate::op::id::{
 #[cfg(doc)]
 use crate::op::info::{
         ForwardDer,
-        ReverseOne,
+        ReverseDer,
 };
 // -------------------------------------------------------------------------
 // rust_src
@@ -144,54 +143,74 @@ where
 // ---------------------------------------------------------------------------
 //
 // mul_pv_reverse_1
-/// first order reverse for parameter * variable; see [ReverseOne]
+/// first order reverse for parameter * variable; see [ReverseDer]
 fn mul_pv_reverse_1 <V, E>(
+    dyp_both   :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
-    var_one    :   &mut Vec<E> ,
+    var_der    :   &mut Vec<E> ,
     cop        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
-    res        :       usize   )
+    arg_type   :   &[ADType]   ,
+    res        :   usize       )
 where
     for<'a> E : std::ops::AddAssign<&'a E> ,
     for<'a> &'a E : std::ops::Mul<&'a V, Output = E> ,
+    for<'a> &'a E : std::ops::Mul<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
-    let term      = &var_one[res] * &cop[lhs];
-    var_one[rhs] += &term;
+    if arg_type[0].is_constant() {
+        let term      = &var_der[res] * &cop[lhs];
+        var_der[rhs] += &term;
+    } else {
+        debug_assert!( arg_type[0].is_dynamic() );
+        let term      = &var_der[res] * &dyp_both[lhs];
+        var_der[rhs] += &term;
+    }
 }
 //
 // mul_vp_reverse_1
-/// first order reverse for variable * parameter; see [ReverseOne]
+/// first order reverse for variable * parameter; see [ReverseDer]
 fn mul_vp_reverse_1 <V, E>(
+    dyp_both   :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
-    var_one    :   &mut Vec<E> ,
+    var_der    :   &mut Vec<E> ,
     cop        :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
-    res        :       usize   )
+    arg_type   :   &[ADType]   ,
+    res        :   usize       )
 where
     for<'a> E : std::ops::AddAssign<&'a E> ,
     for<'a> &'a E : std::ops::Mul<&'a V, Output = E> ,
+    for<'a> &'a E : std::ops::Mul<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
-    let term      = &var_one[res] * &cop[rhs];
-    var_one[lhs] += &term;
+    if arg_type[1].is_constant() {
+        let term      = &var_der[res] * &cop[rhs];
+        var_der[lhs] += &term;
+    } else {
+        debug_assert!( arg_type[1].is_dynamic() );
+        let term      = &var_der[res] * &dyp_both[rhs];
+        var_der[lhs] += &term;
+    }
 }
 //
 // mul_vv_reverse_1
-/// first order reverse for variable * variable; see [ReverseOne]
+/// first order reverse for variable * variable; see [ReverseDer]
 fn mul_vv_reverse_1 <V, E>(
+    _dyp_both  :   &Vec<E>     ,
     var_both   :   &Vec<E>     ,
-    var_one    :   &mut Vec<E> ,
+    var_der    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
-    res        :       usize   )
+    _arg_type  :   &[ADType]   ,
+    res        :   usize       )
 where
     for<'a> E : std::ops::AddAssign<&'a E> ,
     for<'a> &'a E : std::ops::Mul<&'a E, Output = E> ,
@@ -200,11 +219,11 @@ where
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
     //
-    let term      = &var_one[res] * &var_both[rhs];
-    var_one[lhs] += &term;
+    let term      = &var_der[res] * &var_both[rhs];
+    var_der[lhs] += &term;
     //
-    let term      = &var_one[res] * &var_both[lhs];
-    var_one[rhs] += &term;
+    let term      = &var_der[res] * &var_both[lhs];
+    var_der[rhs] += &term;
 }
 // ---------------------------------------------------------------------------
 // set_op_info
@@ -235,8 +254,8 @@ where
         forward_var_ad    : panic_var::<V, AD<V> >,
         forward_der_value : panic_der::<V, V>,
         forward_der_ad    : panic_der::<V, AD<V> >,
-        reverse_1_value   : panic_one::<V, V>,
-        reverse_1_ad      : panic_one::<V, AD<V> >,
+        reverse_1_value   : panic_der::<V, V>,
+        reverse_1_ad      : panic_der::<V, AD<V> >,
         rust_src          : rust_src_none,
         arg_var_index     : binary::binary_pp_arg_var_index,
     };

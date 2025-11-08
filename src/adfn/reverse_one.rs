@@ -172,20 +172,26 @@ macro_rules! reverse_one {
                 println!( "var_index, var_both, var_one, op_name, arg" );
             }
             //
+            // dyp_both
+            let dyp_both : Vec<$E> = Vec::new();
+            //
             // var_one
             for op_index in ( 0 .. self.var.id_seq.len() ).rev() {
                 let op_id = self.var.id_seq[op_index] as usize;
                 let start = self.var.arg_seq[op_index] as usize;
                 let end   = self.var.arg_seq[op_index + 1] as usize;
                 let arg   = &self.var.arg_all[start .. end];
+                let arg_type = &self.var.arg_type[start .. end];
                 let res   = self.var.n_dom + op_index;
                 let reverse_1 = op_info_vec[op_id].[< reverse_1_ $suffix >];
                 reverse_1(
+                    &dyp_both,
                     &var_both,
                     &mut var_one,
                     &self.cop,
                     &self.var.flag,
                     &arg,
+                    &arg_type,
                     res
                 );
                 if trace {

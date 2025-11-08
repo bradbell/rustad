@@ -50,6 +50,7 @@
 //
 use std::sync::RwLock;
 use std::cmp::PartialEq;
+use std::ops::AddAssign;
 //
 use crate::op::info::OpInfo;
 use crate::atom::{
@@ -133,63 +134,6 @@ where
         res_ad_type,
     )
 }
-//
-// extract_call_info_old
-fn extract_call_info_old<'a, V>(
-    arg        : &'a [IndexT]  ,
-    flag       : &'a Vec<bool> ,
-) -> (
-    IndexT       , // call_info
-    usize        , // n_dom
-    usize        , // n_res
-    bool         , // trace
-    &'a [bool]   , // is_arg_var
-    &'a [bool]   , // is_res_var
-    AtomEval<V>  , // atom_eval
-)
-where
-    V           : AtomEvalVec,
-    AtomEval<V> : Clone,
-{
-    // atom_id, call_info, n_dom, n_res,
-    let atom_id    = arg[0] as usize;
-    let call_info  = arg[1];
-    let n_dom      = arg[2] as usize;
-    let n_res      = arg[3] as usize;
-    let trace      = flag[ arg[5] as usize ];
-    //
-    // is_arg_var, is_res_var
-    let mut begin  = (arg[5] as usize) + 1;
-    let mut end     = begin + n_dom;
-    let is_arg_var  = &flag[begin .. end];
-    begin           = end;
-    end             = begin + n_res;
-    let is_res_var  = &flag[begin .. end];
-    //
-    // atom_eval
-    let atom_eval : AtomEval<V>;
-    {   //
-        // rw_lock
-        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
-        //
-        // read_lock
-        let read_lock = rw_lock.read();
-        assert!( read_lock.is_ok() );
-        //
-        // Rest of this block has a lock, so it should be fast and not fail.
-        let atom_eval_vec  = read_lock.unwrap();
-        atom_eval          = atom_eval_vec[atom_id].clone();
-    }
-    (
-        call_info,
-        n_dom,
-        n_res,
-        trace,
-        is_arg_var,
-        is_res_var,
-        atom_eval,
-    )
-}
 // ----------------------------------------------------------------------
 //
 // domain_zero_value
@@ -228,28 +172,6 @@ where
     }
     domain_zero
 }
-//
-// call_domain_zero_value
-fn call_domain_zero_value<'a, 'b, V>(
-    var_both   : &'a Vec<V>    ,
-    cop        : &'a Vec<V>    ,
-    arg        : &'b [IndexT]  ,
-    n_dom      : usize         ,
-    is_arg_var : &'b [bool]    ,
-) -> Vec<&'a V>
-{
-    //
-    let mut call_domain_zero : Vec<&V> = Vec::with_capacity( n_dom );
-    for i_arg in 0 .. n_dom {
-        let index = arg[6 + i_arg] as usize;
-        if is_arg_var[i_arg] {
-            call_domain_zero.push( &var_both[index] );
-        } else {
-            call_domain_zero.push( &cop[index] );
-        }
-    }
-    call_domain_zero
-}
 // ----------------------------------------------------------------------
 //
 // domain_acop
@@ -266,27 +188,6 @@ where
     for i_arg in 0 .. n_dom {
         let ad_type = &arg_type[6 + i_arg];
         if ad_type.is_constant() {
-            let index = arg[6 + i_arg] as usize;
-            acop.push( ad_from_value( cop[index].clone() ) );
-        }
-    }
-    acop
-}
-//
-// call_domain_acop
-fn call_domain_acop<'a, 'b, V>(
-    cop        : &'a Vec<V>    ,
-    arg        : &'b [IndexT]  ,
-    n_dom      : usize         ,
-    is_arg_var : &'b [bool]    ,
-) -> Vec< AD<V> >
-where
-    V : Clone,
-{
-    //
-    let mut acop : Vec< AD<V> > = Vec::new();
-    for i_arg in 0 .. n_dom {
-        if ! is_arg_var[i_arg] {
             let index = arg[6 + i_arg] as usize;
             acop.push( ad_from_value( cop[index].clone() ) );
         }
@@ -334,30 +235,6 @@ where
         }
     }
     domain_zero
-}
-//
-// call_domain_zero_ad
-fn call_domain_zero_ad<'a, 'b, V>(
-    avar_both   : &'a Vec< AD<V> >    ,
-    acop        : &'a Vec< AD<V> >    ,
-    arg         : &'b [IndexT]        ,
-    n_dom      : usize                ,
-    is_arg_var : &'b [bool]           ,
-) -> Vec<&'a AD<V> >
-{
-    //
-    let mut call_domain_zero : Vec<& AD<V> > = Vec::with_capacity( n_dom );
-    let mut i_cop : usize = 0;
-    for i_arg in 0 .. n_dom {
-        if is_arg_var[i_arg] {
-            let index = arg[6 + i_arg] as usize;
-            call_domain_zero.push( &avar_both[index] );
-        } else {
-            call_domain_zero.push( &acop[i_cop] );
-            i_cop += 1;
-        }
-    }
-    call_domain_zero
 }
 // ==========================================================================
 // call_forward_dyp
@@ -677,7 +554,7 @@ where
     let forward_one_value  = &atom_eval.forward_one_value;
     if forward_one_value.is_none() {
         panic!(
-            "{} : forward_zero_value not implemented for this atomic function",
+            "{} : forward_one_value not implemented for this atomic function",
             atom_eval.name,
         );
     }
@@ -802,25 +679,27 @@ where
 //
 /// V evaluation of first order reverse call operator for atomic functions
 fn call_reverse_1_value<V> (
+    dyp_both   : &Vec<V>       ,
     var_both   : &Vec<V>       ,
-    var_one    : &mut Vec<V>   ,
+    var_der    : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
     flag       : &Vec<bool>    ,
     arg        : &[IndexT]     ,
+    arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    for<'a> V   : AtomEvalVec + std::ops::AddAssign<&'a V>  + From<f32>,
+    for<'a> V   : PartialEq + AtomEvalVec + AddAssign<&'a V>  + From<f32>,
     AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
         call_info,
         n_dom,
         n_res,
+        _n_dep,
         trace,
-        is_arg_var,
-        is_res_var,
         atom_eval,
-    ) = extract_call_info_old(arg, flag);
+        res_ad_type,
+    ) = extract_call_info(arg, arg_type, flag);
     //
     // reverse_one_value
     let reverse_one_value = &atom_eval.reverse_one_value;
@@ -832,38 +711,39 @@ where
     }
     let reverse_one_value = reverse_one_value.unwrap();
     //
-    // call_domain_zero
-    let call_domain_zero = call_domain_zero_value(
-        var_both, cop, arg, n_dom, is_arg_var
+    // domain_zero
+    let domain_zero = domain_zero_value(
+        dyp_both, var_both, cop, arg, arg_type, n_dom
     );
     //
-    // call_range_one
+    // ange_one
     let zero_v : V = 0f32.into();
-    let mut call_range_one : Vec<&V> = Vec::with_capacity( n_res );
+    let mut range_one : Vec<&V> = Vec::with_capacity( n_res );
     let mut j_res = 0;
     for i_res in 0 .. n_res {
-        if is_res_var[i_res] {
-            call_range_one.push( &var_one[res + j_res] );
+        if res_ad_type[i_res].is_variable() {
+            range_one.push( &var_der[res + j_res] );
             j_res += 1;
         } else {
-            call_range_one.push( &zero_v );
+            range_one.push( &zero_v );
         }
     }
     // There must be at least one variable result,
     // or this call would not be in the variable operation sequence:
     assert!( 0 < j_res );
     //
-    // call_domain_one
-    let call_domain_one = reverse_one_value(
-        &call_domain_zero, call_range_one, call_info, trace
+    // domain_one
+    let domain_one = reverse_one_value(
+        &domain_zero, range_one, call_info, trace
     );
-    assert_eq!( call_domain_one.len(), n_dom);
+    assert_eq!( domain_one.len(), n_dom);
     //
-    // var_one
+    // var_der
     for i_arg in 0 .. n_dom {
-        let index = arg[6 + i_arg] as usize;
-        if is_arg_var[i_arg] {
-            var_one[index] += &call_domain_one[i_arg];
+        let index    = arg[6 + i_arg] as usize;
+        let ad_type  = arg_type[6 + i_arg].clone();
+        if ad_type.is_variable() {
+            var_der[index] += &domain_one[i_arg];
         }
     }
 }
@@ -872,26 +752,28 @@ where
 //
 /// `AD<V>` evaluation of first order reverse call operator (atomic functions)
 fn call_reverse_1_ad<V> (
+    adyp_both   : &Vec< AD<V> >       ,
     avar_both   : &Vec< AD<V> >       ,
     avar_one    : &mut Vec< AD<V> >   ,
     cop         : &Vec<V>             ,
     flag       : &Vec<bool>           ,
     arg        : &[IndexT]            ,
+    arg_type   : &[ADType]            ,
     res        : usize                )
 where
-    V             : AtomEvalVec + Clone + From<f32>,
-    for<'a> AD<V> : std::ops::AddAssign<&'a AD<V> >,
+    V             : PartialEq + AtomEvalVec + Clone + From<f32>,
+    for<'a> AD<V> : AddAssign<&'a AD<V> >,
     AtomEval<V>   : Clone,
 {   // ----------------------------------------------------------------------
     let (
         call_info,
         n_dom,
         n_res,
+        _n_dep,
         trace,
-        is_arg_var,
-        is_res_var,
         atom_eval,
-    ) = extract_call_info_old(arg, flag);
+        res_ad_type,
+    ) = extract_call_info(arg, arg_type, flag);
     //
     // reverse_one_ad
     let reverse_one_ad = &atom_eval.reverse_one_ad;
@@ -903,40 +785,41 @@ where
     }
     let reverse_one_ad = reverse_one_ad.unwrap();
     //
-    // call_adomain_zero
-    let acop = call_domain_acop(cop, arg, n_dom, is_arg_var);
-    let call_adomain_zero = call_domain_zero_ad(
-        avar_both, &acop, arg, n_dom, is_arg_var
+    // adomain_zero
+    let acop = domain_acop(cop, arg, arg_type, n_dom);
+    let adomain_zero = domain_zero_ad(
+        adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
-    // call_range_one
+    // arange_one
     let zero_v : V    = 0f32.into();
     let azero         = ad_from_value(zero_v);
-    let mut call_arange_one : Vec<& AD<V>> = Vec::with_capacity( n_res );
+    let mut arange_one : Vec<& AD<V>> = Vec::with_capacity( n_res );
     let mut j_res = 0;
     for i_res in 0 .. n_res {
-        if is_res_var[i_res] {
-            call_arange_one.push( &avar_one[res + j_res] );
+        if res_ad_type[i_res].is_variable() {
+            arange_one.push( &avar_one[res + j_res] );
             j_res += 1;
         } else {
-            call_arange_one.push( &azero );
+            arange_one.push( &azero );
         }
     }
     // There must be at least one variable result,
     // or this call would not be in the variable operation sequence:
     assert!( 0 < j_res );
     //
-    // call_adomain_one
-    let call_adomain_one = reverse_one_ad(
-        &call_adomain_zero, call_arange_one, call_info, trace
+    // adomain_one
+    let adomain_one = reverse_one_ad(
+        &adomain_zero, arange_one, call_info, trace
     );
-    assert_eq!( call_adomain_one.len(), n_dom);
+    assert_eq!( adomain_one.len(), n_dom);
     //
     // avar_one
     for i_arg in 0 .. n_dom {
-        let index = arg[6 + i_arg] as usize;
-        if is_arg_var[i_arg] {
-            avar_one[index] += &call_adomain_one[i_arg];
+        let index   = arg[6 + i_arg] as usize;
+        let ad_type = arg_type[6 + i_arg].clone();
+        if ad_type.is_variable() {
+            avar_one[index] += &adomain_one[i_arg];
         }
     }
 }
@@ -980,7 +863,7 @@ fn call_arg_var_index(
 pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
     V : Clone + From<f32> + PartialEq + AtomEvalVec + ThisThreadTapePublic,
-    for<'a> V : std::ops::AddAssign<&'a V> ,
+    for<'a> V : AddAssign<&'a V> ,
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
         name              : "call" ,
@@ -1003,8 +886,8 @@ where
         forward_var_ad    : no_op_var::<V, AD<V> >,
         forward_der_value : no_op_der::<V, V>,
         forward_der_ad    : no_op_der::<V, AD<V> >,
-        reverse_1_value   : no_op_one::<V, V>,
-        reverse_1_ad      : no_op_one::<V, AD<V> >,
+        reverse_1_value   : no_op_der::<V, V>,
+        reverse_1_ad      : no_op_der::<V, AD<V> >,
         rust_src          : no_op_rust_src::<V>,
         arg_var_index     : no_op_arg_var_index,
     };
@@ -1035,7 +918,8 @@ fn no_op_var<V, E>(
 ) { }
 //
 // no_op_der
-/// [ForwardVar](crate::op::info::ForwardVar) function
+/// [ForwardDer](crate::op::info::ForwardDer) or
+/// [ReverseDer](crate::op::info::ReverseDer) function
 fn no_op_der<V, E>(
     _dyp_both : &Vec<E>     ,
     _var_both : &Vec<E>     ,
@@ -1044,18 +928,6 @@ fn no_op_der<V, E>(
     _flag     : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
-    _res      : usize       ,
-) { }
-//
-// no_op_one
-/// [ForwardDer](crate::op::info::ForwardDer) or
-/// [ReverseOne](crate::op::info::ReverseOne) function
-fn no_op_one<V, E>(
-    _var_both : &Vec<E>     ,
-    _var_one  : &mut Vec<E> ,
-    _cop      : &Vec<V>     ,
-    _flag     : &Vec<bool>  ,
-    _arg      : &[IndexT]   ,
     _res      : usize       ,
 ) { }
 //

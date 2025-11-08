@@ -33,7 +33,6 @@ use crate::op::info::{
     panic_dyp,
     panic_var,
     panic_der,
-    panic_one,
     no_rust_src,
 };
 use crate::op::id::{
@@ -45,7 +44,7 @@ use crate::op::id::{
 #[cfg(doc)]
 use crate::op::info::{
     ForwardDer,
-    ReverseOne,
+    ReverseDer,
 };
 // -------------------------------------------------------------------------
 // add_pv_rust_src
@@ -124,54 +123,60 @@ where
 // ---------------------------------------------------------------------------
 //
 // add_pv_reverse_1
-/// first order reverse for parameter + variable; see [ReverseOne]
+/// first order reverse for parameter + variable; see [ReverseDer]
 fn add_pv_reverse_1 <V, E>(
+    _dyp_both  :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
-    var_one    :   &mut Vec<E> ,
+    var_der    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
-    res        :       usize   )
+    _arg_type  :   &[ADType]   ,
+    res        :   usize       )
 where
     for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let rhs = arg[1] as usize;
     //
-    // var_one[rhs] += &var_one[res];
-    let sum      = &var_one[rhs] + &var_one[res];
-    var_one[rhs] = sum;
+    // var_der[rhs] += &var_der[res];
+    let sum      = &var_der[rhs] + &var_der[res];
+    var_der[rhs] = sum;
 }
 //
 // add_vp_reverse_1
-/// first order reverse for variable + parameter; see [ReverseOne]
+/// first order reverse for variable + parameter; see [ReverseDer]
 fn add_vp_reverse_1 <V, E>(
+    _dyp_both  :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
-    var_one    :   &mut Vec<E> ,
+    var_der    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
-    res        :       usize   )
+    _arg_type  :   &[ADType]   ,
+    res        :   usize       )
 where
     for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     //
-    // var_one[lhs] += &var_one[res];
-    let sum      = &var_one[lhs] + &var_one[res];
-    var_one[lhs] = sum;
+    // var_der[lhs] += &var_der[res];
+    let sum      = &var_der[lhs] + &var_der[res];
+    var_der[lhs] = sum;
 }
 //
 // add_vv_reverse_1
-/// first order reverse for variable + variable; see [ReverseOne]
+/// first order reverse for variable + variable; see [ReverseDer]
 fn add_vv_reverse_1 <V, E>(
+    _dyp_both  :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
-    var_one    :   &mut Vec<E> ,
+    var_der    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
     _flag      :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
-    res        :       usize   )
+    _arg_type  :   &[ADType]   ,
+    res        :   usize       )
 where
     for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
 {
@@ -179,12 +184,12 @@ where
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
     //
-    // var_one[lhs] += &var_one[res];
-    // var_one[rhs] += &var_one[res];
-    let sum      = &var_one[rhs] + &var_one[res];
-    var_one[rhs] = sum;
-    let sum      = &var_one[lhs] + &var_one[res];
-    var_one[lhs] = sum;
+    // var_der[lhs] += &var_der[res];
+    // var_der[rhs] += &var_der[res];
+    let sum      = &var_der[rhs] + &var_der[res];
+    var_der[rhs] = sum;
+    let sum      = &var_der[lhs] + &var_der[res];
+    var_der[lhs] = sum;
 }
 // ---------------------------------------------------------------------------
 // set_op_info
@@ -210,8 +215,8 @@ where
         forward_var_ad    : panic_var::<V, AD<V> >,
         forward_der_value : panic_der::<V, V>,
         forward_der_ad    : panic_der::<V, AD<V> >,
-        reverse_1_value   : panic_one::<V, V>,
-        reverse_1_ad      : panic_one::<V, AD<V> >,
+        reverse_1_value   : panic_der::<V, V>,
+        reverse_1_ad      : panic_der::<V, AD<V> >,
         rust_src          : rust_src_none,
         arg_var_index     : binary::binary_pp_arg_var_index,
     };

@@ -33,11 +33,10 @@ use crate::op::info::{
     panic_dyp,
     panic_var,
     panic_der,
-    panic_one,
     no_forward_der_value,
     no_forward_der_ad,
-    no_reverse_one_value,
-    no_reverse_one_ad,
+    no_reverse_der_value,
+    no_reverse_der_ad,
     no_rust_src,
 };
 use crate::op::id::{
@@ -61,8 +60,8 @@ binary::eval_binary_forward_0!(Div, /);
 //
 no_forward_der_value!(Div);
 no_forward_der_ad!(Div);
-no_reverse_one_value!(Div);
-no_reverse_one_ad!(Div);
+no_reverse_der_value!(Div);
+no_reverse_der_ad!(Div);
 no_rust_src!(Div);
 //
 /// Set the operator information for all the Div operators.
@@ -84,8 +83,8 @@ where
         forward_var_ad    : panic_var::<V, AD<V> >,
         forward_der_value : panic_der::<V, V>,
         forward_der_ad    : panic_der::<V, AD<V> >,
-        reverse_1_value   : panic_one::<V, V>,
-        reverse_1_ad      : panic_one::<V, AD<V> >,
+        reverse_1_value   : panic_der::<V, V>,
+        reverse_1_ad      : panic_der::<V, AD<V> >,
         rust_src          : rust_src_none,
         arg_var_index     : binary::binary_pp_arg_var_index,
     };
@@ -97,8 +96,8 @@ where
         forward_var_ad    : div_pv_forward_0::<V, AD<V> >,
         forward_der_value : forward_der_value_none::<V>,
         forward_der_ad    : forward_der_ad_none::<V>,
-        reverse_1_value   : reverse_one_value_none::<V>,
-        reverse_1_ad      : reverse_one_ad_none::<V>,
+        reverse_1_value   : reverse_der_value_none::<V>,
+        reverse_1_ad      : reverse_der_ad_none::<V>,
         rust_src          : div_pv_rust_src,
         arg_var_index     : binary::binary_pv_arg_var_index,
     };
@@ -110,8 +109,8 @@ where
         forward_var_ad    : div_vp_forward_0::<V, AD<V> >,
         forward_der_value : forward_der_value_none::<V>,
         forward_der_ad    : forward_der_ad_none::<V>,
-        reverse_1_value   : reverse_one_value_none::<V>,
-        reverse_1_ad      : reverse_one_ad_none::<V>,
+        reverse_1_value   : reverse_der_value_none::<V>,
+        reverse_1_ad      : reverse_der_ad_none::<V>,
         rust_src          : div_vp_rust_src,
         arg_var_index     : binary::binary_vp_arg_var_index,
     };
@@ -123,8 +122,8 @@ where
         forward_var_ad    : div_vv_forward_0::<V, AD<V> >,
         forward_der_value : forward_der_value_none::<V>,
         forward_der_ad    : forward_der_ad_none::<V>,
-        reverse_1_value   : reverse_one_value_none::<V>,
-        reverse_1_ad      : reverse_one_ad_none::<V>,
+        reverse_1_value   : reverse_der_value_none::<V>,
+        reverse_1_ad      : reverse_der_ad_none::<V>,
         rust_src          : div_vv_rust_src,
         arg_var_index     : binary::binary_vv_arg_var_index,
     };
