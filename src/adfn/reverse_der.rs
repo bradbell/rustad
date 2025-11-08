@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! Implement the [ADfn] forward_der method (directional derivatives).
+//! Implement the [ADfn] reverse_der method (partial derivatives).
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
@@ -21,19 +21,18 @@ use crate::{
 };
 #[cfg(doc)]
 use crate::adfn::forward_zero::doc_forward_zero;
-//
 // -----------------------------------------------------------------------
-// forward_der
-/// First order forward mode evaluation; i.e., directional derivatives.
+// reverse_der
+/// First order reverse mode evaluation; i.e., a gradient.
 ///
 /// * Syntax :
 /// ```text
-///     range_der = f.forward_der_value(&dyp_both, &var_both, dom_der, trace)
-///     range_der = f.forward_der_ad(&dyp_both, &var_both, dom_der, trace)
+///     dom_der = f.reverse_der_value(&dyp_both, &var_both, range_der, trace)
+///     dom_der = f.reverse_der_ad(&dyp_both, &var_both, range_der, trace)
 /// ```
 ///
 /// * Prototype :
-/// see [ADfn::forward_der_value] and [ADfn::forward_der_ad]
+/// see [ADfn::reverse_der_value] and [ADfn::reverse_der_ad]
 ///
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
@@ -54,17 +53,17 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// This is normally computed by
 /// [forward_var](crate::adfn::forward_var::doc_forward_var) .
 ///
-/// * domain_der :
-/// specifies the domain space direction along which the directional
-/// derivative is evaluated. This is a direction in variable space.
+/// * range_der :
+/// specifies the range space weights that define the scalar function
+/// that this call will evaluate the gradient for.
 ///
 /// * trace :
-/// if true, a trace of the calculations is printed on stdout.
+/// if true, a trace of the operations is printed on stdout.
 ///
-/// * range_der
-/// The return value is the directional derivative; i.e,
+/// The return value *dom_der* is the gradient of *range_der* times
+/// the derivative of f with respect to the variables; i.e.,
 /// ```text
-///     range_der = f_var (dyp_dom, var_dom )  * domain_der
+///     dom_der = range_der * f_var (dyp_dom, var_dom)
 /// ```
 /// Here `f_var` is the derivative of f with respect to the variables,
 /// `dyp_dom` is its value in the call to
@@ -73,7 +72,7 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// [forward_var](crate::adfn::forward_var::doc_forward_var) .
 ///
 /// # Example
-/// Computing one partial derivative using forward_der :
+/// Computing the gradient using reverse_der :
 /// ```
 /// use rustad::start_recording_both;
 /// use rustad::stop_recording;
@@ -81,10 +80,9 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// use rustad::ad_from_value;
 ///
 /// // V
-/// type V = f64;
-/// //
+/// type V = f32;
 /// // f
-/// // f(p, x) = p[0] * p[1] * x[0] * x[1] * x[2]
+/// // f(x) = p[0] * p[1] * x[0] * x[1] * x[2]
 /// let p    : Vec<V>   = vec![ 1.0 , 1.0 ];
 /// let x    : Vec<V>   = vec![ 1.0, 1.0, 1.0 ];
 /// let (ap, ax )       = start_recording_both(p, x);
@@ -94,78 +92,79 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// let ay              = vec![ aprod ];
 /// let f               = stop_recording(ay);
 /// //
-/// // dy = partial f(p, x) w.r.t. x[0]
+/// // dx = derivative of f(p, x) with respect to x
 /// let trace           = false;
 /// let p      : Vec<V> = vec![ 2.0, 3.0 ];
 /// let x      : Vec<V> = vec![ 4.0, 5.0, 6.0 ];
-/// let dyp             = f.forward_dyp_value(p, trace);
-/// let (y, var)        = f.forward_var_value(&dyp, x, trace);
-/// let dx     : Vec<V> = vec![ 1.0, 0.0, 0.0 ];
-/// let dy              = f.forward_der_value(&dyp, &var, dx,  trace);
+/// let dyp             = f.forward_dyp_value(p.clone(), trace);
+/// let (y, var)        = f.forward_var_value(&dyp, x.clone(), trace);
+/// let dy     : Vec<V> = vec![ 1.0 ];
+/// let dx              = f.reverse_der_value(&dyp, &var, dy,  trace);
 /// //
-/// // check
-/// // derivative w.r.t x[0] is p[0] * p[1] * x[1] * x[2] * x[3]
-/// assert_eq!( dy[0] , 2.0 * 3.0 * 5.0 * 6.0 );
+/// assert_eq!( dx[0] , p[0] * p[1] * x[1] * x[2] );
+/// assert_eq!( dx[1] , p[0] * p[1] * x[0] * x[2] );
+/// assert_eq!( dx[2] , p[0] * p[1] * x[0] * x[1] );
 /// ```
 ///
-pub fn doc_forward_der() { }
+pub fn doc_reverse_der() { }
 //
-/// Create the first order forward mode member functions.
+/// Create the first order reverse mode member functions.
 ///
-/// * suffix : is either `value` or `ad` ;
-/// * V      : see [doc_generic_v]
-/// * E      : see [doc_generic_e] .
+/// * suffix :
+/// is either `value` or `ad` ;
 ///
+/// * V : see [doc_generic_v]
+///
+/// * E : see [doc_generic_e] .
 /// If *suffix* is `value` , *E must be be the value type *V* .
 /// If *suffix* is `ad` , *E must be be the type `AD<V>` .
 ///
-/// See [doc_forward_der]
-macro_rules! forward_der {
+/// See [doc_reverse_der]
+macro_rules! reverse_der {
     ( $suffix:ident, $V:ident, $E:ty ) => { paste::paste! {
         #[doc = concat!(
-            " `", stringify!($E), "` evaluation of first order forward mode; ",
-            "see [doc_forward_der]",
+            " `", stringify!($E), "` evaluation of first order reverse mode; ",
+            "see [doc_reverse_der]",
         )]
-        pub fn [< forward_der_ $suffix >] (
+        pub fn [< reverse_der_ $suffix >] (
             &self,
-            dyp_both    : &Vec<$E>     ,
-            var_both    : &Vec<$E>     ,
-            dom_der     : Vec<$E>      ,
-            trace       : bool         ,
+            dyp_both    : &Vec<$E>  ,
+            var_both    : &Vec<$E>  ,
+            range_der   : Vec<$E>   ,
+            trace       : bool      ,
         ) -> Vec<$E>
         {
             // n_var
             let n_var = self.var.n_dom + self.var.n_dep;
             //
-            // n_dyp
-            let n_dyp = self.dyp.n_dom + self.dyp.n_dep;
-            //
-            assert_eq!( dyp_both.len(), n_dyp,
-                "f.forward_der: dyp_both vector length does not match f"
+            assert_eq!(
+                range_der.len(), self.range_ad_type.len(),
+                "f.reverse_der: range vector length does not match f"
             );
             assert_eq!(
-                var_both.len(), n_var,
-                "f.forward_der: var_both vector length does not match f"
-            );
-            //
-            assert_eq!(
-                dom_der.len(), self.var.n_dom,
-                "f.forward_der: dom_der vector length does not match f"
+                 var_both.len(), n_var,
+                "f.reverse_der:  var_both does not have the proper length"
             );
             //
             // op_info_vec
             let op_info_vec = &*GlobalOpInfoVec::get();
             //
             // zero_e
-            let zero_e        : $E = eval_from_f32!($suffix, $V, f32::NAN);
+            let zero_e : $E = eval_from_f32!($suffix, $V, 0 as f32);
             //
             // var_der
-            let nan_e         : $E = eval_from_f32!($suffix, $V, f32::NAN);
-            let mut var_der        = dom_der;
-            var_der.resize( n_var, nan_e );
+            let mut var_der       = vec![ zero_e; n_var ];
+            let mut mut_range_der = range_der;
+            for i in (0 .. self.range_ad_type.len()).rev() {
+                let y_i = mut_range_der.pop().unwrap();
+                if self.range_ad_type[i].is_variable() {
+                    let index = self.range_index[i] as usize;
+                    var_der[index] = y_i;
+                }
+            }
             //
             if trace {
-                println!( "Begin Trace: forward_der: n_var = {}", n_var);
+                println!( "Begin Trace: reverse_der: n_var = {}", n_var);
                 println!( "index, flag" );
                 for j in 0 .. self.var.flag.len() {
                     println!( "{}, {}", j, self.var.flag[j] );
@@ -175,26 +174,29 @@ macro_rules! forward_der {
                     println!( "{}, {}", j, self.cop[j] );
                 }
                 println!( "index, dyp_both" );
-                for j in 0 .. n_dyp {
+                for j in 0 .. dyp_both.len() {
                     println!( "{}, {}", j, dyp_both[j] );
                 }
-                println!( "var_index, var_dom, dom_der" );
-                for j in 0 .. self.var.n_dom {
-                    println!( "{}, {}, {}", j, var_both[j], var_der[j] );
+                println!( "var_index, range_der" );
+                for i in 0 .. self.range_ad_type.len() {
+                    if self.range_ad_type[i].is_variable() {
+                        let index = self.range_index[i] as usize;
+                        println!( "{}, {}", index,  var_der[index] );
+                    }
                 }
                 println!( "var_index, var_both, var_der, op_name, arg" );
             }
             //
             // var_der
-            for op_index in 0 .. self.var.id_seq.len() {
-                let op_id    = self.var.id_seq[op_index] as usize;
-                let start    = self.var.arg_seq[op_index] as usize;
-                let end      = self.var.arg_seq[op_index + 1] as usize;
-                let arg      = &self.var.arg_all[start .. end];
+            for op_index in ( 0 .. self.var.id_seq.len() ).rev() {
+                let op_id = self.var.id_seq[op_index] as usize;
+                let start = self.var.arg_seq[op_index] as usize;
+                let end   = self.var.arg_seq[op_index + 1] as usize;
+                let arg   = &self.var.arg_all[start .. end];
                 let arg_type = &self.var.arg_type[start .. end];
-                let res      = self.var.n_dom + op_index;
-                let forward_der = op_info_vec[op_id].[< forward_der_ $suffix >];
-                forward_der(
+                let res   = self.var.n_dom + op_index;
+                let reverse_1 = op_info_vec[op_id].[< reverse_der_ $suffix >];
+                reverse_1(
                     &dyp_both,
                     &var_both,
                     &mut var_der,
@@ -212,27 +214,15 @@ macro_rules! forward_der {
                 }
             }
             if trace {
-                println!( "range_index, var_index, con_index" );
-                for i in 0 .. self.range_ad_type.len() {
-                    let index = self.range_index[i] as usize;
-                    if self.range_ad_type[i].is_variable() {
-                        println!( "{}, {}, ----", i, index);
-                    } else {
-                        println!( "{}, ---- ,{}", i, index);
-                    }
-                }
-                println!( "End Trace: forward_der" );
+                println!( "End Trace: reverse_der" );
             }
-            let mut range_one : Vec<$E> = Vec::new();
-            for i in 0 .. self.range_ad_type.len() {
-                let index = self.range_index[i] as usize;
-                if self.range_ad_type[i].is_variable() {
-                    range_one.push( var_der[index].clone() );
-                } else {
-                    range_one.push( zero_e.clone() );
-                }
-            }
-            range_one
+            //
+            // domain_der
+            let nan_e  : $E    = eval_from_f32!($suffix, $V,  f32::NAN);
+            let mut domain_der = var_der;
+            domain_der.resize(self.var.n_dom, nan_e);
+            domain_der.shrink_to_fit();
+            domain_der
         }
     }
 } }
@@ -241,7 +231,7 @@ impl<V> ADfn<V>
 where
     V     : From<f32> + Clone + std::fmt::Display + GlobalOpInfoVec,
 {   //
-    // forward_der
-    forward_der!( value, V, V );
-    forward_der!( ad,    V, AD::<V> );
+    // reverse_der
+    reverse_der!( value, V, V );
+    reverse_der!( ad,    V, AD::<V> );
 }
