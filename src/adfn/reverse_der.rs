@@ -23,7 +23,7 @@ use crate::{
 use crate::adfn::forward_zero::doc_forward_zero;
 // -----------------------------------------------------------------------
 // reverse_der
-/// First order reverse mode evaluation; i.e., a gradient.
+/// First order reverse mode evaluation with dynamic parameters.
 ///
 /// * Syntax :
 /// ```text

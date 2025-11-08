@@ -24,12 +24,12 @@ use crate::{
 use crate::adfn::forward_zero::doc_forward_zero;
 // -----------------------------------------------------------------------
 // reverse_one
-/// First order reverse mode evaluation; i.e., partial derivatives.
+/// First order reverse mode evaluation with no dynamic parameters.
 ///
 /// * Syntax :
 /// ```text
-///     domain_one = f.reverse_one_value(&var_both, range_one, trace)
-///     domain_one = f.reverse_one_ad(   &var_both, range_one, trace)
+///     dom_der = f.reverse_one_value(&var_both, range_der, trace)
+///     dom_der = f.reverse_one_ad(&var_both, range_der, trace)
 /// ```
 ///
 /// * Prototype :
@@ -37,29 +37,12 @@ use crate::adfn::forward_zero::doc_forward_zero;
 ///
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
+/// * f : is an [ADfn] object.
 ///
-/// ## f
-/// is an [ADfn] object.
-///
-/// ## var_both
-/// must be the *var_both* computed by a previous call to forward_zero.
-///
-/// ## range_one
-/// specifies the range space weights that define the scalar function
-/// for this reverse mode calculation.
-///
-/// ## trace
-/// if true, a trace of the operations is printed on stdout.
-///
-///
-/// ## domain_one
-/// The return value is the partial derivative
-/// ```text
-///     domain_one = range_one * f'(domain_zero)
-/// ```
-/// Here `f'` is the derivative of the function and
-/// [domain_zero](doc_forward_zero#domain_zero) is its value in the call to
-/// forward_zero that created the *var_both* .
+/// * Other Arguments :
+/// This is a wrapper for
+/// [reverse_der](crate::adfn::reverse_der::doc_reverse_der)
+/// that fills in an empty vector for dyp_both
 ///
 /// # Example
 /// Computing all the partial derivatives using reverse_one :
@@ -119,7 +102,7 @@ macro_rules! reverse_one {
         pub fn [< reverse_one_ $suffix >] (
             &self,
             var_both    : &Vec<$E>  ,
-            range_one   : Vec<$E>   ,
+            range_der   : Vec<$E>   ,
             trace       : bool      ,
         ) -> Vec<$E>
         {
@@ -127,7 +110,7 @@ macro_rules! reverse_one {
             let n_var = self.var.n_dom + self.var.n_dep;
             //
             assert_eq!(
-                range_one.len(), self.range_ad_type.len(),
+                range_der.len(), self.range_ad_type.len(),
                 "f.reverse_one: range vector length does not match f"
             );
             assert_eq!(
@@ -138,11 +121,11 @@ macro_rules! reverse_one {
             // dyp_both
             let dyp_both : Vec<$E> = Vec::new();
             //
-            // domain_one
-            let domain_one = self.[< reverse_der_ $suffix >](
-                &dyp_both, &var_both, range_one, trace
+            // dom_der
+            let dom_der = self.[< reverse_der_ $suffix >](
+                &dyp_both, &var_both, range_der, trace
             );
-            domain_one
+            dom_der
         }
     }
 } }
