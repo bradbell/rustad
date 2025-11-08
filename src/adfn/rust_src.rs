@@ -22,7 +22,7 @@ use crate::op::info::GlobalOpInfoVec;
 use crate::{
     doc_generic_v,
     doc_generic_e,
-    RustSrcFn,
+    RustSrcLink,
 };
 // -----------------------------------------------------------------------
 // prototype
@@ -76,7 +76,7 @@ where
     /// If the return matches Err, msg is the corresponding error message.
     ///
     /// * Prototype :
-    /// see [RustSrcFn] .
+    /// see [RustSrcLink] .
     ///
     pub fn rust_src(&self, fn_name : &str) -> String {
         //

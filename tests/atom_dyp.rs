@@ -29,7 +29,7 @@ use rustad::{
     stop_recording,
     call_atom,
     get_lib,
-    RustSrcFn,
+    RustSrcLink,
     get_rust_src_fn,
 };
 //
@@ -250,7 +250,7 @@ fn atom_dyp() {
     let lib         = get_lib(src_file, lib_file, replace_lib);
     //
     // h_fn
-    let h_fn : RustSrcFn<V> = get_rust_src_fn(&lib, &fn_name);
+    let h_fn : RustSrcLink<V> = get_rust_src_fn(&lib, &fn_name);
     //
     // p_ref, x_ref
     let mut p_ref : Vec<&V> = Vec::new();

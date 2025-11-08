@@ -16,7 +16,7 @@ use rustad::{
     stop_recording,
     call_atom,
     get_lib,
-    RustSrcFn,
+    RustSrcLink,
     get_rust_src_fn,
 };
 //
@@ -147,7 +147,7 @@ fn main() {
     let lib         = get_lib(src_file, lib_file, replace_lib);
     //
     // sumsq_fn
-    let sumsq_fn : RustSrcFn<V> = get_rust_src_fn(&lib, &fn_name);
+    let sumsq_fn : RustSrcLink<V> = get_rust_src_fn(&lib, &fn_name);
     //
     // p_ref, x_ref
     let p_ref     : Vec<&V> = Vec::new();

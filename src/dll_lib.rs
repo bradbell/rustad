@@ -91,12 +91,12 @@ pub fn get_lib(
     lib
 }
 //
-// RustSrcFn
+// RustSrcLink
 /// This type is used for function like objects in a dll library.
 ///
-/// If rust_src_fn is a `RustSrcFn<V>` object, it acts like a
+/// If rust_src_fn is a `RustSrcLink<V>` object, it acts like a
 /// [ADfn::rust_src] function.
-pub type RustSrcFn<'a, V> = libloading::Symbol<'a,
+pub type RustSrcLink<'a, V> = libloading::Symbol<'a,
     fn(
         dyp_dom      : &Vec<&V>,
         var_dom      : &Vec<&V>,
@@ -115,14 +115,14 @@ pub type RustSrcFn<'a, V> = libloading::Symbol<'a,
 pub fn get_rust_src_fn<'a, V>(
     lib     : &'a libloading::Library,
     fn_name : &'a str,
-) -> RustSrcFn<'a, V> {
+) -> RustSrcLink<'a, V> {
     //
     // full_name
     let full_name = String::from("rust_src_") + fn_name;
     let full_name = full_name.as_bytes();
     //
     // rust_src_fn
-    let rust_src_fn : RustSrcFn<V>;
+    let rust_src_fn : RustSrcLink<V>;
     unsafe {
         let result = lib.get(full_name);
         if result.is_err() {

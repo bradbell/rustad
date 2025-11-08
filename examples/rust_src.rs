@@ -10,7 +10,7 @@ use rustad::{
     start_recording,
     stop_recording,
     get_lib,
-    RustSrcFn,
+    RustSrcLink,
     get_rust_src_fn,
     ad_from_vector,
 };
@@ -69,10 +69,10 @@ fn main () {
     let lib         = get_lib(src_file, lib_file, replace_lib);
     //
     // sumsq_fn
-    let sumsq_reverse_one_fn : RustSrcFn<V> = get_rust_src_fn(&lib, &gn_name);
+    let sumsq_reverse_one_fn : RustSrcLink<V> = get_rust_src_fn(&lib, &gn_name);
     //
     // p_ref, x_ref
-    let p_ref     : Vec<&V> = Vec::new(); 
+    let p_ref     : Vec<&V> = Vec::new();
     let x         : Vec<V>  = vec![ 3.0 as V; nx ];
     let mut x_ref : Vec<&V> = Vec::new();
     for x_j in x.iter() {
