@@ -124,8 +124,8 @@ fn register_h()-> IndexT {
         forward_der_value    :  None,
         forward_der_ad       :  None,
         //
-        reverse_one_value    :  None,
-        reverse_one_ad       :  None,
+        reverse_der_value    :  None,
+        reverse_der_ad       :  None,
     };
     //
     // h__atom_id

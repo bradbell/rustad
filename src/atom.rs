@@ -185,10 +185,10 @@ pub type AtomForwardOneAD<V> = fn(
 // -------------------------------------------------------------------------
 //
 // AtomReverseOneValue
-/// Callback to atomic functions during reverse_one_value
+/// Callback to atomic functions during reverse_der_value
 ///
 /// * Required :
-/// If you do not use this atomic function with [ADfn::reverse_one_value],
+/// If you do not use this atomic function with [ADfn::reverse_der_value],
 /// its corresponding value in [AtomEval] can be None.
 ///
 /// * range_der :
@@ -209,10 +209,10 @@ pub type AtomReverseOneValue<V> = fn(
 ) -> Vec<V> ;
 //
 // AtomReverseOneAD
-/// Callback to atomic functions during reverse_one_ad
+/// Callback to atomic functions during reverse_der_ad
 ///
 /// * Required :
-/// If you do not use this atomic function with [ADfn::reverse_one_ad],
+/// If you do not use this atomic function with [ADfn::reverse_der_ad],
 /// its corresponding value in [AtomEval] can be None.
 ///
 /// * range_der :
@@ -248,8 +248,8 @@ pub struct AtomEval<V> {
     pub forward_der_value    : Option< AtomForwardOneValue::<V> > ,
     pub forward_der_ad       : Option< AtomForwardOneAD::<V> >    ,
     //
-    pub reverse_one_value    : Option< AtomReverseOneValue::<V> > ,
-    pub reverse_one_ad       : Option< AtomReverseOneAD::<V> >    ,
+    pub reverse_der_value    : Option< AtomReverseOneValue::<V> > ,
+    pub reverse_der_ad       : Option< AtomReverseOneAD::<V> >    ,
     //
 }
 // ----------------------------------------------------------------------------

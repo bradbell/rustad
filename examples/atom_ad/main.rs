@@ -12,7 +12,7 @@ z = g(x) = x[0] * x[0] + x[1] * x[1] + ...
 sumsq_forward_der: see forward_one.rs
 dz = g'(x) * dx = 2 * ( x[0] * dx[0] + x[1] * dx[1] + ... )
 
-sumsq_reverse_one; see reverse_one.rs
+sumsq_reverse_der; see reverse_one.rs
 dx^T = dz * g'(x) = 2 * dz * ( x[0], x[1], ... )
 
 for_sumsq_forward_fun; see for_atom.rs
@@ -61,12 +61,12 @@ use forward_der::{
     sumsq_forward_der_ad,
 };
 //
-// sumsq_reverse_one_value
-// sumsq_reverse_one_ad
-mod reverse_one;
-use reverse_one::{
-    sumsq_reverse_one_value,
-    sumsq_reverse_one_ad,
+// sumsq_reverse_der_value
+// sumsq_reverse_der_ad
+mod reverse_der;
+use reverse_der::{
+    sumsq_reverse_der_value,
+    sumsq_reverse_der_ad,
 };
 //
 // sumsq_forward_type
@@ -97,8 +97,8 @@ fn register_sumsq_atom()-> IndexT {
         forward_der_value    :  Some( sumsq_forward_der_value ),
         forward_der_ad       :  Some( sumsq_forward_der_ad ),
         //
-        reverse_one_value    :  Some( sumsq_reverse_one_value ),
-        reverse_one_ad       :  Some( sumsq_reverse_one_ad ),
+        reverse_der_value    :  Some( sumsq_reverse_der_value ),
+        reverse_der_ad       :  Some( sumsq_reverse_der_ad ),
     };
     //
     // sumsq_atom_id
@@ -127,6 +127,6 @@ fn main() {
     tests::callback_forward_der_value(sumsq_atom_id,  call_info, trace);
     tests::callback_forward_der_ad(sumsq_atom_id,  call_info, trace);
     //
-    tests::callback_reverse_one_value(sumsq_atom_id,  call_info, trace);
-    tests::callback_reverse_one_ad(sumsq_atom_id,  call_info, trace);
+    tests::callback_reverse_der_value(sumsq_atom_id,  call_info, trace);
+    tests::callback_reverse_der_ad(sumsq_atom_id,  call_info, trace);
 }

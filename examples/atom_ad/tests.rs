@@ -120,15 +120,15 @@ pub fn callback_forward_der_ad(
     let dy               = g.forward_one_value(&v , dx2.clone(), trace);
     assert_eq!( dy[0], 2.0 * ( dx2[0] * dx1[0] + dx2[1] * dx1[1] ) );
     //
-    // check reverse_one_value
+    // check reverse_der_value
     let dy     : Vec<V> = vec![ 9.0 ];
     let dx              = g.reverse_one_value(&v , dy.clone(), trace);
     assert_eq!( dx[0], 2.0 * dy[0] * dx1[0] );
     assert_eq!( dx[1], 2.0 * dy[0] * dx1[1] );
 }
 //
-// callback_reverse_one_value
-pub fn callback_reverse_one_value(
+// callback_reverse_der_value
+pub fn callback_reverse_der_value(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
@@ -145,8 +145,8 @@ pub fn callback_reverse_one_value(
     assert_eq!( dx[1], 2.0 * x[1]*dy[0] );
 }
 //
-// callback_reverse_one_ad
-pub fn callback_reverse_one_ad(
+// callback_reverse_der_ad
+pub fn callback_reverse_der_ad(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
@@ -162,7 +162,7 @@ pub fn callback_reverse_one_ad(
     let ady1             = ad_from_vector(dy1.clone());
     //
     // g
-    // callback to sumsq_reverse_one_ad
+    // callback to sumsq_reverse_der_ad
     // g(x) = dy1 * f'(x) = 2 * ( dy1[0] * x[0], dy1[0] * x[1], ... )
     let adx              = f.reverse_one_ad(&av, ady1, trace);
     let g                = stop_recording(adx);
@@ -181,7 +181,7 @@ pub fn callback_reverse_one_ad(
     assert_eq!( dy[0], 2.0 * dy1[0] * dx[0] );
     assert_eq!( dy[1], 2.0 * dy1[0] * dx[1] );
     //
-    // check reverse_one_value
+    // check reverse_der_value
     let dy2  : Vec<V> = vec![ 8.0, 9.0 ];
     let dx            = g.reverse_one_value(&v, dy2.clone(), trace);
     assert_eq!( dx[0], 2.0 * dy1[0] * dy2[0] );

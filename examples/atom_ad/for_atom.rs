@@ -10,7 +10,7 @@ dz = g_x(x, y) * dx + g_y(x, y) * dy
    = 2 * ( dx[0] *  y[0] + dx[1] *  y[1] + ... )
    + 2 * (  x[0] * dy[0] +  x[1] * dy[1] + ... )
 
-for_sumsq_reverse_one
+for_sumsq_reverse_der
 dx^T = dz * g_x(x, y) = 2 * dz * ( y[0], y[1], ... )
 dy^T = dz * g_y(x, y) = 2 * dz * ( x[0], x[1], ... )
 */
@@ -88,8 +88,8 @@ fn for_sumsq_forward_der_value(
     vec![ dz ]
 }
 //
-// for_sumsq_reverse_one_value
-fn for_sumsq_reverse_one_value(
+// for_sumsq_reverse_der_value
+fn for_sumsq_reverse_der_value(
     domain_zero : &Vec<&V>  ,
     range_one   : Vec<&V>   ,
     _call_info  : IndexT    ,
@@ -151,8 +151,8 @@ pub fn register_for_sumsq_atom()-> IndexT {
         forward_der_value    :  Some( for_sumsq_forward_der_value ),
         forward_der_ad       :  None,
         //
-        reverse_one_value    :  Some( for_sumsq_reverse_one_value ),
-        reverse_one_ad       :  None,
+        reverse_der_value    :  Some( for_sumsq_reverse_der_value ),
+        reverse_der_ad       :  None,
     };
     //
     // for_sumsq_atom_id

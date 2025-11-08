@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 /*
-sumsq_reverse_one
+sumsq_reverse_der
 dx^T = dy * g'(x) = 2 * dy * ( x[0], x[1], ... )
 */
 //
@@ -18,8 +18,8 @@ use super::{
     ATOM_ID_VEC,
 };
 //
-// sumsq_reverse_one_value
-pub fn sumsq_reverse_one_value(
+// sumsq_reverse_der_value
+pub fn sumsq_reverse_der_value(
     domain_zero  : &Vec<&V>    ,
     range_one    : Vec<&V>     ,
     _call_info   : IndexT      ,
@@ -38,20 +38,20 @@ pub fn sumsq_reverse_one_value(
         domain_one.push( &two_v * &( domain_zero[j] * range_one[0] ) );
     }
     if trace {
-        println!("Begin Trace: sumsq_reverse_one_value");
+        println!("Begin Trace: sumsq_reverse_der_value");
         println!("range_one = [ {} ]", range_one[0]);
         print!("domain_one = [ ");
         for j in 0 .. domain_one.len() {
                 print!("{}, ", domain_one[j]);
         }
         println!("]");
-        println!("End Trace: sumsq_reverse_one_value");
+        println!("End Trace: sumsq_reverse_der_value");
     }
     domain_one
 }
 //
-// sumsq_reverse_one_ad
-pub fn sumsq_reverse_one_ad(
+// sumsq_reverse_der_ad
+pub fn sumsq_reverse_der_ad(
     domain_zero  : &Vec<& AD<V> >    ,
     range_one    : Vec<& AD<V> >     ,
     call_info    : IndexT            ,
@@ -80,7 +80,7 @@ pub fn sumsq_reverse_one_ad(
     let domain_one = call_atom(rev_domain_zero, atom_id, call_info, trace);
     //
     if trace {
-        println!("Begin Trace: sumsq_reverse_one_ad");
+        println!("Begin Trace: sumsq_reverse_der_ad");
         print!("domain_zero = [ ");
         for j in 0 .. n_domain {
                 print!("{}, ", domain_zero[j]);
@@ -92,7 +92,7 @@ pub fn sumsq_reverse_one_ad(
                 print!("{}, ", domain_one[j]);
         }
         println!("]");
-        println!("End Trace: sumsq_reverse_one_ad");
+        println!("End Trace: sumsq_reverse_der_ad");
     }
     domain_one
 }

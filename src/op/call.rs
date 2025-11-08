@@ -694,15 +694,15 @@ where
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
-    // reverse_one_value
-    let reverse_one_value = &atom_eval.reverse_one_value;
-    if reverse_one_value.is_none() {
+    // reverse_der_value
+    let reverse_der_value = &atom_eval.reverse_der_value;
+    if reverse_der_value.is_none() {
         panic!(
-            "{}: reverse_one_value not implemented for this atomic function",
+            "{}: reverse_der_value not implemented for this atomic function",
             atom_eval.name,
         );
     }
-    let reverse_one_value = reverse_one_value.unwrap();
+    let reverse_der_value = reverse_der_value.unwrap();
     //
     // domain_zero
     let domain_zero = domain_zero_value(
@@ -726,7 +726,7 @@ where
     assert!( 0 < j_res );
     //
     // domain_one
-    let domain_one = reverse_one_value(
+    let domain_one = reverse_der_value(
         &domain_zero, range_one, call_info, trace
     );
     assert_eq!( domain_one.len(), n_dom);
@@ -768,15 +768,15 @@ where
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
-    // reverse_one_ad
-    let reverse_one_ad = &atom_eval.reverse_one_ad;
-    if reverse_one_ad.is_none() {
+    // reverse_der_ad
+    let reverse_der_ad = &atom_eval.reverse_der_ad;
+    if reverse_der_ad.is_none() {
         panic!(
-            "{}: reverse_one_ad not implemented for this atomic function",
+            "{}: reverse_der_ad not implemented for this atomic function",
             atom_eval.name,
         );
     }
-    let reverse_one_ad = reverse_one_ad.unwrap();
+    let reverse_der_ad = reverse_der_ad.unwrap();
     //
     // adomain_zero
     let acop = domain_acop(cop, arg, arg_type, n_dom);
@@ -802,7 +802,7 @@ where
     assert!( 0 < j_res );
     //
     // adomain_one
-    let adomain_one = reverse_one_ad(
+    let adomain_one = reverse_der_ad(
         &adomain_zero, arange_one, call_info, trace
     );
     assert_eq!( adomain_one.len(), n_dom);

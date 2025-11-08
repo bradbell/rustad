@@ -98,8 +98,8 @@ fn checkpoint_forward_der_value(
     range_one
 }
 //
-// checkpoint_reverse_one_value
-fn checkpoint_reverse_one_value(
+// checkpoint_reverse_der_value
+fn checkpoint_reverse_der_value(
     domain_zero      : &Vec<&V>    ,
     range_one        : Vec<&V>     ,
     call_info        : IndexT      ,
@@ -177,8 +177,8 @@ fn register_checkpoint_atom()-> IndexT {
         forward_der_value    :  Some(checkpoint_forward_der_value),
         forward_der_ad       :  None,
         //
-        reverse_one_value    :  Some(checkpoint_reverse_one_value),
-        reverse_one_ad       :  None,
+        reverse_der_value    :  Some(checkpoint_reverse_der_value),
+        reverse_der_ad       :  None,
     };
     //
     // atom_id
