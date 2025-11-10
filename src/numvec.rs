@@ -18,6 +18,8 @@
 //! * Copy, Clone :
 //!  The NumVec types implement Clone, but not the Copy trait.
 // ---------------------------------------------------------------------------
+// use
+use ordered_float::OrderedFloat;
 //
 // NumVec
 /// The numeric vector type
@@ -307,6 +309,7 @@ impl From<f64> for NumVec<f64> {
 ///
 /// Two NumVec object are equal it they have the same length
 /// and their corresponding elements are equal.
+/// The value Nan is considered equal to itself in the comparison.
 ///
 /// Prototype:
 /// <br/>
@@ -316,29 +319,30 @@ impl From<f64> for NumVec<f64> {
 /// ```
 /// use rustad::NumVec;
 ///
-/// let a = NumVec::new( vec![ 2 as f64, 2 as f64 ] );
-/// let b = NumVec::from(2 as f64 );
-/// let c = NumVec::new( vec![ 2 as f64, 3 as f64 ] );
+/// let a = NumVec::new( vec![ 2.0f64, 2.0f64 ] );
+/// let b = NumVec::new( vec![ f64::NAN, 2.064 ] );
+/// let c = NumVec::new( vec![ f64::NAN, 2.064 ] );
 /// assert_eq!(a, a);
 /// assert_eq!(b, b);
 /// assert_eq!(c, c);
 /// assert_ne!(a, b);
-/// assert_ne!(a, c);
+/// assert_eq!(b, c);
 /// ```
 ///
 impl<S> PartialEq for NumVec<S>
 where
-    S : PartialEq,
+    S : PartialEq + ordered_float::FloatCore,
 {
     fn eq(&self, rhs : &Self) -> bool
     {   let mut result = true;
         if self.len() != rhs.len()  {
             result = false;
         } else if self.len() == 1 {
-            result = self.s == rhs.s;
+            result = OrderedFloat(self.s) == OrderedFloat(rhs.s);
         } else {
             for j in 0 .. self.len() {
-                result = result && self.vec[j] == rhs.vec[j];
+                result = result &&
+                    OrderedFloat(self.vec[j]) == OrderedFloat(rhs.vec[j]);
             }
         }
         result
