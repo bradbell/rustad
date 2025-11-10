@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! Some utilities not specific to implementing the rustd package
+//! This pub module defines utilities not specific to implementing rustd
 //!
 //! Link to [parent module](super)
 // --------------------------------------------------------------------------

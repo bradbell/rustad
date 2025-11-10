@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This module defines the numeric vector class `NumVec` < *S* >.
+//! This pub module defines the numeric vector class `NumVec` < *S* >.
 //!
 //! Link to [parent module](super)
 //!

@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This module defines the automatic differentiation class `AD<V>`.
+//! This pub module defines the automatic differentiation class `AD<V>`.
 //!
 //! Link to [parent module](super)
 //!

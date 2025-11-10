@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! AD function objects
+//! This pub module defines AD function objects
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------

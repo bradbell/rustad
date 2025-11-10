@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! Define tape objects
+//! This pub module defines tape objects and functions
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------

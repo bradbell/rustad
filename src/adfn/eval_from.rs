@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
-//! Define the macros that convert to the evaluation type.
+//! This pub(crate) module defines macros that convert to the evaluation type.
 //!
 //! Link to [parent module](super)
 //

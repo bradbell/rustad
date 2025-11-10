@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
-//! This module compiles and links to a dll library routines.
+//! This pub module compiles and links to a dll library routines.
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------

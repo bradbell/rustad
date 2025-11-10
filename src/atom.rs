@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
-//! This module implements AD atomic functions
+//! This pub module implements AD atomic functions
 //!
 //! They are called atomic functions because they are recorded as a
 //! single operation in tapes and ADfn objects.

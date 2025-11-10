@@ -53,16 +53,16 @@ This package is intended to include most of the features in
     during differeniation.
 
 ## Under Construction
+Reduce tape size both during recording and by
+optimizing the operation sequence. 
+For example: multiplication by the constants zero and one 
+and addition by zero does not need to be recorded.
 
 
 ## Goals Before Stable API
 
 1.  Subtraction, division and all the standard math functions.
     
-2.  Reduce tape size both during recording and by
-    optimizing the operation sequence. For example:
-    multiplication by the constants zero and one and addition by zero does not need to be recorded.
-
 3.  Forward and reverse sparse derivative calculations
     (sparsity patterns are already implemented). 
 

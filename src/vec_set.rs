@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
-//! VecSet a vector of sets class
+//! This pub(crate) module defines VecSet, a vector of sets class
 //!
 //! Link to [parent module](super)
 //

@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
-//! Define the functions and objects used to evaluate an operation sequence.
+//! This pub(crate) module defines the objects used to evaluate an
+//! operation sequence.
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------

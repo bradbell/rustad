@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This module does the necessary setup for the possible value types.
+//! This pub(crate) module does setup for the possible value types.
 //!
 //! Link to [parent module](super)
 //!
