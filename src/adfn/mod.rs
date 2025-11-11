@@ -108,7 +108,8 @@ impl<V> ADfn<V> {
     /// ```
     /// use rustad::adfn::ADfn;
     /// let f : ADfn<f32> = ADfn::new();
-    /// assert_eq!( f.domain_len(), 0 );
+    /// assert_eq!( f.dyp_dom_len() + f.dyp_dep_len(), 0 );
+    /// assert_eq!( f.var_dom_len() + f.var_dep_len(), 0 );
     /// assert_eq!( f.range_len(), 0 );
     /// assert_eq!( f.cop_len(), 0 );
     /// ```
@@ -122,9 +123,21 @@ impl<V> ADfn<V> {
         }
     }
     //
-    // domain_len
-    /// dimension of domain space
-    pub fn domain_len(&self) -> usize { self.dyp.n_dom + self.var.n_dom }
+    // dyp_dom_len
+    /// number of domain dynamic parameters
+    pub fn dyp_dom_len(&self) -> usize { self.dyp.n_dom }
+    //
+    // dyp_dep_len
+    /// number of dependent dynamic parameters
+    pub fn dyp_dep_len(&self) -> usize { self.dyp.n_dep }
+    //
+    // var_dom_len
+    /// number of domain variables
+    pub fn var_dom_len(&self) -> usize { self.var.n_dom }
+    //
+    // var_dep_len
+    /// number of dependent variables
+    pub fn var_dep_len(&self) -> usize { self.var.n_dep }
     //
     // range_len
     /// dimension of range space

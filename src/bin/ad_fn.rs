@@ -64,7 +64,7 @@ fn record_normsq_f64()
 {   NORMSQ_F64.with_borrow_mut( |f_static| {
         let mut f = normsq_fn::<f64>();
         f_static.swap(&mut f);
-        assert_eq!( f_static.domain_len(), N_SUM );
+        assert_eq!( f_static.var_dom_len(), N_SUM );
         assert_eq!( f_static.range_len(), 1 );
     } );
 }
@@ -74,7 +74,7 @@ fn record_normsq_nv_f64()
 {   NORMSQ_NUMVEC_F64.with_borrow_mut( |f_static| {
         let mut f = normsq_fn::< NumVec<f64> >();
         f_static.swap(&mut f);
-        assert_eq!( f_static.domain_len(), N_SUM );
+        assert_eq!( f_static.var_dom_len(), N_SUM );
         assert_eq!( f_static.range_len(), 1 );
     } );
 }
