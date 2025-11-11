@@ -18,7 +18,7 @@ pub trait TypeHash
 }
 //
 // impl_type_hash
-/// Implement the TypeHash trait for the value types S and NumVec<S>
+/// Implement the TypeHash trait for the value types S and NumVec `<S>`
 ///
 /// * S : is f32 or f64
 ///
