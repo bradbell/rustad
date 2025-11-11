@@ -31,6 +31,9 @@ pub mod atom;
 // dll_lib
 pub mod dll_lib;
 //
+// hash
+pub(crate) mod hash;
+//
 // vec_set
 pub(crate) mod vec_set;
 //
@@ -100,6 +103,15 @@ pub trait AtomEvalVecPublic : atom::sealed::AtomEvalVec
 impl<V> AtomEvalVecPublic for V
 where
     V : atom::sealed::AtomEvalVec ,
+{ }
+//
+// TypeHashPublic
+/// This is the public interface to a sealed trait
+pub trait TypeHashPublic : hash::TypeHash
+{ }
+impl<V> TypeHashPublic for V
+where
+    V : hash::TypeHash,
 { }
 // ----------------------------------------------------------------------------
 //

@@ -48,3 +48,6 @@ setup_this_value_type!( NumVec<f64> );
 //
 crate::ad::impl_ad_from_f64!(f64);
 crate::ad::impl_ad_from_f64!( NumVec<f64> );
+//
+crate::hash::impl_value_type_hash!(f32);
+crate::hash::impl_value_type_hash!(f64);

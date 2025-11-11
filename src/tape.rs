@@ -155,7 +155,7 @@ pub (crate) mod sealed {
     /// operations.
     ///
     pub trait ThisThreadTape
-        where
+    where
         Self : Sized + 'static ,
     {
         fn get() -> &'static LocalKey< RefCell< Tape<Self> > >;
