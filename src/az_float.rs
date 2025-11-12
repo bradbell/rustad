@@ -196,3 +196,62 @@ where
     }
 }
 impl<B: PartialEq> Eq for AzFloat<B> { }
+// ---------------------------------------------------------------------------
+impl<B> std::fmt::Display for AzFloat<B>
+where
+    B : std::fmt::Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        AzFloat,
+        start_recording_dyp,
+        stop_recording,
+        ad_from_value,
+    };
+    //
+    #[test]
+    fn az_forward_dyp() {
+        //
+        // V
+        type V = AzFloat<f32>;
+        //
+        // np, nx, p, x
+        let np         = 3;
+        let nx         = 1;
+        let p : Vec<V> = vec![ V::from(1.0) ; np ];
+        let x : Vec<V> = vec![ V::from(1.0) ; nx ];
+        //
+        // asum
+        // The first addition adds the constants zero and so is not recorded
+        let (ap, ax)   = start_recording_dyp(p.clone(), x.clone());
+        let mut asum   = ad_from_value( V::from(0.0) );
+        for j in 0 .. np {
+            asum += &ap[j];
+        }
+        //
+        // f
+        let ay = vec![ &ax[0] * &asum ];
+        let f  = stop_recording(ay);
+        //
+        // dyp_both
+        let trace = true;
+        let dyp_both = f.forward_dyp_value(p.clone(), trace);
+        //
+        assert_eq!( dyp_both.len(), 2 * np - 1 );
+        for j in 0 .. np {
+            assert_eq!( dyp_both[j], p[j] );
+        }
+        let mut sum = p[0];
+        for j in 1 .. np {
+        sum += &p[j];
+            assert_eq!( dyp_both[np + j - 1], sum );
+        }
+    }
+}
