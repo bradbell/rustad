@@ -16,8 +16,8 @@ pub mod utility;
 // az_float
 pub mod az_float;
 //
-// numvec
-pub mod numvec;
+// num_vec
+pub mod num_vec;
 //
 // ad
 pub mod ad;
@@ -55,7 +55,7 @@ pub(crate) mod setup;
 pub use az_float::{
     AzFloat,
 };
-pub use numvec::{
+pub use num_vec::{
     NumVec,
 };
 pub use ad::{

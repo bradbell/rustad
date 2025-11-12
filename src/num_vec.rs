@@ -104,15 +104,15 @@ where
 /// assert_eq!( d.len(), 1);
 /// assert_eq!( d.get(0), -1.0f64 );
 /// ```
-pub fn doc_numvec_binary_op() { }
+pub fn doc_num_vec_binary_op() { }
 //
 /// Add one binary operator to the `NumVec` < *S* > class;
-/// see [doc_numvec_binary_op]
-macro_rules! numvec_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
+/// see [doc_num_vec_binary_op]
+macro_rules! num_vec_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
 
     #[doc = concat!(
         "& `NumVec` < *S* > ", stringify!($Op), " & `NumVec` < *S* >",
-        "; see [doc_numvec_binary_op]"
+        "; see [doc_num_vec_binary_op]"
     )]
     impl<'a, S> std::ops::$Name< &'a NumVec<S> > for &'a NumVec<S>
     where
@@ -153,10 +153,10 @@ macro_rules! numvec_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     }
 } } }
 //
-numvec_binary_op!(Add, +);
-numvec_binary_op!(Sub, -);
-numvec_binary_op!(Mul, *);
-numvec_binary_op!(Div, /);
+num_vec_binary_op!(Add, +);
+num_vec_binary_op!(Sub, -);
+num_vec_binary_op!(Mul, *);
+num_vec_binary_op!(Div, /);
 // ----------------------------------------------------------------------------`
 /// Compound Assignment `NumVec` < *S* > operators.
 ///
@@ -186,15 +186,15 @@ numvec_binary_op!(Div, /);
 /// assert_eq!( b.len(), 1);
 /// assert_eq!( b.get(0), 7.0f64 );
 /// ```
-pub fn doc_numvec_compound_op() { }
+pub fn doc_num_vec_compound_op() { }
 //
 /// Add one compound assignment operator to the `NumVec` < *S* > class;
-/// see [doc_numvec_compound_op]
-macro_rules! numvec_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
+/// see [doc_num_vec_compound_op]
+macro_rules! num_vec_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
 
     #[doc = concat!(
         "`NumVec` < *S* > ", stringify!($Op), " & `NumVec` < *S* >",
-        "; see [doc_numvec_compound_op]"
+        "; see [doc_num_vec_compound_op]"
     )]
     impl<'a, S> std::ops::$Name< &'a NumVec<S> > for NumVec<S>
     where
@@ -227,10 +227,10 @@ macro_rules! numvec_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     }
 } } }
 //
-numvec_compound_op!(AddAssign, +=);
-numvec_compound_op!(SubAssign, -=);
-numvec_compound_op!(MulAssign, *=);
-numvec_compound_op!(DivAssign, /=);
+num_vec_compound_op!(AddAssign, +=);
+num_vec_compound_op!(SubAssign, -=);
+num_vec_compound_op!(MulAssign, *=);
+num_vec_compound_op!(DivAssign, /=);
 // ----------------------------------------------------------------------------`
 /// Displays a `NumVec` < *S* > object.
 ///

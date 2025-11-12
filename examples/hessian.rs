@@ -81,9 +81,9 @@ fn example_hessian () {
     }
 }
 //
-// example_numvec_hessian
+// example_num_vec_hessian
 // Same function where V = NumVec<f64>
-fn example_numvec_hessian () {
+fn example_num_vec_hessian () {
     //
     type F     = f64;
     type V     = NumVec<F>;
@@ -164,5 +164,5 @@ fn example_numvec_hessian () {
 }
 fn main() {
     example_hessian();
-    example_numvec_hessian();
+    example_num_vec_hessian();
 }
