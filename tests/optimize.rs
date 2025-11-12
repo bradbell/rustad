@@ -8,7 +8,7 @@ use rustad::{
     stop_recording,
 };
 //
-// test_zero_one_both_ad
+// test_left_zero_one_both_ad
 fn test_left_zero_one_both_ad() {
     type V      = f64;
     let trace   = false;
@@ -34,7 +34,32 @@ fn test_left_zero_one_both_ad() {
     assert_eq!(y[0], x[0]);
 }
 //
-// test_zero_one_right_ad
+// test_right_zero_one_both_ad
+fn test_right_zero_one_both_ad() {
+    type V      = f64;
+    let trace   = false;
+    //
+    let x  : Vec<V>  = vec![ 3.0 ];
+    //
+    let ax  = start_recording( x.clone() );
+    let a1  = &ax[0] + &ad_from_value(0.0 as V); // optimized to ax[0]
+    let a2  = &a1    * &ad_from_value(1.0 as V); // optimized to ax[0]
+    let a3  = &a2    * &ad_from_value(0.0 as V); // constant 0
+    let a4  = &a2 + &a3;                         // optimized to ax[0]
+    let a5  = &a4    / &ad_from_value(1.0 as V); // optimized to ax[0]
+    let ay  = vec![ a5 ];
+    let f   = stop_recording(ay);
+    //
+    let (y, _)       = f.forward_zero_value(x.clone(), trace);
+    //
+    // f.var_dep_len()
+    // Not necessary to create any dependent variables.
+    assert_eq!( f.var_dep_len(), 0 );
+    //
+    assert_eq!(y[0], x[0]);
+}
+//
+// test_left_zero_one_right_ad
 fn test_left_zero_one_right_ad() {
     type V      = f64;
     let trace   = false;
@@ -62,5 +87,6 @@ fn test_left_zero_one_right_ad() {
 #[test]
 fn optimize() {
     test_left_zero_one_both_ad();
+    test_right_zero_one_both_ad();
     test_left_zero_one_right_ad();
 }

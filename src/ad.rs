@@ -339,6 +339,34 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 },
                 _ => { }
             }
+        } else if( cop_rhs ) {
+            match id::[< $Name:upper _VV_OP >] {
+                //
+                id::ADD_VV_OP => {
+                    // add with right operand the constant zero
+                    if( rhs.value == V::from(0f32) ) {
+                        return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
+                    }
+                },
+                id::MUL_VV_OP => {
+                    // multiply with right operand the constant zero
+                    if( rhs.value == V::from(0f32) ) {
+                        return (new_tape_id, new_index, new_ad_type);
+                    }
+                    // multiply with right operand the constant one
+                    if( rhs.value == V::from(1f32) ) {
+                        return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
+                    }
+                },
+                id::DIV_VV_OP => {
+                    // divide with right operand the constant one
+                    if( rhs.value == V::from(1f32) ) {
+                        return (new_tape_id, new_index, new_ad_type);
+                    }
+                },
+                _ => { }
+            }
+
         }
         //
         // new_tape_id
