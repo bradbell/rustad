@@ -320,7 +320,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                     if( lhs.value == V::from(0f32) ) {
                         return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
                     }
-                }
+                },
                 id::MUL_VV_OP => {
                     // multiply with left operand the constant zero
                     if( lhs.value == V::from(0f32) ) {
@@ -330,13 +330,13 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                     if( lhs.value == V::from(1f32) ) {
                         return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
                     }
-                }
+                },
                 id::DIV_VV_OP => {
                     // divide with left operand the constant zero
                     if( lhs.value == V::from(0f32) ) {
                         return (new_tape_id, new_index, new_ad_type);
                     }
-                }
+                },
                 _ => { }
             }
         }
@@ -710,7 +710,7 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
         rhs:       &AD<V>  ,
     ) -> (usize, usize, ADType)
     where
-        V : Clone ,
+        V : Clone + From<f32> + PartialEq ,
     {
         // new_tape_id, new_index, new_ad_type
         let mut new_tape_id   = 0;
@@ -737,6 +737,32 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
         //
         if cop_rhs {
             return (new_tape_id, new_index, new_ad_type);
+        }
+        match id::[< $Name:upper _VV_OP >] {
+            //
+            id::ADD_VV_OP => {
+                // add with left operand the constant zero
+                if( *lhs == V::from(0f32) ) {
+                    return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
+                }
+            },
+            id::MUL_VV_OP => {
+                // multiply with left operand the constant zero
+                if( *lhs == V::from(0f32) ) {
+                    return (new_tape_id, new_index, new_ad_type);
+                }
+                // multiply with left operand the constant one
+                if( *lhs == V::from(1f32) ) {
+                    return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
+                }
+            },
+            id::DIV_VV_OP => {
+                // divide with left operand the constant zero
+                if( *lhs == V::from(0f32) ) {
+                    return (new_tape_id, new_index, new_ad_type);
+                }
+            },
+            _ => { }
         }
         //
         // new_tape_id
