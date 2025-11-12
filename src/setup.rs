@@ -15,8 +15,10 @@ use std::sync::LazyLock;
 use std::sync::RwLock;
 use std::thread::LocalKey;
 use std::cell::RefCell;
-use crate::ad::AD;
-use crate::NumVec;
+use crate::{
+    AD,
+    NumVec,
+};
 ///
 /// Set up rustad to do calculations with value type V; see
 /// [doc_generic_v](crate::doc_generic_v) .
@@ -25,7 +27,6 @@ use crate::NumVec;
 /// The rustad package automatically executes this macro
 /// for the following types: `f32` , `f64` , `NumVec<f32>`, `NumVec<f64>`.
 ///
-/// This macro requires the following use statements:
 /// ```text
 ///     use std::sync::LazyLock;
 ///     use std::sync::RwLock;
@@ -35,10 +36,10 @@ use crate::NumVec;
 /// ```
 macro_rules! setup_this_value_type{ ($V:ty) => {
         crate::tape::impl_this_thread_tape!($V);
+        crate::atom::impl_atom_eval_vec!($V);
         crate::op::info::impl_global_op_info_vec!($V);
         crate::ad::impl_value_op_ad!($V);
         crate::ad::impl_ad_from_f32!($V);
-        crate::atom::impl_atom_eval_vec!($V);
 } }
 //
 setup_this_value_type!(f32);

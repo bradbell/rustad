@@ -12,7 +12,14 @@
 // use
 //
 use std::ops::{
-    Mul
+    Add,
+    Sub,
+    Mul,
+    Div,
+    AddAssign,
+    SubAssign,
+    MulAssign,
+    DivAssign,
 };
 //
 // ---------------------------------------------------------------------------
@@ -30,16 +37,16 @@ use std::ops::{
 /// # Example
 /// ```
 /// use rustad::AzFloat;
-///
+/// //
 /// let zero  = AzFloat( 0f32 );
 /// let nan   = AzFloat( f32::NAN );
 /// let prod  = zero * nan;
 /// assert_eq!( prod, zero );
 /// assert_eq!( nan == nan, true );
-///
+/// //
 /// let three = AzFloat( 3f64 );
 /// let four  = AzFloat( 4f64 );
-/// let prod  = three * four;
+/// let prod  = &three * &four;
 /// assert_eq!( prod.to_inner(), 12f64 );
 ///
 #[derive(Debug, Clone, Copy)]
@@ -61,34 +68,122 @@ where
     }
 }
 //
+// From<f32>
+impl<B> From<f32> for AzFloat<B>
+where
+    B : From<f32> ,
+{
+    fn from(f : f32) -> Self {
+        Self( f.into()  )
+    }
+}
+// ---------------------------------------------------------------------------
+// AzFloat Op AzFloat
+//
 // Mul
 impl<B> Mul for AzFloat<B>
 where
     B : From<f32> + PartialEq + Mul<Output=B>,
 {
     type Output = AzFloat<B>;
-    //
-    fn mul(self, other : Self) -> Self {
+    fn mul(self, rhs : Self) -> Self {
         let zero_b : B = 0f32.into();
-        if (self.0) == zero_b || (other.0) == zero_b {
+        if (self.0) == zero_b || (rhs.0) == zero_b {
                 Self( zero_b )
         } else {
-            Self( (self.0).mul(other.0) )
+            Self( (self.0).mul(rhs.0) )
         }
     }
 }
+macro_rules! impl_binary_operator{ ($Name:ident) => { paste::paste! {
+    impl<B> $Name for AzFloat<B>
+    where
+        B : From<f32> + PartialEq + $Name<Output=B>,
+    {
+        type Output = AzFloat<B>;
+        fn [< $Name:lower >] (self, rhs : Self) -> Self {
+            Self( (self.0). [< $Name:lower >] (rhs.0) )
+        }
+    }
+} } }
+impl_binary_operator!(Add);
+impl_binary_operator!(Sub);
+impl_binary_operator!(Div);
+// ---------------------------------------------------------------------------
+// &AzFloat Op &AzFloat
 //
+// Mul
+impl<B> Mul<& AzFloat<B> > for &AzFloat<B>
+where
+    for<'a> &'a B : Mul<&'a B, Output=B>,
+    B : From<f32> + PartialEq,
+{
+    type Output = AzFloat<B>;
+    //
+    fn mul(self, rhs : & AzFloat<B>) -> AzFloat<B> {
+        let zero_b : B = 0f32.into();
+        if (self.0) == zero_b || (rhs.0) == zero_b {
+                AzFloat( zero_b )
+        } else {
+            AzFloat( (self.0).mul(&rhs.0) )
+        }
+    }
+}
+macro_rules! impl_binary_reference{ ($Name:ident) => { paste::paste! {
+    impl<B> $Name<& AzFloat<B> > for &AzFloat<B>
+    where
+        for<'a> &'a B : $Name<&'a B, Output=B>,
+        B : From<f32> + PartialEq ,
+    {
+        type Output = AzFloat<B>;
+        fn [< $Name:lower >] (self, rhs : & AzFloat<B> ) -> AzFloat<B> {
+            AzFloat( (self.0). [< $Name:lower >] (&rhs.0) )
+        }
+    }
+} } }
+impl_binary_reference!(Add);
+impl_binary_reference!(Sub);
+impl_binary_reference!(Div);
+// ---------------------------------------------------------------------------
+// AzFloat *= &AzFloat
+impl<B> MulAssign<& AzFloat<B> > for AzFloat<B>
+where
+    B : From<f32> + PartialEq + for<'a> MulAssign<&'a B>,
+{
+    fn mul_assign(&mut self, rhs : & AzFloat<B>) {
+        let zero_b : B = 0f32.into();
+        if (self.0) == zero_b || (rhs.0) == zero_b {
+                self.0 = zero_b;
+        } else {
+            self.0.mul_assign( &rhs.0 );
+        }
+    }
+}
+macro_rules! impl_binary_assign{ ($Name:ident) => { paste::paste! {
+    impl<B> [< $Name Assign >] <& AzFloat<B> > for AzFloat<B>
+    where
+        B : From<f32> + PartialEq +  for<'a> [< $Name Assign >] <&'a B>,
+    {
+        fn [< $Name:lower _assign >] (& mut self, rhs : & AzFloat<B> ) {
+            self.0. [< $Name:lower _assign >] ( &rhs.0 );
+        }
+    }
+} } }
+impl_binary_assign!(Add);
+impl_binary_assign!(Sub);
+impl_binary_assign!(Div);
+// ---------------------------------------------------------------------------
 // PartialEq, Eq
 impl<B> PartialEq for AzFloat<B>
 where
     B : PartialEq ,
 {
     //
-    fn eq(&self, other : &Self) -> bool {
-        if self.is_nan() && other.is_nan() {
+    fn eq(&self, rhs : &Self) -> bool {
+        if self.is_nan() && rhs.is_nan() {
                 true
         } else {
-            (self.0).eq(&other.0)
+            (self.0).eq(&rhs.0)
         }
     }
 }
