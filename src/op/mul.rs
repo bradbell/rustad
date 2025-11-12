@@ -244,7 +244,7 @@ where
     //
     for<'a> &'a V : std::ops::Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Mul<&'a V, Output = V> ,
-    V             : Clone + ThisThreadTape ,
+    V             : Clone + From<f32> + PartialEq + ThisThreadTape ,
 {
     op_info_vec[MUL_PP_OP as usize] = OpInfo{
         name              : "mul_pp",

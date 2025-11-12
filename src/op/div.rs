@@ -73,7 +73,7 @@ pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
     for<'a> &'a V : std::ops::Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Div<&'a V, Output = V> ,
-    V             : Clone + ThisThreadTape ,
+    V             : Clone + From<f32> + PartialEq + ThisThreadTape ,
 {
     op_info_vec[DIV_PP_OP as usize] = OpInfo{
         name              : "div_pp",

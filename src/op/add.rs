@@ -205,7 +205,8 @@ pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
     for<'a> &'a V : std::ops::Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
-    for<'a> V     : Clone + ThisThreadTape + std::ops::AddAssign<&'a V>,
+    for<'a> V     : Clone + From<f32> + PartialEq +
+                    ThisThreadTape + std::ops::AddAssign<&'a V>,
 {
     op_info_vec[ADD_PP_OP as usize] = OpInfo{
         name              : "add_pp",

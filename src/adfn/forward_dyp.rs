@@ -174,24 +174,30 @@ mod tests {
         let p : Vec<V> = vec![1.0 as V; np ];
         let x : Vec<V> = vec![1.0 as V; nx ];
         let (ap, ax)   = start_recording_dyp(p.clone(), x.clone());
-
+        //
+        // asum
+        // The first addition adds the constants zero and so is not recorded
         let mut asum   = ad_from_value( V::from(0.0) );
         for j in 0 .. np {
             asum += &ap[j];
         }
+        //
+        // f
         let ay = vec![ &ax[0] * &asum ];
         let f  = stop_recording(ay);
         //
         // dyp_both
-        let trace = false;
+        let trace = true;
         let dyp_both = f.forward_dyp_value(p.clone(), trace);
         //
-        assert_eq!( dyp_both.len(), 2 * np );
-        let mut sum = 0.0 as V;
+        assert_eq!( dyp_both.len(), 2 * np - 1 );
         for j in 0 .. np {
-            sum += p[j];
             assert_eq!( dyp_both[j], p[j] );
-            assert_eq!( dyp_both[np + j], sum );
+        }
+        let mut sum = p[0];
+        for j in 1 .. np {
+            sum += p[j];
+            assert_eq!( dyp_both[np + j - 1], sum );
         }
     }
 }

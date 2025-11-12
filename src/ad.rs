@@ -269,7 +269,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         rhs:       &AD<V>  ,
     ) -> (usize, usize, ADType)
     where
-        V : Clone ,
+        V : Clone + From<f32> + PartialEq ,
     {
         // new_tape_id, new_index, new_ad_typ
         let mut new_tape_id   = 0;
@@ -309,8 +309,36 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             var_rhs      = rhs.ad_type.is_variable();
         };
         //
-        if (cop_lhs && cop_rhs ) {
-            return (new_tape_id, new_index, new_ad_type);
+        if (cop_lhs ) {
+            if( cop_rhs ) {
+                return (new_tape_id, new_index, new_ad_type);
+            }
+            match id::[< $Name:upper _VV_OP >] {
+                //
+                id::ADD_VV_OP => {
+                    // add with left operand the constant zero
+                    if( lhs.value == V::from(0f32) ) {
+                        return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
+                    }
+                }
+                id::MUL_VV_OP => {
+                    // multiply with left operand the constant zero
+                    if( lhs.value == V::from(0f32) ) {
+                        return (new_tape_id, new_index, new_ad_type);
+                    }
+                    // multiply with left operand the constant one
+                    if( lhs.value == V::from(1f32) ) {
+                        return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
+                    }
+                }
+                id::DIV_VV_OP => {
+                    // divide with left operand the constant zero
+                    if( lhs.value == V::from(0f32) ) {
+                        return (new_tape_id, new_index, new_ad_type);
+                    }
+                }
+                _ => { }
+            }
         }
         //
         // new_tape_id
@@ -391,7 +419,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     impl<V> std::ops::$Name< &AD<V> > for &AD<V>
     where
         for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
-        V    : Clone + crate::ThisThreadTapePublic ,
+        V    : Clone + From<f32> + PartialEq + crate::ThisThreadTapePublic ,
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self , rhs : &AD<V> ) -> AD<V>
@@ -598,7 +626,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     )]
     impl<V> std::ops::[< $Name Assign >] < &AD<V> > for AD<V>
     where
-        V: Clone +
+        V: Clone + From<f32> + PartialEq +
             for<'a> std::ops::[< $Name Assign >] <&'a V> +
             crate::ThisThreadTapePublic  ,
     {   //
