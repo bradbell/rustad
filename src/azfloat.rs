@@ -77,6 +77,14 @@ where
         Self( f.into()  )
     }
 }
+//
+// From<f64>
+impl From<f64> for AzFloat<f64>
+{
+    fn from(f : f64) -> Self {
+        Self( f.into()  )
+    }
+}
 // ---------------------------------------------------------------------------
 // AzFloat Op AzFloat
 //
