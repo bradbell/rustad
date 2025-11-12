@@ -309,8 +309,8 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             var_rhs      = rhs.ad_type.is_variable();
         };
         //
-        if (cop_lhs ) {
-            if( cop_rhs ) {
+        if cop_lhs {
+            if cop_rhs {
                 return (new_tape_id, new_index, new_ad_type);
             }
             match id::[< $Name:upper _VV_OP >] {
@@ -339,7 +339,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 },
                 _ => { }
             }
-        } else if( cop_rhs ) {
+        } else if cop_rhs {
             match id::[< $Name:upper _VV_OP >] {
                 //
                 id::ADD_VV_OP => {
@@ -501,7 +501,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             var_lhs      = lhs.ad_type.is_variable();
         };
         //
-        if( cop_lhs ) {
+        if cop_lhs {
             return (new_tape_id, new_index, new_ad_type);
         }
         match id::[< $Name:upper _VV_OP >] {
