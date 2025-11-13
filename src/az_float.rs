@@ -296,6 +296,51 @@ where
     }
 }
 // ---------------------------------------------------------------------------
+/// Hash function for AzFloat objects
+///
+/// * B : is the floating point base type
+///
+/// # Example
+/// ```
+/// use std::collections::HashMap;
+/// use rustad::AzFloat;
+///
+/// let mut map : HashMap<AzFloat<f32>, u32> = HashMap::new();
+/// let z1      = AzFloat(1f32);
+/// let z2      = AzFloat(2f32);
+/// let z3      = AzFloat( f32::NAN );
+/// map.insert(z1, 1u32);
+/// map.insert(z2, 2u32);
+/// let option  = map.get_key_value(&z1);
+/// assert_eq!(option, Some( (&z1, &1u32) ) );
+///
+/// let option  = map.get_key_value(&z2);
+/// assert_eq!(option, Some( (&z2, &2u32) ) );
+///
+/// let option  = map.get_key_value(&z3);
+/// assert_eq!(option, None );
+///
+/// map.insert(z3, 3u32);
+/// let option  = map.get_key_value(&z3);
+/// assert_eq!(option, Some( (&z3, &3u32) ) );
+///
+/// ```
+pub fn doc_hash_trait() {}
+//
+macro_rules! impl_hash_trait{ ($B:ident) => {
+    /// see [doc_hash_trait]
+    impl std::hash::Hash for AzFloat<$B>
+    {
+        fn hash<H : std::hash::Hasher>(&self, state : &mut H) {
+            let bits       = self.0.to_bits();
+            let uint : u64 = bits.into();
+            uint.hash(state);
+        }
+    }
+} }
+impl_hash_trait!(f32);
+impl_hash_trait!(f64);
+// ---------------------------------------------------------------------------
 
 #[cfg(test)]
 mod tests {
