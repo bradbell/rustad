@@ -25,7 +25,7 @@ use std::ops::{
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class
 ///
-/// B : the base floating point class is either f32 or f64
+/// B : the floating point base class is either f32 or f64
 ///
 /// This is acts like the base class with the following different properties:
 ///
@@ -43,11 +43,6 @@ use std::ops::{
 /// let prod  = zero * nan;
 /// assert_eq!( prod, zero );
 /// assert_eq!( nan == nan, true );
-/// //
-/// let three = AzFloat( 3f64 );
-/// let four  = AzFloat( 4f64 );
-/// let prod  = &three * &four;
-/// assert_eq!( prod.to_inner(), 12f64 );
 ///
 #[derive(Debug, Clone, Copy)]
 pub struct AzFloat<B>(pub B);
@@ -58,17 +53,20 @@ where
 {
     //
     // is_nan
+    /// Determine if the floating point base is nan for this object
     pub fn is_nan(&self) -> bool {
         self.0 != self.0
     }
     //
     // to_inner
+    /// Returns the floating point base for this object
     pub fn to_inner(self) -> B {
         self.0
     }
 }
 //
 // From<f32>
+/// Converterst from f32 to an AzFloat object
 impl<B> From<f32> for AzFloat<B>
 where
     B : From<f32> ,
@@ -79,6 +77,7 @@ where
 }
 //
 // From<f64>
+/// Converterst from f64 to an AzFloat object
 impl From<f64> for AzFloat<f64>
 {
     fn from(f : f64) -> Self {
@@ -87,8 +86,31 @@ impl From<f64> for AzFloat<f64>
 }
 // ---------------------------------------------------------------------------
 // AzFloat Op AzFloat
+/// AzFloat binary operations
+///
+/// * B : Is the floating point base type
+///
+/// * Syntax : lhs op rhs
+///
+///     * lhs : is the AzFloat`<B>` left operand
+///     * rhs : is the AzFloat`<B>` right operand
+///     * op  : is one of `+` , `-` , `*` , `/`
+///
+/// # Example :
+/// ```
+/// use rustad::AzFloat;
+/// type B = f64;
+/// //
+/// let z2 : AzFloat<B> = (2.0 as B).into();
+/// let z4 : AzFloat<B> = (4.0 as B).into();
+/// let z6 = z2 + z4;
+/// assert_eq!( z6, (6.0 as B).into() );
+/// ```
+pub fn doc_binary_operator() { }
+///
 //
 // Mul
+/// see [doc_binary_operator]
 impl<B> Mul for AzFloat<B>
 where
     B : From<f32> + PartialEq + Mul<Output=B>,
@@ -104,6 +126,7 @@ where
     }
 }
 macro_rules! impl_binary_operator{ ($Name:ident) => { paste::paste! {
+    #[doc = "see [doc_binary_operator]"]
     impl<B> $Name for AzFloat<B>
     where
         B : From<f32> + PartialEq + $Name<Output=B>,
@@ -119,6 +142,27 @@ impl_binary_operator!(Sub);
 impl_binary_operator!(Div);
 // ---------------------------------------------------------------------------
 // &AzFloat Op &AzFloat
+/// AzFloat binary reference operations
+///
+/// * B : Is the floating point base type
+///
+/// * Syntax : &lhs op &rhs
+///
+///     * lhs : is the AzFloat`<B>` left operand
+///     * rhs : is the AzFloat`<B>` right operand
+///     * op  : is one of `+` , `-` , `*` , `/`
+///
+/// # Example :
+/// ```
+/// use rustad::AzFloat;
+/// type B = f64;
+/// //
+/// let z6 : AzFloat<B> = (6.0 as B).into();
+/// let z4 : AzFloat<B> = (4.0 as B).into();
+/// let z2 = &z6 - &z4;
+/// assert_eq!( z2, (2.0 as B).into() );
+/// ```
+pub fn doc_binary_reference() { }
 //
 // Mul
 impl<B> Mul<& AzFloat<B> > for &AzFloat<B>
@@ -138,6 +182,7 @@ where
     }
 }
 macro_rules! impl_binary_reference{ ($Name:ident) => { paste::paste! {
+    #[doc = "see [doc_binary_reference]"]
     impl<B> $Name<& AzFloat<B> > for &AzFloat<B>
     where
         for<'a> &'a B : $Name<&'a B, Output=B>,
@@ -153,7 +198,30 @@ impl_binary_reference!(Add);
 impl_binary_reference!(Sub);
 impl_binary_reference!(Div);
 // ---------------------------------------------------------------------------
-// AzFloat *= &AzFloat
+// AzFloat Op &AzFloat
+/// AzFloat binary assign operations
+///
+/// * B : Is the floating point base type
+///
+/// * Syntax : lhs op &rhs
+///
+///     * lhs : is the AzFloat`<B>` left operand
+///     * rhs : is the AzFloat`<B>` right operand
+///     * op  : is one of `+` , `-` , `*` , `/`
+///
+/// # Example :
+/// ```
+/// use rustad::AzFloat;
+/// type B = f32;
+/// //
+/// let mut z12_4 : AzFloat<B> = (12.0 as B).into();
+/// let z4        : AzFloat<B> = (4.0 as B).into();
+/// z12_4         /= &z4;
+/// assert_eq!( z12_4.to_inner(), (3.0 as B) );
+/// ```
+pub fn doc_binary_assign() {}
+//
+/// see [doc_binary_assign]
 impl<B> MulAssign<& AzFloat<B> > for AzFloat<B>
 where
     B : From<f32> + PartialEq + for<'a> MulAssign<&'a B>,
@@ -168,6 +236,7 @@ where
     }
 }
 macro_rules! impl_binary_assign{ ($Name:ident) => { paste::paste! {
+    #[doc = "see [doc_binary_assign]"]
     impl<B> [< $Name Assign >] <& AzFloat<B> > for AzFloat<B>
     where
         B : From<f32> + PartialEq +  for<'a> [< $Name Assign >] <&'a B>,
@@ -182,6 +251,16 @@ impl_binary_assign!(Sub);
 impl_binary_assign!(Div);
 // ---------------------------------------------------------------------------
 // PartialEq, Eq
+/// AzFloat Eq Operator
+///
+/// * B : is the floating point base type
+///
+/// # Example
+/// ```
+/// use rustad::AzFloat;
+/// let nan   = AzFloat( f32::NAN );
+/// assert_eq!( nan, nan );
+/// ```
 impl<B> PartialEq for AzFloat<B>
 where
     B : PartialEq ,
@@ -197,6 +276,17 @@ where
 }
 impl<B: PartialEq> Eq for AzFloat<B> { }
 // ---------------------------------------------------------------------------
+/// Display the an AzFloat object
+///
+/// * B : is the floating point base type
+///
+/// # Example
+/// ```
+/// use rustad::AzFloat;
+/// let nan = AzFloat( f64::NAN );
+/// let s   = format!( "{nan}" );
+/// assert_eq!(s, "NaN");
+/// ```
 impl<B> std::fmt::Display for AzFloat<B>
 where
     B : std::fmt::Display,
