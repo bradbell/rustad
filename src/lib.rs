@@ -120,6 +120,7 @@ where
     V : hash::TypeHash,
 { }
 // ----------------------------------------------------------------------------
+// Constants
 //
 // YEAR_MONTH_DAY
 /// is the date corresponding to this version of the software as
@@ -131,3 +132,9 @@ where
 /// assert_eq!(date, "2025.11.14");
 /// ```
 pub const YEAR_MONTH_DAY : &str = "2025.11.14";
+//
+// AZ_FLOAT_SRC
+/// is the source code for the [AzFloat] class.
+/// This is needed at the beginning of a dll library that include
+/// [ADfn::rust_src] .
+pub const AZ_FLOAT_SRC : &str = include_str!( "az_float.rs" );

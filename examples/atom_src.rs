@@ -8,6 +8,7 @@ sumsq_forward_fun;
 z = g(x) = x[0] * x[0] + x[1] * x[1] + ...
 */
 use rustad::{
+    AzFloat,
     ADType,
     register_atom,
     AtomEval,
@@ -21,7 +22,10 @@ use rustad::{
 };
 //
 // V
-type V = f64;
+type V = AzFloat<f64>;
+//
+// V_STR
+const V_STR : &str = "AzFloat<f64>";
 //
 // sumsq_forward_type
 fn sumsq_forward_type(
@@ -69,7 +73,7 @@ pub fn sumsq_forward_fun_value(
 ) -> Vec<V>
 {   //
     // sumsq_zero
-    let mut sumsq_zero = 0 as V;
+    let mut sumsq_zero : V =  0.0.into();
     for j in 0 .. domain_zero.len() {
         sumsq_zero += &( domain_zero[j] * domain_zero[j] );
     }
@@ -95,7 +99,7 @@ fn main() {
     let trace          = false;
     //
     // v_str
-    let v_str   = std::any::type_name::<V>();
+    let v_str   = V_STR;
     //
     // i_str
     let i_str   = std::any::type_name::<IndexT>();
@@ -103,11 +107,14 @@ fn main() {
     // nx
     let nx = 3;
     //
+    // az_float_src
+    let az_float_src = rustad::AZ_FLOAT_SRC;
+    //
     // f
-    let x   : Vec<V> = vec![ 1.0; nx];
-    let ax           = start_recording(x);
-    let ay           = call_atom(ax, sumsq_atom_id, call_info, trace);
-    let f            = stop_recording(ay);
+    let x    = vec![ V::from(1.0) ; nx];
+    let ax   = start_recording(x);
+    let ay   = call_atom(ax, sumsq_atom_id, call_info, trace);
+    let f    = stop_recording(ay);
     //
     // this_src
     let this_file = file!();
@@ -126,7 +133,7 @@ fn main() {
     //
     let atom_src = atom_src.replace("<V>", "<v_str>");
     let atom_src = atom_src.replace("<&V>", "<&v_str>");
-    let atom_src = atom_src.replace("as V", "as v_str");
+    let atom_src = atom_src.replace(": V =", ": v_str =");
     let atom_src = atom_src.replace("v_str", v_str);
     //
     // rust_src
@@ -135,7 +142,7 @@ fn main() {
     //
     // src_file
     let src_file  = "tmp/example_atom_src.rs";
-    let src       = atom_src + &rust_src;
+    let src       = String::from(az_float_src) + &atom_src + &rust_src;
     let result    = std::fs::write(src_file, src);
     if result.is_err() {
         panic!( "Cannot write {src_file}"  );
@@ -151,7 +158,7 @@ fn main() {
     //
     // p_ref, x_ref
     let p_ref     : Vec<&V> = Vec::new();
-    let x         : Vec<V>  = vec![ 3.0 as V; nx ];
+    let x         : Vec<V>  = vec![ V::from(3.0); nx ];
     let mut x_ref : Vec<&V> = Vec::new();
     for x_j in x.iter() {
         x_ref.push( &x_j )
@@ -162,5 +169,5 @@ fn main() {
     let sumsq  = result.unwrap();
     //
     assert_eq!( sumsq.len(), 1 );
-    assert_eq!( sumsq[0], (nx as V) * 3.0 * 3.0 );
+    assert_eq!( sumsq[0].to_inner(), (nx as f64) * 3.0 * 3.0 );
 }

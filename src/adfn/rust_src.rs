@@ -91,7 +91,8 @@ where
         let op_info_vec = &*<V as GlobalOpInfoVec>::get();
         //
         // v_str
-        let v_str   = type_name::<V>();
+        let v_str   = String::from( type_name::<V>() );
+        let v_str   = v_str.replace( "rustad::az_float::AzFloat", "AzFloat" );
         //
         // prototype
         let mut src = prototype_src(fn_name, &v_str);
@@ -123,7 +124,7 @@ where
         src = src +
             "   //\n" +
             "   // V\n" +
-            "   type V = " + v_str + ";\n";
+            "   type V = " + &v_str + ";\n";
         //
         // nan
         src = src +
