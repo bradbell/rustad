@@ -3,11 +3,14 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 //
 use rustad::{
-    AzFloat
+    AzFloat,
+    start_recording_dyp,
+    stop_recording,
+    ad_from_value,
 };
 //
-// test_multiply
-fn test_multiply() {
+// test_multiply_op
+fn test_multiply_op() {
     let zero  = AzFloat( 0f32 );
     let nan   = AzFloat( f32::NAN );
     let prod  = zero * nan;
@@ -24,8 +27,8 @@ fn test_multiply() {
     assert_eq!( six, AzFloat( 6f64 ) );
 }
 //
-// test_other
-fn test_other() {
+// test_other_op
+fn test_other_op() {
     let zero  = AzFloat( 0f32 );
     let nan   = AzFloat( f32::NAN );
     let prod  = zero + nan;
@@ -45,9 +48,49 @@ fn test_other() {
     six          /= &AzFloat( 2f64 );
     assert_eq!( six, AzFloat( 6f64 ) );
 }
+//
+// test_forward_dyp
+fn test_forward_dyp() {
+    //
+    // V
+    type V = AzFloat<f32>;
+    //
+    // np, nx, p, x
+    let np         = 3;
+    let nx         = 1;
+    let p : Vec<V> = vec![ V::from(1.0) ; np ];
+    let x : Vec<V> = vec![ V::from(1.0) ; nx ];
+    //
+    // asum
+    // The first addition adds the constants zero and so is not recorded
+    let (ap, ax)   = start_recording_dyp(p.clone(), x.clone());
+    let mut asum   = ad_from_value( V::from(0.0) );
+    for j in 0 .. np {
+        asum += &ap[j];
+    }
+    //
+    // f
+    let ay = vec![ &ax[0] * &asum ];
+    let f  = stop_recording(ay);
+    //
+    // dyp_both
+    let trace = false;
+    let dyp_both = f.forward_dyp_value(p.clone(), trace);
+    //
+    assert_eq!( dyp_both.len(), 2 * np - 1 );
+    for j in 0 .. np {
+        assert_eq!( dyp_both[j], p[j] );
+    }
+    let mut sum = p[0];
+    for j in 1 .. np {
+    sum += &p[j];
+        assert_eq!( dyp_both[np + j - 1], sum );
+    }
+}
 
 #[test]
 fn az_float() {
-    test_multiply();
-    test_other();
+    test_multiply_op();
+    test_other_op();
+    test_forward_dyp();
 }

@@ -7,6 +7,9 @@
 //!
 //! Link to [parent module](super)
 //!
+//! This module does not have any dependencies outside the standard rust.
+//! This enables it source code to be directly included as part of a
+//! Dll library.
 //!
 // ---------------------------------------------------------------------------
 // use
@@ -138,21 +141,21 @@ where
         }
     }
 }
-macro_rules! impl_binary_operator{ ($Name:ident) => { paste::paste! {
+macro_rules! impl_binary_operator{ ($Name:ident, $name:ident) =>  {
     #[doc = "see [doc_binary_operator]"]
     impl<B> $Name for AzFloat<B>
     where
         B : From<f32> + PartialEq + $Name<Output=B>,
     {
         type Output = AzFloat<B>;
-        fn [< $Name:lower >] (self, rhs : Self) -> Self {
-            Self( (self.0). [< $Name:lower >] (rhs.0) )
+        fn $name(self, rhs : Self) -> Self {
+            Self( (self.0).$name(rhs.0) )
         }
     }
-} } }
-impl_binary_operator!(Add);
-impl_binary_operator!(Sub);
-impl_binary_operator!(Div);
+} }
+impl_binary_operator!(Add, add);
+impl_binary_operator!(Sub, sub);
+impl_binary_operator!(Div, div);
 // ---------------------------------------------------------------------------
 // &AzFloat Op &AzFloat
 /// AzFloat binary reference operations
@@ -194,7 +197,7 @@ where
         }
     }
 }
-macro_rules! impl_binary_reference{ ($Name:ident) => { paste::paste! {
+macro_rules! impl_binary_reference{ ($Name:ident, $name:ident) => {
     #[doc = "see [doc_binary_reference]"]
     impl<B> $Name<& AzFloat<B> > for &AzFloat<B>
     where
@@ -202,14 +205,14 @@ macro_rules! impl_binary_reference{ ($Name:ident) => { paste::paste! {
         B : From<f32> + PartialEq ,
     {
         type Output = AzFloat<B>;
-        fn [< $Name:lower >] (self, rhs : & AzFloat<B> ) -> AzFloat<B> {
-            AzFloat( (self.0). [< $Name:lower >] (&rhs.0) )
+        fn $name (self, rhs : & AzFloat<B> ) -> AzFloat<B> {
+            AzFloat( (self.0).$name(&rhs.0) )
         }
     }
-} } }
-impl_binary_reference!(Add);
-impl_binary_reference!(Sub);
-impl_binary_reference!(Div);
+} }
+impl_binary_reference!(Add, add);
+impl_binary_reference!(Sub, sub);
+impl_binary_reference!(Div, div);
 // ---------------------------------------------------------------------------
 // AzFloat Op &AzFloat
 /// AzFloat binary assign operations
@@ -248,20 +251,20 @@ where
         }
     }
 }
-macro_rules! impl_binary_assign{ ($Name:ident) => { paste::paste! {
+macro_rules! impl_binary_assign{ ($Name:ident, $name:ident) => {
     #[doc = "see [doc_binary_assign]"]
-    impl<B> [< $Name Assign >] <& AzFloat<B> > for AzFloat<B>
+    impl<B> $Name <& AzFloat<B> > for AzFloat<B>
     where
-        B : From<f32> + PartialEq +  for<'a> [< $Name Assign >] <&'a B>,
+        B : From<f32> + PartialEq +  for<'a> $Name <&'a B>,
     {
-        fn [< $Name:lower _assign >] (& mut self, rhs : & AzFloat<B> ) {
-            self.0. [< $Name:lower _assign >] ( &rhs.0 );
+        fn $name(& mut self, rhs : & AzFloat<B> ) {
+            self.0.$name(&rhs.0);
         }
     }
-} } }
-impl_binary_assign!(Add);
-impl_binary_assign!(Sub);
-impl_binary_assign!(Div);
+} }
+impl_binary_assign!(AddAssign, add_assign);
+impl_binary_assign!(SubAssign, sub_assign);
+impl_binary_assign!(DivAssign, div_assign);
 // ---------------------------------------------------------------------------
 // PartialEq, Eq
 /// AzFloat Eq Operator
@@ -354,52 +357,3 @@ macro_rules! impl_hash_trait{ ($B:ident) => {
 impl_hash_trait!(f32);
 impl_hash_trait!(f64);
 // ---------------------------------------------------------------------------
-
-#[cfg(test)]
-mod tests {
-    use crate::{
-        AzFloat,
-        start_recording_dyp,
-        stop_recording,
-        ad_from_value,
-    };
-    //
-    #[test]
-    fn az_forward_dyp() {
-        //
-        // V
-        type V = AzFloat<f32>;
-        //
-        // np, nx, p, x
-        let np         = 3;
-        let nx         = 1;
-        let p : Vec<V> = vec![ V::from(1.0) ; np ];
-        let x : Vec<V> = vec![ V::from(1.0) ; nx ];
-        //
-        // asum
-        // The first addition adds the constants zero and so is not recorded
-        let (ap, ax)   = start_recording_dyp(p.clone(), x.clone());
-        let mut asum   = ad_from_value( V::from(0.0) );
-        for j in 0 .. np {
-            asum += &ap[j];
-        }
-        //
-        // f
-        let ay = vec![ &ax[0] * &asum ];
-        let f  = stop_recording(ay);
-        //
-        // dyp_both
-        let trace = true;
-        let dyp_both = f.forward_dyp_value(p.clone(), trace);
-        //
-        assert_eq!( dyp_both.len(), 2 * np - 1 );
-        for j in 0 .. np {
-            assert_eq!( dyp_both[j], p[j] );
-        }
-        let mut sum = p[0];
-        for j in 1 .. np {
-        sum += &p[j];
-            assert_eq!( dyp_both[np + j - 1], sum );
-        }
-    }
-}
