@@ -49,7 +49,7 @@ pub fn get_lib(
         if lib_path.is_file() {
             let result = std::fs::remove_file(lib_file);
             if result.is_err() {
-                panic!("load_rust_dll_lib: Cannot remove old library");
+                panic!("dll_lib::get_lib: Cannot remove old library");
             }
         }
     }
@@ -67,12 +67,12 @@ pub fn get_lib(
             .arg( &cmd )
             .output();
         if result.is_err() {
-            panic!("load_rust_dll_lib: Cannot create library");
+            panic!("dll_lib::get_lib: Cannot create library");
         }
         let stderr = result.unwrap().stderr;
         let stderr = String::from_utf8( stderr ).unwrap();
         if stderr != "" {
-            eprint!("\nload_rust_dll_lib: can't compile and link library\n\n");
+            eprint!("\ndll_lib::get_lib: can't compile and link library\n\n");
             eprint!("{}", stderr);
             panic!();
         }
@@ -83,7 +83,7 @@ pub fn get_lib(
     unsafe {
         let result = libloading::Library::new( lib_file );
         if result.is_err() {
-            panic!("load_rust_dll_lib: Cannot load library");
+            panic!("dll_lib::get_lib: Cannot load library");
         }
         lib  = result.unwrap();
     }
@@ -121,7 +121,7 @@ pub fn get_rust_src_fn<'a, V>(
         let result = lib.get(full_name);
         if result.is_err() {
             let full_name = String::from("rust_src_") + fn_name;
-            panic!("get_rust_src_fn: can't find {} in lib", full_name);
+            panic!("dll_lib::get_rust_src_fn: can't find {} in lib", full_name);
         }
         rust_src_fn = result.unwrap();
     }
