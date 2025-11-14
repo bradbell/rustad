@@ -20,9 +20,7 @@ fn test_left_zero_one_both_ad() {
     let a2  = &ad_from_value(1.0 as V) * &a1;    // optimized to ax[0]
     let a3  = &ad_from_value(0.0 as V) * &a2;    // constant 0
     let a4  = &a3 + &a2;                         // optimized to ax[0]
-    let a5  = &ad_from_value(0.0 as V) / &a4;    // constant 0
-    let a6  = &a5 + &a4;                         // optimized to ax[0]
-    let ay  = vec![ a6 ];
+    let ay  = vec![ a4 ];
     let f   = stop_recording(ay);
     //
     let (y, _)       = f.forward_zero_value(x.clone(), trace);

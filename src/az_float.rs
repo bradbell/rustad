@@ -25,23 +25,27 @@ use std::ops::{
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
 ///
-/// Motivation :
-/// During forward mode AD, the partial derivaitve of f(x) w.r.t x_i
-/// is evaluated as f'(x) * e
-/// where e_j is one (zero) if j is equal to i (not equal to i).
-/// If zero times nan were nan, and one of the elements of f'(x) were nan,
-/// the partial of f w.r.t. x_i would evaluate to nan
-/// (even if the corresponding column of f'(x) did not have a nan).
-/// A similar effect is present in reverse mode.
+/// * Motivation :
 ///
-/// B : the floating point base class is either f32 or f64
+///     * During forward mode AD, the partial derivaitve of f(x) w.r.t x_i
+///     is evaluated as f'(x) * e
+///     where e_j is one (zero) if j is equal to i (not equal to i).
+///     If zero times nan were nan, and one of the elements of f'(x) were nan,
+///     the partial of f w.r.t. x_i would evaluate to nan
+///     (even if the corresponding column of f'(x) did not have a nan).
+///     A similar effect is present in reverse mode.
 ///
-/// This is acts like the base class with the following different properties:
+///     * Because zero time any value is zero, multiplications by the
+///     constant zero does not need to be recorded in the tape.
 ///
-/// * Zero is an absolute zero; i.e. multiplication by zero
+///
+/// * B : the floating point base class is either f32 or f64
+///
+///
+/// * Zero : is an absolute zero; i.e. multiplication by zero
 /// always results in zero (even if the other operand is nan).
 ///
-/// * : nan is equal to nan.
+/// *  Nan : is equal to Nan.
 ///
 /// # Example
 /// ```

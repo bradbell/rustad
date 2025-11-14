@@ -331,12 +331,15 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                         return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
                     }
                 },
+                /*
+                Not optimized out because not a special case for AzFloat.
                 id::DIV_VV_OP => {
                     // divide with left operand the constant zero
                     if( lhs.value == V::from(0f32) ) {
                         return (new_tape_id, new_index, new_ad_type);
                     }
                 },
+                */
                 _ => { }
             }
         } else if cop_rhs {
