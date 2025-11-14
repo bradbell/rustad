@@ -142,7 +142,7 @@ where
                 let i_str = i.to_string();
                 let c_str = self.cop[i].to_string();
                 src = src +
-                    "   cop[" + &i_str + "] = " + &c_str + " as V;\n";
+                    "   cop[" + &i_str + "] = V::from(" + &c_str + ");\n";
             }
         }
         //

@@ -15,10 +15,11 @@ This test has 2 dyanimic parameters p[0], p[1], and one variable x[0].
 We define the following function using h:
           [ p[0] * p[1] ]
 f(p, x) = [ p[1] * x[0] ]
-          [     5.0     ]
+          [      5      ]
 */
 use std::cmp::max;
 use rustad::{
+    AzFloat,
     AD,
     ad_from_value,
     ADType,
@@ -34,7 +35,10 @@ use rustad::{
 };
 //
 // V
-type V = f64;
+type V = AzFloat<f64>;
+//
+// V_STR
+const V_STR : &str = "AzFloat<f64>";
 //
 // h_forward_type
 fn h_forward_type(
@@ -133,14 +137,14 @@ fn register_h()-> IndexT {
     h_atom_id
 }
 //
-// dll_src
-fn dll_src() -> String {
+// build_atom_src
+fn build_atom_src() -> String {
     //
     // atom_name
     let atom_name = "h";
     //
     // v_str
-    let v_str = std::any::type_name::<V>();
+    let v_str = V_STR;
     //
     // i_str
     let i_str = std::any::type_name::<IndexT>();
@@ -188,19 +192,19 @@ fn atom_dyp() {
     let trace          = false;
     //
     // f
-    let p   : Vec<V> = vec![ 1.0; 2];
-    let x   : Vec<V> = vec![ 1.0; 1];
+    let p   : Vec<V> = vec![ V::from(1.0); 2];
+    let x   : Vec<V> = vec![ V::from(1.0); 1];
     let (ap, ax)     = start_recording_dyp(p, x);
     let z0           = ap[0].clone();
     let z1           = ap[1].clone();
     let z2           = ax[0].clone();
-    let z3           = ad_from_value(5.0);
+    let z3           = ad_from_value( V::from(5.0) );
     let az           = vec![ z0, z1, z2, z3 ];
     let ay           = call_atom(az, h_atom_id, call_info, trace);
     let f            = stop_recording(ay);
     //
-    let p   : Vec<V> = vec![ 2.0, 3.0 ];
-    let x   : Vec<V> = vec![ 4.0 ];
+    let p   : Vec<V> = vec![ V::from(2.0), V::from(3.0) ];
+    let x   : Vec<V> = vec![ V::from(4.0) ];
     let q            = f.forward_dyp_value(p.clone(), trace);
     let (y, _v)      = f.forward_var_value(&q, x.clone(), trace);
     //
@@ -208,18 +212,18 @@ fn atom_dyp() {
     assert_eq!( y.len(), 3 );
     assert_eq!( y[0], p[0] * p[1] );
     assert_eq!( y[1], p[1] * x[0] );
-    assert_eq!( y[2], 5.0  );
+    assert_eq!( y[2], V::from(5.0) );
     //
     // f
-    let p   : Vec<V> = vec![ 1.0; 2];
-    let x   : Vec<V> = vec![ 1.0; 1];
+    let p   : Vec<V> = vec![ V::from(1.0); 2];
+    let x   : Vec<V> = vec![ V::from(1.0); 1];
     let (ap, ax)     = start_recording_dyp(p.clone(), x.clone());
     let aq           = f.forward_dyp_ad(ap, trace);
     let (ay, _av)    = f.forward_var_ad(&aq, ax, trace);
     let g            = stop_recording(ay);
     //
-    let p   : Vec<V> = vec![ 2.0, 3.0 ];
-    let x   : Vec<V> = vec![ 4.0 ];
+    let p   : Vec<V> = vec![ V::from(2.0), V::from(3.0) ];
+    let x   : Vec<V> = vec![ V::from(4.0) ];
     let q            = g.forward_dyp_value(p.clone(), trace);
     let (y, _v)      = g.forward_var_value(&q, x.clone(), trace);
     //
@@ -227,10 +231,13 @@ fn atom_dyp() {
     assert_eq!( y.len(), 3 );
     assert_eq!( y[0], p[0] * p[1] );
     assert_eq!( y[1], p[1] * x[0] );
-    assert_eq!( y[2], 5.0  );
+    assert_eq!( y[2], V::from(5.0) );
+    //
+    // az_float_src
+    let az_float_src = String::from( rustad::AZ_FLOAT_SRC );
     //
     // atom_src
-    let atom_src  = dll_src();
+    let atom_src  = build_atom_src();
     //
     // rust_src
     let fn_name   = "h";
@@ -238,7 +245,7 @@ fn atom_dyp() {
     //
     // src_file
     let src_file  = "tmp/test_atom_dyp.rs";
-    let src       = atom_src + &rust_src;
+    let src       = az_float_src + &atom_src + &rust_src;
     let result    = std::fs::write(src_file, src);
     if result.is_err() {
         panic!( "Cannot write {src_file}"  );
@@ -270,5 +277,5 @@ fn atom_dyp() {
     assert_eq!( y.len(), 3 );
     assert_eq!( y[0], p[0] * p[1] );
     assert_eq!( y[1], p[1] * x[0] );
-    assert_eq!( y[2], 5.0  );
+    assert_eq!( y[2], V::from(5.0) );
 }
