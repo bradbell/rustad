@@ -200,7 +200,7 @@ fn main() {
     let atom_id = register_checkpoint_atom();
     //
     // f
-    let x   : Vec<V> = vec![ 1.0 , 2.0 ];
+    let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
     let ax           = start_recording(x);
     let mut asumsq : AD<V> = ad_from_value( 0 as V );
     for j in 0 .. ax.len() {
@@ -218,24 +218,24 @@ fn main() {
     } );
     //
     // g
-    let x   : Vec<V> = vec![ 1.0 , 2.0 ];
+    let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
     let ax           = start_recording(x);
     let ay           = call_atom(ax, atom_id, call_info, trace);
     let g            = stop_recording(ay);
     //
     // g.forward_zero_value
-    let x       : Vec<V> = vec![ 3.0 , 4.0 ];
+    let x       : Vec<V> = vec![ V::from(3.0) , V::from(4.0) ];
     let (y, v)           = g.forward_zero_value(x.clone(), trace);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
     //
     // g.forward_one_value
-    let dx      : Vec<V> = vec![ 5.0, 6.0 ];
+    let dx      : Vec<V> = vec![ 5.0, V::from(6.0) ];
     let dy               = g.forward_one_value(&v , dx.clone(), trace);
-    assert_eq!( dy[0], 2.0 * x[0]*dx[0] + 2.0 * x[1]*dx[1] );
+    assert_eq!( dy[0], V::from(2.0) * x[0]*dx[0] + V::from(2.0) * x[1]*dx[1] );
     //
     // g.reverse_one_value
-    let dy      : Vec<V> = vec![ 5.0 ];
+    let dy      : Vec<V> = vec![ V::from(5.0) ];
     let dx               = g.reverse_one_value(&v , dy.clone(), trace);
-    assert_eq!( dx[0], 2.0 * x[0]*dy[0] );
-    assert_eq!( dx[1], 2.0 * x[1]*dy[0] );
+    assert_eq!( dx[0], V::from(2.0) * x[0]*dy[0] );
+    assert_eq!( dx[1], V::from(2.0) * x[1]*dy[0] );
 }
