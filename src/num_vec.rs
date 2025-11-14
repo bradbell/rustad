@@ -20,6 +20,7 @@
 // ---------------------------------------------------------------------------
 // use
 use ordered_float::OrderedFloat;
+use crate::AzFloat;
 //
 // NumVec
 /// The numeric vector type
@@ -198,28 +199,28 @@ macro_rules! num_vec_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     )]
     impl<'a, S> std::ops::$Name< &'a NumVec<S> > for NumVec<S>
     where
-        S : Copy + std::ops::$Name ,
+        S : Copy + std::ops::$Name<&'a S>,
     {   //
         fn [< $Name:snake >] (&mut self, rhs : &'a NumVec<S> )
         {   //
             if self.len() == 1 {
                 if rhs.len() == 1 {
-                    self.s $Op rhs.s;
+                    self.s $Op &(rhs.s);
                 } else {
                     self.vec = vec![ self.s ; rhs.len() ];
                     for j in 0 .. rhs.len() {
-                        self.vec[j] $Op rhs.vec[j];
+                        self.vec[j] $Op &(rhs.vec[j]);
                     }
                 }
             } else {
                 if rhs.len() == 1 {
                     for j in 0 .. self.len() {
-                        self.vec[j] $Op rhs.s;
+                        self.vec[j] $Op &(rhs.s);
                     }
                 } else {
                     assert_eq!( self.len(), rhs.len() );
                     for j in 0 .. self.len() {
-                        self.vec[j] $Op rhs.vec[j];
+                        self.vec[j] $Op &(rhs.vec[j]);
                     }
                 }
             }
@@ -264,9 +265,17 @@ impl<S : std::fmt::Display> std::fmt::Display for NumVec<S> {
 // From
 /// Convert a scalar to a NumVec object with one element.
 ///
+/// |           To             | From | From |
+/// |--------------------------|------|------|
+/// | `NumVec<f32>`            | f32  |      |
+/// | `NumVec< AzFloat<f32> >` | f32  |      |
+/// | `NumVec<f64>`            | f32  | f64  |
+/// | `NumVec< AzFloat<f64> >` | f32  | f64  |
+///
 /// # Example
 /// ```
 /// use rustad::NumVec;
+/// use rustad::AzFloat;
 ///
 /// // f32 -> NumVec<f32>
 /// let x                  = 3.0 as f32;
@@ -285,22 +294,30 @@ impl<S : std::fmt::Display> std::fmt::Display for NumVec<S> {
 /// let x_nv : NumVec<f64> = NumVec::from(x);
 /// assert_eq!( x_nv.len(), 1 );
 /// assert_eq!( x_nv.get(0), 3.0 as f64 );
+///
+/// // f64 -> NumVec< AzFloat<f64> >
+/// let x                  = 3.0 as f64;
+/// let x_nv : NumVec< AzFloat<f64> > = NumVec::from(x);
+/// assert_eq!( x_nv.len(), 1 );
+/// assert_eq!( x_nv.get(0), AzFloat(3.0 as f64) );
 /// ```
-impl From<f32> for NumVec<f32> {
-    fn from ( scalar : f32 )-> NumVec<f32> {
-        NumVec { vec : Vec::new(), s : scalar }
+pub fn doc_from_scalar() {}
+//
+macro_rules! impl_from_scalar { ($F:ty, $T:ty ) => {
+    #[doc = "see [doc_from_scalar]"]
+    impl From<$F> for NumVec<$T> {
+        fn from( scalar : $F )-> NumVec<$T> {
+            NumVec { vec : Vec::new(), s : scalar.into() }
+        }
     }
-}
-impl From<f32> for NumVec<f64> {
-    fn from ( scalar : f32 )-> NumVec<f64> {
-        NumVec { vec : Vec::new(), s : scalar as f64 }
-    }
-}
-impl From<f64> for NumVec<f64> {
-    fn from ( scalar : f64 )-> NumVec<f64> {
-        NumVec { vec : Vec::new(), s : scalar }
-    }
-}
+} }
+impl_from_scalar!(f32, f32);
+impl_from_scalar!(f32, f64);
+impl_from_scalar!(f64, f64);
+//
+impl_from_scalar!(f32, AzFloat<f32>);
+impl_from_scalar!(f32, AzFloat<f64>);
+impl_from_scalar!(f64, AzFloat<f64>);
 // ----------------------------------------------------------------------------`
 // PartialEq
 /// PartialEq `NumVec<S>` operator
@@ -328,23 +345,52 @@ impl From<f64> for NumVec<f64> {
 /// assert_ne!(a, b);
 /// assert_eq!(b, c);
 /// ```
+pub fn doc_partial_equal() {}
 ///
-impl<S> PartialEq for NumVec<S>
-where
-    S : PartialEq + ordered_float::FloatCore,
-{
-    fn eq(&self, rhs : &Self) -> bool
-    {   let mut result = true;
-        if self.len() != rhs.len()  {
-            result = false;
-        } else if self.len() == 1 {
-            result = OrderedFloat(self.s) == OrderedFloat(rhs.s);
-        } else {
-            for j in 0 .. self.len() {
-                result = result &&
-                    OrderedFloat(self.vec[j]) == OrderedFloat(rhs.vec[j]);
+macro_rules! impl_ordered_float_partial_equal { ($S:ident) => {
+    impl PartialEq for NumVec<$S>
+    where
+        $S : PartialEq + ordered_float::FloatCore,
+    {
+        fn eq(&self, rhs : &Self) -> bool
+        {   let mut result = true;
+            if self.len() != rhs.len()  {
+                result = false;
+            } else if self.len() == 1 {
+                result = OrderedFloat(self.s) == OrderedFloat(rhs.s);
+            } else {
+                for j in 0 .. self.len() {
+                    result = result &&
+                        OrderedFloat(self.vec[j]) == OrderedFloat(rhs.vec[j]);
+                }
             }
+            result
         }
-        result
     }
-}
+} }
+impl_ordered_float_partial_equal!(f32);
+impl_ordered_float_partial_equal!(f64);
+///
+macro_rules! impl_az_float_partial_equal { ($S:ident) => {
+    impl PartialEq for NumVec< AzFloat<$S> >
+    where
+        AzFloat<$S> : PartialEq
+    {
+        fn eq(&self, rhs : &Self) -> bool
+        {   let mut result = true;
+            if self.len() != rhs.len()  {
+                result = false;
+            } else if self.len() == 1 {
+                result = self.s == rhs.s;
+            } else {
+                for j in 0 .. self.len() {
+                    result = result &&
+                        self.vec[j] == rhs.vec[j];
+                }
+            }
+            result
+        }
+    }
+} }
+impl_az_float_partial_equal!(f32);
+impl_az_float_partial_equal!(f64);
