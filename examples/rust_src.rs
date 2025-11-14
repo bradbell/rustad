@@ -5,6 +5,7 @@
 // Example converting a derivative calculation to rust source code
 //
 use rustad::{
+    AzFloat,
     AD,
     ad_from_value,
     start_recording,
@@ -18,16 +19,16 @@ use rustad::{
 fn main () {
     //
     //
-    type V     = f32;
+    type V     = AzFloat<f32>;
     let nx     = 3;
     let trace  = false;
     //
     // ax
-    let x  : Vec<V> = vec![ 2.0 as V; nx ];
+    let x  : Vec<V> = vec![ V::from(2.0); nx ];
     let ax       = start_recording(x);
     //
     // asum
-    let mut asum : AD<V>  = ad_from_value(  0.0 as V );
+    let mut asum : AD<V>  = ad_from_value(  V::from(0.0) );
     for j in 0 .. nx {
         let square  = &ax[j] * &ax[j];
         asum       += &square;
@@ -39,21 +40,21 @@ fn main () {
     let f  = stop_recording(ay);
     //
     // av
-    let x  : Vec<V> = vec![ 2.0 as V; nx ];
+    let x  : Vec<V> = vec![ V::from(2.0); nx ];
     let ax      = start_recording(x);
     let (_, av) = f.forward_zero_ad(ax, trace);
     //
-       //
     // g
     // g(x) = df/dx = [ 2 * x[0], ..., 2 * x[nx-1] ]
-    let dy  : Vec<V>  = vec![ 1.0 as V ];
+    let dy  : Vec<V>  = vec![ V::from(1.0) ];
     let ady           = ad_from_vector(dy);
     let adx           = f.reverse_one_ad(&av, ady, trace);
     let g             = stop_recording(adx);
     //
-    // src_file
-    let gn_name   = "sumsq_reverse_one";
-    let src = g.rust_src(gn_name);
+    // src
+    let src      = String::from( rustad::AZ_FLOAT_SRC );
+    let gn_name  = "sumsq_reverse_one";
+    let src      = src + &g.rust_src(gn_name);
     //
     // src_file
     let src_file = "tmp/example_rust_src.rs";
@@ -72,7 +73,7 @@ fn main () {
     //
     // p_ref, x_ref
     let p_ref     : Vec<&V> = Vec::new();
-    let x         : Vec<V>  = vec![ 3.0 as V; nx ];
+    let x         : Vec<V>  = vec![ V::from(3.0); nx ];
     let mut x_ref : Vec<&V> = Vec::new();
     for x_j in x.iter() {
         x_ref.push( &x_j )
@@ -83,6 +84,6 @@ fn main () {
     let dx     = result.unwrap();
     assert_eq!( dx.len(), nx);
     for j in 0 .. nx {
-        assert_eq!( dx[j], 2.0 * x[j] );
+        assert_eq!( dx[j], V::from(2.0) * x[j] );
     }
 }
