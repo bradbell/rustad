@@ -24,6 +24,7 @@ z = g(x, y) = 2 * y * (x[0], x[1], ... )^T
 use std::cell::RefCell;
 //
 use rustad::{
+    AzFloat,
     ADType,
     register_atom,
     AtomEval,
@@ -31,7 +32,7 @@ use rustad::{
 };
 //
 // V
-type V = f64;
+type V = AzFloat<f64>;
 //
 // ATOM_ID_VEC
 thread_local! {

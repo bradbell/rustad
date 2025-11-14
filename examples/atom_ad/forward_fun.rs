@@ -26,7 +26,7 @@ pub fn sumsq_forward_fun_value(
 ) -> Vec<V>
 {   //
     // var_both, sumsq_zero
-    let mut sumsq_zero = 0 as V;
+    let mut sumsq_zero = V::from(0.0);
     for j in 0 .. domain_zero.len() {
         sumsq_zero += &( domain_zero[j] * domain_zero[j] );
     }

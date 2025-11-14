@@ -36,16 +36,16 @@ fn for_sumsq_forward_fun_value(
     assert_eq!( 2 * nx , domain_zero.len() );
     //
     // two_v
-    let two_v : V = 2.0 as V;
+    let two_v : V = V::from(2.0);
     //
     // x, y
     let x = &domain_zero[0 .. nx];
     let y = &domain_zero[nx .. 2 * nx];
     //
     // z
-    let mut z = 0.0 as V;
+    let mut z = V::from(0.0);
     for j in 0 .. nx {
-        z += &two_v * &( x[j] * y[j] );
+        z += &( &two_v * &( x[j] * y[j] ) );
     }
     //
     vec![ z ]
@@ -68,7 +68,7 @@ fn for_sumsq_forward_der_value(
     //
     //
     // two_v
-    let two_v : V = 2.0 as V;
+    let two_v : V = V::from(2.0);
     //
     // x, y
     let x =  &domain_zero[0 .. nx];
@@ -79,10 +79,10 @@ fn for_sumsq_forward_der_value(
     let dy =  &domain_one[nx .. 2 * nx];
     //
     // dz
-    let mut dz = 0.0 as V;
+    let mut dz = V::from(0.0);
     for j in 0 .. nx {
-        dz += &two_v * &(  x[j] * dy[j] );
-        dz += &two_v * &( dx[j] * y[j] );
+        dz += &( &two_v * &(  x[j] * dy[j] ) );
+        dz += &( &two_v * &( dx[j] * y[j] ) );
     }
     //
     vec![ dz ]
@@ -105,7 +105,7 @@ fn for_sumsq_reverse_der_value(
     let dz = range_one[0];
     //
     // factor
-    let factor : V = &(2.0 as V) * dz;
+    let factor : V = &(V::from(2.0)) * dz;
     //
     // x, y
     let x =  &domain_zero[0 .. nx];

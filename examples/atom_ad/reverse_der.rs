@@ -30,7 +30,7 @@ pub fn sumsq_reverse_der_value(
     assert_eq!( range_one.len(), 1 );
     //
     // two_v
-    let two_v = 2.0 as V;
+    let two_v = V::from(2.0);
     //
     // domain_one
     let mut domain_one : Vec<V> = Vec::with_capacity( domain_zero.len() );

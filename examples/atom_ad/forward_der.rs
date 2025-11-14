@@ -30,10 +30,10 @@ pub fn sumsq_forward_der_value(
     assert_eq!( domain_zero.len(), domain_one.len() );
     //
     // two_v
-    let two_v = 2.0 as V;
+    let two_v = V::from(2.0);
     //
     // range_one
-    let mut range_one = 0.0 as V;
+    let mut range_one = V::from(0.0);
     for j in 0 .. domain_one.len() {
         range_one += &( &two_v * &( domain_zero[j] * domain_one[j] ) );
     }

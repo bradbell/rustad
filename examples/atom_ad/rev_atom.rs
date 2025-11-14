@@ -40,7 +40,7 @@ fn rev_sumsq_forward_fun_value(
     let y =  domain_zero[nx];
     //
     // two_v
-    let two_v : V = 2.0 as V;
+    let two_v : V = V::from(2.0);
     //
     // z
     let mut z : Vec<V> = Vec::with_capacity(nx);
@@ -68,7 +68,7 @@ fn rev_sumsq_forward_der_value(
     let y =  domain_zero[nx];
     //
     // two_v
-    let two_v   : V = 2.0 as V;
+    let two_v   : V = V::from(2.0);
     //
     // domain_one_zero, domain_one_one
     let dx =  &domain_one[0 .. nx];
@@ -78,7 +78,7 @@ fn rev_sumsq_forward_der_value(
     let mut dz : Vec<V> = Vec::with_capacity( nx );
     for j in 0 .. nx {
         let mut term_j  = &two_v * &( y * dx[j]  );
-        term_j         += &two_v * &( dy * x[j] );
+        term_j         += &( &two_v * &( dy * x[j] ) );
         dz.push( term_j );
     }
     //
@@ -102,17 +102,17 @@ fn rev_sumsq_reverse_der_value(
     let y =  domain_zero[nx];
     //
     // two_v
-    let two_v   : V = 2.0 as V;
+    let two_v   : V = V::from(2.0);
     //
     // dz
     let dz = &range_one;
     //
     // dx_dy
     let mut dx_dy : Vec<V> = Vec::with_capacity(nx + 1);
-    let mut dy             = 0.0 as V;
+    let mut dy             = V::from(0.0);
     for j in 0 .. nx {
         dx_dy.push( &two_v * &( y * dz[j] ) );
-        dy       += &two_v * ( dz[j] * x[j] );
+        dy       += &( &two_v * &( dz[j] * x[j] ) );
     }
     dx_dy.push(dy);
     //
