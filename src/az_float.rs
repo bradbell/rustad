@@ -83,24 +83,34 @@ where
         self.0
     }
 }
+// ---------------------------------------------------------------------------
+// From
 //
-// From<f32>
-/// Converterst from f32 to an AzFloat object
-impl<B> From<f32> for AzFloat<B>
-where
-    B : From<f32> ,
-{
-    fn from(f : f32) -> Self {
-        Self( f.into()  )
+// * AzFloat<f32> :
+// From is implemented for usize and f32 .
+//
+// * AzFloat<f64> :
+// From is implemented for :usize, f32, f64, and AzFloat<f32> .
+pub fn doc_impl_from() {}
+//
+macro_rules! impl_from_primitive{ ($F:ident, $T:ident) => {
+    #[doc = "see [doc_impl_from]" ]
+    impl From<$F> for AzFloat<$T> {
+        fn from(f : $F) -> AzFloat<$T> {
+            AzFloat( f as $T )
+        }
     }
-}
+} }
+impl_from_primitive!(usize, f32);
+impl_from_primitive!(f32, f32);
+impl_from_primitive!(usize, f64);
+impl_from_primitive!(f32, f64);
+impl_from_primitive!(f64, f64);
 //
-// From<f64>
-/// Converterst from f64 to an AzFloat object
-impl From<f64> for AzFloat<f64>
-{
-    fn from(f : f64) -> Self {
-        Self( f.into()  )
+/// see [doc_impl_from]
+impl From< AzFloat<f32> > for AzFloat<f64> {
+    fn from( z : AzFloat<f32> ) -> AzFloat<f64> {
+        AzFloat( z.0 as f64 )
     }
 }
 // ---------------------------------------------------------------------------

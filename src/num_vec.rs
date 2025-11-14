@@ -318,6 +318,10 @@ impl_from_scalar!(f64, f64);
 impl_from_scalar!(f32, AzFloat<f32>);
 impl_from_scalar!(f32, AzFloat<f64>);
 impl_from_scalar!(f64, AzFloat<f64>);
+//
+impl_from_scalar!( AzFloat<f32>, AzFloat<f32>);
+impl_from_scalar!( AzFloat<f32>, AzFloat<f64>);
+impl_from_scalar!( AzFloat<f64>, AzFloat<f64>);
 // ----------------------------------------------------------------------------`
 // PartialEq
 /// PartialEq `NumVec<S>` operator

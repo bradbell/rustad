@@ -5,6 +5,7 @@
 // Example of computing a Hessian
 //
 use rustad::{
+    AzFloat,
     AD,
     ad_from_value,
     ad_from_vector,
@@ -14,21 +15,21 @@ use rustad::{
 };
 //
 // example_hessian
-// Simple case where V = f32
+// Simple case where V = AzFloat<f32>
 fn example_hessian () {
     //
-    type V     = f32;
+    type V     = AzFloat<f32>;
     let nx     = 3;
     let trace  = false;
     //
     // x
-    let x  : Vec<V> = vec![ 2.0 as V; nx ];
+    let x  : Vec<V> = vec![ V::from(2.0); nx ];
     //
     // ax
     let ax       = start_recording(x.clone());
     //
     // asum
-    let mut asum : AD<V>  = ad_from_value(  0.0 as V );
+    let mut asum : AD<V>  = ad_from_value(  V::from(0.0) );
     for j in 0 .. nx {
         let cubed  = &( &ax[j] * &ax[j] ) * &ax[j];
         asum      += &cubed;
@@ -45,7 +46,7 @@ fn example_hessian () {
     //
     // g
     // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
-    let dy  : Vec<V>  = vec![ 1.0 as V ];
+    let dy  : Vec<V>  = vec![ V::from(1.0) ];
     let ady           = ad_from_vector(dy);
     let adx           = f.reverse_one_ad(&av, ady, trace);
     let g             = stop_recording(adx);
@@ -54,28 +55,28 @@ fn example_hessian () {
     // x[j] = j+2
     let mut x  : Vec<V> = Vec::new();
     for j in 0 .. nx {
-        x.push( (j+2) as V );
+        x.push( V::from(j+2) );
     }
     //
     // v, y
     let (y, v) = g.forward_zero_value(x, trace);
     for j in 0 .. nx {
         let check  = 3 * (j+2) * (j+2);
-        assert_eq!( y[j], check as V );
+        assert_eq!( y[j], V::from(check) );
     }
     //
     // dy
     // dy[i] = partial g[i] w.r.t x[j] = 6 * x[j]
     for j in 0 .. nx {
-        let mut dx : Vec<V> = vec![ 0.0 as V; nx ];
-        dx[j]               = 1.0 as V;
+        let mut dx : Vec<V> = vec![ V::from(0.0); nx ];
+        dx[j]               = V::from(1.0);
         let dy              = g.forward_one_value(&v, dx, trace);
         for i in 0 .. nx {
             if i == j {
                 let check  = 6 * (j+2);
-                assert_eq!( dy[i], check as V );
+                assert_eq!( dy[i], V::from(check) );
             } else {
-                assert_eq!( dy[i],  0.0 as V );
+                assert_eq!( dy[i],  V::from(0.0) );
             }
         }
     }
@@ -85,22 +86,22 @@ fn example_hessian () {
 // Same function where V = NumVec<f64>
 fn example_num_vec_hessian () {
     //
-    type F     = f64;
-    type V     = NumVec<F>;
+    type S     = AzFloat<f64>;
+    type V     = NumVec<S>;
     let nx     = 3;
     let trace  = false;
     //
     // x
     let mut x  : Vec<V> = Vec::new();
     for _j in 0 .. nx {
-        x.push( NumVec::new( vec![ 2.0 as F ] ) );
+        x.push( NumVec::new( vec![ S::from(2.0) ] ) );
     }
     //
     // ax
     let ax       = start_recording(x.clone());
     //
     // asum
-    let mut asum : AD<V>  = ad_from_value(  NumVec::from( 0.0 as F ) );
+    let mut asum : AD<V>  = ad_from_value(  NumVec::from( S::from(0.0) ) );
     for j in 0 .. nx {
         let cubed  = &( &ax[j] * &ax[j] ) * &ax[j];
         asum      += &cubed;
@@ -117,7 +118,7 @@ fn example_num_vec_hessian () {
     //
     // g
     // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
-    let dy  : Vec<V>  = vec![ NumVec::from( 1.0 as F ) ];
+    let dy  : Vec<V>  = vec![ NumVec::from( S::from(1.0) ) ];
     let ady           = ad_from_vector(dy);
     let adx           = f.reverse_one_ad(&av, ady, trace);
     let g             = stop_recording(adx);
@@ -126,7 +127,7 @@ fn example_num_vec_hessian () {
     // x[j] = [ j+1, j+2 ]
     let mut x  : Vec<V> = Vec::new();
     for j in 0 .. nx {
-        x.push( NumVec::new( vec![ (j+1) as F, (j+2) as F ] ) );
+        x.push( NumVec::new( vec![ S::from(j+1), S::from(j+2) ] ) );
     }
     //
     // y, v
@@ -134,29 +135,29 @@ fn example_num_vec_hessian () {
     for j in 0 .. nx {
         //
         let check  = 3 * (j+1) * (j+1);
-        assert_eq!( y[j].get(0), check as F );
+        assert_eq!( y[j].get(0), S::from(check) );
         //
         let check  = 3 * (j+2) * (j+2);
-        assert_eq!( y[j].get(1), check as F );
+        assert_eq!( y[j].get(1), S::from(check) );
     }
     //
     // dy
     // dy[i] = partial g[i] w.r.t x[j] = 6 * x[j]
     for j in 0 .. nx {
-        let mut dx : Vec<V> = vec![ NumVec::from( 0.0 as F ); nx ];
-        dx[j]               = NumVec::from( 1.0 as F );
+        let mut dx : Vec<V> = vec![ NumVec::from( S::from(0.0) ); nx ];
+        dx[j]               = NumVec::from( S::from(1.0) );
         let dy              = g.forward_one_value(&v, dx, trace);
         for i in 0 .. nx {
             if i == j {
                 //
                 let check  = 6 * (j+1);
-                assert_eq!( dy[i].get(0), check as F );
+                assert_eq!( dy[i].get(0), S::from(check) );
                 //
                 let check  = 6 * (j+2);
-                assert_eq!( dy[i].get(1), check as F );
+                assert_eq!( dy[i].get(1), S::from(check) );
             } else {
                 for k in 0 .. dy[i].len() {
-                    assert_eq!( dy[i].get(k) ,  0.0 as F );
+                    assert_eq!( dy[i].get(k) ,  S::from(0.0) );
                 }
             }
         }
