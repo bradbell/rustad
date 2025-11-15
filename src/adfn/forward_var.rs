@@ -75,10 +75,11 @@ use crate::{
 /// use rustad::start_recording_dyp;
 /// use rustad::stop_recording;
 /// use rustad::AD;
+/// use rustad::AzFloat;
 /// use rustad::ad_from_value;
 /// //
 /// // V
-/// type V = f32;
+/// type V = rustad::AzFloat<f32>;
 ///
 /// // np, nx
 /// let np = 2;
@@ -86,8 +87,8 @@ use crate::{
 /// //
 /// // f
 /// // f(p, x) = (p[0] + ... + p[np-1]) * (x[0] + ... + x[nx-1])
-/// let p        : Vec<V> = vec![ 1.0; np];
-/// let x        : Vec<V> = vec![ 1.0; nx];
+/// let p                 = vec![ V::from(1.0); np];
+/// let x                 = vec![ V::from(1.0); nx];
 /// let (ap, ax)          = start_recording_dyp(p, x);
 /// let mut ap_sum        = ad_from_value( V::from(0.0) );
 /// for j in 0 .. np {
@@ -104,11 +105,11 @@ use crate::{
 /// let trace           = false;
 /// let mut p : Vec<V> = Vec::new();
 /// for j in 1 .. np+1 {
-///     p.push(j as V);
+///     p.push(V::from(j));
 /// }
 /// let mut x : Vec<V> = Vec::new();
 /// for j in 1 .. nx+1 {
-///     x.push(j as V);
+///     x.push(V::from(j));
 /// }
 /// //
 /// // y = f(p, x)
@@ -119,7 +120,7 @@ use crate::{
 /// let p_sum = ( np * (np + 1) ) / 2;
 /// let x_sum = ( nx * (nx + 1) ) / 2;
 /// //
-/// assert_eq!( y[0] , (p_sum * x_sum) as V );
+/// assert_eq!( y[0] , V::from(p_sum * x_sum) );
 /// ```
 ///
 pub fn doc_forward_var() { }
