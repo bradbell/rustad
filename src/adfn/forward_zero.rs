@@ -48,14 +48,15 @@ use crate::{
 /// use rustad::start_recording;
 /// use rustad::stop_recording;
 /// use rustad::AD;
+/// use rustad::AzFloat;
 /// use rustad::ad_from_value;
 /// //
 /// // V
-/// type V = f32;
+/// type V = rustad::AzFloat<f32>;
 /// //
 /// // f
 /// // f(x) = x[0] + ... + x[nx-1]
-/// let x        : Vec<V> = vec![ 1.0, 1.0, 1.0 ];
+/// let x                 = vec![ V::from(1.0), V::from(1.0), V::from(1.0) ];
 /// let ax                = start_recording(x);
 /// let mut asum          = ad_from_value( V::from(0.0) );
 /// for j in 0 .. ax.len() {
@@ -67,10 +68,10 @@ use crate::{
 /// // y
 /// // y[0] = f(x)
 /// let trace           = false;
-/// let x      : Vec<V> = vec![ 1.0, 2.0, 3.0 ];
+/// let x      : Vec<V> = vec![ V::from(1.0), V::from(2.0), V::from(3.0) ];
 /// let (y, _v)  = f.forward_zero_value(x, trace);
 /// //
-/// assert_eq!( y[0] , (1 + 2 + 3) as V );
+/// assert_eq!( y[0] , V::from(1 + 2 + 3) );
 /// ```
 ///
 pub fn doc_forward_zero() { }
