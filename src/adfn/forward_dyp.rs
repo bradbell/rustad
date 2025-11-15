@@ -157,6 +157,7 @@ where
 #[cfg(test)]
 mod tests {
     use crate::{
+        AzFloat,
         ad_from_value,
         start_recording_dyp,
         stop_recording,
@@ -166,13 +167,13 @@ mod tests {
     fn test_forward_dyp() {
         //
         // V
-        type V = f32;
+        type V = AzFloat<f32>;
         //
         // f
         let np         = 3;
         let nx         = 1;
-        let p : Vec<V> = vec![1.0 as V; np ];
-        let x : Vec<V> = vec![1.0 as V; nx ];
+        let p : Vec<V> = vec![ V::from(1.0); np ];
+        let x : Vec<V> = vec![ V::from(1.0 ); nx ];
         let (ap, ax)   = start_recording_dyp(p.clone(), x.clone());
         //
         // asum
@@ -196,7 +197,7 @@ mod tests {
         }
         let mut sum = p[0];
         for j in 1 .. np {
-            sum += p[j];
+            sum += &p[j];
             assert_eq!( dyp_both[np + j - 1], sum );
         }
     }
