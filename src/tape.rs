@@ -366,13 +366,14 @@ where
 /// ```
 /// use rustad::start_recording;
 /// use rustad::stop_recording;
-/// let domain  : Vec<f32>  = vec![ 1.0, 2.0 ];
-/// let adomain             = start_recording( domain );
-/// let sum                 = &adomain[0] + &adomain[1];
-/// let diff                = &adomain[0] - &adomain[1];
-/// let times               = &adomain[0] * &adomain[1];
-/// let arange              = vec![ sum, diff, times ];
-/// let ad_fn               = stop_recording( arange );
+/// type V       = rustad::AzFloat<f64>;
+/// let domain   = vec![ V::from(1.0), V::from(2.0) ];
+/// let adomain  = start_recording( domain );
+/// let sum      = &adomain[0] + &adomain[1];
+/// let diff     = &adomain[0] - &adomain[1];
+/// let times    = &adomain[0] * &adomain[1];
+/// let arange   = vec![ sum, diff, times ];
+/// let ad_fn    = stop_recording( arange );
 /// assert_eq!( ad_fn.var_dom_len(), 2);
 /// assert_eq!( ad_fn.range_len(), 3);
 /// ```
