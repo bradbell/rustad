@@ -156,12 +156,13 @@ impl<V> AD<V> {
     /// use rustad::AD;
     /// use rustad::ad_from_value;
     /// use rustad::NumVec;
-    /// let v   : Vec<f64>    = vec![ 2.0, 3.0 ];
-    /// let nv                = NumVec::new(v);
-    /// let av                = ad_from_value(nv);
-    /// let nv                = av.to_value();
-    /// assert_eq!( nv.get(0), 2.0 );
-    /// assert_eq!( nv.get(1), 3.0 );
+    /// type V  = rustad::AzFloat<f32>;
+    /// let v   = vec![ V::from(2.0), V::from(3.0) ];
+    /// let nv  = NumVec::new(v);
+    /// let av  = ad_from_value(nv);
+    /// let nv  = av.to_value();
+    /// assert_eq!( nv.get(0), V::from(2.0) );
+    /// assert_eq!( nv.get(1), V::from(3.0) );
     /// ```
     pub fn to_value(self) -> V {
         self.value
@@ -176,21 +177,24 @@ impl<V> AD<V> {
 /// ```
 /// use rustad::AD;
 /// use rustad::ad_from_value;
-/// let x  : f64  = 5.0;
-/// let ax        = ad_from_value(x);
-/// let s         = format!( "{ax}" );
+/// type V  = rustad::AzFloat<f64>;
+/// let x   = V::from(5.0);
+/// let ax  = ad_from_value(x);
+/// let s   = format!( "{ax}" );
 /// assert_eq!(s, "5");
 /// ```
 ///
 /// # Example using NumVec
 /// ```
 /// use rustad::AD;
+/// use rustad::AzFloat;
 /// use rustad::ad_from_value;
 /// use rustad::NumVec;
-/// let x  : Vec<f64>  = vec![ 5.0, 6.0 ];
-/// let x_nv           = NumVec::new(x);
-/// let ax             = ad_from_value(x_nv);
-/// let s              = format!( "{ax}" );
+/// type V     = NumVec< AzFloat<f32> >;
+/// let x      = vec![ AzFloat(5.0), AzFloat(6.0) ];
+/// let x_nv   = NumVec::new(x);
+/// let ax     = ad_from_value(x_nv);
+/// let s      = format!( "{ax}" );
 /// assert_eq!(s, "[ 5, 6, ]");
 /// ```
 impl<V : std::fmt::Display> std::fmt::Display for AD<V> {
@@ -224,33 +228,36 @@ impl<V : std::fmt::Display> std::fmt::Display for AD<V> {
 /// use rustad::AD;
 /// use rustad::ad_from_value;
 ///
-/// let ax  = ad_from_value( 3.0f32 );
-/// let y   = 4.0f32;
+/// type V  = rustad::AzFloat<f64>;
+/// let ax  = ad_from_value( V::from(3.0) );
+/// let y   = V::from(4.0);
 /// let az  = &ax * &y;
-/// assert_eq!( az.to_value(), 12.0f32 );
+/// assert_eq!( az.to_value(), V::from(12.0) );
 ///
-/// let x  = 3.0f32;
-/// let ay = ad_from_value(4.0f32 );
+/// let x   = V::from(3.0);
+/// let ay  = ad_from_value( V::from(4.0) );
 /// let az  = &x * &ay;
-/// assert_eq!( az.to_value(), 12.0f32 );
+/// assert_eq!( az.to_value(), V::from(12.0) );
 /// ```
 ///
 /// # Example using NumVec
 /// ```
 /// use rustad::AD;
+/// use rustad::AzFloat;
 /// use rustad::ad_from_value;
 /// use rustad::NumVec;
 ///
-/// let x     : Vec<f64> = vec![ 1.0, 4.0 ];
-/// let y     : Vec<f64> = vec![ 2.0, 2.0 ];
-/// let x_nv             = NumVec::new(x);
-/// let y_nv             = NumVec::new(y);
-/// let ax               = ad_from_value(x_nv);
-/// let ay               = ad_from_value(y_nv);
-/// let az               = &ax / &ay;
-/// let z_nv             = az.to_value();
-/// assert_eq!( z_nv.get(0), 0.5f64 );
-/// assert_eq!( z_nv.get(1), 2.0f64 );
+/// type V    = NumVec< AzFloat<f32> >;
+/// let x     = vec![ AzFloat(1.0), AzFloat(4.0) ];
+/// let y     = vec![ AzFloat(2.0), AzFloat(2.0) ];
+/// let x_nv  = NumVec::new(x);
+/// let y_nv  = NumVec::new(y);
+/// let ax    = ad_from_value(x_nv);
+/// let ay    = ad_from_value(y_nv);
+/// let az    = &ax / &ay;
+/// let z_nv  = az.to_value();
+/// assert_eq!( z_nv.get(0), AzFloat(0.5) );
+/// assert_eq!( z_nv.get(1), AzFloat(2.0) );
 /// ```
 pub fn doc_ad_binary_op() { }
 //
@@ -639,28 +646,31 @@ ad_binary_op!(Div, /);
 /// use rustad::AD;
 /// use rustad::ad_from_value;
 ///
-/// let mut ax   = ad_from_value( 3.0f64 );
-/// let y        = 4.0f64;
+/// type V       = rustad::AzFloat<f64>;
+/// let mut ax   = ad_from_value( V::from(3.0) );
+/// let y        = V::from(4.0);
 /// ax          -= &y;
-/// assert_eq!( ax.to_value(), -1.0f64 );
+/// assert_eq!( ax.to_value(), V::from(-1.0) );
 /// ```
 ///
 /// # Example using NumVec
 /// ```
 /// use rustad::AD;
+/// use rustad::AzFloat;
 /// use rustad::ad_from_value;
 /// use rustad::NumVec;
 ///
-/// let x     : Vec<f32>  = vec![ 1.0, 4.0 ];
-/// let y     : Vec<f32>  = vec![ 2.0, 2.0 ];
-/// let x_nv              = NumVec::new(x);
-/// let y_nv              = NumVec::new(y);
-/// let mut ax            = ad_from_value(x_nv);
-/// let ay                = ad_from_value(y_nv);
-/// ax                   *= &ay;
-/// let x_nv              = ax.to_value();
-/// assert_eq!( x_nv.get(0), 2.0f32 );
-/// assert_eq!( x_nv.get(1), 8.0f32 );
+/// type V     = NumVec< AzFloat<f32> >;
+/// let x      = vec![ AzFloat(1.0), AzFloat(4.0) ];
+/// let y      = vec![ AzFloat(2.0), AzFloat(2.0) ];
+/// let x_nv   = NumVec::new(x);
+/// let y_nv   = NumVec::new(y);
+/// let mut ax = ad_from_value(x_nv);
+/// let ay     = ad_from_value(y_nv);
+/// ax         *= &ay;
+/// let x_nv   = ax.to_value();
+/// assert_eq!( x_nv.get(0), AzFloat(2.0) );
+/// assert_eq!( x_nv.get(1), AzFloat(8.0) );
 /// ```
 pub fn doc_ad_compound_op() { }
 //
@@ -951,9 +961,10 @@ pub(crate) use impl_value_op_ad;
 /// ```
 /// use rustad::AD;
 /// use rustad::ad_from_value;
-/// let x  : f32  = 3.0;
-/// let ax        = ad_from_value(x);
-/// assert_eq!( ax.to_value(), 3.0 );
+/// type V  = rustad::AzFloat<f64>;
+/// let x   = V::from(3.0);
+/// let ax  = ad_from_value(x);
+/// assert_eq!( ax.to_value(), V::from(3.0) );
 /// ```
 pub fn ad_from_value<V>(value : V) -> AD<V> {
     let tape_id   = 0;
@@ -972,10 +983,11 @@ pub fn ad_from_value<V>(value : V) -> AD<V> {
 /// ```
 /// use rustad::AD;
 /// use rustad::ad_from_vector;
-/// let x  : Vec<f64>  = vec![ 3.0, 4.0 ];
-/// let ax             = ad_from_vector(x);
-/// assert_eq!( ax[0].clone().to_value(), 3.0 );
-/// assert_eq!( ax[1].clone().to_value(), 4.0 );
+/// type V   = rustad::AzFloat<f32>;
+/// let x    = vec![ V::from(3.0), V::from(4.0) ];
+/// let ax   = ad_from_vector(x);
+/// assert_eq!( ax[0].clone().to_value(), V::from(3.0) );
+/// assert_eq!( ax[1].clone().to_value(), V::from(4.0) );
 /// ```
 pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
     assert_ne!( vec.len() , 0 );
@@ -999,27 +1011,30 @@ pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
 /// use rustad::AD;
 /// use rustad::ad_from_value;
 /// use rustad::ad_to_vector;
-/// let ax    = vec![ ad_from_value(3f64), ad_from_value(4f64) ];
+/// type V    = rustad::AzFloat<f64>;
+/// let ax    = vec![ ad_from_value(V::from(3)), ad_from_value(V::from(4)) ];
 /// let y     = ad_to_vector(ax);
-/// assert_eq!( y , vec![ 3f64, 4f64 ] );
+/// assert_eq!( y , vec![ V::from(3), V::from(4) ] );
 /// ```
 ///
 /// # Example using NumVec
 /// ```
 /// use rustad::AD;
+/// use rustad::AzFloat;
 /// use rustad::NumVec;
 /// use rustad::ad_from_vector;
 /// use rustad::ad_to_vector;
-/// let v_0  : Vec<f32>   = vec![ 2.0, 3.0 ];
-/// let nv_0              = NumVec::new(v_0);
-/// let v_1  : Vec<f32>   = vec![ 4.0, 5.0 ];
-/// let nv_1              = NumVec::new(v_1);
-/// let av                = ad_from_vector( vec![nv_0, nv_1] );
-/// let v                 = ad_to_vector(av);
-/// assert_eq!( v[0].get(0), 2.0 );
-/// assert_eq!( v[0].get(1), 3.0 );
-/// assert_eq!( v[1].get(0), 4.0 );
-/// assert_eq!( v[1].get(1), 5.0 );
+/// type V     = NumVec< AzFloat<f32> >;
+/// let v_0    = vec![ AzFloat(2.0), AzFloat(3.0) ];
+/// let nv_0   = NumVec::new(v_0);
+/// let v_1    = vec![ AzFloat(4.0), AzFloat(5.0) ];
+/// let nv_1   = NumVec::new(v_1);
+/// let av     = ad_from_vector( vec![nv_0, nv_1] );
+/// let v      = ad_to_vector(av);
+/// assert_eq!( v[0].get(0), AzFloat(2.0) );
+/// assert_eq!( v[0].get(1), AzFloat(3.0) );
+/// assert_eq!( v[1].get(0), AzFloat(4.0) );
+/// assert_eq!( v[1].get(1), AzFloat(5.0) );
 /// ```
 pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
     assert_ne!( avec.len() , 0 );
@@ -1037,6 +1052,7 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
 /// ```
 /// use rustad::AD;
 /// use rustad::NumVec;
+/// type V = rustad::AzFloat<f32>;
 /// let ax : AD< NumVec<f64> >  = (3.0 as f32).into();
 /// let x                       = ax.to_value();
 /// assert_eq!( x.get(0), 3.0 as f64);
@@ -1077,10 +1093,12 @@ pub(crate) use impl_ad_from_f32;
 /// # Example
 /// ```
 /// use rustad::AD;
+/// use rustad::AzFloat;
 /// use rustad::NumVec;
-/// let ax : AD< NumVec<f64> >  = (3.0 as f64).into();
-/// let x                       = ax.to_value();
-/// assert_eq!( x.get(0), 3.0 as f64);
+/// type V          = NumVec< AzFloat<f64> >;
+/// let ax : AD<V>  = (3.0 as f64).into();
+/// let x           = ax.to_value();
+/// assert_eq!( x.get(0), AzFloat(3.0) );
 /// ```
 pub fn doc_impl_ad_from_f64() { }
 //
