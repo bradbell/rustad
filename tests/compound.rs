@@ -5,32 +5,38 @@
 // Testing compoound assignment operators
 //
 #[cfg(test)]
-use rustad::ad_from_value;
+use rustad::{
+    AzFloat,
+    ad_from_value,
+};
 //
 #[test]
 fn compound() {
     //
+    // V
+    type V = AzFloat<f64>;
+    //
     // add
-    let mut ax   = ad_from_value( 3.0f64 );
-    let y        = 4.0f64;
+    let mut ax   = ad_from_value( V::from(3.0) );
+    let y        = V::from(4.0);
     ax          += &y;
-    assert_eq!( ax.to_value(),  7.0 );
+    assert_eq!( ax.to_value(),  V::from(7.0) );
     //
     // sub
-    let mut ax   = ad_from_value( 3.0f64 );
-    let y        = 4.0f64;
+    let mut ax   = ad_from_value( V::from(3.0) );
+    let y        = V::from(4.0);
     ax          -= &y;
-    assert_eq!( ax.to_value(),  -1.0 );
+    assert_eq!( ax.to_value(),  V::from(-1.0) );
     //
     // mul
-    let mut ax   = ad_from_value( 3.0f64 );
-    let y        = 4.0f64;
+    let mut ax   = ad_from_value( V::from(3.0) );
+    let y        = V::from(4.0);
     ax          *= &y;
-    assert_eq!( ax.to_value(),  12.0 );
+    assert_eq!( ax.to_value(),  V::from(12.0) );
     //
     // div
-    let mut ax   = ad_from_value( 8.0f64 );
-    let y        = 4.0f64;
+    let mut ax   = ad_from_value( V::from(8.0) );
+    let y        = V::from(4.0);
     ax          /= &y;
-    assert_eq!( ax.to_value(),  2.0 );
+    assert_eq!( ax.to_value(),  V::from(2.0) );
 }
