@@ -53,7 +53,6 @@ use crate::adfn::forward_zero::doc_forward_zero;
 ///
 /// // V
 /// type V = rustad::AzFloat<f32>;
-///
 /// //
 /// // f
 /// // f(x) = x[0] * x[1] * x[2]
@@ -67,7 +66,7 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// let f  = stop_recording(ay);
 /// //
 /// // y
-/// // y[0] = f(x)
+/// // y1[0] = partial f(x) w.r.t. x[0] at x0
 /// let trace    = false;
 /// let x0       = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
 /// let (_, v0)  = f.forward_zero_value(x0, trace);
