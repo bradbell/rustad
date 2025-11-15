@@ -50,16 +50,17 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// use rustad::start_recording;
 /// use rustad::stop_recording;
 /// use rustad::AD;
+/// use rustad::AzFloat;
 /// use rustad::ad_from_value;
 ///
 /// // V
-/// type V = f32;
+/// type V = rustad::AzFloat<f32>;
 /// //
 /// // f
 /// // f(x) = x[0] * x[1] * x[2]
-/// let x        : Vec<V> = vec![ 1.0, 1.0, 1.0 ];
-/// let ax                  = start_recording(x);
-/// let mut aprod           = ad_from_value( V::from(1.0) );
+/// let x            = vec![ V::from(1.0), V::from(1.0), V::from(1.0) ];
+/// let ax           = start_recording(x);
+/// let mut aprod    = ad_from_value( V::from(1.0) );
 /// for j in 0 .. ax.len() {
 ///     aprod *= &ax[j];
 /// }
@@ -68,15 +69,15 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// //
 /// // y
 /// // y[0] = f(x)
-/// let trace           = false;
-/// let x0     : Vec<V> = vec![ 4.0, 5.0, 6.0 ];
-/// let (_, v0)         = f.forward_zero_value(x0, trace);
-/// let y1     : Vec<V> = vec![ 1.0 ];
-/// let x1              = f.reverse_one_value(&v0, y1, trace);
+/// let trace    = false;
+/// let x0       = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
+/// let (_, v0)  = f.forward_zero_value(x0, trace);
+/// let y1       = vec![ V::from(1.0) ];
+/// let x1       = f.reverse_one_value(&v0, y1, trace);
 /// //
-/// assert_eq!( x1[0] , 5.0 * 6.0 );
-/// assert_eq!( x1[1] , 4.0 * 6.0 );
-/// assert_eq!( x1[2] , 4.0 * 5.0 );
+/// assert_eq!( x1[0] , V::from(5.0 * 6.0) );
+/// assert_eq!( x1[1] , V::from(4.0 * 6.0) );
+/// assert_eq!( x1[2] , V::from(4.0 * 5.0) );
 /// ```
 ///
 pub fn doc_reverse_one() { }
