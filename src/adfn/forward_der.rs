@@ -81,12 +81,12 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// use rustad::ad_from_value;
 ///
 /// // V
-/// type V = f64;
+/// type V = rustad::AzFloat<f64>;
 /// //
 /// // f
 /// // f(p, x) = p[0] * p[1] * x[0] * x[1] * x[2]
-/// let p    : Vec<V>   = vec![ 1.0 , 1.0 ];
-/// let x    : Vec<V>   = vec![ 1.0, 1.0, 1.0 ];
+/// let p    : Vec<V>   = vec![ V::from(1.0), V::from(1.0) ];
+/// let x    : Vec<V>   = vec![ V::from(1.0), V::from(1.0), V::from(1.0) ];
 /// let (ap, ax )       = start_recording_dyp(p, x);
 /// let aterm1          = &ap[0] * &ap[1];
 /// let aterm2          = &( &ax[0] * &ax[1] ) * &ax[2];
@@ -96,16 +96,16 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// //
 /// // dy = partial f(p, x) w.r.t. x[0]
 /// let trace           = false;
-/// let p      : Vec<V> = vec![ 2.0, 3.0 ];
-/// let x      : Vec<V> = vec![ 4.0, 5.0, 6.0 ];
+/// let p      : Vec<V> = vec![ V::from(2.0), V::from(3.0) ];
+/// let x      : Vec<V> = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
 /// let dyp             = f.forward_dyp_value(p, trace);
 /// let (y, var)        = f.forward_var_value(&dyp, x, trace);
-/// let dx     : Vec<V> = vec![ 1.0, 0.0, 0.0 ];
+/// let dx     : Vec<V> = vec![ V::from(1.0), V::from(0.0), V::from(0.0) ];
 /// let dy              = f.forward_der_value(&dyp, &var, dx,  trace);
 /// //
 /// // check
 /// // derivative w.r.t x[0] is p[0] * p[1] * x[1] * x[2] * x[3]
-/// assert_eq!( dy[0] , 2.0 * 3.0 * 5.0 * 6.0 );
+/// assert_eq!( dy[0] , V::from( 2.0 * 3.0 * 5.0 * 6.0 ) );
 /// ```
 ///
 pub fn doc_forward_der() { }
