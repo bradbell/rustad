@@ -77,29 +77,30 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// use rustad::start_recording_dyp;
 /// use rustad::stop_recording;
 /// use rustad::AD;
+/// use rustad::AzFloat;
 /// use rustad::ad_from_value;
 ///
 /// // V
-/// type V = f32;
+/// type V = rustad::AzFloat<f32>;
 /// // f
 /// // f(x) = p[0] * p[1] * x[0] * x[1] * x[2]
-/// let p    : Vec<V>   = vec![ 1.0 , 1.0 ];
-/// let x    : Vec<V>   = vec![ 1.0, 1.0, 1.0 ];
-/// let (ap, ax )       = start_recording_dyp(p, x);
-/// let aterm1          = &ap[0] * &ap[1];
-/// let aterm2          = &( &ax[0] * &ax[1] ) * &ax[2];
-/// let aprod           = &aterm1 * &aterm2;
-/// let ay              = vec![ aprod ];
-/// let f               = stop_recording(ay);
+/// let p          = vec![ V::from(1.0), V::from(1.0) ];
+/// let x          = vec![ V::from(1.0), V::from(1.0), V::from(1.0) ];
+/// let (ap, ax )  = start_recording_dyp(p, x);
+/// let aterm1     = &ap[0] * &ap[1];
+/// let aterm2     = &( &ax[0] * &ax[1] ) * &ax[2];
+/// let aprod      = &aterm1 * &aterm2;
+/// let ay         = vec![ aprod ];
+/// let f          = stop_recording(ay);
 /// //
 /// // dx = derivative of f(p, x) with respect to x
-/// let trace           = false;
-/// let p      : Vec<V> = vec![ 2.0, 3.0 ];
-/// let x      : Vec<V> = vec![ 4.0, 5.0, 6.0 ];
-/// let dyp             = f.forward_dyp_value(p.clone(), trace);
-/// let (y, var)        = f.forward_var_value(&dyp, x.clone(), trace);
-/// let dy     : Vec<V> = vec![ 1.0 ];
-/// let dx              = f.reverse_der_value(&dyp, &var, dy,  trace);
+/// let trace      = false;
+/// let p          = vec![ V::from(2.0), V::from(3.0) ];
+/// let x          = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
+/// let dyp        = f.forward_dyp_value(p.clone(), trace);
+/// let (y, var)   = f.forward_var_value(&dyp, x.clone(), trace);
+/// let dy         = vec![ V::from(1.0) ];
+/// let dx         = f.reverse_der_value(&dyp, &var, dy,  trace);
 /// //
 /// assert_eq!( dx[0] , p[0] * p[1] * x[1] * x[2] );
 /// assert_eq!( dx[1] , p[0] * p[1] * x[0] * x[2] );
