@@ -19,7 +19,6 @@
 //!  The NumVec types implement Clone, but not the Copy trait.
 // ---------------------------------------------------------------------------
 // use
-use ordered_float::OrderedFloat;
 use crate::AzFloat;
 //
 // NumVec
@@ -92,18 +91,19 @@ where
 ///```
 /// use rustad::NumVec;
 ///
-/// let a  = NumVec::new( vec![ 1f64, 2f64 ] );
-/// let b  = NumVec::from( 3f64 );
-/// let c  = NumVec::from( 4f64 );
+/// type S = f64;
+/// let a  = NumVec::new( vec![ S::from(1.0), S::from(2.0) ] );
+/// let b  = NumVec::from( S::from(3.0) );
+/// let c  = NumVec::from( S::from(4.0) );
 ///
 /// let d = &a * &b;
 /// assert_eq!( d.len(), 2);
-/// assert_eq!( d.get(0), 3f64 );
-/// assert_eq!( d.get(1), 6f64 );
+/// assert_eq!( d.get(0), S::from(3.0) );
+/// assert_eq!( d.get(1), S::from(6.0) );
 ///
 /// let d = &b - &c;
 /// assert_eq!( d.len(), 1);
-/// assert_eq!( d.get(0), -1.0f64 );
+/// assert_eq!( d.get(0), S::from(-1.0) );
 /// ```
 pub fn doc_num_vec_binary_op() { }
 //
@@ -174,18 +174,19 @@ num_vec_binary_op!(Div, /);
 ///```
 /// use rustad::NumVec;
 ///
-/// let mut a = NumVec::new( vec![ 12f64, 6f64 ] );
-/// let mut b = NumVec::from( 3f64 );
-/// let c     = NumVec::from( 4f64 );
+/// type S    = f32;
+/// let mut a = NumVec::new( vec![ S::from(12.0), S::from(6.0) ] );
+/// let mut b = NumVec::from( S::from(3.0) );
+/// let c     = NumVec::from( S::from(4.0) );
 ///
 /// a /= &b;
 /// assert_eq!( a.len(), 2);
-/// assert_eq!( a.get(0), 4f64 );
-/// assert_eq!( a.get(1), 2f64 );
+/// assert_eq!( a.get(0), S::from(4.0) );
+/// assert_eq!( a.get(1), S::from(2.0) );
 ///
 /// b += &c;
 /// assert_eq!( b.len(), 1);
-/// assert_eq!( b.get(0), 7.0f64 );
+/// assert_eq!( b.get(0), S::from(7.0) );
 /// ```
 pub fn doc_num_vec_compound_op() { }
 //
@@ -243,9 +244,10 @@ num_vec_compound_op!(DivAssign, /=);
 /// ```
 /// use rustad::AD;
 /// use rustad::NumVec;
-/// let x     : Vec<f64>  = vec![5.0, 6.0];
-/// let x_nv              = NumVec::new(x);
-/// let s                 = format!( "{x_nv}" );
+/// type S    = f64;
+/// let x     = vec![ S::from(5.0) , S::from(6.0) ];
+/// let x_nv  = NumVec::new(x);
+/// let s     = format!( "{x_nv}" );
 /// assert_eq!( s, "[ 5, 6, ]" );
 /// ```
 impl<S : std::fmt::Display> std::fmt::Display for NumVec<S> {
@@ -330,7 +332,6 @@ impl_from_scalar!( AzFloat<f64>, AzFloat<f64>);
 ///
 /// Two NumVec object are equal it they have the same length
 /// and their corresponding elements are equal.
-/// The value Nan is considered equal to itself in the comparison.
 ///
 /// Prototype:
 /// <br/>
@@ -339,62 +340,33 @@ impl_from_scalar!( AzFloat<f64>, AzFloat<f64>);
 /// # Example
 /// ```
 /// use rustad::NumVec;
+/// use rustad::AzFloat;
 ///
-/// let a = NumVec::new( vec![ 2.0f64, 2.0f64 ] );
-/// let b = NumVec::new( vec![ f64::NAN, 2.064 ] );
-/// let c = NumVec::new( vec![ f64::NAN, 2.064 ] );
+/// type S = AzFloat<f32>;
+/// let a  = NumVec::new( vec![ S::from(f32::NAN), S::from(2.0) ] );
+/// let b  = NumVec::new( vec![ S::from(2.0), S::from(2.0) ] );
+/// let c  = NumVec::from( S::from(2.0) );
 /// assert_eq!(a, a);
 /// assert_eq!(b, b);
 /// assert_eq!(c, c);
+///
 /// assert_ne!(a, b);
-/// assert_eq!(b, c);
+/// assert_ne!(a, c);
+/// assert_ne!(b, c);
 /// ```
 pub fn doc_partial_equal() {}
 ///
-macro_rules! impl_ordered_float_partial_equal { ($S:ident) => {
-    impl PartialEq for NumVec<$S>
-    where
-        $S : PartialEq + ordered_float::FloatCore,
-    {
-        fn eq(&self, rhs : &Self) -> bool
-        {   let mut result = true;
-            if self.len() != rhs.len()  {
-                result = false;
-            } else if self.len() == 1 {
-                result = OrderedFloat(self.s) == OrderedFloat(rhs.s);
-            } else {
-                for j in 0 .. self.len() {
-                    result = result &&
-                        OrderedFloat(self.vec[j]) == OrderedFloat(rhs.vec[j]);
-                }
-            }
-            result
+impl<S> PartialEq for NumVec<S>
+where
+    S : PartialEq,
+{
+    fn eq(&self, rhs : &Self) -> bool
+    {   if self.len() != rhs.len()  {
+            false
+        } else if self.len() == 1 {
+            self.s == rhs.s
+        } else {
+            self.vec == rhs.vec
         }
     }
-} }
-impl_ordered_float_partial_equal!(f32);
-impl_ordered_float_partial_equal!(f64);
-///
-macro_rules! impl_az_float_partial_equal { ($S:ident) => {
-    impl PartialEq for NumVec< AzFloat<$S> >
-    where
-        AzFloat<$S> : PartialEq
-    {
-        fn eq(&self, rhs : &Self) -> bool
-        {   let mut result = true;
-            if self.len() != rhs.len()  {
-                result = false;
-            } else if self.len() == 1 {
-                result = self.s == rhs.s;
-            } else {
-                for j in 0 .. self.len() {
-                    result = result &&
-                        self.vec[j] == rhs.vec[j];
-                }
-            }
-            result
-        }
-    }
-} }
-impl_az_float_partial_equal!(f32);
-impl_az_float_partial_equal!(f64);
+}
