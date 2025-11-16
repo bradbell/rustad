@@ -325,6 +325,7 @@ where
     }
 }
 // ---------------------------------------------------------------------------
+// TODO: use a faster hasher; e.g., rustc_hash::FxHasher.
 /// Hash function for AzFloat objects
 ///
 /// * B : is the floating point base type
@@ -340,6 +341,7 @@ where
 /// let z3      = AzFloat( f32::NAN );
 /// map.insert(z1, 1u32);
 /// map.insert(z2, 2u32);
+///
 /// let option  = map.get_key_value(&z1);
 /// assert_eq!(option, Some( (&z1, &1u32) ) );
 ///

@@ -53,8 +53,6 @@ setup_this_value_type!( NumVec< AzFloat<f32> > );
 setup_this_value_type!( NumVec< AzFloat<f64> > );
 crate::ad::impl_ad_from_f64!( NumVec< AzFloat<f64> > );
 //
-crate::hash::impl_value_type_hash!(f32);
-//
 // Float value types
 // setup_this_value_type!(f32);
 // setup_this_value_type!(f64);
