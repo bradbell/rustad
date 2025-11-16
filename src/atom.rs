@@ -184,7 +184,7 @@ pub type AtomForwardDerAD<V> = fn(
 ) -> Result< Vec< AD<V> >, String >;
 // -------------------------------------------------------------------------
 //
-// AtomReverseOneValue
+// AtomReverseDerValue
 /// Callback to atomic functions during reverse_der_value
 ///
 /// * Required :
@@ -201,14 +201,14 @@ pub type AtomForwardDerAD<V> = fn(
 /// ```text
 ///     dom_der = range_der * f'(domain)
 /// ```
-pub type AtomReverseOneValue<V> = fn(
+pub type AtomReverseDerValue<V> = fn(
     _domain        : &Vec<&V>    ,
     _range_der     : Vec<&V>     ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
 ) -> Vec<V> ;
 //
-// AtomReverseOneAD
+// AtomReverseDerAD
 /// Callback to atomic functions during reverse_der_ad
 ///
 /// * Required :
@@ -225,12 +225,12 @@ pub type AtomReverseOneValue<V> = fn(
 /// ```text
 ///     dom_der = range_der * f'(domain)
 /// ```
-pub type AtomReverseOneAD<V> = fn(
+pub type AtomReverseDerAD<V> = fn(
     _domain        : &Vec<& AD<V> >    ,
     _range_der     : Vec<& AD<V> >     ,
     _call_info     : IndexT            ,
     _trace         : bool              ,
-) -> Vec< AD<V> > ;
+) -> Result< Vec< AD<V> >, String >;
 // ----------------------------------------------------------------------------
 //
 // AtomEval
@@ -248,8 +248,8 @@ pub struct AtomEval<V> {
     pub forward_der_value    : Option< AtomForwardDerValue::<V> > ,
     pub forward_der_ad       : Option< AtomForwardDerAD::<V> >    ,
     //
-    pub reverse_der_value    : Option< AtomReverseOneValue::<V> > ,
-    pub reverse_der_ad       : Option< AtomReverseOneAD::<V> >    ,
+    pub reverse_der_value    : Option< AtomReverseDerValue::<V> > ,
+    pub reverse_der_ad       : Option< AtomReverseDerAD::<V> >    ,
     //
 }
 // ----------------------------------------------------------------------------

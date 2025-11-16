@@ -56,7 +56,7 @@ pub fn sumsq_reverse_der_ad(
     range_one    : Vec<& AD<V> >     ,
     call_info    : IndexT            ,
     trace        : bool              ,
-) -> Vec< AD<V> >
+) -> Result< Vec< AD<V> >, String >
 {   //
     // range_one
     assert_eq!( range_one.len(), 1 );
@@ -94,5 +94,5 @@ pub fn sumsq_reverse_der_ad(
         println!("]");
         println!("End Trace: sumsq_reverse_der_ad");
     }
-    domain_one
+    Ok( domain_one )
 }

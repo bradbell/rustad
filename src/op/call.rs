@@ -832,9 +832,13 @@ where
     assert!( 0 < j_res );
     //
     // adomain_one
-    let adomain_one = reverse_der_ad(
-        &adomain_zero, arange_one, call_info, trace
-    );
+    let result = reverse_der_ad(&adomain_zero, arange_one, call_info, trace);
+    let adomain_one = match result {
+        Err(msg) => { panic!(
+            "atom {} reverse_der_ad error : {}", atom_eval.name, msg);
+        },
+        Ok(domain) => domain,
+    };
     assert_eq!( adomain_one.len(), n_dom);
     //
     // avar_der
