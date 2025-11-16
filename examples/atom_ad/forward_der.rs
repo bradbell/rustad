@@ -24,7 +24,7 @@ pub fn sumsq_forward_der_value(
     domain_one   : Vec<&V>     ,
     _call_info   : IndexT      ,
     trace        : bool        ,
-) -> Vec<V>
+) -> Result< Vec<V>, String >
 {   //
     // domain_zero
     assert_eq!( domain_zero.len(), domain_one.len() );
@@ -51,7 +51,7 @@ pub fn sumsq_forward_der_value(
         println!("range_one = {}", range_one);
         println!("End Trace: sumsq_forward_der_value");
     }
-    vec![ range_one ]
+    Ok( vec![ range_one ] )
 }
 //
 // sumsq_forward_der_ad

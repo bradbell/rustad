@@ -157,7 +157,7 @@ pub type AtomForwardDerValue<V> = fn(
     _dom_der       : Vec<&V>     ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
-) -> Vec<V> ;
+) -> Result< Vec<V>, String >;
 //
 // AtomForwardDerAD
 /// Callback to atomic functions during forward_der_ad

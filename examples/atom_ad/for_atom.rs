@@ -57,7 +57,7 @@ fn for_sumsq_forward_der_value(
     domain_one  : Vec<&V>   ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
-) -> Vec<V>
+) -> Result< Vec<V>, String >
 {   //
     // domain_zero, domain_one
     assert_eq!( domain_zero.len(), domain_one.len() );
@@ -85,7 +85,7 @@ fn for_sumsq_forward_der_value(
         dz += &( &two_v * &( dx[j] * y[j] ) );
     }
     //
-    vec![ dz ]
+    Ok( vec![ dz ] )
 }
 //
 // for_sumsq_reverse_der_value

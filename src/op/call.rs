@@ -592,9 +592,13 @@ where
         }
     }
     // range_one
-    let mut range_one = forward_der_value(
-        &domain_zero, domain_one, call_info, trace
-    );
+    let result = forward_der_value(&domain_zero, domain_one, call_info, trace);
+    let mut range_one = match result {
+        Err(msg) => { panic!(
+            "atom {} forward_der_value error : {}", atom_eval.name, msg);
+        },
+        Ok(range) => range,
+    };
     assert_eq!( range_one.len(), n_res);
     //
     // var_der
