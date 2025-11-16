@@ -52,6 +52,10 @@ This package is intended to include most of the features in
 8.  Dynamic parameters; i.e., function arguments that are treated as constant
     during differeniation.
 
+9.  Absolute zero multiplication; i.e., zero times nan is also zero.
+    This is important when computing derivatives where some of the components
+    are nan, but they are not used.
+
 ## Under Construction
 Reduce tape size both during recording and by
 optimizing the operation sequence. 

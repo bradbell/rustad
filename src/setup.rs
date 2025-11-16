@@ -43,21 +43,24 @@ macro_rules! setup_this_value_type{ ($V:ty) => {
         crate::op::info::impl_global_op_info_vec!($V);
 } }
 //
-setup_this_value_type!(f32);
-setup_this_value_type!(f64);
-//
+// AzFloat value types
 setup_this_value_type!( AzFloat<f32> );
 setup_this_value_type!( AzFloat<f64> );
+crate::ad::impl_ad_from_f64!( AzFloat<f64> );
 //
+// NumVec<AzFloat> value types
 setup_this_value_type!( NumVec< AzFloat<f32> > );
 setup_this_value_type!( NumVec< AzFloat<f64> > );
-//
-crate::ad::impl_ad_from_f64!(f64);
-crate::ad::impl_ad_from_f64!( AzFloat<f64> );
 crate::ad::impl_ad_from_f64!( NumVec< AzFloat<f64> > );
 //
 crate::hash::impl_value_type_hash!(f32);
 //
+// Float value types
+// setup_this_value_type!(f32);
+// setup_this_value_type!(f64);
+// crate::ad::impl_ad_from_f64!(f64);
+//
+// NumVec<Float> value types
 // setup_this_value_type!( NumVec<f32> );
 // setup_this_value_type!( NumVec<f64> );
 // crate::ad::impl_ad_from_f64!( NumVec<f64> );

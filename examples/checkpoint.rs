@@ -10,6 +10,7 @@
 use std::cell::RefCell;
 //
 use rustad::{
+    AzFloat,
     AD,
     ADType,
     ad_from_value,
@@ -23,7 +24,7 @@ use rustad::{
 };
 //
 // V
-type V = f64;
+type V = AzFloat<f64>;
 //
 thread_local! {
     static ADFN_VEC : RefCell< Vec< ADfn<V> > > =
@@ -202,7 +203,7 @@ fn main() {
     // f
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
     let ax           = start_recording(x);
-    let mut asumsq : AD<V> = ad_from_value( 0 as V );
+    let mut asumsq : AD<V> = ad_from_value( V::from(0) );
     for j in 0 .. ax.len() {
         let term = &ax[j] * &ax[j];
         asumsq  += &term;
@@ -229,7 +230,7 @@ fn main() {
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
     //
     // g.forward_one_value
-    let dx      : Vec<V> = vec![ 5.0, V::from(6.0) ];
+    let dx      : Vec<V> = vec![ V::from(5.0), V::from(6.0) ];
     let dy               = g.forward_one_value(&v , dx.clone(), trace);
     assert_eq!( dy[0], V::from(2.0) * x[0]*dx[0] + V::from(2.0) * x[1]*dx[1] );
     //
