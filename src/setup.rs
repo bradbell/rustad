@@ -46,9 +46,6 @@ macro_rules! setup_this_value_type{ ($V:ty) => {
 setup_this_value_type!(f32);
 setup_this_value_type!(f64);
 //
-setup_this_value_type!( NumVec<f32> );
-setup_this_value_type!( NumVec<f64> );
-//
 setup_this_value_type!( AzFloat<f32> );
 setup_this_value_type!( AzFloat<f64> );
 //
@@ -56,8 +53,11 @@ setup_this_value_type!( NumVec< AzFloat<f32> > );
 setup_this_value_type!( NumVec< AzFloat<f64> > );
 //
 crate::ad::impl_ad_from_f64!(f64);
-crate::ad::impl_ad_from_f64!( NumVec<f64> );
 crate::ad::impl_ad_from_f64!( AzFloat<f64> );
 crate::ad::impl_ad_from_f64!( NumVec< AzFloat<f64> > );
 //
 crate::hash::impl_value_type_hash!(f32);
+//
+// setup_this_value_type!( NumVec<f32> );
+// setup_this_value_type!( NumVec<f64> );
+// crate::ad::impl_ad_from_f64!( NumVec<f64> );

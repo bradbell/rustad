@@ -1056,10 +1056,11 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
 /// ```
 /// use rustad::AD;
 /// use rustad::NumVec;
+/// use rustad::AzFloat;
 /// type V = rustad::AzFloat<f32>;
-/// let ax : AD< NumVec<f64> >  = (3.0 as f32).into();
-/// let x                       = ax.to_value();
-/// assert_eq!( x.get(0), 3.0 as f64);
+/// let ax : AD< NumVec< AzFloat<f64> > >  = (3.0 as f32).into();
+/// let x  = ax.to_value();
+/// assert_eq!( x.get(0).to_inner(), 3.0 as f64);
 /// ```
 pub fn doc_impl_ad_from_f32() { }
 //
