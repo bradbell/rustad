@@ -132,7 +132,7 @@ pub type AtomForwardFunAd<V> = fn(
     _domain        : &Vec<& AD<V> >     ,
     _call_info     : IndexT             ,
     _trace         : bool               ,
-) -> Vec< AD<V> > ;
+) -> Result< Vec< AD<V> >, String > ;
 // -------------------------------------------------------------------------
 //
 // AtomForwardDerValue

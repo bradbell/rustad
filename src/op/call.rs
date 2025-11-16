@@ -356,9 +356,13 @@ where
     );
     //
     // arange_zero
-    let mut arange_zero = forward_fun_ad(
-        &adomain_zero, call_info, trace
-    );
+    let result = forward_fun_ad( &adomain_zero, call_info, trace );
+    let mut arange_zero = match result {
+        Err(msg) => { panic!(
+            "atom {} forward_fun_ad error : {}", atom_eval.name, msg);
+        },
+        Ok(range) => range,
+    };
     assert_eq!(
         n_res,
         arange_zero.len(),
@@ -502,9 +506,13 @@ where
     );
     //
     // arange_zero
-    let mut arange_zero = forward_fun_ad(
-        &adomain_zero, call_info, trace
-    );
+    let result = forward_fun_ad( &adomain_zero, call_info, trace );
+    let mut arange_zero = match result {
+        Err(msg) => { panic!(
+            "atom {} forward_fun_ad error : {}", atom_eval.name, msg);
+        },
+        Ok(range) => range,
+    };
     assert_eq!(
         n_res,
         arange_zero.len(),

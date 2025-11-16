@@ -48,7 +48,7 @@ pub fn sumsq_forward_fun_ad(
     domain_zero  : &Vec<& AD<V> >    ,
     call_info    : IndexT            ,
     trace        : bool              ,
-) -> Vec< AD<V> >
+) -> Result< Vec< AD<V> >, String >
 {   //
     // atom_id
     let atom_id = ATOM_ID_VEC.with_borrow( |atom_id_vec|
@@ -77,5 +77,5 @@ pub fn sumsq_forward_fun_ad(
         println!("sumsq_zero = {:?}", sumsq_zero);
         println!("End Trace: sumsq_forward_fun_value");
     }
-    sumsq_zero
+    Ok( sumsq_zero )
 }
