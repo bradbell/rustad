@@ -373,7 +373,7 @@ where
 impl<S: PartialEq> Eq for NumVec<S> { }
 // ---------------------------------------------------------------------------
 // TODO: use a faster hasher; e.g., rustc_hash::FxHasher.
-/// Hash function for NumVec<AzFloat> objects
+/// Hash function for `NumVec<AzFloat>` objects
 ///
 /// * B : is the floating point base type
 ///
