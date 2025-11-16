@@ -673,9 +673,13 @@ where
         }
     }
     // arange_der
-    let mut arange_der = forward_der_ad(
-        &adomain_zero, adomain_der, call_info, trace
-    );
+    let result = forward_der_ad(&adomain_zero, adomain_der, call_info, trace);
+    let mut arange_der = match result {
+        Err(msg) => { panic!(
+            "atom {} forward_der_ad error : {}", atom_eval.name, msg);
+        },
+        Ok(range) => range,
+    };
     assert_eq!( arange_der.len(), n_res);
     //
     // avar_der

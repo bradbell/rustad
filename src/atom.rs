@@ -181,7 +181,7 @@ pub type AtomForwardDerAD<V> = fn(
     _dom_der       : Vec<& AD<V> >     ,
     _call_info     : IndexT            ,
     _trace         : bool              ,
-) -> Vec< AD<V> > ;
+) -> Result< Vec< AD<V> >, String >;
 // -------------------------------------------------------------------------
 //
 // AtomReverseOneValue
