@@ -95,7 +95,7 @@ pub type AtomForwardType = fn(
 )-> Vec<ADType>;
 // -------------------------------------------------------------------------
 //
-// AtonForwardFunValue
+// AtomForwardFunValue
 /// Callback to atomic functions during
 /// forward_dyp_value and forward_var_value.
 ///
@@ -108,13 +108,13 @@ pub type AtomForwardType = fn(
 /// The return
 /// contains the value of the atomic function range variables.
 ///
-pub type AtonForwardFunValue<V> = fn(
+pub type AtomForwardFunValue<V> = fn(
     _domain        : &Vec<&V>    ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
 ) -> Vec<V> ;
 //
-// AtonForwardFunAd
+// AtomForwardFunAd
 /// Callback to atomic functions during
 /// forward_dyp_ad and forward_var_ad.
 ///
@@ -128,14 +128,14 @@ pub type AtonForwardFunValue<V> = fn(
 /// The return
 /// contains the value of the atomic function range variables.
 ///
-pub type AtonForwardFunAd<V> = fn(
+pub type AtomForwardFunAd<V> = fn(
     _domain        : &Vec<& AD<V> >     ,
     _call_info     : IndexT             ,
     _trace         : bool               ,
 ) -> Vec< AD<V> > ;
 // -------------------------------------------------------------------------
 //
-// AtonForwardDerValue
+// AtomForwardDerValue
 /// Callback to atomic functions during forward_der_value
 ///
 /// * Required :
@@ -152,14 +152,14 @@ pub type AtonForwardFunAd<V> = fn(
 /// ```text
 ///     range_der = f'(domain) * dom_der
 /// ```
-pub type AtonForwardDerValue<V> = fn(
+pub type AtomForwardDerValue<V> = fn(
     _domain        : &Vec<&V>    ,
     _dom_der       : Vec<&V>     ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
 ) -> Vec<V> ;
 //
-// AtonForwardDerAD
+// AtomForwardDerAD
 /// Callback to atomic functions during forward_der_ad
 ///
 /// * Required :
@@ -176,7 +176,7 @@ pub type AtonForwardDerValue<V> = fn(
 /// ```text
 ///     range_der = f'(domain) * dom_der
 /// ```
-pub type AtonForwardDerAD<V> = fn(
+pub type AtomForwardDerAD<V> = fn(
     _domain        : &Vec<& AD<V> >    ,
     _dom_der       : Vec<& AD<V> >     ,
     _call_info     : IndexT            ,
@@ -242,11 +242,11 @@ pub struct AtomEval<V> {
     pub name                 : &'static str              ,
     pub forward_type         : AtomForwardType           ,
     //
-    pub forward_fun_value    : Option< AtonForwardFunValue::<V> >,
-    pub forward_fun_ad       : Option< AtonForwardFunAd::<V> >,
+    pub forward_fun_value    : Option< AtomForwardFunValue::<V> >,
+    pub forward_fun_ad       : Option< AtomForwardFunAd::<V> >,
     //
-    pub forward_der_value    : Option< AtonForwardDerValue::<V> > ,
-    pub forward_der_ad       : Option< AtonForwardDerAD::<V> >    ,
+    pub forward_der_value    : Option< AtomForwardDerValue::<V> > ,
+    pub forward_der_ad       : Option< AtomForwardDerAD::<V> >    ,
     //
     pub reverse_der_value    : Option< AtomReverseOneValue::<V> > ,
     pub reverse_der_ad       : Option< AtomReverseOneAD::<V> >    ,
@@ -500,7 +500,7 @@ where
     //
     // forward_zero, forward_type
     let name           : &'static str;
-    let forward_zero   : Option< AtonForwardFunValue<V> >;
+    let forward_zero   : Option< AtomForwardFunValue<V> >;
     let forward_type   : AtomForwardType;
     {   //
         // read_lock
