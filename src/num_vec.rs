@@ -325,8 +325,8 @@ impl_from_scalar!( AzFloat<f32>, AzFloat<f32>);
 impl_from_scalar!( AzFloat<f32>, AzFloat<f64>);
 impl_from_scalar!( AzFloat<f64>, AzFloat<f64>);
 // ----------------------------------------------------------------------------`
-// PartialEq
-/// PartialEq `NumVec<S>` operator
+// PartialEq, Eq
+/// `NumVec<S>` Eq operator
 ///
 /// S : is the type of the elements of the numeric vector.
 ///
@@ -370,3 +370,50 @@ where
         }
     }
 }
+impl<S: PartialEq> Eq for NumVec<S> { }
+// ---------------------------------------------------------------------------
+/// Hash function for NumVec<AzFloat> objects
+///
+/// * B : is the floating point base type
+///
+/// # Example
+/// ```
+/// use std::collections::HashMap;
+/// use rustad::AzFloat;
+/// use rustad::NumVec;
+///
+/// type S      = AzFloat<f64>;
+/// type V      = NumVec<S>;
+/// let mut map : HashMap<V, u32> = HashMap::new();
+/// let z1      = NumVec::new( vec![ S::from(1.0) ] );
+/// let z2      = NumVec::new( vec![ S::from(1.0), S::from( f64::NAN) ] );
+/// let z3      = NumVec::new( vec![ S::from( f64::NAN ) ]  );
+/// map.insert(z1.clone(), 1u32);
+/// map.insert(z2.clone(), 2u32);
+///
+/// let option  = map.get_key_value(&z1);
+/// assert_eq!(option, Some( (&z1, &1u32) ) );
+///
+/// let option  = map.get_key_value(&z2);
+/// assert_eq!(option, Some( (&z2, &2u32) ) );
+///
+/// let option  = map.get_key_value(&z3);
+/// assert_eq!(option, None );
+///
+/// map.insert(z3.clone(), 3u32);
+/// let option  = map.get_key_value(&z3);
+/// assert_eq!(option, Some( (&z3, &3u32) ) );
+///
+/// ```
+impl<S> std::hash::Hash for NumVec<S>
+where
+    S : std::hash::Hash,
+{
+    fn hash<H : std::hash::Hasher>(&self, state : &mut H) {
+        if self.len() == 1 {
+            self.s.hash(state);
+        } else {
+            self.vec.hash(state);
+        }
+    }
+ }
