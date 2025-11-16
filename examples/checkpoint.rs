@@ -104,7 +104,7 @@ fn checkpoint_reverse_der_value(
     range_one        : Vec<&V>     ,
     call_info        : IndexT      ,
     trace            : bool        ,
-) -> Vec<V>
+) -> Result< Vec<V>, String >
 {   //
     // domain_zero_clone
     let n_domain = domain_zero.len();
@@ -132,7 +132,7 @@ fn checkpoint_reverse_der_value(
        let f      = &f_vec[call_info as usize];
        domain_one = f.reverse_one_value(&var_both, range_one_clone, trace);
     } );
-    domain_one
+    Ok( domain_one )
 }
 //
 // checkpoint_forward_type

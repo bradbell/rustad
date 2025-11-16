@@ -206,7 +206,7 @@ pub type AtomReverseDerValue<V> = fn(
     _range_der     : Vec<&V>     ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
-) -> Vec<V> ;
+) -> Result< Vec<V>, String>;
 //
 // AtomReverseDerAD
 /// Callback to atomic functions during reverse_der_ad

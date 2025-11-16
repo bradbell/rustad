@@ -91,7 +91,7 @@ fn rev_sumsq_reverse_der_value(
     range_one   : Vec<&V>   ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
-) -> Vec<V>
+) -> Result< Vec<V>, String >
 {   //
     // nx
     assert_eq!( domain_zero.len(), range_one.len() + 1 );
@@ -116,7 +116,7 @@ fn rev_sumsq_reverse_der_value(
     }
     dx_dy.push(dy);
     //
-    dx_dy
+    Ok( dx_dy )
 }
 //
 // rev_sumsq_forward_type

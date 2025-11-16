@@ -756,9 +756,13 @@ where
     assert!( 0 < j_res );
     //
     // domain_one
-    let domain_one = reverse_der_value(
-        &domain_zero, range_one, call_info, trace
-    );
+    let result = reverse_der_value(&domain_zero, range_one, call_info, trace);
+    let domain_one = match result {
+        Err(msg) => { panic!(
+            "atom {} reverse_der_value error : {}", atom_eval.name, msg);
+        },
+        Ok(domain) => domain,
+    };
     assert_eq!( domain_one.len(), n_dom);
     //
     // var_der

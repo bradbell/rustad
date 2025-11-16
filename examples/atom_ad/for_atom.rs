@@ -94,7 +94,7 @@ fn for_sumsq_reverse_der_value(
     range_one   : Vec<&V>   ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
-) -> Vec<V>
+) -> Result< Vec<V>, String >
 {   //
     // nx
     let nx = domain_zero.len() / 2;
@@ -120,7 +120,7 @@ fn for_sumsq_reverse_der_value(
         dx_dy.push(&factor * x[j]);
     }
     //
-    dx_dy
+    Ok( dx_dy )
 }
 //
 // for_sumsq_forward_type
