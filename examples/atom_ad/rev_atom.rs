@@ -124,7 +124,7 @@ fn rev_sumsq_forward_type(
     domain_ad_type  : &[ADType]    ,
     _call_info      : IndexT       ,
     _trace          : bool         ,
-) -> Vec<ADType>
+) -> Result< Vec<ADType>, String >
 {
     //
     // nx
@@ -140,7 +140,7 @@ fn rev_sumsq_forward_type(
         let ad_type = std::cmp::max(y_ad_type.clone(), x_ad_type[j].clone());
         z_ad_type.push( ad_type );
     }
-    z_ad_type
+    Ok( z_ad_type )
 }
 //
 // register_rev_sumsq_atom

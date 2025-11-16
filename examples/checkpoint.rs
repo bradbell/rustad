@@ -140,7 +140,7 @@ fn checkpoint_forward_type(
     domain_ad_type : &[ADType]    ,
     call_info      : IndexT       ,
     trace          : bool         ,
-) -> Vec<ADType>
+) -> Result< Vec<ADType>, String >
 {   //
     // dependency
     let mut dependency : Vec< [usize; 2] > = Vec::new();
@@ -158,7 +158,7 @@ fn checkpoint_forward_type(
             range_ad_type[i].clone(), domain_ad_type[j].clone()
         );
     }
-    range_ad_type
+    Ok( range_ad_type )
 }
 //
 // -------------------------------------------------------------------------

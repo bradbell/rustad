@@ -128,13 +128,13 @@ fn for_sumsq_forward_type(
     domain_ad_type  : &[ADType]    ,
     _call_info      : IndexT       ,
     _trace          : bool         ,
-) -> Vec<ADType>
+) -> Result< Vec<ADType>, String >
 {
     let mut max_ad_type = ADType::ConstantP;
     for ad_type in domain_ad_type.iter() {
         max_ad_type = std::cmp::max( max_ad_type, ad_type.clone() );
     }
-    vec![ max_ad_type ]
+    Ok( vec![ max_ad_type ] )
 }
 //
 // register_for_sumsq_atom

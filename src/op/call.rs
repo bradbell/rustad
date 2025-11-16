@@ -107,7 +107,13 @@ where
     // res_ad_type
     let forward_type = &atom_eval.forward_type;
     let dom_ad_type  = &arg_type[6 .. 6 + n_dom];
-    let res_ad_type  = forward_type(dom_ad_type, call_info, trace);
+    let result       = forward_type(dom_ad_type, call_info, trace);
+    let res_ad_type = match result {
+        Err(msg) => { panic!(
+            "atom {} forward_type error : {}", atom_eval.name, msg);
+        },
+        Ok(vec_ad_type) => vec_ad_type,
+    };
     assert_eq!(
         n_res,
         res_ad_type.len(),

@@ -67,7 +67,7 @@ pub fn doc_common_arguments() {}
 ///
 /// * Syntax :
 /// ```text
-///     range_ad_type = forward_type(dom_ad_type, call_info, trace)
+///     range_ad_type = forward_type(dom_ad_type, call_info, trace) ?
 /// ```
 ///
 /// forward_ad_type :
@@ -92,7 +92,7 @@ pub type AtomForwardType = fn(
     _domain_ad_type  : &[ADType]    ,
     _call_info       : IndexT       ,
     _trace           : bool         ,
-)-> Vec<ADType>;
+)-> Result< Vec<ADType>, String >;
 // -------------------------------------------------------------------------
 //
 // AtomForwardFunValue
@@ -342,6 +342,7 @@ where
 // record_call_atom
 fn record_call_atom<V>(
     tape                  : &mut Tape<V>                  ,
+    name                  : &str                          ,
     forward_type          : AtomForwardType               ,
     adomain               : Vec< AD<V> >                  ,
     range                 : Vec<V>                        ,
@@ -368,7 +369,13 @@ where
     ).collect();
     //
     // range_ad_type
-    let range_ad_type = forward_type(&domain_ad_type, call_info, trace);
+    let result = forward_type(&domain_ad_type, call_info, trace);
+    let range_ad_type = match result {
+        Err(msg) => {
+            panic!( "atom {} forward_type error : {}", name, msg);
+        },
+        Ok(vec_ad_type) => vec_ad_type,
+    };
     //
     // n_dyp, n_var
     let n_dyp = tape.dyp.n_dom + tape.dyp.n_dep;
@@ -536,6 +543,7 @@ where
     } else {
         arange = local_key.with_borrow_mut( |tape| record_call_atom::<V>(
             tape,
+            name,
             forward_type,
             adomain,
             range,

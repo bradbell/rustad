@@ -45,7 +45,7 @@ fn h_forward_type(
     dom_ad_type  : &[ADType]    ,
     _call_info   : IndexT       ,
     _trace       : bool         ,
-) -> Vec<ADType>
+) -> Result< Vec<ADType>, String >
 {   let n_res = 3;
     let mut res_ad_type : Vec<ADType> = Vec::with_capacity(n_res);
     //
@@ -58,7 +58,7 @@ fn h_forward_type(
     let ad_type = dom_ad_type[3].clone();
     res_ad_type.push( ad_type );
     //
-    res_ad_type
+    Ok( res_ad_type )
 }
 //
 // BEGIN h_forward_fun_value
