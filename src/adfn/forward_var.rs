@@ -251,7 +251,7 @@ macro_rules! forward_var {
                         range.push( cop_e )
                     },
                     ADType::NoType => {
-                        panic!( "forward_var: ADType::NoTYpe not expected" );
+                        panic!( "forward_var: ADType::NoType not expected" );
                     },
                 }
             }
