@@ -149,7 +149,7 @@ pub fn register_rev_sumsq_atom()-> IndexT {
     // rev_sumsq_atom_eval
     let rev_sumsq_atom_eval = AtomEval {
         name                 : &"rev_sumsq",
-        forward_type         :  rev_sumsq_forward_type,
+        forward_type         :  Some( rev_sumsq_forward_type ),
         //
         forward_fun_value    :  Some(rev_sumsq_forward_fun_value),
         forward_fun_ad       :  None,

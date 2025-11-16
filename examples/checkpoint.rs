@@ -169,7 +169,7 @@ fn register_checkpoint_atom()-> IndexT {
     // checkpoint_atom_eval
     let checkpoint_atom_eval = AtomEval {
         name                 : &"checkpoint",
-        forward_type         :  checkpoint_forward_type,
+        forward_type         :  Some( checkpoint_forward_type ),
         //
         forward_fun_value    :  Some(checkpoint_forward_fun_value),
         forward_fun_ad       :  None,

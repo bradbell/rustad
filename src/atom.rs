@@ -239,8 +239,8 @@ pub type AtomReverseDerAD<V> = fn(
 pub struct AtomEval<V> {
     //
     // required
-    pub name                 : &'static str              ,
-    pub forward_type         : AtomForwardType           ,
+    pub name                 : &'static str,
+    pub forward_type         : Option< AtomForwardType >,
     //
     pub forward_fun_value    : Option< AtomForwardFunValue::<V> >,
     pub forward_fun_ad       : Option< AtomForwardFunAd::<V> >,
@@ -508,7 +508,7 @@ where
     // forward_zero, forward_type
     let name           : &'static str;
     let forward_zero   : Option< AtomForwardFunValue<V> >;
-    let forward_type   : AtomForwardType;
+    let forward_type   : Option< AtomForwardType >;
     {   //
         // read_lock
         let read_lock = rw_lock.read();
@@ -521,10 +521,15 @@ where
         name              = atom_eval.name;
         forward_type      = atom_eval.forward_type.clone();
     }
+    if forward_type.is_none() { panic!(
+        "{} : forward_type is not implemented for this atomic function",
+        name,
+    ); }
     if forward_zero.is_none() { panic!(
         "{} : forward_fun_value is not implemented for this atomic function",
         name,
     ); }
+    let forward_type = forward_type.unwrap();
     let forward_zero = forward_zero.unwrap();
     //
     // domain

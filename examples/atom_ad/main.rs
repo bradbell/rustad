@@ -90,7 +90,7 @@ fn register_sumsq_atom()-> IndexT {
     // sumsq_atom_eval
     let sumsq_atom_eval = AtomEval {
         name                 : &"sumsq",
-        forward_type         :  sumsq_forward_type,
+        forward_type         :  Some( sumsq_forward_type ),
         //
         forward_fun_value    :  Some(sumsq_forward_fun_value),
         forward_fun_ad       :  Some( sumsq_forward_fun_ad ),

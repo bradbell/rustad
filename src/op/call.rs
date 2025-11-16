@@ -106,6 +106,11 @@ where
     //
     // res_ad_type
     let forward_type = &atom_eval.forward_type;
+    if forward_type.is_none() { panic!(
+        "{} : forward_type is not implemented for this atomic function",
+        atom_eval.name,
+    ); }
+    let forward_type = forward_type.unwrap();
     let dom_ad_type  = &arg_type[6 .. 6 + n_dom];
     let result       = forward_type(dom_ad_type, call_info, trace);
     let res_ad_type = match result {
