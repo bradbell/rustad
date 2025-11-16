@@ -4,7 +4,7 @@
 //
 use rustad::utility::avg_seconds_to_execute;
 use rustad::{
-    AD,
+    AzFloat,
     ad_from_value,
     NumVec,
 };
@@ -38,7 +38,7 @@ fn six_times_normsq() -> usize
 //
 // f32
 pub fn normsq_f32()
-{   let mut sumsq  = 0f32;
+{   let mut sumsq  = 0 as f32;
     for j in 1 .. (N_SUM+1) {
         sumsq += (j as f32) * (j as f32);
     }
@@ -47,41 +47,59 @@ pub fn normsq_f32()
 //
 // f64
 pub fn normsq_f64()
-{   let mut sumsq  = 0f64;
+{   let mut sumsq  = 0 as f64;
     for j in 1 .. (N_SUM+1) {
         sumsq += (j as f64) * (j as f64);
     }
     assert_eq!( 6.0 * sumsq, six_times_normsq() as f64 );
 }
 //
-// AD<f64>
-pub fn normsq_ad_f64()
-{   let mut sumsq  : AD<f64> = ( 0 as f64 ).into();
+// AzFloat<f64>
+pub fn normsq_az_f64()
+{   let mut sumsq  = AzFloat(0 as f64);
     for j in 1 .. (N_SUM+1) {
-        let ad_j  : AD<f64> = ad_from_value(j as f64);
+        sumsq += &( &AzFloat(j as f64) * &AzFloat(j as f64) );
+    }
+    assert_eq!( 6.0 * sumsq.to_inner(), six_times_normsq() as f64 );
+}
+//
+// NumVec< AzFloat<f64> >
+pub fn normsq_nv_az_f64()
+{   let mut sumsq  = NumVec::from( AzFloat(0 as f64) );
+    for j in 1 .. (N_SUM+1) {
+        let nv_j  = NumVec::from( AzFloat(j as f64) );
+        sumsq += &( &nv_j * &nv_j );
+    }
+    assert_eq!(
+        6.0 * sumsq.get(0).to_inner(),
+        six_times_normsq() as f64
+    );
+}
+//
+// AD< AzFloat<f64> >
+pub fn normsq_ad_az_f64()
+{   let mut sumsq  = ad_from_value( AzFloat( 0 as f64 ) );
+    for j in 1 .. (N_SUM+1) {
+        let ad_j  = ad_from_value( AzFloat(j as f64) );
         sumsq += &( &ad_j * &ad_j );
     }
-    assert_eq!( 6.0 * sumsq.to_value(), six_times_normsq() as f64 );
+    assert_eq!(
+        6.0 * sumsq.to_value().to_inner(),
+        six_times_normsq() as f64
+    );
 }
 //
-// NUMVEC<f64>
-pub fn normsq_nv_f64()
-{   let mut sumsq  : NumVec<f64> = (0 as f64).into();
+// AD< NumVec< AzFloat<f64> > >
+pub fn normsq_ad_nv_az_f64()
+{   let mut sumsq  = ad_from_value( NumVec::from( AzFloat(0 as f64) ) );
     for j in 1 .. (N_SUM+1) {
-        let nv_j  : NumVec<f64>   = (j as f64).into();
+        let nv_j  = ad_from_value( NumVec::from( AzFloat(j as f64 ) ) );
         sumsq += &( &nv_j * &nv_j );
     }
-    assert_eq!( 6.0 * sumsq.get(0), six_times_normsq() as f64 );
-}
-//
-// AD< NUMVEC<f64> >
-pub fn normsq_ad_nv_f64()
-{   let mut sumsq  : AD< NumVec<f64> > = (0 as f64).into();
-    for j in 1 .. (N_SUM+1) {
-        let nv_j  : AD< NumVec<f64> >   = (j as f64).into();
-        sumsq += &( &nv_j * &nv_j );
-    }
-    assert_eq!( 6.0 * sumsq.to_value().get(0), six_times_normsq() as f64 );
+    assert_eq!(
+        6.0 * sumsq.to_value().get(0).to_inner(),
+        six_times_normsq() as f64
+    );
 }
 
 fn bench( name : &str, test_case : fn() ) {
@@ -93,9 +111,10 @@ fn bench( name : &str, test_case : fn() ) {
 }
 
 fn main() {
-    bench( "normsq_f32" ,       normsq_f32 );
-    bench( "normsq_f64" ,       normsq_f64 );
-    bench( "normsq_ad_f64" ,    normsq_ad_f64 );
-    bench( "normsq_nv_f64" ,    normsq_nv_f64 );
-    bench( "normsq_ad_nv_f64" , normsq_ad_nv_f64 );
+    bench( "normsq_f32" ,           normsq_f32 );
+    bench( "normsq_f64" ,           normsq_f64 );
+    bench( "normsq_az_f64" ,        normsq_az_f64 );
+    bench( "normsq_nv_az_f64" ,     normsq_nv_az_f64 );
+    bench( "normsq_ad_az_f64" ,     normsq_ad_az_f64 );
+    bench( "normsq_ad_nv_az_f64" ,  normsq_ad_nv_az_f64 );
 }
