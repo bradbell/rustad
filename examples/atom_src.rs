@@ -70,7 +70,7 @@ pub fn sumsq_forward_fun_value(
     domain_zero  : &Vec<&V>    ,
     _call_info   : IndexT      ,
     trace        : bool        ,
-) -> Vec<V>
+) -> Result< Vec<V>, String >
 {   //
     // sumsq_zero
     let mut sumsq_zero : V =  0.0.into();
@@ -87,7 +87,7 @@ pub fn sumsq_forward_fun_value(
         println!("sumsq_zero = {}", sumsq_zero);
         println!("End Trace: sumsq_forward_fun_value");
     }
-    vec![ sumsq_zero ]
+    Ok( vec![ sumsq_zero ] )
 }
 // END atom_src
 // -------------------------------------------------------------------------

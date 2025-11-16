@@ -66,7 +66,7 @@ pub fn h_forward_fun_value(
     dom_zero     : &Vec<&V>    ,
     _call_info   : IndexT      ,
     trace        : bool        ,
-) -> Vec<V>
+) -> Result< Vec<V>, String >
 {
     // range
     let mut range : Vec<V> = Vec::new();
@@ -84,7 +84,7 @@ pub fn h_forward_fun_value(
         println!("range = {:?}", range);
         println!("End Trace: h_forward_fun_value");
     }
-    range
+    Ok( range )
 }
 // END h_forward_fun_value
 //

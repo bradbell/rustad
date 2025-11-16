@@ -29,7 +29,7 @@ fn for_sumsq_forward_fun_value(
     domain_zero : &Vec<&V>  ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
-) -> Vec<V>
+) -> Result< Vec<V>, String >
 {   //
     // nx
     let nx = domain_zero.len() / 2;
@@ -48,7 +48,7 @@ fn for_sumsq_forward_fun_value(
         z += &( &two_v * &( x[j] * y[j] ) );
     }
     //
-    vec![ z ]
+    Ok( vec![ z ] )
 }
 //
 // for_sumsq_forward_der_value

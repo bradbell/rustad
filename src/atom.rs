@@ -112,7 +112,7 @@ pub type AtomForwardFunValue<V> = fn(
     _domain        : &Vec<&V>    ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
-) -> Vec<V> ;
+) -> Result< Vec<V>, String > ;
 //
 // AtomForwardFunAd
 /// Callback to atomic functions during
@@ -534,7 +534,13 @@ where
     }
     //
     // range
-    let range  = forward_zero( &domain, call_info, trace );
+    let result  = forward_zero( &domain, call_info, trace );
+    let range = match result {
+        Err(msg) => { panic!(
+            "atom {} forward_fun_value error : {}", name, msg);
+        },
+        Ok(range) => range,
+    };
     //
     // arange
     let arange : Vec< AD<V> >;

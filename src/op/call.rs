@@ -280,9 +280,13 @@ where
     );
     //
     // range_zero
-    let mut range_zero = forward_fun_value(
-        &domain_zero, call_info, trace
-    );
+    let result = forward_fun_value(&domain_zero, call_info, trace );
+    let mut range_zero = match result {
+        Err(msg) => { panic!(
+            "atom {} forward_fun_value error : {}", atom_eval.name, msg);
+        },
+        Ok(range) => range,
+    };
     assert_eq!(
         n_res,
         range_zero.len(),
@@ -424,9 +428,13 @@ where
     );
     //
     // range_zero
-    let mut range_zero = forward_fun_value(
-        &domain_zero, call_info, trace
-    );
+    let result = forward_fun_value( &domain_zero, call_info, trace );
+    let mut range_zero = match result {
+        Err(msg) => { panic!(
+            "atom {} forward_fun_value error : {}", atom_eval.name, msg);
+        },
+        Ok(range) => range,
+    };
     assert_eq!(
         n_res,
         range_zero.len(),
@@ -1032,7 +1040,7 @@ where
         "   let call_info  = " + &call_info.to_string() + ";\n" +
         "   let trace      = " + &trace.to_string() + ";\n" +
         "   let mut call_range = " +
-                "atom_" + &name + "(&call_dom, call_info, trace);\n";
+                "atom_" + &name + "(&call_dom, call_info, trace) ?;\n";
     //
     // res_name
     let res_name   : &str;

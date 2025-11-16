@@ -29,7 +29,7 @@ fn rev_sumsq_forward_fun_value(
     domain_zero : &Vec<&V>  ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
-) -> Vec<V>
+) -> Result< Vec<V>, String >
 {   //
     // nx
     assert!( domain_zero.len() > 1 );
@@ -48,7 +48,7 @@ fn rev_sumsq_forward_fun_value(
         z.push( &two_v * &( y * x[j] ) );
     }
     //
-    z
+    Ok( z )
 }
 //
 // rev_sumsq_forward_der_value

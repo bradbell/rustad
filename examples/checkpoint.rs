@@ -39,7 +39,7 @@ fn checkpoint_forward_fun_value(
     domain_zero      : &Vec<&V>     ,
     call_info        : IndexT      ,
     trace            : bool        ,
-) -> Vec<V>
+) -> Result< Vec<V>, String >
 {   //
     // domain_zero_clone
     let n_domain = domain_zero.len();
@@ -56,7 +56,7 @@ fn checkpoint_forward_fun_value(
         );
        range_zero
     } );
-    range_zero
+    Ok( range_zero )
 }
 //
 // checkpoint_forward_der_value
