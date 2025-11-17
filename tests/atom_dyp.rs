@@ -120,6 +120,7 @@ fn register_h()-> IndexT {
     // h_atom_eval
     let h_atom_eval = AtomEval {
         name                 : &"h",
+        depend               :  None,
         forward_type         :  Some( h_forward_type ),
         //
         forward_fun_value    :  Some( h_forward_fun_value ),

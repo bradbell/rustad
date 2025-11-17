@@ -143,6 +143,7 @@ pub fn register_for_sumsq_atom()-> IndexT {
     // for_sumsq_atom_eval
     let for_sumsq_atom_eval = AtomEval {
         name                 : &"for_sumsq",
+        depend               :  None,
         forward_type         :  Some( for_sumsq_forward_type ),
         //
         forward_fun_value    :  Some(for_sumsq_forward_fun_value),

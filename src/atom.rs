@@ -58,6 +58,38 @@ use crate::adfn::{
 #[cfg(doc)]
 pub fn doc_common_arguments() {}
 // -------------------------------------------------------------------------
+// AtomDepend
+/// Callback to atomic functions to determine its sparsity pattern.
+///
+/// * Required :
+/// This callback is required for all atomic functions.
+///
+/// * Syntax :
+/// ```text
+///     pattern = depend(n_dom, call_info, trace) ?
+/// ```
+///
+/// * sparsity :
+/// is the AtomDepend callback for this atomic function.
+///
+/// * n_dom :
+/// This has the length as the domain vector in the corresponding
+/// [call_atom].
+///
+/// Other Arguments : see [doc_common_arguments]
+///
+/// * pattern :
+/// The the return value *pattern* is vector of \[row, column\] pairs.
+/// Each row (column) is less than the range (domain)
+/// dimension for this atomic function call.
+/// If a pair \[i, j\] does not appear, the range component
+/// with index i does not depend on the domain component with index j.
+///
+pub type AtomDepend = fn(
+    _n_dom           : usize        ,
+    _call_info       : IndexT       ,
+    _trace           : bool         ,
+)-> Result< Vec< [usize; 2] >, String >;
 //
 // AtomForwardType
 /// Callback to atomic functions to determine ADType of results.
@@ -287,6 +319,8 @@ pub struct AtomEval<V> {
     //
     // required
     pub name                 : &'static str,
+    //
+    pub depend               : Option< AtomDepend >,
     pub forward_type         : Option< AtomForwardType >,
     //
     pub forward_fun_value    : Option< AtomForwardFunValue::<V> >,
