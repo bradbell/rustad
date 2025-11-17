@@ -348,7 +348,7 @@ pub (crate) mod sealed {
     }
 }
 //
-// impl_atom_eval_vec!
+// impl_callback_vec!
 /// Implement the atomic evaluation vector for value type V
 ///
 /// * V : see [doc_generic_v]
@@ -361,7 +361,7 @@ pub (crate) mod sealed {
 /// ```text
 ///     use std::sync::RwLock;
 /// ```
-macro_rules! impl_atom_eval_vec{ ($V:ty) => {
+macro_rules! impl_callback_vec{ ($V:ty) => {
     #[doc = concat!(
         "The atomic evaluation vector for value type `", stringify!($V), "`"
     ) ]
@@ -375,26 +375,26 @@ macro_rules! impl_atom_eval_vec{ ($V:ty) => {
         }
     }
 } }
-pub(crate) use impl_atom_eval_vec;
+pub(crate) use impl_callback_vec;
 // ----------------------------------------------------------------------------
 // register_atom
 /// Register an atomic function.
 ///
 /// * Syntax :
 /// ```text
-///     atom_id = register_atom(atom_eval)
+///     atom_id = register_atom(callback)
 /// ```
 ///
 /// * V : see [doc_generic_v]
 ///
-/// ## atom_eval :
+/// ## callback :
 /// contains references to the callback functions that compute
 /// values for this atomic function.
 ///
 /// ## atom_id :
 /// is the index that is used to identify this atomic function.
 ///
-pub fn register_atom<V>( atom_eval : AtomCallback<V> ) -> IndexT
+pub fn register_atom<V>( callback : AtomCallback<V> ) -> IndexT
 where
     V : AtomInfoVecPublic ,
 {   //
@@ -410,11 +410,11 @@ where
         assert!( write_lock.is_ok() );
         //
         // Rest of this block has a lock, so it has to be fast and can't fail.
-        let mut atom_eval_vec = write_lock.unwrap();
-        let atom_id_usize     = atom_eval_vec.len();
+        let mut callback_vec = write_lock.unwrap();
+        let atom_id_usize     = callback_vec.len();
         atom_id_too_large     = (IndexT::MAX as usize) < atom_id_usize;
-        atom_id               = atom_eval_vec.len() as IndexT;
-        atom_eval_vec.push( atom_eval );
+        atom_id               = callback_vec.len() as IndexT;
+        callback_vec.push( callback );
     }
     assert!( ! atom_id_too_large );
     atom_id
@@ -557,7 +557,7 @@ where
 ///
 /// * call_info :
 /// This is information about this call that is be passed on to the
-/// callback functions specified by [atom_eval](register_atom#atom_eval).
+/// callback functions specified by [callback](register_atom#callback).
 ///
 /// * trace :
 /// if true, a trace of the calculations may be printed on stdout.
@@ -596,11 +596,11 @@ where
         assert!( read_lock.is_ok() );
         //
         // Rest of this block has a lock, so it should be fast and not fail.
-        let atom_eval_vec = read_lock.unwrap();
-        let atom_eval     = &atom_eval_vec[atom_id as usize];
-        forward_zero      = atom_eval.forward_fun_value.clone();
-        name              = atom_eval.name;
-        forward_type      = atom_eval.forward_type.clone();
+        let callback_vec = read_lock.unwrap();
+        let callback     = &callback_vec[atom_id as usize];
+        forward_zero      = callback.forward_fun_value.clone();
+        name              = callback.name;
+        forward_type      = callback.forward_type.clone();
     }
     if forward_type.is_none() { panic!(
         "{} : forward_type is not implemented for this atomic function",

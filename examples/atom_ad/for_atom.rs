@@ -140,8 +140,8 @@ fn for_sumsq_forward_type(
 // register_for_sumsq_atom
 pub fn register_for_sumsq_atom()-> IndexT {
     //
-    // for_sumsq_atom_eval
-    let for_sumsq_atom_eval = AtomCallback {
+    // for_sumsq_callback
+    let for_sumsq_callback = AtomCallback {
         name                 : &"for_sumsq",
         depend               :  None,
         forward_type         :  Some( for_sumsq_forward_type ),
@@ -157,6 +157,6 @@ pub fn register_for_sumsq_atom()-> IndexT {
     };
     //
     // for_sumsq_atom_id
-    let for_sumsq_atom_id = register_atom( for_sumsq_atom_eval );
+    let for_sumsq_atom_id = register_atom( for_sumsq_callback );
     for_sumsq_atom_id
 }

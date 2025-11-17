@@ -166,8 +166,8 @@ fn checkpoint_forward_type(
 // -------------------------------------------------------------------------
 fn register_checkpoint_atom()-> IndexT {
     //
-    // checkpoint_atom_eval
-    let checkpoint_atom_eval = AtomCallback {
+    // checkpoint_callback
+    let checkpoint_callback = AtomCallback {
         name                 : &"checkpoint",
         depend               :  None,
         forward_type         :  Some( checkpoint_forward_type ),
@@ -183,7 +183,7 @@ fn register_checkpoint_atom()-> IndexT {
     };
     //
     // atom_id
-    let atom_id = register_atom( checkpoint_atom_eval );
+    let atom_id = register_atom( checkpoint_callback );
     atom_id
 }
 // -------------------------------------------------------------------------

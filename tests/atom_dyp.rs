@@ -117,8 +117,8 @@ pub fn h_forward_fun_ad(
 // register_h
 fn register_h()-> IndexT {
     //
-    // h_atom_eval
-    let h_atom_eval = AtomCallback {
+    // h_callback
+    let h_callback = AtomCallback {
         name                 : &"h",
         depend               :  None,
         forward_type         :  Some( h_forward_type ),
@@ -134,7 +134,7 @@ fn register_h()-> IndexT {
     };
     //
     // h__atom_id
-    let h_atom_id = register_atom( h_atom_eval );
+    let h_atom_id = register_atom( h_callback );
     h_atom_id
 }
 //
