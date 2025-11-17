@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 /*
-Test Atomic function with dynamic parameters using a different size
+Test rust_src with an atomic function and dynamic parameters.
 
 The atomic function will be
        [ z[0] * z[1] ]

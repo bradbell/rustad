@@ -30,7 +30,7 @@
 //! # Operator Booleans
 //! | Index    | Meaning |
 //! | -------- | ------- |
-//! | 0        | is the value of the trace argument of this call            |
+//! | 0        | is the value of the trace argument of this call          |
 //!
 //! # Operator Results
 //! We use n_res for the number of results that are variables.
