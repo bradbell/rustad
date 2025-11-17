@@ -47,7 +47,7 @@ use std::ops::AddAssign;
 //
 use crate::op::info::OpInfo;
 use crate::atom::{
-    sealed::AtomEvalVec,
+    sealed::AtomInfoVec,
 };
 use crate::op::id::{
         CALL_OP,
@@ -78,7 +78,7 @@ fn extract_call_info<V>(
     Vec<ADType>  , // res_ad_type
 )
 where
-    V           : AtomEvalVec,
+    V           : AtomInfoVec,
     AtomEval<V> : Clone,
 {
     // atom_id, call_info, n_dom, n_res,
@@ -93,7 +93,7 @@ where
     let atom_eval : AtomEval<V>;
     {   //
         // rw_lock
-        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomEvalVec::get();
+        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomInfoVec::get();
         //
         // read_lock
         let read_lock = rw_lock.read();
@@ -254,7 +254,7 @@ fn call_forward_dyp_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    V           : AtomEvalVec + From<f32> + PartialEq,
+    V           : AtomInfoVec + From<f32> + PartialEq,
     AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -328,7 +328,7 @@ fn call_forward_dyp_ad<V> (
     arg_type   : &[ADType]           ,
     res        : usize               )
 where
-    V           : PartialEq + Clone + From<f32> + AtomEvalVec,
+    V           : PartialEq + Clone + From<f32> + AtomInfoVec,
     AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -408,7 +408,7 @@ fn call_forward_var_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    V           : AtomEvalVec + PartialEq,
+    V           : AtomInfoVec + PartialEq,
     AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -481,7 +481,7 @@ fn call_forward_var_ad<V> (
     arg_type   : &[ADType]           ,
     res        : usize               )
 where
-    V           : PartialEq + Clone + AtomEvalVec,
+    V           : PartialEq + Clone + AtomInfoVec,
     AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -557,7 +557,7 @@ fn call_forward_1_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    V           : PartialEq + AtomEvalVec + From<f32>,
+    V           : PartialEq + AtomInfoVec + From<f32>,
     AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -635,7 +635,7 @@ fn call_forward_1_ad<V> (
     arg_type   : &[ADType]           ,
     res        : usize               )
 where
-    V           : PartialEq + From<f32> + Clone + AtomEvalVec ,
+    V           : PartialEq + From<f32> + Clone + AtomInfoVec ,
     AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -716,7 +716,7 @@ fn call_reverse_1_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    for<'a> V   : PartialEq + AtomEvalVec + AddAssign<&'a V>  + From<f32>,
+    for<'a> V   : PartialEq + AtomInfoVec + AddAssign<&'a V>  + From<f32>,
     AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -793,7 +793,7 @@ fn call_reverse_1_ad<V> (
     arg_type   : &[ADType]            ,
     res        : usize                )
 where
-    V             : PartialEq + AtomEvalVec + Clone + From<f32>,
+    V             : PartialEq + AtomInfoVec + Clone + From<f32>,
     for<'a> AD<V> : AddAssign<&'a AD<V> >,
     AtomEval<V>   : Clone,
 {   // ----------------------------------------------------------------------
@@ -898,7 +898,7 @@ fn call_arg_var_index(
 /// The map results for CALL_OP and CALL_RES_OP are set.
 pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    V : Clone + From<f32> + PartialEq + AtomEvalVec + ThisThreadTapePublic,
+    V : Clone + From<f32> + PartialEq + AtomInfoVec + ThisThreadTapePublic,
     for<'a> V : AddAssign<&'a V> ,
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
@@ -1004,7 +1004,7 @@ fn call_rust_src<V> (
     arg_type  : &[ADType]   ,
     res       : usize       ) -> String
 where
-    V : AtomEvalVec,
+    V : AtomInfoVec,
     AtomEval<V> : Clone,
 {   // ----------------------------------------------------------------------
     debug_assert!( res_type.is_dynamic() || res_type.is_variable() );

@@ -99,13 +99,13 @@ where
     V : tape::sealed::ThisThreadTape ,
 { }
 //
-// AtomEvalVec
+// AtomInfoVec
 /// This is the public interface to a sealed trait
-pub trait AtomEvalVecPublic : atom::sealed::AtomEvalVec
+pub trait AtomInfoVecPublic : atom::sealed::AtomInfoVec
 { }
-impl<V> AtomEvalVecPublic for V
+impl<V> AtomInfoVecPublic for V
 where
-    V : atom::sealed::AtomEvalVec ,
+    V : atom::sealed::AtomInfoVec ,
 { }
 //
 // ----------------------------------------------------------------------------

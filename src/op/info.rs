@@ -17,7 +17,7 @@ use crate::{
 };
 use crate::op::id::NUMBER_OP;
 use crate::tape::sealed::ThisThreadTape;
-use crate::atom::sealed::AtomEvalVec;
+use crate::atom::sealed::AtomInfoVec;
 //
 #[cfg(doc)]
 use crate::{
@@ -431,7 +431,7 @@ where
     for<'a> &'a V : std::ops::Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Div<&'a V, Output = V> ,
     //
-    V : Clone + From<f32> + PartialEq + ThisThreadTape + AtomEvalVec
+    V : Clone + From<f32> + PartialEq + ThisThreadTape + AtomInfoVec
 {
     let empty = OpInfo {
         name               : &"panic",

@@ -25,7 +25,7 @@ use crate::{
     AD,
     ADType,
     ad_from_vector,
-    AtomEvalVecPublic,
+    AtomInfoVecPublic,
     ThisThreadTapePublic,
 };
 //
@@ -317,7 +317,7 @@ pub type AtomReverseDerAD<V> = fn(
 #[derive(Clone)]
 pub struct AtomEval<V> {
     //
-    // required
+    /// name used to distinguish this atomic function.
     pub name                 : &'static str,
     //
     pub depend               : Option< AtomDepend >,
@@ -340,8 +340,8 @@ pub (crate) mod sealed {
     use std::sync::RwLock;
     use super::AtomEval;
     //
-    // AtomEvalVec
-    pub trait AtomEvalVec
+    // AtomInfoVec
+    pub trait AtomInfoVec
     where
         Self : Sized + 'static,
     {   fn get() -> &'static RwLock< Vec< AtomEval<Self> > >;
@@ -365,7 +365,7 @@ macro_rules! impl_atom_eval_vec{ ($V:ty) => {
     #[doc = concat!(
         "The atomic evaluation vector for value type `", stringify!($V), "`"
     ) ]
-    impl crate::atom::sealed::AtomEvalVec for $V {
+    impl crate::atom::sealed::AtomInfoVec for $V {
         fn get() -> &'static
         RwLock< Vec< crate::atom::AtomEval<$V> > > {
             pub(crate) static ATOM_EVAL_VEC :
@@ -396,10 +396,10 @@ pub(crate) use impl_atom_eval_vec;
 ///
 pub fn register_atom<V>( atom_eval : AtomEval<V> ) -> IndexT
 where
-    V : AtomEvalVecPublic ,
+    V : AtomInfoVecPublic ,
 {   //
     // rwlock
-    let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
+    let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomInfoVec::get();
     //
     // atom_id
     let atom_id           : IndexT;
@@ -574,7 +574,7 @@ pub fn call_atom<V>(
     trace       : bool         ,
 ) -> Vec< AD<V> >
 where
-    V   : Clone + From<f32> + ThisThreadTapePublic + AtomEvalVecPublic ,
+    V   : Clone + From<f32> + ThisThreadTapePublic + AtomInfoVecPublic ,
 {
     //
     // local_key
@@ -584,7 +584,7 @@ where
     let recording : bool = local_key.with_borrow( |tape| tape.recording );
     //
     // rwlock
-    let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomEvalVec::get();
+    let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomInfoVec::get();
     //
     // forward_zero, forward_type
     let name           : &'static str;
