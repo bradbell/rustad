@@ -67,10 +67,10 @@ pub fn doc_common_arguments() {}
 ///
 /// * Syntax :
 /// ```text
-///     range_ad_type = forward_type(dom_ad_type, call_info, trace) ?
+///     range_ad_type = forward_type(&dom_ad_type, call_info, trace) ?
 /// ```
 ///
-/// forward_ad_type :
+/// * forward_ad_type :
 /// is the AtomForwardType callback for this atomic function.
 ///
 /// * dom_ad_type :
@@ -102,10 +102,17 @@ pub type AtomForwardType = fn(
 /// * Required :
 /// This callback is required for all atomic functions.
 ///
+/// * Syntax :
+/// ```text
+///     range = forward_fun_value(&domain, call_info, trace) ?
+/// ```
+///
+/// * forward_fun_value :
+/// is the AtomForwardFunValue callback for this atomic function.
+///
 /// * Arguments : see [doc_common_arguments]
 ///
-/// * return :
-/// The return
+/// * range :
 /// contains the value of the atomic function range variables.
 ///
 pub type AtomForwardFunValue<V> = fn(
@@ -119,13 +126,21 @@ pub type AtomForwardFunValue<V> = fn(
 /// forward_dyp_ad and forward_var_ad.
 ///
 /// * Required :
-/// If you do not use this atomic function with [ADfn::forward_der_ad],
-/// its corresponding value in [AtomEval] can be None.
+/// If you do not use this atomic function with
+/// [ADfn::forward_dyp_ad] or [ADfn::forward_var_ad]
+/// the callback in [AtomEval] can be None.
+///
+/// * Syntax :
+/// ```text
+///     range = forward_fun_ad(&domain, call_info, trace) ?
+/// ```
+///
+/// * forward_fun_ad :
+/// is the AtomForwardFunAd callback for this atomic function.
 ///
 /// * Arguments : see [doc_common_arguments]
 ///
-/// * return :
-/// The return
+/// * range :
 /// contains the value of the atomic function range variables.
 ///
 pub type AtomForwardFunAd<V> = fn(
@@ -140,15 +155,23 @@ pub type AtomForwardFunAd<V> = fn(
 ///
 /// * Required :
 /// If you do not use this atomic function with [ADfn::forward_der_value],
-/// its corresponding value in [AtomEval] can be None.
+/// this callback in [AtomEval] can be None.
+///
+/// * Syntax :
+/// ```text
+///     range_der = forward_der_value(&domain, domain_der, call_info, trace) ?
+/// ```
+///
+/// * forward_der_value :
+/// is the AtomForwardDerValue callback for this atomic function.
 ///
 /// * dom_der    :
-/// this contains the domain space direction for the directional derivative.
+/// this contains the domain space direction for the directional derivatives.
 ///
 /// * Other Arguments : see [doc_common_arguments]
 ///
-/// * return :
-/// The return value *range_der* is
+/// * range_der :
+/// is the directional derivative for each of the range space variables.
 /// ```text
 ///     range_der = f'(domain) * dom_der
 /// ```
@@ -159,24 +182,32 @@ pub type AtomForwardDerValue<V> = fn(
     _trace         : bool        ,
 ) -> Result< Vec<V>, String >;
 //
-// AtomForwardDerAD
+// AtomForwardDerAd
 /// Callback to atomic functions during forward_der_ad
 ///
 /// * Required :
 /// If you do not use this atomic function with [ADfn::forward_der_ad],
-/// its corresponding value in [AtomEval] can be None.
+/// this callback in [AtomEval] can be None.
+///
+/// * Syntax :
+/// ```text
+///     range_der = forward_der_ad(&domain, domain_der, call_info, trace) ?
+/// ```
+///
+/// * forward_der_ad :
+/// is the AtomForwardDerAd callback for this atomic function.
 ///
 /// * dom_der    :
 /// this contains the domain space direction for the directional derivative.
 ///
 /// * Other Arguments : see [doc_common_arguments]
 ///
-/// * return :
-/// The return value *range_der* is
+/// * range_der :
+/// is the directional derivative for each of the range space variables.
 /// ```text
 ///     range_der = f'(domain) * dom_der
 /// ```
-pub type AtomForwardDerAD<V> = fn(
+pub type AtomForwardDerAd<V> = fn(
     _domain        : &Vec<& AD<V> >    ,
     _dom_der       : Vec<& AD<V> >     ,
     _call_info     : IndexT            ,
@@ -189,15 +220,23 @@ pub type AtomForwardDerAD<V> = fn(
 ///
 /// * Required :
 /// If you do not use this atomic function with [ADfn::reverse_der_value],
-/// its corresponding value in [AtomEval] can be None.
+/// this callback in [AtomEval] can be None.
+///
+/// * Syntax :
+/// ```text
+///     dom_der = reverse_der_value(&domain, range_der, call_info, trace) ?
+/// ```
+///
+/// * reverse_der_value :
+/// is the AtomReverseDerValue callback for this atomic function.
 ///
 /// * range_der :
 /// this contains the ramge space weights for the partial derivatives.
 ///
 /// * Other Arguments : see [doc_common_arguments]
 ///
-/// * return :
-/// The return value *dom_der* is
+/// * dom_der :
+/// is the partial derivative for each of the domain space variables.
 /// ```text
 ///     dom_der = range_der * f'(domain)
 /// ```
@@ -213,7 +252,15 @@ pub type AtomReverseDerValue<V> = fn(
 ///
 /// * Required :
 /// If you do not use this atomic function with [ADfn::reverse_der_ad],
-/// its corresponding value in [AtomEval] can be None.
+/// this callback in [AtomEval] can be None.
+///
+/// * Syntax :
+/// ```text
+///     dom_der = reverse_der_ad(&domain, range_der, call_info, trace) ?
+/// ```
+///
+/// * reverse_der_ad :
+/// is the AtomReverseDerAd callback for this atomic function.
 ///
 /// * range_der :
 /// this contains the ramge space weights for the partial derivatives.
@@ -221,7 +268,7 @@ pub type AtomReverseDerValue<V> = fn(
 /// * Other Arguments : see [doc_common_arguments]
 ///
 /// * return :
-/// The return value *dom_der* is
+/// is the partial derivative for each of the domain space variables.
 /// ```text
 ///     dom_der = range_der * f'(domain)
 /// ```
@@ -246,7 +293,7 @@ pub struct AtomEval<V> {
     pub forward_fun_ad       : Option< AtomForwardFunAd::<V> >,
     //
     pub forward_der_value    : Option< AtomForwardDerValue::<V> > ,
-    pub forward_der_ad       : Option< AtomForwardDerAD::<V> >    ,
+    pub forward_der_ad       : Option< AtomForwardDerAd::<V> >    ,
     //
     pub reverse_der_value    : Option< AtomReverseDerValue::<V> > ,
     pub reverse_der_ad       : Option< AtomReverseDerAD::<V> >    ,
