@@ -57,7 +57,7 @@ use crate::{
     AD,
     ADType,
     IndexT,
-    AtomEval,
+    AtomCallback,
     ThisThreadTapePublic,
     ad_from_value,
 };
@@ -69,17 +69,17 @@ fn extract_call_info<V>(
     arg_type   : &[ADType] ,
     flag       : &[bool]   ,
 ) -> (
-    IndexT       , // call_info
-    usize        , // n_dom
-    usize        , // n_res
-    usize        , // n_dep
-    bool         , // trace
-    AtomEval<V>  , // atom_eval
-    Vec<ADType>  , // res_ad_type
+    IndexT           , // call_info
+    usize            , // n_dom
+    usize            , // n_res
+    usize            , // n_dep
+    bool             , // trace
+    AtomCallback<V>  , // callback
+    Vec<ADType>      , // res_ad_type
 )
 where
-    V           : AtomInfoVec,
-    AtomEval<V> : Clone,
+    V               : AtomInfoVec,
+    AtomCallback<V> : Clone,
 {
     // atom_id, call_info, n_dom, n_res,
     let atom_id    = arg[0] as usize;
@@ -89,33 +89,33 @@ where
     let n_dep      = arg[4] as usize;
     let trace      = flag[ arg[5] as usize ];
     //
-    // atom_eval
-    let atom_eval : AtomEval<V>;
+    // callback
+    let callback : AtomCallback<V>;
     {   //
         // rw_lock
-        let rw_lock : &RwLock< Vec< AtomEval<V> > > = AtomInfoVec::get();
+        let rw_lock : &RwLock< Vec< AtomCallback<V> > > = AtomInfoVec::get();
         //
         // read_lock
         let read_lock = rw_lock.read();
         assert!( read_lock.is_ok() );
         //
         // Rest of this block has a lock, so it should be fast and not fail.
-        let atom_eval_vec  = read_lock.unwrap();
-        atom_eval          = atom_eval_vec[atom_id].clone();
+        let callback_vec  = read_lock.unwrap();
+        callback          = callback_vec[atom_id].clone();
     }
     //
     // res_ad_type
-    let forward_type = &atom_eval.forward_type;
+    let forward_type = &callback.forward_type;
     if forward_type.is_none() { panic!(
         "{} : forward_type is not implemented for this atomic function",
-        atom_eval.name,
+        callback.name,
     ); }
     let forward_type = forward_type.unwrap();
     let dom_ad_type  = &arg_type[6 .. 6 + n_dom];
     let result       = forward_type(dom_ad_type, call_info, trace);
     let res_ad_type = match result {
         Err(msg) => { panic!(
-            "atom {} forward_type error : {}", atom_eval.name, msg);
+            "atom {} forward_type error : {}", callback.name, msg);
         },
         Ok(vec_ad_type) => vec_ad_type,
     };
@@ -123,7 +123,7 @@ where
         n_res,
         res_ad_type.len(),
         "atom {} forward_type return length: expected {}, found {}",
-        atom_eval.name,
+        callback.name,
         n_res,
         res_ad_type.len(),
     );
@@ -134,7 +134,7 @@ where
         n_res,
         n_dep,
         trace,
-        atom_eval,
+        callback,
         res_ad_type,
     )
 }
@@ -254,8 +254,8 @@ fn call_forward_dyp_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    V           : AtomInfoVec + From<f32> + PartialEq,
-    AtomEval<V> : Clone,
+    V               : AtomInfoVec + From<f32> + PartialEq,
+    AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
         call_info,
@@ -263,16 +263,16 @@ where
         n_res,
         _n_dep,
         trace,
-        atom_eval,
+        callback,
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
     // forward_fun_value
-    let forward_fun_value = &atom_eval.forward_fun_value;
+    let forward_fun_value = &callback.forward_fun_value;
     if forward_fun_value.is_none() {
         panic!(
         "{} : forward_fun_value is not implemented for this atomic function",
-            atom_eval.name,
+            callback.name,
         );
     }
     let forward_fun_value = forward_fun_value.unwrap();
@@ -288,7 +288,7 @@ where
     let result = forward_fun_value(&domain_zero, call_info, trace );
     let mut range_zero = match result {
         Err(msg) => { panic!(
-            "atom {} forward_fun_value error : {}", atom_eval.name, msg);
+            "atom {} forward_fun_value error : {}", callback.name, msg);
         },
         Ok(range) => range,
     };
@@ -296,7 +296,7 @@ where
         n_res,
         range_zero.len(),
         "atom {} forward_fun_value return length: expected {}, found {}",
-        atom_eval.name,
+        callback.name,
         n_res,
         range_zero.len(),
     );
@@ -328,8 +328,8 @@ fn call_forward_dyp_ad<V> (
     arg_type   : &[ADType]           ,
     res        : usize               )
 where
-    V           : PartialEq + Clone + From<f32> + AtomInfoVec,
-    AtomEval<V> : Clone,
+    V               : PartialEq + Clone + From<f32> + AtomInfoVec,
+    AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
         call_info,
@@ -337,16 +337,16 @@ where
         n_res,
         _n_dep,
         trace,
-        atom_eval,
+        callback,
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
     // forward_fun_ad
-    let forward_fun_ad = &atom_eval.forward_fun_ad;
+    let forward_fun_ad = &callback.forward_fun_ad;
     if forward_fun_ad.is_none() {
         panic!(
             "{} : forward_fun_ad is not implemented for this atomic function",
-            atom_eval.name,
+            callback.name,
         );
     }
     let forward_fun_ad = forward_fun_ad.unwrap();
@@ -364,7 +364,7 @@ where
     let result = forward_fun_ad( &adomain_zero, call_info, trace );
     let mut arange_zero = match result {
         Err(msg) => { panic!(
-            "atom {} forward_fun_ad error : {}", atom_eval.name, msg);
+            "atom {} forward_fun_ad error : {}", callback.name, msg);
         },
         Ok(range) => range,
     };
@@ -372,7 +372,7 @@ where
         n_res,
         arange_zero.len(),
         "atom {} forward_fun_ad return length: expected {}, found {}",
-        atom_eval.name,
+        callback.name,
         n_res,
         arange_zero.len(),
     );
@@ -408,8 +408,8 @@ fn call_forward_var_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    V           : AtomInfoVec + PartialEq,
-    AtomEval<V> : Clone,
+    V               : AtomInfoVec + PartialEq,
+    AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
         call_info,
@@ -417,16 +417,16 @@ where
         n_res,
         _n_dep,
         trace,
-        atom_eval,
+        callback,
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
     // forward_fun_value
-    let forward_fun_value = &atom_eval.forward_fun_value;
+    let forward_fun_value = &callback.forward_fun_value;
     if forward_fun_value.is_none() {
         panic!(
         "{} : forward_fun_value is not implemented for this atomic function",
-            atom_eval.name,
+            callback.name,
         );
     }
     let forward_fun_value = forward_fun_value.unwrap();
@@ -440,7 +440,7 @@ where
     let result = forward_fun_value( &domain_zero, call_info, trace );
     let mut range_zero = match result {
         Err(msg) => { panic!(
-            "atom {} forward_fun_value error : {}", atom_eval.name, msg);
+            "atom {} forward_fun_value error : {}", callback.name, msg);
         },
         Ok(range) => range,
     };
@@ -448,7 +448,7 @@ where
         n_res,
         range_zero.len(),
         "atom {} forward_fun_value return length: expected {}, found {}",
-        atom_eval.name,
+        callback.name,
         n_res,
         range_zero.len(),
     );
@@ -481,8 +481,8 @@ fn call_forward_var_ad<V> (
     arg_type   : &[ADType]           ,
     res        : usize               )
 where
-    V           : PartialEq + Clone + AtomInfoVec,
-    AtomEval<V> : Clone,
+    V               : PartialEq + Clone + AtomInfoVec,
+    AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
         call_info,
@@ -490,16 +490,16 @@ where
         n_res,
         _n_dep,
         trace,
-        atom_eval,
+        callback,
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
     // forward_fun_ad
-    let forward_fun_ad = &atom_eval.forward_fun_ad;
+    let forward_fun_ad = &callback.forward_fun_ad;
     if forward_fun_ad.is_none() {
         panic!(
             "{} : forward_fun_ad is not implemented for this atomic function",
-            atom_eval.name,
+            callback.name,
         );
     }
     let forward_fun_ad = forward_fun_ad.unwrap();
@@ -514,7 +514,7 @@ where
     let result = forward_fun_ad( &adomain_zero, call_info, trace );
     let mut arange_zero = match result {
         Err(msg) => { panic!(
-            "atom {} forward_fun_ad error : {}", atom_eval.name, msg);
+            "atom {} forward_fun_ad error : {}", callback.name, msg);
         },
         Ok(range) => range,
     };
@@ -522,7 +522,7 @@ where
         n_res,
         arange_zero.len(),
         "atom {} forward_fun_ad return length: expected {}, found {}",
-        atom_eval.name,
+        callback.name,
         n_res,
         arange_zero.len(),
     );
@@ -557,8 +557,8 @@ fn call_forward_1_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    V           : PartialEq + AtomInfoVec + From<f32>,
-    AtomEval<V> : Clone,
+    V               : PartialEq + AtomInfoVec + From<f32>,
+    AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
         call_info,
@@ -566,16 +566,16 @@ where
         n_res,
         _n_dep,
         trace,
-        atom_eval,
+        callback,
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
     // forward_der_value
-    let forward_der_value  = &atom_eval.forward_der_value;
+    let forward_der_value  = &callback.forward_der_value;
     if forward_der_value.is_none() {
         panic!(
             "{} : forward_der_value not implemented for this atomic function",
-            atom_eval.name,
+            callback.name,
         );
     }
     let forward_der_value  = forward_der_value.unwrap();
@@ -600,7 +600,7 @@ where
     let result = forward_der_value(&domain_zero, domain_one, call_info, trace);
     let mut range_one = match result {
         Err(msg) => { panic!(
-            "atom {} forward_der_value error : {}", atom_eval.name, msg);
+            "atom {} forward_der_value error : {}", callback.name, msg);
         },
         Ok(range) => range,
     };
@@ -635,8 +635,8 @@ fn call_forward_1_ad<V> (
     arg_type   : &[ADType]           ,
     res        : usize               )
 where
-    V           : PartialEq + From<f32> + Clone + AtomInfoVec ,
-    AtomEval<V> : Clone,
+    V               : PartialEq + From<f32> + Clone + AtomInfoVec ,
+    AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
         call_info,
@@ -644,16 +644,16 @@ where
         n_res,
         _n_dep,
         trace,
-        atom_eval,
+        callback,
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
     // forward_der_ad
-    let forward_der_ad       = atom_eval.forward_der_ad.clone();
+    let forward_der_ad       = callback.forward_der_ad.clone();
     if forward_der_ad.is_none() {
         panic!(
             "{} : forward_der_ad is not implemented for this atomic function",
-            atom_eval.name,
+            callback.name,
         );
     }
     let forward_der_ad = forward_der_ad.unwrap();
@@ -681,7 +681,7 @@ where
     let result = forward_der_ad(&adomain_zero, adomain_der, call_info, trace);
     let mut arange_der = match result {
         Err(msg) => { panic!(
-            "atom {} forward_der_ad error : {}", atom_eval.name, msg);
+            "atom {} forward_der_ad error : {}", callback.name, msg);
         },
         Ok(range) => range,
     };
@@ -716,8 +716,8 @@ fn call_reverse_1_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    for<'a> V   : PartialEq + AtomInfoVec + AddAssign<&'a V>  + From<f32>,
-    AtomEval<V> : Clone,
+    for<'a> V       : PartialEq + AtomInfoVec + AddAssign<&'a V>  + From<f32>,
+    AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
         call_info,
@@ -725,16 +725,16 @@ where
         n_res,
         _n_dep,
         trace,
-        atom_eval,
+        callback,
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
     // reverse_der_value
-    let reverse_der_value = &atom_eval.reverse_der_value;
+    let reverse_der_value = &callback.reverse_der_value;
     if reverse_der_value.is_none() {
         panic!(
             "{}: reverse_der_value not implemented for this atomic function",
-            atom_eval.name,
+            callback.name,
         );
     }
     let reverse_der_value = reverse_der_value.unwrap();
@@ -764,7 +764,7 @@ where
     let result = reverse_der_value(&domain_zero, range_one, call_info, trace);
     let domain_one = match result {
         Err(msg) => { panic!(
-            "atom {} reverse_der_value error : {}", atom_eval.name, msg);
+            "atom {} reverse_der_value error : {}", callback.name, msg);
         },
         Ok(domain) => domain,
     };
@@ -793,9 +793,9 @@ fn call_reverse_1_ad<V> (
     arg_type   : &[ADType]            ,
     res        : usize                )
 where
-    V             : PartialEq + AtomInfoVec + Clone + From<f32>,
+    V                 : PartialEq + AtomInfoVec + Clone + From<f32>,
     for<'a> AD<V> : AddAssign<&'a AD<V> >,
-    AtomEval<V>   : Clone,
+    AtomCallback<V>   : Clone,
 {   // ----------------------------------------------------------------------
     let (
         call_info,
@@ -803,16 +803,16 @@ where
         n_res,
         _n_dep,
         trace,
-        atom_eval,
+        callback,
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
     // reverse_der_ad
-    let reverse_der_ad = &atom_eval.reverse_der_ad;
+    let reverse_der_ad = &callback.reverse_der_ad;
     if reverse_der_ad.is_none() {
         panic!(
             "{}: reverse_der_ad not implemented for this atomic function",
-            atom_eval.name,
+            callback.name,
         );
     }
     let reverse_der_ad = reverse_der_ad.unwrap();
@@ -844,7 +844,7 @@ where
     let result = reverse_der_ad(&adomain_zero, arange_one, call_info, trace);
     let adomain_one = match result {
         Err(msg) => { panic!(
-            "atom {} reverse_der_ad error : {}", atom_eval.name, msg);
+            "atom {} reverse_der_ad error : {}", callback.name, msg);
         },
         Ok(domain) => domain,
     };
@@ -898,7 +898,7 @@ fn call_arg_var_index(
 /// The map results for CALL_OP and CALL_RES_OP are set.
 pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    V : Clone + From<f32> + PartialEq + AtomInfoVec + ThisThreadTapePublic,
+    V     : Clone + From<f32> + PartialEq + AtomInfoVec + ThisThreadTapePublic,
     for<'a> V : AddAssign<&'a V> ,
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
@@ -1004,8 +1004,8 @@ fn call_rust_src<V> (
     arg_type  : &[ADType]   ,
     res       : usize       ) -> String
 where
-    V : AtomInfoVec,
-    AtomEval<V> : Clone,
+    V     : AtomInfoVec,
+    AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     debug_assert!( res_type.is_dynamic() || res_type.is_variable() );
     //
@@ -1015,7 +1015,7 @@ where
         n_res,
         n_dep,
         trace,
-        atom_eval,
+        callback,
         res_ad_type,
     ) = extract_call_info(arg, arg_type, flag);
     //
@@ -1023,7 +1023,7 @@ where
     let mut src = String::new();
     //
     // name
-    let name = &atom_eval.name;
+    let name = &callback.name;
     //
     // call_dom
     src = src +

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
 /*
-This atomic example uses all the possible AtomEval callback function.
+This atomic example uses all the possible AtomCallback function.
 The sumsq_forward_der_ad and reverse_forward_der_ad callbacks each
 require defining another atomic function to evaluate their derivatives.
 
@@ -27,7 +27,7 @@ use rustad::{
     AzFloat,
     ADType,
     register_atom,
-    AtomEval,
+    AtomCallback,
     IndexT,
 };
 //
@@ -88,7 +88,7 @@ fn sumsq_forward_type(
 fn register_sumsq_atom()-> IndexT {
     //
     // sumsq_atom_eval
-    let sumsq_atom_eval = AtomEval {
+    let sumsq_atom_eval = AtomCallback {
         name                 : &"sumsq",
         depend               :  None,
         forward_type         :  Some( sumsq_forward_type ),

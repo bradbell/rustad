@@ -76,7 +76,7 @@ pub use tape::{
 pub use atom::{
     register_atom,
     call_atom,
-    AtomEval,
+    AtomCallback,
 };
 pub use dll_lib::{
     get_lib,

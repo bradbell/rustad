@@ -11,7 +11,7 @@ use rustad::{
     AzFloat,
     ADType,
     register_atom,
-    AtomEval,
+    AtomCallback,
     IndexT,
     start_recording,
     stop_recording,
@@ -45,7 +45,7 @@ fn sumsq_forward_type(
 fn register_sumsq_atom()-> IndexT {
     //
     // sumsq_atom_eval
-    let sumsq_atom_eval = AtomEval {
+    let sumsq_atom_eval = AtomCallback {
         name                 : &"sumsq",
         depend               :  None,
         forward_type         :  Some( sumsq_forward_type ),

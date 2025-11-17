@@ -24,7 +24,7 @@ use rustad::{
     ad_from_value,
     ADType,
     register_atom,
-    AtomEval,
+    AtomCallback,
     IndexT,
     start_recording_dyp,
     stop_recording,
@@ -118,7 +118,7 @@ pub fn h_forward_fun_ad(
 fn register_h()-> IndexT {
     //
     // h_atom_eval
-    let h_atom_eval = AtomEval {
+    let h_atom_eval = AtomCallback {
         name                 : &"h",
         depend               :  None,
         forward_type         :  Some( h_forward_type ),

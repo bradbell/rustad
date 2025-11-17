@@ -160,7 +160,7 @@ pub type AtomForwardFunValue<V> = fn(
 /// * Required :
 /// If you do not use this atomic function with
 /// [ADfn::forward_dyp_ad] or [ADfn::forward_var_ad]
-/// the callback in [AtomEval] can be None.
+/// the callback in [AtomCallback] can be None.
 ///
 /// * Syntax :
 /// ```text
@@ -187,7 +187,7 @@ pub type AtomForwardFunAd<V> = fn(
 ///
 /// * Required :
 /// If you do not use this atomic function with [ADfn::forward_der_value],
-/// this callback in [AtomEval] can be None.
+/// this callback in [AtomCallback] can be None.
 ///
 /// * Syntax :
 /// ```text
@@ -219,7 +219,7 @@ pub type AtomForwardDerValue<V> = fn(
 ///
 /// * Required :
 /// If you do not use this atomic function with [ADfn::forward_der_ad],
-/// this callback in [AtomEval] can be None.
+/// this callback in [AtomCallback] can be None.
 ///
 /// * Syntax :
 /// ```text
@@ -252,7 +252,7 @@ pub type AtomForwardDerAd<V> = fn(
 ///
 /// * Required :
 /// If you do not use this atomic function with [ADfn::reverse_der_value],
-/// this callback in [AtomEval] can be None.
+/// this callback in [AtomCallback] can be None.
 ///
 /// * Syntax :
 /// ```text
@@ -284,7 +284,7 @@ pub type AtomReverseDerValue<V> = fn(
 ///
 /// * Required :
 /// If you do not use this atomic function with [ADfn::reverse_der_ad],
-/// this callback in [AtomEval] can be None.
+/// this callback in [AtomCallback] can be None.
 ///
 /// * Syntax :
 /// ```text
@@ -312,10 +312,10 @@ pub type AtomReverseDerAD<V> = fn(
 ) -> Result< Vec< AD<V> >, String >;
 // ----------------------------------------------------------------------------
 //
-// AtomEval
+// AtomCallback
 /// Atomic function evaluation routines.
 #[derive(Clone)]
-pub struct AtomEval<V> {
+pub struct AtomCallback<V> {
     //
     /// name used to distinguish this atomic function.
     pub name                 : &'static str,
@@ -338,13 +338,13 @@ pub (crate) mod sealed {
     //! The sub-module sealed is used to seal traits in this package.
     //
     use std::sync::RwLock;
-    use super::AtomEval;
+    use super::AtomCallback;
     //
     // AtomInfoVec
     pub trait AtomInfoVec
     where
         Self : Sized + 'static,
-    {   fn get() -> &'static RwLock< Vec< AtomEval<Self> > >;
+    {   fn get() -> &'static RwLock< Vec< AtomCallback<Self> > >;
     }
 }
 //
@@ -367,9 +367,9 @@ macro_rules! impl_atom_eval_vec{ ($V:ty) => {
     ) ]
     impl crate::atom::sealed::AtomInfoVec for $V {
         fn get() -> &'static
-        RwLock< Vec< crate::atom::AtomEval<$V> > > {
+        RwLock< Vec< crate::atom::AtomCallback<$V> > > {
             pub(crate) static ATOM_EVAL_VEC :
-            RwLock< Vec< crate::atom::AtomEval<$V> > > =
+            RwLock< Vec< crate::atom::AtomCallback<$V> > > =
                 RwLock::new( Vec::new() );
             &ATOM_EVAL_VEC
         }
@@ -394,12 +394,12 @@ pub(crate) use impl_atom_eval_vec;
 /// ## atom_id :
 /// is the index that is used to identify this atomic function.
 ///
-pub fn register_atom<V>( atom_eval : AtomEval<V> ) -> IndexT
+pub fn register_atom<V>( atom_eval : AtomCallback<V> ) -> IndexT
 where
     V : AtomInfoVecPublic ,
 {   //
     // rwlock
-    let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomInfoVec::get();
+    let rw_lock : &RwLock< Vec< AtomCallback<V> > > = sealed::AtomInfoVec::get();
     //
     // atom_id
     let atom_id           : IndexT;
@@ -584,7 +584,7 @@ where
     let recording : bool = local_key.with_borrow( |tape| tape.recording );
     //
     // rwlock
-    let rw_lock : &RwLock< Vec< AtomEval<V> > > = sealed::AtomInfoVec::get();
+    let rw_lock : &RwLock< Vec< AtomCallback<V> > > = sealed::AtomInfoVec::get();
     //
     // forward_zero, forward_type
     let name           : &'static str;

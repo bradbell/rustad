@@ -16,7 +16,7 @@ dy   = dz^T * g_y(x, y) = 2 * ( dz[0] * x[0]  + dz[1] * x[1]  + ... )
 use rustad::{
     ADType,
     register_atom,
-    AtomEval,
+    AtomCallback,
     IndexT,
 };
 //
@@ -147,7 +147,7 @@ fn rev_sumsq_forward_type(
 pub fn register_rev_sumsq_atom()-> IndexT {
     //
     // rev_sumsq_atom_eval
-    let rev_sumsq_atom_eval = AtomEval {
+    let rev_sumsq_atom_eval = AtomCallback {
         name                 : &"rev_sumsq",
         depend               :  None,
         forward_type         :  Some( rev_sumsq_forward_type ),

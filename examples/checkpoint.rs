@@ -19,7 +19,7 @@ use rustad::{
     stop_recording,
     register_atom,
     call_atom,
-    AtomEval,
+    AtomCallback,
     IndexT,
 };
 //
@@ -167,7 +167,7 @@ fn checkpoint_forward_type(
 fn register_checkpoint_atom()-> IndexT {
     //
     // checkpoint_atom_eval
-    let checkpoint_atom_eval = AtomEval {
+    let checkpoint_atom_eval = AtomCallback {
         name                 : &"checkpoint",
         depend               :  None,
         forward_type         :  Some( checkpoint_forward_type ),
