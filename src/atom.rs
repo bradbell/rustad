@@ -344,7 +344,7 @@ pub (crate) mod sealed {
     pub trait AtomInfoVec
     where
         Self : Sized + 'static,
-    {   fn get() -> &'static RwLock< Vec< AtomCallback<Self> > >;
+    {   fn callback_vec() -> &'static RwLock< Vec< AtomCallback<Self> > >;
     }
 }
 //
@@ -366,12 +366,12 @@ macro_rules! impl_callback_vec{ ($V:ty) => {
         "The atomic evaluation vector for value type `", stringify!($V), "`"
     ) ]
     impl crate::atom::sealed::AtomInfoVec for $V {
-        fn get() -> &'static
+        fn callback_vec() -> &'static
         RwLock< Vec< crate::atom::AtomCallback<$V> > > {
-            pub(crate) static ATOM_EVAL_VEC :
+            pub(crate) static ATOM_CALLBACK_VEC :
             RwLock< Vec< crate::atom::AtomCallback<$V> > > =
                 RwLock::new( Vec::new() );
-            &ATOM_EVAL_VEC
+            &ATOM_CALLBACK_VEC
         }
     }
 } }
@@ -399,7 +399,8 @@ where
     V : AtomInfoVecPublic ,
 {   //
     // rwlock
-    let rw_lock : &RwLock< Vec< AtomCallback<V> > > = sealed::AtomInfoVec::get();
+    let rw_lock : &RwLock< Vec< AtomCallback<V> > > =
+        sealed::AtomInfoVec::callback_vec();
     //
     // atom_id
     let atom_id           : IndexT;
@@ -584,7 +585,8 @@ where
     let recording : bool = local_key.with_borrow( |tape| tape.recording );
     //
     // rwlock
-    let rw_lock : &RwLock< Vec< AtomCallback<V> > > = sealed::AtomInfoVec::get();
+    let rw_lock : &RwLock< Vec< AtomCallback<V> > > =
+        sealed::AtomInfoVec::callback_vec();
     //
     // forward_zero, forward_type
     let name           : &'static str;

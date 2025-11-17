@@ -93,7 +93,8 @@ where
     let callback : AtomCallback<V>;
     {   //
         // rw_lock
-        let rw_lock : &RwLock< Vec< AtomCallback<V> > > = AtomInfoVec::get();
+        let rw_lock : &RwLock< Vec< AtomCallback<V> > > =
+            AtomInfoVec::callback_vec();
         //
         // read_lock
         let read_lock = rw_lock.read();
