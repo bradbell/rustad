@@ -90,25 +90,24 @@ where
         // op_info_vec
         let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
         //
-        // n_domain, n_var, flag_all, arg_all, op2arg,
+        // n_dom, n_var, arg_all, arg_seq,
         // range_ad_type, range_index, n_range
-        let n_domain          = self.var.n_dom;
-        let id_all            = &self.var.id_seq;
-        let flag_all          = &self.var.flag;
+        let n_dom             = self.var.n_dom;
+        let id_seq            = &self.var.id_seq;
+        let arg_seq           = &self.var.arg_seq;
         let arg_all           = &self.var.arg_all;
-        let op2arg            = &self.var.arg_seq;
+        let arg_type_all      = &self.var.arg_type_all;
         let range_ad_type     = &self.range_ad_type;
         let range_index       = &self.range_index;
         let n_range           = range_ad_type.len();
         //
-        // result, arg_var_index, arg_var_usize, set_vec
+        // result, arg_var_usize, set_vec
         let mut result          : Vec< [usize; 2] > = Vec::new();
-        let mut arg_var_index   : Vec<IndexT>       = Vec::new();
         let mut arg_var_usize   : Vec<usize>        = Vec::new();
         let mut set_vec         : VecSet            = VecSet::new();
         //
-        // set_vec.get(id_set) for id_set = 0 .. n_domain
-        for id_set in 0 .. n_domain {
+        // set_vec.get(id_set) for id_set = 0 .. n_dom
+        for id_set in 0 .. n_dom {
             set_vec.singleton( id_set );
         }
         //
@@ -119,49 +118,43 @@ where
                         range_var_index.push(  range_index[i] );
                 }
             }
-            println!( "Begin Trace: for_sparisty: n_domain = {}", n_domain);
+            println!( "Begin Trace: for_sparisty: n_dom = {}", n_dom);
             println!("range_var_index = {:?}", range_var_index);
             println!("var_index, op_name, var_arguments, set_result");
         }
         //
         // op_index
-        for op_index in 0 .. id_all.len() {
+        for op_index in 0 .. id_seq.len() {
             //
-            // op_info, arg_var_index_fn
-            let op_id            = id_all[op_index] as usize;
-            let op_info          = &op_info_vec[op_id];
-            let arg_var_index_fn = op_info.arg_var_index;
-            //
-            // arg
-            let begin = op2arg[op_index] as usize;
-            let end   = op2arg[op_index + 1] as usize;
-            let arg   = &arg_all[begin .. end];
-            //
-            // arg_var_index
-            // the variables that are arguments to this operator
-            arg_var_index_fn(&mut arg_var_index, &flag_all, arg);
+            // arg, arg_type
+            let begin      = arg_seq[op_index] as usize;
+            let end        = arg_seq[op_index + 1] as usize;
+            let arg        = &arg_all[begin .. end];
+            let arg_type   = &arg_type_all[begin .. end];
             //
             // arg_var_usize
-            let n_arg = arg_var_index.len();
-            arg_var_usize.resize(n_arg, 0);
-            for i in 0 .. n_arg {
-                arg_var_usize[i] = arg_var_index[i] as usize;
+            arg_var_usize.resize(0, 0);
+            for i in 0 .. arg.len() {
+                if arg_type[i].is_variable() {
+                    arg_var_usize.push(  arg[i] as usize );
+                }
             }
             //
             // var_index
             // variable index that we are computing the dependency for.
-            let var_index = n_domain + op_index;
+            let var_index = n_dom + op_index;
             //
             // set_vec.get(var_index)
             let set_id = set_vec.union( &arg_var_usize );
             debug_assert!( var_index ==  set_id );
             //
             if trace {
+                let op_id   = self.var.id_seq[op_index] as usize;
                 let op_name = &op_info_vec[op_id].name;
                 let set     = set_vec.get(var_index);
                 println!(
                     "{}, {}, {:?}, {:?}",
-                    var_index, op_name, arg_var_index,  set
+                    var_index, op_name, arg_var_usize,  set
                 );
             }
         }

@@ -154,7 +154,7 @@ where
                         // the operator that creates this variable
                         let op_index         = var_index - n_dom;
                         //
-                        // arv_var_index_fn
+                        // arg, arg_type
                         let begin    = arg_seq[op_index] as usize;
                         let end      = arg_seq[op_index + 1] as usize;
                         let arg      = &arg_all[begin .. end];
