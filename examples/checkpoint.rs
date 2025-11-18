@@ -169,7 +169,7 @@ fn register_checkpoint_atom()-> IndexT {
     // checkpoint_callback
     let checkpoint_callback = AtomCallback {
         name                 : &"checkpoint",
-        depend               :  None,
+        rev_depend           :  None,
         forward_type         :  Some( checkpoint_forward_type ),
         //
         forward_fun_value    :  Some(checkpoint_forward_fun_value),

@@ -120,7 +120,7 @@ fn register_h()-> IndexT {
     // h_callback
     let h_callback = AtomCallback {
         name                 : &"h",
-        depend               :  None,
+        rev_depend           :  None,
         forward_type         :  Some( h_forward_type ),
         //
         forward_fun_value    :  Some( h_forward_fun_value ),

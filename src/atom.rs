@@ -58,19 +58,30 @@ use crate::adfn::{
 #[cfg(doc)]
 pub fn doc_common_arguments() {}
 // -------------------------------------------------------------------------
-// AtomDepend
+// AtomRevDepend
 /// Callback to atomic functions to determine its sparsity pattern.
 ///
 /// * Required :
-/// This callback is required for all atomic functions.
+/// If you do not use this atomic functions with
+/// [ADfn::sub_sparsity] or [ADfn::for_sparsity]
+/// the callback in [AtomCallback] can be None.
 ///
 /// * Syntax :
 /// ```text
-///     pattern = depend(n_dom, call_info, trace) ?
+///     error = rev_depend(&mut depend, range_index, n_dom, call_info, trace) ?
 /// ```
 ///
-/// * sparsity :
-/// is the AtomDepend callback for this atomic function.
+/// * rev_depend :
+/// is the AtomRevDepend callback for this atomic function.
+///
+/// * depend :
+/// This vector is both and input and output and
+/// only its capacity matters on input (to avoid reallocating memory).
+/// Upon return, it contains the domain index values that the specified
+/// range index value depends on.
+///
+/// * range_index :
+/// is the range index that that the dependencies are computed for.
 ///
 /// * n_dom :
 /// This has the length as the domain vector in the corresponding
@@ -78,18 +89,18 @@ pub fn doc_common_arguments() {}
 ///
 /// Other Arguments : see [doc_common_arguments]
 ///
-/// * pattern :
-/// The the return value *pattern* is vector of \[row, column\] pairs.
-/// Each row (column) is less than the range (domain)
-/// dimension for this atomic function call.
-/// If a pair \[i, j\] does not appear, the range component
-/// with index i does not depend on the domain component with index j.
+/// * error :
+/// If the return *error* is None, there was no error.
+/// Otherwise it contains an error message and the value in *depend* is not
+/// specified.
 ///
-pub type AtomDepend = fn(
-    _n_dom           : usize        ,
-    _call_info       : IndexT       ,
-    _trace           : bool         ,
-)-> Result< Vec< [usize; 2] >, String >;
+pub type AtomRevDepend = fn(
+    _depend          : &mut Vec<usize>   ,
+    _range_index     : usize             ,
+    _n_dom           : usize             ,
+    _call_info       : IndexT            ,
+    _trace           : bool              ,
+)-> Option<String>;
 //
 // AtomForwardType
 /// Callback to atomic functions to determine ADType of results.
@@ -320,7 +331,7 @@ pub struct AtomCallback<V> {
     /// name used to distinguish this atomic function.
     pub name                 : &'static str,
     //
-    pub depend               : Option< AtomDepend >,
+    pub rev_depend           : Option< AtomRevDepend >,
     pub forward_type         : Option< AtomForwardType >,
     //
     pub forward_fun_value    : Option< AtomForwardFunValue::<V> >,

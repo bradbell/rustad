@@ -90,7 +90,7 @@ fn register_sumsq_atom()-> IndexT {
     // sumsq_callback
     let sumsq_callback = AtomCallback {
         name                 : &"sumsq",
-        depend               :  None,
+        rev_depend           :  None,
         forward_type         :  Some( sumsq_forward_type ),
         //
         forward_fun_value    :  Some(sumsq_forward_fun_value),
