@@ -23,14 +23,16 @@ use crate::op::id;
 ///
 /// If a result depends on two arguments, the type of the result is the
 /// maximum of the type of its arguments.
-/// The type NoType is greater than any other type.
+/// The values True, False, and Empty are greater than any other type.
 ///
 /// # Example
 /// ```
 /// use rustad::ADType;
 /// assert!( ADType::ConstantP < ADType::DynamicP );
 /// assert!( ADType::DynamicP  < ADType::Variable );
-/// assert!( ADType::Variable  < ADType::NoType );
+/// assert!( ADType::Variable  < ADType::True );
+/// assert!( ADType::True      < ADType::False );
+/// assert!( ADType::False     < ADType::Empty );
 /// ```
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ADType {
@@ -52,9 +54,17 @@ pub enum ADType {
     /// it depends on the value of the domain variables.
     Variable,
     //
-    // NoType
-    /// This is used for the case where this is not the type of an AD object.
-    NoType,
+    // True
+    /// Used when the boolean value true is encoded as an ADType
+    True,
+    //
+    // False
+    /// Used wne the boolean value false is encoded as an ADType
+    False,
+    //
+    // Empty
+    /// This is used for the case where there is no information in this value
+    Empty,
 }
 impl ADType {
     //
@@ -73,6 +83,10 @@ impl ADType {
     /// is a variable
     pub fn is_variable(&self) -> bool
     {   *self == ADType::Variable }
+    //
+    /// is true
+    pub fn is_true(&self) -> bool
+    {   *self == ADType::True }
 }
 // ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter V.

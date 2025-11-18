@@ -168,7 +168,7 @@ macro_rules! forward_der {
                 println!( "Begin Trace: forward_der: n_var = {}", n_var);
                 println!( "index, flag" );
                 for j in 0 .. self.var.flag.len() {
-                    println!( "{}, {}", j, self.var.flag[j] );
+                    println!( "{}, {:?}", j, self.var.flag[j] );
                 }
                 println!( "index, constant" );
                 for j in 0 .. self.cop.len() {

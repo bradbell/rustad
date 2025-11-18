@@ -173,7 +173,7 @@ macro_rules! forward_var {
                 println!( "Begin Trace: forward_var_{}", stringify!($suffix) );
                 println!( "index, flag" );
                 for j in 0 .. self.var.flag.len() {
-                    println!( "{}, {}", j, self.var.flag[j] );
+                    println!( "{}, {:?}", j, self.var.flag[j] );
                 }
                 println!( "index, constant" );
                 for j in 0 .. self.cop.len() {
@@ -250,8 +250,8 @@ macro_rules! forward_var {
                         let cop_e = eval_from_value!($suffix, $V, cop_v);
                         range.push( cop_e )
                     },
-                    ADType::NoType => {
-                        panic!( "forward_var: ADType::NoType not expected" );
+                    _ => {
+                        panic!( "forward_var: and AD type not expected" );
                     },
                 }
             }

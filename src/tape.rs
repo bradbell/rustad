@@ -60,11 +60,10 @@ pub(crate) struct OpSequence {
     pub(crate) arg_type : Vec<ADType>,
     //
     // flag
-    /// is a vector containing boolean flags.
-    /// If an operator has boolean flags, one of its arguments in
-    /// arg_all is the index in flag of its first
-    /// boolean flag.
-    pub(crate) flag : Vec<bool>,
+    /// is a vector containing flags.
+    /// If an operator has flags, one of its arguments in
+    /// arg_all is the index in flag of its first flag.
+    pub(crate) flag : Vec<ADType>,
 }
 // VarTape::new
 impl OpSequence {

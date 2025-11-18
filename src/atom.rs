@@ -509,7 +509,7 @@ where
             sub_tape.arg_all.push( n_dep as IndexT );                // arg[4]
             sub_tape.arg_all.push( sub_tape.flag.len() as IndexT );  // arg[5]
             for _j in 0 .. 6 {
-                sub_tape.arg_type.push( ADType::NoType );
+                sub_tape.arg_type.push( ADType::Empty );
             }
             //
             // sub_tape.arg_type, sub_tape.arg_all
@@ -526,7 +526,11 @@ where
             }
             //
             // sub_tape.flag
-            sub_tape.flag.push( trace );          // flag[ arg[5] ]
+            if trace {
+                sub_tape.flag.push( ADType::True );          // flag[ arg[5] ]
+            } else {
+                sub_tape.flag.push( ADType::False );         // flag[ arg[5] ]
+            }
             //
             // sub_tape.n_dep
             sub_tape.n_dep += n_dep;

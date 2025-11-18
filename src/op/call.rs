@@ -67,7 +67,7 @@ use crate::{
 fn extract_call_info<V>(
     arg        : &[IndexT] ,
     arg_type   : &[ADType] ,
-    flag       : &[bool]   ,
+    flag       : &[ADType] ,
 ) -> (
     IndexT           , // call_info
     usize            , // n_dom
@@ -87,7 +87,7 @@ where
     let n_dom      = arg[2] as usize;
     let n_res      = arg[3] as usize;
     let n_dep      = arg[4] as usize;
-    let trace      = flag[ arg[5] as usize ];
+    let trace      = flag[ arg[5] as usize ].is_true();
     //
     // callback
     let callback : AtomCallback<V>;
@@ -250,7 +250,7 @@ where
 fn call_forward_dyp_value<V> (
     dyp_both   : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag       : &Vec<bool>    ,
+    flag       : &Vec<ADType>  ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -324,7 +324,7 @@ where
 fn call_forward_dyp_ad<V> (
     adyp_both  : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
-    flag       : &Vec<bool>          ,
+    flag       : &Vec<ADType>        ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -404,7 +404,7 @@ fn call_forward_var_value<V> (
     dyp_both   : &Vec<V>       ,
     var_both   : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag       : &Vec<bool>    ,
+    flag       : &Vec<ADType>  ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -477,7 +477,7 @@ fn call_forward_var_ad<V> (
     adyp_both  : &Vec< AD<V> >       ,
     avar_both  : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
-    flag       : &Vec<bool>          ,
+    flag       : &Vec<ADType>        ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -553,7 +553,7 @@ fn call_forward_1_value<V> (
     var_both   : &Vec<V>       ,
     var_der    : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag       : &Vec<bool>    ,
+    flag       : &Vec<ADType>  ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -631,7 +631,7 @@ fn call_forward_1_ad<V> (
     avar_both  : &Vec< AD<V> >       ,
     avar_der   : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
-    flag       : &Vec<bool>          ,
+    flag       : &Vec<ADType>        ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -712,7 +712,7 @@ fn call_reverse_1_value<V> (
     var_both   : &Vec<V>       ,
     var_der    : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag       : &Vec<bool>    ,
+    flag       : &Vec<ADType>  ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -789,7 +789,7 @@ fn call_reverse_1_ad<V> (
     avar_both   : &Vec< AD<V> >       ,
     avar_der    : &mut Vec< AD<V> >   ,
     cop         : &Vec<V>             ,
-    flag       : &Vec<bool>           ,
+    flag       : &Vec<ADType>         ,
     arg        : &[IndexT]            ,
     arg_type   : &[ADType]            ,
     res        : usize                )
@@ -866,7 +866,7 @@ where
 /// vector of variable indices that are arguments to this call operator
 fn call_arg_var_index(
     arg_var_index : &mut Vec<IndexT>,
-    flag          : &Vec<bool>,
+    flag          : &Vec<ADType>,
     arg           : &[IndexT]
 )
 {
@@ -877,13 +877,13 @@ fn call_arg_var_index(
     // is_var
     let begin    = arg[3] as usize;
     let end      = begin + n_dom;
-    let is_var   = &flag[begin .. end];
+    let sub_flag = &flag[begin .. end];
     //
     // arg_var_index
     let zero_t = 0 as IndexT;
     arg_var_index.resize(0, zero_t);
     for call_i_arg in 0 .. n_dom {
-        if is_var[call_i_arg] {
+        if sub_flag[call_i_arg].is_true() {
             arg_var_index.push( arg[5 + call_i_arg]  );
         }
     }
@@ -936,7 +936,7 @@ where
 fn no_op_dyp<V, E>(
     _dyp_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag     : &Vec<bool>  ,
+    _flag     : &Vec<ADType>,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -948,7 +948,7 @@ fn no_op_var<V, E>(
     _dyp_both : &Vec<E>     ,
     _var_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag     : &Vec<bool>  ,
+    _flag     : &Vec<ADType>,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -962,7 +962,7 @@ fn no_op_der<V, E>(
     _var_both : &Vec<E>     ,
     _var_der  : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag     : &Vec<bool>  ,
+    _flag     : &Vec<ADType>,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -972,7 +972,7 @@ fn no_op_der<V, E>(
 /// [ArgVarIndex](crate::op::info::ArgVarIndex) function
 fn no_op_arg_var_index(
     arg_var_index  : &mut Vec<IndexT> ,
-    _flag          : &Vec<bool>       ,
+    _flag          : &Vec<ADType>     ,
     _arg           : &[IndexT]        ,
 ) {
     let zero_t = 0 as IndexT;
@@ -985,7 +985,7 @@ fn no_op_rust_src<V> (
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
     _var_n_dom : usize       ,
-    _flag      : &Vec<bool>  ,
+    _flag      : &Vec<ADType>,
     _arg       : &[IndexT]   ,
     _arg_type  : &[ADType]   ,
     _res       : usize       ,
@@ -1000,7 +1000,7 @@ fn call_rust_src<V> (
     res_type  : ADType      ,
     dyp_n_dom : usize       ,
     var_n_dom : usize       ,
-    flag      : &Vec<bool>  ,
+    flag      : &Vec<ADType>,
     arg       : &[IndexT]   ,
     arg_type  : &[ADType]   ,
     res       : usize       ) -> String

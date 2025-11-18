@@ -96,7 +96,7 @@ macro_rules! forward_dyp {
                 println!( "Begin Trace: forward_dyp_{}", stringify!($suffix) );
                 println!( "index, flag" );
                 for j in 0 .. self.dyp.flag.len() {
-                    println!( "{}, {}", j, self.dyp.flag[j] );
+                    println!( "{}, {:?}", j, self.dyp.flag[j] );
                 }
                 println!( "index, constant" );
                 for j in 0 .. self.cop.len() {
