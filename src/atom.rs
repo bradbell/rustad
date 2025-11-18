@@ -531,6 +531,10 @@ where
             } else {
                 sub_tape.flag.push( ADType::False );         // flag[ arg[5] ]
             }
+            for i in 0 .. n_res {
+                //flag[ arg[5] + i + 1 ]
+                sub_tape.flag.push( arange[i].ad_type.clone() )
+            }
             //
             // sub_tape.n_dep
             sub_tape.n_dep += n_dep;
