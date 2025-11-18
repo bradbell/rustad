@@ -96,12 +96,13 @@ where
         // op_info_vec
         let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
         //
-        // n_domain ... range_index.
-        let n_domain          = self.var.n_dom;
+        // n_dom ... range_index.
+        let n_dom             = self.var.n_dom;
         let n_dep             = self.var.n_dep;
-        let flag_all          = &self.var.flag;
+        let id_seq            = &self.var.id_seq;
         let arg_all           = &self.var.arg_all;
-        let op2arg            = &self.var.arg_seq;
+        let arg_seq           = &self.var.arg_seq;
+        let flag              = &self.var.flag;
         let range_ad_type     = &self.range_ad_type;
         let range_index       = &self.range_index;
         //
@@ -110,7 +111,7 @@ where
         //
         // done
         // initialize all elements as n_var (an invalid variable index)
-        let n_var    = n_domain + n_dep;
+        let n_var    = n_dom + n_dep;
         let mut done = vec![n_var; n_var];
         //
         // result, arg_var_index, var_index_stack
@@ -119,8 +120,8 @@ where
         let mut var_index_stack : Vec<IndexT>       = Vec::new();
         //
         if trace { println!(
-            "Begin Trace: sub_sparsity: n_domain = {}, n_range = {}",
-            n_domain, n_range
+            "Begin Trace: sub_sparsity: n_dom = {}, n_range = {}",
+            n_dom, n_range
         ); }
         //
         // row
@@ -144,7 +145,7 @@ where
                 //
                 if done[var_index] != row {
                     done[var_index] = row;
-                    if var_index < n_domain {
+                    if var_index < n_dom {
                         if trace {
                             println!( "    col = {}", var_index );
                         }
@@ -159,21 +160,21 @@ where
                         //
                         // op_index
                         // the operator that creates this variable
-                        let op_index         = var_index - n_domain;
+                        let op_index         = var_index - n_dom;
                         //
                         // arv_var_index_fn
-                        let op_id            = self.var.id_seq[op_index] as usize;
+                        let op_id            = id_seq[op_index] as usize;
                         let op_info          = &op_info_vec[op_id];
                         let arg_var_index_fn = op_info.arg_var_index;
                         //
                         // arg
-                        let begin = op2arg[op_index] as usize;
-                        let end   = op2arg[op_index + 1] as usize;
+                        let begin = arg_seq[op_index] as usize;
+                        let end   = arg_seq[op_index + 1] as usize;
                         let arg   = &arg_all[begin .. end];
                         //
                         // arg_var_index
                         // the variables that are arguments to this operator
-                        arg_var_index_fn(&mut arg_var_index, &flag_all, arg);
+                        arg_var_index_fn(&mut arg_var_index, &flag, arg);
                         //
                         // var_index_stack
                         for i in 0 .. arg_var_index.len() {
