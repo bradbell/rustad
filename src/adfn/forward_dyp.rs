@@ -115,7 +115,7 @@ macro_rules! forward_dyp {
                 let start    = self.dyp.arg_seq[op_index] as usize;
                 let end      = self.dyp.arg_seq[op_index + 1] as usize;
                 let arg      = &self.dyp.arg_all[start .. end];
-                let arg_type = &self.dyp.arg_type[start .. end];
+                let arg_type = &self.dyp.arg_type_all[start .. end];
                 let res      = self.dyp.n_dom + op_index;
                 let forward_dyp = op_info_vec[op_id].[< forward_dyp_ $suffix >];
                 //

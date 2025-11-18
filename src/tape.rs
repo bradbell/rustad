@@ -53,11 +53,12 @@ pub(crate) struct OpSequence {
     /// starting at arg_seq\[index\] and ending with arg_seq\[index + 1\] .
     pub(crate) arg_all : Vec<IndexT>,
     //
-    // arg_type
-    /// For each index in arg_all, if the value arg_type[index\] is (is not)
-    /// ADType::ConstantP,
-    /// the value arg_all\[index\] is (is not) a constant parameter index.
-    pub(crate) arg_type : Vec<ADType>,
+    // arg_type_all
+    /// For each *index* in arg_all, if the value arg_type\[ *index* \] is
+    /// ADType::ConstantP ( ADType::DynamicP ) { ADtype::Variable } ,
+    /// the value arg_all\[ *index * \] is a constant parameter
+    /// ( dynamic parameter ) { variable }.
+    pub(crate) arg_type_all : Vec<ADType>,
     //
     // flag
     /// is a vector containing flags.
@@ -72,13 +73,13 @@ impl OpSequence {
     /// Sets n_dom, n_dep to zero and all the vectors to empty.
     pub fn new() -> Self {
         Self {
-            n_dom     : 0,
-            n_dep     : 0,
-            id_seq    : Vec::new(),
-            arg_seq   : Vec::new(),
-            arg_all   : Vec::new() ,
-            arg_type  : Vec::new() ,
-            flag      : Vec::new() ,
+            n_dom         : 0,
+            n_dep         : 0,
+            id_seq        : Vec::new(),
+            arg_seq       : Vec::new(),
+            arg_all       : Vec::new() ,
+            arg_type_all  : Vec::new() ,
+            flag          : Vec::new() ,
         }
     }
 }
@@ -419,8 +420,8 @@ where
         assert_eq!( tape.dyp.arg_seq.len()  , tape.dyp.id_seq.len() );
         assert_eq!( tape.var.arg_seq.len()  , tape.var.id_seq.len() );
         //
-        assert_eq!( tape.dyp.arg_all.len()  , tape.dyp.arg_type.len() );
-        assert_eq!( tape.var.arg_all.len()  , tape.var.arg_type.len() );
+        assert_eq!( tape.dyp.arg_all.len()  , tape.dyp.arg_type_all.len() );
+        assert_eq!( tape.var.arg_all.len()  , tape.var.arg_type_all.len() );
         //
         assert_eq!( tape.dyp.n_dep , tape.dyp.id_seq.len());
         assert_eq!( tape.var.n_dep , tape.var.id_seq.len());

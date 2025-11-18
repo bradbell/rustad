@@ -191,7 +191,7 @@ macro_rules! forward_der {
                 let start    = self.var.arg_seq[op_index] as usize;
                 let end      = self.var.arg_seq[op_index + 1] as usize;
                 let arg      = &self.var.arg_all[start .. end];
-                let arg_type = &self.var.arg_type[start .. end];
+                let arg_type = &self.var.arg_type_all[start .. end];
                 let res      = self.var.n_dom + op_index;
                 let forward_der = op_info_vec[op_id].[< forward_der_ $suffix >];
                 forward_der(

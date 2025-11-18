@@ -190,12 +190,12 @@ macro_rules! reverse_der {
             //
             // var_der
             for op_index in ( 0 .. self.var.id_seq.len() ).rev() {
-                let op_id = self.var.id_seq[op_index] as usize;
-                let start = self.var.arg_seq[op_index] as usize;
-                let end   = self.var.arg_seq[op_index + 1] as usize;
-                let arg   = &self.var.arg_all[start .. end];
-                let arg_type = &self.var.arg_type[start .. end];
-                let res   = self.var.n_dom + op_index;
+                let op_id     = self.var.id_seq[op_index] as usize;
+                let start     = self.var.arg_seq[op_index] as usize;
+                let end       = self.var.arg_seq[op_index + 1] as usize;
+                let arg       = &self.var.arg_all[start .. end];
+                let arg_type  = &self.var.arg_type_all[start .. end];
+                let res       = self.var.n_dom + op_index;
                 let reverse_1 = op_info_vec[op_id].[< reverse_der_ $suffix >];
                 reverse_1(
                     &dyp_both,

@@ -509,12 +509,12 @@ where
             sub_tape.arg_all.push( n_dep as IndexT );                // arg[4]
             sub_tape.arg_all.push( sub_tape.flag.len() as IndexT );  // arg[5]
             for _j in 0 .. 6 {
-                sub_tape.arg_type.push( ADType::Empty );
+                sub_tape.arg_type_all.push( ADType::Empty );
             }
             //
-            // sub_tape.arg_type, sub_tape.arg_all
+            // sub_tape.arg_type_all, sub_tape.arg_all
             for j in 0 .. n_dom {
-                sub_tape.arg_type.push( domain_ad_type[j].clone() );
+                sub_tape.arg_type_all.push( domain_ad_type[j].clone() );
                 if domain_ad_type[j].is_constant() {
                     let index = tape.cop.len();
                     tape.cop.push( adomain[j].value.clone() );

@@ -161,7 +161,7 @@ where
                 let start    = self.dyp.arg_seq[op_index] as usize;
                 let end      = self.dyp.arg_seq[op_index + 1] as usize;
                 let arg      = &self.dyp.arg_all[start .. end];
-                let arg_type = &self.dyp.arg_type[start .. end];
+                let arg_type = &self.dyp.arg_type_all[start .. end];
                 let res      = self.dyp.n_dom + op_index;
                 let rust_src = op_info_vec[op_id].rust_src;
                 let not_used = V::from( f32::NAN );
@@ -191,7 +191,7 @@ where
                 let start    = self.var.arg_seq[op_index] as usize;
                 let end      = self.var.arg_seq[op_index + 1] as usize;
                 let arg      = &self.var.arg_all[start .. end];
-                let arg_type = &self.var.arg_type[start .. end];
+                let arg_type = &self.var.arg_type_all[start .. end];
                 let res      = self.var.n_dom + op_index;
                 let rust_src = op_info_vec[op_id].rust_src;
                 let not_used = V::from( f32::NAN );
