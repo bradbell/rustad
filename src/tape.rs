@@ -39,7 +39,7 @@ pub(crate) struct OpSequence {
     //
     // id_seq
     /// For each index in the operation sequence, id_seq\[index\]
-    /// is the corresponding operator id.
+    /// is the corresponding operator [id](crate::op::id) .
     pub(crate) id_seq : Vec<u8>,
     //
     // arg_seq
