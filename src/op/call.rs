@@ -6,10 +6,9 @@
 //!
 //! Link to [parent module](super)
 //!
-//! # Operator Id
-//!  CALL_OP
+//! # CALL_OP
 //!
-//! # Operator Arguments
+//! ## Operator Arguments
 //! | Index    | Meaning |
 //! | -------  | ------- |
 //! | 0        | Index that identifies the atomic function; i.e., atom_id |
@@ -23,7 +22,7 @@
 //! | ...      | ... |
 //! | 5+n_dom  | Variable or parameter index for last argument to call    |
 //!
-//! # Operator Flags
+//! ## Operator Flags
 //! | Index    | Meaning |
 //! | -------- | ------- |
 //! | 0        | is True or false depending on trace for this call        |
@@ -31,12 +30,18 @@
 //! | ...      | ... |
 //! | n_res    | is ADtype for last result of this call                   |
 //!
-//! # Operator Results
+//! ## Operator Results
 //! We use n_res for the number of results that are variables.
-//! There are n_res - 1 CALL_RES_OP directly after each CALL_OP
+//! There are n_dep - 1 CALL_RES_OP directly after each CALL_OP
 //! operator in the sequence of operations. These are place holders so that
-//! there is a direct correspondence between variable, or dynamic parameter,
+//! there is a direct correspondence between dependent indices
 //! and operator indices.
+//!
+//! * CALL_RES_OP
+//! This operator has one argument that is equal to the offset of this
+//! CALL_RES_OP form the corresponding CALL_OP. The first CALL_RES_OP
+//! has arg[0] equal 1, the second has arg[0] equal to 2, ...,
+//! the last has arg[0] equal to n_dep - 1.
 // --------------------------------------------------------------------------
 // use
 //
