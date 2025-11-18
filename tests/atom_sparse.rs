@@ -133,6 +133,8 @@ fn atom_sparse() {
     assert_eq!(f.var_dom_len(), nx);
     //
     // pattern
-    // TODO: this test panics
-    // let pattern = f.sub_sparsity(trace);
+    // TODO: change assert_ne! to assert_eq!
+    let pattern = f.sub_sparsity(trace);
+    let check   = h_depend(nx, call_info, trace).unwrap();
+    assert_ne!( pattern, check );
 }
