@@ -37,7 +37,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
     fn [< $Name:lower _forward_dyp >] <V, E> (
         dyp_both    : &mut Vec<E> ,
         cop         : &Vec<V>     ,
-        _flag       : &Vec<ADType>,
+        _flag_all   : &Vec<ADType>,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       )
@@ -68,7 +68,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         dyp_both    : &Vec<E>     ,
         var_both    : &mut Vec<E> ,
         cop         : &Vec<V>     ,
-        _flag       : &Vec<ADType>,
+        _flag_all   : &Vec<ADType>,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       )
@@ -94,7 +94,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         dyp_both    : &Vec<E>     ,
         var_both    : &mut Vec<E> ,
         cop         : &Vec<V>     ,
-        _flag       : &Vec<ADType>,
+        _flag_all   : &Vec<ADType>,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       )
@@ -120,7 +120,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         _dyp_both   : &Vec<E>     ,
         var_both    : &mut Vec<E> ,
         _cop        : &Vec<V>     ,
-        _flag       : &Vec<ADType>,
+        _flag_all   : &Vec<ADType>,
         arg         : &[IndexT]   ,
         _arg_type   : &[ADType]   ,
         res         : usize       )
@@ -162,7 +162,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         res_type    : ADType      ,
         dyp_n_dom   : usize       ,
         var_n_dom   : usize       ,
-        _flag       : &Vec<ADType>,
+        _flag_all   : &Vec<ADType>,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res       : usize       ) -> String
@@ -217,7 +217,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         res_type    : ADType      ,
         dyp_n_dom   : usize       ,
         var_n_dom   : usize       ,
-        _flag       : &Vec<ADType>,
+        _flag_all   : &Vec<ADType>,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res       : usize       ) -> String
@@ -272,7 +272,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         res_type    : ADType      ,
         _dyp_n_dom  : usize       ,
         var_n_dom   : usize       ,
-        _flag       : &Vec<ADType>,
+        _flag_all   : &Vec<ADType>,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res       : usize       ) -> String

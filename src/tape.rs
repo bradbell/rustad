@@ -60,11 +60,11 @@ pub(crate) struct OpSequence {
     /// ( dynamic parameter ) { variable }.
     pub(crate) arg_type_all : Vec<ADType>,
     //
-    // flag
-    /// is a vector containing flags.
+    // flag_all
+    /// is a vector containing all the flags for all the operators.
     /// If an operator has flags, one of its arguments in
-    /// arg_all is the index in flag of its first flag.
-    pub(crate) flag : Vec<ADType>,
+    /// arg_all is the index in flag_all of its first flag.
+    pub(crate) flag_all : Vec<ADType>,
 }
 // VarTape::new
 impl OpSequence {
@@ -79,7 +79,7 @@ impl OpSequence {
             arg_seq       : Vec::new(),
             arg_all       : Vec::new() ,
             arg_type_all  : Vec::new() ,
-            flag          : Vec::new() ,
+            flag_all      : Vec::new() ,
         }
     }
 }
@@ -296,8 +296,8 @@ where
         assert_eq!( tape.dyp.arg_all.len(),  0 );
         assert_eq!( tape.var.arg_all.len(),  0 );
         //
-        assert_eq!( tape.dyp.flag.len(),     0 );
-        assert_eq!( tape.var.flag.len(),     0 );
+        assert_eq!( tape.dyp.flag_all.len(), 0 );
+        assert_eq!( tape.var.flag_all.len(), 0 );
         //
         assert_eq!( tape.cop.len(),          0 );
         //

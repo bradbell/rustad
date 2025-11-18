@@ -507,7 +507,7 @@ where
             sub_tape.arg_all.push( n_dom as IndexT );                // arg[2]
             sub_tape.arg_all.push( n_res as IndexT );                // arg[3]
             sub_tape.arg_all.push( n_dep as IndexT );                // arg[4]
-            sub_tape.arg_all.push( sub_tape.flag.len() as IndexT );  // arg[5]
+            sub_tape.arg_all.push( sub_tape.flag_all.len() as IndexT );  // arg[5]
             for _j in 0 .. 6 {
                 sub_tape.arg_type_all.push( ADType::Empty );
             }
@@ -525,15 +525,15 @@ where
                 }
             }
             //
-            // sub_tape.flag
+            // sub_tape.flag_all
             if trace {
-                sub_tape.flag.push( ADType::True );          // flag[ arg[5] ]
+                sub_tape.flag_all.push( ADType::True );          // flag_all[ arg[5] ]
             } else {
-                sub_tape.flag.push( ADType::False );         // flag[ arg[5] ]
+                sub_tape.flag_all.push( ADType::False );         // flag_all[ arg[5] ]
             }
             for i in 0 .. n_res {
-                //flag[ arg[5] + i + 1 ]
-                sub_tape.flag.push( arange[i].ad_type.clone() )
+                //flag_all[ arg[5] + i + 1 ]
+                sub_tape.flag_all.push( arange[i].ad_type.clone() )
             }
             //
             // sub_tape.n_dep

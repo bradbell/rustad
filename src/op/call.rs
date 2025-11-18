@@ -6,10 +6,6 @@
 //!
 //! Link to [parent module](super)
 //!
-//! # TODO
-//! Remove the argument flags because arg_type yields the type of each argument.
-//! In addition, change the result flags to ADType for the results.
-//!
 //! # Operator Id
 //!  CALL_OP
 //!
@@ -69,7 +65,7 @@ use crate::{
 // extract_call_info
 fn extract_call_info<'a, V>(
     arg        : &[IndexT] ,
-    flag       : &'a [ADType] ,
+    flag_all   : &'a [ADType] ,
 ) -> (
     IndexT           , // call_info
     usize            , // n_dom
@@ -90,9 +86,9 @@ where
     let n_res        = arg[3] as usize;
     let n_dep        = arg[4] as usize;
     let start        = arg[5] as usize;
-    let trace        = flag[start].is_true();
+    let trace        = flag_all[start].is_true();
     let start        = start + 1;
-    let res_ad_type  = &flag[start .. start+n_res];
+    let res_ad_type  = &flag_all[start .. start+n_res];
     //
     // callback
     let callback : AtomCallback<V>;
@@ -231,7 +227,7 @@ where
 fn call_forward_dyp_value<V> (
     dyp_both   : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag       : &Vec<ADType>  ,
+    flag_all   : &Vec<ADType>  ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -247,7 +243,7 @@ where
         trace,
         res_ad_type,
         callback,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info(arg, flag_all);
     //
     // forward_fun_value
     let forward_fun_value = &callback.forward_fun_value;
@@ -305,7 +301,7 @@ where
 fn call_forward_dyp_ad<V> (
     adyp_both  : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
-    flag       : &Vec<ADType>        ,
+    flag_all   : &Vec<ADType>        ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -321,7 +317,7 @@ where
         trace,
         res_ad_type,
         callback,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info(arg, flag_all);
     //
     // forward_fun_ad
     let forward_fun_ad = &callback.forward_fun_ad;
@@ -385,7 +381,7 @@ fn call_forward_var_value<V> (
     dyp_both   : &Vec<V>       ,
     var_both   : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag       : &Vec<ADType>  ,
+    flag_all   : &Vec<ADType>  ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -401,7 +397,7 @@ where
         trace,
         res_ad_type,
         callback,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info(arg, flag_all);
     //
     // forward_fun_value
     let forward_fun_value = &callback.forward_fun_value;
@@ -458,7 +454,7 @@ fn call_forward_var_ad<V> (
     adyp_both  : &Vec< AD<V> >       ,
     avar_both  : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
-    flag       : &Vec<ADType>        ,
+    flag_all   : &Vec<ADType>        ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -474,7 +470,7 @@ where
         trace,
         res_ad_type,
         callback,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info(arg, flag_all);
     //
     // forward_fun_ad
     let forward_fun_ad = &callback.forward_fun_ad;
@@ -534,7 +530,7 @@ fn call_forward_1_value<V> (
     var_both   : &Vec<V>       ,
     var_der    : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag       : &Vec<ADType>  ,
+    flag_all   : &Vec<ADType>  ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -550,7 +546,7 @@ where
         trace,
         res_ad_type,
         callback,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info(arg, flag_all);
     //
     // forward_der_value
     let forward_der_value  = &callback.forward_der_value;
@@ -612,7 +608,7 @@ fn call_forward_1_ad<V> (
     avar_both  : &Vec< AD<V> >       ,
     avar_der   : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
-    flag       : &Vec<ADType>        ,
+    flag_all   : &Vec<ADType>        ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -628,7 +624,7 @@ where
         trace,
         res_ad_type,
         callback,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info(arg, flag_all);
     //
     // forward_der_ad
     let forward_der_ad       = callback.forward_der_ad.clone();
@@ -693,7 +689,7 @@ fn call_reverse_1_value<V> (
     var_both   : &Vec<V>       ,
     var_der    : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag       : &Vec<ADType>  ,
+    flag_all   : &Vec<ADType>  ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -709,7 +705,7 @@ where
         trace,
         res_ad_type,
         callback,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info(arg, flag_all);
     //
     // reverse_der_value
     let reverse_der_value = &callback.reverse_der_value;
@@ -770,7 +766,7 @@ fn call_reverse_1_ad<V> (
     avar_both   : &Vec< AD<V> >       ,
     avar_der    : &mut Vec< AD<V> >   ,
     cop         : &Vec<V>             ,
-    flag       : &Vec<ADType>         ,
+    flag_all   : &Vec<ADType>         ,
     arg        : &[IndexT]            ,
     arg_type   : &[ADType]            ,
     res        : usize                )
@@ -787,7 +783,7 @@ where
         trace,
         res_ad_type,
         callback,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info(arg, flag_all);
     //
     // reverse_der_ad
     let reverse_der_ad = &callback.reverse_der_ad;
@@ -886,7 +882,7 @@ where
 fn no_op_dyp<V, E>(
     _dyp_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag     : &Vec<ADType>,
+    _flag_all : &Vec<ADType>,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -898,7 +894,7 @@ fn no_op_var<V, E>(
     _dyp_both : &Vec<E>     ,
     _var_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag     : &Vec<ADType>,
+    _flag_all : &Vec<ADType>,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -912,7 +908,7 @@ fn no_op_der<V, E>(
     _var_both : &Vec<E>     ,
     _var_der  : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag     : &Vec<ADType>,
+    _flag_all : &Vec<ADType>,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -924,7 +920,7 @@ fn no_op_rust_src<V> (
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
     _var_n_dom : usize       ,
-    _flag      : &Vec<ADType>,
+    _flag_all  : &Vec<ADType>,
     _arg       : &[IndexT]   ,
     _arg_type  : &[ADType]   ,
     _res       : usize       ,
@@ -939,7 +935,7 @@ fn call_rust_src<V> (
     res_type  : ADType      ,
     dyp_n_dom : usize       ,
     var_n_dom : usize       ,
-    flag      : &Vec<ADType>,
+    flag_all  : &Vec<ADType>,
     arg       : &[IndexT]   ,
     arg_type  : &[ADType]   ,
     res       : usize       ) -> String
@@ -957,7 +953,7 @@ where
         trace,
         res_ad_type,
         callback,
-    ) = extract_call_info(arg, flag);
+    ) = extract_call_info(arg, flag_all);
     //
     // src
     let mut src = String::new();

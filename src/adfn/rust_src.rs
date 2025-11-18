@@ -170,7 +170,7 @@ where
                         ADType::DynamicP,
                         self.dyp.n_dom,
                         self.var.n_dom,
-                        &self.dyp.flag,
+                        &self.dyp.flag_all,
                         arg,
                         arg_type,
                         res
@@ -200,7 +200,7 @@ where
                         ADType::Variable,
                         self.dyp.n_dom,
                         self.var.n_dom,
-                        &self.var.flag,
+                        &self.var.flag_all,
                         arg,
                         arg_type,
                         res
