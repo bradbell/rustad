@@ -296,35 +296,6 @@ macro_rules! no_rust_src{ ($Op:ident) => {
 }}
 pub(crate) use no_rust_src;
 // ---------------------------------------------------------------------------
-// ArgVarIndex
-/// Return indices for variables that are arguments for an operation
-///
-/// * arg_var_index :
-/// This vector is both an input and the output for this function
-/// (to avoid having to reallocate memory for each call).
-/// Only the capacity of the vector matters on input.
-/// Upon return, it contains the indices for the variables that are
-/// arguments for this operator.
-///
-/// * flag :
-/// vector of all the boolean values used by operators.
-///
-/// * arg :
-/// The arguments for this operator as a sub-vector of all the arguments.
-///
-pub type ArgVarIndex = fn(
-    _arg_var_index : &mut Vec<IndexT> ,
-    _flag          : &Vec<ADType>     ,
-    _arg           : &[IndexT]        ,
-);
-// panic_arg_var_index
-/// Default [ArgVarIndex] function will panic.
-fn panic_arg_var_index(
-    _arg_var_index : &mut Vec<IndexT> ,
-    _flag          : &Vec<ADType>     ,
-    _arg           : &[IndexT]        ,
-) { panic!() }
-// ---------------------------------------------------------------------------
 // RustSrc
 /// Generate source code corresponding to forward_dyp and forward_var
 /// evaluation.
@@ -406,8 +377,6 @@ pub struct OpInfo<V> {
     /// generate rust source code for this operator
     pub rust_src        : RustSrc<V>,
     //
-    /// get indices for variables that are arguments to this function
-    pub arg_var_index   : ArgVarIndex,
 }
 // ---------------------------------------------------------------------------
 // op_info_vec
@@ -444,7 +413,6 @@ where
         reverse_der_value  : panic_der::<V, V>,
         reverse_der_ad     : panic_der::<V, AD<V>>,
         rust_src           : panic_rust_src,
-        arg_var_index      : panic_arg_var_index,
     };
     let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
     crate::op::add::set_op_info::<V>(&mut result);

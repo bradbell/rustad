@@ -841,35 +841,6 @@ where
         }
     }
 }
-// --------------------------------------------------------------------------
-//
-// call_arg_var_index
-/// vector of variable indices that are arguments to this call operator
-fn call_arg_var_index(
-    arg_var_index : &mut Vec<IndexT>,
-    flag          : &Vec<ADType>,
-    arg           : &[IndexT]
-)
-{
-    //
-    // n_dom
-    let n_dom = arg[2] as usize;
-    //
-    // is_var
-    let begin    = arg[3] as usize;
-    let end      = begin + n_dom;
-    let sub_flag = &flag[begin .. end];
-    //
-    // arg_var_index
-    let zero_t = 0 as IndexT;
-    arg_var_index.resize(0, zero_t);
-    for call_i_arg in 0 .. n_dom {
-        if sub_flag[call_i_arg].is_true() {
-            arg_var_index.push( arg[5 + call_i_arg]  );
-        }
-    }
-    assert_ne!( arg_var_index.len() , 0 );
-}
 // ---------------------------------------------------------------------------
 //
 // set_op_info
@@ -894,7 +865,6 @@ where
         reverse_der_value : call_reverse_1_value::<V>,
         reverse_der_ad    : call_reverse_1_ad::<V>,
         rust_src          : call_rust_src::<V>,
-        arg_var_index     : call_arg_var_index,
     };
     op_info_vec[CALL_RES_OP as usize] = OpInfo{
         name              : "call_res" ,
@@ -907,7 +877,6 @@ where
         reverse_der_value : no_op_der::<V, V>,
         reverse_der_ad    : no_op_der::<V, AD<V> >,
         rust_src          : no_op_rust_src::<V>,
-        arg_var_index     : no_op_arg_var_index,
     };
 }
 // ---------------------------------------------------------------------------
@@ -948,17 +917,6 @@ fn no_op_der<V, E>(
     _arg_type : &[ADType]   ,
     _res      : usize       ,
 ) { }
-//
-// no_op_arg_var_index
-/// [ArgVarIndex](crate::op::info::ArgVarIndex) function
-fn no_op_arg_var_index(
-    arg_var_index  : &mut Vec<IndexT> ,
-    _flag          : &Vec<ADType>     ,
-    _arg           : &[IndexT]        ,
-) {
-    let zero_t = 0 as IndexT;
-    arg_var_index.resize(0, zero_t);
-}
 //
 // no_op_rust_src
 fn no_op_rust_src<V> (

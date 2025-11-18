@@ -7,52 +7,9 @@
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
 //
-use crate::{
-    IndexT,
-    ADType,
-};
+#[cfg(doc)]
+use crate::IndexT;
 //
-// ---------------------------------------------------------------------------
-//
-// binary_pp_arg_var_index
-pub(crate) fn binary_pp_arg_var_index(
-    arg_var_index : &mut Vec<IndexT> ,
-    _flag         : &Vec<ADType>     ,
-    _arg          : &[IndexT]        ,
-) {
-    arg_var_index.resize(0, 0 as IndexT);
-}
-//
-// binary_pv_arg_var_index
-pub(crate) fn binary_pv_arg_var_index(
-    arg_var_index : &mut Vec<IndexT> ,
-    _flag         : &Vec<ADType>     ,
-    arg           : &[IndexT]        ,
-) {
-    arg_var_index.resize(1, 0 as IndexT);
-    arg_var_index[0] = arg[1];
-}
-//
-// binary_vp_arg_var_index
-pub(crate) fn binary_vp_arg_var_index(
-    arg_var_index : &mut Vec<IndexT> ,
-    _flag         : &Vec<ADType>     ,
-    arg           : &[IndexT]        ,
-) {
-    arg_var_index.resize(1, 0 as IndexT);
-    arg_var_index[0] = arg[0];
-}
-//
-// binary_vv_arg_var_index
-pub(crate) fn binary_vv_arg_var_index(
-    arg_var_index : &mut Vec<IndexT> ,
-    _flag         : &Vec<ADType>     ,
-    arg           : &[IndexT]        ,
-) {
-    arg_var_index.resize(2, 0 as IndexT);
-    arg_var_index[0] = arg[0];
-    arg_var_index[1] = arg[1];
-}
 // ---------------------------------------------------------------------------
 // eval_binary_forward_0
 /// Evaluation of zero order forward for binary operators.
