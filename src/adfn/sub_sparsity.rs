@@ -10,8 +10,6 @@
 //
 use crate::ADfn;
 use crate::IndexT;
-use crate::op::info::GlobalOpInfoVec;
-use crate::op::info::OpInfo;
 //
 #[cfg(doc)]
 use crate::doc_generic_v;
@@ -20,7 +18,6 @@ use crate::doc_generic_v;
 // ADfn::sub_sparsoty
 impl<V> ADfn<V>
 where
-    V : GlobalOpInfoVec,
 {
     /// Use the subgraph method to compute a Jacobian sparsity pattern.
     ///
@@ -93,16 +90,12 @@ where
         // zero_t
         let zero_t  = 0 as IndexT;
         //
-        // op_info_vec
-        let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
-        //
         // n_dom ... range_index.
         let n_dom             = self.var.n_dom;
         let n_dep             = self.var.n_dep;
-        let id_seq            = &self.var.id_seq;
-        let arg_all           = &self.var.arg_all;
         let arg_seq           = &self.var.arg_seq;
-        let flag              = &self.var.flag;
+        let arg_all           = &self.var.arg_all;
+        let arg_type_all      = &self.var.arg_type_all;
         let range_ad_type     = &self.range_ad_type;
         let range_index       = &self.range_index;
         //
@@ -114,9 +107,8 @@ where
         let n_var    = n_dom + n_dep;
         let mut done = vec![n_var; n_var];
         //
-        // result, arg_var_index, var_index_stack
+        // result, var_index_stack
         let mut result          : Vec< [usize; 2] > = Vec::new();
-        let mut arg_var_index   : Vec<IndexT>       = Vec::new();
         let mut var_index_stack : Vec<IndexT>       = Vec::new();
         //
         if trace { println!(
@@ -163,22 +155,16 @@ where
                         let op_index         = var_index - n_dom;
                         //
                         // arv_var_index_fn
-                        let op_id            = id_seq[op_index] as usize;
-                        let op_info          = &op_info_vec[op_id];
-                        let arg_var_index_fn = op_info.arg_var_index;
-                        //
-                        // arg
-                        let begin = arg_seq[op_index] as usize;
-                        let end   = arg_seq[op_index + 1] as usize;
-                        let arg   = &arg_all[begin .. end];
-                        //
-                        // arg_var_index
-                        // the variables that are arguments to this operator
-                        arg_var_index_fn(&mut arg_var_index, &flag, arg);
+                        let begin    = arg_seq[op_index] as usize;
+                        let end      = arg_seq[op_index + 1] as usize;
+                        let arg      = &arg_all[begin .. end];
+                        let arg_type = &arg_type_all[begin .. end];
                         //
                         // var_index_stack
-                        for i in 0 .. arg_var_index.len() {
-                            var_index_stack.push( arg_var_index[i] );
+                        for i in 0 .. arg.len() {
+                            if arg_type[i].is_variable() {
+                                var_index_stack.push( arg[i] );
+                            }
                         }
                     }
                 }
