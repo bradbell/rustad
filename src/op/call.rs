@@ -851,44 +851,6 @@ where
 }
 // ---------------------------------------------------------------------------
 //
-// set_op_info
-/// Set the operator information for call.
-///
-/// * op_info_vec :
-/// The map from operator id to operator information [OpInfo] .
-/// The map results for CALL_OP and CALL_RES_OP are set.
-pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
-where
-    V     : Clone + From<f32> + PartialEq + AtomInfoVec + ThisThreadTapePublic,
-    for<'a> V : AddAssign<&'a V> ,
-{
-    op_info_vec[CALL_OP as usize] = OpInfo{
-        name              : "call" ,
-        forward_dyp_value : call_forward_dyp_value::<V>,
-        forward_dyp_ad    : call_forward_dyp_ad::<V>,
-        forward_var_value : call_forward_var_value::<V>,
-        forward_var_ad    : call_forward_var_ad::<V>,
-        forward_der_value : call_forward_der_value::<V>,
-        forward_der_ad    : call_forward_der_ad::<V>,
-        reverse_der_value : call_reverse_der_value::<V>,
-        reverse_der_ad    : call_reverse_der_ad::<V>,
-        rust_src          : call_rust_src::<V>,
-    };
-    op_info_vec[CALL_RES_OP as usize] = OpInfo{
-        name              : "call_res" ,
-        forward_dyp_value : no_op_dyp::<V, V>,
-        forward_dyp_ad    : no_op_dyp::<V, AD<V> >,
-        forward_var_value : no_op_var::<V, V>,
-        forward_var_ad    : no_op_var::<V, AD<V> >,
-        forward_der_value : no_op_der::<V, V>,
-        forward_der_ad    : no_op_der::<V, AD<V> >,
-        reverse_der_value : no_op_der::<V, V>,
-        reverse_der_ad    : no_op_der::<V, AD<V> >,
-        rust_src          : no_op_rust_src::<V>,
-    };
-}
-// ---------------------------------------------------------------------------
-//
 // no_op_dyp
 /// [ForwardDyp](crate::op::info::ForwardDyp) function
 fn no_op_dyp<V, E>(
@@ -1058,4 +1020,42 @@ where
         "   drop(call_range);\n" ;
     //
     src
+}
+// ===========================================================================
+// set_op_info
+// ===========================================================================
+/// Set the operator information for call.
+///
+/// * op_info_vec :
+/// The map from operator id to operator information [OpInfo] .
+/// The map results for CALL_OP and CALL_RES_OP are set.
+pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
+where
+    V     : Clone + From<f32> + PartialEq + AtomInfoVec + ThisThreadTapePublic,
+    for<'a> V : AddAssign<&'a V> ,
+{
+    op_info_vec[CALL_OP as usize] = OpInfo{
+        name              : "call" ,
+        forward_dyp_value : call_forward_dyp_value::<V>,
+        forward_dyp_ad    : call_forward_dyp_ad::<V>,
+        forward_var_value : call_forward_var_value::<V>,
+        forward_var_ad    : call_forward_var_ad::<V>,
+        forward_der_value : call_forward_der_value::<V>,
+        forward_der_ad    : call_forward_der_ad::<V>,
+        reverse_der_value : call_reverse_der_value::<V>,
+        reverse_der_ad    : call_reverse_der_ad::<V>,
+        rust_src          : call_rust_src::<V>,
+    };
+    op_info_vec[CALL_RES_OP as usize] = OpInfo{
+        name              : "call_res" ,
+        forward_dyp_value : no_op_dyp::<V, V>,
+        forward_dyp_ad    : no_op_dyp::<V, AD<V> >,
+        forward_var_value : no_op_var::<V, V>,
+        forward_var_ad    : no_op_var::<V, AD<V> >,
+        forward_der_value : no_op_der::<V, V>,
+        forward_der_ad    : no_op_der::<V, AD<V> >,
+        reverse_der_value : no_op_der::<V, V>,
+        reverse_der_ad    : no_op_der::<V, AD<V> >,
+        rust_src          : no_op_rust_src::<V>,
+    };
 }
