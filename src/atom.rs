@@ -18,6 +18,7 @@ use std::cell::RefCell;
 use crate::tape::OpSequence;
 use crate::op::id::CALL_OP;
 use crate::op::id::CALL_RES_OP;
+use crate::op::call::BEGIN_DOM;
 use crate::tape::Tape;
 use crate::tape::sealed::ThisThreadTape;
 use crate::{
@@ -475,35 +476,36 @@ where
     let n_var = tape.var.n_dom + tape.var.n_dep;
     //
     // arange, n_dyp_dep, n_var_dep
-    let mut n_dyp_dep = 0;
-    let mut n_var_dep = 0;
+    let mut dyp_dep  : Vec<usize> = Vec::new();
+    let mut var_dep  : Vec<usize> = Vec::new();
     for i in 0 .. n_res {
         if range_ad_type[i].is_variable() {
             arange[i].tape_id   = tape.tape_id;
             arange[i].ad_type   = ADType::Variable;
-            arange[i].index     = n_var + n_var_dep;
-            n_var_dep += 1;
+            arange[i].index     = n_var + var_dep.len();
+            var_dep.push( i );
          } else if range_ad_type[i].is_dynamic() {
             arange[i].tape_id   = tape.tape_id;
             arange[i].ad_type   = ADType::DynamicP;
-            arange[i].index     = n_dyp + n_dyp_dep;
-            n_dyp_dep += 1;
+            arange[i].index     = n_dyp + dyp_dep.len();
+            dyp_dep.push( i );
          } else {
             assert!( range_ad_type[i].is_constant() );
         }
     }
     for k in 0 .. 2 {
         //
-        // n_dep, op_seq
-        let n_dep    : usize;
+        // op_seq, dep, n_dep
         let op_seq   : &mut OpSequence;
+        let dep      : &Vec<usize>;
         if k == 0 {
             op_seq   = &mut tape.dyp;
-            n_dep    = n_dyp_dep;
+            dep      = &dyp_dep;
         } else {
             op_seq   = &mut tape.var;
-            n_dep    = n_var_dep;
+            dep      = &var_dep;
         }
+        let n_dep = dep.len();
         //
         // op_seq
         if n_dep > 0 {
@@ -520,7 +522,12 @@ where
             op_seq.arg_all.push( n_dep as IndexT );                // arg[4]
             // arg[5]
             op_seq.arg_all.push( op_seq.flag_all.len() as IndexT );
-            for _j in 0 .. 6 {
+            //
+            // arg[6]
+            op_seq.arg_all.push( dep[0] as IndexT );
+            //
+            // op_seq.arg_type_all
+            for _j in 0 .. BEGIN_DOM {
                 op_seq.arg_type_all.push( ADType::Empty );
             }
             //
@@ -530,10 +537,10 @@ where
                 if domain_ad_type[j].is_constant() {
                     let index = tape.cop.len();
                     tape.cop.push( adomain[j].value.clone() );
-                    op_seq.arg_all.push( index as IndexT );   // arg[6+j]
+                    op_seq.arg_all.push( index as IndexT ); // arg[BEGIN_DOM+j]
                 } else {
                     let index = adomain[j].index;
-                    op_seq.arg_all.push( index as IndexT );   // arg[6+j]
+                    op_seq.arg_all.push( index as IndexT ); // arg[BEGIN_DOM+j]
                 }
             }
             //
@@ -552,9 +559,11 @@ where
             op_seq.n_dep += n_dep;
             //
             // op_seq.id_seq, op_seq.arg_seq
-            for _i in 0 .. (n_dep - 1) {
+            for i in 1 .. n_dep {
                 op_seq.id_seq.push( CALL_RES_OP );
                 op_seq.arg_seq.push( op_seq.arg_all.len() as IndexT );
+                op_seq.arg_all.push( dep[i] as IndexT );
+                op_seq.arg_type_all.push( ADType::Empty );
             }
         }
     }

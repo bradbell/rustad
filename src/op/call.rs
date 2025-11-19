@@ -14,13 +14,14 @@
 //! | 0        | Index that identifies the atomic function; i.e., atom_id |
 //! | 1        | Extra information about this call; i.e. call_info        |
 //! | 2        | Domain space dimension for function being called (n_dom) |
-//! | 3        | Number of results for the function being called  (n_res) |
+//! | 3        | Number of range components for this call         (n_res) |
 //! | 4        | Number of results that are dependents            (n_dep) |
 //! | 5        | Index of the first boolean for this operator             |
-//! | 6        | Variable or parameter index for first argument to call   |
-//! | 7        | Variable or parameter index for second argument to call  |
+//! | 6        | Index in call range of first dependent result for call   |
+//! | 6+1      | Variable or parameter index for first argument to call   |
+//! | 6+2      | Variable or parameter index for second argument to call  |
 //! | ...      | ... |
-//! | 5+n_dom  | Variable or parameter index for last argument to call    |
+//! | 6+n_dom  | Variable or parameter index for last argument to call    |
 //!
 //! ## Operator Flags
 //! | Index    | Meaning |
@@ -38,10 +39,10 @@
 //! and operator indices.
 //!
 //! * CALL_RES_OP
-//! This operator has one argument that is equal to the offset of this
-//! CALL_RES_OP form the corresponding CALL_OP. The first CALL_RES_OP
-//! has arg\[0\] equal 1, the second has arg\[0\] equal to 2, ...,
-//! the last has arg\[0\] equal to n_dep - 1.
+//! The range index for the first dependent result of a call is stored
+//! in arg\[6\] of the corresponding CALL_OP. For i = 1, .. , n_dep - 1,
+/// the i-th CALL_RES_OP that follows has its arg\[0\] equal to the
+/// range index for i-th dependent returned by the function call.
 // --------------------------------------------------------------------------
 // use
 //
@@ -65,6 +66,10 @@ use crate::{
     ThisThreadTapePublic,
     ad_from_value,
 };
+// ----------------------------------------------------------------------
+/// Index in operator argument vector of the parameter or variable index
+/// of the first atomc function argument.
+pub(crate) const BEGIN_DOM : usize = 7;
 // ----------------------------------------------------------------------
 //
 // extract_call_info
@@ -141,8 +146,8 @@ where
     //
     let mut domain_zero : Vec<&V> = Vec::with_capacity( n_dom );
     for j_arg in 0 .. n_dom {
-        let index   = arg[6 + j_arg] as usize;
-        let ad_type = &arg_type[6 + j_arg];
+        let index   = arg[BEGIN_DOM + j_arg] as usize;
+        let ad_type = &arg_type[BEGIN_DOM + j_arg];
         if ad_type.is_constant() {
             domain_zero.push( &cop[index] );
         } else if ad_type.is_dynamic() {
@@ -171,9 +176,9 @@ where
 {   //
     let mut acop : Vec< AD<V> > = Vec::new();
     for i_arg in 0 .. n_dom {
-        let ad_type = &arg_type[6 + i_arg];
+        let ad_type = &arg_type[BEGIN_DOM + i_arg];
         if ad_type.is_constant() {
-            let index = arg[6 + i_arg] as usize;
+            let index = arg[BEGIN_DOM + i_arg] as usize;
             acop.push( ad_from_value( cop[index].clone() ) );
         }
     }
@@ -202,8 +207,8 @@ where
     let mut domain_zero : Vec<& AD<V> > = Vec::with_capacity( n_dom );
     let mut j_cop : usize = 0;
     for j_arg in 0 .. n_dom {
-        let index   = arg[6 + j_arg] as usize;
-        let ad_type = &arg_type[6 + j_arg];
+        let index   = arg[BEGIN_DOM + j_arg] as usize;
+        let ad_type = &arg_type[BEGIN_DOM + j_arg];
         if ad_type.is_constant() {
             domain_zero.push( &acop[j_cop] );
             j_cop += 1;
@@ -574,8 +579,8 @@ where
     let zero_v : V = 0f32.into();
     let mut domain_one : Vec<&V> = Vec::with_capacity( n_dom );
     for i_dom in 0 .. n_dom {
-        let index   = arg[6 + i_dom] as usize;
-        let ad_type = arg_type[6 + i_dom].clone();
+        let index   = arg[BEGIN_DOM + i_dom] as usize;
+        let ad_type = arg_type[BEGIN_DOM + i_dom].clone();
         if ad_type.is_variable() {
             domain_one.push( &var_der[index] );
         } else {
@@ -656,8 +661,8 @@ where
     let azero      = ad_from_value(zero_v);
     let mut adomain_der : Vec<& AD<V> > = Vec::with_capacity(n_dom);
     for i_dom in 0 .. n_dom {
-        let index   = arg[6 + i_dom] as usize;
-        let ad_type = arg_type[6 + i_dom].clone();
+        let index   = arg[BEGIN_DOM + i_dom] as usize;
+        let ad_type = arg_type[BEGIN_DOM + i_dom].clone();
         if ad_type.is_variable() {
             adomain_der.push( &avar_der[index] );
         } else {
@@ -762,8 +767,8 @@ where
     //
     // var_der
     for i_arg in 0 .. n_dom {
-        let index    = arg[6 + i_arg] as usize;
-        let ad_type  = arg_type[6 + i_arg].clone();
+        let index    = arg[BEGIN_DOM + i_arg] as usize;
+        let ad_type  = arg_type[BEGIN_DOM + i_arg].clone();
         if ad_type.is_variable() {
             var_der[index] += &domain_one[i_arg];
         }
@@ -842,8 +847,8 @@ where
     //
     // avar_der
     for i_arg in 0 .. n_dom {
-        let index   = arg[6 + i_arg] as usize;
-        let ad_type = arg_type[6 + i_arg].clone();
+        let index   = arg[BEGIN_DOM + i_arg] as usize;
+        let ad_type = arg_type[BEGIN_DOM + i_arg].clone();
         if ad_type.is_variable() {
             avar_der[index] += &adomain_one[i_arg];
         }
@@ -944,8 +949,8 @@ where
         "   let mut call_dom : Vec<&V> = " +
                 "vec![&nan; " + &(call_n_dom.to_string()) + "];\n";
     for j_dom in 0 .. call_n_dom {
-        let mut index   = arg[6 + j_dom] as usize;
-        let ad_type     = arg_type[6 + j_dom].clone();
+        let mut index   = arg[BEGIN_DOM + j_dom] as usize;
+        let ad_type     = arg_type[BEGIN_DOM + j_dom].clone();
         if ad_type.is_constant() {
             src = src + "   " +
                 &format!("call_dom[{j_dom}] = &cop[{index}];\n");
