@@ -494,67 +494,67 @@ where
     }
     for k in 0 .. 2 {
         //
-        // n_dep, sub_tape
+        // n_dep, op_seq
         let n_dep    : usize;
-        let sub_tape : &mut OpSequence;
+        let op_seq   : &mut OpSequence;
         if k == 0 {
-            sub_tape = &mut tape.dyp;
+            op_seq   = &mut tape.dyp;
             n_dep    = n_dyp_dep;
         } else {
-            sub_tape = &mut tape.var;
+            op_seq   = &mut tape.var;
             n_dep    = n_var_dep;
         }
         //
-        // sub_tape
+        // op_seq
         if n_dep > 0 {
             //
-            // sub_tape.id_seq, sub_tape.arg_seq
-            sub_tape.id_seq.push( CALL_OP );
-            sub_tape.arg_seq.push( sub_tape.arg_all.len() as IndexT );
+            // op_seq.id_seq, op_seq.arg_seq
+            op_seq.id_seq.push( CALL_OP );
+            op_seq.arg_seq.push( op_seq.arg_all.len() as IndexT );
             //
-            // sub_tape.arg_all, tape.cop
-            sub_tape.arg_all.push( atom_id );                        // arg[0]
-            sub_tape.arg_all.push( call_info );                      // arg[1]
-            sub_tape.arg_all.push( n_dom as IndexT );                // arg[2]
-            sub_tape.arg_all.push( n_res as IndexT );                // arg[3]
-            sub_tape.arg_all.push( n_dep as IndexT );                // arg[4]
+            // op_seq.arg_all, tape.cop
+            op_seq.arg_all.push( atom_id );                        // arg[0]
+            op_seq.arg_all.push( call_info );                      // arg[1]
+            op_seq.arg_all.push( n_dom as IndexT );                // arg[2]
+            op_seq.arg_all.push( n_res as IndexT );                // arg[3]
+            op_seq.arg_all.push( n_dep as IndexT );                // arg[4]
             // arg[5]
-            sub_tape.arg_all.push( sub_tape.flag_all.len() as IndexT );
+            op_seq.arg_all.push( op_seq.flag_all.len() as IndexT );
             for _j in 0 .. 6 {
-                sub_tape.arg_type_all.push( ADType::Empty );
+                op_seq.arg_type_all.push( ADType::Empty );
             }
             //
-            // sub_tape.arg_type_all, sub_tape.arg_all
+            // op_seq.arg_type_all, op_seq.arg_all
             for j in 0 .. n_dom {
-                sub_tape.arg_type_all.push( domain_ad_type[j].clone() );
+                op_seq.arg_type_all.push( domain_ad_type[j].clone() );
                 if domain_ad_type[j].is_constant() {
                     let index = tape.cop.len();
                     tape.cop.push( adomain[j].value.clone() );
-                    sub_tape.arg_all.push( index as IndexT );   // arg[6+j]
+                    op_seq.arg_all.push( index as IndexT );   // arg[6+j]
                 } else {
                     let index = adomain[j].index;
-                    sub_tape.arg_all.push( index as IndexT );   // arg[6+j]
+                    op_seq.arg_all.push( index as IndexT );   // arg[6+j]
                 }
             }
             //
-            // sub_tape.flag_all
+            // op_seq.flag_all
             if trace {
-                sub_tape.flag_all.push( ADType::True );  // flag_all[ arg[5] ]
+                op_seq.flag_all.push( ADType::True );  // flag_all[ arg[5] ]
             } else {
-                sub_tape.flag_all.push( ADType::False ); // flag_all[ arg[5] ]
+                op_seq.flag_all.push( ADType::False ); // flag_all[ arg[5] ]
             }
             for i in 0 .. n_res {
                 //flag_all[ arg[5] + i + 1 ]
-                sub_tape.flag_all.push( arange[i].ad_type.clone() )
+                op_seq.flag_all.push( arange[i].ad_type.clone() )
             }
             //
-            // sub_tape.n_dep
-            sub_tape.n_dep += n_dep;
+            // op_seq.n_dep
+            op_seq.n_dep += n_dep;
             //
-            // sub_tape.id_seq, sub_tape.arg_seq
+            // op_seq.id_seq, op_seq.arg_seq
             for _i in 0 .. (n_dep - 1) {
-                sub_tape.id_seq.push( CALL_RES_OP );
-                sub_tape.arg_seq.push( sub_tape.arg_all.len() as IndexT );
+                op_seq.id_seq.push( CALL_RES_OP );
+                op_seq.arg_seq.push( op_seq.arg_all.len() as IndexT );
             }
         }
     }
