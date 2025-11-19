@@ -31,18 +31,18 @@
 //! | ...      | ... |
 //! | n_res    | is ADtype for last result of this call                   |
 //!
-//! ## Operator Results
-//! We use n_res for the number of results that are variables.
-//! There are n_dep - 1 CALL_RES_OP directly after each CALL_OP
-//! operator in the sequence of operations. These are place holders so that
-//! there is a direct correspondence between dependent indices
-//! and operator indices.
-//!
 //! * CALL_RES_OP
-//! The range index for the first dependent result of a call is stored
-//! in arg\[6\] of the corresponding CALL_OP. For i = 1, .. , n_dep - 1,
-/// the i-th CALL_RES_OP that follows has its arg\[0\] equal to the
-/// range index for i-th dependent returned by the function call.
+//! The operation index for a CALL_OP operator, corresponds to the first
+//! dependent created by the call.
+//! There are n_dep - 1 CALL_RES_OP operators corresponding to the
+//! other dependents created by the call operator.
+//! Each such operator has the following arguments:
+//!
+//! ## Operator Arguments
+//! | Index | Meaning |
+//! | ----- | ------- |
+//! | 0     | dependent index for this result operator            |
+//! | 1     | index in the call range index for dependent result  |
 // --------------------------------------------------------------------------
 // use
 //

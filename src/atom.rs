@@ -498,12 +498,15 @@ where
         // op_seq, dep, n_dep
         let op_seq   : &mut OpSequence;
         let dep      : &Vec<usize>;
+        let dep_type : ADType;
         if k == 0 {
             op_seq   = &mut tape.dyp;
             dep      = &dyp_dep;
+            dep_type = ADType::DynamicP;
         } else {
             op_seq   = &mut tape.var;
             dep      = &var_dep;
+            dep_type = ADType::Variable;
         }
         let n_dep = dep.len();
         //
@@ -562,8 +565,12 @@ where
             for i in 1 .. n_dep {
                 op_seq.id_seq.push( CALL_RES_OP );
                 op_seq.arg_seq.push( op_seq.arg_all.len() as IndexT );
-                op_seq.arg_all.push( dep[i] as IndexT );
+                //
+                op_seq.arg_all.push( i as IndexT );
                 op_seq.arg_type_all.push( ADType::Empty );
+                //
+                op_seq.arg_all.push( dep[i] as IndexT );
+                op_seq.arg_type_all.push( dep_type.clone() );
             }
         }
     }
