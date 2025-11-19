@@ -40,8 +40,8 @@
 //! * CALL_RES_OP
 //! This operator has one argument that is equal to the offset of this
 //! CALL_RES_OP form the corresponding CALL_OP. The first CALL_RES_OP
-//! has arg[0] equal 1, the second has arg[0] equal to 2, ...,
-//! the last has arg[0] equal to n_dep - 1.
+//! has arg\[0\] equal 1, the second has arg\[0\] equal to 2, ...,
+//! the last has arg\[0\] equal to n_dep - 1.
 // --------------------------------------------------------------------------
 // use
 //
@@ -122,7 +122,6 @@ where
     )
 }
 // ----------------------------------------------------------------------
-//
 // domain_zero_value
 fn domain_zero_value<'a, 'b, V>(
     dyp_both   : &'a [V]       ,
@@ -160,7 +159,6 @@ where
     domain_zero
 }
 // ----------------------------------------------------------------------
-//
 // domain_acop
 fn domain_acop <'a, 'b, V>(
     cop        : &'a [V]       ,
@@ -182,7 +180,6 @@ where
     acop
 }
 // ----------------------------------------------------------------------
-//
 // domain_zero_ad
 fn domain_zero_ad<'a, 'b, V>(
     dyp_both   : &'a [AD<V>]    ,
@@ -226,9 +223,9 @@ where
 // ==========================================================================
 // call_forward_dyp
 // ==========================================================================
-//
 // call_forward_dyp_value
-/// atomic function callback for V evaluation of variables.
+/// Call operator V evaluation of dynamic parameters;
+/// see [ForwardDyp](crate::op::info::ForwardDyp)
 fn call_forward_dyp_value<V> (
     dyp_both   : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
@@ -300,9 +297,10 @@ where
     // or this call would not be in the dyp operation sequence:
     assert!( 0 < j_res );
 }
-//
+// ---------------------------------------------------------------------------
 // call_forward_dyp_ad
-/// atomic function callback for `AD<V>` evaluation of dynamic parameters.
+/// Call operator `AD<V>` evaluation of dynamic parameters;
+/// see [ForwardDyp](crate::op::info::ForwardDyp)
 fn call_forward_dyp_ad<V> (
     adyp_both  : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
@@ -381,7 +379,8 @@ where
 // ==========================================================================
 //
 // call_forward_var_value
-/// atomic function callback for V evaluation of variables.
+/// Call operator V evaluation of variables;
+/// see [ForwardVar](crate::op::info::ForwardVar)
 fn call_forward_var_value<V> (
     dyp_both   : &Vec<V>       ,
     var_both   : &mut Vec<V>   ,
@@ -452,9 +451,10 @@ where
     // or this call would not be in the variable operation sequence:
     assert!( 0 < j_res );
 }
-//
+// ---------------------------------------------------------------------------
 // call_forward_var_ad
-/// atomic function callback for `AD<V>` evaluation of variables.
+/// Call operator `AD<V>` evaluation of variables;
+/// see [ForwardVar](crate::op::info::ForwardVar)
 fn call_forward_var_ad<V> (
     adyp_both  : &Vec< AD<V> >       ,
     avar_both  : &mut Vec< AD<V> >   ,
@@ -527,10 +527,13 @@ where
     assert!( 0 < j_res );
 }
 // ==========================================================================
-// call_forward_1_value
+// call_forward_der
+// ==========================================================================
 //
-/// V evaluation of first order forward call operator for atomic functions
-fn call_forward_1_value<V> (
+// call_forward_der_value
+/// Call operator V evaluation of forward mode derivatives;
+/// see [ForwardDer](crate::op::info::ForwardDer)
+fn call_forward_der_value<V> (
     dyp_both   : &Vec<V>       ,
     var_both   : &Vec<V>       ,
     var_der    : &mut Vec<V>   ,
@@ -605,10 +608,11 @@ where
     assert!( 0 < j_res );
 }
 // --------------------------------------------------------------------------
-// call_forward_1_ad
+// call_forward_der_ad
 //
-/// `AD<V>` evaluation of first order forward call operator for atomic functions
-fn call_forward_1_ad<V> (
+/// Call operator `AD<V>` evaluation of forward mode derivatives;
+/// see [ForwardDer](crate::op::info::ForwardDer)
+fn call_forward_der_ad<V> (
     adyp_both  : &Vec< AD<V> >       ,
     avar_both  : &Vec< AD<V> >       ,
     avar_der   : &mut Vec< AD<V> >   ,
@@ -686,10 +690,13 @@ where
     assert!( 0 < j_res );
 }
 // ==========================================================================
-// call_reverse_1_value
+// call_reverse_der_value
+// ===========================================================================
 //
-/// V evaluation of first order reverse call operator for atomic functions
-fn call_reverse_1_value<V> (
+// call_reverse_der_value
+/// Call operator V evaluation of reverse mode derivatives;
+/// see [ReverseDer](crate::op::info::ReverseDer)
+fn call_reverse_der_value<V> (
     dyp_both   : &Vec<V>       ,
     var_both   : &Vec<V>       ,
     var_der    : &mut Vec<V>   ,
@@ -763,10 +770,10 @@ where
     }
 }
 // --------------------------------------------------------------------------
-// call_reverse_1_ad
-//
-/// `AD<V>` evaluation of first order reverse call operator (atomic functions)
-fn call_reverse_1_ad<V> (
+// call_reverse_der_ad
+/// Call operator `AD<V>` evaluation of reverse mode derivatives;
+/// see [ReverseDer](crate::op::info::ReverseDer)
+fn call_reverse_der_ad<V> (
     adyp_both   : &Vec< AD<V> >       ,
     avar_both   : &Vec< AD<V> >       ,
     avar_der    : &mut Vec< AD<V> >   ,
@@ -861,10 +868,10 @@ where
         forward_dyp_ad    : call_forward_dyp_ad::<V>,
         forward_var_value : call_forward_var_value::<V>,
         forward_var_ad    : call_forward_var_ad::<V>,
-        forward_der_value : call_forward_1_value::<V>,
-        forward_der_ad    : call_forward_1_ad::<V>,
-        reverse_der_value : call_reverse_1_value::<V>,
-        reverse_der_ad    : call_reverse_1_ad::<V>,
+        forward_der_value : call_forward_der_value::<V>,
+        forward_der_ad    : call_forward_der_ad::<V>,
+        reverse_der_value : call_reverse_der_value::<V>,
+        reverse_der_ad    : call_reverse_der_ad::<V>,
         rust_src          : call_rust_src::<V>,
     };
     op_info_vec[CALL_RES_OP as usize] = OpInfo{
@@ -920,6 +927,7 @@ fn no_op_der<V, E>(
 ) { }
 //
 // no_op_rust_src
+/// [RustSrc](crate::op::info::RustSrc) function
 fn no_op_rust_src<V> (
     _not_used : V           ,
     _res_type  : ADType      ,
@@ -931,10 +939,11 @@ fn no_op_rust_src<V> (
     _res       : usize       ,
 ) -> String
 {   String::new() }
-// --------------------------------------------------------------------------
+// ===========================================================================
 // call_rust_src
-//
-/// Rust source code for the call operator.
+// ===========================================================================
+/// Call operator rust source code generation;
+/// see [RustSrc](crate::op::info::RustSrc) function
 fn call_rust_src<V> (
     _not_used : V           ,
     res_type  : ADType      ,
