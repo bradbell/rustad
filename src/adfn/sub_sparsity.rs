@@ -13,6 +13,10 @@ use crate::IndexT;
 use crate::op::call::call_depend;
 use crate::atom::sealed::AtomInfoVec;
 use crate::atom::AtomCallback;
+use crate::op::info::{
+    OpInfo,
+    GlobalOpInfoVec
+};
 use crate::op::id::{
     CALL_OP,
     CALL_RES_OP,
@@ -25,7 +29,7 @@ use crate::doc_generic_v;
 // ADfn::subsparsity
 impl<V> ADfn<V>
 where
-    V               : AtomInfoVec,
+    V               : AtomInfoVec + GlobalOpInfoVec,
     AtomCallback<V> : Clone,
 {
     /// Use the subgraph method to compute a Jacobian sparsity pattern.
@@ -115,6 +119,9 @@ where
         &self, trace : bool, compute_dyp : bool
     ) -> ( Vec< [usize; 2] > , Vec< [ usize; 2 ] > )
     {   //
+        // op_info_vec
+        let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
+        //
         // range_ad_type, range_index, n_range
         let range_ad_type     = &self.range_ad_type;
         let range_index       = &self.range_index;
@@ -195,13 +202,17 @@ where
                         // var_index is a domain variable index
                         var_pattern.push( [row, var_index] );
                     } else {
-                        if trace {
-                            println!( "    var_index = {}", var_index );
-                        }
                         //
                         // op_index, op_id
                         let op_index  = var_index - var_n_dom;
                         let op_id     = var_id_seq[op_index];
+                        //
+                        if trace {
+                            let name = &op_info_vec[op_id as usize].name;
+                            println!(
+                                "    {} : var_index = {}", name, var_index
+                            );
+                        }
                         //
                         // var_depend
                         if op_id == CALL_OP || op_id == CALL_RES_OP {
@@ -258,13 +269,17 @@ where
                         // dyp_index is a domain variable index
                         dyp_pattern.push( [row, dyp_index] );
                     } else {
-                        if trace {
-                            println!( "    dyp_index = {}", dyp_index );
-                        }
                         //
                         // op_index, op_id
                         let op_index  = dyp_index - dyp_n_dom;
                         let op_id     = dyp_id_seq[op_index];
+                        //
+                        if trace {
+                            let name = &op_info_vec[op_id as usize].name;
+                            println!(
+                                "    {} :  dyp_index = {}", name, dyp_index
+                        );
+                        }
                         //
                         // dyp_index_stack
                         if op_id == CALL_OP || op_id == CALL_RES_OP {

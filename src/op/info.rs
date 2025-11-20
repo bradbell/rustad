@@ -433,6 +433,7 @@ where
 ///
 /// * V : see [doc_generic_v]
 ///
+/// TODO: This should be a sealed trait.
 pub trait GlobalOpInfoVec
 where
     Self : Sized + 'static,
