@@ -34,7 +34,7 @@ where
     ///
     /// * Syntax :
     /// ```text
-    ///     (var_pattern, dyp_pattern) = f.sub_sparsity(trace, dyp_flag)
+    ///     (var_pattern, dyp_pattern) = f.sub_sparsity(trace, compute_dyp)
     /// ```
     ///
     /// * V : see [doc_generic_v]
@@ -44,18 +44,29 @@ where
     /// of the function defined by the operation sequence stored in f.
     ///
     /// * trace :
-    /// If trace is true, a trace of the sparsity calculation
+    /// If this is true, a trace of the sparsity calculation
     /// is printed on standard output.
     /// Note that in the trace, the cases where *var_index* is less
     /// that the number of domain variables will end up in the pattern
     /// with the corresponding row.
     ///
+    /// * compute_dyp :
+    /// If this is true (false),
+    /// the dynamic parameter pattern is (is not) computed.
+    ///
     /// * var_pattern :
-    /// This return value is vector of [row, column] pairs.
+    /// This return is vector of [row, column] pairs.
     /// Each row (column) is less than the range (variable domain)
     /// dimension for this function.
     /// If a pair [i, j] does not appear, the range component
     /// with index i does not depend on the domain variable with index j.
+    ///
+    /// * dyp_pattern (Under Construction) :
+    /// This return is vector of [row, column] pairs.
+    /// Each row (column) is less than the range (dynamic parameter domain)
+    /// dimension for this function.
+    /// If a pair [i, j] does not appear, the range component
+    /// with index i does not depend on the domain dynamic parameter with index j.
     ///
     /// ## dependency :
     /// This is a dependency pattern. For example,
@@ -75,26 +86,34 @@ where
     /// // V
     /// type V = rustad::AzFloat<f32>;
     /// //
-    /// // nx
+    /// // nx, x, ax
     /// let nx = 4;
-    /// //
     /// let x                     = vec![ V::from(2.0); nx];
     /// let ax                    = start_recording_var(x);
+    /// //
+    /// // ay
     /// let mut ay : Vec< AD<V> > = Vec::new();
     /// ay.push( ad_from_value( V::from(5.0) ) ); // ay[0] is a constant
     /// for j in 1 .. nx {
     ///     ay.push( &ax[j] * &ax[j] );      // ay[j] is a variable
     /// }
+    /// //
+    /// // f
     /// let f           = stop_recording(ay);
-    /// let trace       = false;
-    /// let mut pattern = f.sub_sparsity(trace);
+    /// //
+    /// // pattern
+    /// let trace            = false;
+    /// let compute_dyp      = false;
+    /// let (mut pattern, _) = f.sub_sparsity(trace, compute_dyp);
     /// pattern.sort();
     /// assert_eq!( pattern.len(), nx - 1 );
     /// for j in 1 .. nx {
-    ///     assert_eq!( pattern[j-1], [j,j] );
+    ///     assert_eq!( pattern[j-1], [j, j] );
     /// }
     /// ```
-    pub fn sub_sparsity(&self, trace : bool) -> Vec< [usize; 2] >
+    pub fn sub_sparsity(
+        &self, trace : bool, _compute_dyp : bool
+    ) -> ( Vec< [usize; 2] > , Vec< [ usize; 2 ] > )
     {   //
         // n_dom ... range_index.
         let n_dom             = self.var.n_dom;
@@ -201,6 +220,7 @@ where
         if trace {
             println!( "n_pattern = {}", result.len() );
         }
-        result
+        let empty : Vec< [usize; 2] > = Vec::new();
+        (result, empty)
     }
 }
