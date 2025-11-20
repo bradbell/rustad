@@ -350,29 +350,22 @@ where
 ///
 /// * ad_fn :
 /// The return value is an `ADfn<V>` containing the operation sequence
-/// that computed arange as a function of the domain variables returned by
-/// [start_recording_var] or [start_recording_var_dyp] .
-/// It can be used to compute the values for the function and its derivative.
+/// that computed arange as a function of the domain variables and
+/// dynamic parameters specified by [start_recording_var_dyp] .
+/// It can be used to compute the values for the function and its derivatives.
 ///
-/// * Assumptions :
-/// The following values are checked ensure they are <= IndexT::Max
-/// ```text
-///     tape.tape_id,
-///     tape.dyp.arg_all.len(), tape.var.arg_all.len()
-///     tape.cop.len() + tape.dyp.n_dom + tape.dyp.n_dep + arange.len()
-/// ```
 /// # Example
 /// ```
 /// use rustad::start_recording_var;
 /// use rustad::stop_recording;
-/// type V       = rustad::AzFloat<f64>;
-/// let domain   = vec![ V::from(1.0), V::from(2.0) ];
-/// let adomain  = start_recording_var( domain );
-/// let sum      = &adomain[0] + &adomain[1];
-/// let diff     = &adomain[0] - &adomain[1];
-/// let times    = &adomain[0] * &adomain[1];
-/// let arange   = vec![ sum, diff, times ];
-/// let ad_fn    = stop_recording( arange );
+/// type V    = rustad::AzFloat<f64>;
+/// let x     = vec![ V::from(1.0), V::from(2.0) ];
+/// let ax    = start_recording_var(x);
+/// let sum   = &ax[0] + &ax[1];
+/// let diff  = &ax[0] - &ax[1];
+/// let times = &ax[0] * &ax[1];
+/// let ay    = vec![ sum, diff, times ];
+/// let ad_fn    = stop_recording(ay);
 /// assert_eq!( ad_fn.var_dom_len(), 2);
 /// assert_eq!( ad_fn.range_len(), 3);
 /// ```
