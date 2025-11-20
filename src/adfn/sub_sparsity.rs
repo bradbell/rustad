@@ -34,7 +34,7 @@ where
     ///
     /// * Syntax :
     /// ```text
-    ///     pattern = f.sub_sparsity(trace)
+    ///     (var_pattern, dyp_pattern) = f.sub_sparsity(trace, dyp_flag)
     /// ```
     ///
     /// * V : see [doc_generic_v]
@@ -50,12 +50,12 @@ where
     /// that the number of domain variables will end up in the pattern
     /// with the corresponding row.
     ///
-    /// * pattern :
-    /// The the return value *pattern* is vector of [row, column] pairs.
-    /// Each row (column) is less than the range (domain)
-    /// dimension for the function.
+    /// * var_pattern :
+    /// This return value is vector of [row, column] pairs.
+    /// Each row (column) is less than the range (variable domain)
+    /// dimension for this function.
     /// If a pair [i, j] does not appear, the range component
-    /// with index i does not depend on the domain component with index j.
+    /// with index i does not depend on the domain variable with index j.
     ///
     /// ## dependency :
     /// This is a dependency pattern. For example,

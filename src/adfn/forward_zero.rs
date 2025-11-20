@@ -37,7 +37,7 @@ use crate::{
 /// * E : see [doc_generic_e]
 /// * f : is an [ADfn] object.
 ///
-/// * Other Arguments :
+/// * Arguments and Return :
 /// This is a wrapper for
 /// [forward_var](crate::adfn::forward_var::doc_forward_var)
 /// that fills in an empty vector for dyp_both .

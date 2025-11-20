@@ -202,35 +202,25 @@ pub(crate) use impl_this_thread_tape;
 ///
 /// * Syntax :
 /// ```text
-///     adomain = start_recording(domain)
+///     avar_dom = start_recording(var_dom)
 /// ```
 ///
 /// * V : see [doc_generic_v]
 ///
-/// * Recording :
-/// There must not currently be a recording in process on the current thread
-/// when start_recording is called.
-/// The recording is stopped when [stop_recording] is called.
-///
-/// * domain :
-/// This vector contains the value of the domain variables for use during
-/// the recording. There are no domain parameters when using this call.
-///
-/// * adomain :
-/// The return is a vector of variables
-/// with the same length and values as domain.
-/// Dependencies with respect to these variables will be recorded on
-/// the tape for this thread.
+/// * Arguments and Return :
+/// This is a wrapper for [start_recording_dyp]
+/// that fills in the empty vector for dyp_dom and extracts the
+/// avar_dom return.
 ///
 /// * Example : see [stop_recording]
 ///
-pub fn start_recording<V>(domain : Vec<V> ) -> Vec< AD<V> >
+pub fn start_recording<V>(var_dom : Vec<V> ) -> Vec< AD<V> >
 where
     V : Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
     let dyp_dom : Vec<V> = Vec::new();
-    let (_adyp_dom, adomain) = start_recording_dyp(dyp_dom, domain);
-    adomain
+    let (_adyp_dom, avar_dom) = start_recording_dyp(dyp_dom, var_dom);
+    avar_dom
 }
 //
 // start_recording_dyp
@@ -249,17 +239,26 @@ where
 /// when start_recording_dyp is called.
 /// The recording is stopped when [stop_recording] is called.
 ///
-/// * adyp_dom :
+/// * dyp_dom :
 /// This vector contains the value of the domain dynamic parameters
-/// for use during the recording.
-/// The i-th element of adyp_dom corresponds to the i-th element of dyp_dom.
-/// This vector can be empty in which case there are no dynamic parameters.
+/// used during the recording.
+/// If it is empty, there are no dynamic parameters.
 ///
-/// * avar_dom :
-/// This vector contains the value of the domain variables for use during
-/// the recording. The i-th element of avar_dom corresponds to the i-th element
-/// of var_dom.
-/// This vector must not be empty.
+/// * var_dom :
+/// This vector contains the value of the domain variables
+/// used during the recording.  It can't be empty.
+///
+/// *adyp_dom :
+/// This return is the vector of domain dynamic parameters.
+/// It has the same length and values as *dyp_dom* .
+/// Dependencies with respect to these parameters will be recorded on the
+/// tape for this thread.
+///
+/// *avar_dom :
+/// This return is the vector of domain variables.
+/// It has the same length and values as *var_dom* .
+/// Dependencies with respect to these variables will be recorded on the
+/// tape for this thread.
 ///
 /// * Example : see [stop_recording]
 ///
