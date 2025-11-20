@@ -54,7 +54,7 @@ where
     /// If this is true (false),
     /// the dynamic parameter pattern is (is not) computed.
     ///
-    /// * dyp_pattern (Under Construction) :
+    /// * dyp_pattern :
     /// This return is vector of [row, column] pairs.
     /// Each row (column) is less than the range (dynamic parameter domain)
     /// dimension for this function.
@@ -161,10 +161,8 @@ where
         //
         // row
         // determine the variables that range index row depends on
-        for row in 0 .. n_range { if range_ad_type[row].is_variable() {
+        for row in 0 .. n_range {
             //
-            // var_index
-            let var_index = range_index[row] as usize;
             if trace {
                 println!( "row = {}", row );
             }
@@ -173,10 +171,17 @@ where
             // use clear instead of new stack to reduce memory allocation
             var_index_stack.clear();
             dyp_index_stack.clear();
-            var_index_stack.push( var_index as IndexT );
+            if range_ad_type[row].is_variable() {
+                var_index_stack.push( range_index[row] );
+            } else {
+                if compute_dyp && range_ad_type[row].is_dynamic() {
+                    dyp_index_stack.push( range_index[row] );
+                }
+            }
+            //
+            // var_index
+            // range[row] depends on this variable
             while var_index_stack.len() > 0 {
-                //
-                // var_index
                 let var_index = var_index_stack.pop().unwrap() as usize;
                 //
                 if var_done[var_index] != row {
@@ -236,10 +241,10 @@ where
                     }
                 }
             }
+            // dyp_index
+            // range[row] depends on this dynamic parameter
             while dyp_index_stack.len() > 0 {
                 debug_assert!( compute_dyp );
-                //
-                // dyp_index
                 let dyp_index = dyp_index_stack.pop().unwrap() as usize;
                 //
                 if dyp_done[dyp_index] != row {
@@ -269,7 +274,7 @@ where
                                 &mut atom_depend,
                                 &mut dyp_depend,
                                 &mut var_depend,
-                                &self.var,
+                                &self.dyp,
                                 op_index
                             );
                             assert_eq!( var_depend.len(), 0 );
@@ -294,7 +299,7 @@ where
                     }
                 }
             }
-        } }
+        }
         if trace {
             println!( "var_pattern.len() = {}", var_pattern.len() );
         }

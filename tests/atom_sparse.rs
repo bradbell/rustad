@@ -13,9 +13,11 @@ Note that the domain (range) of h has size 4 (3).
 We define the following function using h:
              [ x[0] * x[1] ]
     f(p,x) = [ x[1] * p[0] ]
-             [     p[2]    ]
+             [     p[1]    ]
 The sparsity pattern for this function w.r.t x is
-    [0. 0], [0, 1} [1, 1]
+    var_pattern = [ [0, 0], [0, 1], [1, 1] ]
+The sparsity pattern for this function w.r.t p is
+    dyp_pattern = [ [1 0], [2, 1] ]
 */
 use std::cmp::max;
 use rustad::{
@@ -143,7 +145,7 @@ fn atom_sparse() {
     let h_atom_id   = register_h();
     let call_info   = 0;
     let trace       = false;
-    let compute_dyp = false;
+    let compute_dyp = true;
     let np          = 2;
     let nx          = 2;
     //
@@ -162,15 +164,20 @@ fn atom_sparse() {
     assert_eq!(f.var_dom_len(), nx);
     //
     // pattern
-    let (_, mut pattern) = f.sub_sparsity(trace, compute_dyp);
-    pattern.sort();
+    let (mut dyp_pattern, mut var_pattern) = f.sub_sparsity(trace, compute_dyp);
+    dyp_pattern.sort();
+    var_pattern.sort();
     //
-    // check
-    let check   = vec![ [0, 0], [0, 1], [1, 1], ];
-    assert_eq!( pattern, check );
+    // dpy_check
+    let dyp_check = vec![ [1, 0], [2, 1] ];
+    assert_eq!( dyp_pattern, dyp_check );
+    //
+    // var_check
+    let var_check   = vec![ [0, 0], [0, 1], [1, 1], ];
+    assert_eq!( var_pattern, var_check );
     //
     // pattern
     let mut pattern = f.for_sparsity(trace);
     pattern.sort();
-    assert_eq!( pattern, check );
+    assert_eq!( pattern, var_check );
 }
