@@ -138,7 +138,7 @@ fn atom_sparse() {
     // h_atom_id, call_info, trace, nx
     let h_atom_id  = register_h();
     let call_info  = 0;
-    let trace      = false;
+    let trace      = true;
     let nx         = 4;
     //
     // f
@@ -151,11 +151,12 @@ fn atom_sparse() {
     //
     // pattern
     // TODO: change assert_ne! to assert_eq!
-    let pattern = f.sub_sparsity(trace);
+    let mut pattern = f.sub_sparsity(trace);
+    pattern.sort();
     let check   = vec![
         [0, 0], [0, 1],
         [1, 1], [1, 2],
         [2, 3],
     ];
-    assert_ne!( pattern, check );
+    assert_eq!( pattern, check );
 }

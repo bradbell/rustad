@@ -10,14 +10,23 @@
 //
 use crate::ADfn;
 use crate::IndexT;
+use crate::op::call::call_depend;
+use crate::atom::sealed::AtomInfoVec;
+use crate::atom::AtomCallback;
+use crate::op::id::{
+    CALL_OP,
+    CALL_RES_OP,
+};
 //
 #[cfg(doc)]
 use crate::doc_generic_v;
 //
 // ---------------------------------------------------------------------------
-// ADfn::sub_sparsoty
+// ADfn::subsparsity
 impl<V> ADfn<V>
 where
+    V               : AtomInfoVec,
+    AtomCallback<V> : Clone,
 {
     /// Use the subgraph method to compute a Jacobian sparsity pattern.
     ///
@@ -93,6 +102,7 @@ where
         // n_dom ... range_index.
         let n_dom             = self.var.n_dom;
         let n_dep             = self.var.n_dep;
+        let id_seq            = &self.var.id_seq;
         let arg_seq           = &self.var.arg_seq;
         let arg_all           = &self.var.arg_all;
         let arg_type_all      = &self.var.arg_type_all;
@@ -115,6 +125,11 @@ where
             "Begin Trace: sub_sparsity: n_dom = {}, n_range = {}",
             n_dom, n_range
         ); }
+        //
+        // atom_depend, dyp_depend, var_depend
+        let mut atom_depend : Vec<usize>  = Vec::new();
+        let mut dyp_depend  : Vec<IndexT> = Vec::new();
+        let mut var_depend  : Vec<IndexT> = Vec::new();
         //
         // row
         // determine the variables that range index row depends on
@@ -150,20 +165,36 @@ where
                             println!( "    var_index = {}", var_index );
                         }
                         //
-                        // op_index
-                        // the operator that creates this variable
-                        let op_index         = var_index - n_dom;
+                        // op_index, op_id
+                        let op_index  = var_index - n_dom;
+                        let op_id     = id_seq[op_index];
                         //
-                        // arg, arg_type
-                        let begin    = arg_seq[op_index] as usize;
-                        let end      = arg_seq[op_index + 1] as usize;
-                        let arg      = &arg_all[begin .. end];
-                        let arg_type = &arg_type_all[begin .. end];
-                        //
-                        // var_index_stack
-                        for i in 0 .. arg.len() {
-                            if arg_type[i].is_variable() {
-                                var_index_stack.push( arg[i] );
+                        // var_depend
+                        if op_id == CALL_OP || op_id == CALL_RES_OP {
+                            dyp_depend.clear();
+                            var_depend.clear();
+                            call_depend::<V>(
+                                &mut atom_depend,
+                                &mut dyp_depend,
+                                &mut var_depend,
+                                &self.var,
+                                op_index
+                            );
+                            for dep_index in var_depend.iter() {
+                                var_index_stack.push( dep_index.clone() );
+                            }
+                        } else {
+                            // arg, arg_type
+                            let begin    = arg_seq[op_index] as usize;
+                            let end      = arg_seq[op_index + 1] as usize;
+                            let arg      = &arg_all[begin .. end];
+                            let arg_type = &arg_type_all[begin .. end];
+                            //
+                            // var_index_stack
+                            for i in 0 .. arg.len() {
+                                if arg_type[i].is_variable() {
+                                    var_index_stack.push( arg[i] );
+                                }
                             }
                         }
                     }

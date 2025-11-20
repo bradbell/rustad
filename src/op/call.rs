@@ -50,10 +50,9 @@ use std::sync::RwLock;
 use std::cmp::PartialEq;
 use std::ops::AddAssign;
 //
+use crate::tape::OpSequence;
 use crate::op::info::OpInfo;
-use crate::atom::{
-    sealed::AtomInfoVec,
-};
+use crate::atom::sealed::AtomInfoVec;
 use crate::op::id::{
         CALL_OP,
         CALL_RES_OP,
@@ -1063,4 +1062,119 @@ where
         reverse_der_ad    : no_op_der::<V, AD<V> >,
         rust_src          : no_op_rust_src::<V>,
     };
+}
+// ===========================================================================
+// call_depend
+// ===========================================================================
+/// Determine which dynamic parameters and variables a call operator's result
+/// depends on.
+///
+/// * op_index ;
+/// This is a index in the operation sequence. The corresponding operator is
+/// an CALL_OP or CALL_RES_OP.
+///
+/// * op_seq :
+/// This is the operation sequence that call or call result operator
+/// appears in.
+///
+/// * atom_depend :
+/// Only the capacity of this vector matters
+/// (it is passed in to avoid reallocating memory).
+///
+/// * dyp_depend :
+/// On input this vector has size zero.
+/// Upon return it contains the set of dynamic parameter indices that
+/// identifies the dynamic parameters that the op_index result depends on.
+///
+/// * var_depend :
+/// On input this vector has size zero.
+/// Upon return it contains the set of variables indices that
+/// identifies the variables that the op_index result depends on.
+///
+pub(crate) fn call_depend<V>(
+    atom_depend     : &mut Vec<usize> ,
+    dyp_depend      : &mut Vec<IndexT> ,
+    var_depend      : &mut Vec<IndexT> ,
+    op_seq          : &OpSequence     ,
+    mut op_index    : usize           )
+where
+    V               : AtomInfoVec,
+    AtomCallback<V> : Clone,
+{
+    atom_depend.clear();
+    debug_assert!( dyp_depend.len() == 0 );
+    debug_assert!( var_depend.len() == 0 );
+    //
+    // id_seq, op_id
+    let id_seq = &op_seq.id_seq;
+    let op_id  = id_seq[op_index];
+    debug_assert!( op_id == CALL_OP || op_id == CALL_RES_OP );
+    //
+    // arg_seq, arg_all, arg_type_all, flag_all
+    let arg_seq         = &op_seq.arg_seq;
+    let arg_all         = &op_seq.arg_all;
+    let arg_type_all    = &op_seq.arg_type_all;
+    let flag_all        = &op_seq.flag_all;
+    //
+    // op_index, dep_index, range_index
+    let begin           = arg_seq[op_index] as usize;
+    let range_index : usize ;
+    if op_id == CALL_RES_OP {
+        let dep_index   = arg_all[begin] as usize;
+        range_index     = arg_all[begin + 1] as usize;
+        debug_assert!( dep_index <= op_index );
+        op_index    = op_index - dep_index;
+        debug_assert!( id_seq[op_index] == CALL_OP );
+    } else {
+        range_index = arg_all[begin + 6] as usize;
+    }
+    debug_assert!( id_seq[op_index] == CALL_OP );
+    //
+    // arg, arg_type
+    let begin    = arg_seq[op_index] as usize;
+    let end      = arg_seq[op_index + 1] as usize;
+    let arg      = &arg_all[begin .. end];
+    let arg_type = &arg_type_all[begin .. end];
+    //
+    // callback, n_dom, call_info, trace
+    let (
+        call_info,
+        n_dom,
+        _n_res,
+        _n_dep,
+        trace,
+        _res_ad_type,
+        callback,
+    ) = extract_call_info::<V>(arg, flag_all);
+    //
+    // rev_depend
+    let rev_depend = &callback.rev_depend;
+    if rev_depend.is_none() {
+        panic!(
+            "{} : rev_depend is not implemented for this atomic function",
+            callback.name,
+        );
+    }
+    let rev_depend = rev_depend.unwrap();
+    //
+    // atom_depend
+    let error_msg = rev_depend(
+        atom_depend, range_index, n_dom, call_info, trace
+    );
+    if error_msg.is_some()
+    {   let msg = error_msg.unwrap();
+        panic!(
+            "{} : rev_depend error message = {}", callback.name, msg
+        );
+    }
+    //
+    // dyp_depend, var_depend
+    for dom_index in atom_depend.iter() {
+        let arg_index = BEGIN_DOM + dom_index;
+        match arg_type[arg_index] {
+            ADType::DynamicP => dyp_depend.push( arg[arg_index] ),
+            ADType::Variable => var_depend.push( arg[arg_index] ),
+            _        => { },
+        }
+    }
 }

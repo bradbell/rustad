@@ -562,14 +562,14 @@ where
             op_seq.n_dep += n_dep;
             //
             // op_seq.id_seq, op_seq.arg_seq
-            for i in 1 .. n_dep {
+            for dep_index in 1 .. n_dep {
                 op_seq.id_seq.push( CALL_RES_OP );
                 op_seq.arg_seq.push( op_seq.arg_all.len() as IndexT );
                 //
-                op_seq.arg_all.push( i as IndexT );
+                op_seq.arg_all.push( dep_index as IndexT );
                 op_seq.arg_type_all.push( ADType::Empty );
                 //
-                op_seq.arg_all.push( dep[i] as IndexT );
+                op_seq.arg_all.push( dep[dep_index] as IndexT );
                 op_seq.arg_type_all.push( dep_type.clone() );
             }
         }
