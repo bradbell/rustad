@@ -9,10 +9,21 @@
 // ---------------------------------------------------------------------------
 //
 use crate::vec_set::VecSet;
-use crate::ADfn;
-use crate::IndexT;
-use crate::op::info::GlobalOpInfoVec;
 use crate::op::info::OpInfo;
+use crate::op::call::call_depend;
+use crate::atom::AtomCallback;
+use crate::{
+    ADfn,
+    IndexT,
+    AtomInfoVecPublic,
+};
+use crate::op::id::{
+    CALL_OP,
+    CALL_RES_OP,
+};
+use crate::op::info::{
+    GlobalOpInfoVec,
+};
 //
 #[cfg(doc)]
 use crate::doc_generic_v;
@@ -20,7 +31,8 @@ use crate::doc_generic_v;
 // ADfn::for_sparsity
 impl<V> ADfn<V>
 where
-    V : GlobalOpInfoVec ,
+    V               : AtomInfoVecPublic + GlobalOpInfoVec ,
+    AtomCallback<V> : Clone,
 {
     /// Use the forward mode to compute a Jacobian sparsity pattern.
     ///
@@ -123,20 +135,45 @@ where
             println!("var_index, op_name, var_arguments, set_result");
         }
         //
+        // atom_depend, dyp_depend, var_depend
+        let mut atom_depend : Vec<usize>  = Vec::new();
+        let mut dyp_depend  : Vec<IndexT> = Vec::new();
+        let mut var_depend  : Vec<IndexT> = Vec::new();
+        //
         // op_index
         for op_index in 0 .. id_seq.len() {
             //
-            // arg, arg_type
-            let begin      = arg_seq[op_index] as usize;
-            let end        = arg_seq[op_index + 1] as usize;
-            let arg        = &arg_all[begin .. end];
-            let arg_type   = &arg_type_all[begin .. end];
+            // op_id
+            let op_id = id_seq[op_index];
             //
             // arg_var_usize
-            arg_var_usize.resize(0, 0);
-            for i in 0 .. arg.len() {
-                if arg_type[i].is_variable() {
-                    arg_var_usize.push(  arg[i] as usize );
+            arg_var_usize.clear();
+            if op_id == CALL_OP || op_id == CALL_RES_OP {
+                dyp_depend.clear();
+                var_depend.clear();
+                call_depend::<V>(
+                    &mut atom_depend,
+                    &mut dyp_depend,
+                    &mut var_depend,
+                    &self.var,
+                    op_index
+                );
+                for dep_index in var_depend.iter() {
+                    arg_var_usize.push( dep_index.clone() as usize );
+                }
+            } else {
+                //
+                // arg, arg_type
+                let begin      = arg_seq[op_index] as usize;
+                let end        = arg_seq[op_index + 1] as usize;
+                let arg        = &arg_all[begin .. end];
+                let arg_type   = &arg_type_all[begin .. end];
+                //
+                // arg_var_usize
+                for i in 0 .. arg.len() {
+                    if arg_type[i].is_variable() {
+                        arg_var_usize.push(  arg[i] as usize );
+                    }
                 }
             }
             //

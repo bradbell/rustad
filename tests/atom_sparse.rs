@@ -150,13 +150,19 @@ fn atom_sparse() {
     assert_eq!(f.var_dom_len(), nx);
     //
     // pattern
-    // TODO: change assert_ne! to assert_eq!
     let mut pattern = f.sub_sparsity(trace);
     pattern.sort();
+    //
+    // check
     let check   = vec![
         [0, 0], [0, 1],
         [1, 1], [1, 2],
         [2, 3],
     ];
+    assert_eq!( pattern, check );
+    //
+    // pattern
+    let mut pattern = f.for_sparsity(trace);
+    pattern.sort();
     assert_eq!( pattern, check );
 }
