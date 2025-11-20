@@ -142,7 +142,7 @@ fn atom_sparse() {
     // h_atom_id, call_info, trace, compute_dyp, np, nx
     let h_atom_id   = register_h();
     let call_info   = 0;
-    let trace       = true;
+    let trace       = false;
     let compute_dyp = false;
     let np          = 2;
     let nx          = 2;
@@ -162,7 +162,7 @@ fn atom_sparse() {
     assert_eq!(f.var_dom_len(), nx);
     //
     // pattern
-    let (mut pattern, _) = f.sub_sparsity(trace, compute_dyp);
+    let (_, mut pattern) = f.sub_sparsity(trace, compute_dyp);
     pattern.sort();
     //
     // check

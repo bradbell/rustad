@@ -148,7 +148,7 @@ fn checkpoint_forward_type(
     ADFN_VEC.with_borrow( |f_vec| {
        let f           = &f_vec[call_info as usize];
        let compute_dyp = false;
-       (dependency, _) = f.sub_sparsity(trace, compute_dyp);
+       (_, dependency) = f.sub_sparsity(trace, compute_dyp);
        call_n_res = f.range_len();
     } );
     //

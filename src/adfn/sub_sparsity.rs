@@ -34,7 +34,7 @@ where
     ///
     /// * Syntax :
     /// ```text
-    ///     (var_pattern, dyp_pattern) = f.sub_sparsity(trace, compute_dyp)
+    ///     (dyp_pattern, var_pattern) = f.sub_sparsity(trace, compute_dyp)
     /// ```
     ///
     /// * V : see [doc_generic_v]
@@ -54,19 +54,19 @@ where
     /// If this is true (false),
     /// the dynamic parameter pattern is (is not) computed.
     ///
-    /// * var_pattern :
-    /// This return is vector of [row, column] pairs.
-    /// Each row (column) is less than the range (variable domain)
-    /// dimension for this function.
-    /// If a pair [i, j] does not appear, the range component
-    /// with index i does not depend on the domain variable with index j.
-    ///
     /// * dyp_pattern (Under Construction) :
     /// This return is vector of [row, column] pairs.
     /// Each row (column) is less than the range (dynamic parameter domain)
     /// dimension for this function.
     /// If a pair [i, j] does not appear, the range component
     /// with index i does not depend on the domain dynamic parameter with index j.
+    ///
+    /// * var_pattern :
+    /// This return is vector of [row, column] pairs.
+    /// Each row (column) is less than the range (variable domain)
+    /// dimension for this function.
+    /// If a pair [i, j] does not appear, the range component
+    /// with index i does not depend on the domain variable with index j.
     ///
     /// ## dependency :
     /// This is a dependency pattern. For example,
@@ -104,7 +104,7 @@ where
     /// // pattern
     /// let trace            = false;
     /// let compute_dyp      = false;
-    /// let (mut pattern, _) = f.sub_sparsity(trace, compute_dyp);
+    /// let (_, mut pattern) = f.sub_sparsity(trace, compute_dyp);
     /// pattern.sort();
     /// assert_eq!( pattern.len(), nx - 1 );
     /// for j in 1 .. nx {
@@ -112,34 +112,46 @@ where
     /// }
     /// ```
     pub fn sub_sparsity(
-        &self, trace : bool, _compute_dyp : bool
+        &self, trace : bool, compute_dyp : bool
     ) -> ( Vec< [usize; 2] > , Vec< [ usize; 2 ] > )
     {   //
-        // n_dom ... range_index.
-        let n_dom             = self.var.n_dom;
-        let n_dep             = self.var.n_dep;
-        let id_seq            = &self.var.id_seq;
-        let arg_seq           = &self.var.arg_seq;
-        let arg_all           = &self.var.arg_all;
-        let arg_type_all      = &self.var.arg_type_all;
+        // range_ad_type, range_index, n_range
         let range_ad_type     = &self.range_ad_type;
         let range_index       = &self.range_index;
-        //
-        // n_range
         let n_range           = range_ad_type.len();
         //
-        // done
-        // initialize all elements as n_var (an invalid variable index)
-        let n_var    = n_dom + n_dep;
-        let mut done = vec![n_var; n_var];
+        // var_ : n_dom, n_dep, id_seq, arg_seq, arg_all, arg_type_all.
+        let var_n_dom             = self.var.n_dom;
+        let var_n_dep             = self.var.n_dep;
+        let var_id_seq            = &self.var.id_seq;
+        let var_arg_seq           = &self.var.arg_seq;
+        let var_arg_all           = &self.var.arg_all;
+        let var_arg_type_all      = &self.var.arg_type_all;
         //
-        // result, var_index_stack
-        let mut result          : Vec< [usize; 2] > = Vec::new();
+        // dyp_ : n_dom, n_dep, id_seq, arg_seq, arg_all, arg_type_all.
+        let dyp_n_dom             = self.dyp.n_dom;
+        let dyp_id_seq            = &self.dyp.id_seq;
+        let dyp_arg_seq           = &self.dyp.arg_seq;
+        let dyp_arg_all           = &self.dyp.arg_all;
+        let dyp_arg_type_all      = &self.dyp.arg_type_all;
+        //
+        // var_done, dyp_done
+        // initialize all elements as n_var (an invalid variable index)
+        let n_var    = var_n_dom + var_n_dep;
+        let mut var_done = vec![n_var; n_var];
+        let mut dyp_done = vec![n_var; n_var];
+        //
+        // var_pattern, var_index_stack
+        let mut var_pattern     : Vec< [usize; 2] > = Vec::new();
         let mut var_index_stack : Vec<IndexT>       = Vec::new();
         //
+        // dyp_pattern, dyp_index_stack
+        let mut dyp_pattern     : Vec< [usize; 2] > = Vec::new();
+        let mut dyp_index_stack : Vec<IndexT>       = Vec::new();
+        //
         if trace { println!(
-            "Begin Trace: sub_sparsity: n_dom = {}, n_range = {}",
-            n_dom, n_range
+            "Begin Trace: sub_sparsity: var_n_dom = {}, n_range = {}",
+            var_n_dom, n_range
         ); }
         //
         // atom_depend, dyp_depend, var_depend
@@ -157,33 +169,34 @@ where
                 println!( "row = {}", row );
             }
             //
-            // var_index_stack
-            // use resize instead of new stack to reduce memory allocation
+            // var_index_stack, dyp_index_stack
+            // use clear instead of new stack to reduce memory allocation
             var_index_stack.clear();
+            dyp_index_stack.clear();
             var_index_stack.push( var_index as IndexT );
             while var_index_stack.len() > 0 {
                 //
                 // var_index
                 let var_index = var_index_stack.pop().unwrap() as usize;
                 //
-                if done[var_index] != row {
-                    done[var_index] = row;
-                    if var_index < n_dom {
+                if var_done[var_index] != row {
+                    var_done[var_index] = row;
+                    if var_index < var_n_dom {
                         if trace {
-                            println!( "    col = {}", var_index );
+                            println!( "    var_col = {}", var_index );
                         }
                         //
-                        // result
+                        // var_pattern
                         // var_index is a domain variable index
-                        result.push( [row, var_index] );
+                        var_pattern.push( [row, var_index] );
                     } else {
                         if trace {
                             println!( "    var_index = {}", var_index );
                         }
                         //
                         // op_index, op_id
-                        let op_index  = var_index - n_dom;
-                        let op_id     = id_seq[op_index];
+                        let op_index  = var_index - var_n_dom;
+                        let op_id     = var_id_seq[op_index];
                         //
                         // var_depend
                         if op_id == CALL_OP || op_id == CALL_RES_OP {
@@ -199,17 +212,82 @@ where
                             for dep_index in var_depend.iter() {
                                 var_index_stack.push( dep_index.clone() );
                             }
+                            if compute_dyp {
+                                for dep_index in dyp_depend.iter() {
+                                    dyp_index_stack.push( dep_index.clone() );
+                                }
+                            }
                         } else {
                             // arg, arg_type
-                            let begin    = arg_seq[op_index] as usize;
-                            let end      = arg_seq[op_index + 1] as usize;
-                            let arg      = &arg_all[begin .. end];
-                            let arg_type = &arg_type_all[begin .. end];
+                            let begin    = var_arg_seq[op_index] as usize;
+                            let end      = var_arg_seq[op_index + 1] as usize;
+                            let arg      = &var_arg_all[begin .. end];
+                            let arg_type = &var_arg_type_all[begin .. end];
                             //
                             // var_index_stack
                             for i in 0 .. arg.len() {
                                 if arg_type[i].is_variable() {
                                     var_index_stack.push( arg[i] );
+                                } else if arg_type[i].is_dynamic() {
+                                    dyp_index_stack.push( arg[i] );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            while dyp_index_stack.len() > 0 {
+                debug_assert!( compute_dyp );
+                //
+                // dyp_index
+                let dyp_index = dyp_index_stack.pop().unwrap() as usize;
+                //
+                if dyp_done[dyp_index] != row {
+                    dyp_done[dyp_index] = row;
+                    if dyp_index < dyp_n_dom {
+                        if trace {
+                            println!( "    dyp_col = {}", dyp_index );
+                        }
+                        //
+                        // dyp_pattern
+                        // dyp_index is a domain variable index
+                        dyp_pattern.push( [row, dyp_index] );
+                    } else {
+                        if trace {
+                            println!( "    dyp_index = {}", dyp_index );
+                        }
+                        //
+                        // op_index, op_id
+                        let op_index  = dyp_index - dyp_n_dom;
+                        let op_id     = dyp_id_seq[op_index];
+                        //
+                        // dyp_index_stack
+                        if op_id == CALL_OP || op_id == CALL_RES_OP {
+                            dyp_depend.clear();
+                            var_depend.clear();
+                            call_depend::<V>(
+                                &mut atom_depend,
+                                &mut dyp_depend,
+                                &mut var_depend,
+                                &self.var,
+                                op_index
+                            );
+                            assert_eq!( var_depend.len(), 0 );
+                            for dep_index in dyp_depend.iter() {
+                                dyp_index_stack.push( dep_index.clone() );
+                            }
+                        } else {
+                            // arg, arg_type
+                            let begin    = dyp_arg_seq[op_index] as usize;
+                            let end      = dyp_arg_seq[op_index + 1] as usize;
+                            let arg      = &dyp_arg_all[begin .. end];
+                            let arg_type = &dyp_arg_type_all[begin .. end];
+                            //
+                            // dyp_index_stack
+                            for i in 0 .. arg.len() {
+                                debug_assert!( ! arg_type[i].is_variable() );
+                                if arg_type[i].is_dynamic() {
+                                    dyp_index_stack.push( arg[i] );
                                 }
                             }
                         }
@@ -218,9 +296,8 @@ where
             }
         } }
         if trace {
-            println!( "n_pattern = {}", result.len() );
+            println!( "var_pattern.len() = {}", var_pattern.len() );
         }
-        let empty : Vec< [usize; 2] > = Vec::new();
-        (result, empty)
+        (dyp_pattern, var_pattern)
     }
 }
