@@ -87,8 +87,9 @@ pub fn h_rev_depend(
     _n_dom        : usize           ,
     _call_info    : IndexT          ,
     _trace        : bool            ,
-) -> Option<String>
+) -> String
 {   assert_eq!( depend.len(), 0 );
+    let mut error_msg = String::new();
     match range_index {
         0 => {
             depend.push(0);
@@ -102,13 +103,11 @@ pub fn h_rev_depend(
             depend.push(3);
         },
         _ => {
-            let error_msg = String::from( "h_rev_depend: 2 < range_index" );
-            return Some( error_msg );
+            error_msg = String::from( "h_rev_depend: 2 < range_index" );
         },
     }
     //
-    // error
-    None
+    error_msg
 }
 //
 // register_h

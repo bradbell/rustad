@@ -69,7 +69,7 @@ pub fn doc_common_arguments() {}
 ///
 /// * Syntax :
 /// ```text
-///     error = rev_depend(&mut depend, range_index, n_dom, call_info, trace) ?
+///     error_msg = rev_depend(&mut depend, range_index, n_dom, call_info, trace)
 /// ```
 ///
 /// * rev_depend :
@@ -90,8 +90,8 @@ pub fn doc_common_arguments() {}
 ///
 /// Other Arguments : see [doc_common_arguments]
 ///
-/// * error :
-/// If the return *error* is None, there was no error.
+/// * error_msg :
+/// If *error_msg* is empty, there was no error.
 /// Otherwise it contains an error message and the value in *depend* is not
 /// specified.
 ///
@@ -101,7 +101,7 @@ pub type AtomRevDepend = fn(
     _n_dom           : usize             ,
     _call_info       : IndexT            ,
     _trace           : bool              ,
-)-> Option<String>;
+)-> String;
 //
 // AtomForwardType
 /// Callback to atomic functions to determine ADType of results.

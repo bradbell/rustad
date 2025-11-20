@@ -1161,10 +1161,9 @@ where
     let error_msg = rev_depend(
         atom_depend, range_index, n_dom, call_info, trace
     );
-    if error_msg.is_some()
-    {   let msg = error_msg.unwrap();
+    if error_msg != "" {
         panic!(
-            "{} : rev_depend error message = {}", callback.name, msg
+            "{} : rev_depend error_msg = {}", callback.name, error_msg
         );
     }
     //
