@@ -11,16 +11,21 @@ h(z) = [ z[1] * z[2] ]
 Note that the domain (range) of h has size 4 (3).
 
 We define the following function using h:
-    f(x) = h(x)
+             [ x[0] * x[1] ]
+    f(p,x) = [ x[1] * p[0] ]
+             [     p[2]    ]
+The sparsity pattern for this function w.r.t x is
+    [0. 0], [0, 1} [1, 1]
 */
 use std::cmp::max;
 use rustad::{
+    AD,
     AzFloat,
     ADType,
     register_atom,
     AtomCallback,
     IndexT,
-    start_recording,
+    start_recording_dyp,
     stop_recording,
     call_atom,
 };
@@ -83,7 +88,7 @@ pub fn h_rev_depend(
     _call_info    : IndexT          ,
     _trace        : bool            ,
 ) -> Option<String>
-{   depend.resize(0, 0);
+{   assert_eq!( depend.len(), 0 );
     match range_index {
         0 => {
             depend.push(0);
@@ -139,14 +144,21 @@ fn atom_sparse() {
     let h_atom_id  = register_h();
     let call_info  = 0;
     let trace      = true;
-    let nx         = 4;
+    let np         = 2;
+    let nx         = 2;
     //
     // f
-    let x   = vec![ V::from(1.0); nx];
-    let ax  = start_recording(x);
-    let ay  = call_atom(ax, h_atom_id, call_info, trace);
+    let p         = vec![ V::from(1.0); np];
+    let x         = vec![ V::from(1.0); nx];
+    let (ap, ax)  = start_recording_dyp(p, x);
+    let mut az : Vec< AD<V> > = Vec::new();
+    az.push( ax[0].clone() );
+    az.push( ax[1].clone() );
+    az.push( ap[0].clone() );
+    az.push( ap[1].clone() );
+    let ay  = call_atom(az, h_atom_id, call_info, trace);
     let f   = stop_recording(ay);
-    assert_eq!(f.dyp_dom_len(), 0);
+    assert_eq!(f.dyp_dom_len(), np);
     assert_eq!(f.var_dom_len(), nx);
     //
     // pattern
@@ -154,11 +166,7 @@ fn atom_sparse() {
     pattern.sort();
     //
     // check
-    let check   = vec![
-        [0, 0], [0, 1],
-        [1, 1], [1, 2],
-        [2, 3],
-    ];
+    let check   = vec![ [0, 0], [0, 1], [1, 1], ];
     assert_eq!( pattern, check );
     //
     // pattern

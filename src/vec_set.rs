@@ -273,9 +273,9 @@ pub fn union(self : &mut Self, sub_sets : &Vec<usize> ) -> usize
     link.push( false );
     //
     // arg, next, equal
-    arg.resize(0, 0);
-    next.resize(0, 0);
-    equal.resize(0, false);
+    arg.clear();
+    next.clear();
+    equal.clear();
     //
     // arg, next, equal
     for i in 0 .. sub_sets.len() {

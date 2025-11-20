@@ -96,9 +96,6 @@ where
     /// ```
     pub fn sub_sparsity(&self, trace : bool) -> Vec< [usize; 2] >
     {   //
-        // zero_t
-        let zero_t  = 0 as IndexT;
-        //
         // n_dom ... range_index.
         let n_dom             = self.var.n_dom;
         let n_dep             = self.var.n_dep;
@@ -143,7 +140,7 @@ where
             //
             // var_index_stack
             // use resize instead of new stack to reduce memory allocation
-            var_index_stack.resize(0, zero_t);
+            var_index_stack.clear();
             var_index_stack.push( var_index as IndexT );
             while var_index_stack.len() > 0 {
                 //
