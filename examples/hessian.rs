@@ -10,7 +10,7 @@ use rustad::{
     ad_from_value,
     ad_from_vector,
     NumVec,
-    start_recording,
+    start_recording_var,
     stop_recording,
 };
 //
@@ -26,7 +26,7 @@ fn example_hessian () {
     let x  : Vec<V> = vec![ V::from(2.0); nx ];
     //
     // ax
-    let ax       = start_recording(x.clone());
+    let ax       = start_recording_var(x.clone());
     //
     // asum
     let mut asum : AD<V>  = ad_from_value(  V::from(0.0) );
@@ -41,7 +41,7 @@ fn example_hessian () {
     let f  = stop_recording(ay);
     //
     // av
-    let ax       = start_recording(x);
+    let ax       = start_recording_var(x);
     let (_, av)  = f.forward_zero_ad(ax, trace);
     //
     // g
@@ -98,7 +98,7 @@ fn example_num_vec_hessian () {
     }
     //
     // ax
-    let ax       = start_recording(x.clone());
+    let ax       = start_recording_var(x.clone());
     //
     // asum
     let mut asum : AD<V>  = ad_from_value(  NumVec::from( S::from(0.0) ) );
@@ -113,7 +113,7 @@ fn example_num_vec_hessian () {
     let f  = stop_recording(ay);
     //
     // av
-    let ax      = start_recording(x);
+    let ax      = start_recording_var(x);
     let (_, av) = f.forward_zero_ad(ax, trace);
     //
     // g

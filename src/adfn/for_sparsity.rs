@@ -71,7 +71,7 @@ where
     /// ```
     /// use rustad::AD;
     /// use rustad::ad_from_value;
-    /// use rustad::start_recording;
+    /// use rustad::start_recording_var;
     /// use rustad::stop_recording;
     /// //
     /// // V
@@ -81,7 +81,7 @@ where
     /// let nx = 4;
     /// //
     /// let x      : Vec<V>       = vec![ V::from(2.0); nx];
-    /// let ax                    = start_recording(x);
+    /// let ax                    = start_recording_var(x);
     /// let mut ay : Vec< AD<V> > = Vec::new();
     /// ay.push( ad_from_value( V::from(5.0) ) ); // ay[0] is a constant
     /// for j in 1 .. nx {

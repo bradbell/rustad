@@ -202,41 +202,41 @@ pub(crate) use impl_this_thread_tape;
 ///
 /// * Syntax :
 /// ```text
-///     avar_dom = start_recording(var_dom)
+///     avar_dom = start_recording_var(var_dom)
 /// ```
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * Arguments and Return :
-/// This is a wrapper for [start_recording_dyp]
+/// This is a wrapper for [start_recording_var_dyp]
 /// that fills in the empty vector for dyp_dom and extracts the
 /// avar_dom return.
 ///
 /// * Example : see [stop_recording]
 ///
-pub fn start_recording<V>(var_dom : Vec<V> ) -> Vec< AD<V> >
+pub fn start_recording_var<V>(var_dom : Vec<V> ) -> Vec< AD<V> >
 where
     V : Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
     let dyp_dom : Vec<V> = Vec::new();
-    let (_adyp_dom, avar_dom) = start_recording_dyp(dyp_dom, var_dom);
+    let (_adyp_dom, avar_dom) = start_recording_var_dyp(dyp_dom, var_dom);
     avar_dom
 }
 //
-// start_recording_dyp
+// start_recording_var_dyp
 /// This starts recording a new `AD<V>` operation sequence with
 /// dynamic parameters.
 ///
 /// * Syntax :
 /// ```text
-///     (adyp_dom, avar_dom) = start_recording_dyp(dyp_dom, var_dom)
+///     (adyp_dom, avar_dom) = start_recording_var_dyp(dyp_dom, var_dom)
 /// ```
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * Recording :
 /// There must not currently be a recording in process on the current thread
-/// when start_recording_dyp is called.
+/// when start_recording_var_dyp is called.
 /// The recording is stopped when [stop_recording] is called.
 ///
 /// * dyp_dom :
@@ -262,7 +262,7 @@ where
 ///
 /// * Example : see [stop_recording]
 ///
-pub fn start_recording_dyp<V>(
+pub fn start_recording_var_dyp<V>(
     dyp_dom : Vec<V>, var_dom : Vec<V>
 ) -> ( Vec< AD<V> >, Vec< AD<V> > )
 where
@@ -283,7 +283,7 @@ where
     local_key.with_borrow_mut( |tape| {
         assert_ne!( tape_id, 0);
         assert!( ! tape.recording ,
-            "start_recording: This thread's tape is already recording"
+            "start_recording_var: This thread's tape is already recording"
         );
         //
         assert_eq!( tape.dyp.id_seq.len(),  0 );
@@ -351,7 +351,7 @@ where
 /// * ad_fn :
 /// The return value is an `ADfn<V>` containing the operation sequence
 /// that computed arange as a function of the domain variables returned by
-/// [start_recording] or [start_recording_dyp] .
+/// [start_recording_var] or [start_recording_var_dyp] .
 /// It can be used to compute the values for the function and its derivative.
 ///
 /// * Assumptions :
@@ -363,11 +363,11 @@ where
 /// ```
 /// # Example
 /// ```
-/// use rustad::start_recording;
+/// use rustad::start_recording_var;
 /// use rustad::stop_recording;
 /// type V       = rustad::AzFloat<f64>;
 /// let domain   = vec![ V::from(1.0), V::from(2.0) ];
-/// let adomain  = start_recording( domain );
+/// let adomain  = start_recording_var( domain );
 /// let sum      = &adomain[0] + &adomain[1];
 /// let diff     = &adomain[0] - &adomain[1];
 /// let times    = &adomain[0] * &adomain[1];

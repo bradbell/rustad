@@ -15,7 +15,7 @@ use rustad::{
     ADType,
     ad_from_value,
     ADfn,
-    start_recording,
+    start_recording_var,
     stop_recording,
     register_atom,
     call_atom,
@@ -203,7 +203,7 @@ fn main() {
     //
     // f
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
-    let ax           = start_recording(x);
+    let ax           = start_recording_var(x);
     let mut asumsq : AD<V> = ad_from_value( V::from(0) );
     for j in 0 .. ax.len() {
         let term = &ax[j] * &ax[j];
@@ -221,7 +221,7 @@ fn main() {
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
-    let ax           = start_recording(x);
+    let ax           = start_recording_var(x);
     let ay           = call_atom(ax, atom_id, call_info, trace);
     let g            = stop_recording(ay);
     //

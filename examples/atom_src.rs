@@ -13,7 +13,7 @@ use rustad::{
     register_atom,
     AtomCallback,
     IndexT,
-    start_recording,
+    start_recording_var,
     stop_recording,
     call_atom,
     get_lib,
@@ -113,7 +113,7 @@ fn main() {
     //
     // f
     let x    = vec![ V::from(1.0) ; nx];
-    let ax   = start_recording(x);
+    let ax   = start_recording_var(x);
     let ay   = call_atom(ax, sumsq_atom_id, call_info, trace);
     let f    = stop_recording(ay);
     //

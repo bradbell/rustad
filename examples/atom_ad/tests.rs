@@ -7,7 +7,7 @@
 use rustad::{
     ADfn,
     ad_from_vector,
-    start_recording,
+    start_recording_var,
     stop_recording,
     call_atom,
     IndexT,
@@ -24,7 +24,7 @@ fn value_callback_f(
 ) -> ADfn<V> {
     //
     let x       : Vec<V> = vec![ V::from(1.0), V::from(2.0) ];
-    let ax               = start_recording(x);
+    let ax               = start_recording_var(x);
     let ay               = call_atom(ax, sumsq_atom_id, call_info, trace);
     let f                = stop_recording(ay);
     f
@@ -53,7 +53,7 @@ pub fn callback_forward_fun_ad(
     //
     // g(x) = f(x)
     let x      : Vec<V>   = vec![ V::from(3.0), V::from(4.0) ];
-    let ax                = start_recording(x);
+    let ax                = start_recording_var(x);
     let (ay, _)           = f.forward_zero_ad(ax.clone(), trace);
     let g                 = stop_recording(ay);
     //
@@ -89,7 +89,7 @@ pub fn callback_forward_der_ad(
     //
     // av, dx1, adx1
     let x      : Vec<V>  = vec![ V::from(3.0), V::from(4.0) ];
-    let ax               = start_recording(x);
+    let ax               = start_recording_var(x);
     let (_, av)          = f.forward_zero_ad(ax, trace);
     let dx1     : Vec<V> = vec![ V::from(5.0), V::from(6.0) ];
     let adx1             = ad_from_vector(dx1.clone());
@@ -145,7 +145,7 @@ pub fn callback_reverse_der_ad(
     //
     // av, dy1, ady1
     let x      : Vec<V>       = vec![ V::from(3.0), V::from(4.0) ];
-    let ax                    = start_recording(x);
+    let ax                    = start_recording_var(x);
     let (_, av)               = f.forward_zero_ad(ax, trace);
     let dy1     : Vec<V> = vec![ V::from(5.0) ];
     let ady1             = ad_from_vector(dy1.clone());

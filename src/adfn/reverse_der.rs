@@ -74,7 +74,7 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// # Example
 /// Computing the gradient using reverse_der :
 /// ```
-/// use rustad::start_recording_dyp;
+/// use rustad::start_recording_var_dyp;
 /// use rustad::stop_recording;
 /// use rustad::AD;
 /// use rustad::AzFloat;
@@ -86,7 +86,7 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// // f(x) = p[0] * p[1] * x[0] * x[1] * x[2]
 /// let p          = vec![ V::from(1.0), V::from(1.0) ];
 /// let x          = vec![ V::from(1.0), V::from(1.0), V::from(1.0) ];
-/// let (ap, ax )  = start_recording_dyp(p, x);
+/// let (ap, ax )  = start_recording_var_dyp(p, x);
 /// let aterm1     = &ap[0] * &ap[1];
 /// let aterm2     = &( &ax[0] * &ax[1] ) * &ax[2];
 /// let aprod      = &aterm1 * &aterm2;

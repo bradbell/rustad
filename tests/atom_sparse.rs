@@ -25,7 +25,7 @@ use rustad::{
     register_atom,
     AtomCallback,
     IndexT,
-    start_recording_dyp,
+    start_recording_var_dyp,
     stop_recording,
     call_atom,
 };
@@ -149,7 +149,7 @@ fn atom_sparse() {
     // f
     let p         = vec![ V::from(1.0); np];
     let x         = vec![ V::from(1.0); nx];
-    let (ap, ax)  = start_recording_dyp(p, x);
+    let (ap, ax)  = start_recording_var_dyp(p, x);
     let mut az : Vec< AD<V> > = Vec::new();
     az.push( ax[0].clone() );
     az.push( ax[1].clone() );

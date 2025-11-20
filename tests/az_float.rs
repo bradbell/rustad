@@ -4,7 +4,7 @@
 //
 use rustad::{
     AzFloat,
-    start_recording_dyp,
+    start_recording_var_dyp,
     stop_recording,
     ad_from_value,
 };
@@ -63,7 +63,7 @@ fn test_forward_dyp() {
     //
     // asum
     // The first addition adds the constants zero and so is not recorded
-    let (ap, ax)   = start_recording_dyp(p.clone(), x.clone());
+    let (ap, ax)   = start_recording_var_dyp(p.clone(), x.clone());
     let mut asum   = ad_from_value( V::from(0.0) );
     for j in 0 .. np {
         asum += &ap[j];
