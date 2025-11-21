@@ -13,10 +13,10 @@
 /// * The elements of the sets are usize values.
 /// * The sets are identified by usize identifies.
 /// * Once a set is created it is not modified.
+/// * An empty set can be created.
 /// * A singleton set can be created from a usize value.
 /// * A set can be created as the union of other sets.
 ///
-/// Note that there is no way to create an empty set.
 ///
 pub struct VecSet {
     //
@@ -33,8 +33,8 @@ pub struct VecSet {
     /// you must eventually some to a set that is not a link.
     ///
     /// * If `link[this_set]` is false, `start[this_set]` is the first element
-    /// of the this set. None of the sets are empty; i.e.,
-    ///  `start[this_set] < start[this_set+1]` .
+    /// of the this set. It is possible to have an empty set; i.e.,
+    ///  `start[this_set] == start[this_set+1]` .
     start : Vec<usize> ,
     //
     /// This vector that holds all the elements, and links, for all the sets.
@@ -75,6 +75,51 @@ impl VecSet {
             equal  : Vec::new(),
         }
     }
+}
+// ----------------------------------------------------------------------------
+// VecSet.empty
+impl VecSet {
+    //
+    // VecSet.empty
+    /// Create a new empty set.
+    ///
+    /// ```text
+    ///     target = vs.empty()
+    /// ```
+    ///
+    ///  vs :
+    /// is this [VecSet] object.
+    ///
+    /// * target :
+    /// is the identifier for the new set.
+    /// It is one greater that the previous identifier returned by vs.
+    ///
+    /// * Example : Select the source code link in [example_empty] .
+    ///
+    pub fn empty(self : &mut Self) -> usize
+    {   // link, start, data
+        let link  = &mut self.link;
+        let start = &mut self.start;
+        let data  = &mut self.data;
+        //
+        // target
+        debug_assert!( link.len() == start.len() );
+        let target = link.len();
+        //
+        // link, start, data
+        link.push( false );
+        start.push( data.len() );
+        //
+        target
+    }
+}
+#[cfg( any(test,doc) )]
+fn example_empty() {
+    let mut vs  = crate::vec_set::VecSet::new();
+    let target  = vs.empty();
+    let set     = vs.get(target);
+    assert_eq!( target,    0 );
+    assert_eq!( set.len(), 0 );
 }
 // ----------------------------------------------------------------------------
 // VecSet.singleton
@@ -284,46 +329,54 @@ pub fn union(self : &mut Self, sub_sets : &Vec<usize> ) -> usize
         let id_set = sub_sets[i];
         debug_assert!( id_set < target );
         //
-        // id_equal
-        let mut id_equal = id_set;
-        let mut count    = 0;
-        while link[id_equal] {
+        // sub_set_empty
+        let sub_set_empty = start[id_set] == start[id_set + 1];
+        if ! sub_set_empty {
+            //
+            // id_equal
+            let mut id_equal = id_set;
+            let mut count    = 0;
+            while link[id_equal] {
+                debug_assert!( start[id_equal] <= start[id_equal + 1] );
+                debug_assert!( data[ start[id_equal] ] < id_equal );
+                id_equal = data[ start[id_equal] ];
+                count   += 1;
+            }
+            debug_assert!( start[id_equal] <= start[id_equal + 1] );
+            debug_assert!( ! link[id_equal] );
+            //
+            // start[id_set]
+            // for faster linking next time
+            if 1 < count {
+                start[id_set] = id_equal;
+            }
+            //
+            // arg, next, equal
             debug_assert!( start[id_equal] < start[id_equal + 1] );
-            debug_assert!( data[ start[id_equal] ] < id_equal );
-            id_equal = data[ start[id_equal] ];
-            count   += 1;
-        }
-        debug_assert!( start[id_equal] < start[id_equal + 1] );
-        debug_assert!( ! link[id_equal] );
-        //
-        // start[id_set]
-        if 1 < count {
-            start[id_set] = id_equal;
-        }
-        //
-        // arg, next, equal
-        debug_assert!( start[id_equal] < start[id_equal + 1] );
-        let mut in_arg = false;
-        for j in 0 .. arg.len() {
-            if id_equal == arg[j] {
-                in_arg = true;
+            let mut in_arg = false;
+            for j in 0 .. arg.len() {
+                if id_equal == arg[j] {
+                    in_arg = true;
+                }
+            }
+            if ! in_arg {
+                arg.push( id_equal );
+                next.push( start[id_equal] );
+                equal.push( true );
             }
         }
-        if ! in_arg {
-            arg.push( id_equal );
-            next.push( start[id_equal] );
-            equal.push( true );
-        }
     }
-    debug_assert!( 0 < arg.len() );
     match arg.len() {
+        0 => {
+            // noting to left to do in the empty set case
+        },
         1 => {
             // link, data
             // result is equal to argument for this union
             link[target]  = true;
             data.push(  arg[0] );
             debug_assert!( start[target] + 1 == data.len() );
-        }
+        },
         _ => {
             //
             // i_min
@@ -417,6 +470,7 @@ fn example_union() {
 // ----------------------------------------------------------------------------
 #[test]
 fn test_vec_set() {
+    example_empty();
     example_singleton();
     example_get();
     example_n_data();

@@ -183,10 +183,8 @@ fn atom_sparse() {
     assert_eq!( var_pattern, var_check );
     //
     // dyp_pattern
-    /* TODO: Get this test to work
     let compute_dyp = true;
     let mut dyp_pattern = f.for_sparsity(trace, compute_dyp);
     dyp_pattern.sort();
     assert_eq!( dyp_pattern, dyp_check );
-    */
 }

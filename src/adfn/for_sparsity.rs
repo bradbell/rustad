@@ -58,7 +58,6 @@ where
     /// If this is true, the return is a sparsity pattern
     /// for the range of f w.r.t. the domain dynamic parameters.
     /// Otherwise, the sparsity pattern is w.r.t. the domain variables.
-    /// TODO : get the true case to pass its tests.
     ///
     /// * pattern :
     /// The the return value *pattern* is vector of [row, column] pairs.
@@ -169,8 +168,16 @@ where
             //
             // op_seq
             let op_seq : &OpSequence;
-            if compute_dyp && i_op_seq == 0 {
-                assert_eq!(n_op_seq, 2);
+            if i_op_seq == 1 {
+                debug_assert!( compute_dyp );
+                op_seq = &self.var;
+                for j in 0 .. self.var.n_dom {
+                    // set_vec
+                    // domain variables don't depend on dynamic parameters
+                    let id_set = set_vec.empty();
+                    assert_eq!(id_set, j + n_dyp);
+                }
+            } else if compute_dyp {
                 op_seq = &self.dyp;
             } else {
                 op_seq = &self.var;
