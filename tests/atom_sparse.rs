@@ -163,7 +163,7 @@ fn atom_sparse() {
     assert_eq!(f.dyp_dom_len(), np);
     assert_eq!(f.var_dom_len(), nx);
     //
-    // pattern
+    // dyp_pattern, var_pattern
     let (mut dyp_pattern, mut var_pattern) = f.sub_sparsity(trace, compute_dyp);
     dyp_pattern.sort();
     var_pattern.sort();
@@ -176,8 +176,17 @@ fn atom_sparse() {
     let var_check   = vec![ [0, 0], [0, 1], [1, 1], ];
     assert_eq!( var_pattern, var_check );
     //
-    // pattern
-    let mut pattern = f.for_sparsity(trace);
-    pattern.sort();
-    assert_eq!( pattern, var_check );
+    // var_pattern
+    let compute_dyp = false;
+    let mut var_pattern = f.for_sparsity(trace, compute_dyp);
+    var_pattern.sort();
+    assert_eq!( var_pattern, var_check );
+    //
+    // dyp_pattern
+    /* TODO: Get this test to work
+    let compute_dyp = true;
+    let mut dyp_pattern = f.for_sparsity(trace, compute_dyp);
+    dyp_pattern.sort();
+    assert_eq!( dyp_pattern, dyp_check );
+    */
 }

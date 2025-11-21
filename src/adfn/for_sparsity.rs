@@ -8,6 +8,7 @@
 //!
 // ---------------------------------------------------------------------------
 //
+use crate::tape::OpSequence;
 use crate::vec_set::VecSet;
 use crate::op::info::OpInfo;
 use crate::op::call::call_depend;
@@ -40,7 +41,7 @@ where
     ///
     /// * Syntax :
     /// ```text
-    ///     pattern = f.for_sparsity(trace)
+    ///     pattern = f.for_sparsity(trace, compute_dyp)
     /// ```
     ///
     /// * V : see [doc_generic_v]
@@ -50,13 +51,21 @@ where
     /// of the function defined by the operation sequence stored in f.
     ///
     /// * trace :
-    /// If trace is true, a trace of the sparsoty calculation
+    /// If trace is true, a trace of the sparsity calculation
     /// is printed on standard output.
+    ///
+    /// * compute_dyp :
+    /// If this is true, the return is a sparsity pattern
+    /// for the range of f w.r.t. the domain dynamic parameters.
+    /// Otherwise, the sparsity pattern is w.r.t. the domain variables.
+    /// TODO : get the true case to pass its tests.
     ///
     /// * pattern :
     /// The the return value *pattern* is vector of [row, column] pairs.
-    /// Each row (column) is less than the range (domain)
-    /// dimension for the function.
+    /// Each row is a range index and is less that [ADfn::range_len] .
+    /// If compute_dyp is true (false) eah column is a
+    /// dynamic parameter (variable) domain index and is less than
+    /// [ADfn::dyp_dom_len] ( [ADfn::var_dom_len] ).
     /// If a pair [i, j] does not appear, the range component
     /// with index i does not depend on the domain component with index j.
     ///
@@ -89,7 +98,8 @@ where
     /// }
     /// let f           = stop_recording(ay);
     /// let trace       = false;
-    /// let mut pattern = f.for_sparsity(trace);
+    /// let compute_dyp = false;
+    /// let mut pattern = f.for_sparsity(trace, compute_dyp);
     /// pattern.sort();
     /// assert_eq!( pattern.len(), nx - 1 );
     /// for j in 1 .. nx {
@@ -97,116 +107,175 @@ where
     /// }
     /// ```
     ///
-    pub fn for_sparsity(&self, trace : bool) -> Vec< [usize; 2] >
+    pub fn for_sparsity(
+        &self, trace : bool, compute_dyp : bool
+    ) -> Vec< [usize; 2] >
     {   //
         // op_info_vec
         let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
         //
-        // n_dom, n_var, arg_all, arg_seq,
-        // range_ad_type, range_index, n_range
-        let n_dom             = self.var.n_dom;
-        let id_seq            = &self.var.id_seq;
-        let arg_seq           = &self.var.arg_seq;
-        let arg_all           = &self.var.arg_all;
-        let arg_type_all      = &self.var.arg_type_all;
+        // range_ad_type, range_ad_index, n_range
         let range_ad_type     = &self.range_ad_type;
         let range_index       = &self.range_index;
         let n_range           = range_ad_type.len();
         //
-        // result, arg_var_usize, set_vec
-        let mut result          : Vec< [usize; 2] > = Vec::new();
-        let mut arg_var_usize   : Vec<usize>        = Vec::new();
-        let mut set_vec         : VecSet            = VecSet::new();
-        //
-        // set_vec.get(id_set) for id_set = 0 .. n_dom
-        for id_set in 0 .. n_dom {
-            set_vec.singleton( id_set );
-        }
-        //
-        if trace {
-            let mut range_var_index : Vec<IndexT> = Vec::new();
-            for i in 0 .. range_index.len() {
-                if range_ad_type[i].is_variable() {
-                        range_var_index.push(  range_index[i] );
-                }
-            }
-            println!( "Begin Trace: for_sparisty: n_dom = {}", n_dom);
-            println!("range_var_index = {:?}", range_var_index);
-            println!("var_index, op_name, var_arguments, set_result");
-        }
+        // pattern, depend_usize
+        let mut pattern         : Vec< [usize; 2] > = Vec::new();
+        let mut depend_usize    : Vec<usize>        = Vec::new();
         //
         // atom_depend, dyp_depend, var_depend
         let mut atom_depend : Vec<usize>  = Vec::new();
         let mut dyp_depend  : Vec<IndexT> = Vec::new();
         let mut var_depend  : Vec<IndexT> = Vec::new();
         //
-        // op_index
-        for op_index in 0 .. id_seq.len() {
-            //
-            // op_id
-            let op_id = id_seq[op_index];
-            //
-            // arg_var_usize
-            arg_var_usize.clear();
-            if op_id == CALL_OP || op_id == CALL_RES_OP {
-                dyp_depend.clear();
-                var_depend.clear();
-                call_depend::<V>(
-                    &mut atom_depend,
-                    &mut dyp_depend,
-                    &mut var_depend,
-                    &self.var,
-                    op_index
-                );
-                for dep_index in var_depend.iter() {
-                    arg_var_usize.push( dep_index.clone() as usize );
+        // n_op_seq, n_dyp, set_vec
+        let n_op_seq     : usize;
+        let n_dyp        : usize;
+        let mut set_vec  : VecSet = VecSet::new();
+        if compute_dyp {
+            n_op_seq  = 2;
+            n_dyp     = self.dyp.n_dom + self.dyp.n_dep;
+            for id_set in 0 .. self.dyp.n_dom {
+                set_vec.singleton( id_set );
+            }
+        } else {
+            n_op_seq  = 1;
+            n_dyp     = 0;
+            for id_set in 0 .. self.var.n_dom {
+                set_vec.singleton( id_set );
+            }
+        }
+        //
+        if trace {
+            let mut range_set_index : Vec<usize> = Vec::new();
+            for i in 0 .. range_index.len() {
+                if range_ad_type[i].is_variable() {
+                        let index = (range_index[i] as usize) + n_dyp;
+                        range_set_index.push( index );
                 }
+                if range_ad_type[i].is_dynamic() && compute_dyp {
+                        range_set_index.push(  range_index[i] as usize );
+                }
+            }
+            let n_dom =
+                if compute_dyp { self.dyp.n_dom } else { self.var.n_dom};
+            println!( "Begin Trace: for_sparisty:" );
+            println!( "compute_dyp = {}, n_dom = {}" , compute_dyp, n_dom);
+            println!("range_set_index = {:?}", range_set_index);
+            println!("var_index, op_name, var_arguments, set_result");
+        }
+        // i_op_seq
+        for i_op_seq in 0 .. n_op_seq {
+            //
+            // op_seq
+            let op_seq : &OpSequence;
+            if compute_dyp && i_op_seq == 0 {
+                assert_eq!(n_op_seq, 2);
+                op_seq = &self.dyp;
             } else {
+                op_seq = &self.var;
+            }
+            //
+            // n_dom, n_dep, id_seq, arg_seq, arg_all, atr_type_all
+            let n_dom             = op_seq.n_dom;
+            let n_dep             = op_seq.n_dep;
+            let id_seq            = &op_seq.id_seq;
+            let arg_seq           = &op_seq.arg_seq;
+            let arg_all           = &op_seq.arg_all;
+            let arg_type_all      = &op_seq.arg_type_all;
+            //
+            // op_index
+            for op_index in 0 .. n_dep {
                 //
-                // arg, arg_type
-                let begin      = arg_seq[op_index] as usize;
-                let end        = arg_seq[op_index + 1] as usize;
-                let arg        = &arg_all[begin .. end];
-                let arg_type   = &arg_type_all[begin .. end];
+                // op_id
+                let op_id = id_seq[op_index];
                 //
-                // arg_var_usize
-                for i in 0 .. arg.len() {
-                    if arg_type[i].is_variable() {
-                        arg_var_usize.push(  arg[i] as usize );
+                // depend_usize
+                depend_usize.clear();
+                if op_id == CALL_OP || op_id == CALL_RES_OP {
+                    dyp_depend.clear();
+                    var_depend.clear();
+                    call_depend::<V>(
+                        &mut atom_depend,
+                        &mut dyp_depend,
+                        &mut var_depend,
+                        &op_seq,
+                        op_index
+                    );
+                    for dep_index in var_depend.iter() {
+                        debug_assert!( i_op_seq != 0 || ! compute_dyp );
+                        depend_usize.push(dep_index.clone() as usize + n_dyp );
+                    }
+                    if compute_dyp {
+                        for dep_index in dyp_depend.iter() {
+                            depend_usize.push( dep_index.clone() as usize );
+                        }
+                    }
+                } else {
+                    //
+                    // arg, arg_type
+                    let begin      = arg_seq[op_index] as usize;
+                    let end        = arg_seq[op_index + 1] as usize;
+                    let arg        = &arg_all[begin .. end];
+                    let arg_type   = &arg_type_all[begin .. end];
+                    //
+                    // depend_usize
+                    for i in 0 .. arg.len() {
+                        if arg_type[i].is_variable() {
+                            debug_assert!( i_op_seq != 0 || ! compute_dyp );
+                            depend_usize.push(  arg[i] as usize + n_dyp );
+                        }
+                        if compute_dyp && arg_type[i].is_dynamic() {
+                            depend_usize.push(  arg[i] as usize );
+                        }
                     }
                 }
-            }
-            //
-            // var_index
-            // variable index that we are computing the dependency for.
-            let var_index = n_dom + op_index;
-            //
-            // set_vec.get(var_index)
-            let set_id = set_vec.union( &arg_var_usize );
-            debug_assert!( var_index ==  set_id );
-            //
-            if trace {
-                let op_id   = self.var.id_seq[op_index] as usize;
-                let op_name = &op_info_vec[op_id].name;
-                let set     = set_vec.get(var_index);
-                println!(
-                    "{}, {}, {:?}, {:?}",
-                    var_index, op_name, arg_var_usize,  set
-                );
+                //
+                // dep_index
+                let dep_index = if compute_dyp && i_op_seq == 0 {
+                    n_dom + op_index
+                } else {
+                    n_dom + op_index + n_dyp
+                };
+                //
+                // set_vec.get(set_id)
+                let set_id = set_vec.union( &depend_usize );
+                assert_eq!(dep_index,  set_id);
+                //
+                if trace {
+                    let op_id   = id_seq[op_index] as usize;
+                    let op_name = &op_info_vec[op_id].name;
+                    let set     = set_vec.get(dep_index);
+                    println!(
+                        "{}, {}, {:?}, {:?}",
+                        dep_index, op_name, depend_usize,  set
+                    );
+                }
             }
         }
-        for i in 0 .. n_range { if range_ad_type[i].is_variable() {
-            let row_var_index = range_index[i] as usize;
-            let set           = set_vec.get(row_var_index);
-            for j in 0 .. set.len() {
-                let row =  i as usize;
-                let col = set[j] as usize;
-                result.push( [row, col] );
+        for i in 0 .. n_range {
+            if range_ad_type[i].is_variable() {
+                let row_var_index = range_index[i] as usize + n_dyp;
+                let set           = set_vec.get(row_var_index);
+                for j in 0 .. set.len() {
+                    let row =  i as usize;
+                    let col = set[j] as usize;
+                    pattern.push( [row, col] );
+                }
             }
-        } }
+            if compute_dyp && range_ad_type[i].is_dynamic() {
+                let row_var_index = range_index[i] as usize;
+                let set           = set_vec.get(row_var_index);
+                for j in 0 .. set.len() {
+                    let row =  i as usize;
+                    let col = set[j] as usize;
+                    pattern.push( [row, col] );
+                }
+            }
+        }
         if trace {
-            println!( "n_pattern = {}", result.len() );
+            println!( "n_pattern = {}", pattern.len() );
         }
-        result
+        pattern
     }
 }
