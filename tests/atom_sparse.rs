@@ -35,27 +35,6 @@ use rustad::{
 // V
 type V = AzFloat<f64>;
 //
-// h_forward_type
-fn h_forward_type(
-    dom_ad_type  : &[ADType]    ,
-    _call_info   : IndexT       ,
-    _trace       : bool         ,
-) -> Result< Vec<ADType>, String >
-{   let n_res = 3;
-    let mut res_ad_type : Vec<ADType> = Vec::with_capacity(n_res);
-    //
-    let ad_type = max( dom_ad_type[0].clone(), dom_ad_type[1].clone() );
-    res_ad_type.push( ad_type );
-    //
-    let ad_type = max( dom_ad_type[1].clone() , dom_ad_type[2].clone() );
-    res_ad_type.push( ad_type );
-    //
-    let ad_type = dom_ad_type[3].clone();
-    res_ad_type.push( ad_type );
-    //
-    Ok( res_ad_type )
-}
-//
 // h_forward_fun_value
 pub fn h_forward_fun_value(
     dom_zero     : &Vec<&V>    ,
@@ -110,7 +89,6 @@ fn register_h()-> IndexT {
         name                 : &"h",
         //
         rev_depend           :  Some( h_rev_depend ),
-        forward_type         :  Some( h_forward_type ),
         //
         forward_fun_value    :  Some( h_forward_fun_value ),
         forward_fun_ad       :  None,

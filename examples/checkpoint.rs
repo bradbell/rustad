@@ -135,33 +135,6 @@ fn checkpoint_reverse_der_value(
     Ok( domain_one )
 }
 //
-// checkpoint_forward_type
-fn checkpoint_forward_type(
-    domain_ad_type : &[ADType]    ,
-    call_info      : IndexT       ,
-    trace          : bool         ,
-) -> Result< Vec<ADType>, String >
-{   //
-    // dependency
-    let mut dependency : Vec< [usize; 2] > = Vec::new();
-    let mut call_n_res : usize             = 0;
-    ADFN_VEC.with_borrow( |f_vec| {
-       let f           = &f_vec[call_info as usize];
-       let compute_dyp = false;
-       (_, dependency) = f.sub_sparsity(trace, compute_dyp);
-       call_n_res = f.range_len();
-    } );
-    //
-    // is_var_range
-    let mut range_ad_type = vec![ADType::ConstantP; call_n_res];
-    for [i,j] in dependency {
-        range_ad_type[i] = std::cmp::max(
-            range_ad_type[i].clone(), domain_ad_type[j].clone()
-        );
-    }
-    Ok( range_ad_type )
-}
-//
 // checkpoint_rev_depend
 fn checkpoint_rev_depend(
     depend       : &mut Vec<usize> ,
@@ -202,7 +175,6 @@ fn register_checkpoint_atom()-> IndexT {
     let checkpoint_callback = AtomCallback {
         name                 : &"checkpoint",
         rev_depend           :  Some( checkpoint_rev_depend ),
-        forward_type         :  Some( checkpoint_forward_type ),
         //
         forward_fun_value    :  Some(checkpoint_forward_fun_value),
         forward_fun_ad       :  None,

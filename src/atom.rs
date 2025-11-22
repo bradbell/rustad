@@ -102,41 +102,6 @@ pub type AtomRevDepend = fn(
     _call_info       : IndexT            ,
     _trace           : bool              ,
 )-> String;
-//
-// AtomForwardType
-/// Callback to atomic functions to determine ADType of results.
-///
-/// * Required :
-/// This callback is required for all atomic functions.
-///
-/// * Syntax :
-/// ```text
-///     range_ad_type = forward_type(&dom_ad_type, call_info, trace) ?
-/// ```
-///
-/// * forward_ad_type :
-/// is the AtomForwardType callback for this atomic function.
-///
-/// * dom_ad_type :
-/// This has the same length as the domain vector in the corresponding
-/// [call_atom].
-/// Its j-th component is the [ADType] of the j-th component
-/// of the domain vector.
-///
-/// Other Arguments : see [doc_common_arguments]
-///
-/// * range_ad_type :
-/// This has the same length as *arange* in the corresponding [call_atom].
-/// The i-th component is the [ADType] of the i-th component
-/// of *arange* .
-/// Note that if a result depends on two arguments, the ADType of the result
-/// is the maximum of the ADType for the two arguments.
-///
-pub type AtomForwardType = fn(
-    _domain_ad_type  : &[ADType]    ,
-    _call_info       : IndexT       ,
-    _trace           : bool         ,
-)-> Result< Vec<ADType>, String >;
 // -------------------------------------------------------------------------
 //
 // AtomForwardFunValue
@@ -333,7 +298,6 @@ pub struct AtomCallback<V> {
     pub name                 : &'static str,
     //
     pub rev_depend           : Option< AtomRevDepend >,
-    pub forward_type         : Option< AtomForwardType >,
     //
     pub forward_fun_value    : Option< AtomForwardFunValue::<V> >,
     pub forward_fun_ad       : Option< AtomForwardFunAd::<V> >,

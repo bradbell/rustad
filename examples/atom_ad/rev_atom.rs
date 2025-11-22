@@ -119,30 +119,6 @@ fn rev_sumsq_reverse_der_value(
     Ok( dx_dy )
 }
 //
-// rev_sumsq_forward_type
-fn rev_sumsq_forward_type(
-    domain_ad_type  : &[ADType]    ,
-    _call_info      : IndexT       ,
-    _trace          : bool         ,
-) -> Result< Vec<ADType>, String >
-{
-    //
-    // nx
-    assert!( domain_ad_type.len() > 1 );
-    let nx = domain_ad_type.len() - 1;
-    //
-    // x_ad_type, y_ad_type
-    let x_ad_type = &domain_ad_type[0 .. nx];
-    let y_ad_type = &domain_ad_type[nx];
-    //
-    let mut z_ad_type : Vec<ADType> = Vec::with_capacity(nx);
-    for j in 0 .. nx {
-        let ad_type = std::cmp::max(y_ad_type.clone(), x_ad_type[j].clone());
-        z_ad_type.push( ad_type );
-    }
-    Ok( z_ad_type )
-}
-//
 // sumsq_rev_depend
 fn rev_sumsq_rev_depend(
     depend       : &mut Vec<usize> ,
@@ -174,7 +150,6 @@ pub fn register_rev_sumsq_atom()-> IndexT {
     let rev_sumsq_callback = AtomCallback {
         name                 : &"rev_sumsq",
         rev_depend           :  Some( rev_sumsq_rev_depend ),
-        forward_type         :  Some( rev_sumsq_forward_type ),
         //
         forward_fun_value    :  Some(rev_sumsq_forward_fun_value),
         forward_fun_ad       :  None,

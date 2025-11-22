@@ -27,20 +27,6 @@ type V = AzFloat<f64>;
 // V_STR
 const V_STR : &str = "AzFloat<f64>";
 //
-// sumsq_forward_type
-fn sumsq_forward_type(
-    domain_ad_type  : &[ADType]    ,
-    _call_info      : IndexT       ,
-    _trace          : bool         ,
-) -> Result< Vec<ADType>, String >
-{
-    let mut max_ad_type = ADType::ConstantP;
-    for ad_type in domain_ad_type.iter() {
-        max_ad_type = std::cmp::max( max_ad_type, ad_type.clone() );
-    }
-    Ok( vec![ max_ad_type ] )
-}
-//
 // sumsq_rev_depend
 fn sumsq_rev_depend(
     depend       : &mut Vec<usize> ,
@@ -68,7 +54,6 @@ fn register_sumsq_atom()-> IndexT {
     let sumsq_callback = AtomCallback {
         name                 : &"sumsq",
         rev_depend           :  Some( sumsq_rev_depend ),
-        forward_type         :  Some( sumsq_forward_type ),
         //
         forward_fun_value    :  Some( sumsq_forward_fun_value ),
         forward_fun_ad       :  None,
