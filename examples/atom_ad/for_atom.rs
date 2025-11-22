@@ -137,13 +137,33 @@ fn for_sumsq_forward_type(
     Ok( vec![ max_ad_type ] )
 }
 //
+// for_sumsq_rev_depend
+fn for_sumsq_rev_depend(
+    depend       : &mut Vec<usize> ,
+    range_index  : usize           ,
+    n_dom        : usize           ,
+    _call_info   : IndexT          ,
+    _trace       : bool            ,
+) -> String {
+    assert_eq!( depend.len(), 0 );
+    let mut error_msg = String::new();
+    if 0 < range_index {
+        error_msg += "for_sumsq_rev_depend: 0 < range_index";
+    } else {
+        for j in 0 .. n_dom {
+            depend.push( j );
+        }
+    }
+    error_msg
+}
+//
 // register_for_sumsq_atom
 pub fn register_for_sumsq_atom()-> IndexT {
     //
     // for_sumsq_callback
     let for_sumsq_callback = AtomCallback {
         name                 : &"for_sumsq",
-        rev_depend           :  None,
+        rev_depend           :  Some( for_sumsq_rev_depend ),
         forward_type         :  Some( for_sumsq_forward_type ),
         //
         forward_fun_value    :  Some(for_sumsq_forward_fun_value),

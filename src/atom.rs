@@ -14,6 +14,7 @@
 use std::sync::RwLock;
 use std::thread::LocalKey;
 use std::cell::RefCell;
+use std::cmp::max;
 //
 use crate::tape::OpSequence;
 use crate::op::id::CALL_OP;
@@ -62,10 +63,9 @@ pub fn doc_common_arguments() {}
 // AtomRevDepend
 /// Callback to atomic functions to determine its sparsity pattern.
 ///
+///
 /// * Required :
-/// If you do not use this atomic functions with
-/// [ADfn::sub_sparsity] or [ADfn::for_sparsity]
-/// the callback in [AtomCallback] can be None.
+/// This callback is required for all atomic functions.
 ///
 /// * Syntax :
 /// ```text
@@ -76,7 +76,7 @@ pub fn doc_common_arguments() {}
 /// is the AtomRevDepend callback for this atomic function.
 ///
 /// * depend :
-/// This vector is both and input and output and
+/// This vector is empty on input,
 /// only its capacity matters on input (to avoid reallocating memory).
 /// Upon return, it contains the domain index values that the specified
 /// range index value depends on.
@@ -275,7 +275,7 @@ pub type AtomForwardDerAd<V> = fn(
 /// is the AtomReverseDerValue callback for this atomic function.
 ///
 /// * range_der :
-/// this contains the ramge space weights for the partial derivatives.
+/// this contains the range space weights for the partial derivatives.
 ///
 /// * Other Arguments : see [doc_common_arguments]
 ///
@@ -307,7 +307,7 @@ pub type AtomReverseDerValue<V> = fn(
 /// is the AtomReverseDerAd callback for this atomic function.
 ///
 /// * range_der :
-/// this contains the ramge space weights for the partial derivatives.
+/// this contains the range space weights for the partial derivatives.
 ///
 /// * Other Arguments : see [doc_common_arguments]
 ///
@@ -437,7 +437,7 @@ where
 fn record_call_atom<V>(
     tape                  : &mut Tape<V>                  ,
     name                  : &str                          ,
-    forward_type          : AtomForwardType               ,
+    rev_depend            : AtomRevDepend                 ,
     adomain               : Vec< AD<V> >                  ,
     range                 : Vec<V>                        ,
     atom_id               : IndexT                        ,
@@ -463,13 +463,33 @@ where
     ).collect();
     //
     // range_ad_type
-    let result = forward_type(&domain_ad_type, call_info, trace);
-    let range_ad_type = match result {
-        Err(msg) => {
-            panic!( "atom {} forward_type error : {}", name, msg);
-        },
-        Ok(vec_ad_type) => vec_ad_type,
-    };
+    let mut range_ad_type : Vec<ADType> = Vec::with_capacity(n_res);
+    let mut depend        : Vec<usize>  = Vec::new();
+    for range_index in 0 .. n_res {
+        depend.clear();
+        let error_msg = rev_depend(
+            &mut depend, range_index, n_dom, call_info, trace
+        );
+        if error_msg.len() != 0 {
+            panic!( "atom {} rev_depend error_msg : {}", name, error_msg);
+        }
+        let mut ad_type = ADType::ConstantP;
+        for k in 0 .. depend.len() {
+            let j = depend[k];
+            if  n_dom <= j {
+                panic!(
+                    "atom {} rev_depend : \
+                    range_index = {},
+                    n_dom = {}, \
+                    k = {} \
+                    depend[k] = {} >= n_dom",
+                    name, range_index, n_dom, k, depend[k]
+                );
+            }
+            ad_type = max( ad_type, domain_ad_type[j].clone() );
+        }
+        range_ad_type.push( ad_type );
+    }
     //
     // n_dyp, n_var
     let n_dyp = tape.dyp.n_dom + tape.dyp.n_dep;
@@ -624,10 +644,10 @@ where
     let rw_lock : &RwLock< Vec< AtomCallback<V> > > =
         sealed::AtomInfoVec::callback_vec();
     //
-    // forward_zero, forward_type
+    // forward_zero, rev_depend
     let name           : &'static str;
     let forward_zero   : Option< AtomForwardFunValue<V> >;
-    let forward_type   : Option< AtomForwardType >;
+    let rev_depend     : Option< AtomRevDepend >;
     {   //
         // read_lock
         let read_lock = rw_lock.read();
@@ -638,17 +658,17 @@ where
         let callback     = &callback_vec[atom_id as usize];
         forward_zero      = callback.forward_fun_value.clone();
         name              = callback.name;
-        forward_type      = callback.forward_type.clone();
+        rev_depend        = callback.rev_depend.clone();
     }
-    if forward_type.is_none() { panic!(
-        "{} : forward_type is not implemented for this atomic function",
+    if rev_depend.is_none() { panic!(
+        "{} : rev_depend is not implemented for this atomic function",
         name,
     ); }
     if forward_zero.is_none() { panic!(
         "{} : forward_fun_value is not implemented for this atomic function",
         name,
     ); }
-    let forward_type = forward_type.unwrap();
+    let rev_depend   = rev_depend.unwrap();
     let forward_zero = forward_zero.unwrap();
     //
     // domain
@@ -674,7 +694,7 @@ where
         arange = local_key.with_borrow_mut( |tape| record_call_atom::<V>(
             tape,
             name,
-            forward_type,
+            rev_depend,
             adomain,
             range,
             atom_id,

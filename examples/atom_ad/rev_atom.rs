@@ -143,13 +143,37 @@ fn rev_sumsq_forward_type(
     Ok( z_ad_type )
 }
 //
+// sumsq_rev_depend
+fn rev_sumsq_rev_depend(
+    depend       : &mut Vec<usize> ,
+    range_index  : usize           ,
+    n_dom        : usize           ,
+    _call_info   : IndexT          ,
+    _trace       : bool            ,
+) -> String {
+    assert_eq!( depend.len(), 0 );
+    assert!( n_dom > 1 );
+    //
+    // nx
+    let nx = n_dom - 1;
+    //
+    let mut error_msg = String::new();
+    if nx <= range_index {
+        error_msg += "rev_sumsq_rev_depend: nx <= range_index";
+    } else {
+        depend.push( range_index );
+        depend.push( nx );
+    }
+    error_msg
+}
+//
 // register_rev_sumsq_atom
 pub fn register_rev_sumsq_atom()-> IndexT {
     //
     // rev_sumsq_callback
     let rev_sumsq_callback = AtomCallback {
         name                 : &"rev_sumsq",
-        rev_depend           :  None,
+        rev_depend           :  Some( rev_sumsq_rev_depend ),
         forward_type         :  Some( rev_sumsq_forward_type ),
         //
         forward_fun_value    :  Some(rev_sumsq_forward_fun_value),

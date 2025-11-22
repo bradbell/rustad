@@ -34,7 +34,7 @@ do
       echo "cargo run --example $example: OK"
    else
       cat temp.out
-      echo "cargom run --example $example: Error"
+      echo "cargo run --example $example: Error"
       exit 1
    fi
 done

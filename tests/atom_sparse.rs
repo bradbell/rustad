@@ -93,20 +93,10 @@ pub fn h_rev_depend(
 {   assert_eq!( depend.len(), 0 );
     let mut error_msg = String::new();
     match range_index {
-        0 => {
-            depend.push(0);
-            depend.push(1);
-        },
-        1 => {
-            depend.push(1);
-            depend.push(2);
-        },
-        2 => {
-            depend.push(3);
-        },
-        _ => {
-            error_msg = String::from( "h_rev_depend: 2 < range_index" );
-        },
+        0 => { depend.push(0); depend.push(1); },
+        1 => { depend.push(1); depend.push(2); },
+        2 => { depend.push(3); },
+        _ => { error_msg += "h_rev_depend: 2 < range_index"; },
     }
     //
     error_msg

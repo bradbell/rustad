@@ -61,6 +61,25 @@ fn h_forward_type(
     Ok( res_ad_type )
 }
 //
+// h_rev_depend
+fn h_rev_depend(
+    depend       : &mut Vec<usize> ,
+    range_index  : usize           ,
+    n_dom        : usize           ,
+    _call_info   : IndexT          ,
+    _trace       : bool            ,
+) -> String {
+    assert_eq!( depend.len(), 0 );
+    let mut error_msg = String::new();
+    match range_index {
+        0 => { depend.push(0); depend.push(1) },
+        1 => { depend.push(1); depend.push(2) },
+        2 => { depend.push(3); },
+        _ => { error_msg += "h_depend: invalid range index"; },
+    }
+    error_msg
+}
+//
 // BEGIN h_forward_fun_value
 pub fn h_forward_fun_value(
     dom_zero     : &Vec<&V>    ,
@@ -120,7 +139,7 @@ fn register_h()-> IndexT {
     // h_callback
     let h_callback = AtomCallback {
         name                 : &"h",
-        rev_depend           :  None,
+        rev_depend           :  Some( h_rev_depend) ,
         forward_type         :  Some( h_forward_type ),
         //
         forward_fun_value    :  Some( h_forward_fun_value ),

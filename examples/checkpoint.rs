@@ -162,6 +162,37 @@ fn checkpoint_forward_type(
     Ok( range_ad_type )
 }
 //
+// checkpoint_rev_depend
+fn checkpoint_rev_depend(
+    depend       : &mut Vec<usize> ,
+    range_index  : usize           ,
+    _n_dom       : usize           ,
+    call_info    : IndexT          ,
+    trace        : bool            ,
+) -> String {
+    assert_eq!( depend.len(), 0 );
+    //
+    // pattern
+    // TODO: store the sparsity pattern in a static structure for this
+    // checkpoint function so do not need to recompute. Also sort it so it
+    // and store point to beginning of each row so depend computes faster.
+    let mut pattern : Vec< [usize; 2] > = Vec::new();
+    ADFN_VEC.with_borrow( |f_vec| {
+       let f           = &f_vec[call_info as usize];
+       let compute_dyp = false;
+       (_, pattern)    = f.sub_sparsity(trace, compute_dyp);
+    } );
+    //
+    // depend
+    for [i, j] in pattern.iter() {
+        if *i == range_index {
+            depend.push( *j );
+        }
+    }
+    let error_msg = String::from("");
+    error_msg
+}
+//
 // -------------------------------------------------------------------------
 // register_checkpoint_atom
 // -------------------------------------------------------------------------
@@ -170,7 +201,7 @@ fn register_checkpoint_atom()-> IndexT {
     // checkpoint_callback
     let checkpoint_callback = AtomCallback {
         name                 : &"checkpoint",
-        rev_depend           :  None,
+        rev_depend           :  Some( checkpoint_rev_depend ),
         forward_type         :  Some( checkpoint_forward_type ),
         //
         forward_fun_value    :  Some(checkpoint_forward_fun_value),

@@ -1168,8 +1168,18 @@ where
     }
     //
     // dyp_depend, var_depend
-    for dom_index in atom_depend.iter() {
-        let arg_index = BEGIN_DOM + dom_index;
+    for k in 0 .. atom_depend.len() {
+        if n_dom <= atom_depend[k] {
+            panic!(
+                "atom {} rev_depend : \
+                range_index = {},
+                n_dom = {}, \
+                k = {} \
+                depend[k] = {} >= n_dom",
+                callback.name, range_index, n_dom, k, atom_depend[k]
+           );
+        }
+        let arg_index = BEGIN_DOM + atom_depend[k];
         match arg_type[arg_index] {
             ADType::DynamicP => dyp_depend.push( arg[arg_index] ),
             ADType::Variable => var_depend.push( arg[arg_index] ),
