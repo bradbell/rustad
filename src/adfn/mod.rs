@@ -23,6 +23,7 @@ pub mod reverse_one;
 pub mod sub_sparsity;
 pub mod for_sparsity;
 pub mod rust_src;
+pub mod optimize;
 //
 pub(crate) mod eval_from;
 // ---------------------------------------------------------------------------
@@ -131,6 +132,10 @@ impl<V> ADfn<V> {
     /// number of dependent dynamic parameters
     pub fn dyp_dep_len(&self) -> usize { self.dyp.n_dep }
     //
+    // dyp_len
+    /// number of dynamic parameters
+    pub fn dyp_len(&self) -> usize { self.dyp.n_dom  + self.dyp.n_dep }
+    //
     // var_dom_len
     /// number of domain variables
     pub fn var_dom_len(&self) -> usize { self.var.n_dom }
@@ -138,6 +143,10 @@ impl<V> ADfn<V> {
     // var_dep_len
     /// number of dependent variables
     pub fn var_dep_len(&self) -> usize { self.var.n_dep }
+    //
+    // var_len
+    /// number of variables
+    pub fn var_len(&self) -> usize { self.var.n_dom  + self.var.n_dep }
     //
     // range_len
     /// dimension of range space

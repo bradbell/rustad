@@ -18,6 +18,7 @@ use crate::{
 use crate::op::id::NUMBER_OP;
 use crate::tape::sealed::ThisThreadTape;
 use crate::atom::sealed::AtomInfoVec;
+use crate::adfn::optimize::OptimizeDepend;
 //
 #[cfg(doc)]
 use crate::{
@@ -42,7 +43,7 @@ use crate::{
 /// * cop :
 /// vector of all the constant values used by operators.
 ///
-/// * flag :
+/// * flag_all :
 /// vector of all the boolean values used by operators.
 ///
 /// * arg :
@@ -189,6 +190,32 @@ pub(crate) type ReverseDer<V, E> = fn(
     _arg_type : &[ADType]   ,
     _res      : usize       ,
 );
+//
+// ReverseDepend
+/// Reverse dependency analysis; i.e., which arguments does a result depend on.
+///
+/// * depend :
+/// On input, depend contains the the dependencies given the dependent values
+///  with index greater than res.
+/// Upon return, depend contains the the dependencies given the operators with
+/// index greater or equal res.
+pub(crate) type ReverseDepend = fn(
+    _depend   : &mut OptimizeDepend ,
+    _flag_all : &Vec<ADType>        ,
+    _arg      : &[IndexT]           ,
+    _arg_type : &[ADType]           ,
+    _res      : usize               ,
+    _res_type : ADType              ,
+);
+// panic_reverse_depend
+pub(crate) fn panic_reverse_depend(
+    _depend   : &mut OptimizeDepend ,
+    _flag_all : &Vec<ADType>        ,
+    _arg      : &[IndexT]           ,
+    _arg_type : &[ADType]           ,
+    _res      : usize               ,
+    _res_type : ADType              ,
+) { panic!(); }
 // --------------------------------------------------------------------------
 // no_forward_der_value
 /// defines forward_der_value_none `<V>`
@@ -277,7 +304,7 @@ pub(crate) use no_reverse_der_ad;
 // no_rust_src
 /// defines rust_src_none `<V>`
 ///
-/// The type IndexT must be in scope where this macro is used.
+/// The types IndexT and ADType must be in scope where this macro is used.
 macro_rules! no_rust_src{ ($Op:ident) => {
     pub fn rust_src_none<V>(
         _not_used : V           ,
@@ -295,6 +322,27 @@ macro_rules! no_rust_src{ ($Op:ident) => {
     ))}
 }}
 pub(crate) use no_rust_src;
+//
+// no_reverse_depend
+/// defines reverse_depend_none `<V>`
+///
+/// The types IndexT, ADType and OptimizeDepend
+/// must be in scope where this macro is used.
+macro_rules! no_reverse_depend{ ($Op:ident) => {
+    pub fn reverse_depend_none<V>(
+        _depend   : &mut OptimizeDepend ,
+        _flag_all : &Vec<ADType>        ,
+        _arg      : &[IndexT]           ,
+        _arg_type : &[ADType]           ,
+        _res      : usize               ,
+        _res_type : ADType              ,
+    )
+    { panic!( concat!(
+        stringify!($Op) ,
+        ": reverse_depend not implemented for this operator" ,
+    ))}
+}}
+pub(crate) use no_reverse_depend;
 // ---------------------------------------------------------------------------
 // RustSrc
 /// Generate source code corresponding to forward_dyp and forward_var
@@ -377,6 +425,8 @@ pub struct OpInfo<V> {
     /// generate rust source code for this operator
     pub(crate) rust_src        : RustSrc<V>,
     //
+    /// reverse dependency analysis for this operator
+    pub(crate) reverse_depend  : ReverseDepend,
 }
 // ---------------------------------------------------------------------------
 // op_info_vec
@@ -413,6 +463,7 @@ where
         reverse_der_value  : panic_der::<V, V>,
         reverse_der_ad     : panic_der::<V, AD<V>>,
         rust_src           : panic_rust_src,
+        reverse_depend     : panic_reverse_depend,
     };
     let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
     crate::op::add::set_op_info::<V>(&mut result);

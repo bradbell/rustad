@@ -7,8 +7,9 @@
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
 //
-#[cfg(doc)]
 use crate::IndexT;
+use crate::adfn::optimize::OptimizeDepend;
+use crate::ad::ADType;
 //
 // ---------------------------------------------------------------------------
 // eval_binary_forward_0
@@ -318,3 +319,49 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
     }
 } } }
 pub(crate) use binary_rust_src;
+// ---------------------------------------------------------------------------
+// reverse_depend
+/// Reverse dependency analysis for a binary operator;
+/// see [ReverseDepend](crate:op::info::ReverseDepend)
+///
+pub(crate) fn reverse_depend(
+    depend    : &mut OptimizeDepend ,
+    _flag_all : &Vec<ADType>        ,
+    arg       : &[IndexT]           ,
+    arg_type  : &[ADType]           ,
+    res       : usize               ,
+    res_type  : ADType              ,
+) { //
+    assert_eq!(arg.len(), 2);
+    assert_eq!(arg_type.len(), 2);
+    //
+    if res_type.is_variable() {
+        if depend.var[res] == false {
+            return;
+        }
+        for i_arg in 0 .. 2 {
+            let index = arg[i_arg] as usize;
+            match arg_type[i_arg] {
+                //
+                ADType::ConstantP => { depend.cop[index] = true; },
+                ADType::DynamicP  => { depend.dyp[index] = true; },
+                ADType::Variable  => { depend.var[index] = true; },
+                _ => { panic!("in binary operator reverse_depend"); },
+            }
+        }
+    } else {
+        assert!( res_type.is_dynamic() );
+        if depend.dyp[res] == false {
+            return;
+        }
+        for i_arg in 0 .. 2 {
+            let index = arg[i_arg] as usize;
+            match arg_type[i_arg] {
+                //
+                ADType::ConstantP => { depend.cop[index] = true; },
+                ADType::DynamicP  => { depend.dyp[index] = true; },
+                _ => { panic!("in binary operator reverse_depend"); },
+            }
+        }
+    }
+}

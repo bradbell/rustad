@@ -219,6 +219,7 @@ where
         reverse_der_value : panic_der::<V, V>,
         reverse_der_ad    : panic_der::<V, AD<V> >,
         rust_src          : rust_src_none,
+        reverse_depend    : binary::reverse_depend,
     };
     op_info_vec[ADD_PV_OP as usize] = OpInfo{
         name              : "add_pv",
@@ -231,6 +232,7 @@ where
         reverse_der_value : add_pv_reverse_1::<V, V>,
         reverse_der_ad    : add_pv_reverse_1::<V, AD<V> >,
         rust_src          : add_pv_rust_src,
+        reverse_depend    : binary::reverse_depend,
     };
     op_info_vec[ADD_VP_OP as usize] = OpInfo{
         name              : "add_vp",
@@ -243,6 +245,7 @@ where
         reverse_der_value : add_vp_reverse_1::<V, V>,
         reverse_der_ad    : add_vp_reverse_1::<V, AD<V> >,
         rust_src          : add_vp_rust_src,
+        reverse_depend    : binary::reverse_depend,
     };
     op_info_vec[ADD_VV_OP as usize] = OpInfo{
         name              : "add_vv",
@@ -255,5 +258,6 @@ where
         reverse_der_value : add_vv_reverse_1::<V, V>,
         reverse_der_ad    : add_vv_reverse_1::<V, AD<V> >,
         rust_src          : add_vv_rust_src,
+        reverse_depend    : binary::reverse_depend,
     };
 }

@@ -50,14 +50,16 @@ use std::sync::RwLock;
 use std::cmp::PartialEq;
 use std::ops::AddAssign;
 //
+use crate::ad::ADType;
+use crate::adfn::optimize::OptimizeDepend;
 use crate::tape::OpSequence;
 use crate::op::info::OpInfo;
+use crate::op::info::no_reverse_depend;
 use crate::atom::sealed::AtomInfoVec;
 use crate::op::id::{
         CALL_OP,
         CALL_RES_OP,
 };
-use crate::ad::ADType;
 use crate::{
     AD,
     IndexT,
@@ -1028,6 +1030,7 @@ where
 // ===========================================================================
 // set_op_info
 // ===========================================================================
+no_reverse_depend!(Call);
 /// Set the operator information for call.
 ///
 /// * op_info_vec :
@@ -1049,6 +1052,7 @@ where
         reverse_der_value : call_reverse_der_value::<V>,
         reverse_der_ad    : call_reverse_der_ad::<V>,
         rust_src          : call_rust_src::<V>,
+        reverse_depend    : reverse_depend_none::<V>,
     };
     op_info_vec[CALL_RES_OP as usize] = OpInfo{
         name              : "call_res" ,
@@ -1061,6 +1065,7 @@ where
         reverse_der_value : no_op_der::<V, V>,
         reverse_der_ad    : no_op_der::<V, AD<V> >,
         rust_src          : no_op_rust_src::<V>,
+        reverse_depend    : reverse_depend_none::<V>,
     };
 }
 // ===========================================================================
