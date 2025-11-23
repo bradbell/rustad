@@ -24,18 +24,8 @@ use crate::op::id;
 /// If a result depends on two arguments, the type of the result is the
 /// maximum of the type of its arguments.
 /// The values True, False, and Empty are greater than any other type.
-///
-/// # Example
-/// ```
-/// use rustad::ad::ADType;
-/// assert!( ADType::ConstantP < ADType::DynamicP );
-/// assert!( ADType::DynamicP  < ADType::Variable );
-/// assert!( ADType::Variable  < ADType::True );
-/// assert!( ADType::True      < ADType::False );
-/// assert!( ADType::False     < ADType::Empty );
-/// ```
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ADType {
+pub(crate) enum ADType {
     //
     // ConstantP
     /// An AD object is a constant parameter if
@@ -87,6 +77,15 @@ impl ADType {
     /// is true
     pub fn is_true(&self) -> bool
     {   *self == ADType::True }
+}
+///
+#[test]
+fn test_ad_type() {
+    assert!( ADType::ConstantP < ADType::DynamicP );
+    assert!( ADType::DynamicP  < ADType::Variable );
+    assert!( ADType::Variable  < ADType::True );
+    assert!( ADType::True      < ADType::False );
+    assert!( ADType::False     < ADType::Empty );
 }
 // ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter V.

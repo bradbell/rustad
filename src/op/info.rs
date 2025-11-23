@@ -73,7 +73,7 @@ pub fn doc_common_arguments() {}
 /// This is an input for dynamic parameters less than *res* and an output
 /// for the results of this operator.
 ///
-pub type ForwardDyp<V, E> = fn(
+pub(crate) type ForwardDyp<V, E> = fn(
     _dyp_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag_all : &Vec<ADType>,
@@ -86,7 +86,7 @@ pub type ForwardDyp<V, E> = fn(
 /// This can be used for dynamic parameter calculations by operators
 /// that only have a variable argument (because they should not be in the
 /// dynamic parameter operation sequence).
-pub fn panic_dyp<V, E> (
+pub(crate) fn panic_dyp<V, E> (
     _dyp_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag_all : &Vec<ADType>,
@@ -105,7 +105,7 @@ pub fn panic_dyp<V, E> (
 /// This is an input for variable indices less than *res* and an output
 /// for the results of this operator.
 ///
-pub type ForwardVar<V, E> = fn(
+pub(crate) type ForwardVar<V, E> = fn(
     _dyp_both : &Vec<E>     ,
     _var_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
@@ -119,7 +119,7 @@ pub type ForwardVar<V, E> = fn(
 /// This can be used for variable calculations by operators
 /// that only have parameter arguments (because they should not be in the
 /// variable operation sequence).
-pub fn panic_var<V, E> (
+pub(crate) fn panic_var<V, E> (
     _dyp_both : &Vec<E>     ,
     _var_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
@@ -141,7 +141,7 @@ pub fn panic_var<V, E> (
 /// of this operator.
 ///
 /// * Other Arguments :  see [doc_common_arguments]
-pub type ForwardDer<V, E> = fn(
+pub(crate) type ForwardDer<V, E> = fn(
     _dyp_both : &Vec<E>     ,
     _var_both : &Vec<E>     ,
     _var_der  : &mut Vec<E> ,
@@ -156,7 +156,7 @@ pub type ForwardDer<V, E> = fn(
 /// This can be used for variable calculations by operators
 /// that only have parameter arguments (because they should not be in the
 /// variable operation sequence).
-pub fn panic_der<V, E>  (
+pub(crate) fn panic_der<V, E>  (
     _dyp_both : &Vec<E>     ,
     _var_both : &Vec<E>     ,
     _var_der  : &mut Vec<E> ,
@@ -179,7 +179,7 @@ pub fn panic_der<V, E>  (
 /// scalar as a function of i_var < res.
 ///
 /// * Other Arguments :  see [doc_common_arguments]
-pub type ReverseDer<V, E> = fn(
+pub(crate) type ReverseDer<V, E> = fn(
     _dyp_both : &Vec<E>     ,
     _var_both : &Vec<E>     ,
     _var_der  : &mut Vec<E> ,
@@ -318,7 +318,7 @@ pub(crate) use no_rust_src;
 /// * return
 /// The return value is the rust source code from this operation.
 ///
-pub type RustSrc<V> = fn(
+pub(crate) type RustSrc<V> = fn(
     _not_used : V           ,
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
@@ -331,7 +331,7 @@ pub type RustSrc<V> = fn(
 //
 // panic_rust_src
 /// Default [RustSrc] function will panic.
-pub fn panic_rust_src<V>(
+pub(crate) fn panic_rust_src<V>(
     _not_used   : V           ,
     _res_type   : ADType      ,
     _dyp_n_dom  : usize       ,
@@ -348,34 +348,34 @@ pub fn panic_rust_src<V>(
 pub struct OpInfo<V> {
     //
     /// name the user sees for this operator
-    pub name : &'static str,
+    pub(crate) name : &'static str,
     //
     /// dependent dynamic parameter V evaluation for this operator
-    pub forward_dyp_value : ForwardDyp<V, V>,
+    pub(crate) forward_dyp_value : ForwardDyp<V, V>,
     //
     /// dependent dynamic parameter `AD<V>` evaluation for this operator
-    pub forward_dyp_ad    : ForwardDyp<V, AD<V> >,
+    pub(crate) forward_dyp_ad    : ForwardDyp<V, AD<V> >,
     //
     /// zero order forward mode V evaluation for this operator
-    pub forward_var_value : ForwardVar<V, V>,
+    pub(crate) forward_var_value : ForwardVar<V, V>,
     //
     /// zero order forward mode `AD<V>` evaluation for this operator
-    pub forward_var_ad  : ForwardVar<V, AD<V> >,
+    pub(crate) forward_var_ad  : ForwardVar<V, AD<V> >,
     //
     /// first order forward mode V evaluation for this operator
-    pub forward_der_value : ForwardDer<V, V>,
+    pub(crate) forward_der_value : ForwardDer<V, V>,
     //
     /// first order forward mode `AD<V>` evaluation for this operator
-    pub forward_der_ad  : ForwardDer<V, AD<V> >,
+    pub(crate) forward_der_ad  : ForwardDer<V, AD<V> >,
     //
     /// first order reverse mode V evaluation for this operator
-    pub reverse_der_value : ReverseDer<V, V>,
+    pub(crate) reverse_der_value : ReverseDer<V, V>,
     //
     /// first order reverse mode `AD<V>` evaluation for this operator
-    pub reverse_der_ad  : ReverseDer<V, AD<V> >,
+    pub(crate) reverse_der_ad  : ReverseDer<V, AD<V> >,
     //
     /// generate rust source code for this operator
-    pub rust_src        : RustSrc<V>,
+    pub(crate) rust_src        : RustSrc<V>,
     //
 }
 // ---------------------------------------------------------------------------
@@ -383,7 +383,7 @@ pub struct OpInfo<V> {
 /// returns the vector of length [NUMBER_OP]
 /// that maps each operator id to it's [OpInfo] .
 ///
-pub fn op_info_vec<V>() -> Vec< OpInfo<V> >
+pub(crate) fn op_info_vec<V>() -> Vec< OpInfo<V> >
 where
     // add_assign
     for<'a> V : std::ops::AddAssign<&'a V> ,
