@@ -34,7 +34,7 @@ use crate::{
 };
 //
 // ADType
-use crate::ADType;
+use crate::ad::ADType;
 //
 // IndexT
 use crate::IndexT;
@@ -149,11 +149,6 @@ impl<V> ADfn<V> {
     // cop_len
     /// number of constant parameters in this function
     pub fn cop_len(&self) -> usize { self.cop.len() }
-    //
-    // range_ad_type
-    /// Type corresponding to the i-th element of the range vector
-    pub fn range_ad_type(&self, i : usize) -> ADType
-    {   self.range_ad_type[i].clone() }
     //
     // swap
     /// exchange the contents of this ADfn with another ADfn.

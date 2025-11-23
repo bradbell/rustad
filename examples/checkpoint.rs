@@ -12,7 +12,6 @@ use std::cell::RefCell;
 use rustad::{
     AzFloat,
     AD,
-    ADType,
     ad_from_value,
     ADfn,
     start_recording_var,

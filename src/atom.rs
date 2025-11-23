@@ -22,10 +22,10 @@ use crate::op::id::CALL_RES_OP;
 use crate::op::call::BEGIN_DOM;
 use crate::tape::Tape;
 use crate::tape::sealed::ThisThreadTape;
+use crate::ad::ADType;
 use crate::{
     IndexT,
     AD,
-    ADType,
     ad_from_vector,
     AtomInfoVecPublic,
     ThisThreadTapePublic,

@@ -19,11 +19,9 @@ The sparsity pattern for this function w.r.t x is
 The sparsity pattern for this function w.r.t p is
     dyp_pattern = [ [1 0], [2, 1] ]
 */
-use std::cmp::max;
 use rustad::{
     AD,
     AzFloat,
-    ADType,
     register_atom,
     AtomCallback,
     IndexT,
@@ -65,11 +63,12 @@ pub fn h_forward_fun_value(
 pub fn h_rev_depend(
     depend        : &mut Vec<usize> ,
     range_index   : usize           ,
-    _n_dom        : usize           ,
+    n_dom         : usize           ,
     _call_info    : IndexT          ,
     _trace        : bool            ,
 ) -> String
 {   assert_eq!( depend.len(), 0 );
+    assert_eq!( n_dom, 4 );
     let mut error_msg = String::new();
     match range_index {
         0 => { depend.push(0); depend.push(1); },

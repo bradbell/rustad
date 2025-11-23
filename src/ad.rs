@@ -27,7 +27,7 @@ use crate::op::id;
 ///
 /// # Example
 /// ```
-/// use rustad::ADType;
+/// use rustad::ad::ADType;
 /// assert!( ADType::ConstantP < ADType::DynamicP );
 /// assert!( ADType::DynamicP  < ADType::Variable );
 /// assert!( ADType::Variable  < ADType::True );
@@ -123,7 +123,7 @@ pub struct AD<V> {
     // ad_type
     /// If this AD object's tape_id is the same as this thread's tape_id,
     /// *ad_type* is Variable or DynamicP and is the type of this AD object.
-    pub ad_type : ADType,
+    pub(crate) ad_type : ADType,
     //
     // value
     /// is the value of this AD object.

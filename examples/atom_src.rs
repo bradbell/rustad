@@ -9,7 +9,6 @@ z = g(x) = x[0] * x[0] + x[1] * x[1] + ...
 */
 use rustad::{
     AzFloat,
-    ADType,
     register_atom,
     AtomCallback,
     IndexT,

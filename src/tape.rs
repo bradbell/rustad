@@ -12,9 +12,9 @@ use std::cell::RefCell;
 use std::thread::LocalKey;
 use std::sync::Mutex;
 //
+use crate::ad::ADType;
 use crate::{
     AD,
-    ADType,
     ADfn,
 };
 //

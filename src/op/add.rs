@@ -20,10 +20,10 @@
 // --------------------------------------------------------------------------
 // use
 //
+use crate::ad::ADType;
 use crate::{
     IndexT,
     AD,
-    ADType
 };
 //
 use crate::op::binary;

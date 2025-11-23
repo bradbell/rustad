@@ -30,7 +30,6 @@ use std::cell::RefCell;
 //
 use rustad::{
     AzFloat,
-    ADType,
     register_atom,
     AtomCallback,
     IndexT,

@@ -10,9 +10,9 @@
 //
 use std::cmp::PartialEq;
 //
+use crate::ad::ADType;
 use crate::{
     AD,
-    ADType,
     IndexT,
 };
 use crate::op::id::NUMBER_OP;

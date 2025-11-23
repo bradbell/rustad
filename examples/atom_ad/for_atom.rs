@@ -15,7 +15,6 @@ dx^T = dz * g_x(x, y) = 2 * dz * ( y[0], y[1], ... )
 dy^T = dz * g_y(x, y) = 2 * dz * ( x[0], x[1], ... )
 */
 use rustad::{
-    ADType,
     register_atom,
     AtomCallback,
     IndexT,

@@ -9,9 +9,9 @@
 // ---------------------------------------------------------------------------
 // use
 //
+use crate::ad::ADType;
 use crate::{
     AD,
-    ADType,
     ADfn,
 };
 use crate::op::id::CALL_OP;
@@ -61,8 +61,7 @@ use crate::{
 /// domain variable and parameter values;
 /// i.e., the value of the function correspdong the operation sequence in f.
 /// Note that a range space component may be a
-/// variable, a dynamic parameter, or a constant parameter;
-/// see [ADfn::range_ad_type] .
+/// variable, a dynamic parameter, or a constant parameter.
 ///
 /// * var_both :
 /// is both the variable sub-vectors in the following order:

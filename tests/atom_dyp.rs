@@ -17,12 +17,10 @@ We define the following function using h:
 f(p, x) = [ p[1] * x[0] ]
           [      5      ]
 */
-use std::cmp::max;
 use rustad::{
     AzFloat,
     AD,
     ad_from_value,
-    ADType,
     register_atom,
     AtomCallback,
     IndexT,
@@ -49,6 +47,7 @@ fn h_rev_depend(
     _trace       : bool            ,
 ) -> String {
     assert_eq!( depend.len(), 0 );
+    assert_eq!( n_dom, 4);
     let mut error_msg = String::new();
     match range_index {
         0 => { depend.push(0); depend.push(1) },

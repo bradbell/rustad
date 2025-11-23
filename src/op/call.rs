@@ -57,9 +57,9 @@ use crate::op::id::{
         CALL_OP,
         CALL_RES_OP,
 };
+use crate::ad::ADType;
 use crate::{
     AD,
-    ADType,
     IndexT,
     AtomCallback,
     ThisThreadTapePublic,
