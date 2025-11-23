@@ -195,7 +195,7 @@ macro_rules! impl_this_thread_tape{ ($V:ty) => {
 } }
 pub(crate) use impl_this_thread_tape;
 // ----------------------------------------------------------------------------
-// start_recording
+// start_recording_var
 //
 /// This starts recording a new `AD<V>` operation sequence with
 /// no dynamic parameters.
@@ -208,7 +208,7 @@ pub(crate) use impl_this_thread_tape;
 /// * V : see [doc_generic_v]
 ///
 /// * Arguments and Return :
-/// This is a wrapper for [start_recording_var_dyp]
+/// This is a wrapper for [start_recording_dyp_var]
 /// that fills in the empty vector for dyp_dom and extracts the
 /// avar_dom return.
 ///
@@ -219,24 +219,24 @@ where
     V : Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
     let dyp_dom : Vec<V> = Vec::new();
-    let (_adyp_dom, avar_dom) = start_recording_var_dyp(dyp_dom, var_dom);
+    let (_adyp_dom, avar_dom) = start_recording_dyp_var(dyp_dom, var_dom);
     avar_dom
 }
 //
-// start_recording_var_dyp
+// start_recording_dyp_var
 /// This starts recording a new `AD<V>` operation sequence with
 /// dynamic parameters.
 ///
 /// * Syntax :
 /// ```text
-///     (adyp_dom, avar_dom) = start_recording_var_dyp(dyp_dom, var_dom)
+///     (adyp_dom, avar_dom) = start_recording_dyp_var(dyp_dom, var_dom)
 /// ```
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * Recording :
 /// There must not currently be a recording in process on the current thread
-/// when start_recording_var_dyp is called.
+/// when start_recording_dyp_var is called.
 /// The recording is stopped when [stop_recording] is called.
 ///
 /// * dyp_dom :
@@ -262,7 +262,7 @@ where
 ///
 /// * Example : see [stop_recording]
 ///
-pub fn start_recording_var_dyp<V>(
+pub fn start_recording_dyp_var<V>(
     dyp_dom : Vec<V>, var_dom : Vec<V>
 ) -> ( Vec< AD<V> >, Vec< AD<V> > )
 where
@@ -351,7 +351,7 @@ where
 /// * ad_fn :
 /// The return value is an `ADfn<V>` containing the operation sequence
 /// that computed arange as a function of the domain variables and
-/// dynamic parameters specified by [start_recording_var_dyp] .
+/// dynamic parameters specified by [start_recording_dyp_var] .
 /// It can be used to compute the values for the function and its derivatives.
 ///
 /// # Example
