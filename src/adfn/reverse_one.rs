@@ -13,7 +13,7 @@ use crate::{
     AD,
     ADfn,
 };
-use crate::op::info::GlobalOpInfoVec;
+use crate::op::info::sealed::GlobalOpInfoVec;
 //
 #[cfg(doc)]
 use crate::{

@@ -424,21 +424,29 @@ where
 }
 // ---------------------------------------------------------------------------
 //
-// GlobalOpInfoVec
-/// returns a reference to the map from operator id to [OpInfo]
-///
-/// ```text
-///     GlobalOpInfoVec::get()
-/// ```
-///
-/// * V : see [doc_generic_v]
-///
-/// TODO: This should be a sealed trait.
-pub trait GlobalOpInfoVec
-where
-    Self : Sized + 'static,
-{
-    fn get() -> &'static std::sync::LazyLock< Vec< OpInfo<Self> > >;
+// sealed::GlobalOpInfoVec
+pub(crate) mod sealed {
+    //! The sub-module sealed is used to seal traits in this package
+    //
+    use super::OpInfo;
+    //
+    #[cfg(doc)]
+    use crate::doc_generic_v;
+    //
+    /// returns a reference to the map from operator id to [OpInfo]
+    ///
+    /// ```text
+    ///     GlobalOpInfoVec::get()
+    /// ```
+    ///
+    /// * V : see [doc_generic_v]
+    ///
+    pub trait GlobalOpInfoVec
+    where
+        Self : Sized + 'static,
+    {
+        fn get() -> &'static std::sync::LazyLock< Vec< OpInfo<Self> > >;
+    }
 }
 // impl_global_op_info_vec!
 /// Implement GlobalOpInfoVec for the value type *V* ; see [doc_generic_v]
@@ -454,7 +462,7 @@ macro_rules! impl_global_op_info_vec{ ($V:ty) => {
         "Operator information used when evaluating `",
         stringify!($V), "`, and `AD<", stringify!($V), ">` operations"
     ) ]
-    impl crate::op::info::GlobalOpInfoVec for $V {
+    impl crate::op::info::sealed::GlobalOpInfoVec for $V {
         fn get() -> &'static LazyLock<
             Vec< crate::op::info::OpInfo<$V> >
         > {

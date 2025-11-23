@@ -16,7 +16,7 @@ use crate::{
 };
 //
 use std::any::type_name;
-use crate::op::info::GlobalOpInfoVec;
+use crate::op::info::sealed::GlobalOpInfoVec;
 //
 #[cfg(doc)]
 use crate::{

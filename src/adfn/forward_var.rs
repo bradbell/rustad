@@ -15,7 +15,7 @@ use crate::{
     ADfn,
 };
 use crate::op::id::CALL_OP;
-use crate::op::info::GlobalOpInfoVec;
+use crate::op::info::sealed::GlobalOpInfoVec;
 use crate::adfn::eval_from::eval_from_f32;
 use crate::adfn::eval_from::eval_from_value;
 //

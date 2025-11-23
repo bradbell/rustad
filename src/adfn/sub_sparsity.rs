@@ -15,7 +15,7 @@ use crate::atom::sealed::AtomInfoVec;
 use crate::atom::AtomCallback;
 use crate::op::info::{
     OpInfo,
-    GlobalOpInfoVec
+    sealed::GlobalOpInfoVec
 };
 use crate::op::id::{
     CALL_OP,

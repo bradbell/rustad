@@ -99,13 +99,23 @@ where
     V : tape::sealed::ThisThreadTape ,
 { }
 //
-// AtomInfoVec
+// AtomInfoVecPublic
 /// This is the public interface to a sealed trait
 pub trait AtomInfoVecPublic : atom::sealed::AtomInfoVec
 { }
 impl<V> AtomInfoVecPublic for V
 where
     V : atom::sealed::AtomInfoVec ,
+{ }
+//
+//
+// GlobalOpInfoVecPublic
+/// This is the public interface to a sealed trait
+pub trait GlobalOpInfoVecPublic : op::info::sealed::GlobalOpInfoVec
+{ }
+impl<V> GlobalOpInfoVecPublic for V
+where
+    V : op::info::sealed::GlobalOpInfoVec ,
 { }
 //
 // ----------------------------------------------------------------------------

@@ -23,7 +23,7 @@ use crate::op::id::{
     CALL_RES_OP,
 };
 use crate::op::info::{
-    GlobalOpInfoVec,
+    sealed::GlobalOpInfoVec,
 };
 //
 #[cfg(doc)]

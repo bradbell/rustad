@@ -11,7 +11,7 @@
 //
 use crate::AD;
 use crate::ADfn;
-use crate::op::info::GlobalOpInfoVec;
+use crate::op::info::sealed::GlobalOpInfoVec;
 //
 #[cfg(doc)]
 use crate::{
