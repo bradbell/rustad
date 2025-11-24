@@ -322,7 +322,7 @@ pub(crate) use binary_rust_src;
 // ---------------------------------------------------------------------------
 // reverse_depend
 /// Reverse dependency analysis for a binary operator;
-/// see [ReverseDepend](crate:op::info::ReverseDepend)
+/// see [ReverseDepend](crate::op::info::ReverseDepend)
 ///
 pub(crate) fn reverse_depend(
     depend    : &mut OptimizeDepend ,

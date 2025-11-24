@@ -188,7 +188,7 @@ mod tests {
         let f  = stop_recording(ay);
         //
         // dyp_both
-        let trace = true;
+        let trace = false;
         let dyp_both = f.forward_dyp_value(p.clone(), trace);
         //
         assert_eq!( dyp_both.len(), 2 * np - 1 );
