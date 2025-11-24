@@ -41,8 +41,8 @@
 //! ## Operator Arguments
 //! | Index | Meaning |
 //! | ----- | ------- |
-//! | 0     | dependent index for this result operator            |
-//! | 1     | index in the call range index for dependent result  |
+//! | 0     | dependent index for this result operator             |
+//! | 1     | index in the call's range for this dependent result  |
 // --------------------------------------------------------------------------
 // use
 //

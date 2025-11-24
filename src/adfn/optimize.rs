@@ -10,11 +10,19 @@
 // use
 //
 use crate::{
-    ADfn
+    ADfn,
+    AtomCallback,
+    IndexT,
 };
-use crate::op::info::sealed::GlobalOpInfoVec;
+use crate::op::{
+    info::sealed::GlobalOpInfoVec,
+    call::call_depend,
+    id::CALL_OP,
+    id::CALL_RES_OP,
+};
 use crate::ad::ADType;
 use crate::tape::OpSequence;
+use crate::atom::sealed::AtomInfoVec;
 //
 #[cfg(doc)]
 use crate::{
@@ -45,12 +53,19 @@ pub struct OptimizeDepend {
 // ADfn::reverse_depend
 impl<V> ADfn<V>
 where
-    V : GlobalOpInfoVec ,
+    V               : AtomInfoVec + GlobalOpInfoVec,
+    AtomCallback<V> : Clone,
 {   //
     // reverse_depend
     /// Determine [OptimizeDepend] for this [ADfn].
     /// TODO: change to private when this gets used by a public function.
     pub fn reverse_depend(&self, trace : bool) -> OptimizeDepend {
+        //
+        // atom_depend, dyp_depend, var_depend
+        // work space used to avoid reallocationg vectors
+        let mut atom_depend : Vec<usize>  = Vec::new();
+        let mut dyp_depend  : Vec<IndexT> = Vec::new();
+        let mut var_depend  : Vec<IndexT> = Vec::new();
         //
         // n_cop, n_dyp, n_var, range_ad_type, range_index
         let n_cop         = self.cop_len();
@@ -113,30 +128,49 @@ where
             let n_dep    = op_seq.n_dep;
             let flag_all = &op_seq.flag_all;
             //
-            // op_index
+            // op_index, op_id
             for op_index in (0 .. n_dep).rev() {
-                let op_id     = op_seq.id_seq[op_index] as usize;
-                let start     = op_seq.arg_seq[op_index] as usize;
-                let end       = op_seq.arg_seq[op_index + 1] as usize;
-                let arg       = &op_seq.arg_all[start .. end];
-                let arg_type  = &op_seq.arg_type_all[start .. end];
-                let res       = n_dom + op_index;
-
-                let reverse_depend = op_info_vec[op_id].reverse_depend;
-                reverse_depend(
-                    &mut depend,
-                    &flag_all,
-                    &arg,
-                    &arg_type,
-                    res,
-                    res_type.clone(),
-                );
-                if trace {
-                    let name = &op_info_vec[op_id].name;
-                    println!(
-                        "{}, {:?}, {}, {:?}, {:?}",
-                        res, res_type, name, arg, arg_type
-                    )
+                let op_id     = op_seq.id_seq[op_index];
+                //
+                if op_id == CALL_OP || op_id == CALL_RES_OP {
+                    dyp_depend.clear();
+                    var_depend.clear();
+                    call_depend::<V>(
+                        &mut atom_depend,
+                        &mut dyp_depend,
+                        &mut var_depend,
+                        &self.var,
+                        op_index
+                     );
+                    for dep_index in var_depend.iter() {
+                        depend.var[*dep_index as usize] = true;
+                    }
+                    for dep_index in dyp_depend.iter() {
+                        depend.dyp[*dep_index as usize] = true;
+                    }
+                } else {
+                    let op_id     = op_id as usize;
+                    let start     = op_seq.arg_seq[op_index] as usize;
+                    let end       = op_seq.arg_seq[op_index + 1] as usize;
+                    let arg       = &op_seq.arg_all[start .. end];
+                    let arg_type  = &op_seq.arg_type_all[start .. end];
+                    let res       = n_dom + op_index;
+                    let reverse_depend = op_info_vec[op_id].reverse_depend;
+                    reverse_depend(
+                        &mut depend,
+                        &flag_all,
+                        &arg,
+                        &arg_type,
+                        res,
+                        res_type.clone(),
+                    );
+                    if trace {
+                        let name = &op_info_vec[op_id].name;
+                        println!(
+                            "{}, {:?}, {}, {:?}, {:?}",
+                            res, res_type, name, arg, arg_type
+                        )
+                    }
                 }
             }
         }
