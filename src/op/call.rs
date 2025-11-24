@@ -857,9 +857,9 @@ where
 }
 // ---------------------------------------------------------------------------
 //
-// no_op_dyp
-/// [ForwardDyp](crate::op::info::ForwardDyp) function
-fn no_op_dyp<V, E>(
+// call_res_dyp
+/// [ForwardDyp](crate::op::info::ForwardDyp) function for call result operator
+fn call_res_dyp<V, E>(
     _dyp_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
     _flag_all : &Vec<ADType>,
@@ -868,9 +868,9 @@ fn no_op_dyp<V, E>(
     _res      : usize       ,
 ) { }
 //
-// no_op_var
-/// [ForwardVar](crate::op::info::ForwardVar) function
-fn no_op_var<V, E>(
+// call_res_var
+/// [ForwardVar](crate::op::info::ForwardVar) function for call result operator
+fn call_res_var<V, E>(
     _dyp_both : &Vec<E>     ,
     _var_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
@@ -880,10 +880,10 @@ fn no_op_var<V, E>(
     _res      : usize       ,
 ) { }
 //
-// no_op_der
+// call_res_der
 /// [ForwardDer](crate::op::info::ForwardDer) or
-/// [ReverseDer](crate::op::info::ReverseDer) function
-fn no_op_der<V, E>(
+/// [ReverseDer](crate::op::info::ReverseDer) function for call result operator
+fn call_res_der<V, E>(
     _dyp_both : &Vec<E>     ,
     _var_both : &Vec<E>     ,
     _var_der  : &mut Vec<E> ,
@@ -894,9 +894,9 @@ fn no_op_der<V, E>(
     _res      : usize       ,
 ) { }
 //
-// no_op_rust_src
-/// [RustSrc](crate::op::info::RustSrc) function
-fn no_op_rust_src<V> (
+// call_res_rust_src
+/// [RustSrc](crate::op::info::RustSrc) function for call result operator
+fn call_res_rust_src<V> (
     _not_used : V           ,
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
@@ -1056,15 +1056,15 @@ where
     };
     op_info_vec[CALL_RES_OP as usize] = OpInfo{
         name              : "call_res" ,
-        forward_dyp_value : no_op_dyp::<V, V>,
-        forward_dyp_ad    : no_op_dyp::<V, AD<V> >,
-        forward_var_value : no_op_var::<V, V>,
-        forward_var_ad    : no_op_var::<V, AD<V> >,
-        forward_der_value : no_op_der::<V, V>,
-        forward_der_ad    : no_op_der::<V, AD<V> >,
-        reverse_der_value : no_op_der::<V, V>,
-        reverse_der_ad    : no_op_der::<V, AD<V> >,
-        rust_src          : no_op_rust_src::<V>,
+        forward_dyp_value : call_res_dyp::<V, V>,
+        forward_dyp_ad    : call_res_dyp::<V, AD<V> >,
+        forward_var_value : call_res_var::<V, V>,
+        forward_var_ad    : call_res_var::<V, AD<V> >,
+        forward_der_value : call_res_der::<V, V>,
+        forward_der_ad    : call_res_der::<V, AD<V> >,
+        reverse_der_value : call_res_der::<V, V>,
+        reverse_der_ad    : call_res_der::<V, AD<V> >,
+        rust_src          : call_res_rust_src::<V>,
         reverse_depend    : reverse_depend_none::<V>,
     };
 }
