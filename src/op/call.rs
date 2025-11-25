@@ -16,19 +16,19 @@
 //! | 2        | Domain space dimension for function being called (n_dom) |
 //! | 3        | Number of range components for this call         (n_res) |
 //! | 4        | Number of results that are dependents            (n_dep) |
-//! | 5        | Index of the first boolean for this operator             |
+//! | 5        | Index of the first flag for this operator                |
 //! | 6        | Index in call range of first dependent result for call   |
-//! | 6+1      | Variable or parameter index for first argument to call   |
-//! | 6+2      | Variable or parameter index for second argument to call  |
-//! | ...      | ... |
-//! | 6+n_dom  | Variable or parameter index for last argument to call    |
+//! | 6+1      | Variable, dynamic, or constant index for first call argument  |
+//! | 6+2      | Variable, dynamic, or constant index for second call argument |
+//! | ...      | ...                                                           |
+//! | 6+n_dom  | Variable, dynamic, or constant index for last call argument   |
 //!
 //! ## Operator Flags
 //! | Index    | Meaning |
 //! | -------- | ------- |
 //! | 0        | is True or false depending on trace for this call        |
 //! | 1        | is ADtype for first result of this call                  |
-//! | ...      | ... |
+//! | ...      | ...                                                      |
 //! | n_res    | is ADtype for last result of this call                   |
 //!
 //! * CALL_RES_OP
@@ -138,12 +138,13 @@ fn domain_zero_value<'a, 'b, V>(
     n_dom      : usize         ,
 ) -> Vec<&'a V>
 where
-    V : PartialEq,
+    V : PartialEq + From<f32>,
 {   //
+    // nan_v
+    let nan_v : V   = f32::NAN.into();
+    //
     // no_var_both
-    // This case is used during zero forward mode for dynamic parameters.
-    // If no_var_both, then var_both[0] is nan.
-    let no_var_both = var_both.len() == 1 && var_both[0] != var_both[0];
+    let no_var_both = var_both.len() == 1 && var_both[0] == nan_v;
     //
     let mut domain_zero : Vec<&V> = Vec::with_capacity( n_dom );
     for j_arg in 0 .. n_dom {
@@ -396,7 +397,7 @@ fn call_forward_var_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    V               : AtomInfoVec + PartialEq,
+    V               : AtomInfoVec + PartialEq + From<f32>,
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -1071,8 +1072,8 @@ where
 // ===========================================================================
 // call_depend
 // ===========================================================================
-/// Determine which dynamic parameters and variables a call operator's result
-/// depends on.
+/// Determine which dynamic parameters, variables, and constants
+///  a call operator's result depends on.
 ///
 /// * op_index ;
 /// This is a index in the operation sequence. The corresponding operator is
@@ -1086,10 +1087,15 @@ where
 /// Only the capacity of this vector matters
 /// (it is passed in to avoid reallocating memory).
 ///
+/// * cop_depend :
+/// On input this vector has size zero.
+/// Upon return it contains the set of constant parameter indices that
+/// identifies the constamts that the op_index result depends on.
+///
 /// * dyp_depend :
 /// On input this vector has size zero.
 /// Upon return it contains the set of dynamic parameter indices that
-/// identifies the dynamic parameters that the op_index result depends on.
+/// identifies the dynamics that the op_index result depends on.
 ///
 /// * var_depend :
 /// On input this vector has size zero.
@@ -1098,6 +1104,7 @@ where
 ///
 pub(crate) fn call_depend<V>(
     atom_depend     : &mut Vec<usize> ,
+    cop_depend      : &mut Vec<IndexT> ,
     dyp_depend      : &mut Vec<IndexT> ,
     var_depend      : &mut Vec<IndexT> ,
     op_seq          : &OpSequence     ,
@@ -1148,9 +1155,14 @@ where
         _n_res,
         _n_dep,
         trace,
-        _res_ad_type,
+        res_ad_type,
         callback,
     ) = extract_call_info::<V>(arg, flag_all);
+    //
+    // constant results do not depend argument values
+    if res_ad_type[ range_index ].is_constant() {
+        return;
+    }
     //
     // rev_depend
     let rev_depend = &callback.rev_depend;
@@ -1186,9 +1198,10 @@ where
         }
         let arg_index = BEGIN_DOM + atom_depend[k];
         match arg_type[arg_index] {
-            ADType::DynamicP => dyp_depend.push( arg[arg_index] ),
-            ADType::Variable => var_depend.push( arg[arg_index] ),
-            _        => { },
+            ADType::ConstantP => cop_depend.push( arg[arg_index] ),
+            ADType::DynamicP  => dyp_depend.push( arg[arg_index] ),
+            ADType::Variable  => var_depend.push( arg[arg_index] ),
+            _                 => { },
         }
     }
 }

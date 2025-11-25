@@ -161,8 +161,9 @@ where
             var_n_dom, n_range
         ); }
         //
-        // atom_depend, dyp_depend, var_depend
+        // atom_depend, cop_depend, dyp_depend, var_depend
         let mut atom_depend : Vec<usize>  = Vec::new();
+        let mut cop_depend  : Vec<IndexT> = Vec::new();
         let mut dyp_depend  : Vec<IndexT> = Vec::new();
         let mut var_depend  : Vec<IndexT> = Vec::new();
         //
@@ -216,10 +217,12 @@ where
                         //
                         // var_depend
                         if op_id == CALL_OP || op_id == CALL_RES_OP {
+                            cop_depend.clear();
                             dyp_depend.clear();
                             var_depend.clear();
                             call_depend::<V>(
                                 &mut atom_depend,
+                                &mut cop_depend,
                                 &mut dyp_depend,
                                 &mut var_depend,
                                 &self.var,
@@ -283,10 +286,12 @@ where
                         //
                         // dyp_index_stack
                         if op_id == CALL_OP || op_id == CALL_RES_OP {
+                            cop_depend.clear();
                             dyp_depend.clear();
                             var_depend.clear();
                             call_depend::<V>(
                                 &mut atom_depend,
+                                &mut cop_depend,
                                 &mut dyp_depend,
                                 &mut var_depend,
                                 &self.dyp,

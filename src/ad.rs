@@ -293,7 +293,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     where
         V : Clone + From<f32> + PartialEq ,
     {
-        // new_tape_id, new_index, new_ad_typ
+        // new_tape_id, new_index, new_ad_type
         let mut new_tape_id   = 0;
         let mut new_index     = 0;
         let mut new_ad_type   = ADType::ConstantP;

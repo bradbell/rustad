@@ -99,7 +99,7 @@ fn register_h()-> IndexT {
         reverse_der_ad       :  None,
     };
     //
-    // h__atom_id
+    // h_atom_id
     let h_atom_id = register_atom( h_callback );
     h_atom_id
 }
