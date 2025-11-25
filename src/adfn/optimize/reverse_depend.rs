@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! Implement the [ADfn] optimize method.
+//! Implement the [ADfn] reverse_depend method.
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
@@ -23,32 +23,9 @@ use crate::op::{
 use crate::ad::ADType;
 use crate::tape::OpSequence;
 use crate::atom::sealed::AtomInfoVec;
-//
-#[cfg(doc)]
-use crate::{
-    doc_generic_v,
-    doc_generic_e,
-};
+use crate::adfn::optimize::OptimizeDepend;
 //
 // -----------------------------------------------------------------------
-// OptimizeDepend
-/// Which constants, dynamic parameters, and variables the
-/// range for an [ADfn] depends on.
-///
-/// TODO: change to private when reverse_depend gets changes to private.
-pub struct OptimizeDepend {
-    // cop
-    /// Constant parameters dependency; length [ADfn::cop_len].
-    pub(crate) cop : Vec<bool> ,
-    //
-    // dyp
-    /// Dynamic parameters dependency; length [ADfn::dyp_len].
-    pub(crate) dyp : Vec<bool> ,
-    //
-    // var
-    /// Variable dependency; length [ADfn::var_len].
-    pub(crate) var : Vec<bool> ,
-}
 //
 // ADfn::reverse_depend
 impl<V> ADfn<V>
