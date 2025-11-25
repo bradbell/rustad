@@ -15,12 +15,12 @@ use crate::ADfn;
 // -----------------------------------------------------------------------
 mod reverse_depend;
 // -----------------------------------------------------------------------
-// OptimizeDepend
+// Depend
 /// Which constants, dynamic parameters, and variables the
 /// range for an [ADfn] depends on.
 ///
 /// TODO: change to private when reverse_depend gets changes to private.
-pub struct OptimizeDepend {
+pub struct Depend {
     // cop
     /// Constant parameters dependency; length [ADfn::cop_len].
     pub(crate) cop : Vec<bool> ,

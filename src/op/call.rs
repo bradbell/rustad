@@ -51,7 +51,7 @@ use std::cmp::PartialEq;
 use std::ops::AddAssign;
 //
 use crate::ad::ADType;
-use crate::adfn::optimize::OptimizeDepend;
+use crate::adfn::optimize;
 use crate::tape::OpSequence;
 use crate::op::info::OpInfo;
 use crate::op::info::no_reverse_depend;

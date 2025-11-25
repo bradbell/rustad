@@ -23,7 +23,7 @@ use crate::op::{
 use crate::ad::ADType;
 use crate::tape::OpSequence;
 use crate::atom::sealed::AtomInfoVec;
-use crate::adfn::optimize::OptimizeDepend;
+use crate::adfn::optimize;
 //
 // -----------------------------------------------------------------------
 //
@@ -34,9 +34,9 @@ where
     AtomCallback<V> : Clone,
 {   //
     // reverse_depend
-    /// Determine [OptimizeDepend] for this [ADfn].
+    /// Determine [optimize::Depend] for this [ADfn].
     /// TODO: change to private when this gets used by a public function
-    pub fn reverse_depend(&self, trace : bool) -> OptimizeDepend {
+    pub fn reverse_depend(&self, trace : bool) -> optimize::Depend {
         //
         // atom_depend, cop_depend, dyp_depend, var_depend
         // work space used to avoid reallocationg vectors
@@ -53,7 +53,7 @@ where
         let range_index   = &self.range_index;
         //
         // depend
-        let mut depend = OptimizeDepend {
+        let mut depend = optimize::Depend {
             cop : vec![false; n_cop ],
             dyp : vec![false; n_dyp ],
             var : vec![false; n_var ],

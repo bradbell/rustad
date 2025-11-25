@@ -18,7 +18,7 @@ use crate::{
 use crate::op::id::NUMBER_OP;
 use crate::tape::sealed::ThisThreadTape;
 use crate::atom::sealed::AtomInfoVec;
-use crate::adfn::optimize::OptimizeDepend;
+use crate::adfn::optimize;
 //
 #[cfg(doc)]
 use crate::{
@@ -200,21 +200,21 @@ pub(crate) type ReverseDer<V, E> = fn(
 /// Upon return, depend contains the the dependencies given the dependent values
 ///  with index greater or equal res.
 pub(crate) type ReverseDepend = fn(
-    _depend   : &mut OptimizeDepend ,
-    _flag_all : &Vec<ADType>        ,
-    _arg      : &[IndexT]           ,
-    _arg_type : &[ADType]           ,
-    _res      : usize               ,
-    _res_type : ADType              ,
+    _depend   : &mut optimize::Depend ,
+    _flag_all : &Vec<ADType>          ,
+    _arg      : &[IndexT]             ,
+    _arg_type : &[ADType]             ,
+    _res      : usize                 ,
+    _res_type : ADType                ,
 );
 // panic_reverse_depend
 pub(crate) fn panic_reverse_depend(
-    _depend   : &mut OptimizeDepend ,
-    _flag_all : &Vec<ADType>        ,
-    _arg      : &[IndexT]           ,
-    _arg_type : &[ADType]           ,
-    _res      : usize               ,
-    _res_type : ADType              ,
+    _depend   : &mut optimize::Depend ,
+    _flag_all : &Vec<ADType>          ,
+    _arg      : &[IndexT]             ,
+    _arg_type : &[ADType]             ,
+    _res      : usize                 ,
+    _res_type : ADType                ,
 ) { panic!(); }
 // --------------------------------------------------------------------------
 // no_forward_der_value
@@ -326,16 +326,16 @@ pub(crate) use no_rust_src;
 // no_reverse_depend
 /// defines reverse_depend_none `<V>`
 ///
-/// The types IndexT, ADType and OptimizeDepend
+/// The types IndexT, ADType and optimize::Depend
 /// must be in scope where this macro is used.
 macro_rules! no_reverse_depend{ ($Op:ident) => {
     pub fn reverse_depend_none<V>(
-        _depend   : &mut OptimizeDepend ,
-        _flag_all : &Vec<ADType>        ,
-        _arg      : &[IndexT]           ,
-        _arg_type : &[ADType]           ,
-        _res      : usize               ,
-        _res_type : ADType              ,
+        _depend   : &mut optimize::Depend ,
+        _flag_all : &Vec<ADType>          ,
+        _arg      : &[IndexT]             ,
+        _arg_type : &[ADType]             ,
+        _res      : usize                 ,
+        _res_type : ADType                ,
     )
     { panic!( concat!(
         stringify!($Op) ,

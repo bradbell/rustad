@@ -8,7 +8,7 @@
 // ---------------------------------------------------------------------------
 //
 use crate::IndexT;
-use crate::adfn::optimize::OptimizeDepend;
+use crate::adfn::optimize;
 use crate::ad::ADType;
 //
 // ---------------------------------------------------------------------------
@@ -325,12 +325,12 @@ pub(crate) use binary_rust_src;
 /// see [ReverseDepend](crate::op::info::ReverseDepend)
 ///
 pub(crate) fn reverse_depend(
-    depend    : &mut OptimizeDepend ,
-    _flag_all : &Vec<ADType>        ,
-    arg       : &[IndexT]           ,
-    arg_type  : &[ADType]           ,
-    res       : usize               ,
-    res_type  : ADType              ,
+    depend    : &mut optimize::Depend ,
+    _flag_all : &Vec<ADType>          ,
+    arg       : &[IndexT]             ,
+    arg_type  : &[ADType]             ,
+    res       : usize                 ,
+    res_type  : ADType                ,
 ) { //
     assert_eq!(arg.len(), 2);
     assert_eq!(arg_type.len(), 2);
