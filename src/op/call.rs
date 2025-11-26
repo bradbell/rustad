@@ -17,7 +17,8 @@
 //! | 3        | Number of range components for this call         (n_res) |
 //! | 4        | Number of results that are dependents            (n_dep) |
 //! | 5        | Index of the first flag for this operator                |
-//! | 6        | Index in call range of first dependent result for call   |
+//! | 6        | Index in call's range corresponding to CALL_OP operator  |
+//! |          | This corresponds to dependent index zero                 |
 //! | 6+1      | Variable, dynamic, or constant index for first call argument  |
 //! | 6+2      | Variable, dynamic, or constant index for second call argument |
 //! | ...      | ...                                                           |
@@ -41,8 +42,8 @@
 //! ## Operator Arguments
 //! | Index | Meaning |
 //! | ----- | ------- |
-//! | 0     | dependent index for this result operator             |
-//! | 1     | index in the call's range for this dependent result  |
+//! | 0     | Dependent index corresponding to this CALL_RES_OP    |
+//! | 1     | Index in the call's range for this dependent result  |
 // --------------------------------------------------------------------------
 // use
 //

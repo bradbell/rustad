@@ -459,7 +459,7 @@ where
     let n_dyp = tape.dyp.n_dom + tape.dyp.n_dep;
     let n_var = tape.var.n_dom + tape.var.n_dep;
     //
-    // arange, n_dyp_dep, n_var_dep
+    // arange, dyp_dep, var_dep
     let mut dyp_dep  : Vec<usize> = Vec::new();
     let mut var_dep  : Vec<usize> = Vec::new();
     for i in 0 .. n_res {
