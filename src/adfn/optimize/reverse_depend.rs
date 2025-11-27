@@ -256,7 +256,7 @@ mod tests {
     fn test_reverse_depend() {
         //
         // trace
-        let trace = true;
+        let trace = false;
         //
         // eye_atom_id, call_info
         let eye_atom_id = register_eye();

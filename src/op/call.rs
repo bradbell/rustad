@@ -15,14 +15,16 @@
 //! | 1        | Extra information about this call; i.e. call_info        |
 //! | 2        | Domain space dimension for function being called (n_dom) |
 //! | 3        | Number of range components for this call         (n_res) |
-//! | 4        | Number of results that are dependents            (n_dep) |
-//! | 5        | Index of the first flag for this operator                |
-//! | 6        | Index in call's range corresponding to CALL_OP operator  |
-//! |          | This corresponds to dependent index zero                 |
-//! | 6+1      | Variable, dynamic, or constant index for first call argument  |
-//! | 6+2      | Variable, dynamic, or constant index for second call argument |
+//! | 4        | Number of dependent results for this call        (n_dep) |
+//! | 5        | Index in flag_all of first flag for this operator        |
+//! | 5+1      | Variable, dynamic, or constant index for first call argument  |
+//! | 5+2      | Variable, dynamic, or constant index for second call argument |
 //! | ...      | ...                                                           |
-//! | 6+n_dom  | Variable, dynamic, or constant index for last call argument   |
+//! | 5+n_dom   | Variable, dynamic, or constant index for last call argument  |
+//! | 5+n_dom+1 | Index in call's range of first dependent result              |
+//! | 5+n_dom+2 | Index in call's range of second dependent result             |
+//! | ...       | ...                                                          |
+//! | 5+n_dom+n_dep | Index in call's range of last dependent result           |
 //!
 //! ## Operator Flags
 //! | Index    | Meaning |
@@ -42,8 +44,8 @@
 //! ## Operator Arguments
 //! | Index | Meaning |
 //! | ----- | ------- |
-//! | 0     | Dependent index corresponding to this CALL_RES_OP    |
-//! | 1     | Index in the call's range for this dependent result  |
+//! | 0     | Dependent index corresponding to this CALL_RES_OP       |
+//! |       | which is also the offset of to get back to this CALL_OP |
 // --------------------------------------------------------------------------
 // use
 //
@@ -71,7 +73,7 @@ use crate::{
 // ----------------------------------------------------------------------
 /// Index in operator argument vector of the parameter or variable index
 /// of the first atomc function argument.
-pub(crate) const BEGIN_DOM : usize = 7;
+pub(crate) const BEGIN_DOM : usize = 6;
 // ----------------------------------------------------------------------
 //
 // extract_call_info
@@ -1129,17 +1131,16 @@ where
     let arg_type_all    = &op_seq.arg_type_all;
     let flag_all        = &op_seq.flag_all;
     //
-    // op_index, dep_index, range_index
+    // op_index, dep_index
     let begin           = arg_seq[op_index] as usize;
-    let range_index : usize ;
+    let dep_index : usize ;
     if op_id == CALL_RES_OP {
-        let dep_index   = arg_all[begin] as usize;
-        range_index     = arg_all[begin + 1] as usize;
+        dep_index   = arg_all[begin] as usize;
         debug_assert!( dep_index <= op_index );
         op_index    = op_index - dep_index;
         debug_assert!( id_seq[op_index] == CALL_OP );
     } else {
-        range_index = arg_all[begin + 6] as usize;
+        dep_index = 0;
     }
     debug_assert!( id_seq[op_index] == CALL_OP );
     //
@@ -1160,10 +1161,11 @@ where
         callback,
     ) = extract_call_info::<V>(arg, flag_all);
     //
-    // constant results do not depend argument values
-    if res_ad_type[ range_index ].is_constant() {
-        return;
-    }
+    // range_index
+    let range_index = arg[BEGIN_DOM + n_dom + dep_index] as usize;
+    //
+    // constants are never dependent values
+    assert_ne!(res_ad_type[ range_index ], ADType::ConstantP);
     //
     // rev_depend
     let rev_depend = &callback.rev_depend;

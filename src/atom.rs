@@ -482,15 +482,12 @@ where
         // op_seq, dep, n_dep
         let op_seq   : &mut OpSequence;
         let dep      : &Vec<usize>;
-        let dep_type : ADType;
         if k == 0 {
             op_seq   = &mut tape.dyp;
             dep      = &dyp_dep;
-            dep_type = ADType::DynamicP;
         } else {
             op_seq   = &mut tape.var;
             dep      = &var_dep;
-            dep_type = ADType::Variable;
         }
         let n_dep = dep.len();
         //
@@ -510,9 +507,6 @@ where
             // arg[5]
             op_seq.arg_all.push( op_seq.flag_all.len() as IndexT );
             //
-            // arg[6]
-            op_seq.arg_all.push( dep[0] as IndexT );
-            //
             // op_seq.arg_type_all
             for _j in 0 .. BEGIN_DOM {
                 op_seq.arg_type_all.push( ADType::Empty );
@@ -529,6 +523,12 @@ where
                     let index = adomain[j].index;
                     op_seq.arg_all.push( index as IndexT ); // arg[BEGIN_DOM+j]
                 }
+            }
+            //
+            // op_seq_arg_type_all, op_seq_arg_all
+            for j in 0 .. n_dep {
+                op_seq.arg_type_all.push( ADType::Empty );
+                op_seq.arg_all.push( dep[j] as IndexT );
             }
             //
             // op_seq.flag_all
@@ -552,9 +552,6 @@ where
                 //
                 op_seq.arg_all.push( dep_index as IndexT );
                 op_seq.arg_type_all.push( ADType::Empty );
-                //
-                op_seq.arg_all.push( dep[dep_index] as IndexT );
-                op_seq.arg_type_all.push( dep_type.clone() );
             }
         }
     }
