@@ -78,7 +78,7 @@ pub(crate) const BEGIN_DOM : usize = 6;
 //
 // extract_call_info
 fn extract_call_info<'a, V>(
-    arg        : &[IndexT] ,
+    arg        : &'a [IndexT] ,
     flag_all   : &'a [ADType] ,
 ) -> (
     IndexT           , // call_info
@@ -87,6 +87,7 @@ fn extract_call_info<'a, V>(
     usize            , // n_dep
     bool             , // trace
     &'a [ADType]     , // res_ad_type
+    &'a [IndexT]     , // dep2res
     AtomCallback<V>  , // callback
 )
 where
@@ -103,6 +104,8 @@ where
     let trace        = flag_all[start].is_true();
     let start        = start + 1;
     let res_ad_type  = &flag_all[start .. start+n_res];
+    let start        = BEGIN_DOM + n_dom;
+    let dep2res      = &arg[start .. start + n_dep];
     //
     // callback
     let callback : AtomCallback<V>;
@@ -127,6 +130,7 @@ where
         n_dep,
         trace,
         res_ad_type,
+        dep2res,
         callback,
     )
 }
@@ -254,6 +258,7 @@ where
         _n_dep,
         trace,
         res_ad_type,
+        _dep2res,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -329,6 +334,7 @@ where
         _n_dep,
         trace,
         res_ad_type,
+        _dep2res,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -410,6 +416,7 @@ where
         _n_dep,
         trace,
         res_ad_type,
+        _dep2res,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -484,6 +491,7 @@ where
         _n_dep,
         trace,
         res_ad_type,
+        _dep2res,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -563,6 +571,7 @@ where
         _n_dep,
         trace,
         res_ad_type,
+        _dep2res,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -642,6 +651,7 @@ where
         _n_dep,
         trace,
         res_ad_type,
+        _dep2res,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -726,6 +736,7 @@ where
         _n_dep,
         trace,
         res_ad_type,
+        _dep2res,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -804,6 +815,7 @@ where
         _n_dep,
         trace,
         res_ad_type,
+        _dep2res,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -938,6 +950,7 @@ where
         n_dep,
         trace,
         res_ad_type,
+        _dep2res,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -1158,6 +1171,7 @@ where
         _n_dep,
         trace,
         res_ad_type,
+        _dep2res,
         callback,
     ) = extract_call_info::<V>(arg, flag_all);
     //
