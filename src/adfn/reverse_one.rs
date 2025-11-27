@@ -111,7 +111,7 @@ macro_rules! reverse_one {
             let n_var = self.var.n_dom + self.var.n_dep;
             //
             assert_eq!(
-                range_der.len(), self.range_ad_type.len(),
+                range_der.len(), self.rng_ad_type.len(),
                 "f.reverse_one: range vector length does not match f"
             );
             assert_eq!(

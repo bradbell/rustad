@@ -77,16 +77,16 @@ pub struct ADfn<V> {
     // The variable operation sequence
     pub(crate) var : OpSequence,
     //
-    // range_ad_type
+    // rng_ad_type
     /// The length of this vector is the dimension of the range space.
-    /// If range_ad_type\[i\] is Variable (DynamicP) {ConstantP},
+    /// If rng_ad_type\[i\] is Variable (DynamicP) {ConstantP},
     /// the i-th range space component is a
     /// variable (dynamic parameter) {constant parameter}.
-    pub(crate) range_ad_type : Vec<ADType>,
+    pub(crate) rng_ad_type   : Vec<ADType>,
     //
     // rng_index
     /// The length of this vector is also the dimension of the range space.
-    /// If range_ad_type\[i\] is Variable (DynamicP) {ConstantP},
+    /// If rng_ad_type\[i\] is Variable (DynamicP) {ConstantP},
     /// rng_index\[i]\ is a variable index
     /// (dynamic parameter index) {constant parameter index} .
     pub(crate) rng_index           : Vec<IndexT>,
@@ -118,7 +118,7 @@ impl<V> ADfn<V> {
         Self {
             dyp              : OpSequence::new(),
             var              : OpSequence::new(),
-            range_ad_type    : Vec::new() ,
+            rng_ad_type      : Vec::new() ,
             rng_index        : Vec::new() ,
             cop              : Vec::new() ,
         }
@@ -151,8 +151,8 @@ impl<V> ADfn<V> {
     // range_len
     /// dimension of range space
     pub fn range_len(&self) -> usize {
-        debug_assert!( self.rng_index.len() == self.range_ad_type.len() );
-        self.range_ad_type.len()
+        debug_assert!( self.rng_index.len() == self.rng_ad_type.len() );
+        self.rng_ad_type.len()
     }
     //
     // cop_len
@@ -164,7 +164,7 @@ impl<V> ADfn<V> {
     pub fn swap(&mut self, other : &mut ADfn<V>) {
         std::mem::swap( &mut self.var,           &mut other.var );
         std::mem::swap( &mut self.cop,           &mut other.cop );
-        std::mem::swap( &mut self.range_ad_type, &mut other.range_ad_type );
+        std::mem::swap( &mut self.rng_ad_type, &mut other.rng_ad_type );
         std::mem::swap( &mut self.rng_index,   &mut other.rng_index );
     }
 }

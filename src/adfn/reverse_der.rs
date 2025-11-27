@@ -139,7 +139,7 @@ macro_rules! reverse_der {
             let n_var = self.var.n_dom + self.var.n_dep;
             //
             assert_eq!(
-                range_der.len(), self.range_ad_type.len(),
+                range_der.len(), self.rng_ad_type.len(),
                 "f.reverse_der: range vector length does not match f"
             );
             assert_eq!(
@@ -156,9 +156,9 @@ macro_rules! reverse_der {
             // var_der
             let mut var_der       = vec![ zero_e; n_var ];
             let mut mut_range_der = range_der;
-            for i in (0 .. self.range_ad_type.len()).rev() {
+            for i in (0 .. self.rng_ad_type.len()).rev() {
                 let y_i = mut_range_der.pop().unwrap();
-                if self.range_ad_type[i].is_variable() {
+                if self.rng_ad_type[i].is_variable() {
                     let index = self.rng_index[i] as usize;
                     var_der[index] = y_i;
                 }
@@ -179,8 +179,8 @@ macro_rules! reverse_der {
                     println!( "{}, {}", j, dyp_both[j] );
                 }
                 println!( "var_index, range_der" );
-                for i in 0 .. self.range_ad_type.len() {
-                    if self.range_ad_type[i].is_variable() {
+                for i in 0 .. self.rng_ad_type.len() {
+                    if self.rng_ad_type[i].is_variable() {
                         let index = self.rng_index[i] as usize;
                         println!( "{}, {}", index,  var_der[index] );
                     }

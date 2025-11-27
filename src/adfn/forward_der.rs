@@ -213,9 +213,9 @@ macro_rules! forward_der {
             }
             if trace {
                 println!( "rng_index, var_index, con_index" );
-                for i in 0 .. self.range_ad_type.len() {
+                for i in 0 .. self.rng_ad_type.len() {
                     let index = self.rng_index[i] as usize;
-                    if self.range_ad_type[i].is_variable() {
+                    if self.rng_ad_type[i].is_variable() {
                         println!( "{}, {}, ----", i, index);
                     } else {
                         println!( "{}, ---- ,{}", i, index);
@@ -224,9 +224,9 @@ macro_rules! forward_der {
                 println!( "End Trace: forward_der" );
             }
             let mut range_one : Vec<$E> = Vec::new();
-            for i in 0 .. self.range_ad_type.len() {
+            for i in 0 .. self.rng_ad_type.len() {
                 let index = self.rng_index[i] as usize;
-                if self.range_ad_type[i].is_variable() {
+                if self.rng_ad_type[i].is_variable() {
                     range_one.push( var_der[index].clone() );
                 } else {
                     range_one.push( zero_e.clone() );

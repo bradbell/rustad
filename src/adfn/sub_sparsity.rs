@@ -122,10 +122,10 @@ where
         // op_info_vec
         let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
         //
-        // range_ad_type, rng_index, n_range
-        let range_ad_type     = &self.range_ad_type;
+        // rng_ad_type, rng_index, n_range
+        let rng_ad_type       = &self.rng_ad_type;
         let rng_index         = &self.rng_index;
-        let n_range           = range_ad_type.len();
+        let n_range           = rng_ad_type.len();
         //
         // var_ : n_dom, n_dep, id_seq, arg_seq, arg_all, arg_type_all.
         let var_n_dom             = self.var.n_dom;
@@ -179,10 +179,10 @@ where
             // use clear instead of new stack to reduce memory allocation
             var_index_stack.clear();
             dyp_index_stack.clear();
-            if range_ad_type[row].is_variable() {
+            if rng_ad_type[row].is_variable() {
                 var_index_stack.push( rng_index[row] );
             } else {
-                if compute_dyp && range_ad_type[row].is_dynamic() {
+                if compute_dyp && rng_ad_type[row].is_dynamic() {
                     dyp_index_stack.push( rng_index[row] );
                 }
             }

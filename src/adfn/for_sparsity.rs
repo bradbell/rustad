@@ -113,10 +113,10 @@ where
         // op_info_vec
         let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
         //
-        // range_ad_type, range_ad_index, n_range
-        let range_ad_type     = &self.range_ad_type;
+        // rng_ad_type, range_ad_index, n_range
+        let rng_ad_type       = &self.rng_ad_type;
         let rng_index         = &self.rng_index;
-        let n_range           = range_ad_type.len();
+        let n_range           = rng_ad_type.len();
         //
         // pattern, depend_usize
         let mut pattern         : Vec< [usize; 2] > = Vec::new();
@@ -149,11 +149,11 @@ where
         if trace {
             let mut range_set_index : Vec<usize> = Vec::new();
             for i in 0 .. rng_index.len() {
-                if range_ad_type[i].is_variable() {
+                if rng_ad_type[i].is_variable() {
                         let index = (rng_index[i] as usize) + n_dyp;
                         range_set_index.push( index );
                 }
-                if range_ad_type[i].is_dynamic() && compute_dyp {
+                if rng_ad_type[i].is_dynamic() && compute_dyp {
                         range_set_index.push(  rng_index[i] as usize );
                 }
             }
@@ -264,7 +264,7 @@ where
             }
         }
         for i in 0 .. n_range {
-            if range_ad_type[i].is_variable() {
+            if rng_ad_type[i].is_variable() {
                 let row_var_index = rng_index[i] as usize + n_dyp;
                 let set           = set_vec.get(row_var_index);
                 for j in 0 .. set.len() {
@@ -273,7 +273,7 @@ where
                     pattern.push( [row, col] );
                 }
             }
-            if compute_dyp && range_ad_type[i].is_dynamic() {
+            if compute_dyp && rng_ad_type[i].is_dynamic() {
                 let row_var_index = rng_index[i] as usize;
                 let set           = set_vec.get(row_var_index);
                 for j in 0 .. set.len() {

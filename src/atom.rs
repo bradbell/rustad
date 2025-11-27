@@ -426,8 +426,8 @@ where
         |adomain_j| adomain_j.ad_type.clone()
     ).collect();
     //
-    // range_ad_type
-    let mut range_ad_type : Vec<ADType> = Vec::with_capacity(n_res);
+    // rng_ad_type
+    let mut rng_ad_type   : Vec<ADType> = Vec::with_capacity(n_res);
     let mut depend        : Vec<usize>  = Vec::new();
     for rng_index in 0 .. n_res {
         depend.clear();
@@ -452,7 +452,7 @@ where
             }
             ad_type = max( ad_type, domain_ad_type[j].clone() );
         }
-        range_ad_type.push( ad_type );
+        rng_ad_type.push( ad_type );
     }
     //
     // n_dyp, n_var
@@ -463,18 +463,18 @@ where
     let mut dyp_dep  : Vec<usize> = Vec::new();
     let mut var_dep  : Vec<usize> = Vec::new();
     for i in 0 .. n_res {
-        if range_ad_type[i].is_variable() {
+        if rng_ad_type[i].is_variable() {
             arange[i].tape_id   = tape.tape_id;
             arange[i].ad_type   = ADType::Variable;
             arange[i].index     = n_var + var_dep.len();
             var_dep.push( i );
-         } else if range_ad_type[i].is_dynamic() {
+         } else if rng_ad_type[i].is_dynamic() {
             arange[i].tape_id   = tape.tape_id;
             arange[i].ad_type   = ADType::DynamicP;
             arange[i].index     = n_dyp + dyp_dep.len();
             dyp_dep.push( i );
          } else {
-            assert!( range_ad_type[i].is_constant() );
+            assert!( rng_ad_type[i].is_constant() );
         }
     }
     for k in 0 .. 2 {

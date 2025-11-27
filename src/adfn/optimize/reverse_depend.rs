@@ -45,11 +45,11 @@ where
         let mut dyp_depend  : Vec<IndexT> = Vec::new();
         let mut var_depend  : Vec<IndexT> = Vec::new();
         //
-        // n_cop, n_dyp, n_var, range_ad_type, rng_index
+        // n_cop, n_dyp, n_var, rng_ad_type, rng_index
         let n_cop         = self.cop_len();
         let n_dyp         = self.dyp_len();
         let n_var         = self.var_len();
-        let range_ad_type = &self.range_ad_type;
+        let rng_ad_type   = &self.rng_ad_type;
         let rng_index     = &self.rng_index;
         //
         // depend
@@ -68,9 +68,9 @@ where
         }
         //
         // depend
-        for i in 0 .. self.range_ad_type.len() {
+        for i in 0 .. self.rng_ad_type.len() {
             let index = rng_index[i] as usize;
-            match range_ad_type[i] {
+            match rng_ad_type[i] {
                 ADType::ConstantP => { depend.cop[index] = true; },
                 ADType::DynamicP  => { depend.dyp[index] = true; },
                 ADType::Variable  => { depend.var[index] = true; },
@@ -78,7 +78,7 @@ where
             }
             //
             if trace {
-                println!( "{}, {}, {:?}", i, index, &range_ad_type[i])
+                println!( "{}, {}, {:?}", i, index, &rng_ad_type[i])
             }
         }
         if trace {
