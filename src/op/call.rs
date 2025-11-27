@@ -276,7 +276,7 @@ where
     // domain
     let nan_v    : V      = f32::NAN.into();
     let var_both : Vec<V> = vec![ nan_v ];
-    let domain      = domain_value(
+    let domain            = domain_value(
         dyp_both, &var_both, cop, arg, arg_type, n_dom
     );
     //
@@ -347,7 +347,7 @@ where
     let nan_v : V = f32::NAN.into();
     let anan      = ad_from_value( nan_v );
     let avar_both = vec! [ anan ];
-    let adomain      = domain_ad(
+    let adomain   = domain_ad(
         adyp_both, &avar_both, &acop, arg, arg_type, n_dom
     );
     //
@@ -418,7 +418,7 @@ where
     let forward_fun_value = forward_fun_value.unwrap();
     //
     // domain
-    let domain      = domain_value(
+    let domain = domain_value(
         dyp_both, var_both, cop, arg, arg_type, n_dom
     );
     //
@@ -486,8 +486,8 @@ where
     let forward_fun_ad = forward_fun_ad.unwrap();
     //
     // adomain
-    let acop = domain_acop(cop, arg, arg_type, n_dom);
-    let adomain      = domain_ad(
+    let acop     = domain_acop(cop, arg, arg_type, n_dom);
+    let adomain  = domain_ad(
         adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
@@ -559,7 +559,7 @@ where
     let forward_der_value  = forward_der_value.unwrap();
     //
     // domain
-    let domain      = domain_value(
+    let domain = domain_value(
         dyp_both, var_both, cop, arg, arg_type, n_dom
     );
     // domain_der
@@ -633,8 +633,8 @@ where
     let forward_der_ad = forward_der_ad.unwrap();
     //
     // adomain
-    let acop = domain_acop(cop, arg, arg_type, n_dom);
-    let adomain      = domain_ad(
+    let acop    = domain_acop(cop, arg, arg_type, n_dom);
+    let adomain = domain_ad(
         adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
@@ -712,7 +712,7 @@ where
     let reverse_der_value = reverse_der_value.unwrap();
     //
     // domain
-    let domain      = domain_value(
+    let domain = domain_value(
         dyp_both, var_both, cop, arg, arg_type, n_dom
     );
     //
@@ -786,8 +786,8 @@ where
     let reverse_der_ad = reverse_der_ad.unwrap();
     //
     // adomain
-    let acop = domain_acop(cop, arg, arg_type, n_dom);
-    let adomain      = domain_ad(
+    let acop     = domain_acop(cop, arg, arg_type, n_dom);
+    let adomain  = domain_ad(
         adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
