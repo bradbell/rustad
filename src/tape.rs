@@ -367,7 +367,7 @@ where
 /// let ay    = vec![ sum, diff, times ];
 /// let ad_fn    = stop_recording(ay);
 /// assert_eq!( ad_fn.var_dom_len(), 2);
-/// assert_eq!( ad_fn.range_len(), 3);
+/// assert_eq!( ad_fn.rng_len(), 3);
 /// ```
 pub fn stop_recording<V>( arange : Vec< AD<V> > ) -> ADfn<V>
 where

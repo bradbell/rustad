@@ -61,7 +61,7 @@ where
     ///
     /// * pattern :
     /// The the return value *pattern* is vector of [row, column] pairs.
-    /// Each row is a range index and is less that [ADfn::range_len] .
+    /// Each row is a range index and is less that [ADfn::rng_len] .
     /// If compute_dyp is true (false) eah column is a
     /// dynamic parameter (variable) domain index and is less than
     /// [ADfn::dyp_dom_len] ( [ADfn::var_dom_len] ).

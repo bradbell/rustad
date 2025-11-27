@@ -111,7 +111,7 @@ impl<V> ADfn<V> {
     /// let f : ADfn<f32> = ADfn::new();
     /// assert_eq!( f.dyp_dom_len() + f.dyp_dep_len(), 0 );
     /// assert_eq!( f.var_dom_len() + f.var_dep_len(), 0 );
-    /// assert_eq!( f.range_len(), 0 );
+    /// assert_eq!( f.rng_len(), 0 );
     /// assert_eq!( f.cop_len(), 0 );
     /// ```
     pub fn new() -> Self {
@@ -148,9 +148,9 @@ impl<V> ADfn<V> {
     /// number of variables
     pub fn var_len(&self) -> usize { self.var.n_dom  + self.var.n_dep }
     //
-    // range_len
+    // rng_len
     /// dimension of range space
-    pub fn range_len(&self) -> usize {
+    pub fn rng_len(&self) -> usize {
         debug_assert!( self.rng_index.len() == self.rng_ad_type.len() );
         self.rng_ad_type.len()
     }

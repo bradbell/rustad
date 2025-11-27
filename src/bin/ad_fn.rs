@@ -72,7 +72,7 @@ fn record_normsq_scalar()
         let mut f = normsq_fn::<ScalarV>();
         f_static.swap(&mut f);
         assert_eq!( f_static.var_dom_len(), N_SUM );
-        assert_eq!( f_static.range_len(), 1 );
+        assert_eq!( f_static.rng_len(), 1 );
     } );
 }
 //
@@ -82,7 +82,7 @@ fn record_normsq_num_vec()
         let mut f = normsq_fn::<NumVecV>();
         f_static.swap(&mut f);
         assert_eq!( f_static.var_dom_len(), N_SUM );
-        assert_eq!( f_static.range_len(), 1 );
+        assert_eq!( f_static.rng_len(), 1 );
     } );
 }
 //
