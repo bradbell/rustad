@@ -22,7 +22,7 @@ rev_sumsq_forward_fun; see rev_atom.rs
 z = g(x, y) = 2 * y * (x[0], x[1], ... )^T
 
 TODO: The following change of argument names in callbacks for this example:
-    domain_zero -> domain
+    domain -> domain
     ramge_one   -> range_der
     domain_der  -> domain_der
 */

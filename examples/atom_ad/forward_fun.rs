@@ -20,21 +20,21 @@ use super::{
 //
 // sumsq_forward_fun_value
 pub fn sumsq_forward_fun_value(
-    domain_zero  : &Vec<&V>    ,
+    domain       : &Vec<&V>    ,
     _call_info   : IndexT      ,
     trace        : bool        ,
 ) -> Result< Vec<V>, String >
 {   //
     // var_both, sumsq_zero
     let mut sumsq_zero = V::from(0.0);
-    for j in 0 .. domain_zero.len() {
-        sumsq_zero += &( domain_zero[j] * domain_zero[j] );
+    for j in 0 .. domain.len() {
+        sumsq_zero += &( domain[j] * domain[j] );
     }
     if trace {
         println!("Begin Trace: sumsq_forward_fun_value");
-        print!("domain_zero = [ ");
-        for j in 0 .. domain_zero.len() {
-                print!("{}, ", domain_zero[j]);
+        print!("domain      = [ ");
+        for j in 0 .. domain.len() {
+                print!("{}, ", domain[j]);
         }
         println!("]");
         println!("sumsq_zero = {}", sumsq_zero);
@@ -45,7 +45,7 @@ pub fn sumsq_forward_fun_value(
 //
 // sumsq_forward_fun_ad
 pub fn sumsq_forward_fun_ad(
-    domain_zero  : &Vec<& AD<V> >    ,
+    domain       : &Vec<& AD<V> >    ,
     call_info    : IndexT            ,
     trace        : bool              ,
 ) -> Result< Vec< AD<V> >, String >
@@ -56,22 +56,22 @@ pub fn sumsq_forward_fun_ad(
     );
     //
     // n_domain
-    let n_domain = domain_zero.len();
+    let n_domain = domain.len();
     //
-    // domain_zero_clone
-    let mut domain_zero_clone : Vec< AD<V> > = Vec::with_capacity( n_domain);
+    // domain_clone
+    let mut domain_clone : Vec< AD<V> > = Vec::with_capacity( n_domain);
     for j in 0 .. n_domain {
-        domain_zero_clone.push( (*domain_zero[j]).clone() );
+        domain_clone.push( (*domain[j]).clone() );
     }
     //
     // sumsq_zero
-    let sumsq_zero = call_atom(domain_zero_clone, atom_id, call_info, trace);
+    let sumsq_zero = call_atom(domain_clone, atom_id, call_info, trace);
     //
     if trace {
         println!("Begin Trace: sumsq_forward_fun_value");
-        print!("domain_zero = [ ");
+        print!("domain      = [ ");
         for j in 0 .. n_domain {
-                print!("{}, ", domain_zero[j]);
+                print!("{}, ", domain[j]);
         }
         println!("]");
         println!("sumsq_zero = {:?}", sumsq_zero);

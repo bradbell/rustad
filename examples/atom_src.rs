@@ -72,21 +72,21 @@ fn register_sumsq_atom()-> IndexT {
 // BEGIN atom_src
 // sumsq_forward_fun_value
 pub fn sumsq_forward_fun_value(
-    domain_zero  : &Vec<&V>    ,
+    domain       : &Vec<&V>    ,
     _call_info   : IndexT      ,
     trace        : bool        ,
 ) -> Result< Vec<V>, String >
 {   //
     // sumsq_zero
     let mut sumsq_zero : V =  0.0.into();
-    for j in 0 .. domain_zero.len() {
-        sumsq_zero += &( domain_zero[j] * domain_zero[j] );
+    for j in 0 .. domain.len() {
+        sumsq_zero += &( domain[j] * domain[j] );
     }
     if trace {
         println!("Begin Trace: sumsq_forward_fun_value");
-        print!("domain_zero = [ ");
-        for j in 0 .. domain_zero.len() {
-                print!("{}, ", domain_zero[j]);
+        print!("domain      = [ ");
+        for j in 0 .. domain.len() {
+                print!("{}, ", domain[j]);
         }
         println!("]");
         println!("sumsq_zero = {}", sumsq_zero);

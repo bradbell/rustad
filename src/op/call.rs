@@ -136,8 +136,8 @@ where
     )
 }
 // ----------------------------------------------------------------------
-// domain_zero_value
-fn domain_zero_value<'a, 'b, V>(
+// domain_value
+fn domain_value<'a, 'b, V>(
     dyp_both   : &'a [V]       ,
     var_both   : &'a [V]       ,
     cop        : &'a [V]       ,
@@ -154,24 +154,24 @@ where
     // no_var_both
     let no_var_both = var_both.len() == 1 && var_both[0] == nan_v;
     //
-    let mut domain_zero : Vec<&V> = Vec::with_capacity( n_dom );
+    let mut domain      : Vec<&V> = Vec::with_capacity( n_dom );
     for j_arg in 0 .. n_dom {
         let index   = arg[BEGIN_DOM + j_arg] as usize;
         let ad_type = &arg_type[BEGIN_DOM + j_arg];
         if ad_type.is_constant() {
-            domain_zero.push( &cop[index] );
+            domain.push( &cop[index] );
         } else if ad_type.is_dynamic() {
-            domain_zero.push( &dyp_both[index] );
+            domain.push( &dyp_both[index] );
         } else {
             debug_assert!( ad_type.is_variable() );
             if no_var_both {
-                domain_zero.push( &var_both[0] );
+                domain.push( &var_both[0] );
             } else {
-                domain_zero.push( &var_both[index] );
+                domain.push( &var_both[index] );
             }
         }
     }
-    domain_zero
+    domain
 }
 // ----------------------------------------------------------------------
 // domain_acop
@@ -195,8 +195,8 @@ where
     acop
 }
 // ----------------------------------------------------------------------
-// domain_zero_ad
-fn domain_zero_ad<'a, 'b, V>(
+// domain_ad
+fn domain_ad<'a, 'b, V>(
     dyp_both   : &'a [AD<V>]    ,
     var_both   : &'a [AD<V>]    ,
     acop       : &'a [AD<V>]    ,
@@ -214,26 +214,26 @@ where
         var_both[0].value != var_both[0].value;
     //
     //
-    let mut domain_zero : Vec<& AD<V> > = Vec::with_capacity( n_dom );
+    let mut domain      : Vec<& AD<V> > = Vec::with_capacity( n_dom );
     let mut j_cop : usize = 0;
     for j_arg in 0 .. n_dom {
         let index   = arg[BEGIN_DOM + j_arg] as usize;
         let ad_type = &arg_type[BEGIN_DOM + j_arg];
         if ad_type.is_constant() {
-            domain_zero.push( &acop[j_cop] );
+            domain.push( &acop[j_cop] );
             j_cop += 1;
         } else if ad_type.is_dynamic() {
-            domain_zero.push( &dyp_both[index] );
+            domain.push( &dyp_both[index] );
         } else {
             debug_assert!( ad_type.is_variable() );
             if no_var_both {
-                domain_zero.push( &var_both[0] );
+                domain.push( &var_both[0] );
             } else {
-                domain_zero.push( &var_both[index] );
+                domain.push( &var_both[index] );
             }
         }
     }
-    domain_zero
+    domain
 }
 // ==========================================================================
 // call_forward_dyp
@@ -273,15 +273,15 @@ where
     }
     let forward_fun_value = forward_fun_value.unwrap();
     //
-    // domain_zero
+    // domain
     let nan_v    : V      = f32::NAN.into();
     let var_both : Vec<V> = vec![ nan_v ];
-    let domain_zero = domain_zero_value(
+    let domain      = domain_value(
         dyp_both, &var_both, cop, arg, arg_type, n_dom
     );
     //
     // range_zero
-    let result = forward_fun_value(&domain_zero, call_info, trace );
+    let result = forward_fun_value(&domain, call_info, trace );
     let mut range_zero = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_value error : {}", callback.name, msg);
@@ -342,17 +342,17 @@ where
     }
     let forward_fun_ad = forward_fun_ad.unwrap();
     //
-    // adomain_zero
+    // adomain
     let acop     = domain_acop(cop, arg, arg_type, n_dom);
     let nan_v : V = f32::NAN.into();
     let anan      = ad_from_value( nan_v );
     let avar_both = vec! [ anan ];
-    let adomain_zero = domain_zero_ad(
+    let adomain      = domain_ad(
         adyp_both, &avar_both, &acop, arg, arg_type, n_dom
     );
     //
     // arange_zero
-    let result = forward_fun_ad( &adomain_zero, call_info, trace );
+    let result = forward_fun_ad( &adomain, call_info, trace );
     let mut arange_zero = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_ad error : {}", callback.name, msg);
@@ -417,13 +417,13 @@ where
     }
     let forward_fun_value = forward_fun_value.unwrap();
     //
-    // domain_zero
-    let domain_zero = domain_zero_value(
+    // domain
+    let domain      = domain_value(
         dyp_both, var_both, cop, arg, arg_type, n_dom
     );
     //
     // range_zero
-    let result = forward_fun_value( &domain_zero, call_info, trace );
+    let result = forward_fun_value( &domain, call_info, trace );
     let mut range_zero = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_value error : {}", callback.name, msg);
@@ -485,14 +485,14 @@ where
     }
     let forward_fun_ad = forward_fun_ad.unwrap();
     //
-    // adomain_zero
+    // adomain
     let acop = domain_acop(cop, arg, arg_type, n_dom);
-    let adomain_zero = domain_zero_ad(
+    let adomain      = domain_ad(
         adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
     // arange_zero
-    let result = forward_fun_ad( &adomain_zero, call_info, trace );
+    let result = forward_fun_ad( &adomain, call_info, trace );
     let mut arange_zero = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_ad error : {}", callback.name, msg);
@@ -558,8 +558,8 @@ where
     }
     let forward_der_value  = forward_der_value.unwrap();
     //
-    // domain_zero
-    let domain_zero = domain_zero_value(
+    // domain
+    let domain      = domain_value(
         dyp_both, var_both, cop, arg, arg_type, n_dom
     );
     // domain_der
@@ -575,7 +575,7 @@ where
         }
     }
     // range_der
-    let result = forward_der_value(&domain_zero, domain_der, call_info, trace);
+    let result = forward_der_value(&domain, domain_der, call_info, trace);
     let mut range_der = match result {
         Err(msg) => { panic!(
             "atom {} forward_der_value error : {}", callback.name, msg);
@@ -632,9 +632,9 @@ where
     }
     let forward_der_ad = forward_der_ad.unwrap();
     //
-    // adomain_zero
+    // adomain
     let acop = domain_acop(cop, arg, arg_type, n_dom);
-    let adomain_zero = domain_zero_ad(
+    let adomain      = domain_ad(
         adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
@@ -652,7 +652,7 @@ where
         }
     }
     // arange_der
-    let result = forward_der_ad(&adomain_zero, adomain_der, call_info, trace);
+    let result = forward_der_ad(&adomain, adomain_der, call_info, trace);
     let mut arange_der = match result {
         Err(msg) => { panic!(
             "atom {} forward_der_ad error : {}", callback.name, msg);
@@ -711,8 +711,8 @@ where
     }
     let reverse_der_value = reverse_der_value.unwrap();
     //
-    // domain_zero
-    let domain_zero = domain_zero_value(
+    // domain
+    let domain      = domain_value(
         dyp_both, var_both, cop, arg, arg_type, n_dom
     );
     //
@@ -728,7 +728,7 @@ where
     assert!( 0 < n_dep );
     //
     // domain_der
-    let result = reverse_der_value(&domain_zero, range_der, call_info, trace);
+    let result = reverse_der_value(&domain, range_der, call_info, trace);
     let domain_der = match result {
         Err(msg) => { panic!(
             "atom {} reverse_der_value error : {}", callback.name, msg);
@@ -785,9 +785,9 @@ where
     }
     let reverse_der_ad = reverse_der_ad.unwrap();
     //
-    // adomain_zero
+    // adomain
     let acop = domain_acop(cop, arg, arg_type, n_dom);
-    let adomain_zero = domain_zero_ad(
+    let adomain      = domain_ad(
         adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
@@ -804,7 +804,7 @@ where
     assert!( 0 < n_dep );
     //
     // adomain_der
-    let result = reverse_der_ad(&adomain_zero, arange_der, call_info, trace);
+    let result = reverse_der_ad(&adomain, arange_der, call_info, trace);
     let adomain_der = match result {
         Err(msg) => { panic!(
             "atom {} reverse_der_ad error : {}", callback.name, msg);

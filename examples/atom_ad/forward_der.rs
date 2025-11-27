@@ -20,14 +20,14 @@ use super::{
 //
 // sumsq_forward_der_value
 pub fn sumsq_forward_der_value(
-    domain_zero  : &Vec<&V>    ,
+    domain       : &Vec<&V>    ,
     domain_der   : Vec<&V>     ,
     _call_info   : IndexT      ,
     trace        : bool        ,
 ) -> Result< Vec<V>, String >
 {   //
-    // domain_zero
-    assert_eq!( domain_zero.len(), domain_der.len() );
+    // domain
+    assert_eq!( domain.len(), domain_der.len() );
     //
     // two_v
     let two_v = V::from(2.0);
@@ -35,13 +35,13 @@ pub fn sumsq_forward_der_value(
     // range_der
     let mut range_der = V::from(0.0);
     for j in 0 .. domain_der.len() {
-        range_der += &( &two_v * &( domain_zero[j] * domain_der[j] ) );
+        range_der += &( &two_v * &( domain[j] * domain_der[j] ) );
     }
     if trace {
         println!("Begin Trace: sumsq_forward_der_value");
-        print!("domain_zero = [ ");
-        for j in 0 .. domain_zero.len() {
-                print!("{}, ", domain_zero[j]);
+        print!("domain      = [ ");
+        for j in 0 .. domain.len() {
+                print!("{}, ", domain[j]);
         }
         print!("domain_der = [ ");
         for j in 0 .. domain_der.len() {
@@ -56,14 +56,14 @@ pub fn sumsq_forward_der_value(
 //
 // sumsq_forward_der_ad
 pub fn sumsq_forward_der_ad(
-    domain_zero  : &Vec<& AD<V> >    ,
+    domain       : &Vec<& AD<V> >    ,
     domain_der   : Vec<& AD<V> >     ,
     call_info    : IndexT            ,
     trace        : bool              ,
 ) -> Result< Vec< AD<V> >, String >
 {   //
-    // domain_zero
-    assert_eq!( domain_zero.len(), domain_der.len() );
+    // domain
+    assert_eq!( domain.len(), domain_der.len() );
     //
     // atom_id
     let atom_id = ATOM_ID_VEC.with_borrow( |atom_id_vec|
@@ -71,25 +71,25 @@ pub fn sumsq_forward_der_ad(
     );
     //
     // n_domain
-    let n_domain = domain_zero.len();
+    let n_domain = domain.len();
     //
-    // for_domain_zero
-    let mut for_domain_zero : Vec< AD<V> > = Vec::with_capacity(2 * n_domain);
+    // for_domain
+    let mut for_domain      : Vec< AD<V> > = Vec::with_capacity(2 * n_domain);
     for j in 0 .. n_domain {
-        for_domain_zero.push( (*domain_zero[j]).clone() );
+        for_domain.push( (*domain[j]).clone() );
     }
     for j in 0 .. n_domain {
-        for_domain_zero.push( (*domain_der[j]).clone() );
+        for_domain.push( (*domain_der[j]).clone() );
     }
     //
     // range_der
-    let range_der = call_atom(for_domain_zero, atom_id, call_info, trace);
+    let range_der = call_atom(for_domain, atom_id, call_info, trace);
     //
     if trace {
         println!("Begin Trace: sumsq_forward_der_ad");
-        print!("domain_zero = [ ");
-        for j in 0 .. domain_zero.len() {
-                print!("{}, ", domain_zero[j]);
+        print!("domain      = [ ");
+        for j in 0 .. domain.len() {
+                print!("{}, ", domain[j]);
         }
         print!("domain_der = [ ");
         for j in 0 .. domain_der.len() {

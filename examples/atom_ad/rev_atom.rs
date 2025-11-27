@@ -25,18 +25,18 @@ use super::V;
 // rev_sumsq_forward_fun_value
 // z = g(x,y) = 2 * y * ( x[0], x[1], ... )
 fn rev_sumsq_forward_fun_value(
-    domain_zero : &Vec<&V>  ,
+    domain      : &Vec<&V>  ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
 ) -> Result< Vec<V>, String >
 {   //
     // nx
-    assert!( domain_zero.len() > 1 );
-    let nx = domain_zero.len() - 1;
+    assert!( domain.len() > 1 );
+    let nx = domain.len() - 1;
     //
     // x, y
-    let x =  &domain_zero[0 .. nx];
-    let y =  domain_zero[nx];
+    let x =  &domain[0 .. nx];
+    let y =  domain[nx];
     //
     // two_v
     let two_v : V = V::from(2.0);
@@ -52,19 +52,19 @@ fn rev_sumsq_forward_fun_value(
 //
 // rev_sumsq_forward_der_value
 fn rev_sumsq_forward_der_value(
-    domain_zero : &Vec<&V>  ,
+    domain      : &Vec<&V>  ,
     domain_der  : Vec<&V>   ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
 ) -> Result< Vec<V>, String >
 {   //
     // nx
-    assert!( domain_zero.len() > 1 );
-    let nx = domain_zero.len() - 1;
+    assert!( domain.len() > 1 );
+    let nx = domain.len() - 1;
     //
     // x, y
-    let x =  &domain_zero[0 .. nx];
-    let y =  domain_zero[nx];
+    let x =  &domain[0 .. nx];
+    let y =  domain[nx];
     //
     // two_v
     let two_v   : V = V::from(2.0);
@@ -86,19 +86,19 @@ fn rev_sumsq_forward_der_value(
 //
 // rev_sumsq_reverse_der_value
 fn rev_sumsq_reverse_der_value(
-    domain_zero : &Vec<&V>  ,
+    domain      : &Vec<&V>  ,
     range_der   : Vec<&V>   ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
 ) -> Result< Vec<V>, String >
 {   //
     // nx
-    assert_eq!( domain_zero.len(), range_der.len() + 1 );
+    assert_eq!( domain.len(), range_der.len() + 1 );
     let nx = range_der.len();
     //
     // x, y
-    let x =  &domain_zero[0 .. nx];
-    let y =  domain_zero[nx];
+    let x =  &domain[0 .. nx];
+    let y =  domain[nx];
     //
     // two_v
     let two_v   : V = V::from(2.0);

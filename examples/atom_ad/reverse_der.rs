@@ -20,7 +20,7 @@ use super::{
 //
 // sumsq_reverse_der_value
 pub fn sumsq_reverse_der_value(
-    domain_zero  : &Vec<&V>    ,
+    domain       : &Vec<&V>    ,
     range_der    : Vec<&V>     ,
     _call_info   : IndexT      ,
     trace        : bool        ,
@@ -33,9 +33,9 @@ pub fn sumsq_reverse_der_value(
     let two_v = V::from(2.0);
     //
     // domain_der
-    let mut domain_der : Vec<V> = Vec::with_capacity( domain_zero.len() );
-    for j in 0 .. domain_zero.len() {
-        domain_der.push( &two_v * &( domain_zero[j] * range_der[0] ) );
+    let mut domain_der : Vec<V> = Vec::with_capacity( domain.len() );
+    for j in 0 .. domain.len() {
+        domain_der.push( &two_v * &( domain[j] * range_der[0] ) );
     }
     if trace {
         println!("Begin Trace: sumsq_reverse_der_value");
@@ -52,7 +52,7 @@ pub fn sumsq_reverse_der_value(
 //
 // sumsq_reverse_der_ad
 pub fn sumsq_reverse_der_ad(
-    domain_zero  : &Vec<& AD<V> >    ,
+    domain       : &Vec<& AD<V> >    ,
     range_der    : Vec<& AD<V> >     ,
     call_info    : IndexT            ,
     trace        : bool              ,
@@ -67,23 +67,23 @@ pub fn sumsq_reverse_der_ad(
     );
     //
     // n_domain
-    let n_domain = domain_zero.len();
+    let n_domain = domain.len();
     //
-    // rev_domain_zero
-    let mut rev_domain_zero : Vec< AD<V> > = Vec::with_capacity(n_domain + 1);
-    for j in 0 .. domain_zero.len() {
-        rev_domain_zero.push( (*domain_zero[j]).clone() );
+    // rev_domain
+    let mut rev_domain      : Vec< AD<V> > = Vec::with_capacity(n_domain + 1);
+    for j in 0 .. domain.len() {
+        rev_domain.push( (*domain[j]).clone() );
     }
-    rev_domain_zero.push( (*range_der[0]).clone() );
+    rev_domain.push( (*range_der[0]).clone() );
     //
     // domain_der
-    let domain_der = call_atom(rev_domain_zero, atom_id, call_info, trace);
+    let domain_der = call_atom(rev_domain, atom_id, call_info, trace);
     //
     if trace {
         println!("Begin Trace: sumsq_reverse_der_ad");
-        print!("domain_zero = [ ");
+        print!("domain      = [ ");
         for j in 0 .. n_domain {
-                print!("{}, ", domain_zero[j]);
+                print!("{}, ", domain[j]);
         }
         println!("]");
         println!("range_der = [ {} ]", range_der[0]);
