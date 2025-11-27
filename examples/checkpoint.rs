@@ -137,7 +137,7 @@ fn checkpoint_reverse_der_value(
 // checkpoint_rev_depend
 fn checkpoint_rev_depend(
     depend       : &mut Vec<usize> ,
-    range_index  : usize           ,
+    rng_index    : usize           ,
     _n_dom       : usize           ,
     call_info    : IndexT          ,
     trace        : bool            ,
@@ -157,7 +157,7 @@ fn checkpoint_rev_depend(
     //
     // depend
     for [i, j] in pattern.iter() {
-        if *i == range_index {
+        if *i == rng_index {
             depend.push( *j );
         }
     }

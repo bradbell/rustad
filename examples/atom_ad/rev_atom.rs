@@ -121,7 +121,7 @@ fn rev_sumsq_reverse_der_value(
 // sumsq_rev_depend
 fn rev_sumsq_rev_depend(
     depend       : &mut Vec<usize> ,
-    range_index  : usize           ,
+    rng_index    : usize           ,
     n_dom        : usize           ,
     _call_info   : IndexT          ,
     _trace       : bool            ,
@@ -133,10 +133,10 @@ fn rev_sumsq_rev_depend(
     let nx = n_dom - 1;
     //
     let mut error_msg = String::new();
-    if nx <= range_index {
-        error_msg += "rev_sumsq_rev_depend: nx <= range_index";
+    if nx <= rng_index {
+        error_msg += "rev_sumsq_rev_depend: nx <= rng_index";
     } else {
-        depend.push( range_index );
+        depend.push( rng_index );
         depend.push( nx );
     }
     error_msg

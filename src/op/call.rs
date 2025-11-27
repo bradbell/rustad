@@ -1175,11 +1175,11 @@ where
         callback,
     ) = extract_call_info::<V>(arg, flag_all);
     //
-    // range_index
-    let range_index = arg[BEGIN_DOM + n_dom + dep_index] as usize;
+    // rng_index
+    let rng_index   = arg[BEGIN_DOM + n_dom + dep_index] as usize;
     //
     // constants are never dependent values
-    assert_ne!(res_ad_type[ range_index ], ADType::ConstantP);
+    assert_ne!(res_ad_type[ rng_index ], ADType::ConstantP);
     //
     // rev_depend
     let rev_depend = &callback.rev_depend;
@@ -1193,7 +1193,7 @@ where
     //
     // atom_depend
     let error_msg = rev_depend(
-        atom_depend, range_index, n_dom, call_info, trace
+        atom_depend, rng_index, n_dom, call_info, trace
     );
     if error_msg != "" {
         panic!(
@@ -1206,11 +1206,11 @@ where
         if n_dom <= atom_depend[k] {
             panic!(
                 "atom {} rev_depend : \
-                range_index = {},
+                rng_index   = {},
                 n_dom = {}, \
                 k = {} \
                 depend[k] = {} >= n_dom",
-                callback.name, range_index, n_dom, k, atom_depend[k]
+                callback.name, rng_index, n_dom, k, atom_depend[k]
            );
         }
         let arg_index = BEGIN_DOM + atom_depend[k];

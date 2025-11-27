@@ -216,7 +216,7 @@ where
             "   let mut range : Vec<V> = " +
                      "Vec::with_capacity(" + &n_range.to_string() + ");\n";
         for i in 0 .. n_range {
-            let index = self.range_index[i] as usize;
+            let index = self.rng_index[i] as usize;
             if self.range_ad_type[i].is_variable() {
                 if index < self.var.n_dom {
                     let i_str = index.to_string();

@@ -159,7 +159,7 @@ macro_rules! reverse_der {
             for i in (0 .. self.range_ad_type.len()).rev() {
                 let y_i = mut_range_der.pop().unwrap();
                 if self.range_ad_type[i].is_variable() {
-                    let index = self.range_index[i] as usize;
+                    let index = self.rng_index[i] as usize;
                     var_der[index] = y_i;
                 }
             }
@@ -181,7 +181,7 @@ macro_rules! reverse_der {
                 println!( "var_index, range_der" );
                 for i in 0 .. self.range_ad_type.len() {
                     if self.range_ad_type[i].is_variable() {
-                        let index = self.range_index[i] as usize;
+                        let index = self.rng_index[i] as usize;
                         println!( "{}, {}", index,  var_der[index] );
                     }
                 }

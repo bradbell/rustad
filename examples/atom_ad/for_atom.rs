@@ -125,15 +125,15 @@ fn for_sumsq_reverse_der_value(
 // for_sumsq_rev_depend
 fn for_sumsq_rev_depend(
     depend       : &mut Vec<usize> ,
-    range_index  : usize           ,
+    rng_index    : usize           ,
     n_dom        : usize           ,
     _call_info   : IndexT          ,
     _trace       : bool            ,
 ) -> String {
     assert_eq!( depend.len(), 0 );
     let mut error_msg = String::new();
-    if 0 < range_index {
-        error_msg += "for_sumsq_rev_depend: 0 < range_index";
+    if 0 < rng_index {
+        error_msg += "for_sumsq_rev_depend: 0 < rng_index";
     } else {
         for j in 0 .. n_dom {
             depend.push( j );

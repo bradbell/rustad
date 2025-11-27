@@ -84,12 +84,12 @@ pub struct ADfn<V> {
     /// variable (dynamic parameter) {constant parameter}.
     pub(crate) range_ad_type : Vec<ADType>,
     //
-    // range_index
+    // rng_index
     /// The length of this vector is also the dimension of the range space.
     /// If range_ad_type\[i\] is Variable (DynamicP) {ConstantP},
-    /// range_index\[i]\ is a variable index
+    /// rng_index\[i]\ is a variable index
     /// (dynamic parameter index) {constant parameter index} .
-    pub(crate) range_index         : Vec<IndexT>,
+    pub(crate) rng_index           : Vec<IndexT>,
     //
     // cop
     /// is the vector of constant parameters used by both operation sequences.
@@ -119,7 +119,7 @@ impl<V> ADfn<V> {
             dyp              : OpSequence::new(),
             var              : OpSequence::new(),
             range_ad_type    : Vec::new() ,
-            range_index      : Vec::new() ,
+            rng_index        : Vec::new() ,
             cop              : Vec::new() ,
         }
     }
@@ -151,7 +151,7 @@ impl<V> ADfn<V> {
     // range_len
     /// dimension of range space
     pub fn range_len(&self) -> usize {
-        debug_assert!( self.range_index.len() == self.range_ad_type.len() );
+        debug_assert!( self.rng_index.len() == self.range_ad_type.len() );
         self.range_ad_type.len()
     }
     //
@@ -165,6 +165,6 @@ impl<V> ADfn<V> {
         std::mem::swap( &mut self.var,           &mut other.var );
         std::mem::swap( &mut self.cop,           &mut other.cop );
         std::mem::swap( &mut self.range_ad_type, &mut other.range_ad_type );
-        std::mem::swap( &mut self.range_index,   &mut other.range_index );
+        std::mem::swap( &mut self.rng_index,   &mut other.rng_index );
     }
 }

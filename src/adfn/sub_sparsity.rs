@@ -122,9 +122,9 @@ where
         // op_info_vec
         let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
         //
-        // range_ad_type, range_index, n_range
+        // range_ad_type, rng_index, n_range
         let range_ad_type     = &self.range_ad_type;
-        let range_index       = &self.range_index;
+        let rng_index         = &self.rng_index;
         let n_range           = range_ad_type.len();
         //
         // var_ : n_dom, n_dep, id_seq, arg_seq, arg_all, arg_type_all.
@@ -180,10 +180,10 @@ where
             var_index_stack.clear();
             dyp_index_stack.clear();
             if range_ad_type[row].is_variable() {
-                var_index_stack.push( range_index[row] );
+                var_index_stack.push( rng_index[row] );
             } else {
                 if compute_dyp && range_ad_type[row].is_dynamic() {
-                    dyp_index_stack.push( range_index[row] );
+                    dyp_index_stack.push( rng_index[row] );
                 }
             }
             //

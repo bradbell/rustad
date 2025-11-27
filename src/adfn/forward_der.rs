@@ -212,9 +212,9 @@ macro_rules! forward_der {
                 }
             }
             if trace {
-                println!( "range_index, var_index, con_index" );
+                println!( "rng_index, var_index, con_index" );
                 for i in 0 .. self.range_ad_type.len() {
-                    let index = self.range_index[i] as usize;
+                    let index = self.rng_index[i] as usize;
                     if self.range_ad_type[i].is_variable() {
                         println!( "{}, {}, ----", i, index);
                     } else {
@@ -225,7 +225,7 @@ macro_rules! forward_der {
             }
             let mut range_one : Vec<$E> = Vec::new();
             for i in 0 .. self.range_ad_type.len() {
-                let index = self.range_index[i] as usize;
+                let index = self.rng_index[i] as usize;
                 if self.range_ad_type[i].is_variable() {
                     range_one.push( var_der[index].clone() );
                 } else {

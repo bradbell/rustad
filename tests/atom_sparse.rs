@@ -62,7 +62,7 @@ pub fn h_forward_fun_value(
 // h_rev_depend
 pub fn h_rev_depend(
     depend        : &mut Vec<usize> ,
-    range_index   : usize           ,
+    rng_index     : usize           ,
     n_dom         : usize           ,
     _call_info    : IndexT          ,
     _trace        : bool            ,
@@ -70,11 +70,11 @@ pub fn h_rev_depend(
 {   assert_eq!( depend.len(), 0 );
     assert_eq!( n_dom, 4 );
     let mut error_msg = String::new();
-    match range_index {
+    match rng_index {
         0 => { depend.push(0); depend.push(1); },
         1 => { depend.push(1); depend.push(2); },
         2 => { depend.push(3); },
-        _ => { error_msg += "h_rev_depend: 2 < range_index"; },
+        _ => { error_msg += "h_rev_depend: 2 < rng_index"; },
     }
     //
     error_msg

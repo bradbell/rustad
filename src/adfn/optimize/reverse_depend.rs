@@ -45,12 +45,12 @@ where
         let mut dyp_depend  : Vec<IndexT> = Vec::new();
         let mut var_depend  : Vec<IndexT> = Vec::new();
         //
-        // n_cop, n_dyp, n_var, range_ad_type, range_index
+        // n_cop, n_dyp, n_var, range_ad_type, rng_index
         let n_cop         = self.cop_len();
         let n_dyp         = self.dyp_len();
         let n_var         = self.var_len();
         let range_ad_type = &self.range_ad_type;
-        let range_index   = &self.range_index;
+        let rng_index     = &self.rng_index;
         //
         // depend
         let mut depend = optimize::Depend {
@@ -64,12 +64,12 @@ where
             println!(
                 "n_cop = {}, n_dyp = {}, n_var = {}", n_cop, n_dyp, n_var
             );
-            println!( "range_index, type_index, type" );
+            println!( "rng_index, type_index, type" );
         }
         //
         // depend
         for i in 0 .. self.range_ad_type.len() {
-            let index = range_index[i] as usize;
+            let index = rng_index[i] as usize;
             match range_ad_type[i] {
                 ADType::ConstantP => { depend.cop[index] = true; },
                 ADType::DynamicP  => { depend.dyp[index] = true; },
@@ -201,14 +201,14 @@ mod tests {
     // eye_rev_depend
     fn eye_rev_depend(
         depend       : &mut Vec<usize> ,
-        range_index  : usize           ,
+        rng_index    : usize           ,
         n_dom        : usize           ,
         _call_info   : IndexT          ,
         _trace       : bool            ,
     ) -> String
     {   assert_eq!( depend.len(), 0 );
-        assert!( range_index < n_dom );
-        depend.push(range_index);
+        assert!( rng_index < n_dom );
+        depend.push(rng_index);
         //
         let error_msg = String::new();
         error_msg

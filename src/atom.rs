@@ -69,7 +69,7 @@ pub fn doc_common_arguments() {}
 ///
 /// * Syntax :
 /// ```text
-///     error_msg = rev_depend(&mut depend, range_index, n_dom, call_info, trace)
+///     error_msg = rev_depend(&mut depend, rng_index, n_dom, call_info, trace)
 /// ```
 ///
 /// * rev_depend :
@@ -81,7 +81,7 @@ pub fn doc_common_arguments() {}
 /// Upon return, it contains the domain index values that the specified
 /// range index value depends on.
 ///
-/// * range_index :
+/// * rng_index   :
 /// is the range index that that the dependencies are computed for.
 ///
 /// * n_dom :
@@ -97,7 +97,7 @@ pub fn doc_common_arguments() {}
 ///
 pub type AtomRevDepend = fn(
     _depend          : &mut Vec<usize>   ,
-    _range_index     : usize             ,
+    _rng_index       : usize             ,
     _n_dom           : usize             ,
     _call_info       : IndexT            ,
     _trace           : bool              ,
@@ -429,10 +429,10 @@ where
     // range_ad_type
     let mut range_ad_type : Vec<ADType> = Vec::with_capacity(n_res);
     let mut depend        : Vec<usize>  = Vec::new();
-    for range_index in 0 .. n_res {
+    for rng_index in 0 .. n_res {
         depend.clear();
         let error_msg = rev_depend(
-            &mut depend, range_index, n_dom, call_info, trace
+            &mut depend, rng_index, n_dom, call_info, trace
         );
         if error_msg.len() != 0 {
             panic!( "atom {} rev_depend error_msg : {}", name, error_msg);
@@ -443,11 +443,11 @@ where
             if  n_dom <= j {
                 panic!(
                     "atom {} rev_depend : \
-                    range_index = {},
+                    rng_index   = {},
                     n_dom = {}, \
                     k = {} \
                     depend[k] = {} >= n_dom",
-                    name, range_index, n_dom, k, depend[k]
+                    name, rng_index, n_dom, k, depend[k]
                 );
             }
             ad_type = max( ad_type, domain_ad_type[j].clone() );

@@ -225,10 +225,10 @@ macro_rules! forward_var {
             //
             // range
             if trace {
-                println!( "range_index, ad_type, index" );
+                println!( "rng_index, ad_type, index" );
                 for i in 0 .. n_range {
                     let ad_type = self.range_ad_type[i].clone();
-                    let index   = self.range_index[i] as usize;
+                    let index   = self.rng_index[i] as usize;
                     println!( "{}, {:?}, {}", i, ad_type, index);
                 }
                 println!( "End Trace: forward_var" );
@@ -236,7 +236,7 @@ macro_rules! forward_var {
             let mut range : Vec<$E> = Vec::with_capacity(n_range);
             for i in 0 .. n_range {
                 let ad_type = self.range_ad_type[i].clone();
-                let index   = self.range_index[i] as usize;
+                let index   = self.rng_index[i] as usize;
                 match ad_type {
                     ADType::Variable =>
                         range.push( var_both[index].clone() )
