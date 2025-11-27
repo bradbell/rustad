@@ -14,7 +14,7 @@
 //! | 0        | Index that identifies the atomic function; i.e., atom_id |
 //! | 1        | Extra information about this call; i.e. call_info        |
 //! | 2        | Domain space dimension for function being called (n_dom) |
-//! | 3        | Number of range components for this call         (n_res) |
+//! | 3        | Number of range components for this call         (n_rng) |
 //! | 4        | Number of dependent results for this call        (n_dep) |
 //! | 5        | Index in flag_all of first flag for this operator        |
 //! | 5+1      | Variable, dynamic, or constant index for first call argument  |
@@ -32,7 +32,7 @@
 //! | 0        | is True or false depending on trace for this call        |
 //! | 1        | is ADtype for first result of this call                  |
 //! | ...      | ...                                                      |
-//! | n_res    | is ADtype for last result of this call                   |
+//! | n_rng    | is ADtype for last result of this call                   |
 //!
 //! * CALL_RES_OP
 //! The operation index for a CALL_OP operator, corresponds to the first
@@ -83,29 +83,29 @@ fn extract_call_info<'a, V>(
 ) -> (
     IndexT           , // call_info
     usize            , // n_dom
-    usize            , // n_res
+    usize            , // n_rng
     usize            , // n_dep
     bool             , // trace
-    &'a [ADType]     , // res_ad_type
-    &'a [IndexT]     , // dep2res
+    &'a [ADType]     , // rng_ad_type
+    &'a [IndexT]     , // dep2rng
     AtomCallback<V>  , // callback
 )
 where
     V               : AtomInfoVec,
     AtomCallback<V> : Clone,
 {
-    // atom_id, call_info, n_dom, n_res,
+    // atom_id, call_info, n_dom, n_rng,
     let atom_id      = arg[0] as usize;
     let call_info    = arg[1];
     let n_dom        = arg[2] as usize;
-    let n_res        = arg[3] as usize;
+    let n_rng        = arg[3] as usize;
     let n_dep        = arg[4] as usize;
     let start        = arg[5] as usize;
     let trace        = flag_all[start].is_true();
     let start        = start + 1;
-    let res_ad_type  = &flag_all[start .. start+n_res];
+    let rng_ad_type  = &flag_all[start .. start+n_rng];
     let start        = BEGIN_DOM + n_dom;
-    let dep2res      = &arg[start .. start + n_dep];
+    let dep2rng      = &arg[start .. start + n_dep];
     //
     // callback
     let callback : AtomCallback<V>;
@@ -126,11 +126,11 @@ where
     (
         call_info,
         n_dom,
-        n_res,
+        n_rng,
         n_dep,
         trace,
-        res_ad_type,
-        dep2res,
+        rng_ad_type,
+        dep2rng,
         callback,
     )
 }
@@ -254,11 +254,11 @@ where
     let (
         call_info,
         n_dom,
-        n_res,
+        n_rng,
         _n_dep,
         trace,
-        res_ad_type,
-        _dep2res,
+        rng_ad_type,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -288,19 +288,19 @@ where
         Ok(range) => range,
     };
     assert_eq!(
-        n_res,
+        n_rng,
         range_zero.len(),
         "atom {} forward_fun_value return length: expected {}, found {}",
         callback.name,
-        n_res,
+        n_rng,
         range_zero.len(),
     );
     //
     // dyp_both
     let mut j_res = 0;
     range_zero.reverse();
-    for i_res in 0 .. n_res {
-        let ad_type_i = &res_ad_type[i_res];
+    for i_res in 0 .. n_rng {
+        let ad_type_i = &rng_ad_type[i_res];
         let range_i   = range_zero.pop();
         debug_assert!( range_i.is_some() );
         if ad_type_i.is_dynamic() {
@@ -330,11 +330,11 @@ where
     let (
         call_info,
         n_dom,
-        n_res,
+        n_rng,
         _n_dep,
         trace,
-        res_ad_type,
-        _dep2res,
+        rng_ad_type,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -366,19 +366,19 @@ where
         Ok(range) => range,
     };
     assert_eq!(
-        n_res,
+        n_rng,
         arange_zero.len(),
         "atom {} forward_fun_ad return length: expected {}, found {}",
         callback.name,
-        n_res,
+        n_rng,
         arange_zero.len(),
     );
     //
     // avar_both
     let mut j_res = 0;
     arange_zero.reverse();
-    for i_res in 0 .. n_res {
-        let ad_type_i = &res_ad_type[i_res];
+    for i_res in 0 .. n_rng {
+        let ad_type_i = &rng_ad_type[i_res];
         let arange_i  = arange_zero.pop();
         debug_assert!( arange_i.is_some() );
         if ad_type_i.is_dynamic() {
@@ -412,11 +412,11 @@ where
     let (
         call_info,
         n_dom,
-        n_res,
+        n_rng,
         _n_dep,
         trace,
-        res_ad_type,
-        _dep2res,
+        rng_ad_type,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -444,19 +444,19 @@ where
         Ok(range) => range,
     };
     assert_eq!(
-        n_res,
+        n_rng,
         range_zero.len(),
         "atom {} forward_fun_value return length: expected {}, found {}",
         callback.name,
-        n_res,
+        n_rng,
         range_zero.len(),
     );
     //
     // var_both
     let mut j_res = 0;
     range_zero.reverse();
-    for i_res in 0 .. n_res {
-        let ad_type_i = &res_ad_type[i_res];
+    for i_res in 0 .. n_rng {
+        let ad_type_i = &rng_ad_type[i_res];
         let range_i   = range_zero.pop();
         debug_assert!( range_i.is_some() );
         if ad_type_i.is_variable() {
@@ -487,11 +487,11 @@ where
     let (
         call_info,
         n_dom,
-        n_res,
+        n_rng,
         _n_dep,
         trace,
-        res_ad_type,
-        _dep2res,
+        rng_ad_type,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -520,19 +520,19 @@ where
         Ok(range) => range,
     };
     assert_eq!(
-        n_res,
+        n_rng,
         arange_zero.len(),
         "atom {} forward_fun_ad return length: expected {}, found {}",
         callback.name,
-        n_res,
+        n_rng,
         arange_zero.len(),
     );
     //
     // avar_both
     let mut j_res = 0;
     arange_zero.reverse();
-    for i_res in 0 .. n_res {
-        let ad_type_i = &res_ad_type[i_res];
+    for i_res in 0 .. n_rng {
+        let ad_type_i = &rng_ad_type[i_res];
         let arange_i  = arange_zero.pop();
         debug_assert!( arange_i.is_some() );
         if ad_type_i.is_variable() {
@@ -567,11 +567,11 @@ where
     let (
         call_info,
         n_dom,
-        n_res,
+        n_rng,
         _n_dep,
         trace,
-        res_ad_type,
-        _dep2res,
+        rng_ad_type,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -609,15 +609,15 @@ where
         },
         Ok(range) => range,
     };
-    assert_eq!( range_one.len(), n_res);
+    assert_eq!( range_one.len(), n_rng);
     //
     // var_der
     let mut j_res = 0;
     range_one.reverse();
-    for i_res in 0 .. n_res {
+    for i_res in 0 .. n_rng {
         let range_i = range_one.pop();
         debug_assert!( range_i.is_some() );
-        if res_ad_type[i_res].is_variable() {
+        if rng_ad_type[i_res].is_variable() {
             var_der[res + j_res] = range_i.unwrap();
             j_res += 1;
         }
@@ -647,11 +647,11 @@ where
     let (
         call_info,
         n_dom,
-        n_res,
+        n_rng,
         _n_dep,
         trace,
-        res_ad_type,
-        _dep2res,
+        rng_ad_type,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -692,15 +692,15 @@ where
         },
         Ok(range) => range,
     };
-    assert_eq!( arange_der.len(), n_res);
+    assert_eq!( arange_der.len(), n_rng);
     //
     // avar_der
     let mut j_res = 0;
     arange_der.reverse();
-    for i_res in 0 .. n_res {
+    for i_res in 0 .. n_rng {
         let arange_i = arange_der.pop();
         debug_assert!( arange_i.is_some() );
-        if res_ad_type[i_res].is_variable() {
+        if rng_ad_type[i_res].is_variable() {
             avar_der[res + j_res] = arange_i.unwrap();
             j_res += 1;
         }
@@ -732,11 +732,11 @@ where
     let (
         call_info,
         n_dom,
-        n_res,
+        n_rng,
         _n_dep,
         trace,
-        res_ad_type,
-        _dep2res,
+        rng_ad_type,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -757,10 +757,10 @@ where
     //
     // ange_one
     let zero_v : V = 0f32.into();
-    let mut range_one : Vec<&V> = Vec::with_capacity( n_res );
+    let mut range_one : Vec<&V> = Vec::with_capacity( n_rng );
     let mut j_res = 0;
-    for i_res in 0 .. n_res {
-        if res_ad_type[i_res].is_variable() {
+    for i_res in 0 .. n_rng {
+        if rng_ad_type[i_res].is_variable() {
             range_one.push( &var_der[res + j_res] );
             j_res += 1;
         } else {
@@ -811,11 +811,11 @@ where
     let (
         call_info,
         n_dom,
-        n_res,
+        n_rng,
         _n_dep,
         trace,
-        res_ad_type,
-        _dep2res,
+        rng_ad_type,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -838,10 +838,10 @@ where
     // arange_one
     let zero_v : V    = 0f32.into();
     let azero         = ad_from_value(zero_v);
-    let mut arange_one : Vec<& AD<V>> = Vec::with_capacity( n_res );
+    let mut arange_one : Vec<& AD<V>> = Vec::with_capacity( n_rng );
     let mut j_res = 0;
-    for i_res in 0 .. n_res {
-        if res_ad_type[i_res].is_variable() {
+    for i_res in 0 .. n_rng {
+        if rng_ad_type[i_res].is_variable() {
             arange_one.push( &avar_der[res + j_res] );
             j_res += 1;
         } else {
@@ -946,11 +946,11 @@ where
     let (
         call_info,
         call_n_dom,
-        n_res,
+        n_rng,
         n_dep,
         trace,
-        res_ad_type,
-        _dep2res,
+        rng_ad_type,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -1023,8 +1023,8 @@ where
         "   // " + res_name + "\n" +
         "   call_range.reverse();\n";
     let mut j_res = 0;
-    for i_res in 0 .. n_res {
-        if res_ad_type[i_res] == res_type {
+    for i_res in 0 .. n_rng {
+        if rng_ad_type[i_res] == res_type {
             let j_dep = res_dep + j_res;
             src = src + "   " +
                 &format!("{res_name}[{j_dep}] = call_range.pop().unwrap();\n");
@@ -1167,11 +1167,11 @@ where
     let (
         call_info,
         n_dom,
-        _n_res,
+        _n_rng,
         _n_dep,
         trace,
-        res_ad_type,
-        _dep2res,
+        rng_ad_type,
+        _dep2rng,
         callback,
     ) = extract_call_info::<V>(arg, flag_all);
     //
@@ -1179,7 +1179,7 @@ where
     let rng_index   = arg[BEGIN_DOM + n_dom + dep_index] as usize;
     //
     // constants are never dependent values
-    assert_ne!(res_ad_type[ rng_index ], ADType::ConstantP);
+    assert_ne!(rng_ad_type[ rng_index ], ADType::ConstantP);
     //
     // rev_depend
     let rev_depend = &callback.rev_depend;
