@@ -24,7 +24,7 @@ z = g(x, y) = 2 * y * (x[0], x[1], ... )^T
 TODO: The following change of argument names in callbacks for this example:
     domain_zero -> domain
     ramge_one   -> range_der
-    domain_one  -> domain_der
+    domain_der  -> domain_der
 */
 use std::cell::RefCell;
 //

@@ -562,32 +562,32 @@ where
     let domain_zero = domain_zero_value(
         dyp_both, var_both, cop, arg, arg_type, n_dom
     );
-    // domain_one
+    // domain_der
     let zero_v : V = 0f32.into();
-    let mut domain_one : Vec<&V> = Vec::with_capacity( n_dom );
+    let mut domain_der : Vec<&V> = Vec::with_capacity( n_dom );
     for i_dom in 0 .. n_dom {
         let index   = arg[BEGIN_DOM + i_dom] as usize;
         let ad_type = arg_type[BEGIN_DOM + i_dom].clone();
         if ad_type.is_variable() {
-            domain_one.push( &var_der[index] );
+            domain_der.push( &var_der[index] );
         } else {
-            domain_one.push( &zero_v );
+            domain_der.push( &zero_v );
         }
     }
-    // range_one
-    let result = forward_der_value(&domain_zero, domain_one, call_info, trace);
-    let mut range_one = match result {
+    // range_der
+    let result = forward_der_value(&domain_zero, domain_der, call_info, trace);
+    let mut range_der = match result {
         Err(msg) => { panic!(
             "atom {} forward_der_value error : {}", callback.name, msg);
         },
         Ok(range) => range,
     };
-    assert_eq!( range_one.len(), n_rng);
+    assert_eq!( range_der.len(), n_rng);
     //
     // var_der
     for i_dep in 0 .. n_dep {
         let rng_index = dep2rng[i_dep] as usize;
-        swap( &mut var_der[res + i_dep], &mut range_one[rng_index] );
+        swap( &mut var_der[res + i_dep], &mut range_der[rng_index] );
     }
     // There must be at least one variable result,
     // or this call would not be in the variable operation sequence:
@@ -716,33 +716,33 @@ where
         dyp_both, var_both, cop, arg, arg_type, n_dom
     );
     //
-    // range_one
+    // range_der
     let zero_v : V = 0f32.into();
-    let mut range_one : Vec<&V> = vec![ &zero_v ; n_rng];
+    let mut range_der : Vec<&V> = vec![ &zero_v ; n_rng];
     for i_dep in 0 .. n_dep {
         let rng_index = dep2rng[i_dep] as usize;
-        range_one[rng_index] = &var_der[res + i_dep];
+        range_der[rng_index] = &var_der[res + i_dep];
     }
     // There must be at least one variable result,
     // or this call would not be in the variable operation sequence:
     assert!( 0 < n_dep );
     //
-    // domain_one
-    let result = reverse_der_value(&domain_zero, range_one, call_info, trace);
-    let domain_one = match result {
+    // domain_der
+    let result = reverse_der_value(&domain_zero, range_der, call_info, trace);
+    let domain_der = match result {
         Err(msg) => { panic!(
             "atom {} reverse_der_value error : {}", callback.name, msg);
         },
         Ok(domain) => domain,
     };
-    assert_eq!( domain_one.len(), n_dom);
+    assert_eq!( domain_der.len(), n_dom);
     //
     // var_der
     for i_arg in 0 .. n_dom {
         let index    = arg[BEGIN_DOM + i_arg] as usize;
         let ad_type  = arg_type[BEGIN_DOM + i_arg].clone();
         if ad_type.is_variable() {
-            var_der[index] += &domain_one[i_arg];
+            var_der[index] += &domain_der[i_arg];
         }
     }
 }
@@ -791,34 +791,34 @@ where
         adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
-    // arange_one
+    // arange_der
     let zero_v : V = 0f32.into();
     let azero      = ad_from_value(zero_v);
-    let mut arange_one : Vec<& AD<V> > = vec![ &azero ; n_rng];
+    let mut arange_der : Vec<& AD<V> > = vec![ &azero ; n_rng];
     for i_dep in 0 .. n_dep {
         let rng_index = dep2rng[i_dep] as usize;
-        arange_one[rng_index] = &avar_der[res + i_dep];
+        arange_der[rng_index] = &avar_der[res + i_dep];
     }
     // There must be at least one variable result,
     // or this call would not be in the variable operation sequence:
     assert!( 0 < n_dep );
     //
-    // adomain_one
-    let result = reverse_der_ad(&adomain_zero, arange_one, call_info, trace);
-    let adomain_one = match result {
+    // adomain_der
+    let result = reverse_der_ad(&adomain_zero, arange_der, call_info, trace);
+    let adomain_der = match result {
         Err(msg) => { panic!(
             "atom {} reverse_der_ad error : {}", callback.name, msg);
         },
         Ok(domain) => domain,
     };
-    assert_eq!( adomain_one.len(), n_dom);
+    assert_eq!( adomain_der.len(), n_dom);
     //
     // avar_der
     for i_arg in 0 .. n_dom {
         let index   = arg[BEGIN_DOM + i_arg] as usize;
         let ad_type = arg_type[BEGIN_DOM + i_arg].clone();
         if ad_type.is_variable() {
-            avar_der[index] += &adomain_one[i_arg];
+            avar_der[index] += &adomain_der[i_arg];
         }
     }
 }

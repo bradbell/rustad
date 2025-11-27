@@ -53,13 +53,13 @@ fn for_sumsq_forward_fun_value(
 // for_sumsq_forward_der_value
 fn for_sumsq_forward_der_value(
     domain_zero : &Vec<&V>  ,
-    domain_one  : Vec<&V>   ,
+    domain_der  : Vec<&V>   ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
 ) -> Result< Vec<V>, String >
 {   //
-    // domain_zero, domain_one
-    assert_eq!( domain_zero.len(), domain_one.len() );
+    // domain_zero, domain_der
+    assert_eq!( domain_zero.len(), domain_der.len() );
     //
     // nx
     let nx = domain_zero.len() / 2;
@@ -74,8 +74,8 @@ fn for_sumsq_forward_der_value(
     let y =  &domain_zero[nx .. 2 * nx];
     //
     // dx, dy
-    let dx =  &domain_one[0 .. nx];
-    let dy =  &domain_one[nx .. 2 * nx];
+    let dx =  &domain_der[0 .. nx];
+    let dy =  &domain_der[nx .. 2 * nx];
     //
     // dz
     let mut dz = V::from(0.0);
@@ -90,7 +90,7 @@ fn for_sumsq_forward_der_value(
 // for_sumsq_reverse_der_value
 fn for_sumsq_reverse_der_value(
     domain_zero : &Vec<&V>  ,
-    range_one   : Vec<&V>   ,
+    range_der   : Vec<&V>   ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
 ) -> Result< Vec<V>, String >
@@ -100,8 +100,8 @@ fn for_sumsq_reverse_der_value(
     assert_eq!( 2 * nx , domain_zero.len() );
     //
     // dz
-    assert_eq!( range_one.len(), 1 );
-    let dz = range_one[0];
+    assert_eq!( range_der.len(), 1 );
+    let dz = range_der[0];
     //
     // factor
     let factor : V = &(V::from(2.0)) * dz;

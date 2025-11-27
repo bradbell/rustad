@@ -53,7 +53,7 @@ fn rev_sumsq_forward_fun_value(
 // rev_sumsq_forward_der_value
 fn rev_sumsq_forward_der_value(
     domain_zero : &Vec<&V>  ,
-    domain_one  : Vec<&V>   ,
+    domain_der  : Vec<&V>   ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
 ) -> Result< Vec<V>, String >
@@ -69,9 +69,9 @@ fn rev_sumsq_forward_der_value(
     // two_v
     let two_v   : V = V::from(2.0);
     //
-    // domain_one_zero, domain_one_one
-    let dx =  &domain_one[0 .. nx];
-    let dy =  domain_one[nx];
+    // domain_der_zero, domain_der_one
+    let dx =  &domain_der[0 .. nx];
+    let dy =  domain_der[nx];
     //
     // dz
     let mut dz : Vec<V> = Vec::with_capacity( nx );
@@ -87,14 +87,14 @@ fn rev_sumsq_forward_der_value(
 // rev_sumsq_reverse_der_value
 fn rev_sumsq_reverse_der_value(
     domain_zero : &Vec<&V>  ,
-    range_one   : Vec<&V>   ,
+    range_der   : Vec<&V>   ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
 ) -> Result< Vec<V>, String >
 {   //
     // nx
-    assert_eq!( domain_zero.len(), range_one.len() + 1 );
-    let nx = range_one.len();
+    assert_eq!( domain_zero.len(), range_der.len() + 1 );
+    let nx = range_der.len();
     //
     // x, y
     let x =  &domain_zero[0 .. nx];
@@ -104,7 +104,7 @@ fn rev_sumsq_reverse_der_value(
     let two_v   : V = V::from(2.0);
     //
     // dz
-    let dz = &range_one;
+    let dz = &range_der;
     //
     // dx_dy
     let mut dx_dy : Vec<V> = Vec::with_capacity(nx + 1);

@@ -223,16 +223,16 @@ macro_rules! forward_der {
                 }
                 println!( "End Trace: forward_der" );
             }
-            let mut range_one : Vec<$E> = Vec::new();
+            let mut range_der : Vec<$E> = Vec::new();
             for i in 0 .. self.rng_ad_type.len() {
                 let index = self.rng_index[i] as usize;
                 if self.rng_ad_type[i].is_variable() {
-                    range_one.push( var_der[index].clone() );
+                    range_der.push( var_der[index].clone() );
                 } else {
-                    range_one.push( zero_e.clone() );
+                    range_der.push( zero_e.clone() );
                 }
             }
-            range_one
+            range_der
         }
     }
 } }

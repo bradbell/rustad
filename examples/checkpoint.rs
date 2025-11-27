@@ -61,12 +61,12 @@ fn checkpoint_forward_fun_value(
 // checkpoint_forward_der_value
 fn checkpoint_forward_der_value(
     domain_zero      : &Vec<&V>    ,
-    domain_one       : Vec<&V>     ,
+    domain_der       : Vec<&V>     ,
     call_info        : IndexT      ,
     trace            : bool        ,
 ) -> Result< Vec<V>, String >
 {   //
-    assert_eq!( domain_zero.len(), domain_one.len() );
+    assert_eq!( domain_zero.len(), domain_der.len() );
     //
     // domain_zero_clone
     let n_domain = domain_zero.len();
@@ -82,25 +82,25 @@ fn checkpoint_forward_der_value(
        (_, var_both) = f.forward_zero_value(domain_zero_clone, trace);
     } );
     //
-    // domain_one
-    let mut domain_one_clone : Vec<V> = Vec::with_capacity( domain_one.len() );
-    for j in 0 .. domain_one.len() {
-        domain_one_clone.push( (*domain_one[j]).clone() );
+    // domain_der
+    let mut domain_der_clone : Vec<V> = Vec::with_capacity( domain_der.len() );
+    for j in 0 .. domain_der.len() {
+        domain_der_clone.push( (*domain_der[j]).clone() );
     }
     //
-    // range_one
-    let mut range_one : Vec<V> = Vec::new();
+    // range_der
+    let mut range_der : Vec<V> = Vec::new();
     ADFN_VEC.with_borrow( |f_vec| {
        let f     = &f_vec[call_info as usize];
-       range_one = f.forward_one_value(&var_both, domain_one_clone, trace);
+       range_der = f.forward_one_value(&var_both, domain_der_clone, trace);
     } );
-    Ok( range_one )
+    Ok( range_der )
 }
 //
 // checkpoint_reverse_der_value
 fn checkpoint_reverse_der_value(
     domain_zero      : &Vec<&V>    ,
-    range_one        : Vec<&V>     ,
+    range_der        : Vec<&V>     ,
     call_info        : IndexT      ,
     trace            : bool        ,
 ) -> Result< Vec<V>, String >
@@ -119,19 +119,19 @@ fn checkpoint_reverse_der_value(
        (_, var_both)  = f.forward_zero_value(domain_zero_clone, trace);
     } );
     //
-    // range_one_clone
-    let mut range_one_clone : Vec<V> = Vec::with_capacity( range_one.len() );
-    for j in 0 .. range_one.len() {
-        range_one_clone.push( (*range_one[j]).clone() );
+    // range_der_clone
+    let mut range_der_clone : Vec<V> = Vec::with_capacity( range_der.len() );
+    for j in 0 .. range_der.len() {
+        range_der_clone.push( (*range_der[j]).clone() );
     }
     //
-    // domain_one
-    let mut domain_one : Vec<V> = Vec::new();
+    // domain_der
+    let mut domain_der : Vec<V> = Vec::new();
     ADFN_VEC.with_borrow( |f_vec| {
        let f      = &f_vec[call_info as usize];
-       domain_one = f.reverse_one_value(&var_both, range_one_clone, trace);
+       domain_der = f.reverse_one_value(&var_both, range_der_clone, trace);
     } );
-    Ok( domain_one )
+    Ok( domain_der )
 }
 //
 // checkpoint_rev_depend

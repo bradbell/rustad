@@ -21,45 +21,45 @@ use super::{
 // sumsq_reverse_der_value
 pub fn sumsq_reverse_der_value(
     domain_zero  : &Vec<&V>    ,
-    range_one    : Vec<&V>     ,
+    range_der    : Vec<&V>     ,
     _call_info   : IndexT      ,
     trace        : bool        ,
 ) -> Result< Vec<V>, String >
 {   //
-    // range_one
-    assert_eq!( range_one.len(), 1 );
+    // range_der
+    assert_eq!( range_der.len(), 1 );
     //
     // two_v
     let two_v = V::from(2.0);
     //
-    // domain_one
-    let mut domain_one : Vec<V> = Vec::with_capacity( domain_zero.len() );
+    // domain_der
+    let mut domain_der : Vec<V> = Vec::with_capacity( domain_zero.len() );
     for j in 0 .. domain_zero.len() {
-        domain_one.push( &two_v * &( domain_zero[j] * range_one[0] ) );
+        domain_der.push( &two_v * &( domain_zero[j] * range_der[0] ) );
     }
     if trace {
         println!("Begin Trace: sumsq_reverse_der_value");
-        println!("range_one = [ {} ]", range_one[0]);
-        print!("domain_one = [ ");
-        for j in 0 .. domain_one.len() {
-                print!("{}, ", domain_one[j]);
+        println!("range_der = [ {} ]", range_der[0]);
+        print!("domain_der = [ ");
+        for j in 0 .. domain_der.len() {
+                print!("{}, ", domain_der[j]);
         }
         println!("]");
         println!("End Trace: sumsq_reverse_der_value");
     }
-    Ok( domain_one )
+    Ok( domain_der )
 }
 //
 // sumsq_reverse_der_ad
 pub fn sumsq_reverse_der_ad(
     domain_zero  : &Vec<& AD<V> >    ,
-    range_one    : Vec<& AD<V> >     ,
+    range_der    : Vec<& AD<V> >     ,
     call_info    : IndexT            ,
     trace        : bool              ,
 ) -> Result< Vec< AD<V> >, String >
 {   //
-    // range_one
-    assert_eq!( range_one.len(), 1 );
+    // range_der
+    assert_eq!( range_der.len(), 1 );
     //
     // atom_id
     let atom_id = ATOM_ID_VEC.with_borrow( |atom_id_vec|
@@ -74,10 +74,10 @@ pub fn sumsq_reverse_der_ad(
     for j in 0 .. domain_zero.len() {
         rev_domain_zero.push( (*domain_zero[j]).clone() );
     }
-    rev_domain_zero.push( (*range_one[0]).clone() );
+    rev_domain_zero.push( (*range_der[0]).clone() );
     //
-    // domain_one
-    let domain_one = call_atom(rev_domain_zero, atom_id, call_info, trace);
+    // domain_der
+    let domain_der = call_atom(rev_domain_zero, atom_id, call_info, trace);
     //
     if trace {
         println!("Begin Trace: sumsq_reverse_der_ad");
@@ -86,13 +86,13 @@ pub fn sumsq_reverse_der_ad(
                 print!("{}, ", domain_zero[j]);
         }
         println!("]");
-        println!("range_one = [ {} ]", range_one[0]);
-        print!("domain_one = [ ");
+        println!("range_der = [ {} ]", range_der[0]);
+        print!("domain_der = [ ");
         for j in 0 .. n_domain {
-                print!("{}, ", domain_one[j]);
+                print!("{}, ", domain_der[j]);
         }
         println!("]");
         println!("End Trace: sumsq_reverse_der_ad");
     }
-    Ok( domain_one )
+    Ok( domain_der )
 }
