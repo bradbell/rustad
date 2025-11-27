@@ -52,6 +52,7 @@
 use std::sync::RwLock;
 use std::cmp::PartialEq;
 use std::ops::AddAssign;
+use std::mem::swap;
 //
 use crate::ad::ADType;
 use crate::adfn::optimize;
@@ -255,10 +256,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
+        n_dep,
         trace,
-        rng_ad_type,
-        _dep2rng,
+        _rng_ad_type,
+        dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -297,20 +298,13 @@ where
     );
     //
     // dyp_both
-    let mut j_res = 0;
-    range_zero.reverse();
-    for i_res in 0 .. n_rng {
-        let ad_type_i = &rng_ad_type[i_res];
-        let range_i   = range_zero.pop();
-        debug_assert!( range_i.is_some() );
-        if ad_type_i.is_dynamic() {
-            dyp_both[res + j_res] = range_i.unwrap();
-            j_res += 1;
-        }
+    for i_dep in 0 .. n_dep {
+        let rng_index = dep2rng[i_dep] as usize;
+        swap( &mut dyp_both[res + i_dep], &mut range_zero[rng_index] );
     }
     // There must be at least one dynamic parameter result,
     // or this call would not be in the dyp operation sequence:
-    assert!( 0 < j_res );
+    assert!( 0 < n_dep );
 }
 // ---------------------------------------------------------------------------
 // call_forward_dyp_ad
@@ -331,10 +325,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
+        n_dep,
         trace,
-        rng_ad_type,
-        _dep2rng,
+        _rng_ad_type,
+        dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -374,21 +368,14 @@ where
         arange_zero.len(),
     );
     //
-    // avar_both
-    let mut j_res = 0;
-    arange_zero.reverse();
-    for i_res in 0 .. n_rng {
-        let ad_type_i = &rng_ad_type[i_res];
-        let arange_i  = arange_zero.pop();
-        debug_assert!( arange_i.is_some() );
-        if ad_type_i.is_dynamic() {
-            adyp_both[res + j_res] = arange_i.unwrap();
-            j_res += 1;
-        }
+    // adyp_both
+    for i_dep in 0 .. n_dep {
+        let rng_index = dep2rng[i_dep] as usize;
+        swap( &mut adyp_both[res + i_dep], &mut arange_zero[rng_index] );
     }
     // There must be at least one dynamic parameter result,
     // or this call would not be in the variable operation sequence:
-    assert!( 0 < j_res );
+    assert!( 0 < n_dep );
 }
 // ==========================================================================
 // call_forward_var
@@ -413,10 +400,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
+        n_dep,
         trace,
-        rng_ad_type,
-        _dep2rng,
+        _rng_ad_type,
+        dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -453,20 +440,13 @@ where
     );
     //
     // var_both
-    let mut j_res = 0;
-    range_zero.reverse();
-    for i_res in 0 .. n_rng {
-        let ad_type_i = &rng_ad_type[i_res];
-        let range_i   = range_zero.pop();
-        debug_assert!( range_i.is_some() );
-        if ad_type_i.is_variable() {
-            var_both[res + j_res] = range_i.unwrap();
-            j_res += 1;
-        }
+    for i_dep in 0 .. n_dep {
+        let rng_index = dep2rng[i_dep] as usize;
+        swap( &mut var_both[res + i_dep], &mut range_zero[rng_index] );
     }
     // There must be at least one variable result,
     // or this call would not be in the variable operation sequence:
-    assert!( 0 < j_res );
+    assert!( 0 < n_dep );
 }
 // ---------------------------------------------------------------------------
 // call_forward_var_ad
@@ -488,10 +468,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
+        n_dep,
         trace,
-        rng_ad_type,
-        _dep2rng,
+        _rng_ad_type,
+        dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -529,20 +509,13 @@ where
     );
     //
     // avar_both
-    let mut j_res = 0;
-    arange_zero.reverse();
-    for i_res in 0 .. n_rng {
-        let ad_type_i = &rng_ad_type[i_res];
-        let arange_i  = arange_zero.pop();
-        debug_assert!( arange_i.is_some() );
-        if ad_type_i.is_variable() {
-            avar_both[res + j_res] = arange_i.unwrap();
-            j_res += 1;
-        }
+    for i_dep in 0 .. n_dep {
+        let rng_index = dep2rng[i_dep] as usize;
+        swap( &mut avar_both[res + i_dep], &mut arange_zero[rng_index] );
     }
     // There must be at least one variable result,
     // or this call would not be in the variable operation sequence:
-    assert!( 0 < j_res );
+    assert!( 0 < n_dep );
 }
 // ==========================================================================
 // call_forward_der
@@ -568,10 +541,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
+        n_dep,
         trace,
-        rng_ad_type,
-        _dep2rng,
+        _rng_ad_type,
+        dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -612,19 +585,13 @@ where
     assert_eq!( range_one.len(), n_rng);
     //
     // var_der
-    let mut j_res = 0;
-    range_one.reverse();
-    for i_res in 0 .. n_rng {
-        let range_i = range_one.pop();
-        debug_assert!( range_i.is_some() );
-        if rng_ad_type[i_res].is_variable() {
-            var_der[res + j_res] = range_i.unwrap();
-            j_res += 1;
-        }
+    for i_dep in 0 .. n_dep {
+        let rng_index = dep2rng[i_dep] as usize;
+        swap( &mut var_der[res + i_dep], &mut range_one[rng_index] );
     }
     // There must be at least one variable result,
     // or this call would not be in the variable operation sequence:
-    assert!( 0 < j_res );
+    assert!( 0 < n_dep );
 }
 // --------------------------------------------------------------------------
 // call_forward_der_ad
@@ -648,10 +615,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
+        n_dep,
         trace,
-        rng_ad_type,
-        _dep2rng,
+        _rng_ad_type,
+        dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -695,19 +662,13 @@ where
     assert_eq!( arange_der.len(), n_rng);
     //
     // avar_der
-    let mut j_res = 0;
-    arange_der.reverse();
-    for i_res in 0 .. n_rng {
-        let arange_i = arange_der.pop();
-        debug_assert!( arange_i.is_some() );
-        if rng_ad_type[i_res].is_variable() {
-            avar_der[res + j_res] = arange_i.unwrap();
-            j_res += 1;
-        }
+    for i_dep in 0 .. n_dep {
+        let rng_index = dep2rng[i_dep] as usize;
+        swap( &mut avar_der[res + i_dep], &mut arange_der[rng_index] );
     }
     // There must be at least one variable result,
     // or this call would not be in the variable operation sequence:
-    assert!( 0 < j_res );
+    assert!( 0 < n_dep );
 }
 // ==========================================================================
 // call_reverse_der_value
@@ -733,10 +694,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
+        n_dep,
         trace,
-        rng_ad_type,
-        _dep2rng,
+        _rng_ad_type,
+        dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -755,21 +716,16 @@ where
         dyp_both, var_both, cop, arg, arg_type, n_dom
     );
     //
-    // ange_one
+    // range_one
     let zero_v : V = 0f32.into();
-    let mut range_one : Vec<&V> = Vec::with_capacity( n_rng );
-    let mut j_res = 0;
-    for i_res in 0 .. n_rng {
-        if rng_ad_type[i_res].is_variable() {
-            range_one.push( &var_der[res + j_res] );
-            j_res += 1;
-        } else {
-            range_one.push( &zero_v );
-        }
+    let mut range_one : Vec<&V> = vec![ &zero_v ; n_rng];
+    for i_dep in 0 .. n_dep {
+        let rng_index = dep2rng[i_dep] as usize;
+        range_one[rng_index] = &var_der[res + i_dep];
     }
     // There must be at least one variable result,
     // or this call would not be in the variable operation sequence:
-    assert!( 0 < j_res );
+    assert!( 0 < n_dep );
     //
     // domain_one
     let result = reverse_der_value(&domain_zero, range_one, call_info, trace);
@@ -812,10 +768,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
+        n_dep,
         trace,
-        rng_ad_type,
-        _dep2rng,
+        _rng_ad_type,
+        dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -836,21 +792,16 @@ where
     );
     //
     // arange_one
-    let zero_v : V    = 0f32.into();
-    let azero         = ad_from_value(zero_v);
-    let mut arange_one : Vec<& AD<V>> = Vec::with_capacity( n_rng );
-    let mut j_res = 0;
-    for i_res in 0 .. n_rng {
-        if rng_ad_type[i_res].is_variable() {
-            arange_one.push( &avar_der[res + j_res] );
-            j_res += 1;
-        } else {
-            arange_one.push( &azero );
-        }
+    let zero_v : V = 0f32.into();
+    let azero      = ad_from_value(zero_v);
+    let mut arange_one : Vec<& AD<V> > = vec![ &azero ; n_rng];
+    for i_dep in 0 .. n_dep {
+        let rng_index = dep2rng[i_dep] as usize;
+        arange_one[rng_index] = &avar_der[res + i_dep];
     }
     // There must be at least one variable result,
     // or this call would not be in the variable operation sequence:
-    assert!( 0 < j_res );
+    assert!( 0 < n_dep );
     //
     // adomain_one
     let result = reverse_der_ad(&adomain_zero, arange_one, call_info, trace);
@@ -946,11 +897,11 @@ where
     let (
         call_info,
         call_n_dom,
-        n_rng,
+        _n_rng,
         n_dep,
         trace,
-        rng_ad_type,
-        _dep2rng,
+        _rng_ad_type,
+        dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -1006,7 +957,7 @@ where
         "   let mut call_range = " +
                 "atom_" + &name + "(&call_dom, call_info, trace) ?;\n";
     //
-    // res_name
+    // res_name, res_dep
     let res_name   : &str;
     let res_dep    : usize;
     if res_type.is_dynamic() {
@@ -1018,22 +969,15 @@ where
         assert!( var_n_dom <= res );
         res_dep  = res - var_n_dom;
     };
-    src = src +
-        "   //\n" +
-        "   // " + res_name + "\n" +
-        "   call_range.reverse();\n";
-    let mut j_res = 0;
-    for i_res in 0 .. n_rng {
-        if rng_ad_type[i_res] == res_type {
-            let j_dep = res_dep + j_res;
-            src = src + "   " +
-                &format!("{res_name}[{j_dep}] = call_range.pop().unwrap();\n");
-            j_res += 1;
-        } else {
-            src = src + "   call_range.pop();\n";
-        }
+    //
+    for i_dep in 0 .. n_dep {
+        let dep_index = res_dep + i_dep;
+        let rng_index = dep2rng[i_dep] as usize;
+        src = src + "   " +
+            &format!( "std::mem::swap(\
+                &mut {res_name}[{dep_index}], &mut call_range[{rng_index}] \
+            );\n");
     }
-    debug_assert!( j_res == n_dep );
     //
     // call_domain, call_range
     src = src +
