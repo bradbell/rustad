@@ -30,9 +30,9 @@
 //! | Index    | Meaning |
 //! | -------- | ------- |
 //! | 0        | is True or false depending on trace for this call        |
-//! | 1        | is ADtype for first result of this call                  |
+//! | 1        | is first result a dependenc for this call                |
 //! | ...      | ...                                                      |
-//! | n_rng    | is ADtype for last result of this call                   |
+//! | n_rng    | is last result a dependent for this call                 |
 //!
 //! * CALL_RES_OP
 //! The operation index for a CALL_OP operator, corresponds to the first
@@ -80,14 +80,14 @@ pub(crate) const BEGIN_DOM : usize = 6;
 // extract_call_info
 fn extract_call_info<'a, V>(
     arg        : &'a [IndexT] ,
-    flag_all   : &'a [ADType] ,
+    flag_all   : &'a [bool]   ,
 ) -> (
     IndexT           , // call_info
     usize            , // n_dom
     usize            , // n_rng
     usize            , // n_dep
     bool             , // trace
-    &'a [ADType]     , // rng_ad_type
+    &'a [bool]       , // rng_is_dep
     &'a [IndexT]     , // dep2rng
     AtomCallback<V>  , // callback
 )
@@ -102,9 +102,9 @@ where
     let n_rng        = arg[3] as usize;
     let n_dep        = arg[4] as usize;
     let start        = arg[5] as usize;
-    let trace        = flag_all[start].is_true();
+    let trace        = flag_all[start];
     let start        = start + 1;
-    let rng_ad_type  = &flag_all[start .. start+n_rng];
+    let rng_is_dep   = &flag_all[start .. start+n_rng];
     let start        = BEGIN_DOM + n_dom;
     let dep2rng      = &arg[start .. start + n_dep];
     //
@@ -130,7 +130,7 @@ where
         n_rng,
         n_dep,
         trace,
-        rng_ad_type,
+        rng_is_dep,
         dep2rng,
         callback,
     )
@@ -244,7 +244,7 @@ where
 fn call_forward_dyp_value<V> (
     dyp_both   : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag_all   : &Vec<ADType>  ,
+    flag_all   : &Vec<bool>    ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -258,7 +258,7 @@ where
         n_rng,
         n_dep,
         trace,
-        _rng_ad_type,
+        _rng_is_dep,
         dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
@@ -313,7 +313,7 @@ where
 fn call_forward_dyp_ad<V> (
     adyp_both  : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
-    flag_all   : &Vec<ADType>        ,
+    flag_all   : &Vec<bool>          ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -327,7 +327,7 @@ where
         n_rng,
         n_dep,
         trace,
-        _rng_ad_type,
+        _rng_is_dep,
         dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
@@ -388,7 +388,7 @@ fn call_forward_var_value<V> (
     dyp_both   : &Vec<V>       ,
     var_both   : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag_all   : &Vec<ADType>  ,
+    flag_all   : &Vec<bool>    ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -402,7 +402,7 @@ where
         n_rng,
         n_dep,
         trace,
-        _rng_ad_type,
+        _rng_is_dep,
         dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
@@ -456,7 +456,7 @@ fn call_forward_var_ad<V> (
     adyp_both  : &Vec< AD<V> >       ,
     avar_both  : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
-    flag_all   : &Vec<ADType>        ,
+    flag_all   : &Vec<bool>          ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -470,7 +470,7 @@ where
         n_rng,
         n_dep,
         trace,
-        _rng_ad_type,
+        _rng_is_dep,
         dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
@@ -529,7 +529,7 @@ fn call_forward_der_value<V> (
     var_both   : &Vec<V>       ,
     var_der    : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag_all   : &Vec<ADType>  ,
+    flag_all   : &Vec<bool>    ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -543,7 +543,7 @@ where
         n_rng,
         n_dep,
         trace,
-        _rng_ad_type,
+        _rng_is_dep,
         dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
@@ -603,7 +603,7 @@ fn call_forward_der_ad<V> (
     avar_both  : &Vec< AD<V> >       ,
     avar_der   : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
-    flag_all   : &Vec<ADType>        ,
+    flag_all   : &Vec<bool>          ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -617,7 +617,7 @@ where
         n_rng,
         n_dep,
         trace,
-        _rng_ad_type,
+        _rng_is_dep,
         dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
@@ -682,7 +682,7 @@ fn call_reverse_der_value<V> (
     var_both   : &Vec<V>       ,
     var_der    : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag_all   : &Vec<ADType>  ,
+    flag_all   : &Vec<bool>    ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -696,7 +696,7 @@ where
         n_rng,
         n_dep,
         trace,
-        _rng_ad_type,
+        _rng_is_dep,
         dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
@@ -755,7 +755,7 @@ fn call_reverse_der_ad<V> (
     avar_both   : &Vec< AD<V> >       ,
     avar_der    : &mut Vec< AD<V> >   ,
     cop         : &Vec<V>             ,
-    flag_all   : &Vec<ADType>         ,
+    flag_all   : &Vec<bool>           ,
     arg        : &[IndexT]            ,
     arg_type   : &[ADType]            ,
     res        : usize                )
@@ -770,7 +770,7 @@ where
         n_rng,
         n_dep,
         trace,
-        _rng_ad_type,
+        _rng_is_dep,
         dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
@@ -829,7 +829,7 @@ where
 fn call_res_dyp<V, E>(
     _dyp_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag_all : &Vec<ADType>,
+    _flag_all : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -841,7 +841,7 @@ fn call_res_var<V, E>(
     _dyp_both : &Vec<E>     ,
     _var_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag_all : &Vec<ADType>,
+    _flag_all : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -855,7 +855,7 @@ fn call_res_der<V, E>(
     _var_both : &Vec<E>     ,
     _var_der  : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag_all : &Vec<ADType>,
+    _flag_all : &Vec<bool>  ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -868,7 +868,7 @@ fn call_res_rust_src<V> (
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
     _var_n_dom : usize       ,
-    _flag_all  : &Vec<ADType>,
+    _flag_all  : &Vec<bool>  ,
     _arg       : &[IndexT]   ,
     _arg_type  : &[ADType]   ,
     _res       : usize       ,
@@ -884,7 +884,7 @@ fn call_rust_src<V> (
     res_type  : ADType      ,
     dyp_n_dom : usize       ,
     var_n_dom : usize       ,
-    flag_all  : &Vec<ADType>,
+    flag_all  : &Vec<bool>  ,
     arg       : &[IndexT]   ,
     arg_type  : &[ADType]   ,
     res       : usize       ) -> String
@@ -900,7 +900,7 @@ where
         _n_rng,
         n_dep,
         trace,
-        _rng_ad_type,
+        _rng_is_dep,
         dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
@@ -1114,16 +1114,13 @@ where
         _n_rng,
         _n_dep,
         trace,
-        rng_ad_type,
+        _rng_is_dep,
         _dep2rng,
         callback,
     ) = extract_call_info::<V>(arg, flag_all);
     //
     // rng_index
     let rng_index   = arg[BEGIN_DOM + n_dom + dep_index] as usize;
-    //
-    // constants are never dependent values
-    assert_ne!(rng_ad_type[ rng_index ], ADType::ConstantP);
     //
     // rev_depend
     let rev_depend = &callback.rev_depend;

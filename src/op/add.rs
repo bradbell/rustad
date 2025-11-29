@@ -68,7 +68,7 @@ fn add_pv_forward_1 <V, E>(
     _var_both  :   &Vec<E>     ,
     var_der    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
-    _flag_all  :   &Vec<ADType>,
+    _flag_all  :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
@@ -87,7 +87,7 @@ fn add_vp_forward_1 <V, E>(
     _var_both  :   &Vec<E>     ,
     var_der    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
-    _flag_all  :   &Vec<ADType>,
+    _flag_all  :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
@@ -106,7 +106,7 @@ fn add_vv_forward_1 <V, E>(
     _var_both  :   &Vec<E>     ,
     var_der    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
-    _flag_all  :   &Vec<ADType>,
+    _flag_all  :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
@@ -129,7 +129,7 @@ fn add_pv_reverse_1 <V, E>(
     _var_both  :   &Vec<E>     ,
     var_der    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
-    _flag_all  :   &Vec<ADType>,
+    _flag_all  :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
@@ -151,7 +151,7 @@ fn add_vp_reverse_1 <V, E>(
     _var_both  :   &Vec<E>     ,
     var_der    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
-    _flag_all  :   &Vec<ADType>,
+    _flag_all  :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
@@ -173,7 +173,7 @@ fn add_vv_reverse_1 <V, E>(
     _var_both  :   &Vec<E>     ,
     var_der    :   &mut Vec<E> ,
     _cop       :   &Vec<V>     ,
-    _flag_all  :   &Vec<ADType>,
+    _flag_all  :   &Vec<bool>  ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,
     res        :   usize       )

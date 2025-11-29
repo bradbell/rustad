@@ -462,17 +462,21 @@ where
     // arange, dyp_dep, var_dep
     let mut dyp_dep  : Vec<usize> = Vec::new();
     let mut var_dep  : Vec<usize> = Vec::new();
+    let mut dyp_flag              = vec![false; n_res];
+    let mut var_flag              = vec![false; n_res];
     for i in 0 .. n_res {
         if rng_ad_type[i].is_variable() {
             arange[i].tape_id   = tape.tape_id;
             arange[i].ad_type   = ADType::Variable;
             arange[i].index     = n_var + var_dep.len();
             var_dep.push( i );
+            var_flag[i] = true;
          } else if rng_ad_type[i].is_dynamic() {
             arange[i].tape_id   = tape.tape_id;
             arange[i].ad_type   = ADType::DynamicP;
             arange[i].index     = n_dyp + dyp_dep.len();
             dyp_dep.push( i );
+            dyp_flag[i] = true;
          } else {
             assert!( rng_ad_type[i].is_constant() );
         }
@@ -482,12 +486,15 @@ where
         // op_seq, dep, n_dep
         let op_seq   : &mut OpSequence;
         let dep      : &Vec<usize>;
+        let flag     : &Vec<bool>;
         if k == 0 {
             op_seq   = &mut tape.dyp;
             dep      = &dyp_dep;
+            flag     = &dyp_flag;
         } else {
             op_seq   = &mut tape.var;
             dep      = &var_dep;
+            flag     = &var_flag;
         }
         let n_dep = dep.len();
         //
@@ -532,14 +539,10 @@ where
             }
             //
             // op_seq.flag_all
-            if trace {
-                op_seq.flag_all.push( ADType::True );  // flag_all[ arg[5] ]
-            } else {
-                op_seq.flag_all.push( ADType::False ); // flag_all[ arg[5] ]
-            }
+            op_seq.flag_all.push( trace );  // flag_all[ arg[5] ]
             for i in 0 .. n_res {
                 //flag_all[ arg[5] + i + 1 ]
-                op_seq.flag_all.push( arange[i].ad_type.clone() )
+                op_seq.flag_all.push( flag[i] )
             }
             //
             // op_seq.n_dep

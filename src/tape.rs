@@ -64,7 +64,7 @@ pub(crate) struct OpSequence {
     /// is a vector containing all the flags for all the operators.
     /// If an operator has flags, one of its arguments in
     /// arg_all is the index in flag_all of its first flag.
-    pub(crate) flag_all : Vec<ADType>,
+    pub(crate) flag_all : Vec<bool>,
 }
 // VarTape::new
 impl OpSequence {
