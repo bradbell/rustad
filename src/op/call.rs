@@ -124,6 +124,7 @@ where
         callback          = callback_vec[atom_id].clone();
     }
     //
+    assert!( 0 < n_dep );
     (
         call_info,
         n_dom,
@@ -256,10 +257,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        n_dep,
+        _n_dep,
         trace,
-        _rng_is_dep,
-        dep2rng,
+        rng_is_dep,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -280,9 +281,9 @@ where
         dyp_both, &var_both, cop, arg, arg_type, n_dom
     );
     //
-    // range_zero
+    // range
     let result = forward_fun_value(&domain, call_info, trace );
-    let mut range_zero = match result {
+    let mut range = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_value error : {}", callback.name, msg);
         },
@@ -290,21 +291,21 @@ where
     };
     assert_eq!(
         n_rng,
-        range_zero.len(),
+        range.len(),
         "atom {} forward_fun_value return length: expected {}, found {}",
         callback.name,
         n_rng,
-        range_zero.len(),
+        range.len(),
     );
     //
     // dyp_both
-    for i_dep in 0 .. n_dep {
-        let rng_index = dep2rng[i_dep] as usize;
-        swap( &mut dyp_both[res + i_dep], &mut range_zero[rng_index] );
+    let mut dep_index = 0;
+    for rng_index in 0 .. n_rng {
+        if rng_is_dep[rng_index] {
+            swap( &mut dyp_both[res + dep_index], &mut range[rng_index] );
+            dep_index += 1;
+        }
     }
-    // There must be at least one dynamic parameter result,
-    // or this call would not be in the dyp operation sequence:
-    assert!( 0 < n_dep );
 }
 // ---------------------------------------------------------------------------
 // call_forward_dyp_ad
@@ -325,10 +326,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        n_dep,
+        _n_dep,
         trace,
-        _rng_is_dep,
-        dep2rng,
+        rng_is_dep,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -353,7 +354,7 @@ where
     //
     // arange_zero
     let result = forward_fun_ad( &adomain, call_info, trace );
-    let mut arange_zero = match result {
+    let mut arange = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_ad error : {}", callback.name, msg);
         },
@@ -361,21 +362,21 @@ where
     };
     assert_eq!(
         n_rng,
-        arange_zero.len(),
+        arange.len(),
         "atom {} forward_fun_ad return length: expected {}, found {}",
         callback.name,
         n_rng,
-        arange_zero.len(),
+        arange.len(),
     );
     //
     // adyp_both
-    for i_dep in 0 .. n_dep {
-        let rng_index = dep2rng[i_dep] as usize;
-        swap( &mut adyp_both[res + i_dep], &mut arange_zero[rng_index] );
+    let mut dep_index = 0;
+    for rng_index in 0 .. n_rng {
+        if rng_is_dep[rng_index] {
+            swap( &mut adyp_both[res + dep_index], &mut arange[rng_index] );
+            dep_index += 1;
+        }
     }
-    // There must be at least one dynamic parameter result,
-    // or this call would not be in the variable operation sequence:
-    assert!( 0 < n_dep );
 }
 // ==========================================================================
 // call_forward_var
@@ -400,10 +401,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        n_dep,
+        _n_dep,
         trace,
-        _rng_is_dep,
-        dep2rng,
+        rng_is_dep,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -422,9 +423,9 @@ where
         dyp_both, var_both, cop, arg, arg_type, n_dom
     );
     //
-    // range_zero
+    // range
     let result = forward_fun_value( &domain, call_info, trace );
-    let mut range_zero = match result {
+    let mut range = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_value error : {}", callback.name, msg);
         },
@@ -432,21 +433,21 @@ where
     };
     assert_eq!(
         n_rng,
-        range_zero.len(),
+        range.len(),
         "atom {} forward_fun_value return length: expected {}, found {}",
         callback.name,
         n_rng,
-        range_zero.len(),
+        range.len(),
     );
     //
     // var_both
-    for i_dep in 0 .. n_dep {
-        let rng_index = dep2rng[i_dep] as usize;
-        swap( &mut var_both[res + i_dep], &mut range_zero[rng_index] );
+    let mut dep_index = 0;
+    for rng_index in 0 .. n_rng {
+        if rng_is_dep[rng_index] {
+            swap( &mut var_both[res + dep_index], &mut range[rng_index] );
+            dep_index += 1;
+        }
     }
-    // There must be at least one variable result,
-    // or this call would not be in the variable operation sequence:
-    assert!( 0 < n_dep );
 }
 // ---------------------------------------------------------------------------
 // call_forward_var_ad
@@ -468,10 +469,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        n_dep,
+        _n_dep,
         trace,
-        _rng_is_dep,
-        dep2rng,
+        rng_is_dep,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -491,9 +492,9 @@ where
         adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
-    // arange_zero
+    // arange
     let result = forward_fun_ad( &adomain, call_info, trace );
-    let mut arange_zero = match result {
+    let mut arange = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_ad error : {}", callback.name, msg);
         },
@@ -501,21 +502,21 @@ where
     };
     assert_eq!(
         n_rng,
-        arange_zero.len(),
+        arange.len(),
         "atom {} forward_fun_ad return length: expected {}, found {}",
         callback.name,
         n_rng,
-        arange_zero.len(),
+        arange.len(),
     );
     //
     // avar_both
-    for i_dep in 0 .. n_dep {
-        let rng_index = dep2rng[i_dep] as usize;
-        swap( &mut avar_both[res + i_dep], &mut arange_zero[rng_index] );
+    let mut dep_index = 0;
+    for rng_index in 0 .. n_rng {
+        if rng_is_dep[rng_index] {
+            swap( &mut avar_both[res + dep_index], &mut arange[rng_index] );
+            dep_index += 1;
+        }
     }
-    // There must be at least one variable result,
-    // or this call would not be in the variable operation sequence:
-    assert!( 0 < n_dep );
 }
 // ==========================================================================
 // call_forward_der
@@ -541,10 +542,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        n_dep,
+        _n_dep,
         trace,
-        _rng_is_dep,
-        dep2rng,
+        rng_is_dep,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -585,13 +586,13 @@ where
     assert_eq!( range_der.len(), n_rng);
     //
     // var_der
-    for i_dep in 0 .. n_dep {
-        let rng_index = dep2rng[i_dep] as usize;
-        swap( &mut var_der[res + i_dep], &mut range_der[rng_index] );
+    let mut dep_index = 0;
+    for rng_index in 0 .. n_rng {
+        if rng_is_dep[rng_index] {
+            swap( &mut var_der[res + dep_index], &mut range_der[rng_index] );
+            dep_index += 1;
+        }
     }
-    // There must be at least one variable result,
-    // or this call would not be in the variable operation sequence:
-    assert!( 0 < n_dep );
 }
 // --------------------------------------------------------------------------
 // call_forward_der_ad
@@ -615,10 +616,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        n_dep,
+        _n_dep,
         trace,
-        _rng_is_dep,
-        dep2rng,
+        rng_is_dep,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -662,13 +663,13 @@ where
     assert_eq!( arange_der.len(), n_rng);
     //
     // avar_der
-    for i_dep in 0 .. n_dep {
-        let rng_index = dep2rng[i_dep] as usize;
-        swap( &mut avar_der[res + i_dep], &mut arange_der[rng_index] );
+    let mut dep_index = 0;
+    for rng_index in 0 .. n_rng {
+        if rng_is_dep[rng_index] {
+            swap( &mut avar_der[res + dep_index], &mut arange_der[rng_index] );
+            dep_index += 1;
+        }
     }
-    // There must be at least one variable result,
-    // or this call would not be in the variable operation sequence:
-    assert!( 0 < n_dep );
 }
 // ==========================================================================
 // call_reverse_der_value
@@ -694,10 +695,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        n_dep,
+        _n_dep,
         trace,
-        _rng_is_dep,
-        dep2rng,
+        rng_is_dep,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -719,13 +720,13 @@ where
     // range_der
     let zero_v : V = 0f32.into();
     let mut range_der : Vec<&V> = vec![ &zero_v ; n_rng];
-    for i_dep in 0 .. n_dep {
-        let rng_index = dep2rng[i_dep] as usize;
-        range_der[rng_index] = &var_der[res + i_dep];
+    let mut dep_index = 0;
+    for rng_index in 0 .. n_rng {
+        if rng_is_dep[rng_index] {
+            range_der[rng_index] = &var_der[res + dep_index];
+            dep_index += 1;
+        }
     }
-    // There must be at least one variable result,
-    // or this call would not be in the variable operation sequence:
-    assert!( 0 < n_dep );
     //
     // domain_der
     let result = reverse_der_value(&domain, range_der, call_info, trace);
@@ -768,10 +769,10 @@ where
         call_info,
         n_dom,
         n_rng,
-        n_dep,
+        _n_dep,
         trace,
-        _rng_is_dep,
-        dep2rng,
+        rng_is_dep,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -791,17 +792,17 @@ where
         adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
-    // arange_der
+    // sarange_der
     let zero_v : V = 0f32.into();
     let azero      = ad_from_value(zero_v);
     let mut arange_der : Vec<& AD<V> > = vec![ &azero ; n_rng];
-    for i_dep in 0 .. n_dep {
-        let rng_index = dep2rng[i_dep] as usize;
-        arange_der[rng_index] = &avar_der[res + i_dep];
+    let mut dep_index = 0;
+    for rng_index in 0 .. n_rng {
+        if rng_is_dep[rng_index] {
+            arange_der[rng_index] = &avar_der[res + dep_index];
+            dep_index += 1;
+        }
     }
-    // There must be at least one variable result,
-    // or this call would not be in the variable operation sequence:
-    assert!( 0 < n_dep );
     //
     // adomain_der
     let result = reverse_der_ad(&adomain, arange_der, call_info, trace);
@@ -897,11 +898,11 @@ where
     let (
         call_info,
         call_n_dom,
-        _n_rng,
-        n_dep,
+        n_rng,
+        _n_dep,
         trace,
-        _rng_is_dep,
-        dep2rng,
+        rng_is_dep,
+        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -970,13 +971,15 @@ where
         res_dep  = res - var_n_dom;
     };
     //
-    for i_dep in 0 .. n_dep {
-        let dep_index = res_dep + i_dep;
-        let rng_index = dep2rng[i_dep] as usize;
-        src = src + "   " +
-            &format!( "std::mem::swap(\
-                &mut {res_name}[{dep_index}], &mut call_range[{rng_index}] \
-            );\n");
+    let mut dep_index = res_dep;
+    for rng_index in 0 .. n_rng {
+        if rng_is_dep[rng_index] {
+            src = src + "   " +
+                &format!( "std::mem::swap(\
+                    &mut {res_name}[{dep_index}], &mut call_range[{rng_index}] \
+                );\n");
+            dep_index += 1;
+        }
     }
     //
     // call_domain, call_range
