@@ -1090,12 +1090,21 @@ where
         n_dom,
         _n_rng,
         trace,
-        _rng_is_dep,
+        rng_is_dep,
         callback,
     ) = extract_call_info::<V>(arg, flag_all);
     //
     // rng_index
-    let rng_index   = arg[BEGIN_DOM + n_dom + dep_index] as usize;
+    let mut dep_count = 0;
+    let mut rng_index = 0;
+    while dep_count < dep_index || ! rng_is_dep[rng_index] {
+        if rng_is_dep[rng_index] {
+            dep_count += 1;
+        }
+        rng_index += 1;
+    }
+    assert_eq!(dep_count, dep_index);
+    assert!( rng_is_dep[rng_index] );
     //
     // rev_depend
     let rev_depend = &callback.rev_depend;
