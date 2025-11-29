@@ -85,10 +85,8 @@ fn extract_call_info<'a, V>(
     IndexT           , // call_info
     usize            , // n_dom
     usize            , // n_rng
-    usize            , // n_dep
     bool             , // trace
     &'a [bool]       , // rng_is_dep
-    &'a [IndexT]     , // dep2rng
     AtomCallback<V>  , // callback
 )
 where
@@ -100,13 +98,10 @@ where
     let call_info    = arg[1];
     let n_dom        = arg[2] as usize;
     let n_rng        = arg[3] as usize;
-    let n_dep        = arg[4] as usize;
     let start        = arg[5] as usize;
     let trace        = flag_all[start];
     let start        = start + 1;
     let rng_is_dep   = &flag_all[start .. start+n_rng];
-    let start        = BEGIN_DOM + n_dom;
-    let dep2rng      = &arg[start .. start + n_dep];
     //
     // callback
     let callback : AtomCallback<V>;
@@ -124,15 +119,12 @@ where
         callback          = callback_vec[atom_id].clone();
     }
     //
-    assert!( 0 < n_dep );
     (
         call_info,
         n_dom,
         n_rng,
-        n_dep,
         trace,
         rng_is_dep,
-        dep2rng,
         callback,
     )
 }
@@ -257,10 +249,8 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
         trace,
         rng_is_dep,
-        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -326,10 +316,8 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
         trace,
         rng_is_dep,
-        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -401,10 +389,8 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
         trace,
         rng_is_dep,
-        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -469,10 +455,8 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
         trace,
         rng_is_dep,
-        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -542,10 +526,8 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
         trace,
         rng_is_dep,
-        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -616,10 +598,8 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
         trace,
         rng_is_dep,
-        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -695,10 +675,8 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
         trace,
         rng_is_dep,
-        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -769,10 +747,8 @@ where
         call_info,
         n_dom,
         n_rng,
-        _n_dep,
         trace,
         rng_is_dep,
-        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -899,10 +875,8 @@ where
         call_info,
         call_n_dom,
         n_rng,
-        _n_dep,
         trace,
         rng_is_dep,
-        _dep2rng,
         callback,
     ) = extract_call_info(arg, flag_all);
     //
@@ -1115,10 +1089,8 @@ where
         call_info,
         n_dom,
         _n_rng,
-        _n_dep,
         trace,
         _rng_is_dep,
-        _dep2rng,
         callback,
     ) = extract_call_info::<V>(arg, flag_all);
     //
