@@ -15,12 +15,11 @@
 //! | 1        | Extra information about this call; i.e. call_info        |
 //! | 2        | Domain space dimension for function being called (n_dom) |
 //! | 3        | Number of range components for this call         (n_rng) |
-//! | 4        | Number of dependent results for this call        (n_dep) |
-//! | 5        | Index in flag_all of first flag for this operator        |
-//! | 5+1      | Variable, dynamic, or constant index for first call argument  |
-//! | 5+2      | Variable, dynamic, or constant index for second call argument |
+//! | 4        | Index in flag_all of first flag for this operator        |
+//! | 4+1      | Variable, dynamic, or constant index for first call argument  |
+//! | 4+2      | Variable, dynamic, or constant index for second call argument |
 //! | ...      | ...                                                           |
-//! | 5+n_dom   | Variable, dynamic, or constant index for last call argument  |
+//! | 4+n_dom   | Variable, dynamic, or constant index for last call argument  |
 //! | 5+n_dom+1 | Index in call's range of first dependent result              |
 //! | 5+n_dom+2 | Index in call's range of second dependent result             |
 //! | ...       | ...                                                          |
@@ -74,7 +73,7 @@ use crate::{
 // ----------------------------------------------------------------------
 /// Index in operator argument vector of the parameter or variable index
 /// of the first atomc function argument.
-pub(crate) const BEGIN_DOM : usize = 6;
+pub(crate) const BEGIN_DOM : usize = 5;
 // ----------------------------------------------------------------------
 //
 // extract_call_info
@@ -98,7 +97,7 @@ where
     let call_info    = arg[1];
     let n_dom        = arg[2] as usize;
     let n_rng        = arg[3] as usize;
-    let start        = arg[5] as usize;
+    let start        = arg[4] as usize;
     let trace        = flag_all[start];
     let start        = start + 1;
     let rng_is_dep   = &flag_all[start .. start+n_rng];

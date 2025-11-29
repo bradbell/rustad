@@ -510,8 +510,7 @@ where
             op_seq.arg_all.push( call_info );                      // arg[1]
             op_seq.arg_all.push( n_dom as IndexT );                // arg[2]
             op_seq.arg_all.push( n_res as IndexT );                // arg[3]
-            op_seq.arg_all.push( n_dep as IndexT );                // arg[4]
-            // arg[5]
+            // arg[4]
             op_seq.arg_all.push( op_seq.flag_all.len() as IndexT );
             //
             // op_seq.arg_type_all
