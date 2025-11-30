@@ -22,10 +22,10 @@ use crate::ad::ADType;
 //
 // Renumber
 /// Mapping from old (ADfn) indices to new (tape) indices
-/// for constants, dyanmics and variables.
+/// for constants, dynamics and variables.
 ///
-/// If an old constant, (dynamic), {variable} index does not get 
-/// used in the new tape, the new index value is 
+/// If an old constant, (dynamic), {variable} index does not get
+/// used in the new tape, the new index value is
 /// cop_len, (dyp_len), {var_len} .
 /// These are invalid values because the new tape does not have more
 /// constants, dynamic parameters, or variables.
@@ -139,20 +139,20 @@ where
                             match arg_type_i {
                                 ADType::ConstantP => {
                                     new_index = renumber.cop[old_index];
-                                    assert_ne!( 
-                                        new_index as usize, renumber.cop.len() 
+                                    assert_ne!(
+                                        new_index as usize, renumber.cop.len()
                                     );
                                 },
                                 ADType::DynamicP  => {
                                     new_index = renumber.dyp[old_index];
-                                    assert_ne!( 
-                                        new_index as usize, renumber.dyp.len() 
+                                    assert_ne!(
+                                        new_index as usize, renumber.dyp.len()
                                     );
                                 },
                                 ADType::Variable => {
                                     new_index = renumber.var[old_index];
-                                    assert_ne!( 
-                                        new_index as usize, renumber.var.len() 
+                                    assert_ne!(
+                                        new_index as usize, renumber.var.len()
                                     );
                                     assert_ne!( i_op_seq, 0 );
                                 },
@@ -160,7 +160,7 @@ where
                                     panic!("dead_code: binary operator error")
                                 },
                             }
-                            new_op_seq.arg_all.push( new_index ); 
+                            new_op_seq.arg_all.push( new_index );
                             new_op_seq.arg_type_all.push( arg_type_i );
                         }
                     } else {
@@ -173,9 +173,3 @@ where
         return tape;
     } // fn dead_code
 } // impl
-    
-                        
-    
-    
-                    
-    
