@@ -20,10 +20,6 @@
 //! | 4+2      | Variable, dynamic, or constant index for second call argument |
 //! | ...      | ...                                                           |
 //! | 4+n_dom   | Variable, dynamic, or constant index for last call argument  |
-//! | 5+n_dom+1 | Index in call's range of first dependent result              |
-//! | 5+n_dom+2 | Index in call's range of second dependent result             |
-//! | ...       | ...                                                          |
-//! | 5+n_dom+n_dep | Index in call's range of last dependent result           |
 //!
 //! ## Operator Flags
 //! | Index    | Meaning |

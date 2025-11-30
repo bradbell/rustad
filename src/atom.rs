@@ -531,12 +531,6 @@ where
                 }
             }
             //
-            // op_seq_arg_type_all, op_seq_arg_all
-            for j in 0 .. n_dep {
-                op_seq.arg_type_all.push( ADType::Empty );
-                op_seq.arg_all.push( dep[j] as IndexT );
-            }
-            //
             // op_seq.flag_all
             op_seq.flag_all.push( trace );  // flag_all[ arg[5] ]
             for i in 0 .. n_res {
