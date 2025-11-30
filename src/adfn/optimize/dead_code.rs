@@ -51,9 +51,8 @@ where
     V : Clone,
 {   //
     // dead_code
-    /// Determine [optimize::Renumber] for this [ADfn].
-    /// TODO: change to private when this gets used by a public function
-    pub fn dead_code(&self, depend : &optimize::Depend) -> Tape<V> {
+    /// Determine [Renumber] for this [ADfn].
+    pub(crate) fn dead_code(&self, depend : &optimize::Depend) -> Tape<V> {
         //
         // tape
         let mut tape : Tape<V> = Tape::new();

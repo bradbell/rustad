@@ -35,8 +35,7 @@ where
 {   //
     // reverse_depend
     /// Determine [optimize::Depend] for this [ADfn].
-    /// TODO: change to private when this gets used by a public function
-    pub fn reverse_depend(&self, trace : bool) -> optimize::Depend {
+    pub(crate) fn reverse_depend(&self, trace : bool) -> optimize::Depend {
         //
         // atom_depend, cop_depend, dyp_depend, var_depend
         // work space used to avoid reallocationg vectors
