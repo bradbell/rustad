@@ -25,7 +25,7 @@
 //! | Index    | Meaning |
 //! | -------- | ------- |
 //! | 0        | is True or false depending on trace for this call        |
-//! | 1        | is first result a dependenc for this call                |
+//! | 1        | is first result a dependent for this call                |
 //! | ...      | ...                                                      |
 //! | n_rng    | is last result a dependent for this call                 |
 //!

@@ -10,7 +10,34 @@
 use crate::IndexT;
 use crate::adfn::optimize;
 use crate::ad::ADType;
+use crate::op::id;
 //
+// ---------------------------------------------------------------------------
+pub(crate) fn is_binary_op(op_id : u8) -> bool {
+    match op_id {
+        id::ADD_PP_OP => true , 
+        id::ADD_PV_OP => true , 
+        id::ADD_VP_OP => true , 
+        id::ADD_VV_OP => true , 
+        //
+        id::SUB_PP_OP => true , 
+        id::SUB_PV_OP => true , 
+        id::SUB_VP_OP => true , 
+        id::SUB_VV_OP => true , 
+        //
+        id::MUL_PP_OP => true , 
+        id::MUL_PV_OP => true , 
+        id::MUL_VP_OP => true , 
+        id::MUL_VV_OP => true , 
+        //
+        id::DIV_PP_OP => true , 
+        id::DIV_PV_OP => true , 
+        id::DIV_VP_OP => true , 
+        id::DIV_VV_OP => true , 
+        //
+        _         => false,
+    }
+}
 // ---------------------------------------------------------------------------
 // eval_binary_forward_0
 /// Evaluation of zero order forward for binary operators.

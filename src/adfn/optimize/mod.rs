@@ -14,6 +14,7 @@ use crate::ADfn;
 //
 // -----------------------------------------------------------------------
 mod reverse_depend;
+mod dead_code;
 // -----------------------------------------------------------------------
 // Depend
 /// Which constants, dynamic parameters, and variables the
