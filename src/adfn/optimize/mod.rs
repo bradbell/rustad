@@ -31,15 +31,39 @@ mod tests;
 pub(crate) struct Depend {
     // cop
     /// Constant parameters dependency; length [ADfn::cop_len].
-    pub(crate) cop : Vec<bool> ,
+    pub cop : Vec<bool> ,
     //
     // dyp
     /// Dynamic parameters dependency; length [ADfn::dyp_len].
-    pub(crate) dyp : Vec<bool> ,
+    pub dyp : Vec<bool> ,
     //
     // var
     /// Variable dependency; length [ADfn::var_len].
-    pub(crate) var : Vec<bool> ,
+    pub var : Vec<bool> ,
+}
+//
+// Renumber
+/// Mapping from old (ADfn) indices to new (tape) indices
+/// for constants, dynamics and variables.
+///
+/// If an old constant, (dynamic), {variable} index does not get
+/// used in the new tape, the new index value is
+/// cop_len, (dyp_len), {var_len} .
+/// These are invalid values because the new tape does not have more
+/// constants, dynamic parameters, or variables.
+///
+pub(crate) struct Renumber {
+    // cop
+    /// Constant parameters; length [ADfn::cop_len].
+    pub cop : Vec<IndexT> ,
+    //
+    // dyp
+    /// Dynamic parameters; length [ADfn::dyp_len].
+    pub dyp : Vec<IndexT> ,
+    //
+    // var
+    /// Variables; length [ADfn::var_len].
+    pub var : Vec<IndexT> ,
 }
 // ADfn::optimize
 impl<V> ADfn<V>

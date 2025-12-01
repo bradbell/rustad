@@ -20,38 +20,13 @@ use crate::op::binary::is_binary_op;
 use crate::ad::ADType;
 // -----------------------------------------------------------------------
 //
-// Renumber
-/// Mapping from old (ADfn) indices to new (tape) indices
-/// for constants, dynamics and variables.
-///
-/// If an old constant, (dynamic), {variable} index does not get
-/// used in the new tape, the new index value is
-/// cop_len, (dyp_len), {var_len} .
-/// These are invalid values because the new tape does not have more
-/// constants, dynamic parameters, or variables.
-///
-/// TODO: change to private when renumber changes to private.
-pub struct Renumber {
-    // cop
-    /// Constant parameters; length [ADfn::cop_len].
-    pub(crate) cop : Vec<IndexT> ,
-    //
-    // dyp
-    /// Dynamic parameters; length [ADfn::dyp_len].
-    pub(crate) dyp : Vec<IndexT> ,
-    //
-    // var
-    /// Variables; length [ADfn::var_len].
-    pub(crate) var : Vec<IndexT> ,
-}
-//
 // ADfn::dead_code
 impl<V> ADfn<V>
 where
     V : Clone,
 {   //
     // dead_code
-    /// Determine [Renumber] for this [ADfn].
+    /// Determine a new tape and map from ADfn indices to tape indices.
     pub(crate) fn dead_code(&self, depend : &optimize::Depend) -> Tape<V> {
         //
         // tape
@@ -64,7 +39,7 @@ where
         //
         // renumber
         // initialize as an invalid value
-        let mut renumber = Renumber{
+        let mut renumber = optimize::Renumber{
                 cop : vec![ n_cop as IndexT; n_cop ] ,
                 dyp : vec![ n_dyp as IndexT; n_dyp ] ,
                 var : vec![ n_var as IndexT; n_var ] ,
