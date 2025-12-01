@@ -16,6 +16,8 @@ use crate::{
     GlobalOpInfoVecPublic,
 };
 //
+use crate::ad::ADType;
+//
 // -----------------------------------------------------------------------
 // mod
 mod reverse_depend;
@@ -73,8 +75,8 @@ where
     // optimize
     pub fn optimize(&mut self, trace : bool)
     {   //
-        let depend   = self.reverse_depend(trace);
-        let mut tape = self.dead_code(&depend);
+        let depend               = self.reverse_depend(trace);
+        let (mut tape, renumber) = self.dead_code(&depend, trace);
         //
         // checks
         assert_eq!( tape.dyp.arg_seq.len()  , tape.dyp.id_seq.len() );
@@ -95,5 +97,30 @@ where
         std::mem::swap(&mut self.cop,  &mut tape.cop);
         std::mem::swap(&mut self.dyp,  &mut tape.dyp);
         std::mem::swap(&mut self.var,  &mut tape.var);
+        //
+        // self: rng_ad_type, rng_index, cop
+        // TODO: figure out how to do this without any cloning of values.
+        let n_rng = self.rng_index.len();
+        for i_rng in 0 .. n_rng {
+            let old_index = self.rng_index[i_rng] as usize;
+            match self.rng_ad_type[i_rng] {
+                ADType::ConstantP => {
+                    let value = tape.cop[old_index].clone();
+                    self.rng_index[i_rng] = self.cop.len() as IndexT;
+                    self.cop.push( value );
+                },
+                ADType::DynamicP => {
+                    let new_index = renumber.dyp[old_index];
+                    assert!( (new_index as usize) < renumber.dyp.len() );
+                    self.rng_index[i_rng] = new_index;
+                },
+                ADType::Variable => {
+                    let new_index = renumber.var[old_index];
+                    assert!( (new_index as usize) < renumber.var.len() );
+                    self.rng_index[i_rng] = new_index;
+                },
+                _ => { panic!("optimize: rng_ad_type error"); },
+            }
+        }
     }
 }

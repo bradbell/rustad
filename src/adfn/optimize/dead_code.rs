@@ -13,7 +13,8 @@ use crate::{
     ADfn,
     IndexT,
 };
-use crate::adfn::optimize;
+use crate::adfn::optimize::Depend;
+use crate::adfn::optimize::Renumber;
 use crate::tape::Tape;
 use crate::tape::OpSequence;
 use crate::op::binary::is_binary_op;
@@ -27,7 +28,8 @@ where
 {   //
     // dead_code
     /// Determine a new tape and map from ADfn indices to tape indices.
-    pub(crate) fn dead_code(&self, depend : &optimize::Depend) -> Tape<V> {
+    pub(crate) fn dead_code(&self, depend : &Depend, _trace : bool,
+    ) -> ( Tape<V>, Renumber) {
         //
         // tape
         let mut tape : Tape<V> = Tape::new();
@@ -39,7 +41,7 @@ where
         //
         // renumber
         // initialize as an invalid value
-        let mut renumber = optimize::Renumber{
+        let mut renumber = Renumber{
                 cop : vec![ n_cop as IndexT; n_cop ] ,
                 dyp : vec![ n_dyp as IndexT; n_dyp ] ,
                 var : vec![ n_var as IndexT; n_var ] ,
@@ -80,13 +82,7 @@ where
             //
             // op_index, first_op
             let mut op_index = 0;
-            let mut first_op = true;
             while op_index < old_op_seq.n_dep {
-                if first_op {
-                    first_op = false;
-                } else {
-                    op_index += 1;
-                }
                 //
                 // res
                 let res  = op_index + old_op_seq.n_dom;
@@ -137,6 +133,18 @@ where
                             new_op_seq.arg_all.push( new_index );
                             new_op_seq.arg_type_all.push( arg_type_i );
                         }
+                        // renumber
+                        let new_op_index = new_op_seq.id_seq.len() - 1;
+                        let new_index    = new_op_index + new_op_seq.n_dom;
+                        let old_index    = op_index     + old_op_seq.n_dom;
+                        if i_op_seq == 0 {
+                            renumber.dyp[old_index] = new_index as IndexT;
+                        } else {
+                            renumber.var[old_index] = new_index as IndexT;
+                        }
+                        //
+                        // op_index
+                        op_index += 1;
                     } else {
                         // CALL_OP not yet implemented
                         assert!( false );
@@ -144,6 +152,6 @@ where
                 } // if old_depend[res]
             } // while op_index < n_dep
         } // for i_op_seq in 0 .. 2
-        return tape;
+        return (tape, renumber);
     } // fn dead_code
 } // impl
