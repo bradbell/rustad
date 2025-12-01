@@ -22,9 +22,6 @@ use crate::ad::ADType;
 // mod
 mod reverse_depend;
 mod dead_code;
-//
-#[cfg(test)]
-mod tests;
 // -----------------------------------------------------------------------
 // Depend
 /// Which constants, dynamic parameters, and variables the
