@@ -71,33 +71,12 @@ use crate::{
 /// of the first atomc function argument.
 pub(crate) const BEGIN_DOM : usize = 5;
 // ----------------------------------------------------------------------
-//
-// extract_call_info
-fn extract_call_info<'a, V>(
-    arg        : &'a [IndexT] ,
-    flag_all   : &'a [bool]   ,
-) -> (
-    IndexT           , // call_info
-    usize            , // n_dom
-    usize            , // n_rng
-    bool             , // trace
-    &'a [bool]       , // rng_is_dep
-    AtomCallback<V>  , // callback
-)
+// get_callback
+fn get_callback<V> (atom_id : usize) -> AtomCallback<V>
 where
     V               : AtomInfoVec,
     AtomCallback<V> : Clone,
-{
-    // atom_id, call_info, n_dom, n_rng,
-    let atom_id      = arg[0] as usize;
-    let call_info    = arg[1];
-    let n_dom        = arg[2] as usize;
-    let n_rng        = arg[3] as usize;
-    let start        = arg[4] as usize;
-    let trace        = flag_all[start];
-    let start        = start + 1;
-    let rng_is_dep   = &flag_all[start .. start+n_rng];
-    //
+{   //
     // callback
     let callback : AtomCallback<V>;
     {   //
@@ -113,14 +92,39 @@ where
         let callback_vec  = read_lock.unwrap();
         callback          = callback_vec[atom_id].clone();
     }
+    callback
+}
+//
+// extract_call_info
+fn extract_call_info<'a>(
+    arg        : &'a [IndexT] ,
+    flag_all   : &'a [bool]   ,
+) -> (
+    usize            , // atom_id
+    IndexT           , // call_info
+    usize            , // n_dom
+    usize            , // n_rng
+    bool             , // trace
+    &'a [bool]       , // rng_is_dep
+)
+{
+    // atom_id, call_info, n_dom, n_rng,
+    let atom_id      = arg[0] as usize;
+    let call_info    = arg[1];
+    let n_dom        = arg[2] as usize;
+    let n_rng        = arg[3] as usize;
+    let start        = arg[4] as usize;
+    let trace        = flag_all[start];
+    let start        = start + 1;
+    let rng_is_dep   = &flag_all[start .. start+n_rng];
     //
     (
+        atom_id,
         call_info,
         n_dom,
         n_rng,
         trace,
         rng_is_dep,
-        callback,
     )
 }
 // ----------------------------------------------------------------------
@@ -241,13 +245,14 @@ where
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
+        atom_id,
         call_info,
         n_dom,
         n_rng,
         trace,
         rng_is_dep,
-        callback,
     ) = extract_call_info(arg, flag_all);
+    let callback = get_callback(atom_id);
     //
     // forward_fun_value
     let forward_fun_value = &callback.forward_fun_value;
@@ -308,13 +313,14 @@ where
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
+        atom_id,
         call_info,
         n_dom,
         n_rng,
         trace,
         rng_is_dep,
-        callback,
     ) = extract_call_info(arg, flag_all);
+    let callback = get_callback(atom_id);
     //
     // forward_fun_ad
     let forward_fun_ad = &callback.forward_fun_ad;
@@ -381,13 +387,14 @@ where
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
+        atom_id,
         call_info,
         n_dom,
         n_rng,
         trace,
         rng_is_dep,
-        callback,
     ) = extract_call_info(arg, flag_all);
+    let callback = get_callback(atom_id);
     //
     // forward_fun_value
     let forward_fun_value = &callback.forward_fun_value;
@@ -447,13 +454,14 @@ where
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
+        atom_id,
         call_info,
         n_dom,
         n_rng,
         trace,
         rng_is_dep,
-        callback,
     ) = extract_call_info(arg, flag_all);
+    let callback = get_callback(atom_id);
     //
     // forward_fun_ad
     let forward_fun_ad = &callback.forward_fun_ad;
@@ -518,13 +526,14 @@ where
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
+        atom_id,
         call_info,
         n_dom,
         n_rng,
         trace,
         rng_is_dep,
-        callback,
     ) = extract_call_info(arg, flag_all);
+    let callback = get_callback(atom_id);
     //
     // forward_der_value
     let forward_der_value  = &callback.forward_der_value;
@@ -590,13 +599,14 @@ where
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
+        atom_id,
         call_info,
         n_dom,
         n_rng,
         trace,
         rng_is_dep,
-        callback,
     ) = extract_call_info(arg, flag_all);
+    let callback = get_callback(atom_id);
     //
     // forward_der_ad
     let forward_der_ad       = callback.forward_der_ad.clone();
@@ -667,13 +677,14 @@ where
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
+        atom_id,
         call_info,
         n_dom,
         n_rng,
         trace,
         rng_is_dep,
-        callback,
     ) = extract_call_info(arg, flag_all);
+    let callback = get_callback(atom_id);
     //
     // reverse_der_value
     let reverse_der_value = &callback.reverse_der_value;
@@ -739,13 +750,14 @@ where
     AtomCallback<V>   : Clone,
 {   // ----------------------------------------------------------------------
     let (
+        atom_id,
         call_info,
         n_dom,
         n_rng,
         trace,
         rng_is_dep,
-        callback,
     ) = extract_call_info(arg, flag_all);
+    let callback = get_callback(atom_id);
     //
     // reverse_der_ad
     let reverse_der_ad = &callback.reverse_der_ad;
@@ -867,13 +879,14 @@ where
     debug_assert!( res_type.is_dynamic() || res_type.is_variable() );
     //
     let (
+        atom_id,
         call_info,
         call_n_dom,
         n_rng,
         trace,
         rng_is_dep,
-        callback,
     ) = extract_call_info(arg, flag_all);
+    let callback = get_callback(atom_id);
     //
     // src
     let mut src = String::new();
@@ -1081,13 +1094,14 @@ where
     //
     // callback, n_dom, call_info, trace
     let (
+        atom_id,
         call_info,
         n_dom,
         _n_rng,
         trace,
         rng_is_dep,
-        callback,
-    ) = extract_call_info::<V>(arg, flag_all);
+    ) = extract_call_info(arg, flag_all);
+    let callback = get_callback::<V>(atom_id);
     //
     // rng_index
     let mut dep_count = 0;
