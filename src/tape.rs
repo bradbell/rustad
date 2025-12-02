@@ -428,14 +428,11 @@ where
         std::mem::swap(&mut ad_fn.var,  &mut tape.var);
         std::mem::swap(&mut ad_fn.cop,  &mut tape.cop);
         //
-        // tape.dyp
-        tape.dyp = OpSequence::new();
-        //
         // tape_id
         tape.tape_id
     } );
     //
-    // rng_ad_type, rng_index, con_all
+    // rng_ad_type, rng_index, cop
     // TODO: figure out how to do this without any cloning of values.
     for i in 0 .. arange.len() {
         if arange[i].tape_id == tape_id {
