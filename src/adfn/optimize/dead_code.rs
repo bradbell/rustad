@@ -125,21 +125,23 @@ where
                 }
             }
             //
-            // op_index, first_op
-            let mut op_index = 0;
-            while op_index < old_op_seq.n_dep {
+            // old_op_index, first_op
+            let mut old_op_index = 0;
+            while old_op_index < old_op_seq.n_dep {
                 //
-                // res, op_id
-                let res    = op_index + old_op_seq.n_dom;
-                let op_id  = old_op_seq.id_seq[op_index];
+                // old_res, op_id
+                let old_res = old_op_index + old_op_seq.n_dom;
+                let op_id   = old_op_seq.id_seq[old_op_index];
                 //
-                if old_depend[res] {
+                if old_depend[old_res] {
                     //
                     if is_binary_op(op_id) {
                         //
                         // arg, arg_type
-                        let start = old_op_seq.arg_seq[op_index] as usize;
-                        let end   = old_op_seq.arg_seq[op_index + 1] as usize;
+                        let start =
+                            old_op_seq.arg_seq[old_op_index] as usize;
+                        let end   =
+                            old_op_seq.arg_seq[old_op_index + 1] as usize;
                         let arg       = &old_op_seq.arg_all[start .. end];
                         let arg_type  = &old_op_seq.arg_type_all[start .. end];
                         assert!( arg.len() == 2 );
@@ -185,7 +187,7 @@ where
                         // renumber
                         let new_op_index = new_op_seq.id_seq.len() - 1;
                         let new_index    = new_op_index + new_op_seq.n_dom;
-                        let old_index    = op_index     + old_op_seq.n_dom;
+                        let old_index    = old_op_index + old_op_seq.n_dom;
                         if i_op_seq == 0 {
                             renumber.dyp[old_index] = new_index as IndexT;
                         } else {
@@ -197,13 +199,13 @@ where
                     } else {
                         panic!( "dead_code: op_id = {}", op_id );
                     }
-                } // if old_depend[res]
+                } // if old_depend[old_res]
                 if is_binary_op(op_id ) {
-                    op_index += 1;
+                    old_op_index += 1;
                 } else {
                     panic!( "dead_code: op_id = {}", op_id );
                 }
-            } // while op_index <
+            } // while old_op_index <
         } // for i_op_seq in 0 .. 2
         if trace {
             println!( "End Trace: dead_code" );
