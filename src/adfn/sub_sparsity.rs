@@ -322,6 +322,7 @@ where
         }
         if trace {
             println!( "var_pattern.len() = {}", var_pattern.len() );
+            println!( "End Trace: sub_sparsity");
         }
         (dyp_pattern, var_pattern)
     }

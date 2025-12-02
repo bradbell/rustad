@@ -285,6 +285,7 @@ where
         }
         if trace {
             println!( "n_pattern = {}", pattern.len() );
+            println!( "End Trace: for_sparisty:" );
         }
         pattern
     }

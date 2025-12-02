@@ -65,6 +65,35 @@ pub(crate) struct Renumber {
     pub var : Vec<IndexT> ,
 }
 // ADfn::optimize
+/// Reduce the number of operations in an ADfn object.
+///
+/// # Example
+/// ```
+/// use rustad::start_recording_var;
+/// use rustad::stop_recording;
+/// type V      = rustad::AzFloat<f32>;
+/// let  trace  = false;
+/// let  x      = vec![ V::from(2.0), V::from(3.0) ];
+/// let ax      = start_recording_var(x.clone());
+/// let _atimes = &ax[0] * &ax[0]; // second dependent variable (not used)
+/// let asum    = &ax[0] + &ax[0]; // first dependent variable (used)
+/// let ay      = vec![ asum ];
+/// let mut f   = stop_recording(ay);
+/// //
+/// // f.var_dep_len
+/// // x[0] + x[0] and x[0] * x[0] are in original version of f.
+/// assert_eq!( f.var_dep_len(), 2 );
+/// //
+/// f.optimize(trace);
+/// //
+/// // f.var_dep_len
+/// // only x[0] + x[0] is in optimized version of f.
+/// assert_eq!( f.var_dep_len(), 1 );
+/// //
+/// // check
+/// let (y, _v) = f.forward_zero_value(x.clone(), trace);
+/// assert_eq!( y[0], &x[0] + &x[0] );
+/// ```
 impl<V> ADfn<V>
 where
     V : Clone + AtomInfoVecPublic + GlobalOpInfoVecPublic,
@@ -102,9 +131,9 @@ where
             let old_index = self.rng_index[i_rng] as usize;
             match self.rng_ad_type[i_rng] {
                 ADType::ConstantP => {
-                    let value = tape.cop[old_index].clone();
-                    self.rng_index[i_rng] = self.cop.len() as IndexT;
-                    self.cop.push( value );
+                    let new_index = renumber.cop[old_index];
+                    assert!( (new_index as usize) < renumber.cop.len() );
+                    self.rng_index[i_rng] = new_index;
                 },
                 ADType::DynamicP => {
                     let new_index = renumber.dyp[old_index];

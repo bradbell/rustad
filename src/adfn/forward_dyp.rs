@@ -138,6 +138,7 @@ macro_rules! forward_dyp {
                             println!( "{}, {}", res + j, dyp_both[res + j]);
                         }
                     }
+                    println!("End Trace: forward_dyp_{}", stringify!($suffix));
                 }
             }
             dyp_both

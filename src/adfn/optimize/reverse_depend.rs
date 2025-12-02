@@ -161,6 +161,7 @@ where
             println!( "depend.cop = {:?}", depend.cop );
             println!( "depend.dyp = {:?}", depend.dyp );
             println!( "depend.var = {:?}", depend.var );
+            println!( "End Trace: reverse_depend" );
         }
         depend
     }

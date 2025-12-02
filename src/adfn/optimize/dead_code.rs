@@ -28,7 +28,7 @@ where
 {   //
     // dead_code
     /// Determine a new tape and map from ADfn indices to tape indices.
-    pub(crate) fn dead_code(&self, depend : &Depend, _trace : bool,
+    pub(crate) fn dead_code(&self, depend : &Depend, trace : bool,
     ) -> ( Tape<V>, Renumber) {
         //
         // tape
@@ -47,6 +47,16 @@ where
                 var : vec![ n_var as IndexT; n_var ] ,
         };
         //
+        if trace {
+            println!( "Begin Trace: dead_code");
+            println!(
+                "n_cop = {}, n_dyp = {}, n_var = {}", n_cop, n_dyp, n_var
+            );
+            if 0 < n_cop {
+                println!( "old_cop_index, new_cop_index" );
+            }
+        }
+        //
         // tape.cop, renumber.cop
         let n_cop = self.cop_len();
         for old_index in 0 .. n_cop {
@@ -55,11 +65,13 @@ where
                 let new_index           = tape.cop.len();
                 renumber.cop[old_index] = new_index as IndexT;
                 tape.cop.push( value );
+                println!( "{}, {}", old_index, new_index );
             }
         }
         //
         // i_op_seq
-        for i_op_seq in 0 .. 2 {
+        let start_op_seq = if n_dyp > 0 { 0 } else { 1 };
+        for i_op_seq in start_op_seq .. 2 {
             let old_depend  : &Vec<bool>;
             let old_op_seq  : &OpSequence;
             let new_op_seq  : &mut OpSequence;
@@ -67,29 +79,39 @@ where
                 old_depend = &depend.dyp;
                 old_op_seq = &self.dyp;
                 new_op_seq = &mut tape.dyp;
+                if trace {
+                    println!( "old_dyp_index, new_dyp_index" );
+                }
             } else {
                 old_depend = &depend.var;
                 old_op_seq = &self.var;
                 new_op_seq = &mut tape.var;
+                if trace {
+                    println!( "old_var_index, new_var_index" );
+                }
             };
             //
             // new_op_seq.n_dom, renumber.dyp
             let n_dom        = old_op_seq.n_dom;
             new_op_seq.n_dom = n_dom;
             for old_index in 0 .. n_dom {
-                renumber.dyp[old_index] = old_index as IndexT;
+                if i_op_seq == 0 {
+                    renumber.dyp[old_index] = old_index as IndexT;
+                } else {
+                    renumber.var[old_index] = old_index as IndexT;
+                }
             }
             //
             // op_index, first_op
             let mut op_index = 0;
             while op_index < old_op_seq.n_dep {
                 //
-                // res
-                let res  = op_index + old_op_seq.n_dom;
+                // res, op_id
+                let res    = op_index + old_op_seq.n_dom;
+                let op_id  = old_op_seq.id_seq[op_index];
+                //
                 if old_depend[res] {
                     //
-                    // op_id
-                    let op_id     = self.dyp.id_seq[op_index];
                     if is_binary_op(op_id) {
                         //
                         // arg, arg_type
@@ -99,8 +121,12 @@ where
                         let arg_type  = &old_op_seq.arg_type_all[start .. end];
                         assert!( arg.len() == 2 );
                         //
-                        // op_sed.id_seq
+                        // new_op_seq: id_seq, arg_seq, n_dep
+                        new_op_seq.n_dep += 1;
                         new_op_seq.id_seq.push( op_id );
+                        new_op_seq.arg_seq.push( 
+                            new_op_seq.arg_all.len() as IndexT
+                        );
                         //
                         for i_arg in 0 .. 2 {
                             let arg_type_i = arg_type[i_arg].clone();
@@ -142,16 +168,23 @@ where
                         } else {
                             renumber.var[old_index] = new_index as IndexT;
                         }
-                        //
-                        // op_index
-                        op_index += 1;
+                        if trace {
+                            println!( "{}, {}", old_index, new_index );
+                        }
                     } else {
-                        // CALL_OP not yet implemented
-                        assert!( false );
+                        panic!( "dead_code: op_id = {}", op_id );
                     }
                 } // if old_depend[res]
-            } // while op_index < n_dep
+                if is_binary_op(op_id ) {
+                    op_index += 1;
+                } else {
+                    panic!( "dead_code: op_id = {}", op_id );
+                }
+            } // while op_index <
         } // for i_op_seq in 0 .. 2
+        if trace {
+            println!( "End Trace: dead_code" );
+        }
         return (tape, renumber);
     } // fn dead_code
 } // impl
