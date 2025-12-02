@@ -27,7 +27,30 @@ where
     V : Clone,
 {   //
     // dead_code
-    /// Determine a new tape and map from ADfn indices to tape indices.
+    /// Determine a new tape, with dead code removed,
+    /// and the map from ADfn indices to tape indices.
+    ///
+    /// * Syntax :
+    /// ```text
+    ///     (tape, renumber) = f.dead_code(depend, trace)
+    /// ```
+    ///
+    /// * f :
+    /// is an [ADfn] object.
+    ///
+    /// * depend :
+    /// is the [Depend] structure for *f* .
+    ///
+    /// * trace :
+    /// if true, a trace is printed on standard output.
+    ///
+    /// * tape :
+    /// is a [Tape] corresponding to the optimized version of *f* .
+    ///
+    /// * renumber :
+    /// is the [Renumber] structure that maps indices in *f* to
+    /// indices in *tape* .
+    ///
     pub(crate) fn dead_code(&self, depend : &Depend, trace : bool,
     ) -> ( Tape<V>, Renumber) {
         //
@@ -124,7 +147,7 @@ where
                         // new_op_seq: id_seq, arg_seq, n_dep
                         new_op_seq.n_dep += 1;
                         new_op_seq.id_seq.push( op_id );
-                        new_op_seq.arg_seq.push( 
+                        new_op_seq.arg_seq.push(
                             new_op_seq.arg_all.len() as IndexT
                         );
                         //
