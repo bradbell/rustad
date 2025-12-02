@@ -133,73 +133,69 @@ where
                 let old_res = old_op_index + old_op_seq.n_dom;
                 let op_id   = old_op_seq.id_seq[old_op_index];
                 //
-                if old_depend[old_res] {
+                // arg, arg_type
+                let start =
+                    old_op_seq.arg_seq[old_op_index] as usize;
+                let end   =
+                    old_op_seq.arg_seq[old_op_index + 1] as usize;
+                let arg       = &old_op_seq.arg_all[start .. end];
+                let arg_type  = &old_op_seq.arg_type_all[start .. end];
+                //
+                if is_binary_op(op_id) && old_depend[old_res] {
                     //
-                    if is_binary_op(op_id) {
-                        //
-                        // arg, arg_type
-                        let start =
-                            old_op_seq.arg_seq[old_op_index] as usize;
-                        let end   =
-                            old_op_seq.arg_seq[old_op_index + 1] as usize;
-                        let arg       = &old_op_seq.arg_all[start .. end];
-                        let arg_type  = &old_op_seq.arg_type_all[start .. end];
-                        assert!( arg.len() == 2 );
-                        //
-                        // new_op_seq: id_seq, arg_seq, n_dep
-                        new_op_seq.n_dep += 1;
-                        new_op_seq.id_seq.push( op_id );
-                        new_op_seq.arg_seq.push(
-                            new_op_seq.arg_all.len() as IndexT
-                        );
-                        //
-                        for i_arg in 0 .. 2 {
-                            let arg_type_i = arg_type[i_arg].clone();
-                            let old_index = arg[i_arg] as usize;
-                            let new_index : IndexT;
-                            match arg_type_i {
-                                ADType::ConstantP => {
-                                    new_index = renumber.cop[old_index];
-                                    assert_ne!(
-                                        new_index as usize, renumber.cop.len()
-                                    );
-                                },
-                                ADType::DynamicP  => {
-                                    new_index = renumber.dyp[old_index];
-                                    assert_ne!(
-                                        new_index as usize, renumber.dyp.len()
-                                    );
-                                },
-                                ADType::Variable => {
-                                    new_index = renumber.var[old_index];
-                                    assert_ne!(
-                                        new_index as usize, renumber.var.len()
-                                    );
-                                    assert_ne!( i_op_seq, 0 );
-                                },
-                                _  => {
-                                    panic!("dead_code: binary operator error")
-                                },
-                            }
-                            new_op_seq.arg_all.push( new_index );
-                            new_op_seq.arg_type_all.push( arg_type_i );
+                    assert!( arg.len() == 2 );
+                    //
+                    // new_op_seq: id_seq, arg_seq, n_dep
+                    new_op_seq.n_dep += 1;
+                    new_op_seq.id_seq.push( op_id );
+                    new_op_seq.arg_seq.push(
+                        new_op_seq.arg_all.len() as IndexT
+                    );
+                    //
+                    for i_arg in 0 .. 2 {
+                        let arg_type_i = arg_type[i_arg].clone();
+                        let old_index = arg[i_arg] as usize;
+                        let new_index : IndexT;
+                        match arg_type_i {
+                            ADType::ConstantP => {
+                                new_index = renumber.cop[old_index];
+                                assert_ne!(
+                                    new_index as usize, renumber.cop.len()
+                                );
+                            },
+                            ADType::DynamicP  => {
+                                new_index = renumber.dyp[old_index];
+                                assert_ne!(
+                                    new_index as usize, renumber.dyp.len()
+                                );
+                            },
+                            ADType::Variable => {
+                                new_index = renumber.var[old_index];
+                                assert_ne!(
+                                    new_index as usize, renumber.var.len()
+                                );
+                                assert_ne!( i_op_seq, 0 );
+                            },
+                            _  => {
+                                panic!("dead_code: binary operator error")
+                            },
                         }
-                        // renumber
-                        let new_op_index = new_op_seq.id_seq.len() - 1;
-                        let new_index    = new_op_index + new_op_seq.n_dom;
-                        let old_index    = old_op_index + old_op_seq.n_dom;
-                        if i_op_seq == 0 {
-                            renumber.dyp[old_index] = new_index as IndexT;
-                        } else {
-                            renumber.var[old_index] = new_index as IndexT;
-                        }
-                        if trace {
-                            println!( "{}, {}", old_index, new_index );
-                        }
-                    } else {
-                        panic!( "dead_code: op_id = {}", op_id );
+                        new_op_seq.arg_all.push( new_index );
+                        new_op_seq.arg_type_all.push( arg_type_i );
                     }
-                } // if old_depend[old_res]
+                    // renumber
+                    let new_op_index = new_op_seq.id_seq.len() - 1;
+                    let new_index    = new_op_index + new_op_seq.n_dom;
+                    let old_index    = old_op_index + old_op_seq.n_dom;
+                    if i_op_seq == 0 {
+                        renumber.dyp[old_index] = new_index as IndexT;
+                    } else {
+                        renumber.var[old_index] = new_index as IndexT;
+                    }
+                    if trace {
+                        println!( "{}, {}", old_index, new_index );
+                    }
+                } // if is_bimary_op(op_id) && old_depend[old_res]
                 if is_binary_op(op_id ) {
                     old_op_index += 1;
                 } else {
@@ -207,8 +203,8 @@ where
                 }
             } // while old_op_index <
         } // for i_op_seq in 0 .. 2
-        if trace {
-            println!( "End Trace: dead_code" );
+    if trace {
+        println!( "End Trace: dead_code" );
         }
         return (tape, renumber);
     } // fn dead_code
