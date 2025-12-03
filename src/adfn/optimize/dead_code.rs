@@ -61,6 +61,46 @@ fn get_renumber(
     new_index
 }
 // -----------------------------------------------------------------------
+// new_binary_op
+fn new_binary_op(
+    renumber     : &mut Renumber   ,
+    i_op_seq     : usize           ,
+    op_id        : u8              ,
+    arg          : &[IndexT]       ,
+    arg_type     : &[ADType]       ,
+    old_op_index : usize           ,
+    old_op_seq   : &OpSequence     ,
+    new_op_seq   : &mut OpSequence ,
+    trace        : bool            ,
+) {
+    assert_eq!( arg.len(),   2);
+    //
+    // new_op_index
+    let new_op_index = new_op_seq.id_seq.len();
+    //
+    // new_op_seq: id_seq, arg_seq, n_dep
+    new_op_seq.n_dep += 1;
+    new_op_seq.id_seq.push( op_id );
+    new_op_seq.arg_seq.push( new_op_seq.arg_all.len() as IndexT );
+    //
+    //
+    for i_arg in 0 .. 2 {
+        let arg_type_i = arg_type[i_arg].clone();
+        let old_index = arg[i_arg] as usize;
+        let new_index = get_renumber( &renumber, &arg_type_i, old_index );
+        new_op_seq.arg_all.push( new_index );
+        new_op_seq.arg_type_all.push( arg_type_i );
+    }
+    // renumber
+    let new_index    = new_op_index + new_op_seq.n_dom;
+    let old_index    = old_op_index + old_op_seq.n_dom;
+    set_renumber(renumber, i_op_seq, old_index, new_index);
+    //
+    if trace {
+        println!( "{}, {}", old_index, new_index );
+    }
+}
+// -----------------------------------------------------------------------
 //
 // ADfn::dead_code
 impl<V> ADfn<V>
@@ -136,9 +176,9 @@ where
         // i_op_seq
         let start_op_seq = if n_dyp > 0 { 0 } else { 1 };
         for i_op_seq in start_op_seq .. 2 {
-            let old_depend  : &Vec<bool>;
-            let old_op_seq  : &OpSequence;
-            let new_op_seq  : &mut OpSequence;
+            let old_depend      : &Vec<bool>;
+            let old_op_seq      : &OpSequence;
+            let mut new_op_seq  : &mut OpSequence;
             if i_op_seq == 0 {
                 old_depend = &depend.dyp;
                 old_op_seq = &self.dyp;
@@ -178,36 +218,20 @@ where
                 let arg       = &old_op_seq.arg_all[start .. end];
                 let arg_type  = &old_op_seq.arg_type_all[start .. end];
                 //
-                if is_binary_op(op_id) && old_depend[old_res] {
-                    //
-                    assert!( arg.len() == 2 );
-                    //
-                    // new_op_seq: id_seq, arg_seq, n_dep
-                    new_op_seq.n_dep += 1;
-                    new_op_seq.id_seq.push( op_id );
-                    new_op_seq.arg_seq.push(
-                        new_op_seq.arg_all.len() as IndexT
-                    );
-                    //
-                    for i_arg in 0 .. 2 {
-                        let arg_type_i = arg_type[i_arg].clone();
-                        let old_index = arg[i_arg] as usize;
-                        let new_index = get_renumber(
-                            &renumber, &arg_type_i, old_index
+                if is_binary_op(op_id) {
+                    if old_depend[old_res] {
+                        new_binary_op(
+                            &mut renumber,
+                            i_op_seq,
+                            op_id,
+                            arg,
+                            arg_type,
+                            old_op_index,
+                            old_op_seq,
+                            &mut new_op_seq,
+                            trace,
                         );
-                        new_op_seq.arg_all.push( new_index );
-                        new_op_seq.arg_type_all.push( arg_type_i );
                     }
-                    // renumber
-                    let new_op_index = new_op_seq.id_seq.len() - 1;
-                    let new_index    = new_op_index + new_op_seq.n_dom;
-                    let old_index    = old_op_index + old_op_seq.n_dom;
-                    set_renumber(&mut renumber, i_op_seq, old_index, new_index);
-                    if trace {
-                        println!( "{}, {}", old_index, new_index );
-                    }
-                } // if is_bimary_op(op_id) && old_depend[old_res]
-                if is_binary_op(op_id ) {
                     old_op_index += 1;
                 } else {
                     panic!( "dead_code: op_id = {}", op_id );
