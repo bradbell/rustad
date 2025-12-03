@@ -19,6 +19,10 @@ use crate::tape::Tape;
 use crate::tape::OpSequence;
 use crate::op::binary::is_binary_op;
 use crate::ad::ADType;
+use crate::op::call::BEGIN_DOM;
+use crate::op::id::CALL_OP;
+use crate::op::id::CALL_RES_OP;
+use crate::op::call::extract_call_info;
 // -----------------------------------------------------------------------
 // set_renumber
 fn set_renumber(
@@ -26,11 +30,15 @@ fn set_renumber(
     i_op_seq      : usize ,
     old_index     : usize ,
     new_index     : usize ,
+    trace         : bool  ,
 ) {
     if i_op_seq == 0 {
         renumber.dyp[old_index] = new_index as IndexT;
     } else {
         renumber.var[old_index] = new_index as IndexT;
+    }
+    if trace {
+        println!( "{}, {}", old_index, new_index );
     }
 }
 // -----------------------------------------------------------------------
@@ -73,7 +81,7 @@ fn new_binary_op(
     new_op_seq   : &mut OpSequence ,
     trace        : bool            ,
 ) {
-    assert_eq!( arg.len(),   2);
+    assert_eq!( arg.len(), 2);
     //
     // new_op_index
     let new_op_index = new_op_seq.id_seq.len();
@@ -94,10 +102,81 @@ fn new_binary_op(
     // renumber
     let new_index    = new_op_index + new_op_seq.n_dom;
     let old_index    = old_op_index + old_op_seq.n_dom;
-    set_renumber(renumber, i_op_seq, old_index, new_index);
+    set_renumber(renumber, i_op_seq, old_index, new_index, trace);
     //
-    if trace {
-        println!( "{}, {}", old_index, new_index );
+}
+// -----------------------------------------------------------------------
+fn new_call_op(
+    renumber         : &mut Renumber    ,
+    old_rng_is_dep   : &[bool]          ,
+    new_flag         : &Vec<bool>       ,
+    i_op_seq         : usize            ,
+    arg              : &[IndexT]        ,
+    arg_type         : &[ADType]        ,
+    old_op_index     : usize            ,
+    new_op_seq       : &mut OpSequence  ,
+    trace            : bool             ,
+) {
+    //
+    //
+    // new_arg
+    let mut new_arg = arg.to_vec();
+    new_arg[BEGIN_DOM-1]  = new_op_seq.flag_all.len() as IndexT;
+    //
+    // new_arg
+    let n_dom = new_op_seq.n_dom;
+    for i_dom in 0 .. n_dom {
+        let old_index  = arg[BEGIN_DOM + i_dom] as usize;
+        let ad_type    = &arg_type[BEGIN_DOM + i_dom];
+        let new_index  = get_renumber(&renumber, ad_type, old_index);
+        new_arg[BEGIN_DOM + i_dom] = new_index;
+    }
+    //
+    // new_op_index
+    let new_op_index = new_op_seq.id_seq.len();
+    //
+    // renumber
+    let old_index    = old_op_index + n_dom;
+    let new_index    = new_op_index + n_dom;
+    set_renumber(renumber, i_op_seq, old_index, new_index, trace);
+    //
+    // new_op_seq: n_dep, id_seq, arg_seq
+    new_op_seq.n_dep += 1;
+    new_op_seq.id_seq.push( CALL_OP );
+    new_op_seq.arg_seq.push( new_op_seq.arg_all.len() as IndexT );
+    //
+    // new_op_seq: arg_all, arg_all_type, arg_type_all, flag_all
+    let n_arg  = new_arg.len();
+    let n_flag = new_flag.len();
+    new_op_seq.arg_all.extend_from_slice( &new_arg[0 .. n_arg] );
+    new_op_seq.arg_type_all.extend_from_slice( &arg_type[0 .. n_arg] );
+    new_op_seq.flag_all.extend_from_slice( &new_flag[0 .. n_flag] );
+    //
+    // CALL_RES_OP operators
+    let new_rng_is_dep = &new_flag[1 .. n_flag];
+    let n_rng          = new_rng_is_dep.len();
+    assert_eq!( n_rng, old_rng_is_dep.len() );
+    let mut old_i_dep = 0;
+    let mut new_i_dep = 0;
+    for i_rng in 0 .. n_rng {
+        if old_rng_is_dep[i_rng] {
+            if new_rng_is_dep[i_rng] {
+                //
+                // new_op_seq: n_dep, id_seq, arg_seq, arg_all, arg_type_all
+                new_op_seq.n_dep += 1;
+                new_op_seq.id_seq.push( CALL_RES_OP );
+                new_op_seq.arg_seq.push( new_op_seq.arg_all.len() as IndexT );
+                new_op_seq.arg_all.push( new_i_dep as IndexT );
+                new_op_seq.arg_type_all.push( ADType::Empty );
+                //
+                let old_index = old_op_index + n_dom + old_i_dep;
+                let new_index = new_op_index + n_dom + new_i_dep;
+                set_renumber(renumber, i_op_seq, old_index, new_index, trace);
+                //
+                new_i_dep += 1;
+            }
+            old_i_dep +=1;
+        }
     }
 }
 // -----------------------------------------------------------------------
@@ -157,7 +236,7 @@ where
                 "n_cop = {}, n_dyp = {}, n_var = {}", n_cop, n_dyp, n_var
             );
             if 0 < n_cop {
-                println!( "old_cop_index, new_cop_index" );
+                println!( "cop: old_index, new_index" );
             }
         }
         //
@@ -184,23 +263,23 @@ where
                 old_op_seq = &self.dyp;
                 new_op_seq = &mut tape.dyp;
                 if trace {
-                    println!( "old_dyp_index, new_dyp_index" );
+                    println!( "dyp: old_index, new_index" );
                 }
             } else {
                 old_depend = &depend.var;
                 old_op_seq = &self.var;
                 new_op_seq = &mut tape.var;
                 if trace {
-                    println!( "old_var_index, new_var_index" );
+                    println!( "var: old_index, new_index" );
                 }
             };
             //
             // new_op_seq.n_dom, renumber.dyp
             let n_dom        = old_op_seq.n_dom;
             new_op_seq.n_dom = n_dom;
-            for old_index in 0 .. n_dom {
-                set_renumber(&mut renumber, i_op_seq, old_index, old_index);
-            }
+            for old_index in 0 .. n_dom { set_renumber(
+                &mut renumber, i_op_seq, old_index, old_index, trace
+            ); }
             //
             // old_op_index, first_op
             let mut old_op_index = 0;
@@ -233,11 +312,52 @@ where
                         );
                     }
                     old_op_index += 1;
+                } else { if op_id == CALL_OP {
+                    let flag_all = &old_op_seq.flag_all;
+                    let (
+                        _atom_id,
+                        _call_info,
+                        _n_dom,
+                        n_rng,
+                        trace_this_op,
+                        old_rng_is_dep,
+                    ) = extract_call_info(arg, flag_all);
+                    //
+                    // old_n_dep, new_n_dep, new_rng_is_dep
+                    let mut old_n_dep      = 0;
+                    let mut new_any_depend = false;
+                    let mut new_flag = vec![false; n_rng + 1];
+                    new_flag[0]      = trace_this_op;
+                    for i_rng in 0 .. n_rng {
+                        if old_rng_is_dep[i_rng] {
+                            if old_depend[old_res + old_n_dep] {
+                                // This i_rng will be a dependent in new_op_seq
+                                new_flag[i_rng + 1] = true;
+                                new_any_depend      = true;
+                            }
+                            old_n_dep += 1;
+                        }
+                    }
+                    if new_any_depend {
+                        new_call_op(
+                            &mut renumber,
+                            &old_rng_is_dep,
+                            &new_flag,
+                            i_op_seq,
+                            arg,
+                            arg_type,
+                            old_op_index,
+                            &mut new_op_seq,
+                            trace,
+                        );
+                    }
+                    old_op_index += old_n_dep;
                 } else {
                     panic!( "dead_code: op_id = {}", op_id );
                 }
             } // while old_op_index <
         } // for i_op_seq in 0 .. 2
+    }
     if trace {
         println!( "End Trace: dead_code" );
         }

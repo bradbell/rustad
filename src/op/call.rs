@@ -96,7 +96,7 @@ where
 }
 //
 // extract_call_info
-fn extract_call_info<'a>(
+pub(crate) fn extract_call_info<'a>(
     arg        : &'a [IndexT] ,
     flag_all   : &'a [bool]   ,
 ) -> (
