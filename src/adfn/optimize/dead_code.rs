@@ -20,6 +20,47 @@ use crate::tape::OpSequence;
 use crate::op::binary::is_binary_op;
 use crate::ad::ADType;
 // -----------------------------------------------------------------------
+// set_renumber
+fn set_renumber(
+    renumber      : &mut Renumber,
+    i_op_seq      : usize ,
+    old_index     : usize ,
+    new_index     : usize ,
+) {
+    if i_op_seq == 0 {
+        renumber.dyp[old_index] = new_index as IndexT;
+    } else {
+        renumber.var[old_index] = new_index as IndexT;
+    }
+}
+// -----------------------------------------------------------------------
+// get_renumber(
+fn get_renumber(
+    renumber  : &Renumber ,
+    ad_type   : &ADType   ,
+    old_index : usize     ,
+) -> IndexT {
+    let new_index : IndexT;
+    match ad_type {
+        ADType::ConstantP => {
+            new_index = renumber.cop[old_index];
+            assert!( (new_index as usize) < renumber.cop.len() );
+        },
+        ADType::DynamicP  => {
+            new_index = renumber.dyp[old_index];
+            assert!( (new_index as usize) < renumber.dyp.len() );
+        },
+        ADType::Variable => {
+            new_index = renumber.var[old_index];
+            assert!( (new_index as usize) < renumber.var.len() );
+        },
+        _  => {
+            panic!("dead_code: unexpected argument type {:?}", ad_type)
+        },
+    }
+    new_index
+}
+// -----------------------------------------------------------------------
 //
 // ADfn::dead_code
 impl<V> ADfn<V>
@@ -118,11 +159,7 @@ where
             let n_dom        = old_op_seq.n_dom;
             new_op_seq.n_dom = n_dom;
             for old_index in 0 .. n_dom {
-                if i_op_seq == 0 {
-                    renumber.dyp[old_index] = old_index as IndexT;
-                } else {
-                    renumber.var[old_index] = old_index as IndexT;
-                }
+                set_renumber(&mut renumber, i_op_seq, old_index, old_index);
             }
             //
             // old_op_index, first_op
@@ -155,31 +192,9 @@ where
                     for i_arg in 0 .. 2 {
                         let arg_type_i = arg_type[i_arg].clone();
                         let old_index = arg[i_arg] as usize;
-                        let new_index : IndexT;
-                        match arg_type_i {
-                            ADType::ConstantP => {
-                                new_index = renumber.cop[old_index];
-                                assert_ne!(
-                                    new_index as usize, renumber.cop.len()
-                                );
-                            },
-                            ADType::DynamicP  => {
-                                new_index = renumber.dyp[old_index];
-                                assert_ne!(
-                                    new_index as usize, renumber.dyp.len()
-                                );
-                            },
-                            ADType::Variable => {
-                                new_index = renumber.var[old_index];
-                                assert_ne!(
-                                    new_index as usize, renumber.var.len()
-                                );
-                                assert_ne!( i_op_seq, 0 );
-                            },
-                            _  => {
-                                panic!("dead_code: binary operator error")
-                            },
-                        }
+                        let new_index = get_renumber(
+                            &renumber, &arg_type_i, old_index
+                        );
                         new_op_seq.arg_all.push( new_index );
                         new_op_seq.arg_type_all.push( arg_type_i );
                     }
@@ -187,11 +202,7 @@ where
                     let new_op_index = new_op_seq.id_seq.len() - 1;
                     let new_index    = new_op_index + new_op_seq.n_dom;
                     let old_index    = old_op_index + old_op_seq.n_dom;
-                    if i_op_seq == 0 {
-                        renumber.dyp[old_index] = new_index as IndexT;
-                    } else {
-                        renumber.var[old_index] = new_index as IndexT;
-                    }
+                    set_renumber(&mut renumber, i_op_seq, old_index, new_index);
                     if trace {
                         println!( "{}, {}", old_index, new_index );
                     }
