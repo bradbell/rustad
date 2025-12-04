@@ -181,9 +181,9 @@ fn build_atom_src() -> String {
     atom_src
 }
 //
-// atom_dyp
+// atom_dyp_src
 #[test]
-fn atom_dyp() {
+fn atom_dyp_src() {
     let h_atom_id  = register_h();
     let call_info      = 0;
     let trace          = false;
@@ -241,7 +241,7 @@ fn atom_dyp() {
     let rust_src  = f.rust_src(fn_name);
     //
     // src_file
-    let src_file  = "tmp/test_atom_dyp.rs";
+    let src_file  = "tmp/test_atom_dyp_src.rs";
     let src       = az_float_src + &atom_src + &rust_src;
     let result    = std::fs::write(src_file, src);
     if result.is_err() {
@@ -249,7 +249,7 @@ fn atom_dyp() {
     }
     //
     // lib
-    let lib_file    = "tmp/test_atom_dyp.so";
+    let lib_file    = "tmp/test_atom_dyp_src.so";
     let replace_lib = true;
     let lib         = get_lib(src_file, lib_file, replace_lib);
     //
