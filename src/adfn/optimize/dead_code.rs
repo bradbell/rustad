@@ -47,26 +47,41 @@ fn get_renumber(
     renumber  : &Renumber ,
     ad_type   : &ADType   ,
     old_index : usize     ,
-) -> IndexT {
-    let new_index : IndexT;
+) -> Option<IndexT> {
+    let option : Option<IndexT>;
     match ad_type {
         ADType::ConstantP => {
-            new_index = renumber.cop[old_index];
-            assert!( (new_index as usize) < renumber.cop.len() );
+            let new_index = renumber.cop[old_index];
+            let index     = new_index as usize;
+            if index < renumber.cop.len() + 1 {
+                option = Some(new_index);
+            } else {
+                option = None;
+            }
         },
         ADType::DynamicP  => {
-            new_index = renumber.dyp[old_index];
-            assert!( (new_index as usize) < renumber.dyp.len() );
+            let new_index = renumber.dyp[old_index];
+            let index     = new_index as usize;
+            if index < renumber.dyp.len() {
+                option = Some(new_index);
+            } else {
+                option = None;
+            }
         },
         ADType::Variable => {
-            new_index = renumber.var[old_index];
-            assert!( (new_index as usize) < renumber.var.len() );
+            let new_index = renumber.var[old_index];
+            let index     = new_index as usize;
+            if index < renumber.var.len() {
+                option = Some(new_index);
+            } else {
+                option = None;
+            }
         },
         _  => {
             panic!("dead_code: unexpected argument type {:?}", ad_type)
         },
     }
-    new_index
+    option
 }
 // -----------------------------------------------------------------------
 // new_binary_op
@@ -91,11 +106,12 @@ fn new_binary_op(
     new_op_seq.id_seq.push( op_id );
     new_op_seq.arg_seq.push( new_op_seq.arg_all.len() as IndexT );
     //
-    //
+    // new_op_seq: arg_all, arg_type_all
     for i_arg in 0 .. 2 {
         let arg_type_i = arg_type[i_arg].clone();
         let old_index = arg[i_arg] as usize;
-        let new_index = get_renumber( &renumber, &arg_type_i, old_index );
+        let option    = get_renumber( &renumber, &arg_type_i, old_index );
+        let new_index = option.unwrap();
         new_op_seq.arg_all.push( new_index );
         new_op_seq.arg_type_all.push( arg_type_i );
     }
@@ -119,17 +135,26 @@ fn new_call_op(
 ) {
     //
     //
-    // new_arg
+    // new_arg, new_arg_type
     let mut new_arg = arg.to_vec();
     new_arg[BEGIN_DOM-1]  = new_op_seq.flag_all.len() as IndexT;
+    let mut new_arg_type  = arg_type.to_vec();
     //
-    // new_arg
+    // new_arg, new_arg_type
     let n_dom = new_op_seq.n_dom;
     for i_dom in 0 .. n_dom {
         let old_index  = arg[BEGIN_DOM + i_dom] as usize;
         let ad_type    = &arg_type[BEGIN_DOM + i_dom];
-        let new_index  = get_renumber(&renumber, ad_type, old_index);
-        new_arg[BEGIN_DOM + i_dom] = new_index;
+        let option  = get_renumber(&renumber, ad_type, old_index);
+        if option.is_none() {
+            // A call argument will get optimized out if it is not
+            // necessary to obtain the call results that are used.
+            new_arg[BEGIN_DOM + i_dom]      = 0; // nan
+            new_arg_type[BEGIN_DOM + i_dom] = ADType::ConstantP;
+        } else {
+            let new_index              = option.unwrap();
+            new_arg[BEGIN_DOM + i_dom] = new_index;
+        }
     }
     //
     // new_op_index
@@ -149,7 +174,7 @@ fn new_call_op(
     let n_arg  = new_arg.len();
     let n_flag = new_flag.len();
     new_op_seq.arg_all.extend_from_slice( &new_arg[0 .. n_arg] );
-    new_op_seq.arg_type_all.extend_from_slice( &arg_type[0 .. n_arg] );
+    new_op_seq.arg_type_all.extend_from_slice( &new_arg_type[0 .. n_arg] );
     new_op_seq.flag_all.extend_from_slice( &new_flag[0 .. n_flag] );
     //
     // CALL_RES_OP operators
@@ -212,7 +237,10 @@ where
     /// indices in *tape* .
     ///
     pub(crate) fn dead_code(&self, depend : &Depend, trace : bool,
-    ) -> ( Tape<V>, Renumber) {
+    ) -> ( Tape<V>, Renumber)
+    where
+        V : Clone + From<f32> ,
+    {
         //
         // tape
         let mut tape : Tape<V> = Tape::new();
@@ -223,9 +251,9 @@ where
         let n_var = self.var_len();
         //
         // renumber
-        // initialize as an invalid value
+        // Initialize as an invalid value.
         let mut renumber = Renumber{
-                cop : vec![ n_cop as IndexT; n_cop ] ,
+                cop : vec![ n_cop as IndexT; n_cop + 1] ,
                 dyp : vec![ n_dyp as IndexT; n_dyp ] ,
                 var : vec![ n_var as IndexT; n_var ] ,
         };
@@ -240,7 +268,11 @@ where
             }
         }
         //
-        // tape.cop, renumber.cop
+        // tape.cop
+        // Place a nan at index zero; note tape.cop.len() <= self.cop.len() + 1
+        let nan :  V  = f32::NAN.into();
+        tape.cop.push( nan );
+        //
         let n_cop = self.cop_len();
         for old_index in 0 .. n_cop {
             if depend.cop[old_index] {
