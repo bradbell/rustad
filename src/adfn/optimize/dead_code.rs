@@ -160,11 +160,6 @@ fn new_call_op(
     // new_op_index
     let new_op_index = new_op_seq.id_seq.len();
     //
-    // renumber
-    let old_index    = old_op_index + n_dom;
-    let new_index    = new_op_index + n_dom;
-    set_renumber(renumber, i_op_seq, old_index, new_index, trace);
-    //
     // new_op_seq: n_dep, id_seq, arg_seq
     new_op_seq.n_dep += 1;
     new_op_seq.id_seq.push( CALL_OP );
@@ -177,7 +172,7 @@ fn new_call_op(
     new_op_seq.arg_type_all.extend_from_slice( &new_arg_type[0 .. n_arg] );
     new_op_seq.flag_all.extend_from_slice( &new_flag[0 .. n_flag] );
     //
-    // CALL_RES_OP operators
+    // renumber, CALL_RES_OP operators
     let new_rng_is_dep = &new_flag[1 .. n_flag];
     let n_rng          = new_rng_is_dep.len();
     assert_eq!( n_rng, old_rng_is_dep.len() );
@@ -187,17 +182,19 @@ fn new_call_op(
         if old_rng_is_dep[i_rng] {
             if new_rng_is_dep[i_rng] {
                 //
-                // new_op_seq: n_dep, id_seq, arg_seq, arg_all, arg_type_all
-                new_op_seq.n_dep += 1;
-                new_op_seq.id_seq.push( CALL_RES_OP );
-                new_op_seq.arg_seq.push( new_op_seq.arg_all.len() as IndexT );
-                new_op_seq.arg_all.push( new_i_dep as IndexT );
-                new_op_seq.arg_type_all.push( ADType::Empty );
-                //
                 let old_index = old_op_index + n_dom + old_i_dep;
                 let new_index = new_op_index + n_dom + new_i_dep;
                 set_renumber(renumber, i_op_seq, old_index, new_index, trace);
                 //
+                if 0 < new_i_dep  {
+                    //
+                    // new_op_seq: n_dep, id_seq, arg_seq, arg_all, arg_type_all
+                    new_op_seq.n_dep += 1;
+                    new_op_seq.id_seq.push( CALL_RES_OP );
+                    new_op_seq.arg_seq.push(new_op_seq.arg_all.len() as IndexT);
+                    new_op_seq.arg_all.push( new_i_dep as IndexT );
+                    new_op_seq.arg_type_all.push( ADType::Empty );
+                }
                 new_i_dep += 1;
             }
             old_i_dep +=1;
@@ -331,6 +328,8 @@ where
                 //
                 if is_binary_op(op_id) {
                     if old_depend[old_res] {
+                        //
+                        // renumber, new_op_seq
                         new_binary_op(
                             &mut renumber,
                             i_op_seq,
@@ -371,6 +370,8 @@ where
                         }
                     }
                     if new_any_depend {
+                        //
+                        // renumber, new_op_seq
                         new_call_op(
                             &mut renumber,
                             &old_rng_is_dep,

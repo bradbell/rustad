@@ -80,6 +80,9 @@ pub fn doc_common_arguments() {}
 /// only its capacity matters on input (to avoid reallocating memory).
 /// Upon return, it contains the domain index values that the specified
 /// range index value depends on.
+/// If range component i does not depend on domain component j,
+/// domain component j may be any value when computing range component i;
+/// e.g. nan.
 ///
 /// * rng_index   :
 /// is the range index that that the dependencies are computed for.

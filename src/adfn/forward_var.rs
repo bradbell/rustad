@@ -18,6 +18,7 @@ use crate::op::id::CALL_OP;
 use crate::op::info::sealed::GlobalOpInfoVec;
 use crate::adfn::eval_from::eval_from_f32;
 use crate::adfn::eval_from::eval_from_value;
+use crate::op::call::extract_call_info;
 //
 #[cfg(doc)]
 use crate::{
@@ -212,9 +213,22 @@ macro_rules! forward_var {
                         res, var_both[res], name, arg, arg_type
                     );
                     if op_id as u8 == CALL_OP {
-                        let n_dep = arg[4] as usize;
-                        for j in 1 .. n_dep {
-                            println!( "{}, {}", res + j, dyp_both[res + j]);
+                        let (
+                            _atom_id,
+                            _call_info,
+                            _n_dom,
+                            n_rng,
+                            _trace,
+                            rng_is_dep,
+                        ) = extract_call_info(arg, &self.dyp.flag_all);
+                        let mut i_dep = 0;
+                        for i_rng in 0 .. n_rng {
+                            if rng_is_dep[i_rng] { if i_dep > 0 { println!(
+                                "{}, {}", res + i_dep, var_both[res + i_dep]
+                            ); } }
+                            if rng_is_dep[i_rng] {
+                                i_dep += 1;
+                            }
                         }
                     }
                 }

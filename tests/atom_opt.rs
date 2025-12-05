@@ -77,10 +77,8 @@ fn atom_opt() {
     let call_info   = 0;
     //
     // f
-    let np   = 2;
-    let nx   = 2;
-    let p    = vec![V::from(1.0); np ];
-    let x    = vec![V::from(1.0); nx ];
+    let p    = vec![V::from(1.0), V::from(2.0) ];
+    let x    = vec![V::from(3.0), V::from(4.0) ];
     let (ap, ax) = start_recording_dyp_var(p.clone(), x.clone());
     //
     // aq
@@ -97,8 +95,6 @@ fn atom_opt() {
     let mut az  : Vec< AD<V> > = Vec::new();
     az.push( aq[0].clone() );  // z[0] = q[0]
     az.push( aq[1].clone() );  // z[1] = q[1]
-    az.push( ay[0].clone() );  // z[2] = y[0]
-    az.push( ay[1].clone() );  // z[3] = y[1]
     //
     // aw
     // w = z
@@ -107,26 +103,32 @@ fn atom_opt() {
     // au
     let mut au : Vec< AD<V> > = Vec::new();
     au.push( aw[1].clone() ); // u[0] = w[1]
-    au.push( aw[3].clone() ); // u[1] = w[3]
     //
     // f, n_dyp, n_var
     let mut f = stop_recording(au);
-    let _n_dyp = f.dyp_len();
-    let _n_var = f.var_len();
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), trace);
     let (u, _u) = f.forward_var_value(&p_, x.clone(), trace);
     assert_eq!(u[0], &p[1] * &p[1] );
-    assert_eq!(u[1], &x[1] * &p[1] );
+    //
+    // n_dyp_dep, n_var_dep
+    let n_dyp_dep = f.dyp_dep_len();
+    let n_var_dep = f.var_dep_len();
+    assert_eq!( n_dyp_dep, 4); // q[0], q[1], w[0], w[1]
+    assert_eq!( n_var_dep, 2); // y[0], y[1]
     //
     // optimize
     f.optimize(trace);
-    /* TODO: get this test to pass
+    //
+    // n_dyp_dep, n_var_dep
+    let n_dyp_dep = f.dyp_dep_len();
+    let n_var_dep = f.var_dep_len();
+    assert_eq!( n_dyp_dep, 2); // q[1], w[1]
+    assert_eq!( n_var_dep, 0);
+    //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), trace);
     let (u, _u) = f.forward_var_value(&p_, x.clone(), trace);
     assert_eq!(u[0], &p[1] * &p[1] );
-    assert_eq!(u[1], &x[1] * &x[1] );
-    */
 }

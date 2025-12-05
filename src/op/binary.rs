@@ -15,25 +15,25 @@ use crate::op::id;
 // ---------------------------------------------------------------------------
 pub(crate) fn is_binary_op(op_id : u8) -> bool {
     match op_id {
-        id::ADD_PP_OP => true , 
-        id::ADD_PV_OP => true , 
-        id::ADD_VP_OP => true , 
-        id::ADD_VV_OP => true , 
+        id::ADD_PP_OP => true ,
+        id::ADD_PV_OP => true ,
+        id::ADD_VP_OP => true ,
+        id::ADD_VV_OP => true ,
         //
-        id::SUB_PP_OP => true , 
-        id::SUB_PV_OP => true , 
-        id::SUB_VP_OP => true , 
-        id::SUB_VV_OP => true , 
+        id::SUB_PP_OP => true ,
+        id::SUB_PV_OP => true ,
+        id::SUB_VP_OP => true ,
+        id::SUB_VV_OP => true ,
         //
-        id::MUL_PP_OP => true , 
-        id::MUL_PV_OP => true , 
-        id::MUL_VP_OP => true , 
-        id::MUL_VV_OP => true , 
+        id::MUL_PP_OP => true ,
+        id::MUL_PV_OP => true ,
+        id::MUL_VP_OP => true ,
+        id::MUL_VV_OP => true ,
         //
-        id::DIV_PP_OP => true , 
-        id::DIV_PV_OP => true , 
-        id::DIV_VP_OP => true , 
-        id::DIV_VV_OP => true , 
+        id::DIV_PP_OP => true ,
+        id::DIV_PV_OP => true ,
+        id::DIV_VP_OP => true ,
+        id::DIV_VV_OP => true ,
         //
         _         => false,
     }
@@ -359,13 +359,11 @@ pub(crate) fn reverse_depend(
     res       : usize                 ,
     res_type  : ADType                ,
 ) { //
-    assert_eq!(arg.len(), 2);
-    assert_eq!(arg_type.len(), 2);
+    debug_assert_eq!(arg.len(), 2);
+    debug_assert_eq!(arg_type.len(), 2);
     //
     if res_type.is_variable() {
-        if depend.var[res] == false {
-            return;
-        }
+        debug_assert!( depend.var[res] );
         for i_arg in 0 .. 2 {
             let index = arg[i_arg] as usize;
             match arg_type[i_arg] {
@@ -377,10 +375,8 @@ pub(crate) fn reverse_depend(
             }
         }
     } else {
-        assert!( res_type.is_dynamic() );
-        if depend.dyp[res] == false {
-            return;
-        }
+        debug_assert!( res_type.is_dynamic() );
+        debug_assert!( depend.dyp[res] );
         for i_arg in 0 .. 2 {
             let index = arg[i_arg] as usize;
             match arg_type[i_arg] {

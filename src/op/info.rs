@@ -197,7 +197,9 @@ pub(crate) type ReverseDer<V, E> = fn(
 /// * depend :
 /// On input, depend contains the the dependencies given the dependent values
 /// with index greater than res.
-/// Upon return, depend contains the the dependencies given the dependent values
+/// In addition, depend[res] is true.
+/// Upon return,
+/// depend contains the the dependencies given the dependent values
 ///  with index greater or equal res.
 pub(crate) type ReverseDepend = fn(
     _depend   : &mut optimize::Depend ,

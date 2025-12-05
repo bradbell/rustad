@@ -1078,6 +1078,7 @@ where
     let dep_index : usize ;
     if op_id == CALL_RES_OP {
         dep_index   = arg_all[begin] as usize;
+        debug_assert!( 0 < dep_index );
         debug_assert!( dep_index <= op_index );
         op_index    = op_index - dep_index;
         debug_assert!( id_seq[op_index] == CALL_OP );
