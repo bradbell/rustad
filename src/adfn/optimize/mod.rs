@@ -96,7 +96,8 @@ pub(crate) struct Renumber {
 /// ```
 impl<V> ADfn<V>
 where
-    V : Clone + From<f32> + AtomInfoVecPublic + GlobalOpInfoVecPublic,
+    V : Clone + From<f32> + PartialEq +
+        AtomInfoVecPublic + GlobalOpInfoVecPublic,
 {   //
     // optimize
     pub fn optimize(&mut self, trace : bool)

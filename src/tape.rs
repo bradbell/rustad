@@ -216,7 +216,7 @@ pub(crate) use impl_this_thread_tape;
 ///
 pub fn start_recording_var<V>(var_dom : Vec<V> ) -> Vec< AD<V> >
 where
-    V : Clone + Sized + 'static + sealed::ThisThreadTape ,
+    V : From<f32> + Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
     let dyp_dom : Vec<V> = Vec::new();
     let (_adyp_dom, avar_dom) = start_recording_dyp_var(dyp_dom, var_dom);
@@ -266,7 +266,7 @@ pub fn start_recording_dyp_var<V>(
     dyp_dom : Vec<V>, var_dom : Vec<V>
 ) -> ( Vec< AD<V> >, Vec< AD<V> > )
 where
-    V : Clone + Sized + 'static + sealed::ThisThreadTape ,
+    V : From<f32> + Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
     assert_ne!( var_dom.len(), 0 );
     //
@@ -300,12 +300,19 @@ where
         //
         assert_eq!( tape.cop.len(),          0 );
         //
+        // tape: tape_id, recording
         tape.tape_id     = tape_id;
         tape.recording   = true;
         //
+        // tape.cop:
+        // initialize with NAN at index zero
+        tape.cop.push( f32::NAN.into() );
+        //
+        // tape.dyp: n_dom, n_dep
         tape.dyp.n_dom   = dyp_dom.len();
         tape.dyp.n_dep   = 0;
         //
+        // tape.var: n_dom, n_dep
         tape.var.n_dom  = var_dom.len();
         tape.var.n_dep  = 0;
     } );

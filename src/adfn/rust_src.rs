@@ -141,8 +141,15 @@ where
             for i in 0 .. self.cop.len() {
                 let i_str = i.to_string();
                 let c_str = self.cop[i].to_string();
-                src = src +
-                    "   cop[" + &i_str + "] = V::from(" + &c_str + ");\n";
+                if c_str.to_ascii_lowercase() == "nan" {
+                    // If we did nothing in this case, we would get a warning
+                    // when all the entries in cop are nan.
+                    src = src +
+                        "   cop[" + &i_str + "] = nan;\n";
+                } else {
+                    src = src +
+                        "   cop[" + &i_str + "] = V::from(" + &c_str + ");\n";
+                }
             }
         }
         //

@@ -314,8 +314,9 @@ mod tests {
         let depend = f.reverse_depend(trace);
         //
         // depend.cop
-        // TODO: There are three constants, but should only be one.
-        assert_eq!( depend.cop, [false, false, true] );
+        // TODO: There are four constants, but should only be two;
+        // The nan at index zero and the five in z[0].
+        assert_eq!( depend.cop, [false, false, false, true] );
         //
         // depend.dyp
         assert_eq!( depend.dyp, [true, false, true, false, true] );

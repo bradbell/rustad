@@ -236,8 +236,12 @@ where
     pub(crate) fn dead_code(&self, depend : &Depend, trace : bool,
     ) -> ( Tape<V>, Renumber)
     where
-        V : Clone + From<f32> ,
+        V : Clone + From<f32> + PartialEq ,
     {
+        //
+        // self.cop[0]
+        let nan :  V  = f32::NAN.into();
+        assert!( nan == self.cop[0] );
         //
         // tape
         let mut tape : Tape<V> = Tape::new();
@@ -250,7 +254,7 @@ where
         // renumber
         // Initialize as an invalid value.
         let mut renumber = Renumber{
-                cop : vec![ n_cop as IndexT; n_cop + 1] ,
+                cop : vec![ n_cop as IndexT; n_cop] ,
                 dyp : vec![ n_dyp as IndexT; n_dyp ] ,
                 var : vec![ n_var as IndexT; n_var ] ,
         };
@@ -266,13 +270,10 @@ where
         }
         //
         // tape.cop
-        // Place a nan at index zero; note tape.cop.len() <= self.cop.len() + 1
-        let nan :  V  = f32::NAN.into();
-        tape.cop.push( nan );
         //
         let n_cop = self.cop_len();
         for old_index in 0 .. n_cop {
-            if depend.cop[old_index] {
+            if depend.cop[old_index] || old_index == 0 {
                 let value               = self.cop[old_index].clone();
                 let new_index           = tape.cop.len();
                 renumber.cop[old_index] = new_index as IndexT;

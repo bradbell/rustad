@@ -11,7 +11,7 @@
 - [Contact Us](#contact-us)
 
 ## Objective
-This package is intended to include most of the features in
+This package is intended to include (and extend) most of the features in
 [CppAD](https://cppad.readthedocs.io/latest/) in a way that :
 
 1.  It is easy to use.
@@ -66,9 +66,13 @@ and addition by zero does not need to be recorded.
 ## Goals Before Stable API
 
 1.  Subtraction, division and all the standard math functions.
+
+2.  Conditional Expressions.
     
 3.  Forward and reverse sparse derivative calculations
     (sparsity patterns are already implemented). 
+
+4.  Checkpointing with arbitrary order of differentiation.
 
 ## Wish List
 
@@ -77,6 +81,8 @@ and addition by zero does not need to be recorded.
 
 2.  In the case of NumVec operations, Generate GPU code and use it
     to speed up evaluation of function values and derivatives.
+
+3.  Abs-normal form.
 
 ## User Documentation
 This package does not yet have a stable API. 
