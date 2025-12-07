@@ -332,10 +332,10 @@ where
 ///
 /// # Example
 /// ```
-/// use std::collections::HashMap;
+/// use rustc_hash::FxHashMap;
 /// use rustad::AzFloat;
 ///
-/// let mut map : HashMap<AzFloat<f32>, u32> = HashMap::new();
+/// let mut map : FxHashMap<AzFloat<f32>, u32> = FxHashMap::default();
 /// let z1      = AzFloat(1f32);
 /// let z2      = AzFloat(2f32);
 /// let z3      = AzFloat( f32::NAN );

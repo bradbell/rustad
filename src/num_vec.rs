@@ -379,13 +379,13 @@ impl<S: PartialEq> Eq for NumVec<S> { }
 ///
 /// # Example
 /// ```
-/// use std::collections::HashMap;
+/// use rustc_hash::FxHashMap;
 /// use rustad::AzFloat;
 /// use rustad::NumVec;
 ///
 /// type S      = AzFloat<f64>;
 /// type V      = NumVec<S>;
-/// let mut map : HashMap<V, u32> = HashMap::new();
+/// let mut map : FxHashMap<V, u32> = FxHashMap::default();
 /// let z1      = NumVec::new( vec![ S::from(1.0) ] );
 /// let z2      = NumVec::new( vec![ S::from(1.0), S::from( f64::NAN) ] );
 /// let z3      = NumVec::new( vec![ S::from( f64::NAN ) ]  );
