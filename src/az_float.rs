@@ -325,7 +325,6 @@ where
     }
 }
 // ---------------------------------------------------------------------------
-// TODO: use a faster hasher; e.g., rustc_hash::FxHasher.
 /// Hash function for AzFloat objects
 ///
 /// * B : is the floating point base type
