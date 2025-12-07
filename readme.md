@@ -14,11 +14,11 @@
 This package is intended to include (and extend) most of the features in
 [CppAD](https://cppad.readthedocs.io/latest/) in a way that :
 
-1.  It is easy to use.
+1.  The API is easy to use.
 2.  The source code is easy to understand and helps developers
     of other AD packages.
-3.  It works well with many threads.
-5.  It supports machine learning algorithms.
+3.  The package works well with many threads.
+4.  The package has special types that supports machine learning algorithms.
 
 ## Releases
 
@@ -61,6 +61,8 @@ Reduce tape size both during recording and by
 optimizing the operation sequence. 
 For example: multiplication by the constants zero and one 
 and addition by zero does not need to be recorded.
+This optimization should use less memory and be faster than 
+CppAD's optimization because it does not re-tape the operation sequence.
 
 
 ## Goals Before Stable API
