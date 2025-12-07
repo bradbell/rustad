@@ -21,6 +21,7 @@ use crate::ad::ADType;
 // -----------------------------------------------------------------------
 // mod
 mod reverse_depend;
+mod compress_cop;
 mod dead_code;
 // -----------------------------------------------------------------------
 // Depend
@@ -96,13 +97,19 @@ pub(crate) struct Renumber {
 /// ```
 impl<V> ADfn<V>
 where
-    V : Clone + From<f32> + PartialEq +
+    V : Clone + From<f32> + Eq + std::fmt::Display + std::hash::Hash +
         AtomInfoVecPublic + GlobalOpInfoVecPublic,
 {   //
     // optimize
     pub fn optimize(&mut self, trace : bool)
     {   //
-        let depend               = self.reverse_depend(trace);
+        // depend
+        let mut depend = self.reverse_depend(trace);
+        //
+        // self, depend
+        self.compress_cop(&mut depend, trace);
+        //
+        // tape, renumber
         let (mut tape, renumber) = self.dead_code(&depend, trace);
         //
         // checks
