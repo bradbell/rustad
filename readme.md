@@ -15,7 +15,8 @@ This package is intended to include (and extend) most of the features in
 [CppAD](https://cppad.readthedocs.io/latest/) in a way that :
 
 1.  The API is easy to use.
-2.  The source code is easy to understand and helps developers
+2.  Its representation of functions using tapes is easy to manipulate.
+    This makes its source code easy to understand and helps developers
     of other AD packages.
 3.  The package works well with many threads.
 4.  The package has special types that supports machine learning algorithms.
