@@ -17,8 +17,8 @@ type V = AzFloat<f32>;
 fn compress_cop() {
     //
     // trace, n_repeat
-    let trace    = false;
-    let n_repeat = 4;
+    let trace    = true;
+    let n_repeat = 2;
     //
     // four, p, x, ap, ax
     let p    = vec! [V::from(2.0) ];

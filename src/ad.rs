@@ -24,7 +24,7 @@ use crate::op::id;
 /// If a result depends on two arguments, the type of the result is the
 /// maximum of the type of its arguments.
 /// The value Empty is greater than any other type.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) enum ADType {
     //
     // ConstantP

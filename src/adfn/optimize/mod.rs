@@ -22,6 +22,7 @@ use crate::ad::ADType;
 // mod
 mod reverse_depend;
 mod compress_cop;
+mod compress_dyp;
 mod dead_code;
 // -----------------------------------------------------------------------
 // Depend
@@ -108,6 +109,9 @@ where
         //
         // self, depend
         self.compress_cop(&mut depend, trace);
+        //
+        // self, depend
+        self.compress_dyp(&mut depend, trace);
         //
         // tape, renumber
         let (mut tape, renumber) = self.dead_code(&depend, trace);
