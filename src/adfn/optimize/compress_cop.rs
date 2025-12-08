@@ -78,25 +78,31 @@ where
         //
         // i_op_seq, op_seq
         for i_op_seq in 0 .. 2 {
-            let op_seq : &mut OpSequence;
+            let op_seq    : &mut OpSequence;
+            let op_depend : &Vec<bool>;
             if i_op_seq == 0 {
-                op_seq = &mut self.dyp;
+                op_seq    = &mut self.dyp;
+                op_depend = &depend.dyp;
             } else {
-                op_seq = &mut self.var;
+                op_seq    = &mut self.var;
+                op_depend = &depend.var;
             }
             //
             // op_seq.arg_all
             for op_index in 0 .. op_seq.n_dep {
-                //
-                let start      = op_seq.arg_start[op_index] as usize;
-                let end        = op_seq.arg_start[op_index + 1] as usize;
-                let arg        = &mut op_seq.arg_all[start .. end];
-                let arg_type   = &op_seq.arg_type_all[start .. end];
-                for i_arg in 0 .. arg.len() {
-                    if arg_type[i_arg] == ADType::ConstantP {
-                        let key    = &self.cop[ arg[i_arg] as usize ];
-                        let index  = hash_map.get(key).unwrap();
-                        arg[i_arg] = *index;
+                let res = op_index + op_seq.n_dom;
+                if op_depend[res] {
+                    //
+                    let start      = op_seq.arg_start[op_index] as usize;
+                    let end        = op_seq.arg_start[op_index + 1] as usize;
+                    let arg        = &mut op_seq.arg_all[start .. end];
+                    let arg_type   = &op_seq.arg_type_all[start .. end];
+                    for i_arg in 0 .. arg.len() {
+                        if arg_type[i_arg] == ADType::ConstantP {
+                            let key    = &self.cop[ arg[i_arg] as usize ];
+                            let index  = hash_map.get(key).unwrap();
+                            arg[i_arg] = *index;
+                        }
                     }
                 }
             }
