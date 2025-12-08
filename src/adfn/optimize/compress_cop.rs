@@ -88,8 +88,8 @@ where
             // op_seq.arg_all
             for op_index in 0 .. op_seq.n_dep {
                 //
-                let start      = op_seq.arg_seq[op_index] as usize;
-                let end        = op_seq.arg_seq[op_index + 1] as usize;
+                let start      = op_seq.arg_start[op_index] as usize;
+                let end        = op_seq.arg_start[op_index + 1] as usize;
                 let arg        = &mut op_seq.arg_all[start .. end];
                 let arg_type   = &op_seq.arg_type_all[start .. end];
                 for i_arg in 0 .. arg.len() {

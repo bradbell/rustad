@@ -122,8 +122,8 @@ where
                     //
                     // op_id, arg, arg_type
                     let op_id     = op_seq.id_all[op_index];
-                    let start     = op_seq.arg_seq[op_index] as usize;
-                    let end       = op_seq.arg_seq[op_index + 1] as usize;
+                    let start     = op_seq.arg_start[op_index] as usize;
+                    let end       = op_seq.arg_start[op_index + 1] as usize;
                     let arg       = &op_seq.arg_all[start .. end];
                     let arg_type  = &op_seq.arg_type_all[start .. end];
                     //

@@ -184,11 +184,11 @@ where
                 op_seq = &self.var;
             }
             //
-            // n_dom, n_dep, id_all, arg_seq, arg_all, atr_type_all
+            // n_dom, n_dep, id_all, arg_start, arg_all, atr_type_all
             let n_dom             = op_seq.n_dom;
             let n_dep             = op_seq.n_dep;
             let id_all            = &op_seq.id_all;
-            let arg_seq           = &op_seq.arg_seq;
+            let arg_start         = &op_seq.arg_start;
             let arg_all           = &op_seq.arg_all;
             let arg_type_all      = &op_seq.arg_type_all;
             //
@@ -224,8 +224,8 @@ where
                 } else {
                     //
                     // arg, arg_type
-                    let begin      = arg_seq[op_index] as usize;
-                    let end        = arg_seq[op_index + 1] as usize;
+                    let begin      = arg_start[op_index] as usize;
+                    let end        = arg_start[op_index + 1] as usize;
                     let arg        = &arg_all[begin .. end];
                     let arg_type   = &arg_type_all[begin .. end];
                     //

@@ -389,9 +389,9 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             new_ad_type     = ADType::Variable;
             new_index       = tape.var.n_dep + tape.var.n_dom;
             //
-            // tape.var: n_dep, arg_seq, arg_type
+            // tape.var: n_dep, arg_start, arg_type
             tape.var.n_dep += 1;
-            tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
+            tape.var.arg_start.push( tape.var.arg_all.len() as IndexT );
             tape.var.arg_type_all.push( lhs_arg_type );
             tape.var.arg_type_all.push( rhs_arg_type );
             //
@@ -424,9 +424,9 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             new_ad_type     = ADType::DynamicP;
             new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
             //
-            // tape.dyp: n_dep, arg_seq, arg_type
+            // tape.dyp: n_dep, arg_start, arg_type
             tape.dyp.n_dep += 1;
-            tape.dyp.arg_seq.push( tape.dyp.arg_all.len() as IndexT );
+            tape.dyp.arg_start.push( tape.dyp.arg_all.len() as IndexT );
             tape.dyp.arg_type_all.push( lhs_arg_type );
             tape.dyp.arg_type_all.push( rhs_arg_type );
             //
@@ -551,9 +551,9 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             new_ad_type     = ADType::Variable;
             new_index       = tape.var.n_dep + tape.var.n_dom;
             //
-            // tape.var: n_dep, arg_seq, arg_type
+            // tape.var: n_dep, arg_start, arg_type
             tape.var.n_dep += 1;
-            tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
+            tape.var.arg_start.push( tape.var.arg_all.len() as IndexT );
             tape.var.arg_type_all.push( lhs_arg_type );
             tape.var.arg_type_all.push( ADType::ConstantP );
             //
@@ -571,9 +571,9 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             new_ad_type     = ADType::DynamicP;
             new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
             //
-            // tape.dyp: n_dep, arg_seq, arg_type
+            // tape.dyp: n_dep, arg_start, arg_type
             tape.dyp.n_dep += 1;
-            tape.dyp.arg_seq.push( tape.dyp.arg_all.len() as IndexT );
+            tape.dyp.arg_start.push( tape.dyp.arg_all.len() as IndexT );
             tape.dyp.arg_type_all.push( lhs_arg_type );
             tape.dyp.arg_type_all.push( ADType::ConstantP );
             //
@@ -844,9 +844,9 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
             new_ad_type     = ADType::Variable;
             new_index       = tape.var.n_dep + tape.var.n_dom;
             //
-            // tape.var: n_dep, arg_seq, arg_type
+            // tape.var: n_dep, arg_start, arg_type
             tape.var.n_dep += 1;
-            tape.var.arg_seq.push( tape.var.arg_all.len() as IndexT );
+            tape.var.arg_start.push( tape.var.arg_all.len() as IndexT );
             tape.var.arg_type_all.push( ADType::ConstantP );
             tape.var.arg_type_all.push( rhs_arg_type );
             //
@@ -863,9 +863,9 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
             new_ad_type     = ADType::DynamicP;
             new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
             //
-            // tape.dyp: n_dep, arg_seq, arg_type
+            // tape.dyp: n_dep, arg_start, arg_type
             tape.dyp.n_dep += 1;
-            tape.dyp.arg_seq.push( tape.dyp.arg_all.len() as IndexT );
+            tape.dyp.arg_start.push( tape.dyp.arg_all.len() as IndexT );
             tape.dyp.arg_type_all.push( ADType::ConstantP );
             tape.dyp.arg_type_all.push( rhs_arg_type );
             //

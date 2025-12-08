@@ -1067,14 +1067,14 @@ where
     let op_id  = id_all[op_index];
     debug_assert!( op_id == CALL_OP || op_id == CALL_RES_OP );
     //
-    // arg_seq, arg_all, arg_type_all, flag_all
-    let arg_seq         = &op_seq.arg_seq;
+    // arg_start, arg_all, arg_type_all, flag_all
+    let arg_start       = &op_seq.arg_start;
     let arg_all         = &op_seq.arg_all;
     let arg_type_all    = &op_seq.arg_type_all;
     let flag_all        = &op_seq.flag_all;
     //
     // op_index, dep_index
-    let begin           = arg_seq[op_index] as usize;
+    let begin           = arg_start[op_index] as usize;
     let dep_index : usize ;
     if op_id == CALL_RES_OP {
         dep_index   = arg_all[begin] as usize;
@@ -1088,8 +1088,8 @@ where
     debug_assert!( id_all[op_index] == CALL_OP );
     //
     // arg, arg_type
-    let begin    = arg_seq[op_index] as usize;
-    let end      = arg_seq[op_index + 1] as usize;
+    let begin    = arg_start[op_index] as usize;
+    let end      = arg_start[op_index + 1] as usize;
     let arg      = &arg_all[begin .. end];
     let arg_type = &arg_type_all[begin .. end];
     //

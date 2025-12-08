@@ -504,9 +504,9 @@ where
         // op_seq
         if n_dep > 0 {
             //
-            // op_seq.id_all, op_seq.arg_seq
+            // op_seq.id_all, op_seq.arg_start
             op_seq.id_all.push( CALL_OP );
-            op_seq.arg_seq.push( op_seq.arg_all.len() as IndexT );
+            op_seq.arg_start.push( op_seq.arg_all.len() as IndexT );
             //
             // op_seq.arg_all, tape.cop
             op_seq.arg_all.push( atom_id );                        // arg[0]
@@ -544,10 +544,10 @@ where
             // op_seq.n_dep
             op_seq.n_dep += n_dep;
             //
-            // op_seq.id_all, op_seq.arg_seq
+            // op_seq.id_all, op_seq.arg_start
             for dep_index in 1 .. n_dep {
                 op_seq.id_all.push( CALL_RES_OP );
-                op_seq.arg_seq.push( op_seq.arg_all.len() as IndexT );
+                op_seq.arg_start.push( op_seq.arg_all.len() as IndexT );
                 //
                 op_seq.arg_all.push( dep_index as IndexT );
                 op_seq.arg_type_all.push( ADType::Empty );

@@ -101,10 +101,10 @@ fn new_binary_op(
     // new_op_index
     let new_op_index = new_op_seq.id_all.len();
     //
-    // new_op_seq: id_all, arg_seq, n_dep
+    // new_op_seq: id_all, arg_start, n_dep
     new_op_seq.n_dep += 1;
     new_op_seq.id_all.push( op_id );
-    new_op_seq.arg_seq.push( new_op_seq.arg_all.len() as IndexT );
+    new_op_seq.arg_start.push( new_op_seq.arg_all.len() as IndexT );
     //
     // new_op_seq: arg_all, arg_type_all
     for i_arg in 0 .. 2 {
@@ -160,10 +160,10 @@ fn new_call_op(
     // new_op_index
     let new_op_index = new_op_seq.id_all.len();
     //
-    // new_op_seq: n_dep, id_all, arg_seq
+    // new_op_seq: n_dep, id_all, arg_start
     new_op_seq.n_dep += 1;
     new_op_seq.id_all.push( CALL_OP );
-    new_op_seq.arg_seq.push( new_op_seq.arg_all.len() as IndexT );
+    new_op_seq.arg_start.push( new_op_seq.arg_all.len() as IndexT );
     //
     // new_op_seq: arg_all, arg_all_type, arg_type_all, flag_all
     let n_arg  = new_arg.len();
@@ -188,10 +188,10 @@ fn new_call_op(
                 //
                 if 0 < new_i_dep  {
                     //
-                    // new_op_seq: n_dep, id_all, arg_seq, arg_all, arg_type_all
+                    // new_op_seq: n_dep, id_all, arg_start, arg_all, arg_type_all
                     new_op_seq.n_dep += 1;
                     new_op_seq.id_all.push( CALL_RES_OP );
-                    new_op_seq.arg_seq.push(new_op_seq.arg_all.len() as IndexT);
+                    new_op_seq.arg_start.push(new_op_seq.arg_all.len() as IndexT);
                     new_op_seq.arg_all.push( new_i_dep as IndexT );
                     new_op_seq.arg_type_all.push( ADType::Empty );
                 }
@@ -321,9 +321,9 @@ where
                 //
                 // arg, arg_type
                 let start =
-                    old_op_seq.arg_seq[old_op_index] as usize;
+                    old_op_seq.arg_start[old_op_index] as usize;
                 let end   =
-                    old_op_seq.arg_seq[old_op_index + 1] as usize;
+                    old_op_seq.arg_start[old_op_index + 1] as usize;
                 let arg       = &old_op_seq.arg_all[start .. end];
                 let arg_type  = &old_op_seq.arg_type_all[start .. end];
                 //

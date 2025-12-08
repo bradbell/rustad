@@ -127,18 +127,18 @@ where
         let rng_index         = &self.rng_index;
         let n_range           = rng_ad_type.len();
         //
-        // var_ : n_dom, n_dep, id_all, arg_seq, arg_all, arg_type_all.
+        // var_ : n_dom, n_dep, id_all, arg_start, arg_all, arg_type_all.
         let var_n_dom             = self.var.n_dom;
         let var_n_dep             = self.var.n_dep;
         let var_id_all            = &self.var.id_all;
-        let var_arg_seq           = &self.var.arg_seq;
+        let var_arg_start         = &self.var.arg_start;
         let var_arg_all           = &self.var.arg_all;
         let var_arg_type_all      = &self.var.arg_type_all;
         //
-        // dyp_ : n_dom, n_dep, id_all, arg_seq, arg_all, arg_type_all.
+        // dyp_ : n_dom, n_dep, id_all, arg_start, arg_all, arg_type_all.
         let dyp_n_dom             = self.dyp.n_dom;
         let dyp_id_all            = &self.dyp.id_all;
-        let dyp_arg_seq           = &self.dyp.arg_seq;
+        let dyp_arg_start         = &self.dyp.arg_start;
         let dyp_arg_all           = &self.dyp.arg_all;
         let dyp_arg_type_all      = &self.dyp.arg_type_all;
         //
@@ -238,8 +238,8 @@ where
                             }
                         } else {
                             // arg, arg_type
-                            let begin    = var_arg_seq[op_index] as usize;
-                            let end      = var_arg_seq[op_index + 1] as usize;
+                            let begin    = var_arg_start[op_index] as usize;
+                            let end      = var_arg_start[op_index + 1] as usize;
                             let arg      = &var_arg_all[begin .. end];
                             let arg_type = &var_arg_type_all[begin .. end];
                             //
@@ -303,8 +303,8 @@ where
                             }
                         } else {
                             // arg, arg_type
-                            let begin    = dyp_arg_seq[op_index] as usize;
-                            let end      = dyp_arg_seq[op_index + 1] as usize;
+                            let begin    = dyp_arg_start[op_index] as usize;
+                            let end      = dyp_arg_start[op_index + 1] as usize;
                             let arg      = &dyp_arg_all[begin .. end];
                             let arg_type = &dyp_arg_type_all[begin .. end];
                             //

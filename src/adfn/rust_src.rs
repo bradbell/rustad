@@ -165,8 +165,8 @@ where
             // dyp_dep
             for op_index in 0 .. self.dyp.id_all.len() {
                 let op_id    = self.dyp.id_all[op_index] as usize;
-                let start    = self.dyp.arg_seq[op_index] as usize;
-                let end      = self.dyp.arg_seq[op_index + 1] as usize;
+                let start    = self.dyp.arg_start[op_index] as usize;
+                let end      = self.dyp.arg_start[op_index + 1] as usize;
                 let arg      = &self.dyp.arg_all[start .. end];
                 let arg_type = &self.dyp.arg_type_all[start .. end];
                 let res      = self.dyp.n_dom + op_index;
@@ -195,8 +195,8 @@ where
                 "   let mut var_dep : Vec<V> = vec![nan; " + &n_dep + "];\n";
             for op_index in 0 .. self.var.id_all.len() {
                 let op_id    = self.var.id_all[op_index] as usize;
-                let start    = self.var.arg_seq[op_index] as usize;
-                let end      = self.var.arg_seq[op_index + 1] as usize;
+                let start    = self.var.arg_start[op_index] as usize;
+                let end      = self.var.arg_start[op_index + 1] as usize;
                 let arg      = &self.var.arg_all[start .. end];
                 let arg_type = &self.var.arg_type_all[start .. end];
                 let res      = self.var.n_dom + op_index;

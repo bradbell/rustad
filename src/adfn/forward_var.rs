@@ -191,8 +191,8 @@ macro_rules! forward_var {
             }
             for op_index in 0 .. self.var.id_all.len() {
                 let op_id     = self.var.id_all[op_index] as usize;
-                let start     = self.var.arg_seq[op_index] as usize;
-                let end       = self.var.arg_seq[op_index + 1] as usize;
+                let start     = self.var.arg_start[op_index] as usize;
+                let end       = self.var.arg_start[op_index + 1] as usize;
                 let arg       = &self.var.arg_all[start .. end];
                 let arg_type  = &self.var.arg_type_all[start .. end];
                 let res       = self.var.n_dom + op_index;
