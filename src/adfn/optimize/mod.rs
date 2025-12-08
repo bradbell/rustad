@@ -113,14 +113,14 @@ where
         let (mut tape, renumber) = self.dead_code(&depend, trace);
         //
         // checks
-        assert_eq!( tape.dyp.arg_seq.len()  , tape.dyp.id_seq.len() );
-        assert_eq!( tape.var.arg_seq.len()  , tape.var.id_seq.len() );
+        assert_eq!( tape.dyp.arg_seq.len()  , tape.dyp.id_all.len() );
+        assert_eq!( tape.var.arg_seq.len()  , tape.var.id_all.len() );
         //
         assert_eq!( tape.dyp.arg_all.len()  , tape.dyp.arg_type_all.len() );
         assert_eq!( tape.var.arg_all.len()  , tape.var.arg_type_all.len() );
         //
-        assert_eq!( tape.dyp.n_dep , tape.dyp.id_seq.len());
-        assert_eq!( tape.var.n_dep , tape.var.id_seq.len());
+        assert_eq!( tape.dyp.n_dep , tape.dyp.id_all.len());
+        assert_eq!( tape.var.n_dep , tape.var.id_all.len());
         //
         // tape.*.var.arg_seq
         // End marker for arguments to the last operation

@@ -111,8 +111,8 @@ macro_rules! forward_dyp {
             }
             //
             // dyp_both
-            for op_index in 0 .. self.dyp.id_seq.len() {
-                let op_id    = self.dyp.id_seq[op_index] as usize;
+            for op_index in 0 .. self.dyp.id_all.len() {
+                let op_id    = self.dyp.id_all[op_index] as usize;
                 let start    = self.dyp.arg_seq[op_index] as usize;
                 let end      = self.dyp.arg_seq[op_index + 1] as usize;
                 let arg      = &self.dyp.arg_all[start .. end];

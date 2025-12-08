@@ -1062,9 +1062,9 @@ where
     debug_assert!( dyp_depend.len() == 0 );
     debug_assert!( var_depend.len() == 0 );
     //
-    // id_seq, op_id
-    let id_seq = &op_seq.id_seq;
-    let op_id  = id_seq[op_index];
+    // id_all, op_id
+    let id_all = &op_seq.id_all;
+    let op_id  = id_all[op_index];
     debug_assert!( op_id == CALL_OP || op_id == CALL_RES_OP );
     //
     // arg_seq, arg_all, arg_type_all, flag_all
@@ -1081,11 +1081,11 @@ where
         debug_assert!( 0 < dep_index );
         debug_assert!( dep_index <= op_index );
         op_index    = op_index - dep_index;
-        debug_assert!( id_seq[op_index] == CALL_OP );
+        debug_assert!( id_all[op_index] == CALL_OP );
     } else {
         dep_index = 0;
     }
-    debug_assert!( id_seq[op_index] == CALL_OP );
+    debug_assert!( id_all[op_index] == CALL_OP );
     //
     // arg, arg_type
     let begin    = arg_seq[op_index] as usize;

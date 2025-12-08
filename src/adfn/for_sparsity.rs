@@ -184,10 +184,10 @@ where
                 op_seq = &self.var;
             }
             //
-            // n_dom, n_dep, id_seq, arg_seq, arg_all, atr_type_all
+            // n_dom, n_dep, id_all, arg_seq, arg_all, atr_type_all
             let n_dom             = op_seq.n_dom;
             let n_dep             = op_seq.n_dep;
-            let id_seq            = &op_seq.id_seq;
+            let id_all            = &op_seq.id_all;
             let arg_seq           = &op_seq.arg_seq;
             let arg_all           = &op_seq.arg_all;
             let arg_type_all      = &op_seq.arg_type_all;
@@ -196,7 +196,7 @@ where
             for op_index in 0 .. n_dep {
                 //
                 // op_id
-                let op_id = id_seq[op_index];
+                let op_id = id_all[op_index];
                 //
                 // depend_usize
                 depend_usize.clear();
@@ -253,7 +253,7 @@ where
                 assert_eq!(dep_index,  set_id);
                 //
                 if trace {
-                    let op_id   = id_seq[op_index] as usize;
+                    let op_id   = id_all[op_index] as usize;
                     let op_name = &op_info_vec[op_id].name;
                     let set     = set_vec.get(dep_index);
                     println!(

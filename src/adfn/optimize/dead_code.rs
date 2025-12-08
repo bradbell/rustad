@@ -99,11 +99,11 @@ fn new_binary_op(
     assert_eq!( arg.len(), 2);
     //
     // new_op_index
-    let new_op_index = new_op_seq.id_seq.len();
+    let new_op_index = new_op_seq.id_all.len();
     //
-    // new_op_seq: id_seq, arg_seq, n_dep
+    // new_op_seq: id_all, arg_seq, n_dep
     new_op_seq.n_dep += 1;
-    new_op_seq.id_seq.push( op_id );
+    new_op_seq.id_all.push( op_id );
     new_op_seq.arg_seq.push( new_op_seq.arg_all.len() as IndexT );
     //
     // new_op_seq: arg_all, arg_type_all
@@ -158,11 +158,11 @@ fn new_call_op(
     }
     //
     // new_op_index
-    let new_op_index = new_op_seq.id_seq.len();
+    let new_op_index = new_op_seq.id_all.len();
     //
-    // new_op_seq: n_dep, id_seq, arg_seq
+    // new_op_seq: n_dep, id_all, arg_seq
     new_op_seq.n_dep += 1;
-    new_op_seq.id_seq.push( CALL_OP );
+    new_op_seq.id_all.push( CALL_OP );
     new_op_seq.arg_seq.push( new_op_seq.arg_all.len() as IndexT );
     //
     // new_op_seq: arg_all, arg_all_type, arg_type_all, flag_all
@@ -188,9 +188,9 @@ fn new_call_op(
                 //
                 if 0 < new_i_dep  {
                     //
-                    // new_op_seq: n_dep, id_seq, arg_seq, arg_all, arg_type_all
+                    // new_op_seq: n_dep, id_all, arg_seq, arg_all, arg_type_all
                     new_op_seq.n_dep += 1;
-                    new_op_seq.id_seq.push( CALL_RES_OP );
+                    new_op_seq.id_all.push( CALL_RES_OP );
                     new_op_seq.arg_seq.push(new_op_seq.arg_all.len() as IndexT);
                     new_op_seq.arg_all.push( new_i_dep as IndexT );
                     new_op_seq.arg_type_all.push( ADType::Empty );
@@ -317,7 +317,7 @@ where
                 //
                 // old_res, op_id
                 let old_res = old_op_index + old_op_seq.n_dom;
-                let op_id   = old_op_seq.id_seq[old_op_index];
+                let op_id   = old_op_seq.id_all[old_op_index];
                 //
                 // arg, arg_type
                 let start =

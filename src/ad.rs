@@ -396,13 +396,13 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             tape.var.arg_type_all.push( rhs_arg_type );
             //
             //
-            // tape.var.id_seq
+            // tape.var.id_all
             if var_lhs && var_rhs {
-                tape.var.id_seq.push( id::[< $Name:upper _VV_OP >] );
+                tape.var.id_all.push( id::[< $Name:upper _VV_OP >] );
             } else if var_lhs {
-                tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
+                tape.var.id_all.push( id::[< $Name:upper _VP_OP >] );
             } else {
-                tape.var.id_seq.push( id::[< $Name:upper _PV_OP >] );
+                tape.var.id_all.push( id::[< $Name:upper _PV_OP >] );
             }
             //
             // tape.cop, tape.var.arg_all
@@ -431,8 +431,8 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             tape.dyp.arg_type_all.push( rhs_arg_type );
             //
             //
-            // tape.var.id_seq
-            tape.dyp.id_seq.push( id::[< $Name:upper _PP_OP >] );
+            // tape.var.id_all
+            tape.dyp.id_all.push( id::[< $Name:upper _PP_OP >] );
             //
             // tape.cop, tape.dyp.arg_all
             if cop_lhs {
@@ -557,8 +557,8 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             tape.var.arg_type_all.push( lhs_arg_type );
             tape.var.arg_type_all.push( ADType::ConstantP );
             //
-            // tape.var.id_seq
-            tape.var.id_seq.push( id::[< $Name:upper _VP_OP >] );
+            // tape.var.id_all
+            tape.var.id_all.push( id::[< $Name:upper _VP_OP >] );
             //
             // tape.cop, tape.var.arg_all
             tape.var.arg_all.push( lhs.index as IndexT );
@@ -577,8 +577,8 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             tape.dyp.arg_type_all.push( lhs_arg_type );
             tape.dyp.arg_type_all.push( ADType::ConstantP );
             //
-            // tape.dyp.id_seq
-            tape.dyp.id_seq.push( id::[< $Name:upper _PP_OP >] );
+            // tape.dyp.id_all
+            tape.dyp.id_all.push( id::[< $Name:upper _PP_OP >] );
             //
             // tape.cop, tape.dyp.arg_all
             tape.dyp.arg_all.push( lhs.index as IndexT );
@@ -850,8 +850,8 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
             tape.var.arg_type_all.push( ADType::ConstantP );
             tape.var.arg_type_all.push( rhs_arg_type );
             //
-            // tape.var.id_seq
-            tape.var.id_seq.push( id::[< $Name:upper _PV_OP >] );
+            // tape.var.id_all
+            tape.var.id_all.push( id::[< $Name:upper _PV_OP >] );
             //
             // tape.var.all_arg, tape.cop
             tape.var.arg_all.push( tape.cop.len() as IndexT );
@@ -869,8 +869,8 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
             tape.dyp.arg_type_all.push( ADType::ConstantP );
             tape.dyp.arg_type_all.push( rhs_arg_type );
             //
-            // tape.dyp.id_seq
-            tape.dyp.id_seq.push( id::[< $Name:upper _PP_OP >] );
+            // tape.dyp.id_all
+            tape.dyp.id_all.push( id::[< $Name:upper _PP_OP >] );
             //
             // tape.dyp.all_arg, tape.cop
             tape.dyp.arg_all.push( tape.cop.len() as IndexT );

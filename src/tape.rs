@@ -37,10 +37,10 @@ pub(crate) struct OpSequence {
     /// is the number of dependent values currently in the operation sequence.
     pub(crate) n_dep : usize,
     //
-    // id_seq
-    /// For each index in the operation sequence, id_seq\[index\]
+    // id_all
+    /// For each index in the operation sequence, id_all\[op_index\]
     /// is the corresponding operator [id](crate::op::id) .
-    pub(crate) id_seq : Vec<u8>,
+    pub(crate) id_all : Vec<u8>,
     //
     // arg_seq
     /// For each index in the operation sequence, arg_seq\[op_index\]
@@ -75,7 +75,7 @@ impl OpSequence {
         Self {
             n_dom         : 0,
             n_dep         : 0,
-            id_seq        : Vec::new(),
+            id_all        : Vec::new(),
             arg_seq       : Vec::new(),
             arg_all       : Vec::new() ,
             arg_type_all  : Vec::new() ,
@@ -286,8 +286,8 @@ where
             "start_recording_var: This thread's tape is already recording"
         );
         //
-        assert_eq!( tape.dyp.id_seq.len(),  0 );
-        assert_eq!( tape.var.id_seq.len(),  0 );
+        assert_eq!( tape.dyp.id_all.len(),  0 );
+        assert_eq!( tape.var.id_all.len(),  0 );
         //
         assert_eq!( tape.dyp.arg_seq.len(),  0 );
         assert_eq!( tape.var.arg_seq.len(),  0 );
@@ -416,14 +416,14 @@ where
         }
         //
         // more checks
-        assert_eq!( tape.dyp.arg_seq.len()  , tape.dyp.id_seq.len() );
-        assert_eq!( tape.var.arg_seq.len()  , tape.var.id_seq.len() );
+        assert_eq!( tape.dyp.arg_seq.len()  , tape.dyp.id_all.len() );
+        assert_eq!( tape.var.arg_seq.len()  , tape.var.id_all.len() );
         //
         assert_eq!( tape.dyp.arg_all.len()  , tape.dyp.arg_type_all.len() );
         assert_eq!( tape.var.arg_all.len()  , tape.var.arg_type_all.len() );
         //
-        assert_eq!( tape.dyp.n_dep , tape.dyp.id_seq.len());
-        assert_eq!( tape.var.n_dep , tape.var.id_seq.len());
+        assert_eq!( tape.dyp.n_dep , tape.dyp.id_all.len());
+        assert_eq!( tape.var.n_dep , tape.var.id_all.len());
         //
         // tape.*.var.arg_seq
         // end marker for arguments to the last operation

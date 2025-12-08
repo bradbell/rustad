@@ -186,8 +186,8 @@ macro_rules! forward_der {
             }
             //
             // var_der
-            for op_index in 0 .. self.var.id_seq.len() {
-                let op_id    = self.var.id_seq[op_index] as usize;
+            for op_index in 0 .. self.var.id_all.len() {
+                let op_id    = self.var.id_all[op_index] as usize;
                 let start    = self.var.arg_seq[op_index] as usize;
                 let end      = self.var.arg_seq[op_index + 1] as usize;
                 let arg      = &self.var.arg_all[start .. end];

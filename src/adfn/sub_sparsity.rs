@@ -127,17 +127,17 @@ where
         let rng_index         = &self.rng_index;
         let n_range           = rng_ad_type.len();
         //
-        // var_ : n_dom, n_dep, id_seq, arg_seq, arg_all, arg_type_all.
+        // var_ : n_dom, n_dep, id_all, arg_seq, arg_all, arg_type_all.
         let var_n_dom             = self.var.n_dom;
         let var_n_dep             = self.var.n_dep;
-        let var_id_seq            = &self.var.id_seq;
+        let var_id_all            = &self.var.id_all;
         let var_arg_seq           = &self.var.arg_seq;
         let var_arg_all           = &self.var.arg_all;
         let var_arg_type_all      = &self.var.arg_type_all;
         //
-        // dyp_ : n_dom, n_dep, id_seq, arg_seq, arg_all, arg_type_all.
+        // dyp_ : n_dom, n_dep, id_all, arg_seq, arg_all, arg_type_all.
         let dyp_n_dom             = self.dyp.n_dom;
-        let dyp_id_seq            = &self.dyp.id_seq;
+        let dyp_id_all            = &self.dyp.id_all;
         let dyp_arg_seq           = &self.dyp.arg_seq;
         let dyp_arg_all           = &self.dyp.arg_all;
         let dyp_arg_type_all      = &self.dyp.arg_type_all;
@@ -206,7 +206,7 @@ where
                         //
                         // op_index, op_id
                         let op_index  = var_index - var_n_dom;
-                        let op_id     = var_id_seq[op_index];
+                        let op_id     = var_id_all[op_index];
                         //
                         if trace {
                             let name = &op_info_vec[op_id as usize].name;
@@ -275,7 +275,7 @@ where
                         //
                         // op_index, op_id
                         let op_index  = dyp_index - dyp_n_dom;
-                        let op_id     = dyp_id_seq[op_index];
+                        let op_id     = dyp_id_all[op_index];
                         //
                         if trace {
                             let name = &op_info_vec[op_id as usize].name;

@@ -163,8 +163,8 @@ where
                 "   let mut dyp_dep : Vec<V> = vec![nan; " + &n_dep + "];\n";
             //
             // dyp_dep
-            for op_index in 0 .. self.dyp.id_seq.len() {
-                let op_id    = self.dyp.id_seq[op_index] as usize;
+            for op_index in 0 .. self.dyp.id_all.len() {
+                let op_id    = self.dyp.id_all[op_index] as usize;
                 let start    = self.dyp.arg_seq[op_index] as usize;
                 let end      = self.dyp.arg_seq[op_index + 1] as usize;
                 let arg      = &self.dyp.arg_all[start .. end];
@@ -193,8 +193,8 @@ where
                 "   // var_dep\n" +
                 "   // vector of dependent variables\n" +
                 "   let mut var_dep : Vec<V> = vec![nan; " + &n_dep + "];\n";
-            for op_index in 0 .. self.var.id_seq.len() {
-                let op_id    = self.var.id_seq[op_index] as usize;
+            for op_index in 0 .. self.var.id_all.len() {
+                let op_id    = self.var.id_all[op_index] as usize;
                 let start    = self.var.arg_seq[op_index] as usize;
                 let end      = self.var.arg_seq[op_index + 1] as usize;
                 let arg      = &self.var.arg_all[start .. end];
