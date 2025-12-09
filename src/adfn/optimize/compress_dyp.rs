@@ -41,6 +41,93 @@ impl BinaryOp {
     }
 }
 // ---------------------------------------------------------------------------
+struct OpHashMap {
+    binary_hash_map : FxHashMap<BinaryOp, IndexT> ,
+}
+//
+impl OpHashMap {
+    //
+    // OpHashMap::new
+    fn new() -> Self {
+        Self {
+            binary_hash_map : FxHashMap::default() ,
+        }
+    }
+    //
+    // OpHashMap::try_insert
+    /// Try to insert an operator in this hash map.
+    ///
+    /// * Syntax :
+    /// ```text
+    ///     option = op_hash_map.try_insert( op_id, arg, arg_type, map_value)
+    /// ```
+    ///
+    /// * op_id :
+    /// is the id for this operator
+    ///
+    /// * arg :
+    /// is the argument subvector for this operator
+    ///
+    /// * arg_type :
+    /// is the type subvector for this operator (has same size as arg).
+    ///
+    /// * map_value :
+    /// If the hash map does not already contain this operator,
+    /// it is inserted with this value.
+    ///
+    /// * option :
+    ///     * None : OpHashMap does not handle this operator.
+    ///     * Some(true) : this operator is inserted in the hash map
+    ///         with the specified value.
+    ///     * Some(false) : this operator is already in the hash map
+    ///         and its corresponding is not changed.
+    ///
+    fn try_insert(
+        &mut self,
+        op_id     : u8        ,
+        arg       : &[IndexT] ,
+        arg_type  : &[ADType] ,
+        map_value : IndexT    ,
+    ) -> Option<bool> {
+        if is_binary_op(op_id) {
+            let key = BinaryOp::new(op_id, arg, arg_type);
+            if self.binary_hash_map.contains_key(&key) {
+                return Some(false);
+            }
+            self.binary_hash_map.insert(key, map_value);
+            return Some(true);
+        }
+        None
+    }
+    //
+    // OpHashMap::get
+    /// Get the map value corresponding to an operator.
+    ///
+    /// * Syntax :
+    /// ```text
+    ///     option = op_hash_map.get(op_id, arg, arg_type)
+    /// ```
+    ///
+    /// * return :
+    /// If this operator is not in the hash map, or this operator is not
+    /// handled by OpHashMap, None is returned.
+    /// Otherwise it is assumed that this operator is in the hash map and
+    /// Some(map_value) for this operator is returned.
+    fn get(
+        &self,
+        op_id     : u8        ,
+        arg       : &[IndexT] ,
+        arg_type  : &[ADType] ,
+    ) -> Option<IndexT> {
+        if is_binary_op(op_id) {
+            let key       = BinaryOp::new(op_id, arg, arg_type);
+            let map_value = *self.binary_hash_map.get(&key).unwrap();
+            return Some(map_value);
+        }
+        return None;
+    }
+}
+// ---------------------------------------------------------------------------
 //
 // ADfn::compress_dyp
 impl<V> ADfn<V>
@@ -77,16 +164,15 @@ where
         // n_dep
         let n_dep = self.dyp.n_dep;
         //
-        // binary_hash_map
-        let mut binary_hash_map : FxHashMap<BinaryOp, IndexT> =
-            FxHashMap::default();
+        // op_hash_map
+        let mut op_hash_map : OpHashMap = OpHashMap::new();
         //
         if trace {
             println!("Begin Trace compress_dyp");
             println!("original_index, compressed_index");
         }
         //
-        // binary_hash_map, depend.dyp
+        // op_hash_map, depend.dyp
         for op_index in 0 .. n_dep {
             let res = op_index + self.dyp.n_dom;
             if depend.dyp[res] {
@@ -95,16 +181,17 @@ where
                 let end       = self.dyp.arg_start[op_index + 1] as usize;
                 let arg       = &self.dyp.arg_all[start .. end];
                 let arg_type  = &self.dyp.arg_type_all[start .. end];
-                if is_binary_op( op_id ) {
-                    let key = BinaryOp::new( op_id, arg, arg_type);
-                    if ! binary_hash_map.contains_key(&key) {
-                        binary_hash_map.insert(key, res as IndexT );
-                    } else {
+                let map_value = res as IndexT;
+                let option   =
+                    op_hash_map.try_insert(op_id, arg, arg_type, map_value);
+                if option.is_some() {
+                    let new_op = option.unwrap();
+                    if ! new_op {
                         depend.dyp[res] = false;
                     }
                     if trace {
-                        let key   = BinaryOp::new( op_id, arg, arg_type);
-                        let index = binary_hash_map.get(&key).unwrap();
+                        let option = op_hash_map.get(op_id, arg, arg_type);
+                        let index  = option.unwrap();
                         println!("{}, {}", res, index);
                     }
                 }
@@ -122,10 +209,10 @@ where
                     let end       = self.dyp.arg_start[op_index + 1] as usize;
                     let arg       = &self.dyp.arg_all[start .. end];
                     let arg_type  = &self.dyp.arg_type_all[start .. end];
-                    if is_binary_op( op_id ) {
-                        let key   = BinaryOp::new( op_id, arg, arg_type);
-                        let index = binary_hash_map.get(&key).unwrap();
-                        self.rng_index[i] = *index;
+                    //
+                    let option    = op_hash_map.get(op_id, arg, arg_type);
+                    if option.is_some() {
+                        self.rng_index[i] = option.unwrap();
                     }
                 }
             }
@@ -155,12 +242,10 @@ where
                         let end_   = self.dyp.arg_start[op_index_ + 1] as usize;
                         let arg_   = &left[start_ .. end_];
                         let arg_type_ = &self.dyp.arg_type_all[start_ .. end_];
-                        if is_binary_op( op_id_ ) {
-                            let key   = BinaryOp::new( op_id_, arg_, arg_type_);
-                            let index = binary_hash_map.get(&key).unwrap();
-                            //
+                        let option  = op_hash_map.get(op_id_, arg_, arg_type_);
+                        if option.is_some() {
                             // self.dyp.arg_all
-                            arg[i_arg] = *index;
+                            arg[i_arg] = option.unwrap();
                         }
                     }
                 }
@@ -189,12 +274,10 @@ where
                         let end_   = self.dyp.arg_start[op_index_ + 1] as usize;
                         let arg_      = &self.dyp.arg_all[start_ .. end_];
                         let arg_type_ = &self.dyp.arg_type_all[start_ .. end_];
-                        if is_binary_op( op_id_ ) {
-                            let key   = BinaryOp::new( op_id_, arg_, arg_type_);
-                            let index = binary_hash_map.get(&key).unwrap();
-                            //
+                        let option  = op_hash_map.get(op_id_, arg_, arg_type_);
+                        if option.is_some() {
                             // self.dyp.arg_all
-                            arg[i_arg] = *index;
+                            arg[i_arg] = option.unwrap();
                         }
                     }
                 }
