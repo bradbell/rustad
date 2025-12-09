@@ -17,6 +17,7 @@ use crate::{
 use crate::ad::ADType;
 use crate::adfn::optimize::Depend;
 use crate::op::binary::is_binary_op;
+use crate::tape::OpSequence;
 //
 // ---------------------------------------------------------------------------
 #[derive(Eq, Hash, PartialEq)]
@@ -59,17 +60,14 @@ impl OpHashMap {
     ///
     /// * Syntax :
     /// ```text
-    ///     option = op_hash_map.try_insert( op_id, arg, arg_type, map_value)
+    ///     option = op_hash_map.try_insert(op_seq, op_index, map_value)
     /// ```
     ///
-    /// * op_id :
-    /// is the id for this operator
+    /// * op_seq :
+    /// is the operation sequence that this operator appears in.
     ///
-    /// * arg :
-    /// is the argument subvector for this operator
-    ///
-    /// * arg_type :
-    /// is the type subvector for this operator (has same size as arg).
+    /// * op_index :
+    /// is the index of this operator in the operation sequence.
     ///
     /// * map_value :
     /// If the hash map does not already contain this operator,
@@ -83,12 +81,16 @@ impl OpHashMap {
     ///         and its corresponding is not changed.
     ///
     fn try_insert(
-        &mut self,
-        op_id     : u8        ,
-        arg       : &[IndexT] ,
-        arg_type  : &[ADType] ,
-        map_value : IndexT    ,
+        &mut self                  ,
+        op_seq       : &OpSequence ,
+        op_index     : usize       ,
+        map_value    : IndexT      ,
     ) -> Option<bool> {
+        let op_id    = op_seq.id_all[op_index];
+        let start    = op_seq.arg_start[op_index] as usize;
+        let end      = op_seq.arg_start[op_index + 1] as usize;
+        let arg      = &op_seq.arg_all[start .. end];
+        let arg_type = &op_seq.arg_type_all[start .. end];
         if is_binary_op(op_id) {
             let key = BinaryOp::new(op_id, arg, arg_type);
             if self.binary_hash_map.contains_key(&key) {
@@ -105,7 +107,7 @@ impl OpHashMap {
     ///
     /// * Syntax :
     /// ```text
-    ///     option = op_hash_map.get(op_id, arg, arg_type)
+    ///     option = op_hash_map.get(op_seq, op_index)
     /// ```
     ///
     /// * return :
@@ -114,11 +116,15 @@ impl OpHashMap {
     /// Otherwise it is assumed that this operator is in the hash map and
     /// Some(map_value) for this operator is returned.
     fn get(
-        &self,
-        op_id     : u8        ,
-        arg       : &[IndexT] ,
-        arg_type  : &[ADType] ,
+        &self                   ,
+        op_seq    : &OpSequence ,
+        op_index  : usize       ,
     ) -> Option<IndexT> {
+        let op_id    = op_seq.id_all[op_index];
+        let start    = op_seq.arg_start[op_index] as usize;
+        let end      = op_seq.arg_start[op_index + 1] as usize;
+        let arg      = &op_seq.arg_all[start .. end];
+        let arg_type = &op_seq.arg_type_all[start .. end];
         if is_binary_op(op_id) {
             let key       = BinaryOp::new(op_id, arg, arg_type);
             let map_value = *self.binary_hash_map.get(&key).unwrap();
@@ -167,6 +173,9 @@ where
         // op_hash_map
         let mut op_hash_map : OpHashMap = OpHashMap::new();
         //
+        // new_arg
+        let mut new_arg : Vec<IndexT> = Vec::new();
+        //
         if trace {
             println!("Begin Trace compress_dyp");
             println!("original_index, compressed_index");
@@ -176,21 +185,16 @@ where
         for op_index in 0 .. n_dep {
             let res = op_index + self.dyp.n_dom;
             if depend.dyp[res] {
-                let op_id     = self.dyp.id_all[op_index];
-                let start     = self.dyp.arg_start[op_index] as usize;
-                let end       = self.dyp.arg_start[op_index + 1] as usize;
-                let arg       = &self.dyp.arg_all[start .. end];
-                let arg_type  = &self.dyp.arg_type_all[start .. end];
                 let map_value = res as IndexT;
                 let option   =
-                    op_hash_map.try_insert(op_id, arg, arg_type, map_value);
+                    op_hash_map.try_insert(&self.dyp, op_index, map_value);
                 if option.is_some() {
                     let new_op = option.unwrap();
                     if ! new_op {
                         depend.dyp[res] = false;
                     }
                     if trace {
-                        let option = op_hash_map.get(op_id, arg, arg_type);
+                        let option = op_hash_map.get(&self.dyp, op_index);
                         let index  = option.unwrap();
                         println!("{}, {}", res, index);
                     }
@@ -204,13 +208,7 @@ where
                 let res      = self.rng_index[i] as usize;
                 if self.dyp.n_dom <= res {
                     let op_index  = res - self.dyp.n_dom;
-                    let op_id     = self.dyp.id_all[op_index];
-                    let start     = self.dyp.arg_start[op_index] as usize;
-                    let end       = self.dyp.arg_start[op_index + 1] as usize;
-                    let arg       = &self.dyp.arg_all[start .. end];
-                    let arg_type  = &self.dyp.arg_type_all[start .. end];
-                    //
-                    let option    = op_hash_map.get(op_id, arg, arg_type);
+                    let option    = op_hash_map.get(&self.dyp, op_index);
                     if option.is_some() {
                         self.rng_index[i] = option.unwrap();
                     }
@@ -224,30 +222,32 @@ where
             // res
             let res = op_index + self.dyp.n_dom;
             if depend.dyp[res] {
+                new_arg.clear();
                 //
-                let start         = self.dyp.arg_start[op_index] as usize;
-                let end           = self.dyp.arg_start[op_index + 1] as usize;
-                let (left, right) = self.dyp.arg_all.split_at_mut(start);
-                //
-                let arg        = &mut right[0 .. end - start];
+                let start      = self.dyp.arg_start[op_index] as usize;
+                let end        = self.dyp.arg_start[op_index + 1] as usize;
+                let arg        = &self.dyp.arg_all[start .. end];
                 let arg_type   = &self.dyp.arg_type_all[start .. end];
                 for i_arg in 0 .. arg.len() {
-                    let res_     = arg[i_arg] as usize;
-                    let mut skip = arg_type[i_arg] != ADType::DynamicP;
-                    skip         = skip || res_ < self.dyp.n_dom;
-                    if ! skip {
+                    let res_   = arg[i_arg] as usize;
+                    let dep    = self.dyp.n_dom <=  res_;
+                    let map    = arg_type[i_arg].is_dynamic() && dep ;
+                    if map {
                         let op_index_ = res_ - self.dyp.n_dom;
-                        let op_id_ = self.dyp.id_all[op_index_];
-                        let start_ = self.dyp.arg_start[op_index_] as usize;
-                        let end_   = self.dyp.arg_start[op_index_ + 1] as usize;
-                        let arg_   = &left[start_ .. end_];
-                        let arg_type_ = &self.dyp.arg_type_all[start_ .. end_];
-                        let option  = op_hash_map.get(op_id_, arg_, arg_type_);
+                        let option    = op_hash_map.get(&self.dyp, op_index_);
                         if option.is_some() {
                             // self.dyp.arg_all
-                            arg[i_arg] = option.unwrap();
+                            new_arg.push( option.unwrap() );
+                        } else {
+                            new_arg.push( arg[i_arg] );
                         }
+                    } else {
+                        new_arg.push( arg[i_arg] );
                     }
+                }
+                let arg  = &mut self.dyp.arg_all[start .. end];
+                for i_arg in 0 .. arg.len() {
+                    arg[i_arg] = new_arg[i_arg];
                 }
             }
         }
@@ -269,12 +269,7 @@ where
                     skip         = skip || res_ < self.dyp.n_dom;
                     if ! skip {
                         let op_index_ = res_ - self.dyp.n_dom;
-                        let op_id_ = self.dyp.id_all[op_index_];
-                        let start_ = self.dyp.arg_start[op_index_] as usize;
-                        let end_   = self.dyp.arg_start[op_index_ + 1] as usize;
-                        let arg_      = &self.dyp.arg_all[start_ .. end_];
-                        let arg_type_ = &self.dyp.arg_type_all[start_ .. end_];
-                        let option  = op_hash_map.get(op_id_, arg_, arg_type_);
+                        let option    = op_hash_map.get(&self.dyp, op_index_);
                         if option.is_some() {
                             // self.dyp.arg_all
                             arg[i_arg] = option.unwrap();
