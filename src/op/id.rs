@@ -89,6 +89,10 @@ set_operator_ids!(
     /// place holder for results of a call operator
     CALL_RES_OP,
     //
+    // NO_OP
+    /// callback to a no-op operations
+    NO_OP,
+    //
     /// number of valid operator ids
     NUMBER_OP,
 );

@@ -473,6 +473,7 @@ where
     crate::op::mul::set_op_info::<V>(&mut result);
     crate::op::div::set_op_info::<V>(&mut result);
     crate::op::call::set_op_info::<V>(&mut result);
+    crate::op::no_op::set_op_info::<V>(&mut result);
     result
 }
 // ---------------------------------------------------------------------------
