@@ -14,7 +14,7 @@ use crate::{
     IndexT,
 };
 use crate::adfn::optimize::Depend;
-use crate::adfn::optimize::Renumber;
+use crate::adfn::optimize::Old2New;
 use crate::tape::Tape;
 use crate::tape::OpSequence;
 use crate::op::binary::is_binary_op;
@@ -24,54 +24,54 @@ use crate::op::id::CALL_OP;
 use crate::op::id::CALL_RES_OP;
 use crate::op::call::extract_call_info;
 // -----------------------------------------------------------------------
-// set_renumber
-fn set_renumber(
-    renumber      : &mut Renumber,
+// set_old2new
+fn set_old2new(
+    old2new       : &mut Old2New,
     i_op_seq      : usize ,
     old_index     : usize ,
     new_index     : usize ,
     trace         : bool  ,
 ) {
     if i_op_seq == 0 {
-        renumber.dyp[old_index] = new_index as IndexT;
+        old2new.dyp[old_index] = new_index as IndexT;
     } else {
-        renumber.var[old_index] = new_index as IndexT;
+        old2new.var[old_index] = new_index as IndexT;
     }
     if trace {
         println!( "{}, {}", old_index, new_index );
     }
 }
 // -----------------------------------------------------------------------
-// get_renumber(
-fn get_renumber(
-    renumber  : &Renumber ,
+// get_old2new(
+fn get_old2new(
+    old2new   : &Old2New ,
     ad_type   : &ADType   ,
     old_index : usize     ,
 ) -> Option<IndexT> {
     let option : Option<IndexT>;
     match ad_type {
         ADType::ConstantP => {
-            let new_index = renumber.cop[old_index];
+            let new_index = old2new.cop[old_index];
             let index     = new_index as usize;
-            if index < renumber.cop.len() + 1 {
+            if index < old2new.cop.len() + 1 {
                 option = Some(new_index);
             } else {
                 option = None;
             }
         },
         ADType::DynamicP  => {
-            let new_index = renumber.dyp[old_index];
+            let new_index = old2new.dyp[old_index];
             let index     = new_index as usize;
-            if index < renumber.dyp.len() {
+            if index < old2new.dyp.len() {
                 option = Some(new_index);
             } else {
                 option = None;
             }
         },
         ADType::Variable => {
-            let new_index = renumber.var[old_index];
+            let new_index = old2new.var[old_index];
             let index     = new_index as usize;
-            if index < renumber.var.len() {
+            if index < old2new.var.len() {
                 option = Some(new_index);
             } else {
                 option = None;
@@ -86,7 +86,7 @@ fn get_renumber(
 // -----------------------------------------------------------------------
 // new_binary_op
 fn new_binary_op(
-    renumber     : &mut Renumber   ,
+    old2new      : &mut Old2New   ,
     i_op_seq     : usize           ,
     op_id        : u8              ,
     arg          : &[IndexT]       ,
@@ -110,20 +110,20 @@ fn new_binary_op(
     for i_arg in 0 .. 2 {
         let arg_type_i = arg_type[i_arg].clone();
         let old_index = arg[i_arg] as usize;
-        let option    = get_renumber( &renumber, &arg_type_i, old_index );
+        let option    = get_old2new( &old2new, &arg_type_i, old_index );
         let new_index = option.unwrap();
         new_op_seq.arg_all.push( new_index );
         new_op_seq.arg_type_all.push( arg_type_i );
     }
-    // renumber
+    // old2new
     let new_index    = new_op_index + new_op_seq.n_dom;
     let old_index    = old_op_index + old_op_seq.n_dom;
-    set_renumber(renumber, i_op_seq, old_index, new_index, trace);
+    set_old2new(old2new, i_op_seq, old_index, new_index, trace);
     //
 }
 // -----------------------------------------------------------------------
 fn new_call_op(
-    renumber         : &mut Renumber    ,
+    old2new          : &mut Old2New    ,
     old_rng_is_dep   : &[bool]          ,
     new_flag         : &Vec<bool>       ,
     i_op_seq         : usize            ,
@@ -145,7 +145,7 @@ fn new_call_op(
     for i_dom in 0 .. n_dom {
         let old_index  = arg[BEGIN_DOM + i_dom] as usize;
         let ad_type    = &arg_type[BEGIN_DOM + i_dom];
-        let option  = get_renumber(&renumber, ad_type, old_index);
+        let option  = get_old2new(&old2new, ad_type, old_index);
         if option.is_none() {
             // A call argument will get optimized out if it is not
             // necessary to obtain the call results that are used.
@@ -172,7 +172,7 @@ fn new_call_op(
     new_op_seq.arg_type_all.extend_from_slice( &new_arg_type[0 .. n_arg] );
     new_op_seq.flag_all.extend_from_slice( &new_flag[0 .. n_flag] );
     //
-    // renumber, CALL_RES_OP operators
+    // old2new, CALL_RES_OP operators
     let new_rng_is_dep = &new_flag[1 .. n_flag];
     let n_rng          = new_rng_is_dep.len();
     assert_eq!( n_rng, old_rng_is_dep.len() );
@@ -184,7 +184,7 @@ fn new_call_op(
                 //
                 let old_index = old_op_index + n_dom + old_i_dep;
                 let new_index = new_op_index + n_dom + new_i_dep;
-                set_renumber(renumber, i_op_seq, old_index, new_index, trace);
+                set_old2new(old2new, i_op_seq, old_index, new_index, trace);
                 //
                 if 0 < new_i_dep  {
                     //
@@ -214,7 +214,7 @@ where
     ///
     /// * Syntax :
     /// ```text
-    ///     (tape, renumber) = f.dead_code(depend, trace)
+    ///     (tape, old2new) = f.dead_code(depend, trace)
     /// ```
     ///
     /// * f :
@@ -229,12 +229,12 @@ where
     /// * tape :
     /// is a [Tape] corresponding to the optimized version of *f* .
     ///
-    /// * renumber :
-    /// is the [Renumber] structure that maps indices in *f* to
+    /// * old2new  :
+    /// is the [Old2New] structure that maps indices in *f* to
     /// indices in *tape* .
     ///
     pub(crate) fn dead_code(&self, depend : &Depend, trace : bool,
-    ) -> ( Tape<V>, Renumber)
+    ) -> ( Tape<V>, Old2New)
     where
         V : Clone + From<f32> + PartialEq ,
     {
@@ -251,9 +251,9 @@ where
         let n_dyp = self.dyp_len();
         let n_var = self.var_len();
         //
-        // renumber
+        // old2new
         // Initialize as an invalid value.
-        let mut renumber = Renumber{
+        let mut old2new = Old2New{
                 cop : vec![ n_cop as IndexT; n_cop] ,
                 dyp : vec![ n_dyp as IndexT; n_dyp ] ,
                 var : vec![ n_var as IndexT; n_var ] ,
@@ -276,7 +276,7 @@ where
             if depend.cop[old_index] || old_index == 0 {
                 let value               = self.cop[old_index].clone();
                 let new_index           = tape.cop.len();
-                renumber.cop[old_index] = new_index as IndexT;
+                old2new.cop[old_index] = new_index as IndexT;
                 tape.cop.push( value );
                 println!( "{}, {}", old_index, new_index );
             }
@@ -304,11 +304,11 @@ where
                 }
             };
             //
-            // new_op_seq.n_dom, renumber.dyp
+            // new_op_seq.n_dom, old2new.dyp
             let n_dom        = old_op_seq.n_dom;
             new_op_seq.n_dom = n_dom;
-            for old_index in 0 .. n_dom { set_renumber(
-                &mut renumber, i_op_seq, old_index, old_index, trace
+            for old_index in 0 .. n_dom { set_old2new(
+                &mut old2new, i_op_seq, old_index, old_index, trace
             ); }
             //
             // old_op_index, first_op
@@ -330,9 +330,9 @@ where
                 if is_binary_op(op_id) {
                     if old_depend[old_res] {
                         //
-                        // renumber, new_op_seq
+                        // old2new, new_op_seq
                         new_binary_op(
-                            &mut renumber,
+                            &mut old2new,
                             i_op_seq,
                             op_id,
                             arg,
@@ -372,9 +372,9 @@ where
                     }
                     if new_any_depend {
                         //
-                        // renumber, new_op_seq
+                        // old2new, new_op_seq
                         new_call_op(
-                            &mut renumber,
+                            &mut old2new,
                             &old_rng_is_dep,
                             &new_flag,
                             i_op_seq,
@@ -395,6 +395,6 @@ where
     if trace {
         println!( "End Trace: dead_code" );
         }
-        return (tape, renumber);
+        return (tape, old2new);
     } // fn dead_code
 } // impl

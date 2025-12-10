@@ -43,7 +43,7 @@ pub(crate) struct Depend {
     pub var : Vec<bool> ,
 }
 //
-// Renumber
+// Old2New
 /// Mapping from old (ADfn) indices to new (tape) indices
 /// for constants, dynamics and variables.
 ///
@@ -53,7 +53,7 @@ pub(crate) struct Depend {
 /// These are invalid values because the new tape does not have more
 /// constants, dynamic parameters, or variables.
 ///
-pub(crate) struct Renumber {
+pub(crate) struct Old2New {
     // cop
     /// Constant parameters; length [ADfn::cop_len].
     pub cop : Vec<IndexT> ,
@@ -113,8 +113,8 @@ where
         // self, depend
         self.compress_dyp(&mut depend, trace);
         //
-        // tape, renumber
-        let (mut tape, renumber) = self.dead_code(&depend, trace);
+        // tape, old2new
+        let (mut tape, old2new) = self.dead_code(&depend, trace);
         //
         // checks
         assert_eq!( tape.dyp.arg_start.len()  , tape.dyp.id_all.len() );
@@ -143,18 +143,18 @@ where
             let old_index = self.rng_index[i_rng] as usize;
             match self.rng_ad_type[i_rng] {
                 ADType::ConstantP => {
-                    let new_index = renumber.cop[old_index];
-                    assert!( (new_index as usize) < renumber.cop.len() );
+                    let new_index = old2new.cop[old_index];
+                    assert!( (new_index as usize) < old2new.cop.len() );
                     self.rng_index[i_rng] = new_index;
                 },
                 ADType::DynamicP => {
-                    let new_index = renumber.dyp[old_index];
-                    assert!( (new_index as usize) < renumber.dyp.len() );
+                    let new_index = old2new.dyp[old_index];
+                    assert!( (new_index as usize) < old2new.dyp.len() );
                     self.rng_index[i_rng] = new_index;
                 },
                 ADType::Variable => {
-                    let new_index = renumber.var[old_index];
-                    assert!( (new_index as usize) < renumber.var.len() );
+                    let new_index = old2new.var[old_index];
+                    assert!( (new_index as usize) < old2new.var.len() );
                     self.rng_index[i_rng] = new_index;
                 },
                 _ => { panic!("optimize: rng_ad_type error"); },
