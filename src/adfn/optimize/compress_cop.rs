@@ -24,7 +24,7 @@ where
     V : Clone + Eq + std::fmt::Display + std::hash::Hash,
 {   //
     // compress_cop
-    /// Determine and compress identical constants to use only one value.
+    /// For each constant, replace its use by the first equal constant.
     ///
     /// * Syntax :
     /// ```text
@@ -38,7 +38,7 @@ where
     /// On input, this is the [Depend] structure for the input f .
     /// Upon return, if two or more constants have the same value,
     /// depend.cop, f.dyp.arg_all, f.var.arg_all, and f.rng_index
-    ///  are modified to only use one of the equal constants.
+    /// are modified to only use the first of the equal constants.
     ///
     /// * trace :
     /// if true, a trace of the compression is printed on std::out.

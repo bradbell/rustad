@@ -141,8 +141,8 @@ where
     V : Clone + Eq + std::fmt::Display + std::hash::Hash,
 {   //
     // compress_dyp
-    /// Determine and compress a set of identical dynamic parameters
-    /// so that only one element of the set is used.
+    /// For each dynamic parameter, replace its use by the first
+    /// identical dynamic parameter.
     ///
     /// * Syntax :
     /// ```text
@@ -154,11 +154,11 @@ where
     ///
     /// * depend :
     /// On input, this is the [Depend] structure for the input f .
-    /// only the constants for which depend.cop is true are included.
+    /// The constants have already been compressed using compress_cop.
     ///
     /// Upon return, if two or more dynamic parameters are identical,
-    /// depend.cop, f.dyp.arg_all, and f.var.arg_all are modified so that
-    /// only one of the equal dynamic parameters is used by f.
+    /// depend.cop, f.dyp.arg_all, and f.var.arg_all are modified
+    /// to only use first of the identical dynamic parameters.
     ///
     /// * trace :
     /// if true, a trace of the compression is printed on std::out.
