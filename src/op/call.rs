@@ -39,8 +39,8 @@
 //! ## Operator Arguments
 //! | Index | Meaning |
 //! | ----- | ------- |
-//! | 0     | Dependent index corresponding to this CALL_RES_OP       |
-//! |       | which is also the offset of to get back to this CALL_OP |
+//! | 0     | Dependent index corresponding to this CALL_RES_OP    |
+//! |       | which is also the offset to get back to this CALL_OP |
 // --------------------------------------------------------------------------
 // use
 //
@@ -67,8 +67,9 @@ use crate::{
     ad_from_value,
 };
 // ----------------------------------------------------------------------
-/// Index in operator argument vector of the parameter or variable index
-/// of the first atomc function argument.
+// BEGIN_DOM
+/// Index, of the first argument for this call operator,
+/// in an operator argument vector.
 pub(crate) const BEGIN_DOM : usize = 5;
 // ----------------------------------------------------------------------
 // get_callback

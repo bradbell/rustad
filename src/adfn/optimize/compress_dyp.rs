@@ -149,16 +149,18 @@ where
     ///     f.compress_dyp(depend, trace)
     /// ```
     ///
-    /// * f :
-    /// The [ADfn] object for which the constants are compressed.
-    ///
-    /// * depend :
-    /// On input, this is the [Depend] structure for the input f .
+    /// * Assumption :
     /// The constants have already been compressed using compress_cop.
     ///
-    /// Upon return, if two or more dynamic parameters are identical,
-    /// depend.cop, f.dyp.arg_all, and f.var.arg_all are modified
-    /// to only use first of the identical dynamic parameters.
+    /// * f :
+    /// The [ADfn] object for which the dynamic parameters are compressed.
+    /// The input and output f represent the same domain to range map.
+    /// The fields f.dyp.arg_all and f.var.arg_all are modified.
+    ///
+    /// * depend :
+    /// On input and output, this is the [Depend] structure for the input f .
+    /// The depend.dyp field is modified because only the first
+    /// of identical dynamic parameters is used.
     ///
     /// * trace :
     /// if true, a trace of the compression is printed on std::out.

@@ -302,7 +302,7 @@ where
                 if trace {
                     println!( "var: old_index, new_index" );
                 }
-            };
+            }
             //
             // new_op_seq.n_dom, old2new.dyp
             let n_dom        = old_op_seq.n_dom;

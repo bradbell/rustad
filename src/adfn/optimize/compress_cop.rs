@@ -33,12 +33,15 @@ where
     ///
     /// * f :
     /// The [ADfn] object for which the constants are compressed.
+    /// The input and output f represent the same domain to range map.
+    /// The fields f.dyp.arg_all, f.var.arg_all, and f.rng_index
+    /// are modified.
     ///
     /// * depend :
-    /// On input, this is the [Depend] structure for the input f .
-    /// Upon return, if two or more constants have the same value,
-    /// depend.cop, f.dyp.arg_all, f.var.arg_all, and f.rng_index
-    /// are modified to only use the first of the equal constants.
+    /// On input and output,
+    /// this is the [Depend] structure for the input f.
+    /// The depend.cop is modified because
+    /// only the first of the equal constants is used.
     ///
     /// * trace :
     /// if true, a trace of the compression is printed on std::out.
@@ -83,8 +86,8 @@ where
                 self.rng_index[i] = *index;
             }
         }
-         //
-        // i_op_seq, op_seq
+        //
+        // op_seq, op_depend
         for i_op_seq in 0 .. 2 {
             let op_seq    : &mut OpSequence;
             let op_depend : &Vec<bool>;
