@@ -71,6 +71,16 @@ use crate::{
 /// Index, of the first argument for this call operator,
 /// in an operator argument vector.
 pub(crate) const BEGIN_DOM : usize = 5;
+//
+// BEGIN_FLAG
+/// Index, of the first flag for this call operator,
+/// in the vector of all the flags for this operation sequence.
+pub(crate) const BEGIN_FLAG: usize = 4;
+//
+// NUMBER_NRNG
+/// Index, of the number of range values for this call operator,
+/// in an operator argument vector.
+pub(crate) const NUMBER_RNG: usize = 3;
 // ----------------------------------------------------------------------
 // get_callback
 fn get_callback<V> (atom_id : usize) -> AtomCallback<V>

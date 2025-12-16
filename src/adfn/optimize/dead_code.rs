@@ -19,10 +19,15 @@ use crate::tape::Tape;
 use crate::tape::OpSequence;
 use crate::op::binary::is_binary_op;
 use crate::ad::ADType;
-use crate::op::call::BEGIN_DOM;
-use crate::op::id::CALL_OP;
-use crate::op::id::CALL_RES_OP;
-use crate::op::call::extract_call_info;
+use crate::op::id::{
+    CALL_OP,
+    CALL_RES_OP
+};
+use crate::op::call::{
+    BEGIN_DOM,
+    BEGIN_FLAG,
+    NUMBER_RNG,
+};
 // -----------------------------------------------------------------------
 // set_old2new
 fn set_old2new(
@@ -125,7 +130,7 @@ fn new_binary_op(
 fn new_call_op(
     old2new          : &mut Old2New    ,
     old_rng_is_dep   : &[bool]          ,
-    new_flag         : &Vec<bool>       ,
+    new_flag         : &[bool]          ,
     i_op_seq         : usize            ,
     arg              : &[IndexT]        ,
     arg_type         : &[ADType]        ,
@@ -345,15 +350,12 @@ where
                     }
                     old_op_index += 1;
                 } else { if op_id == CALL_OP {
-                    let flag_all = &old_op_seq.flag_all;
-                    let (
-                        _atom_id,
-                        _call_info,
-                        _n_dom,
-                        n_rng,
-                        trace_this_op,
-                        old_rng_is_dep,
-                    ) = extract_call_info(arg, flag_all);
+                    let flag_all       = &old_op_seq.flag_all;
+                    let n_rng          = arg[NUMBER_RNG] as usize;
+                    let start          = arg[BEGIN_FLAG] as usize;
+                    let end            = start + n_rng + 1;
+                    let trace_this_op  = flag_all[start];
+                    let old_rng_is_dep = &flag_all[start+1 .. end];
                     //
                     // old_n_dep, new_n_dep, new_rng_is_dep
                     let mut old_n_dep      = 0;
