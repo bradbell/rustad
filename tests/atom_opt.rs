@@ -8,64 +8,14 @@ use rustad::{
     start_recording_dyp_var,
     stop_recording,
     AzFloat,
-    IndexT,
-    AtomCallback,
-    register_atom,
     call_atom,
 };
+//
+mod atom_test;
 //
 // V
 type V = AzFloat<f64>;
 //
-// eye_forward_fun_value
-fn eye_forward_fun_value(
-    domain     : &Vec<&V>  ,
-    _call_info : IndexT    ,
-    _trace      : bool     ,
-) -> Result< Vec<V>, String >
-{   // range
-    let mut range : Vec<V> = Vec::with_capacity( domain.len() );
-    for i in 0 .. domain.len() {
-        range.push( domain[i].clone() );
-    }
-    Ok(range)
-}
-//
-// eye_rev_depend
-fn eye_rev_depend(
-    depend       : &mut Vec<usize> ,
-    rng_index    : usize           ,
-    n_dom        : usize           ,
-    _call_info   : IndexT          ,
-    _trace       : bool            ,
-) -> String
-{   assert_eq!( depend.len(), 0 );
-    assert!( rng_index < n_dom );
-    depend.push(rng_index);
-    //
-    let error_msg = String::new();
-    error_msg
-}
-//
-// register_eye
-fn register_eye() -> IndexT {
-    //
-    // eye_callback
-    let eye_callback = AtomCallback{
-        name               : &"eye",
-        rev_depend         : Some(eye_rev_depend),
-        forward_fun_value  : Some(eye_forward_fun_value) ,
-        //
-        forward_fun_ad     : None,
-        forward_der_value  : None,
-        forward_der_ad     : None,
-        reverse_der_value  : None,
-        reverse_der_ad     : None,
-    };
-    // eye_atom_id
-    let eye_atom_id = register_atom( eye_callback );
-    eye_atom_id
-}
 #[test]
 fn atom_opt() {
     //
@@ -73,7 +23,7 @@ fn atom_opt() {
     let trace = true;
     //
     // eye_atom_id, call_info
-    let eye_atom_id = register_eye();
+    let eye_atom_id = atom_test::register_eye::<V>();
     let call_info   = 0;
     //
     // f
