@@ -29,6 +29,7 @@ use crate::op::call::{
 fn group_call(
     op_seq : &mut OpSequence ,
     depend : &mut Vec<bool>  ,
+    trace  : bool            ,
 ) -> Vec<IndexT>  // old2new
 {   //
     // n_dep, n_dom
@@ -80,7 +81,6 @@ fn group_call(
                 let begin = op_seq.arg_all[start + BEGIN_FLAG] as usize;
                 let flag  = &mut op_seq.flag_all[begin .. begin + n_rng + 1];
                 //
-                //
                 // new_flag, old2new, new_n_dep
                 let mut old_i_dep = 0;
                 let mut new_i_dep = 0;
@@ -118,6 +118,27 @@ fn group_call(
                             n_no_op                 += 1;
                         }
                         old_i_dep += 1;
+                    }
+                }
+                if trace {
+                    let new_depend : Vec<bool> =
+                        (0 .. old_n_dep).map(|i| i < new_n_dep).collect();
+                    let start      = op_index + n_dom;
+                    let end        = start + old_n_dep;
+                    println!(
+                        "{} = {:?}, {}, {:?}",
+                        "old_depend", &depend[start .. end],
+                        "new_depend", &new_depend
+                    );
+                    println!(
+                        "{} = {:?}, {}, {:?}",
+                        "old_flag", &flag,
+                        "new_flag", &new_flag,
+                    );
+                    println!("old_index, new_index");
+                    for i_dep in 0 .. old_n_dep {
+                        let old = op_index + n_dom + i_dep;
+                        println!("{}, {}", old, old2new[old] );
                     }
                 }
                 //
@@ -158,7 +179,7 @@ impl<V> ADfn<V>
     /// correspponds to a depend.dyp (depend.var) true element.
     ///
     /// * f :
-    /// The [ADFun] object for which the calls are compressed.
+    /// The [ADfn] object for which the calls are compressed.
     /// The input and output f represent the same domain to range map.
     /// The following fields are modified :
     /// f.dyp.id_all, f.dyp.arg_all, f.var.id_all, f.var_arg_all, f.rng_index .
@@ -172,7 +193,9 @@ impl<V> ADfn<V>
     ///
     /// * trace :
     /// if true, a trace of the normalization is printed on std::out.
-    pub(crate) fn normalize_call(
+    ///
+    // TODO: Change to private once the tests pass with this included.
+    pub fn normalize_call(
         &mut self            ,
         depend : &mut Depend ,
         trace  : bool        )
@@ -189,25 +212,17 @@ impl<V> ADfn<V>
                 op_seq    = &mut self.dyp;
                 op_depend = &mut depend.dyp;
                 if trace {
-                    println!("dyp_old_index, dyp_new_index");
+                    println!("Dynamic Parameter Operation Sequence")
                 }
             } else {
                 op_seq    = &mut self.var;
                 op_depend = &mut depend.var;
                 if trace {
-                    println!("var_old_index, var_new_index");
+                    println!("Variable Operation Sequence")
                 }
             }
-            let old2new = group_call(op_seq, op_depend);
+            let old2new = group_call(op_seq, op_depend, trace);
             if old2new.len() != 0 {
-                if trace {
-                    for op_index in 0 .. op_seq.n_dep {
-                        let old = (op_index + op_seq.n_dom) as usize;
-                        if old2new[old] as usize != old {
-                            println!( "{}, {}", old, old2new[old] );
-                        }
-                    }
-                }
                 for i_arg in 0 .. op_seq.arg_all.len() {
                     if op_seq.arg_type_all[i_arg].is_dynamic() {
                         let old = op_seq.arg_all[i_arg] as usize;

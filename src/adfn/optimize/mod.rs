@@ -21,6 +21,7 @@ use crate::ad::ADType;
 // -----------------------------------------------------------------------
 // mod
 mod reverse_depend;
+mod normalize_call;
 mod compress_cop;
 mod compress_dyp;
 mod dead_code;
@@ -29,7 +30,8 @@ mod dead_code;
 /// Which constants, dynamic parameters, and variables the
 /// range for an [ADfn] depends on.
 ///
-pub(crate) struct Depend {
+// TODO: change to private once normalize_call is also private.
+pub struct Depend {
     // cop
     /// Constant parameters dependency; length [ADfn::cop_len].
     pub cop : Vec<bool> ,

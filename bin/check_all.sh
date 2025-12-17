@@ -56,11 +56,10 @@ do
    echo_eval $check
 done
 #
-# cargo doc
-echo
-echo_eval cargo doc --document-private-items
-echo
+# src/bin/normsq.rs
 echo_eval cargo run --release --bin normsq
+#
+# src/bin/ad_fn.rs
 echo_eval cargo run --release --bin ad_fn
 echo
 #
