@@ -102,7 +102,7 @@ where
             }
             if trace {
                 println!("Begin reverse {:?}", res_type );
-                println!( "res, name, arg, arg_type" )
+                println!( "res, res_type, name, arg, arg_type" )
             }
             //
             // n_dep, flag_all

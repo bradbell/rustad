@@ -70,7 +70,7 @@ fn register_eye() -> IndexT {
 fn atom_opt() {
     //
     // trace
-    let trace = false;
+    let trace = true;
     //
     // eye_atom_id, call_info
     let eye_atom_id = register_eye();
