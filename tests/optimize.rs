@@ -1,118 +1,91 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025 Bradley M. Bell
-//
+// ---------------------------------------------------------------------------
+/*
+Test ADfn::optimize
+*/
+// use
 use rustad::{
-    AzFloat,
-    ad_from_value,
-    start_recording_var,
+    AD,
+    start_recording_dyp_var,
     stop_recording,
+    AzFloat,
+    call_atom,
 };
 //
-// test_left_zero_one_both_ad
-fn test_left_zero_one_both_ad() {
-    type V      = AzFloat<f64>;
-    let trace   = false;
+mod atom_test;
+//
+// V
+type V = AzFloat<f64>;
+//
+fn an_atom_result_not_used() {
     //
-    let x  : Vec<V>  = vec![ V::from(3.0) ];
+    // trace
+    let trace = true;
     //
-    let ax  = start_recording_var( x.clone() );
-    let a1  = &ad_from_value(V::from(0.0)) + &ax[0]; // optimized to ax[0]
-    let a2  = &ad_from_value(V::from(1.0)) * &a1;    // optimized to ax[0]
-    let a3  = &ad_from_value(V::from(0.0)) * &a2;    // constant 0
-    let a4  = &a3 + &a2;                         // optimized to ax[0]
-    let ay  = vec![ a4 ];
-    let f   = stop_recording(ay);
+    // eye_atom_id, call_info
+    let eye_atom_id = atom_test::register_eye::<V>();
+    let call_info   = 0;
     //
-    let (y, _)       = f.forward_zero_value(x.clone(), trace);
+    // f
+    let p    = vec![V::from(1.0), V::from(2.0) ];
+    let x    = vec![V::from(3.0), V::from(4.0) ];
+    let (ap, ax) = start_recording_dyp_var(p.clone(), x.clone());
     //
-    // f.var_dep_len()
-    // Not necessary to create any dependent variables.
-    assert_eq!( f.var_dep_len(), 0 );
+    // aq
+    let mut aq  : Vec< AD<V> > = Vec::new();
+    aq.push( &ap[0] + &ap[0] );  // q[0] = p[0] + p[0]
+    aq.push( &ap[1] * &ap[1] );  // q[1] = p[1] * p[1]
     //
-    assert_eq!(y[0], x[0]);
+    // ay
+    let mut ay  : Vec< AD<V> > = Vec::new();
+    ay.push( &ax[0] + &ap[0] );  // y[0] = x[0] + p[0]
+    ay.push( &ax[1] * &ap[1] );  // y[1] = x[1] * p[1]
+    //
+    // az
+    let mut az  : Vec< AD<V> > = Vec::new();
+    az.push( aq[0].clone() );  // z[0] = q[0]
+    az.push( aq[1].clone() );  // z[1] = q[1]
+    //
+    // aw
+    // w = z
+    let aw = call_atom(az, eye_atom_id, call_info, trace);
+    //
+    // au
+    let mut au : Vec< AD<V> > = Vec::new();
+    au.push( aw[1].clone() ); // u[0] = w[1]
+    //
+    // f, n_dyp, n_var
+    let mut f = stop_recording(au);
+    //
+    // check f
+    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let (u, _u) = f.forward_var_value(&p_, x.clone(), trace);
+    assert_eq!(u[0], &p[1] * &p[1] );
+    //
+    // n_dyp_dep, n_var_dep
+    let n_dyp_dep = f.dyp_dep_len();
+    let n_var_dep = f.var_dep_len();
+    assert_eq!( n_dyp_dep, 4); // q[0], q[1], w[0], w[1]
+    assert_eq!( n_var_dep, 2); // y[0], y[1]
+    //
+    // optimize
+    f.optimize(trace);
+    //
+    // n_dyp_dep, n_var_dep
+    let n_dyp_dep = f.dyp_dep_len();
+    let n_var_dep = f.var_dep_len();
+    assert_eq!( n_dyp_dep, 2); // q[1], w[1]
+    assert_eq!( n_var_dep, 0);
+    //
+    // check f
+    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let (u, _u) = f.forward_var_value(&p_, x.clone(), trace);
+    assert_eq!(u[0], &p[1] * &p[1] );
 }
 //
-// test_left_zero_one_right_ad
-fn test_left_zero_one_right_ad() {
-    type V      = AzFloat<f64>;
-    let trace   = false;
-    //
-    let x  : Vec<V>  = vec![ V::from(3.0) ];
-    //
-    let ax  = start_recording_var( x.clone() );
-    let a1  = &(V::from(0.0)) + &ax[0]; // optimized to ax[0]
-    let a2  = &(V::from(1.0)) * &a1;    // optimized to ax[0]
-    let a3  = &(V::from(0.0)) * &a2;    // constant 0
-    let a4  = &a3 + &a2;            // optimized to ax[0]
-    let a5  = &(V::from(0.0)) / &a4;    // constant 0
-    let a6  = &a5 + &a4;            // optimized to ax[0]
-    let ay  = vec![ a6 ];
-    let f   = stop_recording(ay);
-    //
-    let (y, _)       = f.forward_zero_value(x.clone(), trace);
-    //
-    // f.var_dep_len()
-    // Not necessary to create any dependent variables.
-    assert_eq!( f.var_dep_len(), 0 );
-    //
-    assert_eq!(y[0], x[0]);
-}
-//
-// test_right_zero_one_both_ad
-fn test_right_zero_one_both_ad() {
-    type V      = AzFloat<f64>;
-    let trace   = false;
-    //
-    let x  : Vec<V>  = vec![ V::from(3.0) ];
-    //
-    let ax  = start_recording_var( x.clone() );
-    let a1  = &ax[0] + &ad_from_value(V::from(0.0)); // optimized to ax[0]
-    let a2  = &a1    * &ad_from_value(V::from(1.0)); // optimized to ax[0]
-    let a3  = &a2    * &ad_from_value(V::from(0.0)); // constant 0
-    let a4  = &a2 + &a3;                         // optimized to ax[0]
-    let a5  = &a4    / &ad_from_value(V::from(1.0)); // optimized to ax[0]
-    let ay  = vec![ a5 ];
-    let f   = stop_recording(ay);
-    //
-    let (y, _)       = f.forward_zero_value(x.clone(), trace);
-    //
-    // f.var_dep_len()
-    // Not necessary to create any dependent variables.
-    assert_eq!( f.var_dep_len(), 0 );
-    //
-    assert_eq!(y[0], x[0]);
-}
-//
-// test_right_zero_one_left_ad
-fn test_right_zero_one_left_ad() {
-    type V      = AzFloat<f64>;
-    let trace   = false;
-    //
-    let x  : Vec<V>  = vec![ V::from(3.0) ];
-    //
-    let ax  = start_recording_var( x.clone() );
-    let a1  = &ax[0] + &(V::from(0.0)); // optimized to ax[0]
-    let a2  = &a1    * &(V::from(1.0)); // optimized to ax[0]
-    let a3  = &a2    * &(V::from(0.0)); // constant 0
-    let a4  = &a2 + &a3;            // optimized to ax[0]
-    let a5  = &a4    / &(V::from(1.0)); // optimized to ax[0]
-    let ay  = vec![ a5 ];
-    let f   = stop_recording(ay);
-    //
-    let (y, _)       = f.forward_zero_value(x.clone(), trace);
-    //
-    // f.var_dep_len()
-    // Not necessary to create any dependent variables.
-    assert_eq!( f.var_dep_len(), 0 );
-    //
-    assert_eq!(y[0], x[0]);
-}
 #[test]
 fn optimize() {
-    test_left_zero_one_both_ad();
-    test_left_zero_one_right_ad();
-    //
-    test_right_zero_one_both_ad();
-    test_right_zero_one_left_ad();
+    an_atom_result_not_used();
 }
