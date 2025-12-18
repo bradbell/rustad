@@ -94,7 +94,7 @@ impl OpHashMap {
     ///
     /// * Syntax :
     /// ```text
-    ///     option = op_hash_map.try_insert(op_seq, op_index, map_value)
+    ///     option = op_hash_map.try_insert(op_seq, op_index, map_value_in)
     /// ```
     ///
     /// * op_seq :
@@ -103,48 +103,46 @@ impl OpHashMap {
     /// * op_index :
     /// is the index of this operator in the operation sequence.
     ///
-    /// * map_value :
-    /// If the hash map does not already contain this operator,
+    /// * map_value_in :
+    /// If the hash map does not contain this operator,
     /// it is inserted with this value.
+    /// This value is different for each call to try_insert.
     ///
     /// * option :
     ///     * None : try_insert only handles the following operators:
     ///         binary operators, CALL_OP operators.
     ///         If this is not one of these, try_insert returns None.
-    ///     * Some(true) : this operator is inserted in the hash map
-    ///         with the specified value.
-    ///     * Some(false) : this operator is already in the hash map
-    ///         and its corresponding is not changed.
+    ///     * Some(map_value_out) : If map_value_out is equal to map_value_in,
+    ///         this operator was inserted in the hash map
+    ///         with the specified value. Otherwise,
+    ///         this operation is equivalent to a previous operator and
+    ///         is map_value_out is its map value.
     ///
     fn try_insert(
         &mut self                  ,
         op_seq       : &OpSequence ,
         op_index     : usize       ,
-        map_value    : IndexT      ,
-    ) -> Option<bool> {
+        map_value_in : IndexT      ,
+    ) -> Option<IndexT> {
         let op_id    = op_seq.id_all[op_index];
         let start    = op_seq.arg_start[op_index] as usize;
         let end      = op_seq.arg_start[op_index + 1] as usize;
         let arg      = &op_seq.arg_all[start .. end];
         let arg_type = &op_seq.arg_type_all[start .. end];
         if is_binary_op(op_id) {
-            let key = BinaryOp::new(op_id, arg, arg_type);
-            if self.binary_hash_map.contains_key(&key) {
-                return Some(false);
-            }
-            self.binary_hash_map.insert(key, map_value);
-            return Some(true);
+            let key           = BinaryOp::new(op_id, arg, arg_type);
+            let map_value_out =
+                self.binary_hash_map.entry(key).or_insert(map_value_in);
+            return Some(*map_value_out);
         } else if op_id == CALL_OP {
             let n_rng = arg[NUMBER_RNG] as usize;
             let start = arg[BEGIN_FLAG] as usize;
             let end   = start + 1 + n_rng;
             let flag  = &op_seq.flag_all[start .. end];
             let key   = CallOp::new(arg, arg_type, flag);
-            if self.call_hash_map.contains_key(&key) {
-                return Some(false);
-            }
-            self.call_hash_map.insert(key, map_value);
-            return Some(true);
+            let map_value_out =
+                self.call_hash_map.entry(key).or_insert(map_value_in);
+            return Some(*map_value_out);
         }
         return None;
     }
@@ -287,10 +285,12 @@ where
                         id_all[op_index + n_call] == CALL_RES_OP {
                         n_call += 1;
                     }
-                    let map_value = (op_index + n_dom) as IndexT;
-                    let option =
-                        op_hash_map.try_insert(&self.dyp, op_index, map_value);
-                    let new_op = option.unwrap();
+                    let map_value_in = (op_index + n_dom) as IndexT;
+                    let option = op_hash_map.try_insert(
+                        &self.dyp, op_index, map_value_in
+                    );
+                    let map_value_out = option.unwrap();
+                    let new_op        = map_value_out == map_value_in;
                     //
                     if trace { for i_call in 0 .. n_call {
                         let op_index_ = op_index + i_call;
@@ -308,11 +308,13 @@ where
                     // increment
                     increment = n_call;
                 } else {
-                    let map_value = (op_index + n_dom) as IndexT;
-                    let option   =
-                        op_hash_map.try_insert(&self.dyp, op_index, map_value);
+                    let map_value_in = (op_index + n_dom) as IndexT;
+                    let option = op_hash_map.try_insert(
+                        &self.dyp, op_index, map_value_in
+                    );
                     if option.is_some() {
-                        let new_op = option.unwrap();
+                        let map_value_out = option.unwrap();
+                        let new_op        = map_value_out == map_value_in;
                         if ! new_op {
                             depend.dyp[op_index + n_dom] = false;
                         }
