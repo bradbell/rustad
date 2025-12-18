@@ -18,7 +18,56 @@ mod atom_test;
 //
 // V
 type V = AzFloat<f64>;
+type W = AzFloat<f32>;
 //
+// drill_down_to_first_match
+fn drill_down_to_first_match() {
+    //
+    // trace
+    let trace = true;
+    //
+    // p, x, ap, ax
+    let p    = vec![ W::from(2.0) ];
+    let x    = vec![ W::from(3.0) ];
+    let (ap, _ax) = start_recording_dyp_var(p.clone(), x.clone());
+    //
+    // aq0, aq1, aq2, aq3
+    // Optimizer should detect that aq0 and aq1 are identical.
+    // GIven that, it should detect that aq2 and aq3 are identical.
+    let aq0 = &ap[0] + &ap[0];   // q0 = p[0] + p[0]
+    let aq1 = &ap[0] + &ap[0];   // q1 = p[0] + p[0]
+    let aq2 = &ap[0] * &aq0;     // q2 = p[0] * q0
+    let aq3 = &ap[0] * &aq1;     // q3 = p[0] * q1
+    //
+    // f
+    let ay     = vec![ aq0, aq1, aq2, aq3 ];
+    let mut f  = stop_recording(ay);
+    //
+    // check f
+    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let (y, _y) = f.forward_var_value(&p_, x.clone(), trace);
+    assert_eq!( y[0], &p[0] + &p[0] );
+    assert_eq!( y[1], &p[0] + &p[0] );
+    assert_eq!( y[2], &p[0] * &( &p[0] + &p[0] ) ) ;
+    assert_eq!( y[3], &p[0] * &( &p[0] + &p[0] ) ) ;
+    assert_eq!( f.dyp_dep_len(), 4 );
+    assert_eq!( f.var_dep_len(), 0 );
+    //
+    // f
+    f.optimize(trace);
+    //
+    // check f
+    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let (y, _y) = f.forward_var_value(&p_, x.clone(), trace);
+    assert_eq!( y[0], &p[0] + &p[0] );
+    assert_eq!( y[1], &p[0] + &p[0] );
+    assert_eq!( y[2], &p[0] * &( &p[0] + &p[0] ) ) ;
+    assert_eq!( y[3], &p[0] * &( &p[0] + &p[0] ) ) ;
+    assert_eq!( f.dyp_dep_len(), 3 ); // TODO: should be 2
+    assert_eq!( f.var_dep_len(), 0 );
+}
+//
+// an_atom_result_not_used
 fn an_atom_result_not_used() {
     //
     // trace
@@ -28,7 +77,7 @@ fn an_atom_result_not_used() {
     let eye_atom_id = atom_test::register_eye::<V>();
     let call_info   = 0;
     //
-    // f
+    // p, x, ap, ax
     let p    = vec![V::from(1.0), V::from(2.0) ];
     let x    = vec![V::from(3.0), V::from(4.0) ];
     let (ap, ax) = start_recording_dyp_var(p.clone(), x.clone());
@@ -87,5 +136,6 @@ fn an_atom_result_not_used() {
 //
 #[test]
 fn optimize() {
+    drill_down_to_first_match();
     an_atom_result_not_used();
 }
