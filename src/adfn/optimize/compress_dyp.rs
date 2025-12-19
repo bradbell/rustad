@@ -146,68 +146,6 @@ impl OpHashMap {
         }
         return None;
     }
-    //
-    // OpHashMap::get
-    /// Get the map value corresponding to an operator.
-    ///
-    /// * Syntax :
-    /// ```text
-    ///     option = op_hash_map.get(op_seq, op_index)
-    /// ```
-    ///
-    /// * return :
-    ///     * None : get only handles the following operators:
-    ///         binary operators, CALL_OP and CALL_RES_OP operators.
-    ///         If this is not one of these, get returns None.
-    ///     * Some(map_value) : If this is a binary or CALL_OP operator,
-    ///         map_value is the value inserted for this operator.
-    ///         If this is a CALL_RES_OP, map_value is the _value inserted for
-    ///         the correspodning CALL_OP plus the offset for this CALL_RES_OP.
-    fn get(
-        &self                   ,
-        op_seq    : &OpSequence ,
-        op_index  : usize       ,
-    ) -> Option<IndexT> {
-        let mut op_id    = op_seq.id_all[op_index];
-        let mut start    = op_seq.arg_start[op_index] as usize;
-        let mut end      = op_seq.arg_start[op_index + 1] as usize;
-        let mut arg      = &op_seq.arg_all[start .. end];
-        let mut arg_type = &op_seq.arg_type_all[start .. end];
-        if is_binary_op(op_id) {
-            let key       = BinaryOp::new(op_id, arg, arg_type);
-            let map_value = *self.binary_hash_map.get(&key).unwrap();
-            //
-            return Some(map_value);
-        } else if op_id == CALL_OP || op_id == CALL_RES_OP {
-            let offset : IndexT;
-            if op_id == CALL_OP {
-                offset = 0 as IndexT;
-            } else {
-                debug_assert!( arg[0] as usize <= op_index );
-                offset        = arg[0];
-                let op_index_ = op_index - (offset as usize);
-                op_id         = op_seq.id_all[op_index_];
-                start         = op_seq.arg_start[op_index_] as usize;
-                end           = op_seq.arg_start[op_index_ + 1] as usize;
-                arg           = &op_seq.arg_all[start .. end];
-                arg_type      = &op_seq.arg_type_all[start .. end];
-            }
-            debug_assert!( op_id == CALL_OP );
-            //
-            // TODO: It is possible to avoid re-allocating memory
-            // for every key during this lookup. Passing in work space
-            // to this function is one option.
-            let n_rng     = arg[NUMBER_RNG] as usize;
-            let start     = arg[BEGIN_FLAG] as usize;
-            let end       = start + 1 + n_rng;
-            let flag      = &op_seq.flag_all[start .. end];
-            let key       = CallOp::new(arg, arg_type, flag);
-            let map_value = *self.call_hash_map.get(&key).unwrap() + offset;
-            //
-            return Some(map_value);
-        }
-        return None;
-    }
 }
 // ---------------------------------------------------------------------------
 //
@@ -251,6 +189,12 @@ where
         // n_dom
         let n_dom = self.dyp.n_dom;
         //
+        // first_match
+        let mut first_match : Vec<IndexT> = Vec::with_capacity(n_dep + n_dom);
+        for dyp_index in 0 .. (n_dep + n_dom) {
+            first_match.push( dyp_index as IndexT );
+        }
+        //
         // op_hash_map
         let mut op_hash_map : OpHashMap = OpHashMap::new();
         //
@@ -293,12 +237,9 @@ where
                     let new_op        = map_value_out == map_value_in;
                     //
                     if trace { for i_call in 0 .. n_call {
-                        let op_index_ = op_index + i_call;
-                        if depend.dyp[op_index_ + n_dom] {
-                            let option = op_hash_map.get(&self.dyp, op_index_);
-                            let index  = option.unwrap();
-                            println!("{}, {}", op_index_ + n_dom, index);
-                        }
+                        let dyp_index = op_index + i_call + n_dom;
+                        let dyp_match = map_value_out + (i_call as IndexT);
+                        first_match[dyp_index] = dyp_match;
                     } }
                     //
                     if ! new_op { for i_call in 0 .. n_call {
@@ -318,11 +259,8 @@ where
                         if ! new_op {
                             depend.dyp[op_index + n_dom] = false;
                         }
-                        if trace {
-                            let option = op_hash_map.get(&self.dyp, op_index);
-                            let index  = option.unwrap();
-                            println!("{}, {}", op_index + n_dom, index);
-                        }
+                        let dyp_index = op_index + n_dom;
+                        first_match[dyp_index] = map_value_out;
                     }
                 }
             }
@@ -333,14 +271,8 @@ where
         // self.rng_index
         for i in 0 .. self.rng_index.len() {
             if self.rng_ad_type[i].is_dynamic() {
-                let res      = self.rng_index[i] as usize;
-                if n_dom <= res {
-                    let op_index  = res - n_dom;
-                    let option    = op_hash_map.get(&self.dyp, op_index);
-                    if option.is_some() {
-                        self.rng_index[i] = option.unwrap();
-                    }
-                }
+                let dyp_index     = self.rng_index[i] as usize;
+                self.rng_index[i] = first_match[dyp_index];
             }
         }
         //
@@ -357,18 +289,9 @@ where
                 let arg        = &self.dyp.arg_all[start .. end];
                 let arg_type   = &self.dyp.arg_type_all[start .. end];
                 for i_arg in 0 .. arg.len() {
-                    let res_   = arg[i_arg] as usize;
-                    let dep    = self.dyp.n_dom <=  res_;
-                    let map    = arg_type[i_arg].is_dynamic() && dep ;
-                    if map {
-                        let op_index_ = res_ - self.dyp.n_dom;
-                        let option    = op_hash_map.get(&self.dyp, op_index_);
-                        if option.is_some() {
-                            // self.dyp.arg_all
-                            new_arg.push( option.unwrap() );
-                        } else {
-                            new_arg.push( arg[i_arg] );
-                        }
+                    if arg_type[i_arg].is_dynamic() {
+                        let dyp_index  = arg[i_arg] as usize;
+                        new_arg.push( first_match[dyp_index] );
                     } else {
                         new_arg.push( arg[i_arg] );
                     }
@@ -392,16 +315,9 @@ where
                 let arg        = &mut self.var.arg_all[start .. end];
                 let arg_type   = &self.var.arg_type_all[start .. end];
                 for i_arg in 0 .. arg.len() {
-                    let res_     = arg[i_arg] as usize;
-                    let mut skip = arg_type[i_arg] != ADType::DynamicP;
-                    skip         = skip || res_ < self.dyp.n_dom;
-                    if ! skip {
-                        let op_index_ = res_ - self.dyp.n_dom;
-                        let option    = op_hash_map.get(&self.dyp, op_index_);
-                        if option.is_some() {
-                            // self.dyp.arg_all
-                            arg[i_arg] = option.unwrap();
-                        }
+                    if arg_type[i_arg].is_dynamic() {
+                            let dyp_index  = arg[i_arg] as usize;
+                            arg[i_arg]     = first_match[dyp_index];
                     }
                 }
             }
