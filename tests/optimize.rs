@@ -63,7 +63,7 @@ fn drill_down_to_first_match() {
     assert_eq!( y[1], &p[0] + &p[0] );
     assert_eq!( y[2], &p[0] * &( &p[0] + &p[0] ) ) ;
     assert_eq!( y[3], &p[0] * &( &p[0] + &p[0] ) ) ;
-    assert_eq!( f.dyp_dep_len(), 3 ); // TODO: should be 2
+    assert_eq!( f.dyp_dep_len(), 2 );
     assert_eq!( f.var_dep_len(), 0 );
 }
 //
