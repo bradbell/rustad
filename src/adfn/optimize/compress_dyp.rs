@@ -191,9 +191,9 @@ where
         let n_dom_indext = n_dom as IndexT;
         //
         // first_match
-        let mut first_match : Vec<IndexT> = Vec::with_capacity(n_dep + n_dom);
-        for dyp_index in 0 .. (n_dep + n_dom) {
-            first_match.push( dyp_index as IndexT );
+        let mut first_match : Vec<IndexT> = Vec::with_capacity(n_dep);
+        for op_index in 0 .. n_dep {
+            first_match.push( op_index as IndexT );
         }
         //
         // op_hash_map
@@ -238,10 +238,9 @@ where
                     let new_op        = map_value_out == map_value_in;
                     //
                     for i_call in 0 .. n_call {
-                        let dyp_index = op_index + i_call + n_dom;
-                        let dyp_match = map_value_out +
-                            (i_call as IndexT) + n_dom_indext;
-                        first_match[dyp_index] = dyp_match;
+                        let dep_index = op_index + i_call;
+                        let dep_match = map_value_out + (i_call as IndexT);
+                        first_match[dep_index] = dep_match;
                     }
                     //
                     if ! new_op { for i_call in 0 .. n_call {
@@ -261,8 +260,8 @@ where
                         if ! new_op {
                             depend.dyp[op_index + n_dom] = false;
                         }
-                        let dyp_index = op_index + n_dom;
-                        first_match[dyp_index] = map_value_out + n_dom_indext;
+                        let dyp_index = op_index;
+                        first_match[dyp_index] = map_value_out;
                     }
                 }
             }
@@ -272,9 +271,12 @@ where
         //
         // self.rng_index
         for i in 0 .. self.rng_index.len() {
-            if self.rng_ad_type[i].is_dynamic() {
+            let dynamic   = self.rng_ad_type[i].is_dynamic();
+            let dependent = dynamic && n_dom_indext <= self.rng_index[i];
+            if dependent {
                 let dyp_index     = self.rng_index[i] as usize;
-                self.rng_index[i] = first_match[dyp_index];
+                let op_index      = dyp_index - n_dom;
+                self.rng_index[i] = first_match[op_index] + n_dom_indext;
             }
         }
         //
@@ -291,9 +293,12 @@ where
                 let arg        = &self.dyp.arg_all[start .. end];
                 let arg_type   = &self.dyp.arg_type_all[start .. end];
                 for i_arg in 0 .. arg.len() {
-                    if arg_type[i_arg].is_dynamic() {
+                    let dynamic   = arg_type[i_arg].is_dynamic();
+                    let dependent = dynamic && n_dom_indext <= arg[i_arg];
+                    if dependent {
                         let dyp_index  = arg[i_arg] as usize;
-                        new_arg.push( first_match[dyp_index] );
+                        let dep_index  = dyp_index - n_dom;
+                        new_arg.push( first_match[dep_index] + n_dom_indext );
                     } else {
                         new_arg.push( arg[i_arg] );
                     }
@@ -317,9 +322,12 @@ where
                 let arg        = &mut self.var.arg_all[start .. end];
                 let arg_type   = &self.var.arg_type_all[start .. end];
                 for i_arg in 0 .. arg.len() {
-                    if arg_type[i_arg].is_dynamic() {
+                    let dynamic   = arg_type[i_arg].is_dynamic();
+                    let dependent = dynamic && n_dom_indext <= arg[i_arg];
+                    if dependent {
                             let dyp_index  = arg[i_arg] as usize;
-                            arg[i_arg]     = first_match[dyp_index];
+                            let dep_index  = dyp_index - n_dom;
+                            arg[i_arg] = first_match[dep_index] + n_dom_indext;
                     }
                 }
             }
