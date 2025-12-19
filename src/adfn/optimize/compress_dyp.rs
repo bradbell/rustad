@@ -186,8 +186,9 @@ where
         // n_dep
         let n_dep = self.dyp.n_dep;
         //
-        // n_dom
-        let n_dom = self.dyp.n_dom;
+        // n_dom, n_dom_i
+        let n_dom        = self.dyp.n_dom;
+        let n_dom_indext = n_dom as IndexT;
         //
         // first_match
         let mut first_match : Vec<IndexT> = Vec::with_capacity(n_dep + n_dom);
@@ -229,18 +230,19 @@ where
                         id_all[op_index + n_call] == CALL_RES_OP {
                         n_call += 1;
                     }
-                    let map_value_in = (op_index + n_dom) as IndexT;
+                    let map_value_in = op_index as IndexT;
                     let option = op_hash_map.try_insert(
                         &self.dyp, op_index, map_value_in
                     );
                     let map_value_out = option.unwrap();
                     let new_op        = map_value_out == map_value_in;
                     //
-                    if trace { for i_call in 0 .. n_call {
+                    for i_call in 0 .. n_call {
                         let dyp_index = op_index + i_call + n_dom;
-                        let dyp_match = map_value_out + (i_call as IndexT);
+                        let dyp_match = map_value_out +
+                            (i_call as IndexT) + n_dom_indext;
                         first_match[dyp_index] = dyp_match;
-                    } }
+                    }
                     //
                     if ! new_op { for i_call in 0 .. n_call {
                         depend.dyp[op_index + i_call] = false;
@@ -249,7 +251,7 @@ where
                     // increment
                     increment = n_call;
                 } else {
-                    let map_value_in = (op_index + n_dom) as IndexT;
+                    let map_value_in = op_index as IndexT;
                     let option = op_hash_map.try_insert(
                         &self.dyp, op_index, map_value_in
                     );
@@ -260,7 +262,7 @@ where
                             depend.dyp[op_index + n_dom] = false;
                         }
                         let dyp_index = op_index + n_dom;
-                        first_match[dyp_index] = map_value_out;
+                        first_match[dyp_index] = map_value_out + n_dom_indext;
                     }
                 }
             }
