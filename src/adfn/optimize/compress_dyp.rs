@@ -15,6 +15,7 @@ use crate::{
 };
 use crate::ad::ADType;
 use crate::adfn::optimize::{
+        renumber_op_seq,
         Depend,
         op_hash_map::first_equal_op,
 };
@@ -62,19 +63,17 @@ where
         let n_dom_indext = n_dom as IndexT;
         //
         // first_equal
-        let mut first_equal : Vec<IndexT> = Vec::with_capacity(n_dep);
-        for op_index in 0 .. n_dep {
-            first_equal.push( op_index as IndexT );
-        }
-        //
-        // new_arg
-        let mut new_arg : Vec<IndexT> = Vec::new();
-        //
-        // first_equal
         let op_seq_type = ADType::DynamicP;
         let first_equal = first_equal_op(
-            op_seq_type, &mut depend.dyp, &self.dyp
+            op_seq_type, &depend.dyp, &self.dyp
         );
+        //
+        // depend.dyp
+        for op_index in 0 .. n_dep {
+            if first_equal[op_index] as usize != op_index {
+                depend.dyp[op_index + n_dom] = false;
+            }
+        }
         //
         if trace {
             println!("Begin Trace compress_dyp");
@@ -100,57 +99,13 @@ where
         }
         //
         // self.dyp.arg_all
-        for op_index in 0 .. self.dyp.n_dep {
-            //
-            // res
-            let res = op_index + self.dyp.n_dom;
-            if depend.dyp[res] {
-                new_arg.clear();
-                //
-                let start      = self.dyp.arg_start[op_index] as usize;
-                let end        = self.dyp.arg_start[op_index + 1] as usize;
-                let arg        = &self.dyp.arg_all[start .. end];
-                let arg_type   = &self.dyp.arg_type_all[start .. end];
-                for i_arg in 0 .. arg.len() {
-                    let dynamic   = arg_type[i_arg].is_dynamic();
-                    let dependent = dynamic && n_dom_indext <= arg[i_arg];
-                    if dependent {
-                        let dyp_index  = arg[i_arg] as usize;
-                        let dep_index  = dyp_index - n_dom;
-                        new_arg.push( first_equal[dep_index] + n_dom_indext );
-                    } else {
-                        new_arg.push( arg[i_arg] );
-                    }
-                }
-                let arg  = &mut self.dyp.arg_all[start .. end];
-                for i_arg in 0 .. arg.len() {
-                    arg[i_arg] = new_arg[i_arg];
-                }
-            }
-        }
+        let equal_type = ADType::DynamicP;
+        renumber_op_seq(equal_type, &first_equal, &depend.dyp, &mut self.dyp);
         //
         // self.var.arg_all
-        for op_index in 0 .. self.var.n_dep {
-            //
-            // res
-            let res = op_index + self.var.n_dom;
-            if depend.var[res] {
-                //
-                let start      = self.var.arg_start[op_index] as usize;
-                let end        = self.var.arg_start[op_index + 1] as usize;
-                let arg        = &mut self.var.arg_all[start .. end];
-                let arg_type   = &self.var.arg_type_all[start .. end];
-                for i_arg in 0 .. arg.len() {
-                    let dynamic   = arg_type[i_arg].is_dynamic();
-                    let dependent = dynamic && n_dom_indext <= arg[i_arg];
-                    if dependent {
-                            let dyp_index  = arg[i_arg] as usize;
-                            let dep_index  = dyp_index - n_dom;
-                            arg[i_arg] = first_equal[dep_index] + n_dom_indext;
-                    }
-                }
-            }
-        }
+        let equal_type = ADType::DynamicP;
+        renumber_op_seq(equal_type, &first_equal, &depend.var, &mut self.var);
+        //
         if trace {
             println!("End Trace compress_dyp");
         }

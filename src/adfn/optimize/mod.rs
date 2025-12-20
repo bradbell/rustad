@@ -17,6 +17,7 @@ use crate::{
 };
 //
 use crate::ad::ADType;
+use crate::tape::OpSequence;
 //
 // -----------------------------------------------------------------------
 // mod
@@ -67,6 +68,82 @@ pub(crate) struct Old2New {
     /// Variables; length [ADfn::var_len].
     pub var : Vec<IndexT> ,
 }
+// --------------------------------------------------------------------------
+// renumber_op_seq
+/// Renumber an operation sequence using the the first equivalent operator map.
+///
+/// * equal_type *
+/// Type of operator that first_equal refers to.
+///
+/// * first_equal :
+/// If first_equal\[op_index\] is not equal to op_index,
+/// depend\[op_index\] is true and the operator with index op_index
+/// is equivalent to the operator with index first_equal\[op_index\].
+/// In addition, this is the first operator that is known to be equivalent.
+///
+/// * depend :
+/// This identifies which operators, in the operation sequence,
+/// are necessary to compute the results
+/// for the function this operation sequence appears in.
+///
+/// * op_seq :
+/// This is the operator sequence that we are renumbering.
+/// Only the field op_seq.arg_all is modified.
+///
+///
+pub(crate) fn renumber_op_seq(
+    equal_type  : ADType           ,
+    first_equal : &Vec<IndexT>     ,
+    depend      : &Vec<bool>       ,
+    op_seq      : &mut OpSequence  ,
+) {
+    //
+    // n_dep
+    let n_dep = op_seq.n_dep;
+    //
+    // n_dom
+    let n_dom        = op_seq.n_dom;
+    let n_dom_indext = n_dom as IndexT;
+    //
+    // new_arg
+    let mut new_arg : Vec<IndexT> = Vec::new();
+    //
+    // op_seq.arg_all
+    for op_index in 0 .. n_dep {
+        //
+        // both_index
+        let both_index = op_index + n_dom;
+        if depend[both_index] {
+            //
+            // new_arg
+            new_arg.clear();
+            //
+            let start      = op_seq.arg_start[op_index] as usize;
+            let end        = op_seq.arg_start[op_index + 1] as usize;
+            let arg        = &op_seq.arg_all[start .. end];
+            let arg_type   = &op_seq.arg_type_all[start .. end];
+            for i_arg in 0 .. arg.len() {
+                if n_dom_indext <= arg[i_arg] {
+                    if arg_type[i_arg] == equal_type {
+                        let both_index  = arg[i_arg] as usize;
+                        let dep_index   = both_index - n_dom;
+                        new_arg.push( first_equal[dep_index] + n_dom_indext );
+                    } else {
+                        new_arg.push( arg[i_arg] );
+                    }
+                } else {
+                    new_arg.push( arg[i_arg] );
+                }
+            }
+
+            let arg  = &mut op_seq.arg_all[start .. end];
+            for i_arg in 0 .. arg.len() {
+                arg[i_arg] = new_arg[i_arg];
+            }
+        }
+    }
+}
+// --------------------------------------------------------------------------
 // ADfn::optimize
 /// Reduce the number of operations in an ADfn object.
 ///

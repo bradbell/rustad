@@ -207,18 +207,23 @@ impl OpHashMap {
 /// * depend :
 /// This identifies which operators are necessary to compute the results
 /// for the function this operation sequence appears in.
-/// On input, this dependency may be true for an operator
-/// that are equivalent to a previous operator.
-/// Upon return, this dependency is false for all operators
-/// that are equivalent to previous operators.
 ///
 /// * op_seq :
 /// is the operation sequence.
+///
+/// * first_equal :
+/// If first_equal\[op_index\] is not equal to op_index,
+/// depend\[op_index\] is true and the operator with index op_index
+/// is equivalent to the operator with index first_equal\[op_index\].
+/// In addition, this is the first operator that is known to be equivalent.
+///
+/// If depend\[op_index\] is false,
+/// first_equal\[op_index\] is equal to op_index.
 //
 pub(crate) fn first_equal_op(
-    op_seq_type : ADType          ,
-    depend      : &mut Vec<bool>  ,
-    op_seq      : &OpSequence     ,
+    op_seq_type : ADType      ,
+    depend      : &Vec<bool>  ,
+    op_seq      : &OpSequence ,
 ) -> Vec<IndexT>
 {   //
     // n_dep
@@ -239,7 +244,7 @@ pub(crate) fn first_equal_op(
     // op_hash_map
     let mut op_hash_map : OpHashMap = OpHashMap::new();
     //
-    // op_index, increment, op_hash_map, depend, first_equal
+    // op_index, increment, op_hash_map, first_equal
     let mut op_index  = 0;
     let mut increment;
     while op_index < n_dep {
@@ -260,7 +265,7 @@ pub(crate) fn first_equal_op(
                 op_seq_type.clone(), op_index, &first_equal, map_value_in
             );
             //
-            // first_equal, depend
+            // first_equal
             if id_all[op_index] == CALL_OP {
                 let mut n_call = 1;
                 while op_index + n_call < n_dep &&
@@ -275,8 +280,6 @@ pub(crate) fn first_equal_op(
                         let dep_match = map_value_out + (i_call as IndexT);
                         //
                         first_equal[dep_index]    = dep_match;
-                        depend[dep_index + n_dom] = false;
-
                     }
                 }
                 //
@@ -291,7 +294,6 @@ pub(crate) fn first_equal_op(
                         let dep_index = op_index;
                         let dep_match = map_value_out;
                         first_equal[dep_index]    = dep_match;
-                        depend[dep_index + n_dom] = false;
                     }
                 }
                 //
