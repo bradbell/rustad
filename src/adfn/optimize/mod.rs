@@ -20,6 +20,7 @@ use crate::ad::ADType;
 //
 // -----------------------------------------------------------------------
 // mod
+mod op_hash_map;
 mod reverse_depend;
 mod compress_cop;
 mod compress_dyp;
