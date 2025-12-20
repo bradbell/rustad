@@ -25,6 +25,7 @@ mod op_hash_map;
 mod reverse_depend;
 mod compress_cop;
 mod compress_dyp;
+mod compress_var;
 mod dead_code;
 // -----------------------------------------------------------------------
 // Depend
@@ -172,6 +173,10 @@ where
         //
         // self, depend
         self.compress_dyp(&mut depend, trace);
+        //
+        // self, depend
+        self.compress_var(&mut depend, trace);
+        //
         //
         // tape, old2new
         let (mut tape, old2new) = self.dead_code(&depend, trace);
