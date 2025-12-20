@@ -172,6 +172,8 @@ impl OpHashMap {
                     arg_match[i_arg] = first_match[dep_index] + n_dom_indext;
                 }
             }
+            // position where flags start does not matter.
+            arg_match[BEGIN_FLAG] = 0;
             let key   = CallOp::new(arg_match, arg_type, flag);
             let map_value_out =
                 self.call_hash_map.entry(key).or_insert(map_value_in);
@@ -238,11 +240,6 @@ where
         // id_all
         let id_all = &self.dyp.id_all;
         //
-        if trace {
-            println!("Begin Trace compress_dyp");
-            println!("original_index, compressed_index");
-        }
-        //
         // op_index, increment, op_hash_map, depend.dyp
         let mut op_index = 0;
         while op_index < n_dep {
@@ -277,7 +274,7 @@ where
                     }
                     //
                     if ! new_op { for i_call in 0 .. n_call {
-                        depend.dyp[op_index + i_call] = false;
+                        depend.dyp[op_index + i_call + n_dom] = false;
                     } }
                     //
                     // increment
@@ -300,6 +297,18 @@ where
             }
             // op_index
             op_index += increment;
+        }
+        //
+        if trace {
+            println!("Begin Trace compress_dyp");
+            println!("original_index, compressed_index");
+            for op_index in 0 .. n_dep {
+                if first_match[op_index] != op_index as IndexT {
+                    let dep_index   = op_index + n_dom;
+                    let match_index = first_match[op_index] + n_dom_indext;
+                    println!( "{}, {}", dep_index, match_index );
+                }
+            }
         }
         //
         // self.rng_index

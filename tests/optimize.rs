@@ -20,11 +20,77 @@ mod atom_test;
 type V = AzFloat<f64>;
 type W = AzFloat<f32>;
 //
-// drill_down_to_first_match
-fn drill_down_to_first_match() {
+// find_first_match_call
+fn find_first_match_call() {
     //
     // trace
     let trace = true;
+    //
+    // eye_atom_id, call_info
+    let eye_atom_id = atom_test::register_eye::<V>();
+    let call_info   = 0;
+    //
+    // p, x, ap, ax
+    let p    = vec![V::from(2.0), V::from(3.0) ];
+    let x    = vec![V::from(4.0) ];
+    let (ap, _ax) = start_recording_dyp_var(p.clone(), x.clone());
+    //
+    // aq
+    let mut aq  : Vec< AD<V> > = Vec::new();
+    aq.push( &ap[0] + &ap[0] );  // q[0] = p[0] + p[0], first dependent
+    aq.push( &ap[1] * &ap[1] );  // q[1] = p[1] * p[1], second dependent
+    //
+    // ar
+    let mut ar  : Vec< AD<V> > = Vec::new();
+    ar.push( &ap[0] + &ap[0] );  // r[0] = p[0] + p[0], identical to first
+    ar.push( &ap[1] * &ap[1] );  // r[1] = p[1] * p[1], identical to second
+    //
+    // u = q
+    // first call has two dependent results
+    let au = call_atom(aq, eye_atom_id, call_info, trace);
+    //
+    // w = r
+    // identical to first call
+    let aw = call_atom(ar, eye_atom_id, call_info, trace);
+    //
+    // y = u + w
+    let mut ay  : Vec< AD<V> > = Vec::new();
+    ay.push( &au[0] + &aw[0] );  // y[0] = u[0] + w[0], next to last dependent
+    ay.push( &au[1] * &aw[1] );  // y[1] = u[1] * w[1], last dependent
+    //
+    //
+    // f, n_dyp, n_var
+    let mut f = stop_recording(ay);
+    //
+    // check f
+    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let (y, _y) = f.forward_var_value(&p_, x.clone(), trace);
+    let u_0     = &p[0] + &p[0];
+    let u_1     = &p[1] * &p[1];
+    assert_eq!(y[0], &u_0 + &u_0);
+    assert_eq!(y[1], &u_1 * &u_1);
+    assert_eq!( f.dyp_dep_len(), 10 );
+    assert_eq!( f.var_dep_len(), 0 );
+    //
+    // f
+    f.optimize(trace);
+    //
+    // check f
+    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let (y, _y) = f.forward_var_value(&p_, x.clone(), trace);
+    let u_0     = &p[0] + &p[0];
+    let u_1     = &p[1] * &p[1];
+    assert_eq!(y[0], &u_0 + &u_0);
+    assert_eq!(y[1], &u_1 * &u_1);
+    assert_eq!( f.dyp_dep_len(), 6 );
+    assert_eq!( f.var_dep_len(), 0 );
+}
+//
+// find_first_match_binary
+fn find_first_match_binary() {
+    //
+    // trace
+    let trace = false;
     //
     // p, x, ap, ax
     let p    = vec![ W::from(2.0) ];
@@ -71,7 +137,7 @@ fn drill_down_to_first_match() {
 fn an_atom_result_not_used() {
     //
     // trace
-    let trace = true;
+    let trace = false;
     //
     // eye_atom_id, call_info
     let eye_atom_id = atom_test::register_eye::<V>();
@@ -136,6 +202,7 @@ fn an_atom_result_not_used() {
 //
 #[test]
 fn optimize() {
-    drill_down_to_first_match();
+    find_first_match_call();
+    find_first_match_binary();
     an_atom_result_not_used();
 }
