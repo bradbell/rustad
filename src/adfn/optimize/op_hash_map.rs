@@ -90,7 +90,7 @@ impl OpHashMap {
     /// * Syntax :
     /// ```text
     ///     option = op_hash_map.try_insert(
-    ///         op_seq, op_seq_type, op_index, &first_match, map_value_in
+    ///         op_seq, op_seq_type, op_index, &first_equal, map_value_in
     ///     )
     /// ```
     ///
@@ -104,9 +104,9 @@ impl OpHashMap {
     /// * op_index :
     /// is the index of this operator in the operation sequence.
     ///
-    /// * first_match :
+    /// * first_equal :
     /// For each operator index i_op < op_index,
-    /// first_match\[i_op\] is the index of the first operator
+    /// first_equal\[i_op\] is the index of the first operator
     /// that is known to be equivalent to the operator with index i_op.
     ///
     /// * map_value_in :
@@ -129,7 +129,7 @@ impl OpHashMap {
         op_seq       : &OpSequence  ,
         op_seq_type  : ADType       ,
         op_index     : usize        ,
-        first_match  : &Vec<IndexT> ,
+        first_equal  : &Vec<IndexT> ,
         map_value_in : IndexT       ,
     ) -> Option<IndexT> {
         let n_dom_indext = op_seq.n_dom as IndexT;
@@ -144,7 +144,7 @@ impl OpHashMap {
             let match_0 = arg_type[0] == op_seq_type && n_dom_indext <= arg[0];
             let arg_0   = if match_0 {
                 let dep_index = (arg[0] - n_dom_indext) as usize;
-                first_match[dep_index] + n_dom_indext
+                first_equal[dep_index] + n_dom_indext
             } else {
                 arg[0]
             };
@@ -153,7 +153,7 @@ impl OpHashMap {
             let match_1 = arg_type[1] == op_seq_type && n_dom_indext <= arg[1];
             let arg_1   = if match_1 {
                 let dep_index = (arg[1] - n_dom_indext) as usize;
-                first_match[dep_index] + n_dom_indext
+                first_equal[dep_index] + n_dom_indext
             } else {
                 arg[1]
             };
@@ -173,7 +173,7 @@ impl OpHashMap {
                     n_dom_indext <= arg[i_arg];
                 if match_i {
                     let dep_index    = (arg[i_arg] - n_dom_indext) as usize;
-                    arg_match[i_arg] = first_match[dep_index] + n_dom_indext;
+                    arg_match[i_arg] = first_equal[dep_index] + n_dom_indext;
                 }
             }
             // position where flags start does not matter.

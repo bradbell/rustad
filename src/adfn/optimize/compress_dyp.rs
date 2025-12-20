@@ -65,10 +65,10 @@ where
         let n_dom        = self.dyp.n_dom;
         let n_dom_indext = n_dom as IndexT;
         //
-        // first_match
-        let mut first_match : Vec<IndexT> = Vec::with_capacity(n_dep);
+        // first_equal
+        let mut first_equal : Vec<IndexT> = Vec::with_capacity(n_dep);
         for op_index in 0 .. n_dep {
-            first_match.push( op_index as IndexT );
+            first_equal.push( op_index as IndexT );
         }
         //
         // op_hash_map
@@ -105,7 +105,7 @@ where
                     }
                     let map_value_in = op_index as IndexT;
                     let option = op_hash_map.try_insert( &self.dyp,
-                        op_seq_type, op_index, &first_match, map_value_in
+                        op_seq_type, op_index, &first_equal, map_value_in
                     );
                     let map_value_out = option.unwrap();
                     let new_op        = map_value_out == map_value_in;
@@ -113,7 +113,7 @@ where
                     for i_call in 0 .. n_call {
                         let dep_index = op_index + i_call;
                         let dep_match = map_value_out + (i_call as IndexT);
-                        first_match[dep_index] = dep_match;
+                        first_equal[dep_index] = dep_match;
                     }
                     //
                     if ! new_op { for i_call in 0 .. n_call {
@@ -125,7 +125,7 @@ where
                 } else {
                     let map_value_in = op_index as IndexT;
                     let option = op_hash_map.try_insert( &self.dyp,
-                        op_seq_type, op_index, &first_match, map_value_in
+                        op_seq_type, op_index, &first_equal, map_value_in
                     );
                     if option.is_some() {
                         let map_value_out = option.unwrap();
@@ -134,7 +134,7 @@ where
                             depend.dyp[op_index + n_dom] = false;
                         }
                         let dyp_index = op_index;
-                        first_match[dyp_index] = map_value_out;
+                        first_equal[dyp_index] = map_value_out;
                     }
                 }
             }
@@ -146,9 +146,9 @@ where
             println!("Begin Trace compress_dyp");
             println!("original_index, compressed_index");
             for op_index in 0 .. n_dep {
-                if first_match[op_index] != op_index as IndexT {
+                if first_equal[op_index] != op_index as IndexT {
                     let dep_index   = op_index + n_dom;
-                    let match_index = first_match[op_index] + n_dom_indext;
+                    let match_index = first_equal[op_index] + n_dom_indext;
                     println!( "{}, {}", dep_index, match_index );
                 }
             }
@@ -161,7 +161,7 @@ where
             if dependent {
                 let dyp_index     = self.rng_index[i] as usize;
                 let op_index      = dyp_index - n_dom;
-                self.rng_index[i] = first_match[op_index] + n_dom_indext;
+                self.rng_index[i] = first_equal[op_index] + n_dom_indext;
             }
         }
         //
@@ -183,7 +183,7 @@ where
                     if dependent {
                         let dyp_index  = arg[i_arg] as usize;
                         let dep_index  = dyp_index - n_dom;
-                        new_arg.push( first_match[dep_index] + n_dom_indext );
+                        new_arg.push( first_equal[dep_index] + n_dom_indext );
                     } else {
                         new_arg.push( arg[i_arg] );
                     }
@@ -212,7 +212,7 @@ where
                     if dependent {
                             let dyp_index  = arg[i_arg] as usize;
                             let dep_index  = dyp_index - n_dom;
-                            arg[i_arg] = first_match[dep_index] + n_dom_indext;
+                            arg[i_arg] = first_equal[dep_index] + n_dom_indext;
                     }
                 }
             }

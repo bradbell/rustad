@@ -20,8 +20,8 @@ mod atom_test;
 type V = AzFloat<f64>;
 type W = AzFloat<f32>;
 //
-// find_first_match_call
-fn find_first_match_call() {
+// find_first_equal_call
+fn find_first_equal_call() {
     //
     // trace
     let trace = true;
@@ -86,8 +86,8 @@ fn find_first_match_call() {
     assert_eq!( f.var_dep_len(), 0 );
 }
 //
-// find_first_match_binary
-fn find_first_match_binary() {
+// find_first_equal_binary
+fn find_first_equal_binary() {
     //
     // trace
     let trace = false;
@@ -202,7 +202,7 @@ fn an_atom_result_not_used() {
 //
 #[test]
 fn optimize() {
-    find_first_match_call();
-    find_first_match_binary();
+    find_first_equal_call();
+    find_first_equal_binary();
     an_atom_result_not_used();
 }
