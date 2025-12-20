@@ -16,11 +16,7 @@ use crate::{
 use crate::ad::ADType;
 use crate::adfn::optimize::{
         Depend,
-        op_hash_map::OpHashMap,
-};
-use crate::op::id::{
-    CALL_OP,
-    CALL_RES_OP,
+        op_hash_map::first_equal_op,
 };
 // ---------------------------------------------------------------------------
 //
@@ -71,76 +67,14 @@ where
             first_equal.push( op_index as IndexT );
         }
         //
-        // op_hash_map
-        let mut op_hash_map : OpHashMap = OpHashMap::new();
-        //
         // new_arg
         let mut new_arg : Vec<IndexT> = Vec::new();
         //
-        // id_all
-        let id_all = &self.dyp.id_all;
-        //
-        // op_index, increment, op_hash_map, depend.dyp
-        let mut op_index = 0;
-        while op_index < n_dep {
-            let mut increment = 1;
-            //
-            if depend.dyp[op_index + n_dom] {
-                //
-                // op_seq_type
-                let op_seq_type = ADType::DynamicP;
-                //
-                // op_index
-                if id_all[op_index] == CALL_RES_OP {
-                    let start    = self.dyp.arg_start[op_index] as usize;
-                    let offset   = self.dyp.arg_all[start] as usize;
-                    op_index     = op_index - offset;
-                    debug_assert!( id_all[op_index] == CALL_OP );
-                }
-                if id_all[op_index] == CALL_OP {
-                    let mut n_call = 1;
-                    while op_index + n_call < n_dep &&
-                        id_all[op_index + n_call] == CALL_RES_OP {
-                        n_call += 1;
-                    }
-                    let map_value_in = op_index as IndexT;
-                    let option = op_hash_map.try_insert( &self.dyp,
-                        op_seq_type, op_index, &first_equal, map_value_in
-                    );
-                    let map_value_out = option.unwrap();
-                    let new_op        = map_value_out == map_value_in;
-                    //
-                    for i_call in 0 .. n_call {
-                        let dep_index = op_index + i_call;
-                        let dep_match = map_value_out + (i_call as IndexT);
-                        first_equal[dep_index] = dep_match;
-                    }
-                    //
-                    if ! new_op { for i_call in 0 .. n_call {
-                        depend.dyp[op_index + i_call + n_dom] = false;
-                    } }
-                    //
-                    // increment
-                    increment = n_call;
-                } else {
-                    let map_value_in = op_index as IndexT;
-                    let option = op_hash_map.try_insert( &self.dyp,
-                        op_seq_type, op_index, &first_equal, map_value_in
-                    );
-                    if option.is_some() {
-                        let map_value_out = option.unwrap();
-                        let new_op        = map_value_out == map_value_in;
-                        if ! new_op {
-                            depend.dyp[op_index + n_dom] = false;
-                        }
-                        let dyp_index = op_index;
-                        first_equal[dyp_index] = map_value_out;
-                    }
-                }
-            }
-            // op_index
-            op_index += increment;
-        }
+        // first_equal
+        let op_seq_type = ADType::DynamicP;
+        let first_equal = first_equal_op(
+            op_seq_type, &mut depend.dyp, &self.dyp
+        );
         //
         if trace {
             println!("Begin Trace compress_dyp");

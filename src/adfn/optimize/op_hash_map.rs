@@ -16,7 +16,10 @@ use crate::{
 use crate::ad::ADType;
 use crate::tape::OpSequence;
 use crate::op::binary::is_binary_op;
-use crate::op::id::CALL_OP;
+use crate::op::id::{
+    CALL_OP,
+    CALL_RES_OP,
+};
 use crate::op::call::{
     BEGIN_FLAG,
     NUMBER_RNG,
@@ -69,7 +72,7 @@ impl CallOp {
 /// A hash map that identifies identical operator uses; i.e.,
 /// operators uses that will always yield the same results.
 ///
-pub(crate) struct OpHashMap {
+struct OpHashMap {
     binary_hash_map : FxHashMap<BinaryOp, IndexT> ,
     call_hash_map   : FxHashMap<CallOp, IndexT> ,
 }
@@ -77,7 +80,7 @@ pub(crate) struct OpHashMap {
 impl OpHashMap {
     //
     // OpHashMap::new
-    pub(crate) fn new() -> Self {
+    fn new() -> Self {
         Self {
             binary_hash_map : FxHashMap::default() ,
             call_hash_map   : FxHashMap::default() ,
@@ -122,7 +125,8 @@ impl OpHashMap {
     ///         this operator was inserted in the hash map
     ///         with the specified value. Otherwise,
     ///         this operation is equivalent to a previous operator and
-    ///         is map_value_out is its map value.
+    ///         is map_value_out is the map value for the first equivalent
+    ///         operator.
     ///
     pub(crate) fn try_insert(
         &mut self                   ,
@@ -185,4 +189,120 @@ impl OpHashMap {
         }
         return None;
     }
+}
+// ---------------------------------------------------------------------------
+// first_equal_op
+/// Determine mapping from operator index to first operator that is known
+/// to be equivalent; i.e., the results for the two operators will be equal.
+///
+/// * Syntax :
+/// ```text
+///     first_equal = first_equal_op(op_seq_type, depend, op_seq)
+/// ```
+///
+/// * op_seq_type :
+/// is the type of this operation sequence. Must be one of
+/// ADType::DynamicP, ADType::VariableP.
+///
+/// * depend :
+/// This identifies which operators are necessary to compute the results
+/// for the function this operation sequence appears in.
+/// On input, this dependency may be true for an operator
+/// that are equivalent to a previous operator.
+/// Upon return, this dependency is false for all operators
+/// that are equivalent to previous operators.
+///
+/// * op_seq :
+/// is the operation sequence.
+//
+pub(crate) fn first_equal_op(
+    op_seq_type : ADType          ,
+    depend      : &mut Vec<bool>  ,
+    op_seq      : &OpSequence     ,
+) -> Vec<IndexT>
+{   //
+    // n_dep
+    let n_dep = op_seq.n_dep;
+    //
+    // n_dom
+    let n_dom = op_seq.n_dom;
+    //
+    // id_all
+    let id_all = &op_seq.id_all;
+    //
+    // first_equal
+    let mut first_equal : Vec<IndexT> = Vec::with_capacity(n_dep);
+    for op_index in 0 .. n_dep {
+        first_equal.push( op_index as IndexT );
+    }
+    //
+    // op_hash_map
+    let mut op_hash_map : OpHashMap = OpHashMap::new();
+    //
+    // op_index, increment, op_hash_map, depend, first_equal
+    let mut op_index  = 0;
+    let mut increment;
+    while op_index < n_dep {
+        //
+        if depend[op_index + n_dom] {
+            //
+            // op_index
+            if id_all[op_index] == CALL_RES_OP {
+                let start    = op_seq.arg_start[op_index] as usize;
+                let offset   = op_seq.arg_all[start] as usize;
+                op_index     = op_index - offset;
+                debug_assert!( id_all[op_index] == CALL_OP );
+            }
+            //
+            // map_value_in, option
+            let map_value_in = op_index as IndexT;
+            let option = op_hash_map.try_insert( op_seq,
+                op_seq_type.clone(), op_index, &first_equal, map_value_in
+            );
+            //
+            // first_equal, depend
+            if id_all[op_index] == CALL_OP {
+                let mut n_call = 1;
+                while op_index + n_call < n_dep &&
+                    id_all[op_index + n_call] == CALL_RES_OP {
+                        n_call += 1;
+                }
+                let map_value_out = option.unwrap();
+                if map_value_out != map_value_in {
+                    debug_assert!( map_value_out < map_value_in );
+                    for i_call in 0 .. n_call {
+                        let dep_index = op_index + i_call;
+                        let dep_match = map_value_out + (i_call as IndexT);
+                        //
+                        first_equal[dep_index]    = dep_match;
+                        depend[dep_index + n_dom] = false;
+
+                    }
+                }
+                //
+                // increment
+                increment = n_call;
+                //
+            } else {
+                if option.is_some() {
+                    let map_value_out = option.unwrap();
+                    if map_value_out != map_value_in {
+                        debug_assert!( map_value_out < map_value_in );
+                        let dep_index = op_index;
+                        let dep_match = map_value_out;
+                        first_equal[dep_index]    = dep_match;
+                        depend[dep_index + n_dom] = false;
+                    }
+                }
+                //
+                // increment
+                increment = 1;
+            }
+        } else {
+            increment = 1;
+        }
+        // op_index
+        op_index += increment;
+    }
+    first_equal
 }
