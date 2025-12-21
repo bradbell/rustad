@@ -47,15 +47,15 @@ fn checkpoint_forward_fun_value(
         domain_clone.push( (*domain[j]).clone() );
     }
     //
-    // range_zero
-    let range_zero    = ADFN_VEC.with_borrow( |f_vec| {
+    // range
+    let range         = ADFN_VEC.with_borrow( |f_vec| {
        let f          = &f_vec[call_info as usize];
-       let (range_zero, _) = f.forward_zero_value(
+       let (range, _) = f.forward_zero_value(
             domain_clone, trace
         );
-       range_zero
+       range
     } );
-    Ok( range_zero )
+    Ok( range )
 }
 //
 // checkpoint_forward_der_value
@@ -225,7 +225,8 @@ fn main() {
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
     let ax           = start_recording_var(x);
-    let ay           = call_atom(ax, atom_id, call_info, trace);
+    let ny           = 1;
+    let ay           = call_atom(ny, ax, atom_id, call_info, trace);
     let g            = stop_recording(ay);
     //
     // g.forward_zero_value

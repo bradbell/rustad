@@ -198,11 +198,13 @@ fn find_first_equal_call() {
     //
     // u = q
     // first call has two dependent results
-    let au = call_atom(aq, eye_atom_id, call_info, trace);
+    let nu = aq.len();
+    let au = call_atom(nu, aq, eye_atom_id, call_info, trace);
     //
     // w = r
     // identical to first call
-    let aw = call_atom(ar, eye_atom_id, call_info, trace);
+    let nw = ar.len();
+    let aw = call_atom(nw, ar, eye_atom_id, call_info, trace);
     //
     // y = u + w
     let mut ay  : Vec< AD<V> > = Vec::new();
@@ -316,7 +318,8 @@ fn an_atom_result_not_used() {
     //
     // aw
     // w = z
-    let aw = call_atom(az, eye_atom_id, call_info, trace);
+    let nw = az.len();
+    let aw = call_atom(nw, az, eye_atom_id, call_info, trace);
     //
     // au
     let mut au : Vec< AD<V> > = Vec::new();

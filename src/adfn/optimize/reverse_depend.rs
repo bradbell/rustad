@@ -304,7 +304,8 @@ mod tests {
         // aw[0] = last constant
         // aw[1] = dynamic with index np + 2 depoends on dynamic with index np
         // aw[2] = variable with index nx + 2 depends on variable with index nx
-        let aw = call_atom(az, eye_atom_id, call_info, trace);
+        let nw = az.len();
+        let aw = call_atom(nw, az, eye_atom_id, call_info, trace);
         let f  = stop_recording(aw);
         //
         let p_both      = f.forward_dyp_value(p, trace);

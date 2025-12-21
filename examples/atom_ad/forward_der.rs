@@ -83,7 +83,10 @@ pub fn sumsq_forward_der_ad(
     }
     //
     // range_der
-    let range_der = call_atom(for_domain, atom_id, call_info, trace);
+    let n_range   = 1;
+    let range_der = call_atom(
+        n_range, for_domain, atom_id, call_info, trace
+    );
     //
     if trace {
         println!("Begin Trace: sumsq_forward_der_ad");

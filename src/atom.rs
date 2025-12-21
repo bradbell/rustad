@@ -559,9 +559,14 @@ where
 ///
 /// * V : see [doc_generic_v]
 ///
+/// * n_range :
+/// is the range space dimension for this atomic function call.
+/// Note that the dimension of the range space may depend on the call.
+///
 /// * adomain :
-/// This is the value of the arguments to the atomic function.
-/// `
+/// This is the value of the arguments for this atomic function call.
+/// Note that the dimension of the domain space may depend on the call.
+///
 /// * atom_id :
 /// The [atom_id](register_atom#atom_id) returned by register_atom for this
 /// atomic function.
@@ -579,6 +584,7 @@ where
 /// for this atomic function.
 ///
 pub fn call_atom<V>(
+    n_range     : usize        ,
     adomain     : Vec< AD<V> > ,
     atom_id     : IndexT       ,
     call_info   : IndexT       ,
@@ -632,13 +638,18 @@ where
     }
     //
     // range
-    let result  = forward_fun_value( &domain, call_info, trace );
+    let result  = forward_fun_value(  &domain, call_info, trace );
     let range = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_value error : {}", name, msg);
         },
         Ok(range) => range,
     };
+    if range.len() != n_range { panic!(
+        "atom {} forward_fun_value : domain.len() = {} \
+        expected range.len() = {} found range.len() = {}",
+        name, domain.len(), n_range, range.len()
+    ); }
     //
     // arange
     let arange : Vec< AD<V> >;

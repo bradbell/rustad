@@ -125,7 +125,8 @@ fn atom_sparse() {
     az.push( ax[1].clone() );
     az.push( ap[0].clone() );
     az.push( ap[1].clone() );
-    let ay  = call_atom(az, h_atom_id, call_info, trace);
+    let ny  = 3;
+    let ay  = call_atom(ny, az, h_atom_id, call_info, trace);
     let f   = stop_recording(ay);
     assert_eq!(f.dyp_dom_len(), np);
     assert_eq!(f.var_dom_len(), nx);

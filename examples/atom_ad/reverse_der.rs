@@ -77,7 +77,9 @@ pub fn sumsq_reverse_der_ad(
     rev_domain.push( (*range_der[0]).clone() );
     //
     // domain_der
-    let domain_der = call_atom(rev_domain, atom_id, call_info, trace);
+    let domain_der = call_atom(
+        n_domain, rev_domain, atom_id, call_info, trace
+    );
     //
     if trace {
         println!("Begin Trace: sumsq_reverse_der_ad");

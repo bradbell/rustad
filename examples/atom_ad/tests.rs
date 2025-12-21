@@ -25,7 +25,8 @@ fn value_callback_f(
     //
     let x       : Vec<V> = vec![ V::from(1.0), V::from(2.0) ];
     let ax               = start_recording_var(x);
-    let ay               = call_atom(ax, sumsq_atom_id, call_info, trace);
+    let ny               = 1;
+    let ay               = call_atom(ny, ax, sumsq_atom_id, call_info, trace);
     let f                = stop_recording(ay);
     f
 }

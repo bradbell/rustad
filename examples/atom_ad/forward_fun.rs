@@ -65,7 +65,10 @@ pub fn sumsq_forward_fun_ad(
     }
     //
     // sumsq_zero
-    let sumsq_zero = call_atom(domain_clone, atom_id, call_info, trace);
+    let n_range    = 1;
+    let sumsq_zero = call_atom(
+        n_range, domain_clone, atom_id, call_info, trace
+    );
     //
     if trace {
         println!("Begin Trace: sumsq_forward_fun_value");

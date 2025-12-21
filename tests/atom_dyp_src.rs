@@ -197,7 +197,8 @@ fn atom_dyp_src() {
     let z2           = ax[0].clone();
     let z3           = ad_from_value( V::from(5.0) );
     let az           = vec![ z0, z1, z2, z3 ];
-    let ay           = call_atom(az, h_atom_id, call_info, trace);
+    let ny           = 3;
+    let ay           = call_atom(ny, az, h_atom_id, call_info, trace);
     let f            = stop_recording(ay);
     //
     let p   : Vec<V> = vec![ V::from(2.0), V::from(3.0) ];
