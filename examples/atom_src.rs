@@ -72,7 +72,7 @@ fn register_sumsq_atom()-> IndexT {
 // BEGIN atom_src
 // sumsq_forward_fun_value
 pub fn sumsq_forward_fun_value(
-    domain       : &Vec<&V>    ,
+    domain       : &[&V]       ,
     _call_info   : IndexT      ,
     trace        : bool        ,
 ) -> Result< Vec<V>, String >
@@ -137,7 +137,7 @@ fn main() {
     let atom_src = atom_src.replace("IndexT", i_str);
     //
     let atom_src = atom_src.replace("<V>", "<v_str>");
-    let atom_src = atom_src.replace("<&V>", "<&v_str>");
+    let atom_src = atom_src.replace("[&V]", "[&v_str]");
     let atom_src = atom_src.replace(": V =", ": v_str =");
     let atom_src = atom_src.replace("v_str", v_str);
     //

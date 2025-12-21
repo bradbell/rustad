@@ -25,7 +25,7 @@ use super::V;
 // rev_sumsq_forward_fun_value
 // z = g(x,y) = 2 * y * ( x[0], x[1], ... )
 fn rev_sumsq_forward_fun_value(
-    domain      : &Vec<&V>  ,
+    domain      : &[&V]     ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
 ) -> Result< Vec<V>, String >
@@ -52,7 +52,7 @@ fn rev_sumsq_forward_fun_value(
 //
 // rev_sumsq_forward_der_value
 fn rev_sumsq_forward_der_value(
-    domain      : &Vec<&V>  ,
+    domain      : &[&V]     ,
     domain_der  : Vec<&V>   ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
@@ -86,7 +86,7 @@ fn rev_sumsq_forward_der_value(
 //
 // rev_sumsq_reverse_der_value
 fn rev_sumsq_reverse_der_value(
-    domain      : &Vec<&V>  ,
+    domain      : &[&V]     ,
     range_der   : Vec<&V>   ,
     _call_info  : IndexT    ,
     _trace      : bool      ,

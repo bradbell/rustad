@@ -25,7 +25,7 @@ use super::V;
 //
 // for_sumsq_forward_fun_value
 fn for_sumsq_forward_fun_value(
-    domain      : &Vec<&V>  ,
+    domain      : &[&V]     ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
 ) -> Result< Vec<V>, String >
@@ -52,7 +52,7 @@ fn for_sumsq_forward_fun_value(
 //
 // for_sumsq_forward_der_value
 fn for_sumsq_forward_der_value(
-    domain      : &Vec<&V>  ,
+    domain      : &[&V]     ,
     domain_der  : Vec<&V>   ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
@@ -89,7 +89,7 @@ fn for_sumsq_forward_der_value(
 //
 // for_sumsq_reverse_der_value
 fn for_sumsq_reverse_der_value(
-    domain      : &Vec<&V>  ,
+    domain      : &[&V]     ,
     range_der   : Vec<&V>   ,
     _call_info  : IndexT    ,
     _trace      : bool      ,

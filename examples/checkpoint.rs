@@ -35,7 +35,7 @@ thread_local! {
 //
 // checkpoint_forward_fun_value
 fn checkpoint_forward_fun_value(
-    domain           : &Vec<&V>     ,
+    domain           : &[&V]        ,
     call_info        : IndexT      ,
     trace            : bool        ,
 ) -> Result< Vec<V>, String >
@@ -60,7 +60,7 @@ fn checkpoint_forward_fun_value(
 //
 // checkpoint_forward_der_value
 fn checkpoint_forward_der_value(
-    domain           : &Vec<&V>    ,
+    domain           : &[&V]       ,
     domain_der       : Vec<&V>     ,
     call_info        : IndexT      ,
     trace            : bool        ,
@@ -99,7 +99,7 @@ fn checkpoint_forward_der_value(
 //
 // checkpoint_reverse_der_value
 fn checkpoint_reverse_der_value(
-    domain           : &Vec<&V>    ,
+    domain           : &[&V]       ,
     range_der        : Vec<&V>     ,
     call_info        : IndexT      ,
     trace            : bool        ,

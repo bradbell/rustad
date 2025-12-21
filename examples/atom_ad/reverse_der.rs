@@ -20,7 +20,7 @@ use super::{
 //
 // sumsq_reverse_der_value
 pub fn sumsq_reverse_der_value(
-    domain       : &Vec<&V>    ,
+    domain       : &[&V]       ,
     range_der    : Vec<&V>     ,
     _call_info   : IndexT      ,
     trace        : bool        ,

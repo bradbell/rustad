@@ -12,7 +12,7 @@ use rustad::{
 //
 // forward_fun_value
 fn forward_fun_value<V>(
-    domain     : &Vec<&V>  ,
+    domain     : &[&V]     ,
     _call_info : IndexT    ,
     _trace      : bool     ,
 ) -> Result< Vec<V>, String >

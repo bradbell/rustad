@@ -35,7 +35,7 @@ type V = AzFloat<f64>;
 //
 // h_forward_fun_value
 pub fn h_forward_fun_value(
-    domain       : &Vec<&V>    ,
+    domain       : &[&V]       ,
     _call_info   : IndexT      ,
     trace        : bool        ,
 ) -> Result< Vec<V>, String >

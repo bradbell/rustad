@@ -60,7 +60,7 @@ fn h_rev_depend(
 //
 // BEGIN h_forward_fun_value
 pub fn h_forward_fun_value(
-    domain       : &Vec<&V>    ,
+    domain       : &[&V]       ,
     _call_info   : IndexT      ,
     trace        : bool        ,
 ) -> Result< Vec<V>, String >
@@ -174,7 +174,7 @@ fn build_atom_src() -> String {
     //
     // atom_src
     let atom_src = atom_src.replace("<V>", "<v_str>");
-    let atom_src = atom_src.replace("<&V>", "<&v_str>");
+    let atom_src = atom_src.replace("[&V]", "[&v_str]");
     let atom_src = atom_src.replace("as V", "as v_str");
     let atom_src = atom_src.replace("v_str", v_str);
     //
