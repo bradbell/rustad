@@ -150,7 +150,7 @@ pub type AtomForwardFunValue<V> = fn(
 /// contains the value of the atomic function range variables.
 ///
 pub type AtomForwardFunAd<V> = fn(
-    _domain        : &Vec<& AD<V> >     ,
+    _domain        : &[& AD<V>]        ,
     _call_info     : IndexT             ,
     _trace         : bool               ,
 ) -> Result< Vec< AD<V> >, String > ;
@@ -214,7 +214,7 @@ pub type AtomForwardDerValue<V> = fn(
 ///     range_der = f'(domain) * dom_der
 /// ```
 pub type AtomForwardDerAd<V> = fn(
-    _domain        : &Vec<& AD<V> >    ,
+    _domain        : &[& AD<V>]       ,
     _dom_der       : Vec<& AD<V> >     ,
     _call_info     : IndexT            ,
     _trace         : bool              ,
@@ -279,7 +279,7 @@ pub type AtomReverseDerValue<V> = fn(
 ///     dom_der = range_der * f'(domain)
 /// ```
 pub type AtomReverseDerAd<V> = fn(
-    _domain        : &Vec<& AD<V> >    ,
+    _domain        : &[& AD<V>]       ,
     _range_der     : Vec<& AD<V> >     ,
     _call_info     : IndexT            ,
     _trace         : bool              ,

@@ -56,7 +56,7 @@ pub fn sumsq_forward_der_value(
 //
 // sumsq_forward_der_ad
 pub fn sumsq_forward_der_ad(
-    domain       : &Vec<& AD<V> >    ,
+    domain       : &[& AD<V>]       ,
     domain_der   : Vec<& AD<V> >     ,
     call_info    : IndexT            ,
     trace        : bool              ,
