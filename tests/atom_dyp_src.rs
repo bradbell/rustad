@@ -60,6 +60,7 @@ fn h_rev_depend(
 //
 // BEGIN h_forward_fun_value
 pub fn h_forward_fun_value(
+    _use_range   : &[bool]     ,
     domain       : &[&V]       ,
     _call_info   : IndexT      ,
     trace        : bool        ,

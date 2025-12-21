@@ -25,6 +25,7 @@ use super::V;
 // rev_sumsq_forward_fun_value
 // z = g(x,y) = 2 * y * ( x[0], x[1], ... )
 fn rev_sumsq_forward_fun_value(
+    _use_range  : &[bool]   ,
     domain      : &[&V]     ,
     _call_info  : IndexT    ,
     _trace      : bool      ,

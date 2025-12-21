@@ -283,7 +283,7 @@ where
     );
     //
     // range
-    let result = forward_fun_value(&domain, call_info, trace );
+    let result = forward_fun_value( rng_is_dep, &domain, call_info, trace );
     let mut range = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_value error : {}", callback.name, msg);
@@ -423,7 +423,7 @@ where
     );
     //
     // range
-    let result = forward_fun_value( &domain, call_info, trace );
+    let result = forward_fun_value(  rng_is_dep, &domain, call_info, trace );
     let mut range = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_value error : {}", callback.name, msg);
@@ -942,6 +942,19 @@ where
         }
     }
     //
+    // use_range
+    src = src +
+        "   //\n" +
+        "   let mut use_range : Vec<bool> = " +
+            &format!("vec![false; {n_rng}];\n");
+    for i_rng in 0 .. n_rng {
+        if rng_is_dep[i_rng] {
+            let rng_is_dep_i = rng_is_dep[i_rng];
+            src = src + "    " +
+                &format!( "use_range[{i_rng}] = {rng_is_dep_i};\n");
+        }
+    }
+    //
     // call_range
     src = src +
         "   //\n" +
@@ -949,7 +962,7 @@ where
         "   let call_info  = " + &call_info.to_string() + ";\n" +
         "   let trace      = " + &trace.to_string() + ";\n" +
         "   let mut call_range = " +
-                "atom_" + &name + "(&call_dom, call_info, trace) ?;\n";
+            "atom_" + &name + "(&use_range, &call_dom, call_info, trace) ?;\n";
     //
     // res_name, res_dep
     let res_name   : &str;

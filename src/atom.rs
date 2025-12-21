@@ -110,7 +110,7 @@ pub type AtomRevDepend = fn(
 ///
 /// * Syntax :
 /// ```text
-///     range = forward_fun_value(&domain, call_info, trace) ?
+///     range = forward_fun_value(&use_range, &domain, call_info, trace) ?
 /// ```
 ///
 /// * forward_fun_value :
@@ -118,10 +118,17 @@ pub type AtomRevDepend = fn(
 ///
 /// * Arguments : see [doc_common_arguments]
 ///
+/// * use_range :
+/// If use_range\[i\] is true (false),
+/// the value range\[i\] is used (is not used).
+/// This may be used to avoid computations that are not needed.
+/// This vector has length equal to n_range in [call_atom] .
+///
 /// * range :
 /// contains the value of the atomic function range variables.
 ///
 pub type AtomForwardFunValue<V> = fn(
+    _use_range     : &[bool]     ,
     _domain        : &[&V]       ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
@@ -637,8 +644,11 @@ where
         domain.push( &adomain[j].value );
     }
     //
+    // use_range
+    let use_range = vec![true; n_range];
+    //
     // range
-    let result  = forward_fun_value(  &domain, call_info, trace );
+    let result  = forward_fun_value(  &use_range, &domain, call_info, trace );
     let range = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_value error : {}", name, msg);

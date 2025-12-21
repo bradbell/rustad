@@ -35,6 +35,7 @@ thread_local! {
 //
 // checkpoint_forward_fun_value
 fn checkpoint_forward_fun_value(
+    _use_range       : &[bool]      ,
     domain           : &[&V]        ,
     call_info        : IndexT      ,
     trace            : bool        ,

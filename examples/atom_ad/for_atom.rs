@@ -25,6 +25,7 @@ use super::V;
 //
 // for_sumsq_forward_fun_value
 fn for_sumsq_forward_fun_value(
+    _use_range  : &[bool]   ,
     domain      : &[&V]     ,
     _call_info  : IndexT    ,
     _trace      : bool      ,

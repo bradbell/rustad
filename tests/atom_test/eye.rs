@@ -12,6 +12,7 @@ use rustad::{
 //
 // forward_fun_value
 fn forward_fun_value<V>(
+    _use_range : &[bool]   ,
     domain     : &[&V]     ,
     _call_info : IndexT    ,
     _trace      : bool     ,
