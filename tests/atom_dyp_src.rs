@@ -60,22 +60,22 @@ fn h_rev_depend(
 //
 // BEGIN h_forward_fun_value
 pub fn h_forward_fun_value(
-    dom_zero     : &Vec<&V>    ,
+    domain       : &Vec<&V>    ,
     _call_info   : IndexT      ,
     trace        : bool        ,
 ) -> Result< Vec<V>, String >
 {
     // range
     let mut range : Vec<V> = Vec::new();
-    range.push( dom_zero[0] * dom_zero[1] );
-    range.push( dom_zero[1] * dom_zero[2] );
-    range.push( dom_zero[3].clone() );
+    range.push( domain[0] * domain[1] );
+    range.push( domain[1] * domain[2] );
+    range.push( domain[3].clone() );
     //
     if trace {
         println!("Begin Trace: h_forward_fun_value");
-        print!("dom_zero = [ ");
-        for j in 0 .. dom_zero.len() {
-                print!("{}, ", dom_zero[j]);
+        print!("domain = [ ");
+        for j in 0 .. domain.len() {
+                print!("{}, ", domain[j]);
         }
         println!("]");
         println!("range = {:?}", range);
@@ -87,22 +87,22 @@ pub fn h_forward_fun_value(
 //
 // h_forward_fun_ad
 pub fn h_forward_fun_ad(
-    dom_zero     : &Vec<& AD<V> >    ,
+    domain       : &Vec<& AD<V> >    ,
     _call_info   : IndexT            ,
     trace        : bool              ,
 ) -> Result< Vec< AD<V> >, String >
 {
     // range
     let mut range : Vec< AD<V> > = Vec::new();
-    range.push( dom_zero[0] * dom_zero[1] );
-    range.push( dom_zero[1] * dom_zero[2] );
-    range.push( dom_zero[3].clone() );
+    range.push( domain[0] * domain[1] );
+    range.push( domain[1] * domain[2] );
+    range.push( domain[3].clone() );
     //
     if trace {
         println!("Begin Trace: h_forward_fun_ad");
-        print!("dom_zero = [ ");
-        for j in 0 .. dom_zero.len() {
-                print!("{}, ", dom_zero[j]);
+        print!("domain = [ ");
+        for j in 0 .. domain.len() {
+                print!("{}, ", domain[j]);
         }
         println!("]");
         println!("range = {:?}", range);
