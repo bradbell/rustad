@@ -74,7 +74,7 @@ fn compress_dyp() {
     //
     // trace, n_repeat
     let trace    = false;
-    let n_repeat = 2;
+    let n_repeat = 5;
     //
     // four, p, x, ap, ax
     let p    = vec! [V::from(2.0) ];
@@ -119,11 +119,63 @@ fn compress_dyp() {
     }
 }
 //
+// compress_var
+fn compress_var() {
+    //
+    // trace, n_repeat
+    let trace    = false;
+    let n_repeat = 5;
+    //
+    // four, p, x, ap, ax
+    let p    = vec! [V::from(2.0) ];
+    let x    = vec![ V::from(3.0) ];
+    let (ap, ax) = start_recording_dyp_var(p.clone(), x.clone());
+    //
+    // ay
+    let mut ay : Vec< AD<V> >  = Vec::new();
+    for _i in 0 .. n_repeat {
+        ay.push( &ap[0] + &ax[0] );
+    }
+    for _i in 0 .. n_repeat {
+        ay.push( &ay[0] * &ax[0] );
+    }
+    //
+    // f, n_dyp, n_var
+    // 2 * n_repeat variables in computation (plus one domain variable).
+    let mut f = stop_recording(ay);
+    let n_dyp = f.dyp_len();
+    let n_var = f.var_len();
+    assert_eq!( 1, n_dyp );
+    assert_eq!( 2 * n_repeat + 1, n_var);
+    //
+    // f, n_dyp
+    // two variable in computation plus domain variable
+    f.optimize(trace);
+    let n_dyp = f.dyp_len();
+    let n_var = f.var_len();
+    assert_eq!(1, n_dyp);
+    assert_eq!(3, n_var);
+    //
+    // y
+    let p_both       = f.forward_dyp_value(p.clone(), trace);
+    let (y, _y_both) = f.forward_var_value(&p_both, x.clone(), trace);
+    //
+    // check
+    let check = &p[0] + &x[0];
+    for i in 0 .. n_repeat {
+        assert_eq!( y[i], check );
+    }
+    let check = &y[0] * &x[0];
+    for i in 0 .. n_repeat {
+        assert_eq!( y[n_repeat + i], check );
+    }
+}
+//
 // find_first_equal_call
 fn find_first_equal_call() {
     //
     // trace
-    let trace = true;
+    let trace = false;
     //
     // eye_atom_id, call_info
     let eye_atom_id = atom_test::register_eye::<V>();
@@ -303,6 +355,7 @@ fn an_atom_result_not_used() {
 fn optimize() {
     compress_cop();
     compress_dyp();
+    compress_var();
     find_first_equal_call();
     find_first_equal_binary();
     an_atom_result_not_used();
