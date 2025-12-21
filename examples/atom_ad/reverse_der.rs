@@ -52,7 +52,7 @@ pub fn sumsq_reverse_der_value(
 //
 // sumsq_reverse_der_ad
 pub fn sumsq_reverse_der_ad(
-    domain       : &[& AD<V>]       ,
+    domain       : &[& AD<V>]        ,
     range_der    : Vec<& AD<V> >     ,
     call_info    : IndexT            ,
     trace        : bool              ,

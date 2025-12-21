@@ -45,7 +45,7 @@ pub fn sumsq_forward_fun_value(
 //
 // sumsq_forward_fun_ad
 pub fn sumsq_forward_fun_ad(
-    domain       : &[& AD<V>]       ,
+    domain       : &[& AD<V>]        ,
     call_info    : IndexT            ,
     trace        : bool              ,
 ) -> Result< Vec< AD<V> >, String >

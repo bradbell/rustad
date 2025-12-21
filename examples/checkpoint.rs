@@ -61,7 +61,7 @@ fn checkpoint_forward_fun_value(
 // checkpoint_forward_der_value
 fn checkpoint_forward_der_value(
     domain           : &[&V]       ,
-    domain_der       : Vec<&V>     ,
+    domain_der       : &[&V]       ,
     call_info        : IndexT      ,
     trace            : bool        ,
 ) -> Result< Vec<V>, String >

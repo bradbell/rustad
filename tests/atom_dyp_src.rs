@@ -87,7 +87,7 @@ pub fn h_forward_fun_value(
 //
 // h_forward_fun_ad
 pub fn h_forward_fun_ad(
-    domain       : &[& AD<V>]       ,
+    domain       : &[& AD<V>]        ,
     _call_info   : IndexT            ,
     trace        : bool              ,
 ) -> Result< Vec< AD<V> >, String >
