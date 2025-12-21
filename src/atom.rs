@@ -235,6 +235,7 @@ pub type AtomForwardDerValue<V> = fn(
 ///     range_der = f'(domain) * domain_der
 /// ```
 pub type AtomForwardDerAD<V> = fn(
+    _use_range     : &[bool]           ,
     _domain        : &[& AD<V>]        ,
     _domain_der    : &[& AD<V>]        ,
     _call_info     : IndexT            ,

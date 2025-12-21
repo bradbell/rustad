@@ -57,6 +57,7 @@ pub fn sumsq_forward_der_value(
 //
 // sumsq_forward_der_ad
 pub fn sumsq_forward_der_ad(
+    _use_range   : &[bool]           ,
     domain       : &[& AD<V>]        ,
     domain_der   : &[& AD<V>]        ,
     call_info    : IndexT            ,
