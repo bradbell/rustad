@@ -185,6 +185,12 @@ pub type AtomForwardFunAD<V> = fn(
 /// * forward_der_value :
 /// is the AtomForwardDerValue callback for this atomic function.
 ///
+/// * use_range :
+/// If use_range\[i\] is true (false),
+/// the value range_der\[i\] is used (is not used).
+/// This may be used to avoid computations that are not needed.
+/// This vector has length equal to n_range in [call_atom] .
+///
 /// * domain_der    :
 /// this contains the domain space direction for the directional derivatives.
 ///
@@ -196,6 +202,7 @@ pub type AtomForwardFunAD<V> = fn(
 ///     range_der = f'(domain) * domain_der
 /// ```
 pub type AtomForwardDerValue<V> = fn(
+    _use_range     : &[bool]     ,
     _domain        : &[&V]       ,
     _domain_der    : &[&V]       ,
     _call_info     : IndexT      ,

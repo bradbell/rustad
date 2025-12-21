@@ -20,6 +20,7 @@ use super::{
 //
 // sumsq_forward_der_value
 pub fn sumsq_forward_der_value(
+    _use_range   : &[bool]     ,
     domain       : &[&V]       ,
     domain_der   : &[&V]       ,
     _call_info   : IndexT      ,

@@ -573,7 +573,9 @@ where
         }
     }
     // range_der
-    let result = forward_der_value(&domain, &domain_der, call_info, trace);
+    let result = forward_der_value(
+        &rng_is_dep, &domain, &domain_der, call_info, trace
+    );
     let mut range_der = match result {
         Err(msg) => { panic!(
             "atom {} forward_der_value error : {}", callback.name, msg);
