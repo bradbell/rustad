@@ -36,12 +36,6 @@ use crate::{
         doc_generic_v,
         ADfn,
 };
-#[cfg(doc)]
-use crate::adfn::{
-    forward_zero::doc_forward_zero,
-    forward_one::doc_forward_one,
-    reverse_one::doc_reverse_one,
-};
 // ---------------------------------------------------------------------------
 // doc_common_arguments
 /// Common arguments for atomic function callbacks.
@@ -604,32 +598,32 @@ where
     let rw_lock : &RwLock< Vec< AtomCallback<V> > > =
         sealed::AtomInfoVec::callback_vec();
     //
-    // forward_zero, rev_depend
-    let name           : &'static str;
-    let forward_zero   : Option< AtomForwardFunValue<V> >;
-    let rev_depend     : Option< AtomRevDepend >;
+    // forward_fun_value, rev_depend
+    let name               : &'static str;
+    let forward_fun_value  : Option< AtomForwardFunValue<V> >;
+    let rev_depend         : Option< AtomRevDepend >;
     {   //
         // read_lock
         let read_lock = rw_lock.read();
         assert!( read_lock.is_ok() );
         //
         // Rest of this block has a lock, so it should be fast and not fail.
-        let callback_vec = read_lock.unwrap();
-        let callback     = &callback_vec[atom_id as usize];
-        forward_zero      = callback.forward_fun_value.clone();
-        name              = callback.name;
-        rev_depend        = callback.rev_depend.clone();
+        let callback_vec   = read_lock.unwrap();
+        let callback       = &callback_vec[atom_id as usize];
+        forward_fun_value  = callback.forward_fun_value.clone();
+        name               = callback.name;
+        rev_depend         = callback.rev_depend.clone();
     }
     if rev_depend.is_none() { panic!(
         "{} : rev_depend is not implemented for this atomic function",
         name,
     ); }
-    if forward_zero.is_none() { panic!(
+    if forward_fun_value.is_none() { panic!(
         "{} : forward_fun_value is not implemented for this atomic function",
         name,
     ); }
     let rev_depend   = rev_depend.unwrap();
-    let forward_zero = forward_zero.unwrap();
+    let forward_fun_value = forward_fun_value.unwrap();
     //
     // domain
     let mut domain      : Vec<&V> = Vec::with_capacity( adomain.len() );
@@ -638,7 +632,7 @@ where
     }
     //
     // range
-    let result  = forward_zero( &domain, call_info, trace );
+    let result  = forward_fun_value( &domain, call_info, trace );
     let range = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_value error : {}", name, msg);

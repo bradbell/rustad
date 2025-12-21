@@ -43,7 +43,7 @@ This package is intended to include (and extend) most of the features in
 
 5.  Derivative calculations can be used in the definition of new functions
     (that can be differentiated). 
-    This uses called AD evaluation of the derivatives.
+    This is called AD evaluation of the derivatives.
 
 6.  Atomic functions and Checkpointing. Atomic function have been extended
     so that they stay atomic when used in functions that are AD evaluated.
@@ -57,12 +57,10 @@ This package is intended to include (and extend) most of the features in
     This is important when computing derivatives where some of the components
     are nan, but they are not used.
 
-10. Reduce tape size both during recording.
-    For example: multiplication by the constants zero and one 
-    and addition by zero does not need to be recorded.
-
-11. Avoid recomputaiton in AD function objects by detecting
-    equivalent constants, dynamic parameters, and varialbes.
+10. Optimization: Reduce tape size both during recording; e.g.,
+    multiplication by the constants zero and one does not need to be recorded.
+    Reduce size and avoid recomputaiton in AD function objects by detecting
+    equivalent constants, dynamic parameters, and variables..
 
 ## Goals Before Stable API
 
