@@ -353,7 +353,7 @@ where
     );
     //
     // arange_zero
-    let result = forward_fun_ad( &adomain, call_info, trace );
+    let result = forward_fun_ad( &rng_is_dep, &adomain, call_info, trace );
     let mut arange = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_ad error : {}", callback.name, msg);
@@ -491,7 +491,7 @@ where
     );
     //
     // arange
-    let result = forward_fun_ad( &adomain, call_info, trace );
+    let result = forward_fun_ad( &rng_is_dep, &adomain, call_info, trace );
     let mut arange = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_ad error : {}", callback.name, msg);

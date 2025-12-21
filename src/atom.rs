@@ -116,13 +116,13 @@ pub type AtomRevDepend = fn(
 /// * forward_fun_value :
 /// is the AtomForwardFunValue callback for this atomic function.
 ///
-/// * Arguments : see [doc_common_arguments]
-///
 /// * use_range :
 /// If use_range\[i\] is true (false),
 /// the value range\[i\] is used (is not used).
 /// This may be used to avoid computations that are not needed.
 /// This vector has length equal to n_range in [call_atom] .
+///
+/// * Arguments : see [doc_common_arguments]
 ///
 /// * range :
 /// contains the value of the atomic function range variables.
@@ -145,11 +145,17 @@ pub type AtomForwardFunValue<V> = fn(
 ///
 /// * Syntax :
 /// ```text
-///     range = forward_fun_ad(&domain, call_info, trace) ?
+///     range = forward_fun_ad(&use_range, &domain, call_info, trace) ?
 /// ```
 ///
 /// * forward_fun_ad :
 /// is the AtomForwardFunAD callback for this atomic function.
+///
+/// * use_range :
+/// If use_range\[i\] is true (false),
+/// the value range\[i\] is used (is not used).
+/// This may be used to avoid computations that are not needed.
+/// This vector has length equal to n_range in [call_atom] .
 ///
 /// * Arguments : see [doc_common_arguments]
 ///
@@ -157,6 +163,7 @@ pub type AtomForwardFunValue<V> = fn(
 /// contains the value of the atomic function range variables.
 ///
 pub type AtomForwardFunAD<V> = fn(
+    _use_range     : &[bool]            ,
     _domain        : &[& AD<V>]         ,
     _call_info     : IndexT             ,
     _trace         : bool               ,

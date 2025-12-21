@@ -46,6 +46,7 @@ pub fn sumsq_forward_fun_value(
 //
 // sumsq_forward_fun_ad
 pub fn sumsq_forward_fun_ad(
+    _use_range   : &[bool]      ,
     domain       : &[& AD<V>]        ,
     call_info    : IndexT            ,
     trace        : bool              ,
