@@ -57,14 +57,12 @@ This package is intended to include (and extend) most of the features in
     This is important when computing derivatives where some of the components
     are nan, but they are not used.
 
-## Under Construction
-Reduce tape size both during recording and by
-optimizing the operation sequence. 
-For example: multiplication by the constants zero and one 
-and addition by zero does not need to be recorded.
-This optimization should use less memory and be faster than 
-CppAD's optimization because it does not re-tape the operation sequence.
+10. Reduce tape size both during recording.
+    For example: multiplication by the constants zero and one 
+    and addition by zero does not need to be recorded.
 
+11. Avoid recomputaiton in AD function objects by detecting
+    equivalent constants, dynamic parameters, and varialbes.
 
 ## Goals Before Stable API
 
