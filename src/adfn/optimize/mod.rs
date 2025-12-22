@@ -12,7 +12,7 @@
 use crate::{
     ADfn,
     IndexT,
-    AtomInfoVecPublic,
+    GlobalAtomCallbackVecPublic,
     GlobalOpInfoVecPublic,
 };
 //
@@ -160,7 +160,7 @@ pub(crate) fn renumber_op_seq(
 impl<V> ADfn<V>
 where
     V : Clone + From<f32> + Eq + std::fmt::Display + std::hash::Hash +
-        AtomInfoVecPublic + GlobalOpInfoVecPublic,
+        GlobalAtomCallbackVecPublic + GlobalOpInfoVecPublic,
 {   //
     // optimize
     pub fn optimize(&mut self, trace : bool)

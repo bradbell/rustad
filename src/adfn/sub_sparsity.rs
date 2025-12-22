@@ -11,7 +11,7 @@
 use crate::ADfn;
 use crate::IndexT;
 use crate::op::call::call_depend;
-use crate::atom::sealed::AtomInfoVec;
+use crate::atom::sealed::GlobalAtomCallbackVec;
 use crate::atom::AtomCallback;
 use crate::op::info::{
     OpInfo,
@@ -29,7 +29,7 @@ use crate::doc_generic_v;
 // ADfn::subsparsity
 impl<V> ADfn<V>
 where
-    V               : AtomInfoVec + GlobalOpInfoVec,
+    V               : GlobalAtomCallbackVec + GlobalOpInfoVec,
     AtomCallback<V> : Clone,
 {
     /// Use the subgraph method to compute a Jacobian sparsity pattern.

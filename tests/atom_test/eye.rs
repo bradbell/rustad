@@ -7,7 +7,7 @@ use rustad::{
     IndexT,
     AtomCallback,
     register_atom,
-    AtomInfoVecPublic,
+    GlobalAtomCallbackVecPublic,
 };
 //
 // forward_fun_value
@@ -18,7 +18,7 @@ fn forward_fun_value<V>(
     _trace      : bool     ,
 ) -> Result< Vec<V>, String >
 where
-    V : Clone + AtomInfoVecPublic ,
+    V : Clone + GlobalAtomCallbackVecPublic ,
 {   // range
     let mut range : Vec<V> = Vec::with_capacity( domain.len() );
     for i in 0 .. domain.len() {
@@ -46,7 +46,7 @@ fn rev_depend<V>(
 // register_eye
 pub fn register_eye<V>() -> IndexT
 where
-    V : Clone + AtomInfoVecPublic ,
+    V : Clone + GlobalAtomCallbackVecPublic ,
 {
     //
     // callback

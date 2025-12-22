@@ -16,7 +16,7 @@ use crate::atom::AtomCallback;
 use crate::{
     ADfn,
     IndexT,
-    AtomInfoVecPublic,
+    GlobalAtomCallbackVecPublic,
 };
 use crate::op::id::{
     CALL_OP,
@@ -32,7 +32,7 @@ use crate::doc_generic_v;
 // ADfn::for_sparsity
 impl<V> ADfn<V>
 where
-    V               : AtomInfoVecPublic + GlobalOpInfoVec ,
+    V               : GlobalAtomCallbackVecPublic + GlobalOpInfoVec ,
     AtomCallback<V> : Clone,
 {
     /// Use the forward mode to compute a Jacobian sparsity pattern.

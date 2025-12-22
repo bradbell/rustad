@@ -94,13 +94,13 @@ where
     V : tape::sealed::ThisThreadTape ,
 { }
 //
-// AtomInfoVecPublic
+// GlobalAtomCallbackVecPublic
 /// This is the public interface to a sealed trait
-pub trait AtomInfoVecPublic : atom::sealed::AtomInfoVec
+pub trait GlobalAtomCallbackVecPublic : atom::sealed::GlobalAtomCallbackVec
 { }
-impl<V> AtomInfoVecPublic for V
+impl<V> GlobalAtomCallbackVecPublic for V
 where
-    V : atom::sealed::AtomInfoVec ,
+    V : atom::sealed::GlobalAtomCallbackVec ,
 { }
 //
 //
@@ -123,9 +123,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2025.12.21");
+/// assert_eq!(date, "2025.12.22");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2025.12.21";
+pub const YEAR_MONTH_DAY : &str = "2025.12.22";
 //
 // AZ_FLOAT_SRC
 /// is the source code for the [AzFloat] class.

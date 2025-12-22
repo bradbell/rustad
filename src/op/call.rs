@@ -54,7 +54,7 @@ use crate::adfn::optimize;
 use crate::tape::OpSequence;
 use crate::op::info::OpInfo;
 use crate::op::info::no_reverse_depend;
-use crate::atom::sealed::AtomInfoVec;
+use crate::atom::sealed::GlobalAtomCallbackVec;
 use crate::op::id::{
         CALL_OP,
         CALL_RES_OP,
@@ -85,7 +85,7 @@ pub(crate) const NUMBER_RNG: usize = 3;
 // get_callback
 fn get_callback<V> (atom_id : usize) -> AtomCallback<V>
 where
-    V               : AtomInfoVec,
+    V               : GlobalAtomCallbackVec,
     AtomCallback<V> : Clone,
 {   //
     // callback
@@ -93,7 +93,7 @@ where
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomCallback<V> > > =
-            AtomInfoVec::callback_vec();
+            GlobalAtomCallbackVec::callback_vec();
         //
         // read_lock
         let read_lock = rw_lock.read();
@@ -252,7 +252,7 @@ fn call_forward_dyp_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    V               : AtomInfoVec + From<f32> + PartialEq,
+    V               : GlobalAtomCallbackVec + From<f32> + PartialEq,
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -320,7 +320,7 @@ fn call_forward_dyp_ad<V> (
     arg_type   : &[ADType]           ,
     res        : usize               )
 where
-    V               : PartialEq + Clone + From<f32> + AtomInfoVec,
+    V               : PartialEq + Clone + From<f32> + GlobalAtomCallbackVec,
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -394,7 +394,7 @@ fn call_forward_var_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    V               : AtomInfoVec + PartialEq + From<f32>,
+    V               : GlobalAtomCallbackVec + PartialEq + From<f32>,
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -461,7 +461,7 @@ fn call_forward_var_ad<V> (
     arg_type   : &[ADType]           ,
     res        : usize               )
 where
-    V               : PartialEq + Clone + AtomInfoVec,
+    V               : PartialEq + Clone + GlobalAtomCallbackVec,
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -533,7 +533,7 @@ fn call_forward_der_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    V               : PartialEq + AtomInfoVec + From<f32>,
+    V               : PartialEq + GlobalAtomCallbackVec + From<f32>,
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -608,7 +608,7 @@ fn call_forward_der_ad<V> (
     arg_type   : &[ADType]           ,
     res        : usize               )
 where
-    V               : PartialEq + From<f32> + Clone + AtomInfoVec ,
+    V               : PartialEq + From<f32> + Clone + GlobalAtomCallbackVec ,
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -688,7 +688,7 @@ fn call_reverse_der_value<V> (
     arg_type   : &[ADType]     ,
     res        : usize         )
 where
-    for<'a> V       : PartialEq + AtomInfoVec + AddAssign<&'a V>  + From<f32>,
+    for<'a> V       : PartialEq + GlobalAtomCallbackVec + AddAssign<&'a V>  + From<f32>,
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     let (
@@ -760,7 +760,7 @@ fn call_reverse_der_ad<V> (
     arg_type   : &[ADType]            ,
     res        : usize                )
 where
-    V                 : PartialEq + AtomInfoVec + Clone + From<f32>,
+    V                 : PartialEq + GlobalAtomCallbackVec + Clone + From<f32>,
     for<'a> AD<V> : AddAssign<&'a AD<V> >,
     AtomCallback<V>   : Clone,
 {   // ----------------------------------------------------------------------
@@ -888,7 +888,7 @@ fn call_rust_src<V> (
     arg_type  : &[ADType]   ,
     res       : usize       ) -> String
 where
-    V     : AtomInfoVec,
+    V     : GlobalAtomCallbackVec,
     AtomCallback<V> : Clone,
 {   // ----------------------------------------------------------------------
     debug_assert!( res_type.is_dynamic() || res_type.is_variable() );
@@ -1012,7 +1012,7 @@ no_reverse_depend!(Call);
 /// The map results for CALL_OP and CALL_RES_OP are set.
 pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    V     : Clone + From<f32> + PartialEq + AtomInfoVec + ThisThreadTapePublic,
+    V     : Clone + From<f32> + PartialEq + GlobalAtomCallbackVec + ThisThreadTapePublic,
     for<'a> V : AddAssign<&'a V> ,
 {
     op_info_vec[CALL_OP as usize] = OpInfo{
@@ -1083,7 +1083,7 @@ pub(crate) fn call_depend<V>(
     op_seq          : &OpSequence     ,
     mut op_index    : usize           )
 where
-    V               : AtomInfoVec,
+    V               : GlobalAtomCallbackVec,
     AtomCallback<V> : Clone,
 {
     atom_depend.clear();

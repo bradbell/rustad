@@ -22,7 +22,7 @@ use crate::op::{
 };
 use crate::ad::ADType;
 use crate::tape::OpSequence;
-use crate::atom::sealed::AtomInfoVec;
+use crate::atom::sealed::GlobalAtomCallbackVec;
 use crate::adfn::optimize;
 //
 // -----------------------------------------------------------------------
@@ -30,7 +30,7 @@ use crate::adfn::optimize;
 // ADfn::reverse_depend
 impl<V> ADfn<V>
 where
-    V               : AtomInfoVec + GlobalOpInfoVec,
+    V               : GlobalAtomCallbackVec + GlobalOpInfoVec,
     AtomCallback<V> : Clone,
 {   //
     // reverse_depend

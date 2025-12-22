@@ -27,7 +27,7 @@ use crate::{
     IndexT,
     AD,
     ad_from_vector,
-    AtomInfoVecPublic,
+    GlobalAtomCallbackVecPublic,
     ThisThreadTapePublic,
 };
 //
@@ -335,15 +335,15 @@ pub (crate) mod sealed {
     use std::sync::RwLock;
     use super::AtomCallback;
     //
-    // AtomInfoVec
-    pub trait AtomInfoVec
+    // GlobalAtomCallbackVec
+    pub trait GlobalAtomCallbackVec
     where
         Self : Sized + 'static,
     {   fn callback_vec() -> &'static RwLock< Vec< AtomCallback<Self> > >;
     }
 }
 //
-// impl_callback_vec!
+// impl_global_atom_callback_vec!
 /// Implement the atomic evaluation vector for value type V
 ///
 /// * V : see [doc_generic_v]
@@ -356,11 +356,11 @@ pub (crate) mod sealed {
 /// ```text
 ///     use std::sync::RwLock;
 /// ```
-macro_rules! impl_callback_vec{ ($V:ty) => {
+macro_rules! impl_global_atom_callback_vec{ ($V:ty) => {
     #[doc = concat!(
         "The atomic evaluation vector for value type `", stringify!($V), "`"
     ) ]
-    impl crate::atom::sealed::AtomInfoVec for $V {
+    impl crate::atom::sealed::GlobalAtomCallbackVec for $V {
         fn callback_vec() -> &'static
         RwLock< Vec< crate::atom::AtomCallback<$V> > > {
             pub(crate) static ATOM_CALLBACK_VEC :
@@ -370,7 +370,7 @@ macro_rules! impl_callback_vec{ ($V:ty) => {
         }
     }
 } }
-pub(crate) use impl_callback_vec;
+pub(crate) use impl_global_atom_callback_vec;
 // ----------------------------------------------------------------------------
 // register_atom
 /// Register an atomic function.
@@ -391,11 +391,11 @@ pub(crate) use impl_callback_vec;
 ///
 pub fn register_atom<V>( callback : AtomCallback<V> ) -> IndexT
 where
-    V : AtomInfoVecPublic ,
+    V : GlobalAtomCallbackVecPublic ,
 {   //
     // rwlock
     let rw_lock : &RwLock< Vec< AtomCallback<V> > > =
-        sealed::AtomInfoVec::callback_vec();
+        sealed::GlobalAtomCallbackVec::callback_vec();
     //
     // atom_id
     let atom_id           : IndexT;
@@ -613,7 +613,7 @@ pub fn call_atom<V>(
     trace       : bool         ,
 ) -> Vec< AD<V> >
 where
-    V   : Clone + From<f32> + ThisThreadTapePublic + AtomInfoVecPublic ,
+    V   : Clone + From<f32> + ThisThreadTapePublic + GlobalAtomCallbackVecPublic ,
 {
     //
     // local_key
@@ -624,7 +624,7 @@ where
     //
     // rwlock
     let rw_lock : &RwLock< Vec< AtomCallback<V> > > =
-        sealed::AtomInfoVec::callback_vec();
+        sealed::GlobalAtomCallbackVec::callback_vec();
     //
     // forward_fun_value, rev_depend
     let name               : &'static str;
