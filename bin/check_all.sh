@@ -15,6 +15,9 @@ then
    echo "bin/check_all.sh: must be executed from its parent directory"
    exit 1
 fi
+#
+export RUSTFLAGS="-D warnings"
+#
 # sed
 source bin/grep_and_sed.sh
 #

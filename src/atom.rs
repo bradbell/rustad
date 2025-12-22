@@ -335,11 +335,41 @@ pub (crate) mod sealed {
     use std::sync::RwLock;
     use super::AtomCallback;
     //
+    #[cfg(doc)]
+    use crate::doc_generic_v;
+    //
     // GlobalAtomCallbackVec
     pub trait GlobalAtomCallbackVec
     where
         Self : Sized + 'static,
-    {   fn get() -> &'static RwLock< Vec< AtomCallback<Self> > >;
+    {   /// Returns a reference to the map from atom_id to callback information
+        ///
+        /// ```text
+        ///     let rw_lock = &*GlobalAtomCallbackVec::get();
+        /// ```
+        ///
+        /// * Self : must be a value type V in [doc_generic_v]
+        ///
+        /// * rw_lock :
+        /// is a read-write lock object [std::sync::RwLock]
+        ///
+        /// * write_lock :
+        /// ``` text
+        ///     let write_lock    = rw_lock.write();
+        ///     let callback_vec  = write_lock.unwrap();
+        /// ```
+        ///
+        /// * read_lock :
+        /// ``` text
+        ///     let read_lock    = rw_lock.read();
+        ///     let callback_vec = read_lock.unwrap();
+        /// ```
+        ///
+        /// * callback_vec :
+        /// callback_vec\[atom_id\] is the callback information
+        /// for the atomic function corresponding to atom_id.
+        ///
+        fn get() -> &'static RwLock< Vec< AtomCallback<Self> > >;
     }
 }
 //

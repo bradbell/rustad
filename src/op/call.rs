@@ -44,7 +44,6 @@
 // --------------------------------------------------------------------------
 // use
 //
-use std::sync::RwLock;
 use std::cmp::PartialEq;
 use std::ops::AddAssign;
 use std::mem::swap;
@@ -92,8 +91,7 @@ where
     let callback : AtomCallback<V>;
     {   //
         // rw_lock
-        let rw_lock : &RwLock< Vec< AtomCallback<V> > > =
-            GlobalAtomCallbackVec::get();
+        let rw_lock = GlobalAtomCallbackVec::get();
         //
         // read_lock
         let read_lock = rw_lock.read();
