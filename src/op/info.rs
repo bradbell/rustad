@@ -487,18 +487,21 @@ pub(crate) mod sealed {
     #[cfg(doc)]
     use crate::doc_generic_v;
     //
-    /// returns a reference to the map from operator id to [OpInfo]
-    ///
-    /// ```text
-    ///     GlobalOpInfoVec::get()
-    /// ```
-    ///
-    /// * V : see [doc_generic_v]
-    ///
     pub trait GlobalOpInfoVec
     where
         Self : Sized + 'static,
     {
+        /// Returns a reference to the map from operator id to [OpInfo]
+        ///
+        /// ```text
+        ///     op_info_vec = &*GlobalOpInfoVec::get()
+        /// ```
+        ///
+        /// * Self : must be a value type V in [doc_generic_v]
+        ///
+        /// * op_info_vec :
+        /// is the global vector of operator information.
+        ///
         fn get() -> &'static std::sync::LazyLock< Vec< OpInfo<Self> > >;
     }
 }
@@ -512,11 +515,11 @@ pub(crate) mod sealed {
 ///     use crate::ad::AD;
 /// ```
 macro_rules! impl_global_op_info_vec{ ($V:ty) => {
-    #[doc = concat!(
-        "Operator information used when evaluating `",
-        stringify!($V), "`, and `AD<", stringify!($V), ">` operations"
-    ) ]
     impl crate::op::info::sealed::GlobalOpInfoVec for $V {
+        #[doc = concat!(
+            "Operator information used to evaluate `",
+            stringify!($V), "`, and `AD<", stringify!($V), ">` operations"
+        ) ]
         fn get() -> &'static LazyLock<
             Vec< crate::op::info::OpInfo<$V> >
         > {
