@@ -339,7 +339,7 @@ pub (crate) mod sealed {
     pub trait GlobalAtomCallbackVec
     where
         Self : Sized + 'static,
-    {   fn callback_vec() -> &'static RwLock< Vec< AtomCallback<Self> > >;
+    {   fn get() -> &'static RwLock< Vec< AtomCallback<Self> > >;
     }
 }
 //
@@ -361,7 +361,7 @@ macro_rules! impl_global_atom_callback_vec{ ($V:ty) => {
         "The atomic evaluation vector for value type `", stringify!($V), "`"
     ) ]
     impl crate::atom::sealed::GlobalAtomCallbackVec for $V {
-        fn callback_vec() -> &'static
+        fn get() -> &'static
         RwLock< Vec< crate::atom::AtomCallback<$V> > > {
             pub(crate) static ATOM_CALLBACK_VEC :
             RwLock< Vec< crate::atom::AtomCallback<$V> > > =
@@ -395,7 +395,7 @@ where
 {   //
     // rwlock
     let rw_lock : &RwLock< Vec< AtomCallback<V> > > =
-        sealed::GlobalAtomCallbackVec::callback_vec();
+        sealed::GlobalAtomCallbackVec::get();
     //
     // atom_id
     let atom_id           : IndexT;
@@ -624,7 +624,7 @@ where
     //
     // rwlock
     let rw_lock : &RwLock< Vec< AtomCallback<V> > > =
-        sealed::GlobalAtomCallbackVec::callback_vec();
+        sealed::GlobalAtomCallbackVec::get();
     //
     // forward_fun_value, rev_depend
     let name               : &'static str;

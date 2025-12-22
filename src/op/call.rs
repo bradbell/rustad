@@ -93,7 +93,7 @@ where
     {   //
         // rw_lock
         let rw_lock : &RwLock< Vec< AtomCallback<V> > > =
-            GlobalAtomCallbackVec::callback_vec();
+            GlobalAtomCallbackVec::get();
         //
         // read_lock
         let read_lock = rw_lock.read();
