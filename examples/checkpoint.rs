@@ -12,194 +12,17 @@ use rustad::{
     AzFloat,
     AD,
     ad_from_value,
-    ADfn,
     start_recording_var,
     stop_recording,
-    register_atom,
     call_atom,
-    AtomCallback,
-    IndexT,
 };
-use rustad::checkpoint::sealed::GlobalCheckpointVec;
-use rustad::checkpoint::register_checkpoint;
+use rustad::checkpoint::{
+    register_checkpoint,
+    register_checkpoint_atom,
+};
 //
 // V
 type V = AzFloat<f64>;
-//
-// -------------------------------------------------------------------------
-// Value Routines
-// -------------------------------------------------------------------------
-//
-// checkpoint_forward_fun_value
-fn checkpoint_forward_fun_value(
-    _use_range       : &[bool]      ,
-    domain           : &[&V]        ,
-    call_info        : IndexT      ,
-    trace            : bool        ,
-) -> Result< Vec<V>, String >
-{   //
-    // domain_clone
-    let n_domain = domain.len();
-    let mut domain_clone : Vec<V> = Vec::with_capacity(n_domain);
-    for j in 0 .. n_domain {
-        domain_clone.push( (*domain[j]).clone() );
-    }
-    //
-    // checkpoint_id
-    let checkpoint_id = call_info as usize;
-    //
-    // rw_lock, ad_fn
-    let rw_lock           = GlobalCheckpointVec::get();
-    let read_lock         = rw_lock.read();
-    let checkpoint_vec    = read_lock.unwrap();
-    let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
-    //
-    // range
-    let (range, _)        = ad_fn.forward_zero_value( domain_clone, trace );
-    Ok( range )
-}
-//
-// checkpoint_forward_der_value
-fn checkpoint_forward_der_value(
-    _use_range       : &[bool]     ,
-    domain           : &[&V]       ,
-    domain_der       : &[&V]       ,
-    call_info        : IndexT      ,
-    trace            : bool        ,
-) -> Result< Vec<V>, String >
-{   //
-    assert_eq!( domain.len(), domain_der.len() );
-    //
-    // domain_clone
-    let n_domain = domain.len();
-    let mut domain_clone : Vec<V> = Vec::with_capacity(n_domain);
-    for j in 0 .. n_domain {
-        domain_clone.push( (*domain[j]).clone() );
-    }
-    //
-    // domain_der_clone
-    let mut domain_der_clone : Vec<V> = Vec::with_capacity( domain_der.len() );
-    for j in 0 .. domain_der.len() {
-        domain_der_clone.push( (*domain_der[j]).clone() );
-    }
-    //
-    // checkpoint_id
-    let checkpoint_id = call_info as usize;
-    //
-    // rw_lock, ad_fn
-    let rw_lock           = GlobalCheckpointVec::get();
-    let read_lock         = rw_lock.read();
-    let checkpoint_vec    = read_lock.unwrap();
-    let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
-    //
-    // range_der
-    let (_, var_both)     = ad_fn.forward_zero_value(domain_clone, trace);
-    let range_der         = ad_fn.forward_one_value(
-        &var_both, domain_der_clone, trace
-    );
-    Ok( range_der )
-}
-//
-// checkpoint_reverse_der_value
-fn checkpoint_reverse_der_value(
-    domain           : &[&V]       ,
-    range_der        : Vec<&V>     ,
-    call_info        : IndexT      ,
-    trace            : bool        ,
-) -> Result< Vec<V>, String >
-{   //
-    // domain_clone
-    let n_domain = domain.len();
-    let mut domain_clone : Vec<V> = Vec::with_capacity(n_domain);
-    for j in 0 .. n_domain {
-        domain_clone.push( (*domain[j]).clone() );
-    }
-    //
-    // range_der_clone
-    let mut range_der_clone : Vec<V> = Vec::with_capacity( range_der.len() );
-    for j in 0 .. range_der.len() {
-        range_der_clone.push( (*range_der[j]).clone() );
-    }
-    //
-    // checkpoint_id
-    let checkpoint_id = call_info as usize;
-    //
-    // rw_lock, ad_fn
-    let rw_lock           = GlobalCheckpointVec::get();
-    let read_lock         = rw_lock.read();
-    let checkpoint_vec    = read_lock.unwrap();
-    let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
-    //
-    // domain_der
-    let (_, var_both)     = ad_fn.forward_zero_value(domain_clone, trace);
-    let domain_der        = ad_fn.reverse_one_value(
-        &var_both, range_der_clone, trace
-    );
-    Ok( domain_der )
-}
-//
-// checkpoint_rev_depend
-fn checkpoint_rev_depend(
-    depend       : &mut Vec<usize> ,
-    rng_index    : usize           ,
-    _n_dom       : usize           ,
-    call_info    : IndexT          ,
-    trace        : bool            ,
-) -> String {
-    assert_eq!( depend.len(), 0 );
-    //
-    // compute_dyp
-    let compute_dyp = false;
-    //
-    // checkpoint_id
-    let checkpoint_id = call_info as usize;
-    //
-    // rw_lock, ad_fn
-    let rw_lock           = GlobalCheckpointVec::get();
-    let read_lock         = rw_lock.read();
-    let checkpoint_vec    = read_lock.unwrap();
-    let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
-    //
-    // pattern
-    // TODO: store the sparsity pattern in a static structure for this
-    // checkpoint function so do not need to recompute. Also sort it so it
-    // and store point to beginning of each row so depend computes faster.
-    let (_, pattern)    = ad_fn.sub_sparsity(trace, compute_dyp);
-    //
-    // depend
-    for [i, j] in pattern.iter() {
-        if *i == rng_index {
-            depend.push( *j );
-        }
-    }
-    let error_msg = String::from("");
-    error_msg
-}
-//
-// -------------------------------------------------------------------------
-// register_checkpoint_atom
-// -------------------------------------------------------------------------
-fn register_checkpoint_atom()-> IndexT {
-    //
-    // checkpoint_callback
-    let checkpoint_callback = AtomCallback {
-        name                 : &"checkpoint",
-        rev_depend           :  Some( checkpoint_rev_depend ),
-        //
-        forward_fun_value    :  Some(checkpoint_forward_fun_value),
-        forward_fun_ad       :  None,
-        //
-        forward_der_value    :  Some(checkpoint_forward_der_value),
-        forward_der_ad       :  None,
-        //
-        reverse_der_value    :  Some(checkpoint_reverse_der_value),
-        reverse_der_ad       :  None,
-    };
-    //
-    // atom_id
-    let atom_id = register_atom( checkpoint_callback );
-    atom_id
-}
 // -------------------------------------------------------------------------
 // AD routines
 // -------------------------------------------------------------------------
@@ -213,7 +36,7 @@ fn main() {
     let trace = false;
     //
     // atom_id
-    let atom_id = register_checkpoint_atom();
+    let atom_id = register_checkpoint_atom::<V>();
     //
     // f
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
