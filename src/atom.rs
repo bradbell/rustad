@@ -394,8 +394,8 @@ macro_rules! impl_global_atom_callback_vec{ ($V:ty) => {
         fn get() -> &'static
         RwLock< Vec< crate::atom::AtomCallback<$V> > > {
             pub(crate) static ATOM_CALLBACK_VEC :
-            RwLock< Vec< crate::atom::AtomCallback<$V> > > =
-                RwLock::new( Vec::new() );
+                RwLock< Vec< crate::atom::AtomCallback<$V> > > =
+                    RwLock::new( Vec::new() );
             &ATOM_CALLBACK_VEC
         }
     }

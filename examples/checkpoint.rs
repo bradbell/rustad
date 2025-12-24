@@ -7,7 +7,6 @@
 //
 // TODO: convert this example in to a general purpose checkpoint utility.
 // ---------------------------------------------------------------------------
-use std::cell::RefCell;
 //
 use rustad::{
     AzFloat,
@@ -21,14 +20,12 @@ use rustad::{
     AtomCallback,
     IndexT,
 };
+use rustad::checkpoint::sealed::GlobalCheckpointVec;
+use rustad::checkpoint::register_checkpoint;
 //
 // V
 type V = AzFloat<f64>;
 //
-thread_local! {
-    static ADFN_VEC : RefCell< Vec< ADfn<V> > > =
-        RefCell::new( Vec::new() );
-}
 // -------------------------------------------------------------------------
 // Value Routines
 // -------------------------------------------------------------------------
@@ -48,14 +45,17 @@ fn checkpoint_forward_fun_value(
         domain_clone.push( (*domain[j]).clone() );
     }
     //
+    // checkpoint_id
+    let checkpoint_id = call_info as usize;
+    //
+    // rw_lock, ad_fn
+    let rw_lock           = GlobalCheckpointVec::get();
+    let read_lock         = rw_lock.read();
+    let checkpoint_vec    = read_lock.unwrap();
+    let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
+    //
     // range
-    let range         = ADFN_VEC.with_borrow( |f_vec| {
-       let f          = &f_vec[call_info as usize];
-       let (range, _) = f.forward_zero_value(
-            domain_clone, trace
-        );
-       range
-    } );
+    let (range, _)        = ad_fn.forward_zero_value( domain_clone, trace );
     Ok( range )
 }
 //
@@ -77,25 +77,26 @@ fn checkpoint_forward_der_value(
         domain_clone.push( (*domain[j]).clone() );
     }
     //
-    // var_both
-    let mut var_both  : Vec<V> = Vec::new();
-    ADFN_VEC.with_borrow( |f_vec| {
-       let f         = &f_vec[call_info as usize];
-       (_, var_both) = f.forward_zero_value(domain_clone, trace);
-    } );
-    //
-    // domain_der
+    // domain_der_clone
     let mut domain_der_clone : Vec<V> = Vec::with_capacity( domain_der.len() );
     for j in 0 .. domain_der.len() {
         domain_der_clone.push( (*domain_der[j]).clone() );
     }
     //
+    // checkpoint_id
+    let checkpoint_id = call_info as usize;
+    //
+    // rw_lock, ad_fn
+    let rw_lock           = GlobalCheckpointVec::get();
+    let read_lock         = rw_lock.read();
+    let checkpoint_vec    = read_lock.unwrap();
+    let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
+    //
     // range_der
-    let mut range_der : Vec<V> = Vec::new();
-    ADFN_VEC.with_borrow( |f_vec| {
-       let f     = &f_vec[call_info as usize];
-       range_der = f.forward_one_value(&var_both, domain_der_clone, trace);
-    } );
+    let (_, var_both)     = ad_fn.forward_zero_value(domain_clone, trace);
+    let range_der         = ad_fn.forward_one_value(
+        &var_both, domain_der_clone, trace
+    );
     Ok( range_der )
 }
 //
@@ -114,25 +115,26 @@ fn checkpoint_reverse_der_value(
         domain_clone.push( (*domain[j]).clone() );
     }
     //
-    // var_both
-    let mut var_both  : Vec<V> = Vec::new();
-    ADFN_VEC.with_borrow( |f_vec| {
-       let f          = &f_vec[call_info as usize];
-       (_, var_both)  = f.forward_zero_value(domain_clone, trace);
-    } );
-    //
     // range_der_clone
     let mut range_der_clone : Vec<V> = Vec::with_capacity( range_der.len() );
     for j in 0 .. range_der.len() {
         range_der_clone.push( (*range_der[j]).clone() );
     }
     //
+    // checkpoint_id
+    let checkpoint_id = call_info as usize;
+    //
+    // rw_lock, ad_fn
+    let rw_lock           = GlobalCheckpointVec::get();
+    let read_lock         = rw_lock.read();
+    let checkpoint_vec    = read_lock.unwrap();
+    let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
+    //
     // domain_der
-    let mut domain_der : Vec<V> = Vec::new();
-    ADFN_VEC.with_borrow( |f_vec| {
-       let f      = &f_vec[call_info as usize];
-       domain_der = f.reverse_one_value(&var_both, range_der_clone, trace);
-    } );
+    let (_, var_both)     = ad_fn.forward_zero_value(domain_clone, trace);
+    let domain_der        = ad_fn.reverse_one_value(
+        &var_both, range_der_clone, trace
+    );
     Ok( domain_der )
 }
 //
@@ -146,16 +148,23 @@ fn checkpoint_rev_depend(
 ) -> String {
     assert_eq!( depend.len(), 0 );
     //
+    // compute_dyp
+    let compute_dyp = false;
+    //
+    // checkpoint_id
+    let checkpoint_id = call_info as usize;
+    //
+    // rw_lock, ad_fn
+    let rw_lock           = GlobalCheckpointVec::get();
+    let read_lock         = rw_lock.read();
+    let checkpoint_vec    = read_lock.unwrap();
+    let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
+    //
     // pattern
     // TODO: store the sparsity pattern in a static structure for this
     // checkpoint function so do not need to recompute. Also sort it so it
     // and store point to beginning of each row so depend computes faster.
-    let mut pattern : Vec< [usize; 2] > = Vec::new();
-    ADFN_VEC.with_borrow( |f_vec| {
-       let f           = &f_vec[call_info as usize];
-       let compute_dyp = false;
-       (_, pattern)    = f.sub_sparsity(trace, compute_dyp);
-    } );
+    let (_, pattern)    = ad_fn.sub_sparsity(trace, compute_dyp);
     //
     // depend
     for [i, j] in pattern.iter() {
@@ -215,19 +224,16 @@ fn main() {
         asumsq  += &term;
     }
     let ay          = vec![ asumsq ];
-    let f           = stop_recording(ay);
+    let ad_fn       = stop_recording(ay);
     //
-    // call_info , ADFN_VEC
-    let call_info  = ADFN_VEC.with_borrow_mut( |f_vec| {
-            let index = f_vec.len() as IndexT;
-            f_vec.push( f );
-            index
-    } );
+    // checkpoint_id
+    let checkpoint_id  = register_checkpoint(ad_fn);
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
     let ax           = start_recording_var(x);
     let ny           = 1;
+    let call_info    = checkpoint_id;
     let ay           = call_atom(ny, ax, atom_id, call_info, trace);
     let g            = stop_recording(ay);
     //

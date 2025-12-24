@@ -8,7 +8,7 @@
 //! This library is Under Construction and its API is not stable; see its
 //! [readme file](<https://github.com/bradbell/rustad/blob/main/readme.md>)
 // ----------------------------------------------------------------------------
-// sub-modules
+// public sub-modules
 //
 // utility
 pub mod utility;
@@ -31,8 +31,14 @@ pub mod adfn;
 // atom
 pub mod atom;
 //
+// checkpoint
+pub mod checkpoint;
+//
 // dll_lib
 pub mod dll_lib;
+//
+// ----------------------------------------------------------------------------
+// private sub-modules
 //
 // vec_set
 pub(crate) mod vec_set;
@@ -103,6 +109,15 @@ where
     V : atom::sealed::GlobalAtomCallbackVec ,
 { }
 //
+// GlobalCheckpointVecPublic
+/// This is the public interface to a sealed trait
+pub trait GlobalCheckpointVecPublic : checkpoint::sealed::GlobalCheckpointVec
+{ }
+impl<V> GlobalCheckpointVecPublic for V
+where
+    V : checkpoint::sealed::GlobalCheckpointVec ,
+{ }
+//
 //
 // GlobalOpInfoVecPublic
 /// This is the public interface to a sealed trait
@@ -123,9 +138,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2025.12.22");
+/// assert_eq!(date, "2025.12.24");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2025.12.22";
+pub const YEAR_MONTH_DAY : &str = "2025.12.24";
 //
 // AZ_FLOAT_SRC
 /// is the source code for the [AzFloat] class.
