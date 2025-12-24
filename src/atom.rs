@@ -345,7 +345,7 @@ pub (crate) mod sealed {
     {   /// Returns a reference to the map from atom_id to callback information
         ///
         /// ```text
-        ///     let rw_lock = &*GlobalAtomCallbackVec::get();
+        ///     let rw_lock = GlobalAtomCallbackVec::get();
         /// ```
         ///
         /// * Self : must be a value type V in [doc_generic_v]
