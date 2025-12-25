@@ -109,13 +109,13 @@ where
     V : atom::sealed::GlobalAtomCallbackVec ,
 { }
 //
-// GlobalCheckpointVecPublic
+// GlobalCheckpointInfoPublic
 /// This is the public interface to a sealed trait
-pub trait GlobalCheckpointVecPublic : checkpoint::sealed::GlobalCheckpointVec
+pub trait GlobalCheckpointInfoPublic : checkpoint::sealed::GlobalCheckpointInfo
 { }
-impl<V> GlobalCheckpointVecPublic for V
+impl<V> GlobalCheckpointInfoPublic for V
 where
-    V : checkpoint::sealed::GlobalCheckpointVec ,
+    V : checkpoint::sealed::GlobalCheckpointInfo ,
 { }
 //
 //
@@ -138,9 +138,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2025.12.24");
+/// assert_eq!(date, "2025.12.25");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2025.12.24";
+pub const YEAR_MONTH_DAY : &str = "2025.12.25";
 //
 // AZ_FLOAT_SRC
 /// is the source code for the [AzFloat] class.

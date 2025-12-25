@@ -18,7 +18,7 @@ use crate::{
     register_atom,
 };
 //
-use sealed::GlobalCheckpointVec;
+use sealed::GlobalCheckpointInfo;
 use crate::op::info::sealed::GlobalOpInfoVec;
 use crate::atom::sealed::GlobalAtomCallbackVec;
 //
@@ -31,23 +31,32 @@ pub mod sealed {
     //! The sub-module sealed is used to seal traits in this package.
     //
     use std::sync::RwLock;
+    use std::sync::LazyLock;
     //
-    use crate::ADfn;
+    use crate::{
+        ADfn,
+        IndexT,
+    };
     //
     #[cfg(doc)]
     use crate::doc_generic_v;
     //
-    // GlobalCheckpointVec
-    pub trait GlobalCheckpointVec
+    // GlobalCheckpointInfo
+    pub trait GlobalCheckpointInfo
     where
         Self : Sized + 'static,
     {   /// Returns a reference to the map from checkpoint_id to ADfn objects.
         ///
         /// ```text
-        ///     let rw_lock = GlobalCheckpointVec::get();
+        ///     let rw_lock  = GlobalCheckpointInfo::get();
+        ///     let atom_id  = GlobalCheckpointInfo::atom_id();
         /// ```
         ///
         /// * Self : must be a value type V in [doc_generic_v]
+        ///
+        /// * atom_id:
+        /// is the [atom_id](crate::atom::register_atom) used to evaluate
+        /// checkpoint functions.
         ///
         /// * rw_lock :
         /// is a read-write lock object [std::sync::RwLock]
@@ -69,10 +78,11 @@ pub mod sealed {
         /// checkpoint_id.
         ///
         fn get() -> &'static RwLock< Vec< ADfn<Self> > >;
+        fn atom_id()-> &'static LazyLock<IndexT>;
     }
 }
 //
-// impl_global_checkpoint_vec!
+// impl_global_checkpoint_info!
 /// Implement the global checkpoint vector for value type V
 ///
 /// * V : see [doc_generic_v]
@@ -85,11 +95,11 @@ pub mod sealed {
 /// ```text
 ///     use std::sync::RwLock;
 /// ```
-macro_rules! impl_global_checkpoint_vec{ ($V:ty) => {
+macro_rules! impl_global_checkpoint_info{ ($V:ty) => {
     #[doc = concat!(
         "The global Checkpoint vector for value type `", stringify!($V), "`"
     ) ]
-    impl crate::checkpoint::sealed::GlobalCheckpointVec for $V {
+    impl crate::checkpoint::sealed::GlobalCheckpointInfo for $V {
         fn get() -> &'static
         RwLock< Vec< crate::ADfn<$V> > > {
             pub(crate) static CHECKPOINT_VEC :
@@ -97,9 +107,47 @@ macro_rules! impl_global_checkpoint_vec{ ($V:ty) => {
                     RwLock::new( Vec::new() );
             &CHECKPOINT_VEC
         }
+        fn atom_id() -> &'static LazyLock<crate::IndexT> {
+            pub static ATOM_ID : LazyLock<crate::IndexT> = LazyLock::new(
+                || crate::checkpoint::register_checkpoint_atom::<$V>()
+            );
+            &ATOM_ID
+        }
+
+
+
     }
 } }
-pub(crate) use impl_global_checkpoint_vec;
+pub(crate) use impl_global_checkpoint_info;
+// -------------------------------------------------------------------------
+// register_checkpoint_atom
+// -------------------------------------------------------------------------
+// TODO: make this private
+pub fn register_checkpoint_atom<V>()-> IndexT
+where
+    V : Clone + From<f32> + std::fmt::Display,
+    V : GlobalOpInfoVec + GlobalCheckpointInfo + GlobalAtomCallbackVec,
+{
+    //
+    // checkpoint_callback
+    let checkpoint_callback = AtomCallback {
+        name                 : &"checkpoint",
+        rev_depend           :  Some( checkpoint_rev_depend::<V> ),
+        //
+        forward_fun_value    :  Some( checkpoint_forward_fun_value::<V> ),
+        forward_fun_ad       :  None,
+        //
+        forward_der_value    :  Some( checkpoint_forward_der_value::<V> ),
+        forward_der_ad       :  None,
+        //
+        reverse_der_value    :  Some( checkpoint_reverse_der_value::<V> ),
+        reverse_der_ad       :  None,
+    };
+    //
+    // atom_id
+    let atom_id = register_atom( checkpoint_callback );
+    atom_id
+}
 // ----------------------------------------------------------------------------
 // register_checkpoint
 /// Move a function object to the global chekpoint vector.
@@ -119,11 +167,11 @@ pub(crate) use impl_global_checkpoint_vec;
 ///
 pub fn register_checkpoint<V>( ad_fn : ADfn<V> ) -> IndexT
 where
-    V : GlobalCheckpointVec,
+    V : GlobalCheckpointInfo,
 {   //
     // rwlock
     let rw_lock : &RwLock< Vec< ADfn<V> > > =
-        sealed::GlobalCheckpointVec::get();
+        sealed::GlobalCheckpointInfo::get();
     //
     // checkpoint_id
     let checkpoint_id  : IndexT;
@@ -155,7 +203,7 @@ fn checkpoint_forward_fun_value<V>(
 ) -> Result< Vec<V>, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointVec,
+    V : GlobalOpInfoVec + GlobalCheckpointInfo,
 {   //
     // domain_clone
     let n_domain = domain.len();
@@ -168,7 +216,7 @@ where
     let checkpoint_id = call_info as usize;
     //
     // rw_lock, ad_fn
-    let rw_lock           = GlobalCheckpointVec::get();
+    let rw_lock           = GlobalCheckpointInfo::get();
     let read_lock         = rw_lock.read();
     let checkpoint_vec    = read_lock.unwrap();
     let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
@@ -188,7 +236,7 @@ fn checkpoint_forward_der_value<V>(
 ) -> Result< Vec<V>, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointVec,
+    V : GlobalOpInfoVec + GlobalCheckpointInfo,
 {   //
     assert_eq!( domain.len(), domain_der.len() );
     //
@@ -209,7 +257,7 @@ where
     let checkpoint_id = call_info as usize;
     //
     // rw_lock, ad_fn
-    let rw_lock           = GlobalCheckpointVec::get();
+    let rw_lock           = GlobalCheckpointInfo::get();
     let read_lock         = rw_lock.read();
     let checkpoint_vec    = read_lock.unwrap();
     let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
@@ -231,7 +279,7 @@ fn checkpoint_reverse_der_value<V>(
 ) -> Result< Vec<V>, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointVec,
+    V : GlobalOpInfoVec + GlobalCheckpointInfo,
 {   //
     // domain_clone
     let n_domain = domain.len();
@@ -250,7 +298,7 @@ where
     let checkpoint_id = call_info as usize;
     //
     // rw_lock, ad_fn
-    let rw_lock           = GlobalCheckpointVec::get();
+    let rw_lock           = GlobalCheckpointInfo::get();
     let read_lock         = rw_lock.read();
     let checkpoint_vec    = read_lock.unwrap();
     let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
@@ -273,7 +321,7 @@ fn checkpoint_rev_depend<V>(
 ) -> String
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointVec + GlobalAtomCallbackVec,
+    V : GlobalOpInfoVec + GlobalCheckpointInfo + GlobalAtomCallbackVec,
 {
     assert_eq!( depend.len(), 0 );
     //
@@ -284,7 +332,7 @@ where
     let checkpoint_id = call_info as usize;
     //
     // rw_lock, ad_fn
-    let rw_lock           = GlobalCheckpointVec::get();
+    let rw_lock           = GlobalCheckpointInfo::get();
     let read_lock         = rw_lock.read();
     let checkpoint_vec    = read_lock.unwrap();
     let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
@@ -308,32 +356,3 @@ where
 // AD routines
 // -------------------------------------------------------------------------
 //
-// -------------------------------------------------------------------------
-// register_checkpoint_atom
-// -------------------------------------------------------------------------
-// TODO: make this private
-pub fn register_checkpoint_atom<V>()-> IndexT
-where
-    V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointVec + GlobalAtomCallbackVec,
-{
-    //
-    // checkpoint_callback
-    let checkpoint_callback = AtomCallback {
-        name                 : &"checkpoint",
-        rev_depend           :  Some( checkpoint_rev_depend::<V> ),
-        //
-        forward_fun_value    :  Some( checkpoint_forward_fun_value::<V> ),
-        forward_fun_ad       :  None,
-        //
-        forward_der_value    :  Some( checkpoint_forward_der_value::<V> ),
-        forward_der_ad       :  None,
-        //
-        reverse_der_value    :  Some( checkpoint_reverse_der_value::<V> ),
-        reverse_der_ad       :  None,
-    };
-    //
-    // atom_id
-    let atom_id = register_atom( checkpoint_callback );
-    atom_id
-}
