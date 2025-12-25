@@ -28,9 +28,7 @@ use crate::tape::sealed::ThisThreadTape;
 #[cfg(doc)]
 use crate::doc_generic_v;
 // ---------------------------------------------------------------------------
-// TODO: Change to pub(crate) after general purpose examples/checkpoint.rs
-// code moves to this file.
-pub mod sealed {
+pub(crate) mod sealed {
     //! The sub-module sealed is used to seal traits in this package.
     //
     use std::sync::RwLock;
@@ -125,10 +123,7 @@ macro_rules! impl_global_checkpoint_info{ ($V:ty) => {
 } }
 pub(crate) use impl_global_checkpoint_info;
 // -------------------------------------------------------------------------
-//
-// register_checkpoint_atom
-// TODO: make this private
-pub fn register_checkpoint_atom<V>()-> IndexT
+pub(crate) fn register_checkpoint_atom<V>()-> IndexT
 where
     V : Clone + From<f32> + std::fmt::Display,
     V : GlobalOpInfoVec + GlobalCheckpointInfo + GlobalAtomCallbackVec,
