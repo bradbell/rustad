@@ -40,6 +40,8 @@ pub mod sealed {
     //
     #[cfg(doc)]
     use crate::doc_generic_v;
+    #[cfg(doc)]
+    use super::register_checkpoint;
     //
     // GlobalCheckpointInfo
     pub trait GlobalCheckpointInfo
@@ -63,19 +65,19 @@ pub mod sealed {
         ///
         /// * write_lock :
         /// ``` text
-        ///     let write_lock     = rw_lock.write();
-        ///     let checkpoint_vec = write_lock.unwrap();
+        ///     let write_lock = rw_lock.write();
+        ///     let checkpoint_vec : &Vec< ADfn<V> > = &*write_lock.unwrap();
         /// ```
         ///
         /// * read_lock :
         /// ``` text
         ///     let read_lock      = rw_lock.read();
-        ///     let checkpoint_vec = read_lock.unwrap();
+        ///     let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
         /// ```
         ///
         /// * checkpont_vec :
         /// checkpont_vec\[checkpoint_id\] is the [ADfn] corresponding to
-        /// checkpoint_id.
+        /// checkpoint_id; see [register_checkpoint] .
         ///
         fn get() -> &'static RwLock< Vec< ADfn<Self> > >;
         fn atom_id()-> &'static LazyLock<IndexT>;
@@ -216,10 +218,10 @@ where
     let checkpoint_id = call_info as usize;
     //
     // rw_lock, ad_fn
-    let rw_lock           = GlobalCheckpointInfo::get();
-    let read_lock         = rw_lock.read();
-    let checkpoint_vec    = read_lock.unwrap();
-    let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
+    let rw_lock   = GlobalCheckpointInfo::get();
+    let read_lock  = rw_lock.read();
+    let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
+    let ad_fn = &checkpoint_vec[checkpoint_id];
     //
     // range
     let (range, _)        = ad_fn.forward_zero_value( domain_clone, trace );
@@ -259,8 +261,8 @@ where
     // rw_lock, ad_fn
     let rw_lock           = GlobalCheckpointInfo::get();
     let read_lock         = rw_lock.read();
-    let checkpoint_vec    = read_lock.unwrap();
-    let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
+    let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
+    let ad_fn = &checkpoint_vec[checkpoint_id];
     //
     // range_der
     let (_, var_both)     = ad_fn.forward_zero_value(domain_clone, trace);
@@ -300,8 +302,8 @@ where
     // rw_lock, ad_fn
     let rw_lock           = GlobalCheckpointInfo::get();
     let read_lock         = rw_lock.read();
-    let checkpoint_vec    = read_lock.unwrap();
-    let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
+    let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
+    let ad_fn = &checkpoint_vec[checkpoint_id];
     //
     // domain_der
     let (_, var_both)     = ad_fn.forward_zero_value(domain_clone, trace);
@@ -334,8 +336,8 @@ where
     // rw_lock, ad_fn
     let rw_lock           = GlobalCheckpointInfo::get();
     let read_lock         = rw_lock.read();
-    let checkpoint_vec    = read_lock.unwrap();
-    let ad_fn : &ADfn<V>  = &checkpoint_vec[checkpoint_id];
+    let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
+    let ad_fn = &checkpoint_vec[checkpoint_id];
     //
     // pattern
     // TODO: store the sparsity pattern in a static structure for this
