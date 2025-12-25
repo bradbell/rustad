@@ -83,6 +83,10 @@ pub use atom::{
     call_atom,
     AtomCallback,
 };
+pub use checkpoint::{
+    register_checkpoint,
+    call_checkpoint,
+};
 pub use dll_lib::{
     get_lib,
     RustSrcLink,

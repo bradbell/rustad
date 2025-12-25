@@ -14,11 +14,8 @@ use rustad::{
     ad_from_value,
     start_recording_var,
     stop_recording,
-    call_atom,
-};
-use rustad::checkpoint::{
     register_checkpoint,
-    register_checkpoint_atom,
+    call_checkpoint,
 };
 //
 // V
@@ -34,9 +31,6 @@ fn main() {
     //
     // trace
     let trace = false;
-    //
-    // atom_id
-    let atom_id = register_checkpoint_atom::<V>();
     //
     // f
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
@@ -55,9 +49,7 @@ fn main() {
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
     let ax           = start_recording_var(x);
-    let ny           = 1;
-    let call_info    = checkpoint_id;
-    let ay           = call_atom(ny, ax, atom_id, call_info, trace);
+    let ay           = call_checkpoint(ax, checkpoint_id, trace);
     let g            = stop_recording(ay);
     //
     // g.forward_zero_value

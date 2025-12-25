@@ -12,6 +12,7 @@
 use std::sync::RwLock;
 //
 use crate::{
+    AD,
     IndexT,
     ADfn,
     AtomCallback,
@@ -21,6 +22,8 @@ use crate::{
 use sealed::GlobalCheckpointInfo;
 use crate::op::info::sealed::GlobalOpInfoVec;
 use crate::atom::sealed::GlobalAtomCallbackVec;
+use crate::atom::call_atom;
+use crate::tape::sealed::ThisThreadTape;
 //
 #[cfg(doc)]
 use crate::doc_generic_v;
@@ -51,7 +54,7 @@ pub mod sealed {
         ///
         /// ```text
         ///     let rw_lock  = GlobalCheckpointInfo::get();
-        ///     let atom_id  = GlobalCheckpointInfo::atom_id();
+        ///     let atom_id  = **GlobalCheckpointInfo::atom_id();
         /// ```
         ///
         /// * Self : must be a value type V in [doc_generic_v]
@@ -71,7 +74,7 @@ pub mod sealed {
         ///
         /// * read_lock :
         /// ``` text
-        ///     let read_lock      = rw_lock.read();
+        ///     let read_lock  = rw_lock.read();
         ///     let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
         /// ```
         ///
@@ -122,8 +125,8 @@ macro_rules! impl_global_checkpoint_info{ ($V:ty) => {
 } }
 pub(crate) use impl_global_checkpoint_info;
 // -------------------------------------------------------------------------
+//
 // register_checkpoint_atom
-// -------------------------------------------------------------------------
 // TODO: make this private
 pub fn register_checkpoint_atom<V>()-> IndexT
 where
@@ -150,7 +153,7 @@ where
     let atom_id = register_atom( checkpoint_callback );
     atom_id
 }
-// ----------------------------------------------------------------------------
+//
 // register_checkpoint
 /// Move a function object to the global chekpoint vector.
 ///
@@ -164,7 +167,7 @@ where
 /// * ad_fn :
 /// is the ad_fn that is being moved to the global checkpoint vector.
 ///
-/// * checkpoint_id :
+/// ## checkpoint_id :
 /// is the index that is used to identify this checkpoint function.
 ///
 pub fn register_checkpoint<V>( ad_fn : ADfn<V> ) -> IndexT
@@ -191,6 +194,47 @@ where
     }
     assert!( ! id_too_large );
     checkpoint_id
+}
+//
+// call_checkpoint
+/// Make an AD call to a checkpoint function.
+///
+/// Compute the result of a checkpoint function and,
+/// if this thread is currently recording, include the call in its tape.
+///
+/// * adomain :
+/// This is the value of the arguments for this atomic function call.
+/// Note that the dimension of the domain only depends on checkpoint_id.
+///
+/// * checkpoint_id :
+/// The [checkpoint_id](register_checkpoint#checkpoint_id)
+/// returned by register_checkpoint for this checkpoint function.
+///
+/// * trace :
+/// if true, a trace of the calculations may be printed on stdout.
+/// This may be useful for debugging.
+///
+pub fn call_checkpoint<V>(
+    adomain       : Vec< AD<V> > ,
+    checkpoint_id : IndexT       ,
+    trace         : bool         ,
+) -> Vec< AD<V> >
+where
+    V : Clone + From<f32>,
+    V : ThisThreadTape + GlobalAtomCallbackVec + GlobalCheckpointInfo ,
+{   //
+    // n_var_dom
+    let n_range =
+    {   let rw_lock   = GlobalCheckpointInfo::get();
+        let read_lock  = rw_lock.read();
+        let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
+        let ad_fn = &checkpoint_vec[checkpoint_id as usize];
+        ad_fn.rng_len()
+    };
+    let atom_id   = **< V as GlobalCheckpointInfo>::atom_id();
+    let call_info = checkpoint_id;
+    let ad_vec = call_atom(n_range, adomain, atom_id, call_info, trace);
+    ad_vec
 }
 // ----------------------------------------------------------------------------
 // Value Routines
