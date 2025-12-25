@@ -169,6 +169,9 @@ pub fn register_checkpoint<V>( ad_fn : ADfn<V> ) -> IndexT
 where
     V : GlobalCheckpointInfo,
 {   //
+    if 0 < ad_fn.dyp_len() { panic!(
+        "register_checkpoint: 0 > ad_fun.dyp_len()"
+    ); }
     // rwlock
     let rw_lock : &RwLock< Vec< ADfn<V> > > =
         sealed::GlobalCheckpointInfo::get();
