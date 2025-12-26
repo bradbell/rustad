@@ -113,13 +113,13 @@ where
     V : atom::sealed::GlobalAtomCallbackVec ,
 { }
 //
-// GlobalCheckpointInfoPublic
+// GlobalCheckpointInfoVecPublic
 /// This is the public interface to a sealed trait
-pub trait GlobalCheckpointInfoPublic : checkpoint::sealed::GlobalCheckpointInfo
+pub trait GlobalCheckpointInfoVecPublic : checkpoint::sealed::GlobalCheckpointInfoVec
 { }
-impl<V> GlobalCheckpointInfoPublic for V
+impl<V> GlobalCheckpointInfoVecPublic for V
 where
-    V : checkpoint::sealed::GlobalCheckpointInfo ,
+    V : checkpoint::sealed::GlobalCheckpointInfoVec ,
 { }
 //
 //

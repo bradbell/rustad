@@ -19,7 +19,7 @@ use crate::{
     register_atom,
 };
 //
-use sealed::GlobalCheckpointInfo;
+use sealed::GlobalCheckpointInfoVec;
 use crate::op::info::sealed::GlobalOpInfoVec;
 use crate::atom::sealed::GlobalAtomCallbackVec;
 use crate::atom::call_atom;
@@ -57,15 +57,15 @@ pub(crate) mod sealed {
     #[cfg(doc)]
     use super::register_checkpoint;
     //
-    // GlobalCheckpointInfo
-    pub trait GlobalCheckpointInfo
+    // GlobalCheckpointInfoVec
+    pub trait GlobalCheckpointInfoVec
     where
         Self : Sized + 'static,
     {   /// Returns a reference to the map from checkpoint_id to ADfn objects.
         ///
         /// ```text
-        ///     let rw_lock  = GlobalCheckpointInfo::get();
-        ///     let atom_id  = **GlobalCheckpointInfo::atom_id();
+        ///     let rw_lock  = GlobalCheckpointInfoVec::get();
+        ///     let atom_id  = **GlobalCheckpointInfoVec::atom_id();
         /// ```
         ///
         /// * Self : must be a value type V in [doc_generic_v]
@@ -115,7 +115,7 @@ macro_rules! impl_global_checkpoint_info{ ($V:ty) => {
     #[doc = concat!(
         "The global Checkpoint vector for value type `", stringify!($V), "`"
     ) ]
-    impl crate::checkpoint::sealed::GlobalCheckpointInfo for $V {
+    impl crate::checkpoint::sealed::GlobalCheckpointInfoVec for $V {
         fn get() -> &'static
         RwLock< Vec< crate::ADfn<$V> > > {
             pub(crate) static CHECKPOINT_VEC :
@@ -139,7 +139,7 @@ pub(crate) use impl_global_checkpoint_info;
 pub(crate) fn register_checkpoint_atom<V>()-> IndexT
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfo + GlobalAtomCallbackVec,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + GlobalAtomCallbackVec,
     V : ThisThreadTape,
 {
     //
@@ -181,14 +181,14 @@ where
 ///
 pub fn register_checkpoint<V>( ad_fn : ADfn<V> ) -> IndexT
 where
-    V : GlobalCheckpointInfo,
+    V : GlobalCheckpointInfoVec,
 {   //
     if 0 < ad_fn.dyp_len() { panic!(
         "register_checkpoint: 0 > ad_fun.dyp_len()"
     ); }
     // rwlock
     let rw_lock : &RwLock< Vec< ADfn<V> > > =
-        sealed::GlobalCheckpointInfo::get();
+        sealed::GlobalCheckpointInfoVec::get();
     //
     // checkpoint_id
     let checkpoint_id  : IndexT;
@@ -233,11 +233,11 @@ pub fn call_checkpoint<V>(
 ) -> Vec< AD<V> >
 where
     V : Clone + From<f32>,
-    V : ThisThreadTape + GlobalAtomCallbackVec + GlobalCheckpointInfo ,
+    V : ThisThreadTape + GlobalAtomCallbackVec + GlobalCheckpointInfoVec ,
 {   //
     // n_var_dom
     let n_range =
-    {   let rw_lock   = GlobalCheckpointInfo::get();
+    {   let rw_lock   = GlobalCheckpointInfoVec::get();
         let read_lock  = rw_lock.read();
         let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
         let ad_fn = &checkpoint_vec[checkpoint_id as usize];
@@ -245,7 +245,7 @@ where
     };
     //
     // arange
-    let atom_id   = **< V as GlobalCheckpointInfo>::atom_id();
+    let atom_id   = **< V as GlobalCheckpointInfoVec>::atom_id();
     let call_info = checkpoint_id;
     let arange    = call_atom(n_range, adomain, atom_id, call_info, trace);
     arange
@@ -263,7 +263,7 @@ fn checkpoint_forward_fun_value<V>(
 ) -> Result< Vec<V>, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfo,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec,
 {   //
     // domain_clone
     let domain_clone = ref_slice2vec(domain);
@@ -272,7 +272,7 @@ where
     let checkpoint_id = call_info;
     //
     // rw_lock, ad_fn
-    let rw_lock   = GlobalCheckpointInfo::get();
+    let rw_lock   = GlobalCheckpointInfoVec::get();
     let read_lock  = rw_lock.read();
     let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
     let ad_fn = &checkpoint_vec[checkpoint_id as usize];
@@ -292,7 +292,7 @@ fn checkpoint_forward_der_value<V>(
 ) -> Result< Vec<V>, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfo,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec,
 {   //
     assert_eq!( domain.len(), domain_der.len() );
     //
@@ -306,7 +306,7 @@ where
     let checkpoint_id = call_info;
     //
     // rw_lock, ad_fn
-    let rw_lock           = GlobalCheckpointInfo::get();
+    let rw_lock           = GlobalCheckpointInfoVec::get();
     let read_lock         = rw_lock.read();
     let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
     let ad_fn = &checkpoint_vec[checkpoint_id as usize];
@@ -328,7 +328,7 @@ fn checkpoint_reverse_der_value<V>(
 ) -> Result< Vec<V>, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfo,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec,
 {   //
     // domain_clone
     let domain_clone = ref_slice2vec(domain);
@@ -340,7 +340,7 @@ where
     let checkpoint_id = call_info;
     //
     // rw_lock, ad_fn
-    let rw_lock           = GlobalCheckpointInfo::get();
+    let rw_lock           = GlobalCheckpointInfoVec::get();
     let read_lock         = rw_lock.read();
     let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
     let ad_fn = &checkpoint_vec[checkpoint_id as usize];
@@ -363,7 +363,7 @@ fn checkpoint_rev_depend<V>(
 ) -> String
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfo + GlobalAtomCallbackVec,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + GlobalAtomCallbackVec,
 {
     assert_eq!( depend.len(), 0 );
     //
@@ -374,7 +374,7 @@ where
     let checkpoint_id = call_info;
     //
     // rw_lock, ad_fn
-    let rw_lock           = GlobalCheckpointInfo::get();
+    let rw_lock           = GlobalCheckpointInfoVec::get();
     let read_lock         = rw_lock.read();
     let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
     let ad_fn = &checkpoint_vec[checkpoint_id as usize];
@@ -407,7 +407,7 @@ fn checkpoint_forward_fun_ad<V>(
 ) -> Result< Vec< AD<V> >, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfo + GlobalAtomCallbackVec,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + GlobalAtomCallbackVec,
     V : ThisThreadTape,
 {   //
     // adomain_clone
@@ -418,7 +418,7 @@ where
     //
     // n_var_dom
     let n_range =
-    {   let rw_lock   = GlobalCheckpointInfo::get();
+    {   let rw_lock   = GlobalCheckpointInfoVec::get();
         let read_lock  = rw_lock.read();
         let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
         let ad_fn = &checkpoint_vec[checkpoint_id as usize];
@@ -426,7 +426,7 @@ where
     };
     //
     // arange
-    let atom_id   = **< V as GlobalCheckpointInfo>::atom_id();
+    let atom_id   = **< V as GlobalCheckpointInfoVec>::atom_id();
     let call_info = checkpoint_id;
     let arange = call_atom(n_range, adomain_clone, atom_id, call_info, trace);
     Ok(arange)
