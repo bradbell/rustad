@@ -28,6 +28,33 @@ use crate::tape::sealed::ThisThreadTape;
 #[cfg(doc)]
 use crate::doc_generic_v;
 // ---------------------------------------------------------------------------
+// CheckpointInfo
+/// Information for one checkpoint function.
+///
+/// TODO: change this from pub to pub(crate)
+pub struct CheckpointInfo<V> {
+    /// The function object used for value evaluations and AD evlaution of
+    /// the function.
+    pub ad_fn         : ADfn<V>        ,
+    /// The checkpoint_id used for AD evaluation of forward mode derivatives.
+    pub ad_forward_id : Option<IndexT> ,
+    /// The checkpoint_id used for AD evaluation of reverse mode derivatives.
+    pub ad_reverse_id: Option<IndexT>  ,
+}
+impl<V> CheckpointInfo<V> {
+    fn new(
+        new_ad_fn         : ADfn<V>         ,
+        new_ad_forward_id : Option<IndexT>  ,
+        new_ad_reverse_id : Option<IndexT> ,
+)-> Self {
+        Self{
+            ad_fn         : new_ad_fn         ,
+            ad_forward_id : new_ad_forward_id ,
+            ad_reverse_id : new_ad_reverse_id ,
+        }
+    }
+}
+// ---------------------------------------------------------------------------
 // ref_slice2vec
 fn ref_slice2vec<E>(ref_slice : &[&E]) -> Vec<E>
 where
@@ -47,10 +74,8 @@ pub(crate) mod sealed {
     use std::sync::RwLock;
     use std::sync::LazyLock;
     //
-    use crate::{
-        ADfn,
-        IndexT,
-    };
+    use crate::IndexT;
+    use super::CheckpointInfo;
     //
     #[cfg(doc)]
     use crate::doc_generic_v;
@@ -61,7 +86,7 @@ pub(crate) mod sealed {
     pub trait GlobalCheckpointInfoVec
     where
         Self : Sized + 'static,
-    {   /// Returns a reference to the map from checkpoint_id to ADfn objects.
+    {   /// Returns a reference to map from checkpoint_id to CheckpointInfo.
         ///
         /// ```text
         ///     let rw_lock  = GlobalCheckpointInfoVec::get();
@@ -80,20 +105,22 @@ pub(crate) mod sealed {
         /// * write_lock :
         /// ``` text
         ///     let write_lock = rw_lock.write();
-        ///     let checkpoint_vec : &Vec< ADfn<V> > = &*write_lock.unwrap();
+        ///     let mut info_vec : &Vec< CheckpointInfo<V> >
+        ///         = &*write_lock.unwrap();
         /// ```
         ///
         /// * read_lock :
         /// ``` text
         ///     let read_lock  = rw_lock.read();
-        ///     let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
+        ///     let info_vec : &Vec< CheckpointINfo<V> >
+        ///         = &*read_lock.unwrap();
         /// ```
         ///
-        /// * checkpont_vec :
-        /// checkpont_vec\[checkpoint_id\] is the [ADfn] corresponding to
+        /// * info_vec :
+        /// info_vec\[checkpoint_id\] is the [CheckpointInfo' corresponding to
         /// checkpoint_id; see [register_checkpoint] .
         ///
-        fn get() -> &'static RwLock< Vec< ADfn<Self> > >;
+        fn get() -> &'static RwLock< Vec< CheckpointInfo<Self> > >;
         fn atom_id()-> &'static LazyLock<IndexT>;
     }
 }
@@ -117,9 +144,9 @@ macro_rules! impl_global_checkpoint_info{ ($V:ty) => {
     ) ]
     impl crate::checkpoint::sealed::GlobalCheckpointInfoVec for $V {
         fn get() -> &'static
-        RwLock< Vec< crate::ADfn<$V> > > {
+        RwLock< Vec< crate::checkpoint::CheckpointInfo<$V> > > {
             pub(crate) static CHECKPOINT_VEC :
-                RwLock< Vec< crate::ADfn<$V> > > =
+                RwLock< Vec< crate::checkpoint::CheckpointInfo<$V> > > =
                     RwLock::new( Vec::new() );
             &CHECKPOINT_VEC
         }
@@ -187,7 +214,7 @@ where
         "register_checkpoint: 0 > ad_fun.dyp_len()"
     ); }
     // rwlock
-    let rw_lock : &RwLock< Vec< ADfn<V> > > =
+    let rw_lock : &RwLock< Vec< CheckpointInfo<V> > > =
         sealed::GlobalCheckpointInfoVec::get();
     //
     // checkpoint_id
@@ -198,11 +225,12 @@ where
         let write_lock = rw_lock.write();
         assert!( write_lock.is_ok() );
         //
-        let mut checkpoint_vec = write_lock.unwrap();
-        let id_usize           = checkpoint_vec.len();
+        let mut info_vec = write_lock.unwrap();
+        let id_usize           = info_vec.len();
         id_too_large           = (IndexT::MAX as usize) < id_usize;
-        checkpoint_id          = checkpoint_vec.len() as IndexT;
-        checkpoint_vec.push( ad_fn );
+        checkpoint_id          = info_vec.len() as IndexT;
+        let info               = CheckpointInfo::new( ad_fn, None, None );
+        info_vec.push( info );
     }
     assert!( ! id_too_large );
     checkpoint_id
@@ -239,8 +267,8 @@ where
     let n_range =
     {   let rw_lock   = GlobalCheckpointInfoVec::get();
         let read_lock  = rw_lock.read();
-        let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
-        let ad_fn = &checkpoint_vec[checkpoint_id as usize];
+        let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+        let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
         ad_fn.rng_len()
     };
     //
@@ -274,8 +302,8 @@ where
     // rw_lock, ad_fn
     let rw_lock   = GlobalCheckpointInfoVec::get();
     let read_lock  = rw_lock.read();
-    let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
-    let ad_fn = &checkpoint_vec[checkpoint_id as usize];
+    let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+    let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // range
     let (range, _)        = ad_fn.forward_zero_value( domain_clone, trace );
@@ -308,8 +336,8 @@ where
     // rw_lock, ad_fn
     let rw_lock           = GlobalCheckpointInfoVec::get();
     let read_lock         = rw_lock.read();
-    let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
-    let ad_fn = &checkpoint_vec[checkpoint_id as usize];
+    let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+    let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // range_der
     let (_, var_both)     = ad_fn.forward_zero_value(domain_clone, trace);
@@ -342,8 +370,8 @@ where
     // rw_lock, ad_fn
     let rw_lock           = GlobalCheckpointInfoVec::get();
     let read_lock         = rw_lock.read();
-    let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
-    let ad_fn = &checkpoint_vec[checkpoint_id as usize];
+    let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+    let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // domain_der
     let (_, var_both)     = ad_fn.forward_zero_value(domain_clone, trace);
@@ -376,8 +404,8 @@ where
     // rw_lock, ad_fn
     let rw_lock           = GlobalCheckpointInfoVec::get();
     let read_lock         = rw_lock.read();
-    let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
-    let ad_fn = &checkpoint_vec[checkpoint_id as usize];
+    let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+    let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // pattern
     // TODO: store the sparsity pattern in a static structure for this
@@ -420,8 +448,8 @@ where
     let n_range =
     {   let rw_lock   = GlobalCheckpointInfoVec::get();
         let read_lock  = rw_lock.read();
-        let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
-        let ad_fn = &checkpoint_vec[checkpoint_id as usize];
+        let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+        let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
             ad_fn.rng_len()
     };
     //
