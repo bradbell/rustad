@@ -19,7 +19,10 @@ use crate::{
     register_atom,
 };
 //
-use sealed::GlobalCheckpointInfoVec;
+use sealed::{
+    CheckpointInfo,
+    GlobalCheckpointInfoVec,
+};
 use crate::op::info::sealed::GlobalOpInfoVec;
 use crate::atom::sealed::GlobalAtomCallbackVec;
 use crate::atom::call_atom;
@@ -27,33 +30,6 @@ use crate::tape::sealed::ThisThreadTape;
 //
 #[cfg(doc)]
 use crate::doc_generic_v;
-// ---------------------------------------------------------------------------
-// CheckpointInfo
-/// Information for one checkpoint function.
-///
-/// TODO: change this from pub to pub(crate)
-pub struct CheckpointInfo<V> {
-    /// The function object used for value evaluations and AD evlaution of
-    /// the function.
-    pub ad_fn         : ADfn<V>        ,
-    /// The checkpoint_id used for AD evaluation of forward mode derivatives.
-    pub ad_forward_id : Option<IndexT> ,
-    /// The checkpoint_id used for AD evaluation of reverse mode derivatives.
-    pub ad_reverse_id: Option<IndexT>  ,
-}
-impl<V> CheckpointInfo<V> {
-    fn new(
-        new_ad_fn         : ADfn<V>         ,
-        new_ad_forward_id : Option<IndexT>  ,
-        new_ad_reverse_id : Option<IndexT> ,
-)-> Self {
-        Self{
-            ad_fn         : new_ad_fn         ,
-            ad_forward_id : new_ad_forward_id ,
-            ad_reverse_id : new_ad_reverse_id ,
-        }
-    }
-}
 // ---------------------------------------------------------------------------
 // ref_slice2vec
 fn ref_slice2vec<E>(ref_slice : &[&E]) -> Vec<E>
@@ -74,13 +50,42 @@ pub(crate) mod sealed {
     use std::sync::RwLock;
     use std::sync::LazyLock;
     //
-    use crate::IndexT;
-    use super::CheckpointInfo;
+    use crate::{
+        ADfn,
+        IndexT,
+    };
     //
     #[cfg(doc)]
     use crate::doc_generic_v;
     #[cfg(doc)]
     use super::register_checkpoint;
+    // ------------------------------------------------------------------------
+    // CheckpointInfo
+    /// Information for one checkpoint function.
+    ///
+    /// TODO: change this from pub to pub(crate)
+    pub struct CheckpointInfo<V> {
+        /// The function object used for value evaluations and AD evlaution of
+        /// the function.
+        pub ad_fn         : ADfn<V>        ,
+        /// The checkpoint_id for AD evaluation of forward mode derivatives.
+        pub ad_forward_id : Option<IndexT> ,
+        /// The checkpoint_id for AD evaluation of reverse mode derivatives.
+        pub ad_reverse_id: Option<IndexT>  ,
+    }
+    impl<V> CheckpointInfo<V> {
+        pub(crate) fn new(
+            new_ad_fn         : ADfn<V>         ,
+            new_ad_forward_id : Option<IndexT>  ,
+            new_ad_reverse_id : Option<IndexT> ,
+    )-> Self {
+            Self{
+                ad_fn         : new_ad_fn         ,
+                ad_forward_id : new_ad_forward_id ,
+                ad_reverse_id : new_ad_reverse_id ,
+            }
+        }
+    }
     //
     // GlobalCheckpointInfoVec
     pub trait GlobalCheckpointInfoVec
@@ -144,9 +149,9 @@ macro_rules! impl_global_checkpoint_info{ ($V:ty) => {
     ) ]
     impl crate::checkpoint::sealed::GlobalCheckpointInfoVec for $V {
         fn get() -> &'static
-        RwLock< Vec< crate::checkpoint::CheckpointInfo<$V> > > {
+        RwLock< Vec< crate::checkpoint::sealed::CheckpointInfo<$V> > > {
             pub(crate) static CHECKPOINT_VEC :
-                RwLock< Vec< crate::checkpoint::CheckpointInfo<$V> > > =
+                RwLock< Vec< crate::checkpoint::sealed::CheckpointInfo<$V> > > =
                     RwLock::new( Vec::new() );
             &CHECKPOINT_VEC
         }
