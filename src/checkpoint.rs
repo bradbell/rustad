@@ -28,6 +28,19 @@ use crate::tape::sealed::ThisThreadTape;
 #[cfg(doc)]
 use crate::doc_generic_v;
 // ---------------------------------------------------------------------------
+// ref_slice2vec
+fn ref_slice2vec<E>(ref_slice : &[&E]) -> Vec<E>
+where
+    E : Clone,
+{
+    let n                 = ref_slice.len();
+    let mut vec  : Vec<E> = Vec::with_capacity(n);
+    for i in 0 .. n {
+        vec.push( (*ref_slice[i]).clone() );
+    }
+    vec
+}
+// ---------------------------------------------------------------------------
 pub(crate) mod sealed {
     //! The sub-module sealed is used to seal traits in this package.
     //
@@ -253,11 +266,7 @@ where
     V : GlobalOpInfoVec + GlobalCheckpointInfo,
 {   //
     // domain_clone
-    let n_domain = domain.len();
-    let mut domain_clone : Vec<V> = Vec::with_capacity(n_domain);
-    for j in 0 .. n_domain {
-        domain_clone.push( (*domain[j]).clone() );
-    }
+    let domain_clone = ref_slice2vec(domain);
     //
     // checkpoint_id
     let checkpoint_id = call_info;
@@ -288,17 +297,10 @@ where
     assert_eq!( domain.len(), domain_der.len() );
     //
     // domain_clone
-    let n_domain = domain.len();
-    let mut domain_clone : Vec<V> = Vec::with_capacity(n_domain);
-    for j in 0 .. n_domain {
-        domain_clone.push( (*domain[j]).clone() );
-    }
+    let domain_clone = ref_slice2vec(domain);
     //
     // domain_der_clone
-    let mut domain_der_clone : Vec<V> = Vec::with_capacity( domain_der.len() );
-    for j in 0 .. domain_der.len() {
-        domain_der_clone.push( (*domain_der[j]).clone() );
-    }
+    let domain_der_clone = ref_slice2vec(domain_der);
     //
     // checkpoint_id
     let checkpoint_id = call_info;
@@ -329,17 +331,10 @@ where
     V : GlobalOpInfoVec + GlobalCheckpointInfo,
 {   //
     // domain_clone
-    let n_domain = domain.len();
-    let mut domain_clone : Vec<V> = Vec::with_capacity(n_domain);
-    for j in 0 .. n_domain {
-        domain_clone.push( (*domain[j]).clone() );
-    }
+    let domain_clone = ref_slice2vec(domain);
     //
     // range_der_clone
-    let mut range_der_clone : Vec<V> = Vec::with_capacity( range_der.len() );
-    for j in 0 .. range_der.len() {
-        range_der_clone.push( (*range_der[j]).clone() );
-    }
+    let range_der_clone = ref_slice2vec(&range_der);
     //
     // checkpoint_id
     let checkpoint_id = call_info;
@@ -416,11 +411,7 @@ where
     V : ThisThreadTape,
 {   //
     // adomain_clone
-    let n_domain = adomain.len();
-    let mut adomain_clone : Vec< AD<V> > = Vec::with_capacity(n_domain);
-    for j in 0 .. n_domain {
-        adomain_clone.push( (*adomain[j]).clone() );
-    }
+    let adomain_clone = ref_slice2vec(adomain);
     //
     // checkpoint_id
     let checkpoint_id = call_info;
