@@ -726,7 +726,7 @@ where
     }
     //
     // domain_der
-    let result = reverse_der_value(&domain, range_der, call_info, trace);
+    let result = reverse_der_value(&domain, &range_der, call_info, trace);
     let domain_der = match result {
         Err(msg) => { panic!(
             "atom {} reverse_der_value error : {}", callback.name, msg);

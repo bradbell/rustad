@@ -252,7 +252,7 @@ pub type AtomForwardDerAD<V> = fn(
 ///
 /// * Syntax :
 /// ```text
-///     domain_der = reverse_der_value(&domain, range_der, call_info, trace) ?
+///     domain_der = reverse_der_value(&domain, &range_der, call_info, trace) ?
 /// ```
 ///
 /// * reverse_der_value :
@@ -270,7 +270,7 @@ pub type AtomForwardDerAD<V> = fn(
 /// ```
 pub type AtomReverseDerValue<V> = fn(
     _domain        : &[&V]       ,
-    _range_der     : Vec<&V>     ,
+    _range_der     : &[&V]       ,
     _call_info     : IndexT      ,
     _trace         : bool        ,
 ) -> Result< Vec<V>, String>;
@@ -284,7 +284,7 @@ pub type AtomReverseDerValue<V> = fn(
 ///
 /// * Syntax :
 /// ```text
-///     domain_der = reverse_der_ad(&domain, range_der, call_info, trace) ?
+///     domain_der = reverse_der_ad(&domain, &range_der, call_info, trace) ?
 /// ```
 ///
 /// * reverse_der_ad :

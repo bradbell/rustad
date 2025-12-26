@@ -21,7 +21,7 @@ use super::{
 // sumsq_reverse_der_value
 pub fn sumsq_reverse_der_value(
     domain       : &[&V]       ,
-    range_der    : Vec<&V>     ,
+    range_der    : &[&V]       ,
     _call_info   : IndexT      ,
     trace        : bool        ,
 ) -> Result< Vec<V>, String >

@@ -322,7 +322,7 @@ where
 // checkpoint_reverse_der_value
 fn checkpoint_reverse_der_value<V>(
     domain           : &[&V]       ,
-    range_der        : Vec<&V>     ,
+    range_der        : &[&V]       ,
     call_info        : IndexT      ,
     trace            : bool        ,
 ) -> Result< Vec<V>, String >

@@ -89,7 +89,7 @@ fn rev_sumsq_forward_der_value(
 // rev_sumsq_reverse_der_value
 fn rev_sumsq_reverse_der_value(
     domain      : &[&V]     ,
-    range_der   : Vec<&V>   ,
+    range_der   : &[&V]     ,
     _call_info  : IndexT    ,
     _trace      : bool      ,
 ) -> Result< Vec<V>, String >
