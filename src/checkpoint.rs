@@ -127,6 +127,7 @@ pub(crate) fn register_checkpoint_atom<V>()-> IndexT
 where
     V : Clone + From<f32> + std::fmt::Display,
     V : GlobalOpInfoVec + GlobalCheckpointInfo + GlobalAtomCallbackVec,
+    V : ThisThreadTape,
 {
     //
     // checkpoint_callback
@@ -135,7 +136,7 @@ where
         rev_depend           :  Some( checkpoint_rev_depend::<V> ),
         //
         forward_fun_value    :  Some( checkpoint_forward_fun_value::<V> ),
-        forward_fun_ad       :  None,
+        forward_fun_ad       :  Some( checkpoint_forward_fun_ad::<V>    ),
         //
         forward_der_value    :  Some( checkpoint_forward_der_value::<V> ),
         forward_der_ad       :  None,
@@ -229,10 +230,12 @@ where
         let ad_fn = &checkpoint_vec[checkpoint_id as usize];
         ad_fn.rng_len()
     };
+    //
+    // arange
     let atom_id   = **< V as GlobalCheckpointInfo>::atom_id();
     let call_info = checkpoint_id;
-    let ad_vec = call_atom(n_range, adomain, atom_id, call_info, trace);
-    ad_vec
+    let arange    = call_atom(n_range, adomain, atom_id, call_info, trace);
+    arange
 }
 // ----------------------------------------------------------------------------
 // Value Routines
@@ -257,13 +260,13 @@ where
     }
     //
     // checkpoint_id
-    let checkpoint_id = call_info as usize;
+    let checkpoint_id = call_info;
     //
     // rw_lock, ad_fn
     let rw_lock   = GlobalCheckpointInfo::get();
     let read_lock  = rw_lock.read();
     let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
-    let ad_fn = &checkpoint_vec[checkpoint_id];
+    let ad_fn = &checkpoint_vec[checkpoint_id as usize];
     //
     // range
     let (range, _)        = ad_fn.forward_zero_value( domain_clone, trace );
@@ -298,13 +301,13 @@ where
     }
     //
     // checkpoint_id
-    let checkpoint_id = call_info as usize;
+    let checkpoint_id = call_info;
     //
     // rw_lock, ad_fn
     let rw_lock           = GlobalCheckpointInfo::get();
     let read_lock         = rw_lock.read();
     let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
-    let ad_fn = &checkpoint_vec[checkpoint_id];
+    let ad_fn = &checkpoint_vec[checkpoint_id as usize];
     //
     // range_der
     let (_, var_both)     = ad_fn.forward_zero_value(domain_clone, trace);
@@ -339,13 +342,13 @@ where
     }
     //
     // checkpoint_id
-    let checkpoint_id = call_info as usize;
+    let checkpoint_id = call_info;
     //
     // rw_lock, ad_fn
     let rw_lock           = GlobalCheckpointInfo::get();
     let read_lock         = rw_lock.read();
     let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
-    let ad_fn = &checkpoint_vec[checkpoint_id];
+    let ad_fn = &checkpoint_vec[checkpoint_id as usize];
     //
     // domain_der
     let (_, var_both)     = ad_fn.forward_zero_value(domain_clone, trace);
@@ -373,13 +376,13 @@ where
     let compute_dyp = false;
     //
     // checkpoint_id
-    let checkpoint_id = call_info as usize;
+    let checkpoint_id = call_info;
     //
     // rw_lock, ad_fn
     let rw_lock           = GlobalCheckpointInfo::get();
     let read_lock         = rw_lock.read();
     let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
-    let ad_fn = &checkpoint_vec[checkpoint_id];
+    let ad_fn = &checkpoint_vec[checkpoint_id as usize];
     //
     // pattern
     // TODO: store the sparsity pattern in a static structure for this
@@ -400,3 +403,40 @@ where
 // AD routines
 // -------------------------------------------------------------------------
 //
+// checkpoint_forward_fun_ad
+fn checkpoint_forward_fun_ad<V>(
+    _use_range       : &[bool]      ,
+    adomain          : &[& AD<V> ]  ,
+    call_info        : IndexT       ,
+    trace            : bool         ,
+) -> Result< Vec< AD<V> >, String >
+where
+    V : Clone + From<f32> + std::fmt::Display,
+    V : GlobalOpInfoVec + GlobalCheckpointInfo + GlobalAtomCallbackVec,
+    V : ThisThreadTape,
+{   //
+    // adomain_clone
+    let n_domain = adomain.len();
+    let mut adomain_clone : Vec< AD<V> > = Vec::with_capacity(n_domain);
+    for j in 0 .. n_domain {
+        adomain_clone.push( (*adomain[j]).clone() );
+    }
+    //
+    // checkpoint_id
+    let checkpoint_id = call_info;
+    //
+    // n_var_dom
+    let n_range =
+    {   let rw_lock   = GlobalCheckpointInfo::get();
+        let read_lock  = rw_lock.read();
+        let checkpoint_vec : &Vec< ADfn<V> > = &*read_lock.unwrap();
+        let ad_fn = &checkpoint_vec[checkpoint_id as usize];
+            ad_fn.rng_len()
+    };
+    //
+    // arange
+    let atom_id   = **< V as GlobalCheckpointInfo>::atom_id();
+    let call_info = checkpoint_id;
+    let arange = call_atom(n_range, adomain_clone, atom_id, call_info, trace);
+    Ok(arange)
+}

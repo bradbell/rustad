@@ -609,6 +609,12 @@ where
 /// Compute the result of an atomic function and,
 /// if this thread is currently recording, include the call in its tape.
 ///
+/// * Syntax :
+/// ```text
+///     arange= call_atom(n_range, adomain, atom_id, call_info, trace)
+/// ```
+///
+///
 /// * V : see [doc_generic_v]
 ///
 /// * n_range :
@@ -631,7 +637,7 @@ where
 /// if true, a trace of the calculations may be printed on stdout.
 /// This may be useful for debugging atomic functions.
 ///
-/// * return :
+/// * arange :
 /// The return value *arange* is the range, as a function of the domain,
 /// for this atomic function.
 ///
@@ -643,7 +649,7 @@ pub fn call_atom<V>(
     trace       : bool         ,
 ) -> Vec< AD<V> >
 where
-    V   : Clone + From<f32> + ThisThreadTapePublic + GlobalAtomCallbackVecPublic ,
+    V : Clone + From<f32> + ThisThreadTapePublic + GlobalAtomCallbackVecPublic,
 {
     //
     // local_key

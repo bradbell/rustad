@@ -40,11 +40,11 @@ fn main() {
         let term = &ax[j] * &ax[j];
         asumsq  += &term;
     }
-    let ay          = vec![ asumsq ];
-    let ad_fn       = stop_recording(ay);
+    let ay      = vec![ asumsq ];
+    let f       = stop_recording(ay);
     //
     // checkpoint_id
-    let checkpoint_id  = register_checkpoint(ad_fn);
+    let checkpoint_id  = register_checkpoint(f);
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
@@ -67,4 +67,13 @@ fn main() {
     let dx               = g.reverse_one_value(&v , dy.clone(), trace);
     assert_eq!( dx[0], V::from(2.0) * x[0]*dy[0] );
     assert_eq!( dx[1], V::from(2.0) * x[1]*dy[0] );
+    //
+    // g.forward_zero_ad
+    let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
+    let ax           = start_recording_var(x);
+    let (ay, _av)    = g.forward_zero_ad(ax, trace);
+    let h            = stop_recording(ay);
+    let x   : Vec<V> = vec![ V::from(3.0) , V::from(4.0) ];
+    let (y, _v)      = h.forward_zero_value(x.clone(), trace);
+    assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
 }
