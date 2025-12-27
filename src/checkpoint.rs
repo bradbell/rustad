@@ -251,9 +251,9 @@ where
 /// is the index that is used to identify this checkpoint function.
 ///
 pub fn register_checkpoint<V>(
-    ad_fn       : ADfn<V>                 ,
-    directions  : &[Direction]            ,
-    hash_map    : HashMap<&str, String>   ,
+    ad_fn         : ADfn<V>                 ,
+    directions    : &[Direction]            ,
+    mut hash_map  : HashMap<&str, String>   ,
 ) -> IndexT
 where
     V : Clone + From<f32> + std::fmt::Display,
@@ -292,6 +292,7 @@ where
     if 0 < directions.len()  {
         let directions_tail = &directions[1 .. directions.len()];
         if directions[0] == Direction::Forward {
+            hash_map.insert( "name", name.clone() + ".forward" );
             let nx            = ad_fn.var_dom_len();
             let x_dx          = vec![one_v; 2 * nx ];
             let ax_dx         = start_recording_var(x_dx);
@@ -306,6 +307,7 @@ where
             ad_forward_id     = Some(checkpoint_id);
         } else {
             debug_assert!( directions[0] == Direction::Reverse );
+            hash_map.insert( "name", name.clone() + ".reverse" );
             let nx            = ad_fn.var_dom_len();
             let ny            = ad_fn.rng_len();
             let x_dy          = vec![one_v; nx + ny ];
@@ -599,8 +601,9 @@ where
     let read_lock         = rw_lock.read();
     let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
     let ad_forward_id = &info_vec[checkpoint_id as usize].ad_forward_id;
+    let name          = &info_vec[checkpoint_id as usize].name;
     if ad_forward_id.is_none() {
-        panic!( "forward_der_ad not implemented for for this checkpoint");
+        panic!( "forward_der_ad not requested: checkpoint name = {}", name);
     }
     let ad_forward_id = ad_forward_id.unwrap();
     //
@@ -635,8 +638,9 @@ where
     let read_lock         = rw_lock.read();
     let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
     let ad_reverse_id = &info_vec[checkpoint_id as usize].ad_reverse_id;
+    let name          = &info_vec[checkpoint_id as usize].name;
     if ad_reverse_id.is_none() {
-        panic!( "reverse_der_ad not implemented for for this checkpoint");
+        panic!( "reverse_der_ad not requested: checkpoint name = {}", name);
     }
     let ad_reverse_id = ad_reverse_id.unwrap();
     //
