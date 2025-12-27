@@ -16,6 +16,7 @@ use rustad::{
     stop_recording,
     register_checkpoint,
     call_checkpoint,
+    ad_from_vector,
 };
 //
 // V
@@ -44,7 +45,7 @@ fn main() {
     let f       = stop_recording(ay);
     //
     // checkpoint_id
-    let forward_der_ad = false;
+    let forward_der_ad = true;
     let checkpoint_id  = register_checkpoint(f, forward_der_ad);
     //
     // g
@@ -61,7 +62,7 @@ fn main() {
     // g.forward_one_value
     let dx      : Vec<V> = vec![ V::from(5.0), V::from(6.0) ];
     let dy               = g.forward_one_value(&v , dx.clone(), trace);
-    assert_eq!( dy[0], V::from(2.0) * x[0]*dx[0] + V::from(2.0) * x[1]*dx[1] );
+    assert_eq!( dy[0], V::from(2.0) * ( x[0]*dx[0] + x[1]*dx[1] ) );
     //
     // g.reverse_one_value
     let dy      : Vec<V> = vec![ V::from(5.0) ];
@@ -77,4 +78,16 @@ fn main() {
     let x   : Vec<V> = vec![ V::from(3.0) , V::from(4.0) ];
     let (y, _v)      = h.forward_zero_value(x.clone(), trace);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
+    //
+    // g.forward_one_value
+    let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
+    let dx  : Vec<V> = vec![ V::from(5.0), V::from(6.0) ];
+    let adx          = ad_from_vector(dx.clone());
+    let ax           = start_recording_var(x);
+    let (_ay, av)    = g.forward_zero_ad(ax, trace);
+    let ady          = g.forward_one_ad(&av , adx, trace);
+    let h            = stop_recording(ady);
+    let x   : Vec<V> = vec![ V::from(7.0) , V::from(8.0) ];
+    let (dy, _v)     = h.forward_zero_value(x.clone(), trace);
+    assert_eq!( dy[0], V::from(2.0) * ( x[0]*dx[0] + x[1]*dx[1] ) );
 }
