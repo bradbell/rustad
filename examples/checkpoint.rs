@@ -8,6 +8,8 @@
 // TODO: convert this example in to a general purpose checkpoint utility.
 // ---------------------------------------------------------------------------
 //
+use std::collections::HashMap;
+//
 use rustad::{
     Direction,
     AzFloat,
@@ -46,8 +48,12 @@ fn main() {
     let f       = stop_recording(ay);
     //
     // checkpoint_id
-    let direction  = vec![ Direction::Forward ];
-    let checkpoint_id  = register_checkpoint(f, &direction);
+    let directions  = vec![ Direction::Forward ];
+    let hash_map    = HashMap::from( [
+        ("name",  "example".to_string() ),
+        ("trace", "false".to_string() ),
+    ] );
+    let checkpoint_id  = register_checkpoint(f, &directions, hash_map);
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];

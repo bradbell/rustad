@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------
 // use
 use std::sync::RwLock;
+use std::collections::HashMap;
 //
 use crate::{
     AD,
@@ -74,21 +75,28 @@ pub(crate) mod sealed {
     ///
     /// TODO: change this from pub to pub(crate)
     pub struct CheckpointInfo<V> {
+        /// The user name for this checkpoint function
+        pub name         : String         ,
+        //
         /// The function object used for value evaluations and AD evlaution of
         /// the function.
         pub ad_fn         : ADfn<V>        ,
+        //
         /// The checkpoint_id for AD evaluation of forward mode derivatives.
         pub ad_forward_id : Option<IndexT> ,
+        //
         /// The checkpoint_id for AD evaluation of reverse mode derivatives.
         pub ad_reverse_id: Option<IndexT>  ,
     }
     impl<V> CheckpointInfo<V> {
         pub(crate) fn new(
+            new_name          : String          ,
             new_ad_fn         : ADfn<V>         ,
             new_ad_forward_id : Option<IndexT>  ,
             new_ad_reverse_id : Option<IndexT> ,
     )-> Self {
             Self{
+                name          : new_name          ,
                 ad_fn         : new_ad_fn         ,
                 ad_forward_id : new_ad_forward_id ,
                 ad_reverse_id : new_ad_reverse_id ,
@@ -214,13 +222,25 @@ where
 ///
 /// * Syntax :
 /// ```text
-///     checkpoint_id = register_checkpoint(ad_fn, direction)
+///     checkpoint_id = register_checkpoint(ad_fn, directions, hash_map)
 /// ```
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * ad_fn :
 /// is the ad_fn that is being moved to the global checkpoint vector.
+///
+/// * hash_map :
+/// The following is a description of the valid key :
+///
+///     name :
+///     the value is the name that identifies this checkpoint function
+///     (default no_name).
+///
+///     trace :
+///     the value is true or false (the default is false).
+///     If trace is true, and 0 < directions.len(), the creation
+///     of the new [ADfn] objects use for AD derivative evaluation is traced.
 ///
 /// * directions :
 /// If directions\[k\] is Forward (Reverse), then k-th order forward
@@ -231,7 +251,9 @@ where
 /// is the index that is used to identify this checkpoint function.
 ///
 pub fn register_checkpoint<V>(
-    ad_fn : ADfn<V> , direction : &[Direction] ,
+    ad_fn       : ADfn<V>                 ,
+    directions  : &[Direction]            ,
+    hash_map    : HashMap<&str, String>   ,
 ) -> IndexT
 where
     V : Clone + From<f32> + std::fmt::Display,
@@ -241,8 +263,25 @@ where
         "register_checkpoint: 0 > ad_fun.dyp_len()"
     ); }
     //
-    // trace
-    let trace = false;
+    // name, trace
+    let mut name  = "no_name".to_string();
+    let mut trace = false;
+    for key in hash_map.keys() { match key {
+        &"name" => {
+            name = hash_map.get(key).unwrap().clone();
+        },
+        &"trace" => {
+            let value = hash_map.get( "trace").unwrap();
+            if value != "true" && value != "false" { panic!(
+                "registem_checkpoint: hash_map.get(trace): \
+                {} is not a valid value", value
+            ); }
+            trace = value == "true";
+        },
+        _ => panic!(
+            "registem_checkpoint hash_map : {} is not a valid key", key
+        ),
+    } }
     //
     // one_v
     let one_v : V = 0f32.into();
@@ -250,9 +289,9 @@ where
     // ad_forward_id, ad_reverse_id
     let mut ad_forward_id : Option<IndexT> = None;
     let mut ad_reverse_id : Option<IndexT> = None;
-    if 0 < direction.len()  {
-        let direction_tail = &direction[1 .. direction.len()];
-        if direction[0] == Direction::Forward {
+    if 0 < directions.len()  {
+        let directions_tail = &directions[1 .. directions.len()];
+        if directions[0] == Direction::Forward {
             let nx            = ad_fn.var_dom_len();
             let x_dx          = vec![one_v; 2 * nx ];
             let ax_dx         = start_recording_var(x_dx);
@@ -261,10 +300,12 @@ where
             let (_ay, av)     = ad_fn.forward_zero_ad(ax, trace);
             let ady           = ad_fn.forward_one_ad(&av, adx, trace);
             let ad_fn_for     = stop_recording(ady);
-            let checkpoint_id = register_checkpoint(ad_fn_for, direction_tail);
+            let checkpoint_id = register_checkpoint(
+                ad_fn_for, directions_tail, hash_map
+            );
             ad_forward_id     = Some(checkpoint_id);
         } else {
-            debug_assert!( direction[0] == Direction::Reverse );
+            debug_assert!( directions[0] == Direction::Reverse );
             let nx            = ad_fn.var_dom_len();
             let ny            = ad_fn.rng_len();
             let x_dy          = vec![one_v; nx + ny ];
@@ -274,7 +315,9 @@ where
             let (_ay, av)     = ad_fn.forward_zero_ad(ax, trace);
             let adx           = ad_fn.reverse_one_ad(&av, ady, trace);
             let ad_fn_rev     = stop_recording(adx);
-            let checkpoint_id = register_checkpoint(ad_fn_rev, direction_tail);
+            let checkpoint_id = register_checkpoint(
+                ad_fn_rev, directions_tail, hash_map
+            );
             ad_reverse_id     = Some(checkpoint_id);
         }
     }
@@ -296,7 +339,7 @@ where
         id_too_large           = (IndexT::MAX as usize) < id_usize;
         checkpoint_id          = info_vec.len() as IndexT;
         let info               = CheckpointInfo::new(
-            ad_fn, ad_forward_id, ad_reverse_id
+            name, ad_fn, ad_forward_id, ad_reverse_id
         );
         info_vec.push( info );
     }
