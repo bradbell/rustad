@@ -44,7 +44,8 @@ fn main() {
     let f       = stop_recording(ay);
     //
     // checkpoint_id
-    let checkpoint_id  = register_checkpoint(f);
+    let forward_der_ad = false;
+    let checkpoint_id  = register_checkpoint(f, forward_der_ad);
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];

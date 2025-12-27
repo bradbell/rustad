@@ -17,6 +17,8 @@ use crate::{
     ADfn,
     AtomCallback,
     register_atom,
+    start_recording_var,
+    stop_recording,
 };
 //
 use sealed::{
@@ -184,7 +186,7 @@ where
         forward_fun_ad       :  Some( checkpoint_forward_fun_ad::<V>    ),
         //
         forward_der_value    :  Some( checkpoint_forward_der_value::<V> ),
-        forward_der_ad       :  None,
+        forward_der_ad       :  Some( checkpoint_forward_der_ad::<V>    ),
         //
         reverse_der_value    :  Some( checkpoint_reverse_der_value::<V> ),
         reverse_der_ad       :  None,
@@ -200,7 +202,7 @@ where
 ///
 /// * Syntax :
 /// ```text
-///     checkpoint_id = register_checkpoint(ad_fn)
+///     checkpoint_id = register_checkpoint(ad_fn, forward_der_ad)
 /// ```
 ///
 /// * V : see [doc_generic_v]
@@ -208,16 +210,45 @@ where
 /// * ad_fn :
 /// is the ad_fn that is being moved to the global checkpoint vector.
 ///
+/// * forward_der_ad :
+/// if true (false), this checkpoint function can (can not) be used with
+/// AD evaluation of forward mode derivatives.
+///
 /// ## checkpoint_id :
 /// is the index that is used to identify this checkpoint function.
 ///
-pub fn register_checkpoint<V>( ad_fn : ADfn<V> ) -> IndexT
+pub fn register_checkpoint<V>(
+    ad_fn : ADfn<V> , forward_der_ad : bool,
+) -> IndexT
 where
-    V : GlobalCheckpointInfoVec,
+    V : Clone + From<f32> + std::fmt::Display,
+    V : ThisThreadTape + GlobalOpInfoVec + GlobalCheckpointInfoVec,
 {   //
     if 0 < ad_fn.dyp_len() { panic!(
         "register_checkpoint: 0 > ad_fun.dyp_len()"
     ); }
+    //
+    // trace
+    let trace = false;
+    //
+    // one_v
+    let one_v : V = 0f32.into();
+    //
+    // ad_forward_id
+    let mut ad_forward_id : Option<IndexT> = None;
+    if forward_der_ad {
+        let nx            = ad_fn.var_dom_len();
+        let x_dx          = vec![one_v; 2 * nx ];
+        let ax_dx         = start_recording_var(x_dx);
+        let ax            = ax_dx[0 .. nx].to_vec();
+        let adx           = ax_dx[nx .. 2*nx].to_vec();
+        let (_ay, av)     = ad_fn.forward_zero_ad(ax, trace);
+        let ady           = ad_fn.forward_one_ad(&av, adx, trace);
+        let ad_fn_for     = stop_recording(ady);
+        let checkpoint_id = register_checkpoint(ad_fn_for, false);
+        ad_forward_id     = Some(checkpoint_id);
+    }
+    //
     // rwlock
     let rw_lock : &RwLock< Vec< CheckpointInfo<V> > > =
         sealed::GlobalCheckpointInfoVec::get();
@@ -234,7 +265,9 @@ where
         let id_usize           = info_vec.len();
         id_too_large           = (IndexT::MAX as usize) < id_usize;
         checkpoint_id          = info_vec.len() as IndexT;
-        let info               = CheckpointInfo::new( ad_fn, None, None );
+        let info               = CheckpointInfo::new(
+            ad_fn, ad_forward_id, None
+        );
         info_vec.push( info );
     }
     assert!( ! id_too_large );
@@ -463,4 +496,43 @@ where
     let call_info = checkpoint_id;
     let arange = call_atom(n_range, adomain_clone, atom_id, call_info, trace);
     Ok(arange)
+}
+//
+// checkpoint_forward_der_ad
+fn checkpoint_forward_der_ad<V>(
+    _use_range       : &[bool]     ,
+    adomain          : &[& AD<V> ] ,
+    adomain_der      : &[& AD<V> ] ,
+    call_info        : IndexT      ,
+    trace            : bool        ,
+) -> Result< Vec< AD<V> >, String >
+where
+    V : Clone + From<f32> + std::fmt::Display,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + ThisThreadTape,
+    V : GlobalAtomCallbackVec,
+{   //
+    assert_eq!( adomain.len(), adomain_der.len() );
+    //
+    // domain_both
+    let mut adomain_both = ref_slice2vec(adomain);
+    let mut adomain_der_clone = ref_slice2vec(adomain_der);
+    adomain_both.append( &mut adomain_der_clone );
+    //
+    // checkpoint_id
+    let checkpoint_id = call_info;
+    //
+    // rw_lock, ad_forward_id
+    let rw_lock           = GlobalCheckpointInfoVec::get();
+    let read_lock         = rw_lock.read();
+    let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+    let ad_forward_id = &info_vec[checkpoint_id as usize].ad_forward_id;
+    if ad_forward_id.is_none() {
+        panic!( "forward_der_ad not implemented for for this checkpoint");
+    }
+    let ad_forward_id = ad_forward_id.unwrap();
+    //
+    // arange_der
+    let arange_der = call_checkpoint(adomain_both, ad_forward_id, trace);
+    //
+    Ok( arange_der )
 }
