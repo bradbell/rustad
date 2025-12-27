@@ -801,7 +801,7 @@ where
     }
     //
     // adomain_der
-    let result = reverse_der_ad(&adomain, arange_der, call_info, trace);
+    let result = reverse_der_ad(&adomain, &arange_der, call_info, trace);
     let adomain_der = match result {
         Err(msg) => { panic!(
             "atom {} reverse_der_ad error : {}", callback.name, msg);

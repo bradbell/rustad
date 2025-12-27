@@ -301,10 +301,10 @@ pub type AtomReverseDerValue<V> = fn(
 ///     domain_der = range_der * f'(domain)
 /// ```
 pub type AtomReverseDerAD<V> = fn(
-    _domain        : &[& AD<V>]        ,
-    _range_der     : Vec<& AD<V> >     ,
-    _call_info     : IndexT            ,
-    _trace         : bool              ,
+    _domain        : &[& AD<V>]     ,
+    _range_der     : &[& AD<V>]     ,
+    _call_info     : IndexT         ,
+    _trace         : bool           ,
 ) -> Result< Vec< AD<V> >, String >;
 // ----------------------------------------------------------------------------
 //

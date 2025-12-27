@@ -569,10 +569,10 @@ where
 //
 // checkpoint_reverse_der_ad
 fn checkpoint_reverse_der_ad<V>(
-    adomain          : &[& AD<V> ]   ,
-    arange_der       : Vec<& AD<V> > ,
-    call_info        : IndexT        ,
-    trace            : bool          ,
+    adomain          : &[& AD<V> ] ,
+    arange_der       : &[& AD<V> ] ,
+    call_info        : IndexT      ,
+    trace            : bool        ,
 ) -> Result< Vec< AD<V> >, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
