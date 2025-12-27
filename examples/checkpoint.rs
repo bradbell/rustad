@@ -9,6 +9,7 @@
 // ---------------------------------------------------------------------------
 //
 use rustad::{
+    Direction,
     AzFloat,
     AD,
     ad_from_value,
@@ -45,8 +46,8 @@ fn main() {
     let f       = stop_recording(ay);
     //
     // checkpoint_id
-    let forward_der_ad = true;
-    let checkpoint_id  = register_checkpoint(f, forward_der_ad);
+    let direction  = vec![ Direction::Forward ];
+    let checkpoint_id  = register_checkpoint(f, &direction);
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];

@@ -84,6 +84,7 @@ pub use atom::{
     AtomCallback,
 };
 pub use checkpoint::{
+    Direction,
     register_checkpoint,
     call_checkpoint,
 };
