@@ -18,7 +18,7 @@ use crate::{
     ADfn,
     AtomCallback,
     register_atom,
-    start_recording_var,
+    start_recording,
     stop_recording,
 };
 //
@@ -295,7 +295,7 @@ where
             hash_map.insert( "name", name.clone() + ".forward" );
             let nx            = ad_fn.var_dom_len();
             let x_dx          = vec![one_v; 2 * nx ];
-            let ax_dx         = start_recording_var(x_dx);
+            let (_, ax_dx)    = start_recording(None, x_dx);
             let ax            = ax_dx[0 .. nx].to_vec();
             let adx           = ax_dx[nx .. 2*nx].to_vec();
             let (_ay, av)     = ad_fn.forward_zero_ad(ax, trace);
@@ -311,7 +311,7 @@ where
             let nx            = ad_fn.var_dom_len();
             let ny            = ad_fn.rng_len();
             let x_dy          = vec![one_v; nx + ny ];
-            let ax_dy         = start_recording_var(x_dy);
+            let (_, ax_dy)    = start_recording(None, x_dy);
             let ax            = ax_dy[0 .. nx].to_vec();
             let ady           = ax_dy[nx .. nx + ny].to_vec();
             let (_ay, av)     = ad_fn.forward_zero_ad(ax, trace);

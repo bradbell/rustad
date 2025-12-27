@@ -8,7 +8,7 @@ use rustad::{
     AzFloat,
     AD,
     ad_from_value,
-    start_recording_var,
+    start_recording,
     stop_recording,
     get_lib,
     RustSrcLink,
@@ -25,7 +25,7 @@ fn main () {
     //
     // ax
     let x  : Vec<V> = vec![ V::from(2.0); nx ];
-    let ax       = start_recording_var(x);
+    let (_, ax)  = start_recording(None, x);
     //
     // asum
     let mut asum : AD<V>  = ad_from_value(  V::from(0.0) );
@@ -41,7 +41,7 @@ fn main () {
     //
     // av
     let x  : Vec<V> = vec![ V::from(2.0); nx ];
-    let ax      = start_recording_var(x);
+    let (_, ax) = start_recording(None, x);
     let (_, av) = f.forward_zero_ad(ax, trace);
     //
     // g

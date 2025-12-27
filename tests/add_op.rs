@@ -4,7 +4,7 @@
 //
 use rustad::{
     AzFloat,
-    start_recording_var,
+    start_recording,
     stop_recording,
 };
 //
@@ -15,7 +15,7 @@ fn test_add_vv() {
     //
     let x  : Vec<V>  = vec![ V::from(1.0), V::from(2.0), V::from(3.0) ];
     //
-    let ax           = start_recording_var( x.clone() );
+    let (_, ax)      = start_recording(None,  x.clone() );
     let ay_0         = &ax[0] + &ax[1];
     let ay_1         = &ax[1] + &ax[2];
     let ay           = vec! [ ay_0, ay_1 ];
@@ -45,7 +45,7 @@ fn test_add_vc() {
     //
     let x  : Vec<V>  = vec![ V::from(1.0), V::from(2.0) ];
     //
-    let ax           = start_recording_var( x.clone() );
+    let (_, ax)      = start_recording(None,  x.clone() );
     let ay_0         = &ax[0] + &(V::from(4.0));
     let ay_1         = &ax[1] + &(V::from(5.0));
     let ay           = vec! [ ay_0, ay_1 ];
@@ -74,7 +74,7 @@ fn test_add_cv() {
     //
     let x  : Vec<V>  = vec![ V::from(1.0), V::from(2.0) ];
     //
-    let ax           = start_recording_var( x.clone() );
+    let (_, ax)      = start_recording(None,  x.clone() );
     let ay_0         = &(V::from(4.0)) + &ax[1];
     let ay_1         = &(V::from(5.0)) + &ax[0];
     let ay           = vec! [ ay_0, ay_1 ];

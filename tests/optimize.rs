@@ -8,7 +8,7 @@ Test ADfn::optimize
 // use
 use rustad::{
     AD,
-    start_recording_dyp_var,
+    start_recording,
     stop_recording,
     AzFloat,
     call_atom,
@@ -31,7 +31,7 @@ fn compress_cop() {
     let p    = vec! [W::from(2.0) ];
     let x    = vec![ W::from(3.0) ];
     let four = W::from(4.0);
-    let (ap, ax) = start_recording_dyp_var(p.clone(), x.clone());
+    let (ap, ax) = start_recording( Some(p.clone()), x.clone());
     //
     // ay
     let mut ay : Vec< AD<W> >  = Vec::new();
@@ -79,7 +79,7 @@ fn compress_dyp() {
     // four, p, x, ap, ax
     let p    = vec! [V::from(2.0) ];
     let x    = vec![ V::from(3.0) ];
-    let (ap, ax) = start_recording_dyp_var(p.clone(), x.clone());
+    let (ap, ax) = start_recording( Some(p.clone()), x.clone());
     //
     // ay
     let mut ay : Vec< AD<V> >  = Vec::new();
@@ -129,7 +129,7 @@ fn compress_var() {
     // four, p, x, ap, ax
     let p    = vec! [V::from(2.0) ];
     let x    = vec![ V::from(3.0) ];
-    let (ap, ax) = start_recording_dyp_var(p.clone(), x.clone());
+    let (ap, ax) = start_recording( Some(p.clone()), x.clone());
     //
     // ay
     let mut ay : Vec< AD<V> >  = Vec::new();
@@ -184,7 +184,7 @@ fn find_first_equal_call() {
     // p, x, ap, ax
     let p    = vec![V::from(2.0), V::from(3.0) ];
     let x    = vec![V::from(4.0) ];
-    let (ap, _ax) = start_recording_dyp_var(p.clone(), x.clone());
+    let (ap, _ax) = start_recording( Some(p.clone()), x.clone());
     //
     // aq
     let mut aq  : Vec< AD<V> > = Vec::new();
@@ -248,7 +248,7 @@ fn find_first_equal_binary() {
     // p, x, ap, ax
     let p    = vec![ W::from(2.0) ];
     let x    = vec![ W::from(3.0) ];
-    let (ap, _ax) = start_recording_dyp_var(p.clone(), x.clone());
+    let (ap, _ax) = start_recording( Some(p.clone()), x.clone());
     //
     // aq0, aq1, aq2, aq3
     // Optimizer should detect that aq0 and aq1 are identical.
@@ -299,7 +299,7 @@ fn an_atom_result_not_used() {
     // p, x, ap, ax
     let p    = vec![V::from(1.0), V::from(2.0) ];
     let x    = vec![V::from(3.0), V::from(4.0) ];
-    let (ap, ax) = start_recording_dyp_var(p.clone(), x.clone());
+    let (ap, ax) = start_recording( Some(p.clone()), x.clone());
     //
     // aq
     let mut aq  : Vec< AD<V> > = Vec::new();

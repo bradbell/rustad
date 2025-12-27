@@ -9,7 +9,7 @@ use rustad::{
     AzFloat,
     ADfn,
     NumVec,
-    start_recording_var,
+    start_recording,
     stop_recording,
     ad_from_value,
     ThisThreadTapePublic,
@@ -43,7 +43,7 @@ where
 {   // ax
     let zero_v : V = (0 as f32).into();
     let x          = vec![zero_v.clone() ; N_SUM];
-    let ax         = start_recording_var(x);
+    let (_, ax)    = start_recording(None, x);
     //
     // sumsq
     let mut sumsq  = ad_from_value(zero_v);

@@ -155,7 +155,7 @@ mod tests {
     use crate::{
         AzFloat,
         ad_from_value,
-        start_recording_dyp_var,
+        start_recording,
         stop_recording,
     };
     //
@@ -170,7 +170,7 @@ mod tests {
         let nx         = 1;
         let p : Vec<V> = vec![ V::from(1.0); np ];
         let x : Vec<V> = vec![ V::from(1.0 ); nx ];
-        let (ap, ax)   = start_recording_dyp_var(p.clone(), x.clone());
+        let (ap, ax)   = start_recording( Some(p.clone()), x.clone());
         //
         // asum
         // The first addition adds the constants zero and so is not recorded

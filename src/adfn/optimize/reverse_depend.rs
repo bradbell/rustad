@@ -186,7 +186,7 @@ where
 mod tests {
     use crate::{
         AD,
-        start_recording_dyp_var,
+        start_recording,
         stop_recording,
         AzFloat,
         ad_from_value,
@@ -283,7 +283,7 @@ mod tests {
         let nx   = 2;
         let p    = vec![V::from(1.0); np ];
         let x    = vec![V::from(1.0); nx ];
-        let (ap, ax) = start_recording_dyp_var(p.clone(), x.clone());
+        let (ap, ax) = start_recording( Some(p.clone()), x.clone());
         //
         // aq
         let mut aq  : Vec< AD<V> > = Vec::new();

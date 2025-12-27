@@ -15,7 +15,7 @@ use rustad::{
     AzFloat,
     AD,
     ad_from_value,
-    start_recording_var,
+    start_recording,
     stop_recording,
     register_checkpoint,
     call_checkpoint,
@@ -38,7 +38,7 @@ fn main() {
     //
     // f
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
-    let ax           = start_recording_var(x);
+    let (_, ax)      = start_recording(None, x);
     let mut asumsq : AD<V> = ad_from_value( V::from(0) );
     for j in 0 .. ax.len() {
         let term = &ax[j] * &ax[j];
@@ -57,7 +57,7 @@ fn main() {
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
-    let ax           = start_recording_var(x);
+    let (_, ax)      = start_recording(None, x);
     let ay           = call_checkpoint(ax, checkpoint_id, trace);
     let g            = stop_recording(ay);
     //
@@ -79,7 +79,7 @@ fn main() {
     //
     // g.forward_zero_ad
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
-    let ax           = start_recording_var(x);
+    let (_, ax)      = start_recording(None, x);
     let (ay, _av)    = g.forward_zero_ad(ax, trace);
     let h            = stop_recording(ay);
     let x   : Vec<V> = vec![ V::from(3.0) , V::from(4.0) ];
@@ -90,7 +90,7 @@ fn main() {
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
     let dx  : Vec<V> = vec![ V::from(5.0), V::from(6.0) ];
     let adx          = ad_from_vector(dx.clone());
-    let ax           = start_recording_var(x);
+    let (_, ax)      = start_recording(None, x);
     let (_ay, av)    = g.forward_zero_ad(ax, trace);
     let ady          = g.forward_one_ad(&av , adx, trace);
     let h            = stop_recording(ady);

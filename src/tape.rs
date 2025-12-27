@@ -195,54 +195,27 @@ macro_rules! impl_this_thread_tape{ ($V:ty) => {
 } }
 pub(crate) use impl_this_thread_tape;
 // ----------------------------------------------------------------------------
-// start_recording_var
 //
-/// This starts recording a new `AD<V>` operation sequence with
-/// no dynamic parameters.
-///
-/// * Syntax :
-/// ```text
-///     avar_dom = start_recording_var(var_dom)
-/// ```
-///
-/// * V : see [doc_generic_v]
-///
-/// * Arguments and Return :
-/// This is a wrapper for [start_recording_dyp_var]
-/// that fills in the empty vector for dyp_dom and extracts the
-/// avar_dom return.
-///
-/// * Example : see [stop_recording]
-///
-pub fn start_recording_var<V>(var_dom : Vec<V> ) -> Vec< AD<V> >
-where
-    V : From<f32> + Clone + Sized + 'static + sealed::ThisThreadTape ,
-{
-    let dyp_dom : Vec<V> = Vec::new();
-    let (_adyp_dom, avar_dom) = start_recording_dyp_var(dyp_dom, var_dom);
-    avar_dom
-}
-//
-// start_recording_dyp_var
+// start_recording
 /// This starts recording a new `AD<V>` operation sequence with
 /// dynamic parameters.
 ///
 /// * Syntax :
 /// ```text
-///     (adyp_dom, avar_dom) = start_recording_dyp_var(dyp_dom, var_dom)
+///     (adyp_dom, avar_dom) = start_recording(dyp_dom, var_dom)
 /// ```
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * Recording :
 /// There must not currently be a recording in process on the current thread
-/// when start_recording_dyp_var is called.
+/// when start_recording is called.
 /// The recording is stopped when [stop_recording] is called.
 ///
 /// * dyp_dom :
-/// This vector contains the value of the domain dynamic parameters
+/// If this is None or an empty vector, there must be no dynamic parameters.
+/// Otherwise, vector contains the value of the domain dynamic parameters
 /// used during the recording.
-/// If it is empty, there are no dynamic parameters.
 ///
 /// * var_dom :
 /// This vector contains the value of the domain variables
@@ -262,13 +235,21 @@ where
 ///
 /// * Example : see [stop_recording]
 ///
-pub fn start_recording_dyp_var<V>(
-    dyp_dom : Vec<V>, var_dom : Vec<V>
+pub fn start_recording<V>(
+    dyp_dom : Option< Vec<V> >  ,
+    var_dom : Vec<V>            ,
 ) -> ( Vec< AD<V> >, Vec< AD<V> > )
 where
     V : From<f32> + Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
     assert_ne!( var_dom.len(), 0 );
+    //
+    // dyp_dom
+    let dyp_dom : Vec<V> = if dyp_dom.is_none() {
+        Vec::new()
+    } else {
+        dyp_dom.unwrap()
+    };
     //
     // tape_id
     let tape_id : usize;
@@ -358,20 +339,20 @@ where
 /// * ad_fn :
 /// The return value is an `ADfn<V>` containing the operation sequence
 /// that computed arange as a function of the domain variables and
-/// dynamic parameters specified by [start_recording_dyp_var] .
+/// dynamic parameters specified by [start_recording] .
 /// It can be used to compute the values for the function and its derivatives.
 ///
 /// # Example
 /// ```
-/// use rustad::start_recording_var;
+/// use rustad::start_recording;
 /// use rustad::stop_recording;
-/// type V    = rustad::AzFloat<f64>;
-/// let x     = vec![ V::from(1.0), V::from(2.0) ];
-/// let ax    = start_recording_var(x);
-/// let sum   = &ax[0] + &ax[1];
-/// let diff  = &ax[0] - &ax[1];
-/// let times = &ax[0] * &ax[1];
-/// let ay    = vec![ sum, diff, times ];
+/// type V       = rustad::AzFloat<f64>;
+/// let x        = vec![ V::from(1.0), V::from(2.0) ];
+/// let (_, ax)  = start_recording(None, x);
+/// let sum      = &ax[0] + &ax[1];
+/// let diff     = &ax[0] - &ax[1];
+/// let times    = &ax[0] * &ax[1];
+/// let ay       = vec![ sum, diff, times ];
 /// let ad_fn    = stop_recording(ay);
 /// assert_eq!( ad_fn.var_dom_len(), 2);
 /// assert_eq!( ad_fn.rng_len(), 3);

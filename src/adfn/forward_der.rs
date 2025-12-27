@@ -75,7 +75,7 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// # Example
 /// Computing one partial derivative using forward_der :
 /// ```
-/// use rustad::start_recording_dyp_var;
+/// use rustad::start_recording;
 /// use rustad::stop_recording;
 /// use rustad::AD;
 /// use rustad::ad_from_value;
@@ -87,7 +87,7 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// // f(p, x) = p[0] * p[1] * x[0] * x[1] * x[2]
 /// let p    : Vec<V>   = vec![ V::from(1.0), V::from(1.0) ];
 /// let x    : Vec<V>   = vec![ V::from(1.0), V::from(1.0), V::from(1.0) ];
-/// let (ap, ax )       = start_recording_dyp_var(p, x);
+/// let (ap, ax )       = start_recording( Some(p), x);
 /// let aterm1          = &ap[0] * &ap[1];
 /// let aterm2          = &( &ax[0] * &ax[1] ) * &ax[2];
 /// let aprod           = &aterm1 * &aterm2;

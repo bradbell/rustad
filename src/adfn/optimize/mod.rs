@@ -132,12 +132,12 @@ pub(crate) fn renumber_op_seq(
 ///
 /// # Example
 /// ```
-/// use rustad::start_recording_var;
+/// use rustad::start_recording;
 /// use rustad::stop_recording;
 /// type V      = rustad::AzFloat<f32>;
 /// let  trace  = false;
 /// let  x      = vec![ V::from(2.0), V::from(3.0) ];
-/// let ax      = start_recording_var(x.clone());
+/// let (_, ax) = start_recording(None, x.clone());
 /// let _atimes = &ax[0] * &ax[0]; // second dependent variable (not used)
 /// let asum    = &ax[0] + &ax[0]; // first dependent variable (used)
 /// let ay      = vec![ asum ];

@@ -84,7 +84,7 @@ where
     /// use rustad::AD;
     /// use rustad::AzFloat;
     /// use rustad::ad_from_value;
-    /// use rustad::start_recording_var;
+    /// use rustad::start_recording;
     /// use rustad::stop_recording;
     /// //
     /// // V
@@ -93,7 +93,7 @@ where
     /// // nx, x, ax
     /// let nx = 4;
     /// let x                     = vec![ V::from(2.0); nx];
-    /// let ax                    = start_recording_var(x);
+    /// let (_, ax)               = start_recording(None, x);
     /// //
     /// // ay
     /// let mut ay : Vec< AD<V> > = Vec::new();
