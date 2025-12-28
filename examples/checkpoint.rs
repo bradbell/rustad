@@ -68,7 +68,7 @@ fn main() {
     //
     // g.forward_one_value
     let dx      : Vec<V> = vec![ V::from(5.0), V::from(6.0) ];
-    let dy               = g.forward_one_value(&v , dx.clone(), trace);
+    let dy               = g.forward_der_value(None, &v , dx.clone(), trace);
     assert_eq!( dy[0], V::from(2.0) * ( x[0]*dx[0] + x[1]*dx[1] ) );
     //
     // g.reverse_one_value
@@ -92,7 +92,7 @@ fn main() {
     let adx          = ad_from_vector(dx.clone());
     let (_, ax)      = start_recording(None, x);
     let (_ay, av)    = g.forward_var_ad(None, ax, trace);
-    let ady          = g.forward_one_ad(&av , adx, trace);
+    let ady          = g.forward_der_ad(None, &av , adx, trace);
     let h            = stop_recording(ady);
     let x   : Vec<V> = vec![ V::from(7.0) , V::from(8.0) ];
     let (dy, _v)     = h.forward_var_value(None, x.clone(), trace);

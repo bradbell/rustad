@@ -27,8 +27,8 @@ use crate::{
 ///
 /// * Syntax :
 /// ```text
-///     range_der = f.forward_der_value(&dyp_both, &var_both, dom_der, trace)
-///     range_der = f.forward_der_ad(&dyp_both, &var_both, dom_der, trace)
+///     range_der = f.forward_der_value(dyp_both, &var_both, dom_der, trace)
+///     range_der = f.forward_der_ad(dyp_both, &var_both, dom_der, trace)
 /// ```
 ///
 /// * Prototype :
@@ -39,13 +39,12 @@ use crate::{
 /// * f : is an [ADfn] object.
 ///
 /// * dyp_both :
-/// is both the dynamic parameter sub-vectors in the following order:
+/// If there are no dynamic parameters in f, this should be None
+/// or the empty vector.
+/// Otherwise it is the dynamic parameter sub-vectors in the following order:
 /// the domain dynamic parameters followed by the dependent dynamic parameters.
 /// This is normally computed by
 /// [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
-/// In the special case where there are no dynamic parameters,
-/// *dyp_both* can be set to the empty vector
-/// ( it is not necessary to call `forward_dyp` ).
 ///
 /// * var_both :
 /// is both the variable sub-vectors in the following order:
@@ -86,7 +85,7 @@ use crate::{
 /// // f(p, x) = p[0] * p[1] * x[0] * x[1] * x[2]
 /// let p    : Vec<V>   = vec![ V::from(1.0), V::from(1.0) ];
 /// let x    : Vec<V>   = vec![ V::from(1.0), V::from(1.0), V::from(1.0) ];
-/// let (ap, ax )       = start_recording( Some(p), x);
+/// let (ap, ax )       = start_recording(Some(p), x);
 /// let aterm1          = &ap[0] * &ap[1];
 /// let aterm2          = &( &ax[0] * &ax[1] ) * &ax[2];
 /// let aprod           = &aterm1 * &aterm2;
@@ -100,7 +99,7 @@ use crate::{
 /// let dyp             = f.forward_dyp_value(p, trace);
 /// let (y, var)        = f.forward_var_value(Some(&dyp), x, trace);
 /// let dx     : Vec<V> = vec![ V::from(1.0), V::from(0.0), V::from(0.0) ];
-/// let dy              = f.forward_der_value(&dyp, &var, dx,  trace);
+/// let dy              = f.forward_der_value(Some(&dyp), &var, dx,  trace);
 /// //
 /// // check
 /// // derivative w.r.t x[0] is p[0] * p[1] * x[1] * x[2] * x[3]
@@ -127,12 +126,19 @@ macro_rules! forward_der {
         )]
         pub fn [< forward_der_ $suffix >] (
             &self,
-            dyp_both    : &Vec<$E>     ,
-            var_both    : &Vec<$E>     ,
-            dom_der     : Vec<$E>      ,
-            trace       : bool         ,
+            dyp_both    : Option< &Vec<$E> >  ,
+            var_both    : &Vec<$E>            ,
+            dom_der     : Vec<$E>             ,
+            trace       : bool                ,
         ) -> Vec<$E>
         {
+            // dyp_both
+            let dyp_both : &Vec<$E> = if dyp_both.is_none() {
+                &Vec::new()
+            } else {
+                dyp_both.unwrap()
+            };
+            //
             // n_var
             let n_var = self.var.n_dom + self.var.n_dep;
             //

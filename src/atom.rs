@@ -179,7 +179,7 @@ pub type AtomForwardFunAD<V> = fn(
 ///
 /// * Syntax :
 /// ```text
-///     range_der = forward_der_value(&domain, domain_der, call_info, trace) ?
+///     range_der = forward_der_value(Some(&domain), domain_der, call_info, trace) ?
 /// ```
 ///
 /// * forward_der_value :
@@ -218,7 +218,7 @@ pub type AtomForwardDerValue<V> = fn(
 ///
 /// * Syntax :
 /// ```text
-///     range_der = forward_der_ad(&domain, domain_der, call_info, trace) ?
+///     range_der = forward_der_ad(Some(&domain), domain_der, call_info, trace) ?
 /// ```
 ///
 /// * forward_der_ad :

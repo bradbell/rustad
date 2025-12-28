@@ -70,7 +70,7 @@ fn example_hessian () {
     for j in 0 .. nx {
         let mut dx : Vec<V> = vec![ V::from(0.0); nx ];
         dx[j]               = V::from(1.0);
-        let dy              = g.forward_one_value(&v, dx, trace);
+        let dy              = g.forward_der_value(None, &v, dx, trace);
         for i in 0 .. nx {
             if i == j {
                 let check  = 6 * (j+2);
@@ -146,7 +146,7 @@ fn example_num_vec_hessian () {
     for j in 0 .. nx {
         let mut dx : Vec<V> = vec![ NumVec::from( S::from(0.0) ); nx ];
         dx[j]               = NumVec::from( S::from(1.0) );
-        let dy              = g.forward_one_value(&v, dx, trace);
+        let dy              = g.forward_der_value(None, &v, dx, trace);
         for i in 0 .. nx {
             if i == j {
                 //

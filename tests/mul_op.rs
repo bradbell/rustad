@@ -26,7 +26,7 @@ fn test_mul_vv() {
     assert_eq!( y[1], x[1] * x[2] );
     //
     let dx : Vec<V>  = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
-    let dy           = f.forward_one_value(&v, dx.clone(), trace);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
     assert_eq!( dy[0], dx[0] * x[1] + x[0] * dx[1] );
     assert_eq!( dy[1], dx[1] * x[2] + x[1] * dx[2] );
     //
@@ -56,7 +56,7 @@ fn test_mul_vc() {
     assert_eq!( y[1], x[1] * (V::from(5.0)) );
     //
     let dx : Vec<V>  = vec![ V::from(4.0), V::from(5.0) ];
-    let dy           = f.forward_one_value(&v, dx.clone(), trace);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
     assert_eq!( dy[0], dx[0] * (V::from(4.0)) );
     assert_eq!( dy[1], dx[1] * (V::from(5.0) ) );
     //
@@ -85,7 +85,7 @@ fn test_mul_cv() {
     assert_eq!( y[1], (V::from(5.0)) * x[0] );
     //
     let dx : Vec<V>  = vec![ V::from(4.0), V::from(5.0) ];
-    let dy           = f.forward_one_value(&v, dx.clone(), trace);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
     assert_eq!( dy[0], (V::from(4.0)) * dx[1] );
     assert_eq!( dy[1], (V::from(5.0)) * dx[0] );
     //

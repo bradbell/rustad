@@ -299,7 +299,7 @@ where
             let ax            = ax_dx[0 .. nx].to_vec();
             let adx           = ax_dx[nx .. 2*nx].to_vec();
             let (_ay, av)     = ad_fn.forward_var_ad(None, ax, trace);
-            let ady           = ad_fn.forward_one_ad(&av, adx, trace);
+            let ady           = ad_fn.forward_der_ad(None, &av, adx, trace);
             let ad_fn_for     = stop_recording(ady);
             let checkpoint_id = register_checkpoint(
                 ad_fn_for, directions_tail, hash_map
@@ -454,8 +454,8 @@ where
     //
     // range_der
     let (_, var_both)     = ad_fn.forward_var_value(None, domain_clone, trace);
-    let range_der         = ad_fn.forward_one_value(
-        &var_both, domain_der_clone, trace
+    let range_der         = ad_fn.forward_der_value(
+        None, &var_both, domain_der_clone, trace
     );
     Ok( range_der )
 }
