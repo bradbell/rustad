@@ -6,7 +6,7 @@ This atomic example uses all the possible AtomCallback function.
 The sumsq_forward_der_ad and reverse_forward_der_ad callbacks each
 require defining another atomic function to evaluate their derivatives.
 
-sumsq_forward_fun; see forward_zero.rs
+sumsq_forward_fun; see forward_var.rs
 z = g(x) = x[0] * x[0] + x[1] * x[1] + ...
 
 sumsq_forward_der: see forward_one.rs

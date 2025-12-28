@@ -86,8 +86,8 @@ fn record_normsq_num_vec()
     } );
 }
 //
-// forward_zero_normsq_scalar
-fn forward_zero_normsq_scalar()
+// forward_var_normsq_scalar
+fn forward_var_normsq_scalar()
 {   let zero   = ScalarV::from(0.0);
     let mut x  = vec![zero; N_SUM];
     for j in 0 .. N_SUM {
@@ -104,8 +104,8 @@ fn forward_zero_normsq_scalar()
     );
 }
 //
-// forward_zero_normsq_num_vec
-fn forward_zero_normsq_num_vec()
+// forward_var_normsq_num_vec
+fn forward_var_normsq_num_vec()
 {   let zero     = NumVecV::from(0.0);
     let mut x    = vec![zero; N_SUM];
     for j in 0 .. N_SUM {
@@ -136,6 +136,6 @@ fn bench( name : &str, test_case : fn() ) {
 fn main() {
     bench( "record_normsq_scalar" ,       record_normsq_scalar );
     bench( "record_normsq_num_vec" ,      record_normsq_num_vec );
-    bench( "forward_zero_normsq_scalar" , forward_zero_normsq_scalar );
-    bench( "forward_zero_normsq_num_vec" , forward_zero_normsq_num_vec );
+    bench( "forward_var_normsq_scalar" ,  forward_var_normsq_scalar );
+    bench( "forward_var_normsq_num_vec" , forward_var_normsq_num_vec );
 }

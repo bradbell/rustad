@@ -20,7 +20,6 @@ use crate::{
     doc_generic_e,
 };
 #[cfg(doc)]
-use crate::adfn::forward_zero::doc_forward_zero;
 // -----------------------------------------------------------------------
 // reverse_der
 /// First order reverse mode evaluation with dynamic parameters.

@@ -12,7 +12,6 @@
 pub mod forward_dyp;
 //
 pub mod forward_var;
-pub mod forward_zero;
 //
 pub mod forward_der;
 pub mod forward_one;
