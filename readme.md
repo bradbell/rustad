@@ -45,7 +45,8 @@ This package is intended to include (and extend) most of the features in
     (that can be differentiated). 
     This is called AD evaluation of the derivatives.
 
-6.  Atomic functions and Checkpointing. Atomic function have been extended
+6.  Atomic functions and Checkpointing. These have been extended
+    (from the CppAD implementations)
     so that they stay atomic when used in functions that are AD evaluated.
 
 7.  Generate compile and link source code for derivative calculations.
@@ -70,8 +71,6 @@ This package is intended to include (and extend) most of the features in
     
 3.  Forward and reverse sparse derivative calculations
     (sparsity patterns are already implemented). 
-
-4.  Checkpointing with arbitrary order of differentiation.
 
 ## Wish List
 
