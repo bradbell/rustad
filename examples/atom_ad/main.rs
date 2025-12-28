@@ -9,10 +9,10 @@ require defining another atomic function to evaluate their derivatives.
 sumsq_forward_fun; see forward_var.rs
 z = g(x) = x[0] * x[0] + x[1] * x[1] + ...
 
-sumsq_forward_der: see forward_one.rs
+sumsq_forward_der: see forward_der.rs
 dz = g'(x) * dx = 2 * ( x[0] * dx[0] + x[1] * dx[1] + ... )
 
-sumsq_reverse_der; see reverse_one.rs
+sumsq_reverse_der; see reverse_der.rs
 dx^T = dz * g'(x) = 2 * dz * ( x[0], x[1], ... )
 
 for_sumsq_forward_fun; see for_atom.rs

@@ -61,23 +61,23 @@ fn main() {
     let ay           = call_checkpoint(ax, checkpoint_id, trace);
     let g            = stop_recording(ay);
     //
-    // g.forward_zero_value
+    // g.forward_var_value
     let x       : Vec<V> = vec![ V::from(3.0) , V::from(4.0) ];
     let (y, v)           = g.forward_var_value(None, x.clone(), trace);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
     //
-    // g.forward_one_value
+    // g.forward_der_value
     let dx      : Vec<V> = vec![ V::from(5.0), V::from(6.0) ];
     let dy               = g.forward_der_value(None, &v , dx.clone(), trace);
     assert_eq!( dy[0], V::from(2.0) * ( x[0]*dx[0] + x[1]*dx[1] ) );
     //
-    // g.reverse_one_value
+    // g.reverse_der_value
     let dy      : Vec<V> = vec![ V::from(5.0) ];
     let dx               = g.reverse_der_value(None, &v , dy.clone(), trace);
     assert_eq!( dx[0], V::from(2.0) * x[0]*dy[0] );
     assert_eq!( dx[1], V::from(2.0) * x[1]*dy[0] );
     //
-    // g.forward_zero_ad
+    // g.forward_var_ad
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
     let (_, ax)      = start_recording(None, x);
     let (ay, _av)    = g.forward_var_ad(None, ax, trace);
@@ -86,7 +86,7 @@ fn main() {
     let (y, _v)      = h.forward_var_value(None, x.clone(), trace);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
     //
-    // g.forward_one_value
+    // g.forward_der_value
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
     let dx  : Vec<V> = vec![ V::from(5.0), V::from(6.0) ];
     let adx          = ad_from_vector(dx.clone());
