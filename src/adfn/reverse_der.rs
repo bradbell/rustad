@@ -26,8 +26,8 @@ use crate::{
 ///
 /// * Syntax :
 /// ```text
-///     dom_der = f.reverse_der_value(&dyp_both, &var_both, range_der, trace)
-///     dom_der = f.reverse_der_ad(&dyp_both, &var_both, range_der, trace)
+///     dom_der = f.reverse_der_value(dyp_both, &var_both, range_der, trace)
+///     dom_der = f.reverse_der_ad(dyp_both, &var_both, range_der, trace)
 /// ```
 ///
 /// * Prototype :
@@ -38,13 +38,12 @@ use crate::{
 /// * f : is an [ADfn] object.
 ///
 /// * dyp_both :
-/// is both the dynamic parameter sub-vectors in the following order:
+/// If there are no dynamic parameters in f, this should be None
+/// or the empty vector.
+/// Otherwise it is the dynamic parameter sub-vectors in the following order:
 /// the domain dynamic parameters followed by the dependent dynamic parameters.
 /// This is normally computed by
 /// [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
-/// In the special case where there are no dynamic parameters,
-/// *dyp_both* can be set to the empty vector
-/// ( it is not necessary to call `forward_dyp` ).
 ///
 /// * var_both :
 /// is both the variable sub-vectors in the following order:
@@ -99,7 +98,7 @@ use crate::{
 /// let dyp        = f.forward_dyp_value(p.clone(), trace);
 /// let (y, var)   = f.forward_var_value(Some(&dyp), x.clone(), trace);
 /// let dy         = vec![ V::from(1.0) ];
-/// let dx         = f.reverse_der_value(&dyp, &var, dy,  trace);
+/// let dx         = f.reverse_der_value(Some(&dyp), &var, dy,  trace);
 /// //
 /// assert_eq!( dx[0] , p[0] * p[1] * x[1] * x[2] );
 /// assert_eq!( dx[1] , p[0] * p[1] * x[0] * x[2] );
@@ -128,12 +127,19 @@ macro_rules! reverse_der {
         )]
         pub fn [< reverse_der_ $suffix >] (
             &self,
-            dyp_both    : &Vec<$E>  ,
-            var_both    : &Vec<$E>  ,
-            range_der   : Vec<$E>   ,
-            trace       : bool      ,
+            dyp_both    : Option< &Vec<$E> >  ,
+            var_both    : &Vec<$E>            ,
+            range_der   : Vec<$E>             ,
+            trace       : bool                ,
         ) -> Vec<$E>
         {
+            // dyp_both
+            let dyp_both : &Vec<$E> = if dyp_both.is_none() {
+                &Vec::new()
+            } else {
+                dyp_both.unwrap()
+            };
+            //
             // n_var
             let n_var = self.var.n_dom + self.var.n_dep;
             //

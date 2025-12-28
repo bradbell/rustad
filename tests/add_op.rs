@@ -31,7 +31,7 @@ fn test_add_vv() {
     assert_eq!( dy[1], dx[1] + dx[2] );
     //
     let dy : Vec<V>  = vec![ V::from(7.0), V::from(8.0) ];
-    let dx           = f.reverse_one_value(&v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
     //
     assert_eq!( dx[0], dy[0] );
     assert_eq!( dx[1], dy[0] + dy[1] );
@@ -61,7 +61,7 @@ fn test_add_vc() {
     assert_eq!( dy[1], dx[1] );
     //
     let dy : Vec<V>  = vec![ V::from(7.0), V::from(8.0) ];
-    let dx           = f.reverse_one_value(&v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
     //
     assert_eq!( dx[0], dy[0] );
     assert_eq!( dx[1], dy[1] );
@@ -90,7 +90,7 @@ fn test_add_cv() {
     assert_eq!( dy[1], dx[0] );
     //
     let dy : Vec<V>  = vec![ V::from(7.0), V::from(8.0) ];
-    let dx           = f.reverse_one_value(&v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
     //
     assert_eq!( dx[0], dy[1] );
     assert_eq!( dx[1], dy[0] );

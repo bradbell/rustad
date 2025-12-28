@@ -48,7 +48,7 @@ fn example_hessian () {
     // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
     let dy  : Vec<V>  = vec![ V::from(1.0) ];
     let ady           = ad_from_vector(dy);
-    let adx           = f.reverse_one_ad(&av, ady, trace);
+    let adx           = f.reverse_der_ad(None, &av, ady, trace);
     let g             = stop_recording(adx);
     //
     // x
@@ -120,7 +120,7 @@ fn example_num_vec_hessian () {
     // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
     let dy  : Vec<V>  = vec![ NumVec::from( S::from(1.0) ) ];
     let ady           = ad_from_vector(dy);
-    let adx           = f.reverse_one_ad(&av, ady, trace);
+    let adx           = f.reverse_der_ad(None, &av, ady, trace);
     let g             = stop_recording(adx);
     //
     // x

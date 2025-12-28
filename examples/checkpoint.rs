@@ -73,7 +73,7 @@ fn main() {
     //
     // g.reverse_one_value
     let dy      : Vec<V> = vec![ V::from(5.0) ];
-    let dx               = g.reverse_one_value(&v , dy.clone(), trace);
+    let dx               = g.reverse_der_value(None, &v , dy.clone(), trace);
     assert_eq!( dx[0], V::from(2.0) * x[0]*dy[0] );
     assert_eq!( dx[1], V::from(2.0) * x[1]*dy[0] );
     //

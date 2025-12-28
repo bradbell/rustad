@@ -315,7 +315,7 @@ where
             let ax            = ax_dy[0 .. nx].to_vec();
             let ady           = ax_dy[nx .. nx + ny].to_vec();
             let (_ay, av)     = ad_fn.forward_var_ad(None, ax, trace);
-            let adx           = ad_fn.reverse_one_ad(&av, ady, trace);
+            let adx           = ad_fn.reverse_der_ad(None, &av, ady, trace);
             let ad_fn_rev     = stop_recording(adx);
             let checkpoint_id = register_checkpoint(
                 ad_fn_rev, directions_tail, hash_map
@@ -488,8 +488,8 @@ where
     //
     // domain_der
     let (_, var_both)     = ad_fn.forward_var_value(None, domain_clone, trace);
-    let domain_der        = ad_fn.reverse_one_value(
-        &var_both, range_der_clone, trace
+    let domain_der        = ad_fn.reverse_der_value(
+        None, &var_both, range_der_clone, trace
     );
     Ok( domain_der )
 }
