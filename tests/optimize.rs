@@ -56,7 +56,7 @@ fn compress_cop() {
     //
     // y
     let p_both       = f.forward_dyp_value(p.clone(), trace);
-    let (y, _y_both) = f.forward_var_value(&p_both, x.clone(), trace);
+    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), trace);
     //
     // check
     let check = &p[0] + &four;
@@ -106,7 +106,7 @@ fn compress_dyp() {
     //
     // y
     let p_both       = f.forward_dyp_value(p.clone(), trace);
-    let (y, _y_both) = f.forward_var_value(&p_both, x.clone(), trace);
+    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), trace);
     //
     // check
     let check = &p[0] + &p[0];
@@ -158,7 +158,7 @@ fn compress_var() {
     //
     // y
     let p_both       = f.forward_dyp_value(p.clone(), trace);
-    let (y, _y_both) = f.forward_var_value(&p_both, x.clone(), trace);
+    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), trace);
     //
     // check
     let check = &p[0] + &x[0];
@@ -217,7 +217,7 @@ fn find_first_equal_call() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), trace);
-    let (y, _y) = f.forward_var_value(&p_, x.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
     let u_0     = &p[0] + &p[0];
     let u_1     = &p[1] * &p[1];
     assert_eq!(y[0], &u_0 + &u_0);
@@ -230,7 +230,7 @@ fn find_first_equal_call() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), trace);
-    let (y, _y) = f.forward_var_value(&p_, x.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
     let u_0     = &p[0] + &p[0];
     let u_1     = &p[1] * &p[1];
     assert_eq!(y[0], &u_0 + &u_0);
@@ -264,7 +264,7 @@ fn find_first_equal_binary() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), trace);
-    let (y, _y) = f.forward_var_value(&p_, x.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
     assert_eq!( y[0], &p[0] + &p[0] );
     assert_eq!( y[1], &p[0] + &p[0] );
     assert_eq!( y[2], &p[0] * &( &p[0] + &p[0] ) ) ;
@@ -277,7 +277,7 @@ fn find_first_equal_binary() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), trace);
-    let (y, _y) = f.forward_var_value(&p_, x.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
     assert_eq!( y[0], &p[0] + &p[0] );
     assert_eq!( y[1], &p[0] + &p[0] );
     assert_eq!( y[2], &p[0] * &( &p[0] + &p[0] ) ) ;
@@ -330,7 +330,7 @@ fn an_atom_result_not_used() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), trace);
-    let (u, _u) = f.forward_var_value(&p_, x.clone(), trace);
+    let (u, _u) = f.forward_var_value(Some(&p_), x.clone(), trace);
     assert_eq!(u[0], &p[1] * &p[1] );
     //
     // n_dyp_dep, n_var_dep
@@ -350,7 +350,7 @@ fn an_atom_result_not_used() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), trace);
-    let (u, _u) = f.forward_var_value(&p_, x.clone(), trace);
+    let (u, _u) = f.forward_var_value(Some(&p_), x.clone(), trace);
     assert_eq!(u[0], &p[1] * &p[1] );
 }
 //

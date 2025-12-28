@@ -98,7 +98,7 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// let p          = vec![ V::from(2.0), V::from(3.0) ];
 /// let x          = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
 /// let dyp        = f.forward_dyp_value(p.clone(), trace);
-/// let (y, var)   = f.forward_var_value(&dyp, x.clone(), trace);
+/// let (y, var)   = f.forward_var_value(Some(&dyp), x.clone(), trace);
 /// let dy         = vec![ V::from(1.0) ];
 /// let dx         = f.reverse_der_value(&dyp, &var, dy,  trace);
 /// //

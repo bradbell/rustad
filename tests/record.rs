@@ -27,7 +27,7 @@ fn test_left_zero_one_both_ad() {
     let ay  = vec![ a4 ];
     let f   = stop_recording(ay);
     //
-    let (y, _)       = f.forward_zero_value(x.clone(), trace);
+    let (y, _)       = f.forward_var_value(None, x.clone(), trace);
     //
     // f.var_dep_len()
     // Not necessary to create any dependent variables.
@@ -53,7 +53,7 @@ fn test_left_zero_one_right_ad() {
     let ay  = vec![ a6 ];
     let f   = stop_recording(ay);
     //
-    let (y, _)       = f.forward_zero_value(x.clone(), trace);
+    let (y, _)       = f.forward_var_value(None, x.clone(), trace);
     //
     // f.var_dep_len()
     // Not necessary to create any dependent variables.
@@ -78,7 +78,7 @@ fn test_right_zero_one_both_ad() {
     let ay  = vec![ a5 ];
     let f   = stop_recording(ay);
     //
-    let (y, _)       = f.forward_zero_value(x.clone(), trace);
+    let (y, _)       = f.forward_var_value(None, x.clone(), trace);
     //
     // f.var_dep_len()
     // Not necessary to create any dependent variables.
@@ -103,7 +103,7 @@ fn test_right_zero_one_left_ad() {
     let ay  = vec![ a5 ];
     let f   = stop_recording(ay);
     //
-    let (y, _)       = f.forward_zero_value(x.clone(), trace);
+    let (y, _)       = f.forward_var_value(None, x.clone(), trace);
     //
     // f.var_dep_len()
     // Not necessary to create any dependent variables.

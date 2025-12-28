@@ -21,7 +21,7 @@ fn test_mul_vv() {
     let ay           = vec! [ ay_0, ay_1 ];
     let f            = stop_recording(ay);
     //
-    let (y, v)       = f.forward_zero_value(x.clone(), trace);
+    let (y, v)       = f.forward_var_value(None, x.clone(), trace);
     assert_eq!( y[0], x[0] * x[1] );
     assert_eq!( y[1], x[1] * x[2] );
     //
@@ -51,7 +51,7 @@ fn test_mul_vc() {
     let ay           = vec! [ ay_0, ay_1 ];
     let f            = stop_recording(ay);
     //
-    let (y, v)       = f.forward_zero_value(x.clone(), trace);
+    let (y, v)       = f.forward_var_value(None, x.clone(), trace);
     assert_eq!( y[0], x[0] * (V::from(4.0)) );
     assert_eq!( y[1], x[1] * (V::from(5.0)) );
     //
@@ -80,7 +80,7 @@ fn test_mul_cv() {
     let ay           = vec! [ ay_0, ay_1 ];
     let f            = stop_recording(ay);
     //
-    let (y, v)       = f.forward_zero_value(x.clone(), trace);
+    let (y, v)       = f.forward_var_value(None, x.clone(), trace);
     assert_eq!( y[0], (V::from(4.0)) * x[1] );
     assert_eq!( y[1], (V::from(5.0)) * x[0] );
     //

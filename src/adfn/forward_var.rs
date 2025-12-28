@@ -30,8 +30,8 @@ use crate::{
 ///
 /// * Syntax :
 /// ```text
-///     (range, var_both) = f.forward_var_value(&dyp_both, var_dom, trace)
-///     (range, var_both)  = f.forward_var_ad(&dyp_both, var_dom, trace)
+///     (range, var_both) = f.forward_var_value(dyp_both, var_dom, trace)
+///     (range, var_both)  = f.forward_var_ad(dyp_both, var_dom, trace)
 /// ```
 /// * Prototype :
 /// see [ADfn::forward_var_value] and [ADfn::forward_var_ad]
@@ -41,13 +41,12 @@ use crate::{
 /// * f : is an [ADfn] object.
 ///
 /// * dyp_both :
-/// is both the dynamic parameter sub-vectors in the following order:
+/// If there are no dynamic parameters in f, this should be None
+/// or the empty vector.
+/// Otherwise it is the dynamic parameter sub-vectors in the following order:
 /// the domain dynamic parameters followed by the dependent dynamic parameters.
 /// This is normally computed by
 /// [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
-/// In the special case where there are no dynamic parameters,
-/// *dyp_both* can be set to the empty vector
-/// ( it is not necessary to call `forward_dyp` ).
 ///
 /// * var_dom :
 /// This the the domain variable values.
@@ -112,7 +111,7 @@ use crate::{
 /// //
 /// // y = f(p, x)
 /// let dyp_both      = f.forward_dyp_value(p.clone(), trace);
-/// let (y, var_both) = f.forward_var_value(&dyp_both, x.clone(), trace);
+/// let (y, var_both) = f.forward_var_value( Some(&dyp_both), x.clone(), trace);
 /// //
 /// // check
 /// let p_sum = ( np * (np + 1) ) / 2;
@@ -123,7 +122,7 @@ use crate::{
 ///
 pub fn doc_forward_var() { }
 //
-/// Create the zero order forward mode member functions with dynamic parameters.
+/// Evaluate the zero order forward mode member functions.
 ///
 /// * suffix : is either `value` or `ad` ;
 ///
@@ -142,15 +141,22 @@ macro_rules! forward_var {
         )]
         pub fn [< forward_var_ $suffix >] (
             &self,
-            dyp_both    : &Vec<$E>     ,
-            var_dom     : Vec<$E>      ,
-            trace       : bool         ,
+            dyp_both    : Option< &Vec<$E> > ,
+            var_dom     : Vec<$E>            ,
+            trace       : bool               ,
         ) -> ( Vec<$E> , Vec<$E> )
         {
             assert_eq!(
                 var_dom.len(), self.var.n_dom,
                 "f.forward_var: var_dom vector length does not match f"
             );
+            //
+            // dyp_both
+            let dyp_both : &Vec<$E> = if dyp_both.is_none() {
+                &Vec::new()
+            } else {
+                dyp_both.unwrap()
+            };
             //
             // op_info_vec
             let op_info_vec = &*GlobalOpInfoVec::get();

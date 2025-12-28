@@ -298,7 +298,7 @@ where
             let (_, ax_dx)    = start_recording(None, x_dx);
             let ax            = ax_dx[0 .. nx].to_vec();
             let adx           = ax_dx[nx .. 2*nx].to_vec();
-            let (_ay, av)     = ad_fn.forward_zero_ad(ax, trace);
+            let (_ay, av)     = ad_fn.forward_var_ad(None, ax, trace);
             let ady           = ad_fn.forward_one_ad(&av, adx, trace);
             let ad_fn_for     = stop_recording(ady);
             let checkpoint_id = register_checkpoint(
@@ -314,7 +314,7 @@ where
             let (_, ax_dy)    = start_recording(None, x_dy);
             let ax            = ax_dy[0 .. nx].to_vec();
             let ady           = ax_dy[nx .. nx + ny].to_vec();
-            let (_ay, av)     = ad_fn.forward_zero_ad(ax, trace);
+            let (_ay, av)     = ad_fn.forward_var_ad(None, ax, trace);
             let adx           = ad_fn.reverse_one_ad(&av, ady, trace);
             let ad_fn_rev     = stop_recording(adx);
             let checkpoint_id = register_checkpoint(
@@ -419,7 +419,7 @@ where
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // range
-    let (range, _)        = ad_fn.forward_zero_value( domain_clone, trace );
+    let (range, _)        = ad_fn.forward_var_value(None, domain_clone, trace );
     Ok( range )
 }
 //
@@ -453,7 +453,7 @@ where
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // range_der
-    let (_, var_both)     = ad_fn.forward_zero_value(domain_clone, trace);
+    let (_, var_both)     = ad_fn.forward_var_value(None, domain_clone, trace);
     let range_der         = ad_fn.forward_one_value(
         &var_both, domain_der_clone, trace
     );
@@ -487,7 +487,7 @@ where
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // domain_der
-    let (_, var_both)     = ad_fn.forward_zero_value(domain_clone, trace);
+    let (_, var_both)     = ad_fn.forward_var_value(None, domain_clone, trace);
     let domain_der        = ad_fn.reverse_one_value(
         &var_both, range_der_clone, trace
     );

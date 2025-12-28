@@ -310,7 +310,7 @@ mod tests {
         let f  = stop_recording(aw);
         //
         let p_both      = f.forward_dyp_value(p, trace);
-        f.forward_var_value(&p_both, x, trace);
+        f.forward_var_value(Some(&p_both), x, trace);
         //
         // depend
         let depend = f.reverse_depend(trace);

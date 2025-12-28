@@ -95,7 +95,7 @@ fn forward_zero_normsq_scalar()
     }
     let trace                  = false;
     let sumsq = NORMSQ_F64.with_borrow_mut( |f_static| {
-        let (y, _) = f_static.forward_zero_value(x, trace);
+        let (y, _) = f_static.forward_var_value(None, x, trace);
         y[0]
     } );
     assert_eq!(
@@ -113,7 +113,7 @@ fn forward_zero_normsq_num_vec()
     }
     let trace                             = false;
     let sumsq = NORMSQ_NUMVEC_F64.with_borrow_mut( |f_static| {
-        let (y, _) = f_static.forward_zero_value(x, trace);
+        let (y, _) = f_static.forward_var_value(None, x, trace);
         let mut y_itr = y.into_iter();
         y_itr.next().unwrap()
     } );

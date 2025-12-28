@@ -154,7 +154,7 @@ pub(crate) fn renumber_op_seq(
 /// assert_eq!( f.var_dep_len(), 1 );
 /// //
 /// // check
-/// let (y, _v) = f.forward_zero_value(x.clone(), trace);
+/// let (y, _v) = f.forward_var_value(None, x.clone(), trace);
 /// assert_eq!( y[0], &x[0] + &x[0] );
 /// ```
 impl<V> ADfn<V>

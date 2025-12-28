@@ -42,7 +42,7 @@ fn main () {
     // av
     let x  : Vec<V> = vec![ V::from(2.0); nx ];
     let (_, ax) = start_recording(None, x);
-    let (_, av) = f.forward_zero_ad(ax, trace);
+    let (_, av) = f.forward_var_ad(None, ax, trace);
     //
     // g
     // g(x) = df/dx = [ 2 * x[0], ..., 2 * x[nx-1] ]

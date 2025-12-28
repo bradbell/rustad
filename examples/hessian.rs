@@ -42,7 +42,7 @@ fn example_hessian () {
     //
     // av
     let (_, ax)  = start_recording(None, x);
-    let (_, av)  = f.forward_zero_ad(ax, trace);
+    let (_, av)  = f.forward_var_ad(None, ax, trace);
     //
     // g
     // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
@@ -59,7 +59,7 @@ fn example_hessian () {
     }
     //
     // v, y
-    let (y, v) = g.forward_zero_value(x, trace);
+    let (y, v) = g.forward_var_value(None, x, trace);
     for j in 0 .. nx {
         let check  = 3 * (j+2) * (j+2);
         assert_eq!( y[j], V::from(check) );
@@ -114,7 +114,7 @@ fn example_num_vec_hessian () {
     //
     // av
     let (_, ax) = start_recording(None, x);
-    let (_, av) = f.forward_zero_ad(ax, trace);
+    let (_, av) = f.forward_var_ad(None, ax, trace);
     //
     // g
     // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
@@ -131,7 +131,7 @@ fn example_num_vec_hessian () {
     }
     //
     // y, v
-    let (y, v)  = g.forward_zero_value(x, trace);
+    let (y, v)  = g.forward_var_value(None, x, trace);
     for j in 0 .. nx {
         //
         let check  = 3 * (j+1) * (j+1);

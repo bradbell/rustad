@@ -71,7 +71,7 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// // y[0] = f(x)
 /// let trace    = false;
 /// let x0       = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
-/// let (_, v0)  = f.forward_zero_value(x0, trace);
+/// let (_, v0)  = f.forward_var_value(None, x0, trace);
 /// let y1       = vec![ V::from(1.0) ];
 /// let x1       = f.reverse_one_value(&v0, y1, trace);
 /// //

@@ -69,7 +69,7 @@ use crate::adfn::forward_zero::doc_forward_zero;
 /// // y1[0] = partial f(x) w.r.t. x[0] at x0
 /// let trace    = false;
 /// let x0       = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
-/// let (_, v0)  = f.forward_zero_value(x0, trace);
+/// let (_, v0)  = f.forward_var_value(None, x0, trace);
 /// let x1       = vec![ V::from(1.0), V::from(0.0), V::from(0.0) ];
 /// let y1       = f.forward_one_value(&v0, x1,  trace);
 /// //

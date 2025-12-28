@@ -206,7 +206,7 @@ fn atom_dyp_src() {
     let p   : Vec<V> = vec![ V::from(2.0), V::from(3.0) ];
     let x   : Vec<V> = vec![ V::from(4.0) ];
     let q            = f.forward_dyp_value(p.clone(), trace);
-    let (y, _v)      = f.forward_var_value(&q, x.clone(), trace);
+    let (y, _v)      = f.forward_var_value(Some(&q), x.clone(), trace);
     //
     // check h_forward_fun_value
     assert_eq!( y.len(), 3 );
@@ -219,13 +219,13 @@ fn atom_dyp_src() {
     let x   : Vec<V> = vec![ V::from(1.0); 1];
     let (ap, ax)     = start_recording( Some(p.clone()), x.clone());
     let aq           = f.forward_dyp_ad(ap, trace);
-    let (ay, _av)    = f.forward_var_ad(&aq, ax, trace);
+    let (ay, _av)    = f.forward_var_ad(Some(&aq), ax, trace);
     let g            = stop_recording(ay);
     //
     let p   : Vec<V> = vec![ V::from(2.0), V::from(3.0) ];
     let x   : Vec<V> = vec![ V::from(4.0) ];
     let q            = g.forward_dyp_value(p.clone(), trace);
-    let (y, _v)      = g.forward_var_value(&q, x.clone(), trace);
+    let (y, _v)      = g.forward_var_value(Some(&q), x.clone(), trace);
     //
     // check h_forward_fun_ad
     assert_eq!( y.len(), 3 );

@@ -110,7 +110,7 @@ macro_rules! forward_zero {
             // range, var_both
             let (range, var_both) =
                 self. [< forward_var_ $suffix >]  (
-                    &dyp_both, var_dom, trace
+                    Some(&dyp_both), var_dom, trace
             );
             (range, var_both)
         }
