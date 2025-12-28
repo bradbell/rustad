@@ -215,10 +215,12 @@ where
 // register_checkpoint
 /// Convert a function object to a chekpoint function.
 ///
-/// A checkpoint function call [call_checkpoint]
-/// supports AD evlation of [ADfn] function values
-/// and value evaluation of derivatives.
-/// See direction below for restrictions on AD evlation of derivatives.
+/// A checkpoint function call [call_checkpoint] only puts a call operator
+/// in the current tape (instead of all the operations in ad_fn).
+/// If a function is used many times, this can greatly reduce
+/// the size of the operation sequence.
+///
+/// * See Also : [register_atom]
 ///
 /// * Syntax :
 /// ```text
@@ -243,9 +245,15 @@ where
 ///     of the new [ADfn] objects use for AD derivative evaluation is traced.
 ///
 /// * directions :
-/// If directions\[k\] is Forward (Reverse), then k-th order forward
-/// (reverse) AD derivatives can be computed starting with an [ADfn]
-/// object that uses this checkpoint function.
+/// If directions\[k\] is Forward (Reverse), then (k+1)-th order forward
+/// (reverse) AD derivatives of this checkpoint function can be computed.
+/// This requires creating new ADfn objects for each element of directions.
+/// To be more specific, if direction\[k\] is Forward (Reverse)
+/// the (k+1)-th order derivative is computer using
+/// the ADfn that is the forward (reverse) derivative of
+/// the k-th order derivative.
+/// (The zero order derivative corresponds to ad_fn.)
+///
 ///
 /// ## checkpoint_id :
 /// is the index that is used to identify this checkpoint function.

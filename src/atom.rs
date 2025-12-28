@@ -405,6 +405,14 @@ pub(crate) use impl_global_atom_callback_vec;
 // register_atom
 /// Register an atomic function.
 ///
+/// An atomic function call [call_atom] only puts a call operator
+/// in the current tape (instead of all the operations in the
+/// atomic function).
+/// If a function is used many times, this can greatly reduce
+/// the size of the operation sequence.
+///
+/// * See Also : [register_checkpoint](crate::checkpoint::register_checkpoint)
+///
 /// * Syntax :
 /// ```text
 ///     atom_id = register_atom(callback)
