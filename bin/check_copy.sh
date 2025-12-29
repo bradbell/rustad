@@ -71,16 +71,19 @@ missing='no'
 changed='no'
 for file_name in $(git ls-files | $sed -f temp.sed)
 do
-   if ! $grep "$spdx_license_id\$" $file_name > /dev/null
+   if [ -e $file_name ]
    then
-      if [ "$missing" == 'no' ]
+      if ! $grep "$spdx_license_id\$" $file_name > /dev/null
       then
-         echo "Cannot find line that ends with:"
-         echo "   $spdx_license_id"
-         echo "In the following files:"
+         if [ "$missing" == 'no' ]
+         then
+            echo "Cannot find line that ends with:"
+            echo "   $spdx_license_id"
+            echo "In the following files:"
+         fi
+         echo "$file_name"
+         missing='yes'
       fi
-      echo "$file_name"
-      missing='yes'
    fi
 done
 if [ "$missing" == 'yes' ]
