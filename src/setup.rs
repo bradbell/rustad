@@ -37,7 +37,7 @@ use crate::{
 /// ```
 macro_rules! setup_this_value_type{ ($V:ty) => {
         crate::tape::impl_this_thread_tape!($V);
-        crate::ad::impl_value_op_ad!($V);
+        crate::ad::binary::impl_value_op_ad!($V);
         crate::ad::impl_ad_from_f32!($V);
         crate::atom::impl_global_atom_callback_vec!($V);
         crate::checkpoint::impl_global_checkpoint_info!($V);
