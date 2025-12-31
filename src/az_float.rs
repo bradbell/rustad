@@ -95,7 +95,7 @@ pub trait CompareAsNumber {
 /// assert_eq!( prod, zero );
 /// assert_eq!( nan , nan );
 ///
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialOrd)]
 pub struct AzFloat<B>(pub B);
 //
 impl<B> AzFloat<B>

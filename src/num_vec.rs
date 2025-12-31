@@ -241,7 +241,6 @@ num_vec_compound_op!(DivAssign, /=);
 /// CompareAsNumber trait for `NumVec<S>`
 ///
 /// * S : is the type of the elements of the numeric vector.
-///     This type must be `AzFloat<B>` .
 ///
 /// * Syntax : &lhs.compare(&rhs)
 ///
@@ -276,41 +275,45 @@ pub fn doc_compare_num_vec() {}
 macro_rules! impl_compare_num_vec{ ($name:ident, $op:tt) => {
     #[doc = concat!( "compare trait for ", stringify!( $op ) ) ]
     fn $name(&self, other : & Self ) -> Self {
-        let mut v : Vec< AzFloat<B> >;
-        let e     : AzFloat<B>;
+        //
+        let zero  : S = 0.into();
+        let one   : S = 1.into();
+        //
+        let mut v : Vec<S>;
+        let e     : S;
+        //
         if self.len() == 1 {
             if other.len() == 1 {
-                e = self.s.$name( &other.s );
+                e = if self.s $op other.s { one } else { zero };
                 v = Vec::new();
             } else {
                 e = f32::NAN.into();
                 v = Vec::with_capacity( other.len() );
-                for j in 0 .. other.len() {
-                    v.push(  self.s.$name( &other.vec[j] ) );
-                }
+                for j in 0 .. other.len() { v.push(
+                    if self.s $op other.vec[j] { one } else { zero }
+                ); }
             }
         } else {
             e = f32::NAN.into();
             v = Vec::with_capacity( self.len() );
             if other.len() == 1 {
-                for j in 0 .. self.len() {
-                    v.push(  self.vec[j].$name( &other.s) );
-                }
+                for j in 0 .. self.len() { v.push(
+                    if self.vec[j] $op other.s { one } else { zero }
+                ); }
             } else {
                 assert_eq!( self.len(), other.len() );
-                for j in 0 .. self.len() {
-                    v.push(  self.vec[j].$name( &other.vec[j] ) );
-                }
+                for j in 0 .. self.len() { v.push(
+                    if self.vec[j] $op other.vec[j] { one } else { zero }
+                ); }
             }
         }
         NumVec{ vec : v, s : e }
     }
 } }
 //
-impl<B> CompareAsNumber for NumVec< AzFloat<B> >
+impl<S> CompareAsNumber for NumVec<S>
 where
-    B           : PartialOrd ,
-    AzFloat<B>  : From<f32> + From<usize> + CompareAsNumber,
+    S  : Copy + From<f32> + From<usize> + PartialOrd + CompareAsNumber,
 {
     impl_compare_num_vec!( lt_num, <  );
     impl_compare_num_vec!( le_num, <= );
