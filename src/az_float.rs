@@ -27,23 +27,55 @@ use std::ops::{
     MulAssign,
     DivAssign,
 };
+// ---------------------------------------------------------------------------
+// CompareAsNumber Trait
 //
+/// These comparisons results are  1 for true and 0 for false.
+pub trait CompareAsNumber {
+    /// self < other
+    fn lt_num(&self, other : &Self) -> Self;
+    /// self <= other
+    fn le_num(&self, other : &Self) -> Self;
+    /// self == other
+    fn eq_num(&self, other : &Self) -> Self;
+    /// self != other
+    fn ne_num(&self, other : &Self) -> Self;
+    /// self >= other
+    fn ge_num(&self, other : &Self) -> Self;
+    /// self > other
+    fn gt_num(&self, other : &Self) -> Self;
+}
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
 ///
 /// * Motivation :
 ///
-///     * During forward mode AD, the partial derivaitve of f(x) w.r.t x_i
-///     is evaluated as f'(x) * e
-///     where e_j is one (zero) if j is equal to i (not equal to i).
-///     If zero times nan were nan, and one of the elements of f'(x) were nan,
-///     the partial of f w.r.t. x_i would evaluate to nan
-///     (even if the corresponding column of f'(x) did not have a nan).
-///     A similar effect is present in reverse mode.
+///     * Forward Mode :
+///         During forward mode AD, the partial derivaitve of f(x) w.r.t x_i
+///         is evaluated as f'(x) * e
+///         where e_j is one (zero) if j is equal to i (not equal to i).
+///         If zero times nan were nan, and one of the elements of f'(x)
+///         were nan, the partial of f w.r.t. x_i would evaluate to nan
+///         (even if the corresponding column of f'(x) did not have a nan).
 ///
-///     * Because zero time any value is zero, multiplications by the
-///     constant zero does not need to be recorded in the tape.
+///     * Reverse Mode :
+///         A similar effect to forward mode is present in reverse mode.
 ///
+///     * Optimization :
+///         Because zero times anything (including a variable)
+///         is the constant zero, multiplications by the
+///         constant zero does not need to be recorded in the tape.
+///
+///     * Conditional Expressions :
+///         Comparison operators; e.g. <=, are represented by 1 for
+///         true and 0 for false. It follows that the two expressions
+///         below are equivalent :
+///         ```text
+///             if x <= y { u } else {v}
+///             x.le(y) * u + x.gt(y) * v
+///         ```
+///         Note that this works element wise when x, y, u, v
+///         are numeric vectors.
 ///
 /// * B : the floating point base class is either f32 or f64
 ///
@@ -278,6 +310,62 @@ macro_rules! impl_binary_assign{ ($Name:ident, $name:ident) => {
 impl_binary_assign!(AddAssign, add_assign);
 impl_binary_assign!(SubAssign, sub_assign);
 impl_binary_assign!(DivAssign, div_assign);
+// ---------------------------------------------------------------------------
+// CompareAsNumber for AzFloat
+/// CompareAsNumber trait for AzFloat
+///
+/// * B : Is the floating point base type
+///
+/// * Syntax : &lhs.compare(&rhs)
+///
+///     * lhs : is the AzFloat`<B>` left operand
+///     * rhs : is the AzFloat`<B>` right operand
+///     * compare  : is one of
+///         `lt_num` , `le_num`, `eq_num`,
+///         `ne_num`, `ge_num`, `gt_num`
+///
+/// # Example :
+/// ```
+/// use rustad::AzFloat;
+/// use rustad::CompareAsNumber;
+/// type B = f64;
+/// //
+/// let two   : AzFloat<B> = (2.0 as B).into();
+/// let three : AzFloat<B> = (3.0 as B).into();
+/// let lt_num   = two.lt_num(&three);
+/// let eq_num   = two.eq_num(&three);
+/// assert_eq!( lt_num.to_inner(), (1.0 as B) );
+/// assert_eq!( eq_num.to_inner(), (0.0 as B) );
+/// ```
+pub fn doc_compare_az_float() {}
+//
+/// see [doc_compare_az_float]
+macro_rules! impl_compare_az_float{ ($name:ident, $op:tt) => {
+    #[doc = concat!( "compare trait for ", stringify!( $op ) ) ]
+    fn $name(&self, other : & AzFloat<B> ) -> AzFloat<B> {
+        let zero : AzFloat<B> = 0f32.into();
+        let one  : AzFloat<B> = 1f32.into();
+        //
+        if self.0 $op other.0 {
+            one
+        } else {
+            zero
+        }
+    }
+} }
+//
+impl<B> CompareAsNumber for AzFloat<B>
+where
+    B          :  PartialOrd,
+    AzFloat<B> : From<f32>,
+{
+    impl_compare_az_float!( lt_num, <  );
+    impl_compare_az_float!( le_num, <= );
+    impl_compare_az_float!( eq_num, == );
+    impl_compare_az_float!( ne_num, != );
+    impl_compare_az_float!( ge_num, >= );
+    impl_compare_az_float!( gt_num, >  );
+}
 // ---------------------------------------------------------------------------
 // PartialEq, Eq
 /// AzFloat Eq Operator
