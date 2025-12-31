@@ -83,6 +83,19 @@ set_operator_ids!(
     /// variable / variable
     DIV_VV_OP,
     //
+    /// lhs.num_lt(rhs)
+    LT_OP,
+    /// lhs.num_le(rhs)
+    LE_OP,
+    /// lhs.num_eq(rhs)
+    EQ_OP,
+    /// lhs.num_ne(rhs)
+    NE_OP,
+    /// lhs.num_ge(rhs)
+    GE_OP,
+    /// lhs.num_gt(rhs)
+    GT_OP,
+    //
     // CALL
     /// callback to an atomic function
     CALL_OP,
