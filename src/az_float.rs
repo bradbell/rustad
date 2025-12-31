@@ -33,17 +33,17 @@ use std::ops::{
 /// These comparisons results are  1 for true and 0 for false.
 pub trait CompareAsNumber {
     /// self < other
-    fn lt_num(&self, other : &Self) -> Self;
+    fn num_lt(&self, other : &Self) -> Self;
     /// self <= other
-    fn le_num(&self, other : &Self) -> Self;
+    fn num_le(&self, other : &Self) -> Self;
     /// self == other
-    fn eq_num(&self, other : &Self) -> Self;
+    fn num_eq(&self, other : &Self) -> Self;
     /// self != other
-    fn ne_num(&self, other : &Self) -> Self;
+    fn num_ne(&self, other : &Self) -> Self;
     /// self >= other
-    fn ge_num(&self, other : &Self) -> Self;
+    fn num_ge(&self, other : &Self) -> Self;
     /// self > other
-    fn gt_num(&self, other : &Self) -> Self;
+    fn num_gt(&self, other : &Self) -> Self;
 }
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
@@ -116,13 +116,14 @@ where
     }
 }
 // ---------------------------------------------------------------------------
-// From
-//
-// * AzFloat<f32> :
-// From is implemented for usize and f32 .
-//
-// * AzFloat<f64> :
-// From is implemented for :usize, f32, f64, and AzFloat<f32> .
+/// AzFloat From
+///
+/// * `AzFloat<f32>` :
+/// From is implemented for usize and f32 .
+///
+/// * `AzFloat<f64>` :
+/// From is implemented for :usize, f32, f64, and `AzFloat<f32>` .
+///
 pub fn doc_impl_from() {}
 //
 macro_rules! impl_from_primitive{ ($F:ident, $T:ident) => {
@@ -321,8 +322,8 @@ impl_binary_assign!(DivAssign, div_assign);
 ///     * lhs : is the AzFloat`<B>` left operand
 ///     * rhs : is the AzFloat`<B>` right operand
 ///     * compare  : is one of
-///         `lt_num` , `le_num`, `eq_num`,
-///         `ne_num`, `ge_num`, `gt_num`
+///         `num_lt` , `num_le`, `num_eq`,
+///         `num_ne`, `num_ge`, `num_gt`
 ///
 /// # Example :
 /// ```
@@ -332,10 +333,10 @@ impl_binary_assign!(DivAssign, div_assign);
 /// //
 /// let two   : AzFloat<B> = (2.0 as B).into();
 /// let three : AzFloat<B> = (3.0 as B).into();
-/// let lt_num   = two.lt_num(&three);
-/// let eq_num   = two.eq_num(&three);
-/// assert_eq!( lt_num.to_inner(), (1.0 as B) );
-/// assert_eq!( eq_num.to_inner(), (0.0 as B) );
+/// let num_lt   = two.num_lt(&three);
+/// let num_eq   = two.num_eq(&three);
+/// assert_eq!( num_lt.to_inner(), (1.0 as B) );
+/// assert_eq!( num_eq.to_inner(), (0.0 as B) );
 /// ```
 pub fn doc_compare_az_float() {}
 //
@@ -359,12 +360,12 @@ where
     B          :  PartialOrd,
     AzFloat<B> : From<usize>,
 {
-    impl_compare_az_float!( lt_num, <  );
-    impl_compare_az_float!( le_num, <= );
-    impl_compare_az_float!( eq_num, == );
-    impl_compare_az_float!( ne_num, != );
-    impl_compare_az_float!( ge_num, >= );
-    impl_compare_az_float!( gt_num, >  );
+    impl_compare_az_float!( num_lt, <  );
+    impl_compare_az_float!( num_le, <= );
+    impl_compare_az_float!( num_eq, == );
+    impl_compare_az_float!( num_ne, != );
+    impl_compare_az_float!( num_ge, >= );
+    impl_compare_az_float!( num_gt, >  );
 }
 // ---------------------------------------------------------------------------
 // PartialEq, Eq

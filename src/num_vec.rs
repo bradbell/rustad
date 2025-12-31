@@ -134,7 +134,7 @@ macro_rules! num_vec_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 } else {
                     e = f32::NAN.into();
                     v = Vec::with_capacity( rhs.len() );
-                    for j in 0 .. rhs.len() { v.push( 
+                    for j in 0 .. rhs.len() { v.push(
                         self.s $Op rhs.vec[j]
                     ); }
                 }
@@ -142,7 +142,7 @@ macro_rules! num_vec_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 e = f32::NAN.into();
                 v = Vec::with_capacity( self.len() );
                 if rhs.len() == 1 {
-                    for j in 0 .. self.len() { v.push( 
+                    for j in 0 .. self.len() { v.push(
                         self.vec[j] $Op rhs.s
                     ); }
                 } else {
@@ -247,8 +247,8 @@ num_vec_compound_op!(DivAssign, /=);
 ///     * lhs : is the S left operand
 ///     * rhs : is the S right operand
 ///     * compare  : is one of
-///         `lt_num` , `le_num`, `eq_num`,
-///         `ne_num`, `ge_num`, `gt_num`
+///         `num_lt` , `num_le`, `num_eq`,
+///         `num_ne`, `num_ge`, `num_gt`
 ///
 /// # Example :
 /// ```
@@ -261,13 +261,13 @@ num_vec_compound_op!(DivAssign, /=);
 /// let two_three = NumVec::new( vec![ S::from(2), S::from(3) ] );
 /// let three     = NumVec::from( S::from(3) );
 ///
-/// let lt_num    = two_three.lt_num(&three);
+/// let num_lt    = two_three.num_lt(&three);
 /// let check     = NumVec::new( vec![ S::from(1), S::from(0) ] );
-/// assert_eq!( lt_num, check);
+/// assert_eq!( num_lt, check);
 ///
-/// let eq_num    = three.eq_num(&two_three);
+/// let num_eq    = three.num_eq(&two_three);
 /// let check     = NumVec::new( vec![ S::from(0), S::from(1) ] );
-/// assert_eq!( eq_num, check);
+/// assert_eq!( num_eq, check);
 /// ```
 pub fn doc_compare_num_vec() {}
 //
@@ -315,12 +315,12 @@ impl<S> CompareAsNumber for NumVec<S>
 where
     S  : Copy + From<f32> + From<usize> + PartialOrd + CompareAsNumber,
 {
-    impl_compare_num_vec!( lt_num, <  );
-    impl_compare_num_vec!( le_num, <= );
-    impl_compare_num_vec!( eq_num, == );
-    impl_compare_num_vec!( ne_num, != );
-    impl_compare_num_vec!( ge_num, >= );
-    impl_compare_num_vec!( gt_num, >  );
+    impl_compare_num_vec!( num_lt, <  );
+    impl_compare_num_vec!( num_le, <= );
+    impl_compare_num_vec!( num_eq, == );
+    impl_compare_num_vec!( num_ne, != );
+    impl_compare_num_vec!( num_ge, >= );
+    impl_compare_num_vec!( num_gt, >  );
 }
 // ----------------------------------------------------------------------------`
 /// Displays a `NumVec` < *S* > object.

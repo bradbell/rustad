@@ -83,7 +83,7 @@ use crate::doc_generic_v;
 pub fn doc_ad_binary_op() { }
 //
 /// Add one binary operator to the `AD<V>` class;
-//
+///
 /// * V : see [doc_generic_v]
 /// * Name : is the operator name; i.e., Add, Sub, Mul, or Div.
 /// * Op : is the operator token; i.e., +, -, *, or /.
@@ -505,8 +505,6 @@ pub fn doc_ad_compound_op() { }
 ///
 /// * Op : is the operator token; i.e., +=, -=, *=, or /= .
 ///
-/// see [doc_ad_compound_op]
-//
 /// see [doc_ad_compound_op]
 macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     //
