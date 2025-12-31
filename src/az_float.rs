@@ -343,8 +343,8 @@ pub fn doc_compare_az_float() {}
 macro_rules! impl_compare_az_float{ ($name:ident, $op:tt) => {
     #[doc = concat!( "compare trait for ", stringify!( $op ) ) ]
     fn $name(&self, other : & AzFloat<B> ) -> AzFloat<B> {
-        let zero : AzFloat<B> = 0f32.into();
-        let one  : AzFloat<B> = 1f32.into();
+        let zero : AzFloat<B> = 0.into();
+        let one  : AzFloat<B> = 1.into();
         //
         if self.0 $op other.0 {
             one
@@ -357,7 +357,7 @@ macro_rules! impl_compare_az_float{ ($name:ident, $op:tt) => {
 impl<B> CompareAsNumber for AzFloat<B>
 where
     B          :  PartialOrd,
-    AzFloat<B> : From<f32>,
+    AzFloat<B> : From<usize>,
 {
     impl_compare_az_float!( lt_num, <  );
     impl_compare_az_float!( le_num, <= );

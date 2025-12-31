@@ -19,7 +19,10 @@
 //!  The NumVec types implement Clone, but not the Copy trait.
 // ---------------------------------------------------------------------------
 // use
-use crate::AzFloat;
+use crate::{
+    AzFloat,
+    CompareAsNumber,
+};
 //
 // NumVec
 /// The numeric vector type
@@ -233,6 +236,89 @@ num_vec_compound_op!(AddAssign, +=);
 num_vec_compound_op!(SubAssign, -=);
 num_vec_compound_op!(MulAssign, *=);
 num_vec_compound_op!(DivAssign, /=);
+// ---------------------------------------------------------------------------
+// CompareAsNumber for NumVec
+/// CompareAsNumber trait for `NumVec<S>`
+///
+/// * S : is the type of the elements of the numeric vector.
+///     This type must be `AzFloat<B>` .
+///
+/// * Syntax : &lhs.compare(&rhs)
+///
+///     * lhs : is the S left operand
+///     * rhs : is the S right operand
+///     * compare  : is one of
+///         `lt_num` , `le_num`, `eq_num`,
+///         `ne_num`, `ge_num`, `gt_num`
+///
+/// # Example :
+/// ```
+/// use rustad::NumVec;
+/// use rustad::AzFloat;
+/// use rustad::CompareAsNumber;
+///
+/// type S = AzFloat<f32>;
+/// //
+/// let two_three = NumVec::new( vec![ S::from(2), S::from(3) ] );
+/// let three     = NumVec::from( S::from(3) );
+///
+/// let lt_num    = two_three.lt_num(&three);
+/// let check     = NumVec::new( vec![ S::from(1), S::from(0) ] );
+/// assert_eq!( lt_num, check);
+///
+/// let eq_num    = three.eq_num(&two_three);
+/// let check     = NumVec::new( vec![ S::from(0), S::from(1) ] );
+/// assert_eq!( eq_num, check);
+/// ```
+pub fn doc_compare_num_vec() {}
+//
+/// see [doc_compare_num_vec]
+macro_rules! impl_compare_num_vec{ ($name:ident, $op:tt) => {
+    #[doc = concat!( "compare trait for ", stringify!( $op ) ) ]
+    fn $name(&self, other : & Self ) -> Self {
+        let mut v : Vec< AzFloat<B> >;
+        let e     : AzFloat<B>;
+        if self.len() == 1 {
+            if other.len() == 1 {
+                e = self.s.$name( &other.s );
+                v = Vec::new();
+            } else {
+                e = f32::NAN.into();
+                v = Vec::with_capacity( other.len() );
+                for j in 0 .. other.len() {
+                    v.push(  self.s.$name( &other.vec[j] ) );
+                }
+            }
+        } else {
+            e = f32::NAN.into();
+            v = Vec::with_capacity( self.len() );
+            if other.len() == 1 {
+                for j in 0 .. self.len() {
+                    v.push(  self.vec[j].$name( &other.s) );
+                }
+            } else {
+                assert_eq!( self.len(), other.len() );
+                for j in 0 .. self.len() {
+                    v.push(  self.vec[j].$name( &other.vec[j] ) );
+                }
+            }
+        }
+        NumVec{ vec : v, s : e }
+    }
+} }
+//
+impl<B> CompareAsNumber for NumVec< AzFloat<B> >
+where
+    B           : PartialOrd ,
+    AzFloat<B>  : From<f32> + From<usize> + CompareAsNumber,
+{
+    impl_compare_num_vec!( lt_num, <  );
+    impl_compare_num_vec!( le_num, <= );
+    impl_compare_num_vec!( eq_num, == );
+    impl_compare_num_vec!( ne_num, != );
+    impl_compare_num_vec!( ge_num, >= );
+    impl_compare_num_vec!( gt_num, >  );
+}
 // ----------------------------------------------------------------------------`
 /// Displays a `NumVec` < *S* > object.
 ///
@@ -372,7 +458,6 @@ where
 }
 impl<S: PartialEq> Eq for NumVec<S> { }
 // ---------------------------------------------------------------------------
-// TODO: use a faster hasher; e.g., rustc_hash::FxHasher.
 /// Hash function for `NumVec<AzFloat>` objects
 ///
 /// * B : is the floating point base type
