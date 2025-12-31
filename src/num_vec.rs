@@ -133,23 +133,23 @@ macro_rules! num_vec_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                     v = Vec::new();
                 } else {
                     e = f32::NAN.into();
-                    v = vec![e; rhs.len() ];
-                    for j in 0 .. rhs.len() {
-                        v[j] = self.s $Op rhs.vec[j];
-                    }
+                    v = Vec::with_capacity( rhs.len() );
+                    for j in 0 .. rhs.len() { v.push( 
+                        self.s $Op rhs.vec[j]
+                    ); }
                 }
             } else {
                 e = f32::NAN.into();
-                v = vec![e; self.len() ];
+                v = Vec::with_capacity( self.len() );
                 if rhs.len() == 1 {
-                    for j in 0 .. self.len() {
-                        v[j] = self.vec[j] $Op rhs.s;
-                    }
+                    for j in 0 .. self.len() { v.push( 
+                        self.vec[j] $Op rhs.s
+                    ); }
                 } else {
                     assert_eq!( self.len(), rhs.len() );
-                    for j in 0 .. self.len() {
-                        v[j] = self.vec[j] $Op rhs.vec[j];
-                    }
+                    for j in 0 .. self.len() { v.push(
+                        self.vec[j] $Op rhs.vec[j]
+                    ); }
                 }
             }
             NumVec{ vec : v, s : e }
