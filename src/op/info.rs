@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 //! Information about an operator given it's operator id.
 //!
@@ -14,6 +14,7 @@ use crate::ad::ADType;
 use crate::{
     AD,
     IndexT,
+    CompareAsNumber,
 };
 use crate::op::id::NUMBER_OP;
 use crate::tape::sealed::ThisThreadTape;
@@ -452,7 +453,9 @@ where
     for<'a> &'a V : std::ops::Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Div<&'a V, Output = V> ,
     //
-    V : Clone + From<f32> + PartialEq + ThisThreadTape + GlobalAtomCallbackVec
+    V     : Clone + From<f32> + PartialEq,
+    V     : CompareAsNumber + ThisThreadTape + GlobalAtomCallbackVec,
+    AD<V> : From<f32>,
 {
     let empty = OpInfo {
         name               : &"panic",
@@ -474,6 +477,7 @@ where
     crate::op::div::set_op_info::<V>(&mut result);
     crate::op::call::set_op_info::<V>(&mut result);
     crate::op::no_op::set_op_info::<V>(&mut result);
+    crate::op::compare::set_op_info::<V>(&mut result);
     result
 }
 // ---------------------------------------------------------------------------

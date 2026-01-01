@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 //! Evaluate the Add operators
 //!
@@ -194,6 +194,7 @@ where
 // ---------------------------------------------------------------------------
 // set_op_info
 //
+// rust_src_none
 no_rust_src!(Add);
 //
 /// Set the operator information for all the Add operators.

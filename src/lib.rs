@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ----------------------------------------------------------------------------
 //
 //! A rust Automatic Differentiation library
@@ -143,9 +143,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2025.12.31");
+/// assert_eq!(date, "2026.1.1");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2025.12.31";
+pub const YEAR_MONTH_DAY : &str = "2026.1.1";
 //
 // AZ_FLOAT_SRC
 /// is the source code for the [AzFloat] class.

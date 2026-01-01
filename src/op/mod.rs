@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 //! This pub(crate) module defines the objects used to evaluate an
 //! operation sequence.
@@ -12,6 +12,7 @@
 pub mod id;
 pub mod info;
 pub mod binary;
+pub mod compare;
 //
 pub mod add;
 pub mod sub;
