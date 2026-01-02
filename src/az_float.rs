@@ -40,19 +40,19 @@ use std::ops::{
 /// self is zero (non-zero).
 ///
 /// The not operator will return zero (one)
-pub trait CompareAsNumber {
+pub trait CompareAsNumber<Rhs = Self> {
     /// self < other
-    fn num_lt(&self, other : &Self) -> Self;
+    fn num_lt(&self, other : &Rhs) -> Self;
     /// self <= other
-    fn num_le(&self, other : &Self) -> Self;
+    fn num_le(&self, other : &Rhs) -> Self;
     /// self == other
-    fn num_eq(&self, other : &Self) -> Self;
+    fn num_eq(&self, other : &Rhs) -> Self;
     /// self != other
-    fn num_ne(&self, other : &Self) -> Self;
+    fn num_ne(&self, other : &Rhs) -> Self;
     /// self >= other
-    fn num_ge(&self, other : &Self) -> Self;
+    fn num_ge(&self, other : &Rhs) -> Self;
     /// self > other
-    fn num_gt(&self, other : &Self) -> Self;
+    fn num_gt(&self, other : &Rhs) -> Self;
     /// logical not
     fn num_not(&self) -> Self;
 }
