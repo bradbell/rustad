@@ -100,8 +100,6 @@ pub fn doc_ad_compare() { }
 //
 // impl_binary_aa
 macro_rules! impl_binary_aa{ ($name:ident) => { paste::paste! {
-    // -----------------------------------------------------------------------
-    //
     //
     #[doc = concat!(
         "& `AD<V>` num_", stringify!($name), "( & `AD<V>` )",
@@ -155,6 +153,64 @@ where
     impl_binary_aa!( ne );
     impl_binary_aa!( ge );
     impl_binary_aa!( gt );
+}
+// ---------------------------------------------------------------------------
+//
+// impl_binary_av
+macro_rules! impl_binary_av{ ($name:ident) => { paste::paste! {
+    //
+    #[doc = concat!(
+        "& `AD<V>` num_", stringify!($name), "( &V )",
+        "; see [doc_ad_compare]"
+    )]
+    fn [< num_ $name >](&self , rhs : &V ) -> AD<V>
+    {
+        // new_value
+        let new_value     = self.value. [< num_ $name >] ( rhs );
+        //
+        // local_key
+        let local_key : &LocalKey< RefCell< Tape<V> > > =
+            ThisThreadTape::get();
+        //
+        // new_tape_id, new_index, new_ad_type
+        let (new_tape_id, new_index, new_ad_type) =
+            local_key.with_borrow_mut( |tape| {
+                let op_id = [< $name:upper _OP >];
+                record_binary_av::<V> ( tape, self, rhs, op_id )
+            } );
+        //
+        // result
+        AD::new(new_tape_id, new_index, new_ad_type, new_value)
+    }
+} } }
+impl<V> CompareAsNumber<V> for AD<V>
+where
+    V : Clone + From<f32> + PartialEq + CompareAsNumber + ThisThreadTape ,
+{
+    fn num_not(&self) -> AD<V>
+    {
+        // new_value
+        let new_value  = self.value.num_not();
+        //
+        // local_key
+        let local_key : &LocalKey< RefCell< Tape<V> > > =
+            ThisThreadTape::get();
+        //
+        // new_tape_id, new_index, new_ad_type
+        let (new_tape_id, new_index, new_ad_type) =
+            local_key.with_borrow_mut( |tape| {
+                record_not::<V> (tape, self)
+            } );
+        //
+        // result
+        AD::new(new_tape_id, new_index, new_ad_type, new_value)
+    }
+    impl_binary_av!( lt );
+    impl_binary_av!( le );
+    impl_binary_av!( eq );
+    impl_binary_av!( ne );
+    impl_binary_av!( ge );
+    impl_binary_av!( gt );
 }
 // ---------------------------------------------------------------------------
 // record_not
@@ -348,6 +404,91 @@ where
         } else {
             tape.dyp.arg_all.push( rhs.index as IndexT );
         }
+    }
+    (new_tape_id, new_index, new_ad_type)
+}
+// ---------------------------------------------------------------------------
+// record_binary_av
+//
+fn record_binary_av <V> (
+    tape: &mut Tape<V> ,
+    lhs:       &AD<V>  ,
+    rhs:       &V      ,
+    op_id:     u8      ,
+) -> (usize, usize, ADType)
+where
+    V : Clone + From<f32> + PartialEq ,
+{
+    // new_tape_id, new_index, new_ad_type
+    let mut new_tape_id   = 0;
+    let mut new_index     = 0;
+    let mut new_ad_type   = ADType::ConstantP;
+    if ! tape.recording {
+        return (new_tape_id, new_index, new_ad_type);
+    }
+    //
+    // lhs_arg_type, cop_lhs, var_lhs
+    let lhs_arg_type : ADType;
+    let cop_lhs      : bool;
+    let var_lhs      : bool;
+    if lhs.tape_id != tape.tape_id {
+        lhs_arg_type = ADType::ConstantP;
+        cop_lhs      = true;
+        var_lhs      = false;
+    } else {
+        debug_assert!( lhs.ad_type != ADType::ConstantP );
+        lhs_arg_type = lhs.ad_type.clone();
+        cop_lhs      = false;
+        var_lhs      = lhs.ad_type.is_variable();
+    };
+    //
+    if cop_lhs {
+        return (new_tape_id, new_index, new_ad_type);
+    }
+    //
+    // new_tape_id
+    new_tape_id = tape.tape_id;
+    //
+    if var_lhs {
+        //
+        // new_ad_type, new_index
+        new_ad_type     = ADType::Variable;
+        new_index       = tape.var.n_dep + tape.var.n_dom;
+        //
+        // tape.var: n_dep, arg_start, arg_type
+        tape.var.n_dep += 1;
+        tape.var.arg_start.push( tape.var.arg_all.len() as IndexT );
+        tape.var.arg_type_all.push( lhs_arg_type );
+        tape.var.arg_type_all.push( ADType::ConstantP );
+        //
+        //
+        // tape.var.id_all
+        tape.var.id_all.push( op_id );
+        //
+        // tape.cop, tape.var.arg_all
+        tape.var.arg_all.push( lhs.index as IndexT );
+        tape.var.arg_all.push( tape.cop.len() as IndexT );
+        tape.cop.push( rhs.clone() );
+    } else {
+        debug_assert!( lhs.ad_type.is_dynamic() );
+        //
+        // new_ad_type, new_index
+        new_ad_type     = ADType::DynamicP;
+        new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
+        //
+        // tape.dyp: n_dep, arg_start, arg_type
+        tape.dyp.n_dep += 1;
+        tape.dyp.arg_start.push( tape.dyp.arg_all.len() as IndexT );
+        tape.dyp.arg_type_all.push( lhs_arg_type );
+        tape.dyp.arg_type_all.push( ADType::ConstantP );
+        //
+        // tape.var.id_all
+        tape.dyp.id_all.push( op_id );
+        //
+        // tape.cop, tape.dyp.arg_all
+        tape.dyp.arg_all.push( lhs.index as IndexT );
+        tape.dyp.arg_all.push( tape.cop.len() as IndexT );
+        tape.cop.push( rhs.clone() );
     }
     (new_tape_id, new_index, new_ad_type)
 }
