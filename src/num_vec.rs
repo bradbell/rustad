@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! This pub module defines the numeric vector class `NumVec` < *S* >.
@@ -242,13 +242,7 @@ num_vec_compound_op!(DivAssign, /=);
 ///
 /// * S : is the type of the elements of the numeric vector.
 ///
-/// * Syntax : &lhs.compare(&rhs)
-///
-///     * lhs : is the S left operand
-///     * rhs : is the S right operand
-///     * compare  : is one of
-///         `num_lt` , `num_le`, `num_eq`,
-///         `num_ne`, `num_ge`, `num_gt`
+/// Note that these functions act element-wise on each `NumVec<S>` object.
 ///
 /// # Example :
 /// ```
@@ -261,13 +255,13 @@ num_vec_compound_op!(DivAssign, /=);
 /// let two_three = NumVec::new( vec![ S::from(2), S::from(3) ] );
 /// let three     = NumVec::from( S::from(3) );
 ///
-/// let num_lt    = two_three.num_lt(&three);
+/// let lt        = two_three.num_lt(&three);
 /// let check     = NumVec::new( vec![ S::from(1), S::from(0) ] );
-/// assert_eq!( num_lt, check);
+/// assert_eq!( lt, check);
 ///
-/// let num_eq    = three.num_eq(&two_three);
+/// let not_lt    = lt.num_not();
 /// let check     = NumVec::new( vec![ S::from(0), S::from(1) ] );
-/// assert_eq!( num_eq, check);
+/// assert_eq!(not_lt, check);
 /// ```
 pub fn doc_compare_num_vec() {}
 //
@@ -315,6 +309,26 @@ impl<S> CompareAsNumber for NumVec<S>
 where
     S  : Copy + From<f32> + From<usize> + PartialOrd + CompareAsNumber,
 {
+    fn num_not(&self) -> Self {
+        //
+        let zero  : S = 0.into();
+        let one   : S = 1.into();
+        //
+        let mut v : Vec<S>;
+        let e     : S;
+        //
+        if self.len() == 1 {
+            e = if self.s == zero { one } else { zero };
+            v = Vec::new();
+        } else {
+            e = f32::NAN.into();
+            v = Vec::with_capacity( self.len() );
+            for j in 0 .. self.len() { v.push(
+                if self.vec[j] == zero { one } else { zero }
+            ); }
+        }
+        NumVec{ vec : v, s : e }
+    }
     impl_compare_num_vec!( num_lt, <  );
     impl_compare_num_vec!( num_le, <= );
     impl_compare_num_vec!( num_eq, == );

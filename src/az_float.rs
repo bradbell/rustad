@@ -3,7 +3,7 @@
 // ============================================================================
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! This pub module defines the rustad AzFloat class.
@@ -31,6 +31,15 @@ use std::ops::{
 // CompareAsNumber Trait
 //
 /// These comparisons results are  1 for true and 0 for false.
+///
+/// For cmp equal to lt, le, eq, ne, ge, gt :
+/// The num_cmp function returns one (zero) if
+/// self compare other is true (false).
+///
+/// The num_not function returns one (zero) if
+/// self is zero (non-zero).
+///
+/// The not operator will return zero (one)
 pub trait CompareAsNumber {
     /// self < other
     fn num_lt(&self, other : &Self) -> Self;
@@ -44,6 +53,8 @@ pub trait CompareAsNumber {
     fn num_ge(&self, other : &Self) -> Self;
     /// self > other
     fn num_gt(&self, other : &Self) -> Self;
+    /// logical not
+    fn num_not(&self) -> Self;
 }
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
@@ -313,17 +324,9 @@ impl_binary_assign!(SubAssign, sub_assign);
 impl_binary_assign!(DivAssign, div_assign);
 // ---------------------------------------------------------------------------
 // CompareAsNumber for AzFloat
-/// CompareAsNumber trait for AzFloat
+/// CompareAsNumber trait for `AzFloat<B>`
 ///
 /// * B : Is the floating point base type
-///
-/// * Syntax : &lhs.compare(&rhs)
-///
-///     * lhs : is the AzFloat`<B>` left operand
-///     * rhs : is the AzFloat`<B>` right operand
-///     * compare  : is one of
-///         `num_lt` , `num_le`, `num_eq`,
-///         `num_ne`, `num_ge`, `num_gt`
 ///
 /// # Example :
 /// ```
@@ -333,10 +336,10 @@ impl_binary_assign!(DivAssign, div_assign);
 /// //
 /// let two   : AzFloat<B> = (2.0 as B).into();
 /// let three : AzFloat<B> = (3.0 as B).into();
-/// let num_lt   = two.num_lt(&three);
-/// let num_eq   = two.num_eq(&three);
-/// assert_eq!( num_lt.to_inner(), (1.0 as B) );
-/// assert_eq!( num_eq.to_inner(), (0.0 as B) );
+/// let lt     = two.num_lt(&three);
+/// let not_lt = lt.num_not();
+/// assert_eq!( lt.to_inner(), (1.0 as B) );
+/// assert_eq!( not_lt.to_inner(), (0.0 as B) );
 /// ```
 pub fn doc_compare_az_float() {}
 //
@@ -359,7 +362,16 @@ impl<B> CompareAsNumber for AzFloat<B>
 where
     B          :  PartialOrd,
     AzFloat<B> : From<usize>,
-{
+{   // not
+    fn num_not(&self) -> AzFloat<B> {
+        let zero : AzFloat<B> = 0.into();
+        let one  : AzFloat<B> = 1.into();
+        if *self == zero {
+            one
+        } else {
+            zero
+        }
+    }
     impl_compare_az_float!( num_lt, <  );
     impl_compare_az_float!( num_le, <= );
     impl_compare_az_float!( num_eq, == );

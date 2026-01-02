@@ -143,9 +143,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2026.1.1");
+/// assert_eq!(date, "2026.1.2");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2026.1.1";
+pub const YEAR_MONTH_DAY : &str = "2026.1.2";
 //
 // AZ_FLOAT_SRC
 /// is the source code for the [AzFloat] class.
