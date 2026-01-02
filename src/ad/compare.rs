@@ -96,7 +96,10 @@ pub fn doc_ad_compare() { }
 ///     lt, le, eq, ne, ge, gt.
 ///
 /// see [doc_ad_compare]
-macro_rules! impl_compare_ad{ ($name:ident) => { paste::paste! {
+// ---------------------------------------------------------------------------
+//
+// impl_binary_aa
+macro_rules! impl_binary_aa{ ($name:ident) => { paste::paste! {
     // -----------------------------------------------------------------------
     //
     //
@@ -117,14 +120,14 @@ macro_rules! impl_compare_ad{ ($name:ident) => { paste::paste! {
         let (new_tape_id, new_index, new_ad_type) =
             local_key.with_borrow_mut( |tape| {
                 let op_id = [< $name:upper _OP >];
-                record_compare::<V> ( tape, self, rhs, op_id )
+                record_binary_aa::<V> ( tape, self, rhs, op_id )
             } );
         //
         // result
         AD::new(new_tape_id, new_index, new_ad_type, new_value)
     }
 } } }
-impl<V> CompareAsNumber for AD<V>
+impl<V> CompareAsNumber< AD<V> > for AD<V>
 where
     V : Clone + From<f32> + PartialEq + CompareAsNumber + ThisThreadTape ,
 {
@@ -146,12 +149,12 @@ where
         // result
         AD::new(new_tape_id, new_index, new_ad_type, new_value)
     }
-    impl_compare_ad!( lt );
-    impl_compare_ad!( le );
-    impl_compare_ad!( eq );
-    impl_compare_ad!( ne );
-    impl_compare_ad!( ge );
-    impl_compare_ad!( gt );
+    impl_binary_aa!( lt );
+    impl_binary_aa!( le );
+    impl_binary_aa!( eq );
+    impl_binary_aa!( ne );
+    impl_binary_aa!( ge );
+    impl_binary_aa!( gt );
 }
 // ---------------------------------------------------------------------------
 // record_not
@@ -229,9 +232,9 @@ where
     (new_tape_id, new_index, new_ad_type)
 }
 // ---------------------------------------------------------------------------
-// record_compare
+// record_binary_aa
 //
-fn record_compare <V> (
+fn record_binary_aa <V> (
     tape: &mut Tape<V> ,
     lhs:       &AD<V>  ,
     rhs:       &AD<V>  ,
