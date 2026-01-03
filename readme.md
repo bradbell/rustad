@@ -38,7 +38,7 @@ This package is intended to include (and extend) most of the features in
     of the computation.
 
 4.  Generic code that is is the same for different floating point types.
-    These types include numerical vectors that act element wise
+    These types include numeric vectors that act element wise
     (for machine learning) .
 
 5.  Derivative calculations can be used in the definition of new functions
@@ -63,13 +63,23 @@ This package is intended to include (and extend) most of the features in
     Reduce size and avoid recomputaiton in AD function objects by detecting
     equivalent constants, dynamic parameters, and variables..
 
+11. Conditional Expressions allow for if then else values to be recorded
+    in an AD function object. Rustad implements this using comparison operators
+    that have numerical results (instead of boolean results).
+    For example, the following pseudo syntax would represent the absolute
+    value of x: 
+
+        y = (x >= 0) * x + (x < 0) * -x
+
+    Note that this has a natural extension to numeric vectors where it
+    acts element wise.
+    
+
 ## Goals Before Stable API
 
 1.  Subtraction, division and all the standard math functions.
-
-2.  Conditional Expressions.
     
-3.  Forward and reverse sparse derivative calculations
+2.  Forward and reverse sparse derivative calculations
     (sparsity patterns are already implemented). 
 
 ## Wish List
