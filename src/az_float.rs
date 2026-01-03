@@ -36,9 +36,6 @@ use std::ops::{
 /// The num_cmp function returns one (zero) if
 /// self compare other is true (false).
 ///
-/// The num_not function returns one (zero) if
-/// self is zero (non-zero).
-///
 /// The not operator will return zero (one)
 pub trait CompareAsNumber<Rhs = Self> {
     /// self < other
@@ -53,8 +50,6 @@ pub trait CompareAsNumber<Rhs = Self> {
     fn num_ge(&self, other : &Rhs) -> Self;
     /// self > other
     fn num_gt(&self, other : &Rhs) -> Self;
-    /// logical not
-    fn num_not(&self) -> Self;
 }
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
@@ -334,10 +329,11 @@ impl_binary_assign!(DivAssign, div_assign);
 /// use rustad::CompareAsNumber;
 /// type B = f64;
 /// //
+/// let one   : AzFloat<B> = (1.0 as B).into();
 /// let two   : AzFloat<B> = (2.0 as B).into();
 /// let three : AzFloat<B> = (3.0 as B).into();
 /// let lt     = two.num_lt(&three);
-/// let not_lt = lt.num_not();
+/// let not_lt = &one - &lt;
 /// assert_eq!( lt.to_inner(), (1.0 as B) );
 /// assert_eq!( not_lt.to_inner(), (0.0 as B) );
 /// ```
@@ -362,16 +358,7 @@ impl<B> CompareAsNumber for AzFloat<B>
 where
     B          :  PartialOrd,
     AzFloat<B> : From<usize>,
-{   // not
-    fn num_not(&self) -> AzFloat<B> {
-        let zero : AzFloat<B> = 0.into();
-        let one  : AzFloat<B> = 1.into();
-        if *self == zero {
-            one
-        } else {
-            zero
-        }
-    }
+{
     impl_compare_az_float!( num_lt, <  );
     impl_compare_az_float!( num_le, <= );
     impl_compare_az_float!( num_eq, == );

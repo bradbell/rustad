@@ -31,7 +31,6 @@ pub(crate) fn is_compare_op(op_id : u8) -> bool {
         id::NE_OP => true ,
         id::GE_OP => true ,
         id::GT_OP => true ,
-        id::NOT_OP => true,
         //
         _         => false,
     }
@@ -134,101 +133,12 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
         };
     }
 } } }
-/// E zero order forward for dynamic parameter num_not; see
-/// [ForwardDyp](crate::op::info::ForwardDyp)"
-fn not_forward_dyp <V, E> (
-    dyp_both    : &mut Vec<E> ,
-    _cop        : &Vec<V>     ,
-    _flag_all   : &Vec<bool>  ,
-    arg         : &[IndexT]   ,
-    arg_type    : &[ADType]   ,
-    res         : usize       )
-where
-    V : CompareAsNumber,
-    E : CompareAsNumber,
-{
-    debug_assert!( arg.len() == 1);
-    debug_assert!( ! ( arg_type[0].is_constant() ) );
-    //
-    // lhs_ref
-    let lhs = arg[0] as usize;
-    let lhs_ref = match arg_type[0] {
-        // ADType::ConstantP => &cop[lhs],
-        ADType::DynamicP  => &dyp_both[lhs],
-        _ => { panic!( "CompareAsNumber: constants not yet implemented" );},
-    };
-    dyp_both[ res ] = lhs_ref.num_not();
-}
-/// E zero order forward for variables num_not; see
-/// [ForwardDyp](crate::op::info::ForwardDyp)"
-fn not_forward_var <V, E> (
-    dyp_both    : &Vec<E>     ,
-    var_both    : &mut Vec<E> ,
-    _cop        : &Vec<V>     ,
-    _flag_all   : &Vec<bool>  ,
-    arg         : &[IndexT]   ,
-    arg_type    : &[ADType]   ,
-    res         : usize       )
-where
-    V : CompareAsNumber,
-    E : CompareAsNumber,
-{
-    debug_assert!( arg.len() == 1);
-    //
-    // lhs_ref
-    let lhs = arg[0] as usize;
-    let lhs_ref = match arg_type[0] {
-        // ADType::ConstantP => &cop[lhs],
-        ADType::DynamicP  => &dyp_both[lhs],
-        ADType::Variable  => &var_both[lhs],
-        _ => { panic!( "CompareAsNumber: constants not yet implemented" );},
-    };
-    var_both[ res ] = lhs_ref.num_not()    ;
-}
 eval_compare_forward_fun!( lt );
 eval_compare_forward_fun!( le );
 eval_compare_forward_fun!( eq );
 eval_compare_forward_fun!( ne );
 eval_compare_forward_fun!( ge );
 eval_compare_forward_fun!( gt );
-// ---------------------------------------------------------------------------
-// unary_reverse_depend
-/// Reverse dependency analysis for a NOT_OP operator;
-/// see [ReverseDepend](crate::op::info::ReverseDepend)
-///
-pub(crate) fn unary_reverse_depend(
-    depend    : &mut optimize::Depend ,
-    _flag_all : &Vec<bool>            ,
-    arg       : &[IndexT]             ,
-    arg_type  : &[ADType]             ,
-    res       : usize                 ,
-    res_type  : ADType                ,
-) { //
-    debug_assert_eq!(arg.len(), 1);
-    debug_assert_eq!(arg_type.len(), 1);
-    //
-    if res_type.is_variable() {
-        debug_assert!( depend.var[res] );
-        let index = arg[0] as usize;
-        match arg_type[0] {
-            //
-            ADType::ConstantP => { depend.cop[index] = true; },
-            ADType::DynamicP  => { depend.dyp[index] = true; },
-            ADType::Variable  => { depend.var[index] = true; },
-            _ => { panic!("in compare operator reverse_depend"); },
-        }
-    } else {
-        debug_assert!( res_type.is_dynamic() );
-        debug_assert!( depend.dyp[res] );
-        let index = arg[0] as usize;
-        match arg_type[0] {
-            //
-            ADType::ConstantP => { depend.cop[index] = true; },
-            ADType::DynamicP  => { depend.dyp[index] = true; },
-            _ => { panic!("in compare operator reverse_depend"); },
-        }
-    }
-}
 // ---------------------------------------------------------------------------
 // binary_reverse_depend
 /// Reverse dependency analysis for a compare operator;
@@ -394,18 +304,5 @@ where
         reverse_der_ad    : zero_reverse_der::<V, AD<V> >,
         rust_src          : rust_src_none,
         reverse_depend    : binary_reverse_depend,
-    };
-    op_info_vec[id::NOT_OP as usize] = OpInfo{
-        name              : "not",
-        forward_dyp_value : not_forward_dyp::<V, V>,
-        forward_dyp_ad    : not_forward_dyp::<V, AD<V> >,
-        forward_var_value : not_forward_var::<V, V>,
-        forward_var_ad    : not_forward_var::<V, AD<V> >,
-        forward_der_value : zero_forward_der::<V, V>,
-        forward_der_ad    : zero_forward_der::<V, AD<V> >,
-        reverse_der_value : zero_reverse_der::<V, V>,
-        reverse_der_ad    : zero_reverse_der::<V, AD<V> >,
-        rust_src          : rust_src_none,
-        reverse_depend    : unary_reverse_depend,
     };
 }

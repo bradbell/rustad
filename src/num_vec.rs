@@ -259,7 +259,8 @@ num_vec_compound_op!(DivAssign, /=);
 /// let check     = NumVec::new( vec![ S::from(1), S::from(0) ] );
 /// assert_eq!( lt, check);
 ///
-/// let not_lt    = lt.num_not();
+/// let one       = NumVec::from( S::from(1) );
+/// let not_lt    = &one - &lt;
 /// let check     = NumVec::new( vec![ S::from(0), S::from(1) ] );
 /// assert_eq!(not_lt, check);
 /// ```
@@ -309,26 +310,6 @@ impl<S> CompareAsNumber for NumVec<S>
 where
     S  : Copy + From<f32> + From<usize> + PartialOrd + CompareAsNumber,
 {
-    fn num_not(&self) -> Self {
-        //
-        let zero  : S = 0.into();
-        let one   : S = 1.into();
-        //
-        let mut v : Vec<S>;
-        let e     : S;
-        //
-        if self.len() == 1 {
-            e = if self.s == zero { one } else { zero };
-            v = Vec::new();
-        } else {
-            e = f32::NAN.into();
-            v = Vec::with_capacity( self.len() );
-            for j in 0 .. self.len() { v.push(
-                if self.vec[j] == zero { one } else { zero }
-            ); }
-        }
-        NumVec{ vec : v, s : e }
-    }
     impl_compare_num_vec!( num_lt, <  );
     impl_compare_num_vec!( num_le, <= );
     impl_compare_num_vec!( num_eq, == );

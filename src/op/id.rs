@@ -95,8 +95,6 @@ set_operator_ids!(
     GE_OP,
     /// lhs.num_gt(rhs)
     GT_OP,
-    /// lhs.not()
-    NOT_OP,
     //
     // CALL
     /// callback to an atomic function
