@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This pub module defines the CompareAsNumber triat for AD types
+//! This pub module defines the CompareAsNumber trait for AD types
 //!
 //! Link to [parent module](super)
 //!

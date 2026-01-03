@@ -2,7 +2,7 @@
 set -e -u
 # SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 # SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-# SPDX-FileContributor: 2025 Bradley M. Bell
+# SPDX-FileContributor: 2025-26 Bradley M. Bell
 # -----------------------------------------------------------------------------
 # echo_eval
 echo_eval() {
@@ -14,6 +14,10 @@ if [ "$0" != "bin/check_example.sh" ]
 then
    echo "bin/check_example.sh: must be executed from its parent directory"
    exit 1
+fi
+if [ ! -d tmp ]
+then
+   mkdir tmp
 fi
 cat << EOF > temp.sed
 /^error:/d

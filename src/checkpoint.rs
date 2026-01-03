@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! This pub module defines the checkpoint utilities.
@@ -213,7 +213,7 @@ where
 }
 //
 // register_checkpoint
-/// Convert a function object to a chekpoint function.
+/// Convert a function object to a checkpoint function.
 ///
 /// A checkpoint function call [call_checkpoint] only puts a call operator
 /// in the current tape (instead of all the operations in ad_fn).
