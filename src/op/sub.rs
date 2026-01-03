@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 //! Evaluate the Sub operators
 //!
@@ -33,8 +33,6 @@ use crate::op::info::{
     panic_dyp,
     panic_var,
     panic_der,
-    no_forward_der_value,
-    no_forward_der_ad,
     no_reverse_der_value,
     no_reverse_der_ad,
     no_rust_src,
@@ -44,6 +42,10 @@ use crate::op::id::{
     SUB_PV_OP,
     SUB_VP_OP,
     SUB_VV_OP,
+};
+#[cfg(doc)]
+use crate::op::info::{
+    ForwardDer
 };
 // -------------------------------------------------------------------------
 // sub_pv_rust_src
@@ -57,10 +59,72 @@ binary::binary_rust_src!(Sub, -);
 // sub_vv_forward_0
 binary::eval_binary_forward_0!(Sub, -);
 // ---------------------------------------------------------------------------
+// forward_der
+// ---------------------------------------------------------------------------
+//
+// sub_pv_forward_der
+/// first order forward for parameter - variable; see [ForwardDer]
+fn sub_pv_forward_der <V, E>(
+    _dyp_both  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
+    var_der    :   &mut Vec<E> ,
+    _cop       :   &Vec<V>     ,
+    _flag_all  :   &Vec<bool>  ,
+    arg        :   &[IndexT]   ,
+    _arg_type  :   &[ADType]   ,
+    res        :   usize       )
+where
+    E  : Clone + From<f32> ,
+    for<'a> &'a E : std::ops::Sub<&'a E, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let rhs = arg[1] as usize;
+    // TODO: use unary minus once it is defined for AD<V>.
+    let zero : E   = E::from( 0f32 );
+    var_der[ res ] = &zero - &var_der[rhs];
+}
+//
+// sub_vp_forward_der
+/// first order forward for variable - parameter; see [ForwardDer]
+fn sub_vp_forward_der <V, E>(
+    _dyp_both  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
+    var_der    :   &mut Vec<E> ,
+    _cop       :   &Vec<V>     ,
+    _flag_all  :   &Vec<bool>  ,
+    arg        :   &[IndexT]   ,
+    _arg_type  :   &[ADType]   ,
+    res        :   usize       )
+where
+    E             : Clone,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    var_der[ res ] = var_der[lhs].clone();
+}
+//
+// sub_vv_forward_der
+/// first order forward for variable - variable; see [ForwardDer]
+fn sub_vv_forward_der <V, E>(
+    _dyp_both  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
+    var_der    :   &mut Vec<E> ,
+    _cop       :   &Vec<V>     ,
+    _flag_all  :   &Vec<bool>  ,
+    arg        :   &[IndexT]   ,
+    _arg_type  :   &[ADType]   ,
+    res        :   usize       )
+where
+    for<'a> &'a E : std::ops::Sub<&'a E, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    let rhs = arg[1] as usize;
+    var_der[res] = &var_der[lhs]  - &var_der[rhs];
+}
+// ---------------------------------------------------------------------------
 // set_op_info
 //
-no_forward_der_value!(Sub);
-no_forward_der_ad!(Sub);
 no_reverse_der_value!(Sub);
 no_reverse_der_ad!(Sub);
 no_rust_src!(Sub);
@@ -75,6 +139,7 @@ where
     for<'a> &'a V : std::ops::Sub<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Sub<&'a V, Output = V>          ,
     V             : Clone + From<f32> + PartialEq + ThisThreadTape ,
+    AD<V>         : From<f32>
 {
     op_info_vec[SUB_PP_OP as usize] = OpInfo{
         name              : "sub_pp",
@@ -95,8 +160,8 @@ where
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : sub_pv_forward_0::<V, V>,
         forward_var_ad    : sub_pv_forward_0::<V, AD<V> >,
-        forward_der_value : forward_der_value_none::<V>,
-        forward_der_ad    : forward_der_ad_none::<V>,
+        forward_der_value : sub_pv_forward_der::<V, V>,
+        forward_der_ad    : sub_pv_forward_der::<V, AD<V>>,
         reverse_der_value : reverse_der_value_none::<V>,
         reverse_der_ad    : reverse_der_ad_none::<V>,
         rust_src          : sub_pv_rust_src,
@@ -108,8 +173,8 @@ where
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : sub_vp_forward_0::<V, V>,
         forward_var_ad    : sub_vp_forward_0::<V, AD<V> >,
-        forward_der_value : forward_der_value_none::<V>,
-        forward_der_ad    : forward_der_ad_none::<V>,
+        forward_der_value : sub_vp_forward_der::<V, V>,
+        forward_der_ad    : sub_vp_forward_der::<V, AD<V> >,
         reverse_der_value : reverse_der_value_none::<V>,
         reverse_der_ad    : reverse_der_ad_none::<V>,
         rust_src          : sub_vp_rust_src,
@@ -121,8 +186,8 @@ where
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : sub_vv_forward_0::<V, V>,
         forward_var_ad    : sub_vv_forward_0::<V, AD<V> >,
-        forward_der_value : forward_der_value_none::<V>,
-        forward_der_ad    : forward_der_ad_none::<V>,
+        forward_der_value : sub_vv_forward_der::<V, V>,
+        forward_der_ad    : sub_vv_forward_der::<V, AD<V> >,
         reverse_der_value : reverse_der_value_none::<V>,
         reverse_der_ad    : reverse_der_ad_none::<V>,
         rust_src          : sub_vv_rust_src,
