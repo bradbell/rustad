@@ -97,8 +97,8 @@ pub fn doc_ad_compare() { }
 /// see [doc_ad_compare]
 // ---------------------------------------------------------------------------
 //
-// impl_binary_aa
-macro_rules! impl_binary_aa{ ($name:ident) => { paste::paste! {
+// impl_compare_aa
+macro_rules! impl_compare_aa{ ($name:ident) => { paste::paste! {
     //
     #[doc = concat!(
         "& `AD<V>` num_", stringify!($name), "( & `AD<V>` )",
@@ -117,7 +117,7 @@ macro_rules! impl_binary_aa{ ($name:ident) => { paste::paste! {
         let (new_tape_id, new_index, new_ad_type) =
             local_key.with_borrow_mut( |tape| {
                 let op_id = [< $name:upper _OP >];
-                record_binary_aa::<V> ( tape, self, rhs, op_id )
+                record_compare_aa::<V> ( tape, self, rhs, op_id )
             } );
         //
         // result
@@ -128,17 +128,17 @@ impl<V> CompareAsNumber< AD<V> > for AD<V>
 where
     V : Clone + From<f32> + PartialEq + CompareAsNumber + ThisThreadTape ,
 {
-    impl_binary_aa!( lt );
-    impl_binary_aa!( le );
-    impl_binary_aa!( eq );
-    impl_binary_aa!( ne );
-    impl_binary_aa!( ge );
-    impl_binary_aa!( gt );
+    impl_compare_aa!( lt );
+    impl_compare_aa!( le );
+    impl_compare_aa!( eq );
+    impl_compare_aa!( ne );
+    impl_compare_aa!( ge );
+    impl_compare_aa!( gt );
 }
 // ---------------------------------------------------------------------------
 //
-// impl_binary_av
-macro_rules! impl_binary_av{ ($name:ident) => { paste::paste! {
+// impl_compare_av
+macro_rules! impl_compare_av{ ($name:ident) => { paste::paste! {
     //
     #[doc = concat!(
         "& `AD<V>` num_", stringify!($name), "( &V )",
@@ -157,7 +157,7 @@ macro_rules! impl_binary_av{ ($name:ident) => { paste::paste! {
         let (new_tape_id, new_index, new_ad_type) =
             local_key.with_borrow_mut( |tape| {
                 let op_id = [< $name:upper _OP >];
-                record_binary_av::<V> ( tape, self, rhs, op_id )
+                record_compare_av::<V> ( tape, self, rhs, op_id )
             } );
         //
         // result
@@ -168,17 +168,17 @@ impl<V> CompareAsNumber<V> for AD<V>
 where
     V : Clone + From<f32> + PartialEq + CompareAsNumber + ThisThreadTape ,
 {
-    impl_binary_av!( lt );
-    impl_binary_av!( le );
-    impl_binary_av!( eq );
-    impl_binary_av!( ne );
-    impl_binary_av!( ge );
-    impl_binary_av!( gt );
+    impl_compare_av!( lt );
+    impl_compare_av!( le );
+    impl_compare_av!( eq );
+    impl_compare_av!( ne );
+    impl_compare_av!( ge );
+    impl_compare_av!( gt );
 }
 // ---------------------------------------------------------------------------
-// record_binary_aa
+// record_compare_aa
 //
-fn record_binary_aa <V> (
+fn record_compare_aa <V> (
     tape: &mut Tape<V> ,
     lhs:       &AD<V>  ,
     rhs:       &AD<V>  ,
@@ -296,9 +296,9 @@ where
     (new_tape_id, new_index, new_ad_type)
 }
 // ---------------------------------------------------------------------------
-// record_binary_av
+// record_compare_av
 //
-fn record_binary_av <V> (
+fn record_compare_av <V> (
     tape: &mut Tape<V> ,
     lhs:       &AD<V>  ,
     rhs:       &V      ,
