@@ -64,6 +64,7 @@ pub use num_vec::{
 };
 pub use ad::{
     AD,
+    compare::CompareAsRight,
     ad_from_value,
     ad_from_vector,
     ad_to_vector,
