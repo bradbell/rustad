@@ -83,17 +83,17 @@ set_operator_ids!(
     /// variable / variable
     DIV_VV_OP,
     //
-    /// lhs.num_lt(rhs)
+    /// lhs.left_lt(rhs)
     LT_OP,
-    /// lhs.num_le(rhs)
+    /// lhs.left_le(rhs)
     LE_OP,
-    /// lhs.num_eq(rhs)
+    /// lhs.left_eq(rhs)
     EQ_OP,
-    /// lhs.num_ne(rhs)
+    /// lhs.left_ne(rhs)
     NE_OP,
-    /// lhs.num_ge(rhs)
+    /// lhs.left_ge(rhs)
     GE_OP,
-    /// lhs.num_gt(rhs)
+    /// lhs.left_gt(rhs)
     GT_OP,
     //
     // CALL

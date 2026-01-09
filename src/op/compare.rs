@@ -10,7 +10,7 @@
 use crate::{
     AD,
     IndexT,
-    CompareAsNumber,
+    CompareAsLeft,
 };
 use crate::adfn::optimize;
 use crate::ad::ADType;
@@ -22,7 +22,7 @@ use crate::op::info::{
 //
 // ---------------------------------------------------------------------------
 /*
-TODO: Uncomment when optimizer handles CompareAsNumber operators.
+TODO: Uncomment when optimizer handles CompareAsLeft operators.
 pub(crate) fn is_compare_op(op_id : u8) -> bool {
     match op_id {
         id::LT_OP => true ,
@@ -65,8 +65,8 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        V : CompareAsNumber,
-        E : CompareAsNumber,
+        V : CompareAsLeft,
+        E : CompareAsLeft,
     {
         debug_assert!( arg.len() == 2);
         debug_assert!(
@@ -78,7 +78,7 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
         let lhs_ref = match arg_type[0] {
             // ADType::ConstantP => &cop[lhs],
             ADType::DynamicP  => &dyp_both[lhs],
-            _ => { panic!( "CompareAsNumber: constants not yet implemented" );},
+            _ => { panic!( "CompareAsLeft: constants not yet implemented" );},
         };
         //
         // rhs_ref
@@ -86,9 +86,9 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
         let rhs_ref = match arg_type[1] {
             // ADType::ConstantP => &cop[rhs],
             ADType::DynamicP  => &dyp_both[rhs],
-            _ => { panic!( "CompareAsNumber: constants not yet implemented" );},
+            _ => { panic!( "CompareAsLeft: constants not yet implemented" );},
         };
-        dyp_both[ res ] = lhs_ref. [< num_ $name >] ( rhs_ref );
+        dyp_both[ res ] = lhs_ref. [< left_ $name >] ( rhs_ref );
     }
     #[doc = concat!(
         " E zero order forward variable num_", stringify!( $name ),
@@ -103,8 +103,8 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        V : CompareAsNumber<V> ,
-        E : CompareAsNumber<V> + CompareAsNumber<E>,
+        V : CompareAsLeft<V> ,
+        E : CompareAsLeft<V> + CompareAsLeft<E>,
     {
         debug_assert!( arg.len() == 2);
         //
@@ -114,22 +114,22 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
             // ADType::ConstantP => &cop[lhs],
             ADType::DynamicP  => &dyp_both[lhs],
             ADType::Variable  => &var_both[lhs],
-            _ => { panic!( "CompareAsNumber: constants not yet implemented" );},
+            _ => { panic!( "CompareAsLeft: constants not yet implemented" );},
         };
         //
         // rhs_ref
         let rhs = arg[1] as usize;
         match arg_type[1] {
             ADType::ConstantP => {
-                var_both[ res ] = lhs_ref. [< num_ $name >] ( &cop[rhs] );
+                var_both[ res ] = lhs_ref. [< left_ $name >] ( &cop[rhs] );
             },
             ADType::DynamicP  => {
-                var_both[ res ] = lhs_ref. [< num_ $name >] ( &dyp_both[rhs] );
+                var_both[ res ] = lhs_ref. [< left_ $name >] ( &dyp_both[rhs] );
             },
             ADType::Variable  => {
-                var_both[ res ] = lhs_ref. [< num_ $name >] ( &var_both[rhs] );
+                var_both[ res ] = lhs_ref. [< left_ $name >] ( &var_both[rhs] );
             },
-            _ => { panic!( "CompareAsNumber: constants not yet implemented" );},
+            _ => { panic!( "CompareAsLeft: constants not yet implemented" );},
         };
     }
 } } }
@@ -214,9 +214,9 @@ fn zero_reverse_der<V, E>  (
 // set_op_info
 //
 // rust_src_none
-no_rust_src!(CompareAsNumber);
+no_rust_src!(CompareAsLeft);
 //
-/// Set the operator information for the CompareAsNumber operators
+/// Set the operator information for the CompareAsLeft operators
 ///
 /// * op_info_vec :
 /// The map from [op::id](crate::op::id) to operator information.
@@ -224,8 +224,8 @@ no_rust_src!(CompareAsNumber);
 /// LT_OP, LE_OP, EQ_OP, NE_OP, GE_OP, GT_OP .
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    V     : Clone + From<f32> + CompareAsNumber,
-    AD<V> : From<f32> + CompareAsNumber<V> + CompareAsNumber< AD<V> >,
+    V     : Clone + From<f32> + CompareAsLeft,
+    AD<V> : From<f32> + CompareAsLeft<V> + CompareAsLeft< AD<V> >,
 {
     op_info_vec[id::LT_OP as usize] = OpInfo{
         name              : "lt",

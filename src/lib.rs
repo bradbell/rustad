@@ -57,7 +57,7 @@ pub(crate) mod setup;
 //
 pub use az_float::{
     AzFloat,
-    CompareAsNumber,
+    CompareAsLeft,
 };
 pub use num_vec::{
     NumVec,
@@ -143,9 +143,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2026.1.7");
+/// assert_eq!(date, "2026.1.9");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2026.1.7";
+pub const YEAR_MONTH_DAY : &str = "2026.1.9";
 //
 // AZ_FLOAT_SRC
 /// is the source code for the [AzFloat] class.

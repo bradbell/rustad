@@ -2,10 +2,10 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
-// Example using CompareAsNumber operators
+// Example using CompareAsLeft operators
 //
 use rustad::{
-    CompareAsNumber,
+    CompareAsLeft,
     AzFloat,
     start_recording,
     stop_recording,
@@ -23,7 +23,7 @@ fn heaviside() {
     //
     // heaviside
     let zero           = V::from(0);
-    let ay             = vec![ ax[0].num_ge(&zero) ];
+    let ay             = vec![ ax[0].left_ge(&zero) ];
     let heaviside      = stop_recording(ay);
     //
     let x       = vec![ V::from(-1.0f32) ];
@@ -57,8 +57,8 @@ fn abs() {
     //
     // abs
     let zero    = V::from(0);
-    let a_lt    = ax[0].num_lt(&zero);
-    let a_ge    = ax[0].num_ge(&zero);
+    let a_lt    = ax[0].left_lt(&zero);
+    let a_ge    = ax[0].left_ge(&zero);
     let a_neg   = &zero - &ax[0];
     let ay      = vec![  &(&a_lt * &a_neg) + &(&a_ge * &ax[0]) ];
     let abs     = stop_recording(ay);

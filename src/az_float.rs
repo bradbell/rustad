@@ -28,28 +28,29 @@ use std::ops::{
     DivAssign,
 };
 // ---------------------------------------------------------------------------
-// CompareAsNumber Trait
+// CompareAsLeft Trait
 //
-/// These comparisons results are  1 for true and 0 for false.
+/// These comparisons results are 1 for true and 0 for false and
+/// have the same type as the left operand.
 ///
 /// For cmp equal to lt, le, eq, ne, ge, gt :
-/// The num_cmp function returns one (zero) if
+/// The left_cmp function returns one (zero) if
 /// self compare other is true (false).
 ///
 /// The not operator will return zero (one)
-pub trait CompareAsNumber<Rhs = Self> {
+pub trait CompareAsLeft<Rhs = Self> {
     /// self < other
-    fn num_lt(&self, other : &Rhs) -> Self;
+    fn left_lt(&self, other : &Rhs) -> Self;
     /// self <= other
-    fn num_le(&self, other : &Rhs) -> Self;
+    fn left_le(&self, other : &Rhs) -> Self;
     /// self == other
-    fn num_eq(&self, other : &Rhs) -> Self;
+    fn left_eq(&self, other : &Rhs) -> Self;
     /// self != other
-    fn num_ne(&self, other : &Rhs) -> Self;
+    fn left_ne(&self, other : &Rhs) -> Self;
     /// self >= other
-    fn num_ge(&self, other : &Rhs) -> Self;
+    fn left_ge(&self, other : &Rhs) -> Self;
     /// self > other
-    fn num_gt(&self, other : &Rhs) -> Self;
+    fn left_gt(&self, other : &Rhs) -> Self;
 }
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
@@ -318,21 +319,21 @@ impl_binary_assign!(AddAssign, add_assign);
 impl_binary_assign!(SubAssign, sub_assign);
 impl_binary_assign!(DivAssign, div_assign);
 // ---------------------------------------------------------------------------
-// CompareAsNumber for AzFloat
-/// CompareAsNumber trait for `AzFloat<B>`
+// CompareAsLeft for AzFloat
+/// CompareAsLeft trait for `AzFloat<B>`
 ///
 /// * B : Is the floating point base type
 ///
 /// # Example :
 /// ```
 /// use rustad::AzFloat;
-/// use rustad::CompareAsNumber;
+/// use rustad::CompareAsLeft;
 /// type B = f64;
 /// //
 /// let one   : AzFloat<B> = (1.0 as B).into();
 /// let two   : AzFloat<B> = (2.0 as B).into();
 /// let three : AzFloat<B> = (3.0 as B).into();
-/// let lt     = two.num_lt(&three);
+/// let lt     = two.left_lt(&three);
 /// let not_lt = &one - &lt;
 /// assert_eq!( lt.to_inner(), (1.0 as B) );
 /// assert_eq!( not_lt.to_inner(), (0.0 as B) );
@@ -354,17 +355,17 @@ macro_rules! impl_compare_az_float{ ($name:ident, $op:tt) => {
     }
 } }
 //
-impl<B> CompareAsNumber for AzFloat<B>
+impl<B> CompareAsLeft for AzFloat<B>
 where
     B          :  PartialOrd,
     AzFloat<B> : From<usize>,
 {
-    impl_compare_az_float!( num_lt, <  );
-    impl_compare_az_float!( num_le, <= );
-    impl_compare_az_float!( num_eq, == );
-    impl_compare_az_float!( num_ne, != );
-    impl_compare_az_float!( num_ge, >= );
-    impl_compare_az_float!( num_gt, >  );
+    impl_compare_az_float!( left_lt, <  );
+    impl_compare_az_float!( left_le, <= );
+    impl_compare_az_float!( left_eq, == );
+    impl_compare_az_float!( left_ne, != );
+    impl_compare_az_float!( left_ge, >= );
+    impl_compare_az_float!( left_gt, >  );
 }
 // ---------------------------------------------------------------------------
 // PartialEq, Eq

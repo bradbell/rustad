@@ -21,7 +21,7 @@
 // use
 use crate::{
     AzFloat,
-    CompareAsNumber,
+    CompareAsLeft,
 };
 //
 // NumVec
@@ -237,8 +237,8 @@ num_vec_compound_op!(SubAssign, -=);
 num_vec_compound_op!(MulAssign, *=);
 num_vec_compound_op!(DivAssign, /=);
 // ---------------------------------------------------------------------------
-// CompareAsNumber for NumVec
-/// CompareAsNumber trait for `NumVec<S>`
+// CompareAsLeft for NumVec
+/// CompareAsLeft trait for `NumVec<S>`
 ///
 /// * S : is the type of the elements of the numeric vector.
 ///
@@ -248,14 +248,14 @@ num_vec_compound_op!(DivAssign, /=);
 /// ```
 /// use rustad::NumVec;
 /// use rustad::AzFloat;
-/// use rustad::CompareAsNumber;
+/// use rustad::CompareAsLeft;
 ///
 /// type S = AzFloat<f32>;
 /// //
 /// let two_three = NumVec::new( vec![ S::from(2), S::from(3) ] );
 /// let three     = NumVec::from( S::from(3) );
 ///
-/// let lt        = two_three.num_lt(&three);
+/// let lt        = two_three.left_lt(&three);
 /// let check     = NumVec::new( vec![ S::from(1), S::from(0) ] );
 /// assert_eq!( lt, check);
 ///
@@ -306,16 +306,16 @@ macro_rules! impl_compare_num_vec{ ($name:ident, $op:tt) => {
     }
 } }
 //
-impl<S> CompareAsNumber for NumVec<S>
+impl<S> CompareAsLeft for NumVec<S>
 where
-    S  : Copy + From<f32> + From<usize> + PartialOrd + CompareAsNumber,
+    S  : Copy + From<f32> + From<usize> + PartialOrd + CompareAsLeft,
 {
-    impl_compare_num_vec!( num_lt, <  );
-    impl_compare_num_vec!( num_le, <= );
-    impl_compare_num_vec!( num_eq, == );
-    impl_compare_num_vec!( num_ne, != );
-    impl_compare_num_vec!( num_ge, >= );
-    impl_compare_num_vec!( num_gt, >  );
+    impl_compare_num_vec!( left_lt, <  );
+    impl_compare_num_vec!( left_le, <= );
+    impl_compare_num_vec!( left_eq, == );
+    impl_compare_num_vec!( left_ne, != );
+    impl_compare_num_vec!( left_ge, >= );
+    impl_compare_num_vec!( left_gt, >  );
 }
 // ----------------------------------------------------------------------------`
 /// Displays a `NumVec` < *S* > object.

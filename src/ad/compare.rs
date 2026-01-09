@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This pub module defines the CompareAsNumber trait for AD types
+//! This pub module defines the CompareAsLeft trait for AD types
 //!
 //! Link to [parent module](super)
 //!
@@ -14,7 +14,7 @@ use std::cell::RefCell;
 use crate::{
     AD,
     IndexT,
-    CompareAsNumber,
+    CompareAsLeft,
 };
 use crate::ad::ADType;
 use crate::tape::Tape;
@@ -31,13 +31,13 @@ use crate::op::id::{
 #[cfg(doc)]
 use crate::doc_generic_v;
 // ---------------------------------------------------------------------------
-// CompareAsNumber for AD<V>
-/// CompareAsNumber trait for `AD<V>`
+// CompareAsLeft for AD<V>
+/// CompareAsLeft trait for `AD<V>`
 ///
 /// * Syntax : lhs.compare(&rhs)
 ///
 ///     * lhs : is the `AD<V>` left operand
-///     * rhs : is the `AD<V>` right operand
+///     * rhs : is the `AD<V>` or V right operand
 ///     * compare  : is one of `lt` , `le`, `eq`, `ne`, `ge`, `gt`
 ///
 /// # Example
@@ -45,18 +45,22 @@ use crate::doc_generic_v;
 /// use rustad::{
 ///     AD,
 ///     ad_from_value,
-///     CompareAsNumber,
+///     CompareAsLeft,
 /// };
 ///
 /// type V       = rustad::AzFloat<f64>;
 /// let ax       = ad_from_value( V::from(3.0) );
 /// let ay       = ad_from_value( V::from(4.0) );
+/// let z        = V::from(4.0);
 ///
-/// let ax_lt_y  = ax.num_lt(&ay);
+/// let ax_lt_y  = ax.left_lt(&ay);
 /// assert_eq!(ax_lt_y.to_value(), V::from(1) );
 ///
-/// let ax_ge_y  = ax.num_ge(&ay);
+/// let ax_ge_y  = ax.left_ge(&ay);
 /// assert_eq!(ax_ge_y.to_value(), V::from(0) );
+///
+/// let ay_eq_z  = ay.left_eq(&z);
+/// assert_eq!(ay_eq_z.to_value(), V::from(1) );
 /// ```
 ///
 /// # Example using NumVec
@@ -66,7 +70,7 @@ use crate::doc_generic_v;
 ///     AzFloat,
 ///     ad_from_value,
 ///     NumVec,
-///     CompareAsNumber,
+///     CompareAsLeft,
 /// };
 ///
 /// type S    = AzFloat<f32>;
@@ -78,15 +82,15 @@ use crate::doc_generic_v;
 /// let ax    = ad_from_value(x_nv);
 /// let ay    = ad_from_value(y_nv);
 ///
-/// let ax_lt_y  = ax.num_lt(&ay);
+/// let ax_lt_y  = ax.left_lt(&ay);
 /// let check    = NumVec::new( vec![ S::from(1), S::from(0) ] );
 /// assert_eq!(ax_lt_y.to_value(), check );
 ///
-/// let ax_gt_y  = ax.num_gt(&ay);
+/// let ax_gt_y  = ax.left_gt(&ay);
 /// let check    = NumVec::new( vec![ S::from(0), S::from(1) ] );
 /// assert_eq!(ax_gt_y.to_value(), check );
 /// ```
-pub fn doc_ad_compare() { }
+pub fn doc_ad_compare_left() { }
 //
 /// Add one compare operator to the `AD<V>` class;
 ///
@@ -94,7 +98,7 @@ pub fn doc_ad_compare() { }
 /// * name : is the operator name; i.e., one of the following:
 ///     lt, le, eq, ne, ge, gt.
 ///
-/// see [doc_ad_compare]
+/// see [doc_ad_compare_left]
 // ---------------------------------------------------------------------------
 //
 // impl_compare_aa
@@ -102,12 +106,12 @@ macro_rules! impl_compare_aa{ ($name:ident) => { paste::paste! {
     //
     #[doc = concat!(
         "& `AD<V>` num_", stringify!($name), "( & `AD<V>` )",
-        "; see [doc_ad_compare]"
+        "; see [doc_ad_compare_left]"
     )]
-    fn [< num_ $name >](&self , rhs : &AD<V> ) -> AD<V>
+    fn [< left_ $name >](&self , rhs : &AD<V> ) -> AD<V>
     {
         // new_value
-        let new_value     = self.value. [< num_ $name >] ( &rhs.value );
+        let new_value     = self.value. [< left_ $name >] ( &rhs.value );
         //
         // local_key
         let local_key : &LocalKey< RefCell< Tape<V> > > =
@@ -124,9 +128,9 @@ macro_rules! impl_compare_aa{ ($name:ident) => { paste::paste! {
         AD::new(new_tape_id, new_index, new_ad_type, new_value)
     }
 } } }
-impl<V> CompareAsNumber< AD<V> > for AD<V>
+impl<V> CompareAsLeft< AD<V> > for AD<V>
 where
-    V : Clone + From<f32> + PartialEq + CompareAsNumber + ThisThreadTape ,
+    V : Clone + From<f32> + PartialEq + CompareAsLeft + ThisThreadTape ,
 {
     impl_compare_aa!( lt );
     impl_compare_aa!( le );
@@ -142,12 +146,12 @@ macro_rules! impl_compare_av{ ($name:ident) => { paste::paste! {
     //
     #[doc = concat!(
         "& `AD<V>` num_", stringify!($name), "( &V )",
-        "; see [doc_ad_compare]"
+        "; see [doc_ad_compare_left]"
     )]
-    fn [< num_ $name >](&self , rhs : &V ) -> AD<V>
+    fn [< left_ $name >](&self , rhs : &V ) -> AD<V>
     {
         // new_value
-        let new_value     = self.value. [< num_ $name >] ( rhs );
+        let new_value     = self.value. [< left_ $name >] ( rhs );
         //
         // local_key
         let local_key : &LocalKey< RefCell< Tape<V> > > =
@@ -164,9 +168,9 @@ macro_rules! impl_compare_av{ ($name:ident) => { paste::paste! {
         AD::new(new_tape_id, new_index, new_ad_type, new_value)
     }
 } } }
-impl<V> CompareAsNumber<V> for AD<V>
+impl<V> CompareAsLeft<V> for AD<V>
 where
-    V : Clone + From<f32> + PartialEq + CompareAsNumber + ThisThreadTape ,
+    V : Clone + From<f32> + PartialEq + CompareAsLeft + ThisThreadTape ,
 {
     impl_compare_av!( lt );
     impl_compare_av!( le );
