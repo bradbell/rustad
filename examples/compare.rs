@@ -29,22 +29,41 @@ fn heaviside() {
     let x       = vec![ V::from(-1.0f32) ];
     let (y, _v) = heaviside.forward_var_value(None, x, trace);
     assert_eq!(y[0], V::from(0));
+    // ------------------------------------------------------------------------
+    // forward_var_value
     //
-    let x       = vec![ V::from(-1.0f32) ];
+    let x       = vec![ V::from(-2.0f32) ];
     let (y, _v) = heaviside.forward_var_value(None, x, trace);
     assert_eq!(y[0], V::from(0));
     //
-    let x       = vec![ V::from(1.0f32) ];
+    let x       = vec![ V::from(2.0f32) ];
     let (y, _v) = heaviside.forward_var_value(None, x, trace);
     assert_eq!(y[0], V::from(1));
     //
-    let x       = vec![ V::from(-1.0f32) ];
+    let x       = vec![ V::from(-2.0f32) ];
     let (y, v)  = heaviside.forward_var_value(None, x, trace);
     assert_eq!(y[0], V::from(0));
     //
-    let dx      = vec![ V::from(1.0f32) ];
+    let dx      = vec![ V::from(2.0f32) ];
     let dy      = heaviside.forward_der_value(None, &v, dx, trace);
     assert_eq!(dy[0], V::from(0));
+    // ------------------------------------------------------------------------
+    // forward_var_ad
+    //
+    // f(x) = if x > 0 { x } else { 0 }
+    let x         = vec![ V::from(-1.0f32) ];
+    let (_ap, ax) = start_recording(None, x);
+    let (ah, av) = heaviside.forward_var_ad(None, ax, trace);
+    let ay        = vec![ &ah[0] * &av[0] ]; // av[0] == ax[0]
+    let f         = stop_recording(ay);
+    //
+    let x       = vec![ V::from(-2.0f32) ];
+    let (y, _v) = f.forward_var_value(None, x, trace);
+    assert_eq!(y[0], V::from(0));
+    //
+    let x       = vec![ V::from(2.0f32) ];
+    let (y, _v) = f.forward_var_value(None, x, trace);
+    assert_eq!(y[0], V::from(2));
 }
 //
 fn abs() {
@@ -52,7 +71,7 @@ fn abs() {
     let trace = false;
     //
     // ax
-    let x : Vec<V> = vec![ V::from(2) ];
+    let x : Vec<V> = vec![ V::from(1) ];
     let (_ap, ax ) = start_recording(None, x);
     //
     // abs
@@ -74,6 +93,23 @@ fn abs() {
     let dx      = vec![ V::from(1.0f32) ];
     let dy      = abs.forward_der_value(None, &v, dx, trace);
     assert_eq!(dy[0], V::from(1));
+    // ------------------------------------------------------------------------
+    // forward_var_ad
+    //
+    // f(x) = if x > 0 { x * x } else { - x * x }
+    let x           = vec![ V::from(-1.0f32) ];
+    let (_ap, ax)   = start_recording(None, x);
+    let (a_abs, av) = abs.forward_var_ad(None, ax, trace);
+    let ay        = vec![ &a_abs[0] * &av[0] ]; // av[0] == ax[0]
+    let f         = stop_recording(ay);
+    //
+    let x       = vec![ V::from(-2.0f32) ];
+    let (y, _v) = f.forward_var_value(None, x, trace);
+    assert_eq!( y[0], V::from(- 4f32 ) );
+    //
+    let x       = vec![ V::from(2.0f32) ];
+    let (y, _v) = f.forward_var_value(None, x, trace);
+    assert_eq!( y[0], V::from( 4f32 ) );
 }
 
 fn main() {
