@@ -457,7 +457,7 @@ where
     V     : Clone + From<f32> + PartialEq,
     V     : ThisThreadTape + GlobalAtomCallbackVec,
     V     : CompareAsLeft<V> + CompareAsRight<V>,
-    AD<V> : From<f32>,
+    AD<V> : From<V>,
 {
     let empty = OpInfo {
         name               : &"panic",

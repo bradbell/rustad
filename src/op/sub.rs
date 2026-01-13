@@ -74,13 +74,14 @@ fn sub_pv_forward_der <V, E>(
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
 where
-    E  : Clone + From<f32> ,
+    E  : Clone + From<V>,
+    V  : From<f32>,
     for<'a> &'a E : std::ops::Sub<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let rhs = arg[1] as usize;
     // TODO: use unary minus once it is defined for AD<V>.
-    let zero : E   = E::from( 0f32 );
+    let zero : E   = E::from( V::from( 0f32 ) );
     var_der[ res ] = &zero - &var_der[rhs];
 }
 //
@@ -139,7 +140,7 @@ where
     for<'a> &'a V : std::ops::Sub<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Sub<&'a V, Output = V>          ,
     V             : Clone + From<f32> + PartialEq + ThisThreadTape ,
-    AD<V>         : From<f32>
+    AD<V>         : From<V>
 {
     op_info_vec[SUB_PP_OP as usize] = OpInfo{
         name              : "sub_pp",

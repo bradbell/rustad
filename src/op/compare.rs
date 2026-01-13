@@ -220,9 +220,10 @@ fn zero_forward_der<V, E>  (
     res        : usize      ,
 )
 where
-    E : From<f32>,
+    E : From<V>,
+    V : From<f32>,
 {
-    var_der [ res ] = 0.0f32.into();
+    var_der [ res ] = V::from(0.0f32).into();
 }
 // ---------------------------------------------------------------------------
 // zero_reverse_der
@@ -253,7 +254,7 @@ where
     V     : Clone + From<f32>,
     V     :  CompareAsLeft<V>  + CompareAsRight< AD<V> >,
     V     :  CompareAsRight<V> + CompareAsRight< AD<V> >,
-    AD<V> : From<f32>,
+    AD<V> : From<V>,
     AD<V> :  CompareAsLeft<V> + CompareAsLeft< AD<V> >,
 {
     op_info_vec[id::LT_OP as usize] = OpInfo{

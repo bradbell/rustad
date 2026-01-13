@@ -14,10 +14,6 @@
 pub mod binary;
 pub mod compare;
 // ---------------------------------------------------------------------------
-// use
-//
-use crate::AzFloat;
-// ---------------------------------------------------------------------------
 //
 // ADType
 /// The AD types satisfy the following order:
@@ -295,83 +291,6 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
     vec
 }
 // -------------------------------------------------------------------------
-/// Convert an f32 value to an AD object with no function information;
-/// i.e., constant parameter.
-///
-/// See Also :
-/// example in [ad_from_value], [ad_from_vector]
-///
-/// Syntax :
-/// ```text
-/// az  = AD::<V>::from( f32_value )
-/// ```
-///
-/// * V : see [doc_generic_v]
-///
-/// * f32_value : is an f32 value
-///
-/// # Example
-/// ```
-/// use rustad::AD;
-/// use rustad::NumVec;
-/// use rustad::AzFloat;
-/// type S = rustad::AzFloat<f32>;
-/// type V = NumVec<S>;
-/// let ax = AD::<V>::from(3.0 as f32);
-/// let x  = ax.to_value();
-/// assert_eq!( x.get(0).to_inner(), 3.0 as f32);
-/// ```
-impl<V> From<f32> for AD<V>
-where
-    V : From<f32>,
-{
-    fn from( f32_value : f32 ) -> AD<V> {
-        let tape_id    = 0;
-        let index      = 0;
-        let ad_type    = crate::ad::ADType::ConstantP;
-        let value      = V::from(f32_value);
-        AD::new(tape_id, index, ad_type, value)
-    }
-}
-// -------------------------------------------------------------------------
-/// Convert an f64 value to an AD object with no function information;
-/// i.e., constant parameter.
-///
-/// See Also :
-/// example in [ad_from_value], [ad_from_vector]
-///
-/// Syntax :
-/// ```text
-/// az = AD<V>::from( f64_value )
-/// ```
-///
-/// * V : see [doc_generic_v] . In addition, this type must support
-/// `V::from<f64>` .
-///
-/// # Example
-/// ```
-/// use rustad::AD;
-/// use rustad::AzFloat;
-/// use rustad::NumVec;
-/// type S  = AzFloat<f64>;
-/// type V  = NumVec<S>;
-/// let ax  = AD::<V>::from(3.0 as f64);
-/// let x   = ax.to_value();
-/// assert_eq!( x.get(0), S::from(3.0) );
-/// ```
-impl<V> From<f64> for AD<V>
-where
-    V : From<f64>,
-{
-    fn from( f64_value : f64 ) -> AD<V> {
-        let tape_id    = 0;
-        let index      = 0;
-        let ad_type    = crate::ad::ADType::ConstantP;
-        let value      = V::from(f64_value);
-        AD::new(tape_id, index, ad_type, value)
-    }
-}
-// -------------------------------------------------------------------------
 /// Convert V to an `AD<V>` object with no function information;
 /// i.e., constant parameter.
 ///
@@ -395,9 +314,9 @@ where
 /// let x   = ax.to_value();
 /// assert_eq!( x, V::from(3.0) );
 /// ```
-impl<B> From< AzFloat<B> > for AD< AzFloat<B> >
+impl<V> From<V> for AD<V>
 {
-    fn from( value : AzFloat<B> ) -> AD< AzFloat<B> > {
+    fn from( value : V ) -> AD<V> {
         let tape_id    = 0;
         let index      = 0;
         let ad_type    = crate::ad::ADType::ConstantP;
