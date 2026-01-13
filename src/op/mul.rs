@@ -54,12 +54,12 @@ use crate::op::info::{
 // mul_vv_rust_src
 binary::binary_rust_src!(Mul, *);
 // -------------------------------------------------------------------------
-// forward_0
+// forward_var
 // -------------------------------------------------------------------------
-// mul_pv_forward_0
-// mul_vp_forward_0
-// mul_vv_forward_0
-binary::eval_binary_forward_0!(Mul, *);
+// mul_pv_forward_var
+// mul_vp_forward_var
+// mul_vv_forward_var
+binary::eval_binary_forward_var!(Mul, *);
 // ---------------------------------------------------------------------------
 // forward_der
 // ---------------------------------------------------------------------------
@@ -264,8 +264,8 @@ where
         name              : "mul_pv",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
-        forward_var_value : mul_pv_forward_0::<V, V>,
-        forward_var_ad    : mul_pv_forward_0::<V, AD<V> >,
+        forward_var_value : mul_pv_forward_var::<V, V>,
+        forward_var_ad    : mul_pv_forward_var::<V, AD<V> >,
         forward_der_value : mul_pv_forward_der::<V, V>,
         forward_der_ad    : mul_pv_forward_der::<V, AD<V> >,
         reverse_der_value : mul_pv_reverse_der::<V, V>,
@@ -277,8 +277,8 @@ where
         name              : "mul_vp",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
-        forward_var_value : mul_vp_forward_0::<V, V>,
-        forward_var_ad    : mul_vp_forward_0::<V, AD<V> >,
+        forward_var_value : mul_vp_forward_var::<V, V>,
+        forward_var_ad    : mul_vp_forward_var::<V, AD<V> >,
         forward_der_value : mul_vp_forward_der::<V, V>,
         forward_der_ad    : mul_vp_forward_der::<V, AD<V> >,
         reverse_der_value : mul_vp_reverse_der::<V, V>,
@@ -290,8 +290,8 @@ where
         name              : "mul_vv",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
-        forward_var_value : mul_vv_forward_0::<V, V>,
-        forward_var_ad    : mul_vv_forward_0::<V, AD<V> >,
+        forward_var_value : mul_vv_forward_var::<V, V>,
+        forward_var_ad    : mul_vv_forward_var::<V, AD<V> >,
         forward_der_value : mul_vv_forward_der::<V, V>,
         forward_der_ad    : mul_vv_forward_der::<V, AD<V> >,
         reverse_der_value : mul_vv_reverse_der::<V, V>,

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 //! Utilities used by the binary operators.
 //!
@@ -39,7 +39,7 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
     }
 }
 // ---------------------------------------------------------------------------
-// eval_binary_forward_0
+// eval_binary_forward_var
 /// Evaluation of zero order forward for binary operators.
 ///
 /// * V      : see [doc_generic_v](crate::doc_generic_v)
@@ -49,15 +49,15 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
 ///
 /// This defines the following functions in the current module:
 /// ```text
-///     {name}_pv_forward_0<V, E>
-///     {name}_vp_forward_0<V, E>
-///     {name}_vv_forward_0<V, E>
+///     {name}_pv_forward_var<V, E>
+///     {name}_vp_forward_var<V, E>
+///     {name}_vv_forward_var<V, E>
 /// ```
 /// where {name} is a lower case version of Name and
 /// v (p) means the corresponding operand is a variable (parameter) .
 ///
-/// [IndexT] must be defined in any module that uses eval_binary_forward_0
-macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
+/// [IndexT] must be defined in any module that uses eval_binary_forward_var
+macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! {
     #[doc = concat!(
         " E zero order forward for parameter ", stringify!( $op ),
         " parameter; see [ForwardDyp](crate::op::info::ForwardDyp)"
@@ -92,7 +92,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         " E zero order forward for parameter ", stringify!( $op ),
         " variable; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
-    fn [< $Name:lower _pv_forward_0 >] <V, E> (
+    fn [< $Name:lower _pv_forward_var >] <V, E> (
         dyp_both    : &Vec<E>     ,
         var_both    : &mut Vec<E> ,
         cop         : &Vec<V>     ,
@@ -118,7 +118,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         " E zero order forward variable ", stringify!( $op ),
         " parameter; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
-    fn [< $Name:lower _vp_forward_0 >] <V, E> (
+    fn [< $Name:lower _vp_forward_var >] <V, E> (
         dyp_both    : &Vec<E>     ,
         var_both    : &mut Vec<E> ,
         cop         : &Vec<V>     ,
@@ -144,7 +144,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         " E zero order forward variable ", stringify!( $op ),
         " variable; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
-    fn [< $Name:lower _vv_forward_0 >] <V, E> (
+    fn [< $Name:lower _vv_forward_var >] <V, E> (
         _dyp_both   : &Vec<E>     ,
         var_both    : &mut Vec<E> ,
         _cop        : &Vec<V>     ,
@@ -161,7 +161,7 @@ macro_rules! eval_binary_forward_0 { ($Name:ident, $op:tt) => { paste::paste! {
         var_both[ res ] = &var_both[lhs] $op &var_both[rhs];
     }
 } } }
-pub(crate) use eval_binary_forward_0;
+pub(crate) use eval_binary_forward_var;
 // ---------------------------------------------------------------------------
 // binary_rust_src
 /// Rust source code for binary operators.

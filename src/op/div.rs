@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 //! Evaluate the Div operators
 //!
@@ -51,10 +51,10 @@ use crate::op::id::{
 // div_vv_rust_src
 binary::binary_rust_src!(Div, /);
 // -------------------------------------------------------------------------
-// div_pv_forward_0
-// div_vp_forward_0
-// div_vv_forward_0
-binary::eval_binary_forward_0!(Div, /);
+// div_pv_forward_var
+// div_vp_forward_var
+// div_vv_forward_var
+binary::eval_binary_forward_var!(Div, /);
 // ---------------------------------------------------------------------------
 // set_op_info
 //
@@ -92,8 +92,8 @@ where
         name              : "div_pv",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
-        forward_var_value : div_pv_forward_0::<V, V>,
-        forward_var_ad    : div_pv_forward_0::<V, AD<V> >,
+        forward_var_value : div_pv_forward_var::<V, V>,
+        forward_var_ad    : div_pv_forward_var::<V, AD<V> >,
         forward_der_value : forward_der_value_none::<V>,
         forward_der_ad    : forward_der_ad_none::<V>,
         reverse_der_value : reverse_der_value_none::<V>,
@@ -105,8 +105,8 @@ where
         name              : "div_vp",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
-        forward_var_value : div_vp_forward_0::<V, V>,
-        forward_var_ad    : div_vp_forward_0::<V, AD<V> >,
+        forward_var_value : div_vp_forward_var::<V, V>,
+        forward_var_ad    : div_vp_forward_var::<V, AD<V> >,
         forward_der_value : forward_der_value_none::<V>,
         forward_der_ad    : forward_der_ad_none::<V>,
         reverse_der_value : reverse_der_value_none::<V>,
@@ -118,8 +118,8 @@ where
         name              : "div_vv",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
-        forward_var_value : div_vv_forward_0::<V, V>,
-        forward_var_ad    : div_vv_forward_0::<V, AD<V> >,
+        forward_var_value : div_vv_forward_var::<V, V>,
+        forward_var_ad    : div_vv_forward_var::<V, AD<V> >,
         forward_der_value : forward_der_value_none::<V>,
         forward_der_ad    : forward_der_ad_none::<V>,
         reverse_der_value : reverse_der_value_none::<V>,

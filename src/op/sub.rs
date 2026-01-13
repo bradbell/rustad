@@ -56,10 +56,10 @@ use crate::op::info::{
 binary::binary_rust_src!(Sub, -);
 // -------------------------------------------------------------------------
 // sub_forward_dyp
-// sub_pv_forward_0
-// sub_vp_forward_0
-// sub_vv_forward_0
-binary::eval_binary_forward_0!(Sub, -);
+// sub_pv_forward_var
+// sub_vp_forward_var
+// sub_vv_forward_var
+binary::eval_binary_forward_var!(Sub, -);
 // ---------------------------------------------------------------------------
 // forward_der
 // ---------------------------------------------------------------------------
@@ -231,8 +231,8 @@ where
         name              : "sub_pv",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
-        forward_var_value : sub_pv_forward_0::<V, V>,
-        forward_var_ad    : sub_pv_forward_0::<V, AD<V> >,
+        forward_var_value : sub_pv_forward_var::<V, V>,
+        forward_var_ad    : sub_pv_forward_var::<V, AD<V> >,
         forward_der_value : sub_pv_forward_der::<V, V>,
         forward_der_ad    : sub_pv_forward_der::<V, AD<V>>,
         reverse_der_value : sub_pv_reverse_der::<V, V>,
@@ -244,8 +244,8 @@ where
         name              : "sub_vp",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
-        forward_var_value : sub_vp_forward_0::<V, V>,
-        forward_var_ad    : sub_vp_forward_0::<V, AD<V> >,
+        forward_var_value : sub_vp_forward_var::<V, V>,
+        forward_var_ad    : sub_vp_forward_var::<V, AD<V> >,
         forward_der_value : sub_vp_forward_der::<V, V>,
         forward_der_ad    : sub_vp_forward_der::<V, AD<V> >,
         reverse_der_value : sub_vp_reverse_der::<V, V>,
@@ -257,8 +257,8 @@ where
         name              : "sub_vv",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
-        forward_var_value : sub_vv_forward_0::<V, V>,
-        forward_var_ad    : sub_vv_forward_0::<V, AD<V> >,
+        forward_var_value : sub_vv_forward_var::<V, V>,
+        forward_var_ad    : sub_vv_forward_var::<V, AD<V> >,
         forward_der_value : sub_vv_forward_der::<V, V>,
         forward_der_ad    : sub_vv_forward_der::<V, AD<V> >,
         reverse_der_value : sub_vv_reverse_der::<V, V>,
