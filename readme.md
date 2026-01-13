@@ -30,7 +30,8 @@ This package is intended to include (and extend) most of the features in
 
 ## Features Implemented
 
-1.  Addition and multiplication: We have held off on other simple numerical
+1.  Addition, subtraction and multiplication: 
+    We have held off on other simple numerical
     operations while we focus on more complicated features.
 
 2.  Forward and reverse mode derivatives with optional tracing
@@ -79,7 +80,7 @@ This package is intended to include (and extend) most of the features in
 
 ## Goals Before Stable API
 
-1.  Subtraction, division and all the standard math functions.
+1.  Division and all the standard math functions.
     
 2.  Forward and reverse sparse derivative calculations
     (sparsity patterns are already implemented). 

@@ -6,8 +6,6 @@
 //
 use rustad::{
     AzFloat,
-    AD,
-    ad_from_value,
     start_recording,
     stop_recording,
     get_lib,
@@ -16,27 +14,23 @@ use rustad::{
     ad_from_vector,
 };
 //
-fn main () {
+fn test_sub () {
     //
     //
     type V     = AzFloat<f32>;
-    let nx     = 3;
+    let nx     = 2;
     let trace  = false;
     //
     // ax
     let x  : Vec<V> = vec![ V::from(2.0); nx ];
     let (_, ax)  = start_recording(None, x);
     //
-    // asum
-    let mut asum : AD<V>  = ad_from_value(  V::from(0.0) );
-    for j in 0 .. nx {
-        let square  = &ax[j] * &ax[j];
-        asum       += &square;
-    }
+    // asub
+    let asub = &ax[0] - &ax[1];
     //
     // f
-    // f(x) = x[0] * x[0] + ... + x[nx-1] * x[nx-1]
-    let ay = vec![ asum ];
+    // f(x) = x[0] - x[1]
+    let ay = vec![ asub ];
     let f  = stop_recording(ay);
     //
     // av
@@ -45,7 +39,7 @@ fn main () {
     let (_, av) = f.forward_var_ad(None, ax, trace);
     //
     // g
-    // g(x) = df/dx = [ 2 * x[0], ..., 2 * x[nx-1] ]
+    // g(x) = df/dx = [ x[0], - x[1] ]
     let dy  : Vec<V>  = vec![ V::from(1.0) ];
     let ady           = ad_from_vector(dy);
     let adx           = f.reverse_der_ad(None, &av, ady, trace);
@@ -53,23 +47,23 @@ fn main () {
     //
     // src
     let src      = String::from( rustad::AZ_FLOAT_SRC );
-    let gn_name  = "sumsq_reverse_der";
+    let gn_name  = "sub_reverse_der";
     let src      = src + &g.rust_src(gn_name);
     //
     // src_file
-    let src_file = "tmp/example_rust_src.rs";
+    let src_file = "tmp/test_sub_rust_src.rs";
     let result = std::fs::write(src_file, src);
     if result.is_err() {
         panic!( "Cannot write {src_file}"  );
     }
     //
     // lib
-    let lib_file    = "tmp/example_rust_src.so";
+    let lib_file    = "tmp/test_sub_rust_src.so";
     let replace_lib = true;
     let lib         = get_lib(src_file, lib_file, replace_lib);
     //
-    // sumsq_fn_reverse_der_fn
-    let sumsq_reverse_der_fn : RustSrcLink<V> = get_rust_src_fn(&lib, &gn_name);
+    // sub_reverse_der_fn
+    let sub_reverse_der_fn : RustSrcLink<V> = get_rust_src_fn(&lib, &gn_name);
     //
     // p_ref, x_ref
     let p_ref     : Vec<&V> = Vec::new();
@@ -80,10 +74,14 @@ fn main () {
     }
     //
     // check result
-    let result = sumsq_reverse_der_fn(&p_ref, &x_ref);
+    let result = sub_reverse_der_fn(&p_ref, &x_ref);
     let dx     = result.unwrap();
     assert_eq!( dx.len(), nx);
-    for j in 0 .. nx {
-        assert_eq!( dx[j], V::from(2.0) * x[j] );
-    }
+    assert_eq!( dx[0], V::from(1.0f32) );
+    assert_eq!( dx[1], V::from(-1.0f32) );
+}
+//
+#[test]
+fn rust_src() {
+    test_sub();
 }
