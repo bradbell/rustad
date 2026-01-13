@@ -15,6 +15,7 @@ use crate::{
     AD,
     IndexT,
     CompareAsLeft,
+    CompareAsRight,
 };
 use crate::ad::ADType;
 use crate::tape::Tape;
@@ -30,31 +31,6 @@ use crate::op::id::{
 //
 #[cfg(doc)]
 use crate::doc_generic_v;
-// ---------------------------------------------------------------------------
-// CompareAsRight Trait
-//
-/// These comparisons results are 1 for true and 0 for false and
-/// have the same type as the left operand.
-///
-/// For cmp equal to lt, le, eq, ne, ge, gt :
-/// The cmp_right function returns one (zero) if
-/// self compare other is true (false).
-///
-/// The not operator will return zero (one)
-pub trait CompareAsRight<Rhs> {
-    /// self < other
-    fn lt_right(&self, other : &Rhs) -> Rhs;
-    /// self <= other
-    fn le_right(&self, other : &Rhs) -> Rhs;
-    /// self == other
-    fn eq_right(&self, other : &Rhs) -> Rhs;
-    /// self != other
-    fn ne_right(&self, other : &Rhs) -> Rhs;
-    /// self >= other
-    fn ge_right(&self, other : &Rhs) -> Rhs;
-    /// self > other
-    fn gt_right(&self, other : &Rhs) -> Rhs;
-}
 // ---------------------------------------------------------------------------
 // CompareAsLeft for AD<V>
 /// CompareAsLeft trait for `AD<V>`

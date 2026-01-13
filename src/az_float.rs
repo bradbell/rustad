@@ -53,6 +53,31 @@ pub trait CompareAsLeft<Rhs = Self> {
     fn left_gt(&self, other : &Rhs) -> Self;
 }
 // ---------------------------------------------------------------------------
+// CompareAsRight Trait
+//
+/// These comparisons results are 1 for true and 0 for false and
+/// have the same type as the right operand.
+///
+/// For cmp equal to lt, le, eq, ne, ge, gt :
+/// The cmp_right function returns one (zero) if
+/// self compare other is true (false).
+///
+/// The not operator will return zero (one)
+pub trait CompareAsRight<Rhs = Self> {
+    /// self < other
+    fn lt_right(&self, other : &Rhs) -> Rhs;
+    /// self <= other
+    fn le_right(&self, other : &Rhs) -> Rhs;
+    /// self == other
+    fn eq_right(&self, other : &Rhs) -> Rhs;
+    /// self != other
+    fn ne_right(&self, other : &Rhs) -> Rhs;
+    /// self >= other
+    fn ge_right(&self, other : &Rhs) -> Rhs;
+    /// self > other
+    fn gt_right(&self, other : &Rhs) -> Rhs;
+}
+// ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
 ///
 /// * Motivation :
@@ -320,7 +345,7 @@ impl_binary_assign!(SubAssign, sub_assign);
 impl_binary_assign!(DivAssign, div_assign);
 // ---------------------------------------------------------------------------
 // CompareAsLeft for AzFloat
-/// CompareAsLeft trait for `AzFloat<B>`
+/// CompareAsLeft when both operands are `AzFloat<B>`
 ///
 /// * B : Is the floating point base type
 ///
@@ -338,11 +363,11 @@ impl_binary_assign!(DivAssign, div_assign);
 /// assert_eq!( lt.to_inner(), (1.0 as B) );
 /// assert_eq!( not_lt.to_inner(), (0.0 as B) );
 /// ```
-pub fn doc_compare_az_float() {}
+pub fn doc_compare_left_az_float() {}
 //
-/// see [doc_compare_az_float]
-macro_rules! impl_compare_az_float{ ($name:ident, $op:tt) => {
-    #[doc = concat!( "compare trait for ", stringify!( $op ) ) ]
+/// see [doc_compare_left_az_float]
+macro_rules! impl_compare_left_az_float{ ($name:ident, $op:tt) => {
+    #[doc = concat!( "CompareLeft trait for ", stringify!( $op ) ) ]
     fn $name(&self, other : & AzFloat<B> ) -> AzFloat<B> {
         let zero : AzFloat<B> = 0.into();
         let one  : AzFloat<B> = 1.into();
@@ -360,12 +385,61 @@ where
     B          :  PartialOrd,
     AzFloat<B> : From<usize>,
 {
-    impl_compare_az_float!( left_lt, <  );
-    impl_compare_az_float!( left_le, <= );
-    impl_compare_az_float!( left_eq, == );
-    impl_compare_az_float!( left_ne, != );
-    impl_compare_az_float!( left_ge, >= );
-    impl_compare_az_float!( left_gt, >  );
+    impl_compare_left_az_float!( left_lt, <  );
+    impl_compare_left_az_float!( left_le, <= );
+    impl_compare_left_az_float!( left_eq, == );
+    impl_compare_left_az_float!( left_ne, != );
+    impl_compare_left_az_float!( left_ge, >= );
+    impl_compare_left_az_float!( left_gt, >  );
+}
+// ---------------------------------------------------------------------------
+// CompareAsRight for AzFloat
+/// CompareAsRight when both operands are `AzFloat<B>`
+///
+/// * B : Is the floating point base type
+///
+/// # Example :
+/// ```
+/// use rustad::AzFloat;
+/// use rustad::CompareAsRight;
+/// type B = f64;
+/// //
+/// let one   : AzFloat<B> = (1.0 as B).into();
+/// let two   : AzFloat<B> = (2.0 as B).into();
+/// let three : AzFloat<B> = (3.0 as B).into();
+/// let lt     = two.lt_right(&three);
+/// let not_lt = &one - &lt;
+/// assert_eq!( lt.to_inner(), (1.0 as B) );
+/// assert_eq!( not_lt.to_inner(), (0.0 as B) );
+/// ```
+pub fn doc_compare_right_az_float() {}
+//
+/// see [doc_compare_right_az_float]
+macro_rules! impl_compare_right_az_float{ ($name:ident, $op:tt) => {
+    #[doc = concat!( "CompareAsRight trait for ", stringify!( $op ) ) ]
+    fn $name(&self, other : & AzFloat<B> ) -> AzFloat<B> {
+        let zero : AzFloat<B> = 0.into();
+        let one  : AzFloat<B> = 1.into();
+        //
+        if self.0 $op other.0 {
+            one
+        } else {
+            zero
+        }
+    }
+} }
+//
+impl<B> CompareAsRight for AzFloat<B>
+where
+    B          :  PartialOrd,
+    AzFloat<B> : From<usize>,
+{
+    impl_compare_right_az_float!( lt_right, <  );
+    impl_compare_right_az_float!( le_right, <= );
+    impl_compare_right_az_float!( eq_right, == );
+    impl_compare_right_az_float!( ne_right, != );
+    impl_compare_right_az_float!( ge_right, >= );
+    impl_compare_right_az_float!( gt_right, >  );
 }
 // ---------------------------------------------------------------------------
 // PartialEq, Eq
