@@ -215,10 +215,7 @@ impl<V : std::fmt::Display> std::fmt::Display for AD<V> {
 /// assert_eq!( ax.to_value(), V::from(3.0) );
 /// ```
 pub fn ad_from_value<V>(value : V) -> AD<V> {
-    let tape_id   = 0;
-    let index     = 0;
-    let ad_type   = ADType::ConstantP;
-    AD::new(tape_id, index, ad_type, value)
+    AD::<V>::from(value)
 }
 // ---------------------------------------------------------------------------
 // ad_from_vector
@@ -239,12 +236,7 @@ pub fn ad_from_value<V>(value : V) -> AD<V> {
 /// ```
 pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
     assert_ne!( vec.len() , 0 );
-    let avec      = vec.into_iter().map( |value| {
-        let tape_id   = 0;
-        let index     = 0;
-        let ad_type   = ADType::ConstantP;
-        AD::new(tape_id, index, ad_type, value)
-    } ).collect();
+    let avec = vec.into_iter().map( |value| AD::<V>::from(value) ).collect();
     avec
 }
 // ---------------------------------------------------------------------------
