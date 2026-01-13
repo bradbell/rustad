@@ -58,12 +58,12 @@ binary::binary_rust_src!(Add, +);
 // add_vv_forward_0
 binary::eval_binary_forward_0!(Add, +);
 // ---------------------------------------------------------------------------
-// forward_1
+// forward_der
 // ---------------------------------------------------------------------------
 //
-// add_pv_forward_1
+// add_pv_forward_der
 /// first order forward for parameter + variable; see [ForwardDer]
-fn add_pv_forward_1 <V, E>(
+fn add_pv_forward_der <V, E>(
     _dyp_both  :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
     var_der    :   &mut Vec<E> ,
@@ -80,9 +80,9 @@ where
     var_der[ res ] = var_der[rhs].clone();
 }
 //
-// add_vp_forward_1
+// add_vp_forward_der
 /// first order forward for variable + parameter; see [ForwardDer]
-fn add_vp_forward_1 <V, E>(
+fn add_vp_forward_der <V, E>(
     _dyp_both  :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
     var_der    :   &mut Vec<E> ,
@@ -99,9 +99,9 @@ where
     var_der[ res ] = var_der[lhs].clone();
 }
 //
-// add_vv_forward_1
+// add_vv_forward_der
 /// first order forward for variable + variable; see [ForwardDer]
-fn add_vv_forward_1 <V, E>(
+fn add_vv_forward_der <V, E>(
     _dyp_both  :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
     var_der    :   &mut Vec<E> ,
@@ -119,12 +119,12 @@ where
     var_der[res] = &var_der[lhs]  + &var_der[rhs];
 }
 // ---------------------------------------------------------------------------
-// reverse_1
+// reverse_der
 // ---------------------------------------------------------------------------
 //
-// add_pv_reverse_1
+// add_pv_reverse_der
 /// first order reverse for parameter + variable; see [ReverseDer]
-fn add_pv_reverse_1 <V, E>(
+fn add_pv_reverse_der <V, E>(
     _dyp_both  :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
     var_der    :   &mut Vec<E> ,
@@ -144,9 +144,9 @@ where
     var_der[rhs] = sum;
 }
 //
-// add_vp_reverse_1
+// add_vp_reverse_der
 /// first order reverse for variable + parameter; see [ReverseDer]
-fn add_vp_reverse_1 <V, E>(
+fn add_vp_reverse_der <V, E>(
     _dyp_both  :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
     var_der    :   &mut Vec<E> ,
@@ -166,9 +166,9 @@ where
     var_der[lhs] = sum;
 }
 //
-// add_vv_reverse_1
+// add_vv_reverse_der
 /// first order reverse for variable + variable; see [ReverseDer]
-fn add_vv_reverse_1 <V, E>(
+fn add_vv_reverse_der <V, E>(
     _dyp_both  :   &Vec<E>     ,
     _var_both  :   &Vec<E>     ,
     var_der    :   &mut Vec<E> ,
@@ -228,10 +228,10 @@ where
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : add_pv_forward_0::<V, V>,
         forward_var_ad    : add_pv_forward_0::<V, AD<V> >,
-        forward_der_value : add_pv_forward_1::<V, V>,
-        forward_der_ad    : add_pv_forward_1::<V, AD<V> >,
-        reverse_der_value : add_pv_reverse_1::<V, V>,
-        reverse_der_ad    : add_pv_reverse_1::<V, AD<V> >,
+        forward_der_value : add_pv_forward_der::<V, V>,
+        forward_der_ad    : add_pv_forward_der::<V, AD<V> >,
+        reverse_der_value : add_pv_reverse_der::<V, V>,
+        reverse_der_ad    : add_pv_reverse_der::<V, AD<V> >,
         rust_src          : add_pv_rust_src,
         reverse_depend    : binary::reverse_depend,
     };
@@ -241,10 +241,10 @@ where
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : add_vp_forward_0::<V, V>,
         forward_var_ad    : add_vp_forward_0::<V, AD<V> >,
-        forward_der_value : add_vp_forward_1::<V, V>,
-        forward_der_ad    : add_vp_forward_1::<V, AD<V> >,
-        reverse_der_value : add_vp_reverse_1::<V, V>,
-        reverse_der_ad    : add_vp_reverse_1::<V, AD<V> >,
+        forward_der_value : add_vp_forward_der::<V, V>,
+        forward_der_ad    : add_vp_forward_der::<V, AD<V> >,
+        reverse_der_value : add_vp_reverse_der::<V, V>,
+        reverse_der_ad    : add_vp_reverse_der::<V, AD<V> >,
         rust_src          : add_vp_rust_src,
         reverse_depend    : binary::reverse_depend,
     };
@@ -254,10 +254,10 @@ where
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : add_vv_forward_0::<V, V>,
         forward_var_ad    : add_vv_forward_0::<V, AD<V> >,
-        forward_der_value : add_vv_forward_1::<V, V>,
-        forward_der_ad    : add_vv_forward_1::<V, AD<V> >,
-        reverse_der_value : add_vv_reverse_1::<V, V>,
-        reverse_der_ad    : add_vv_reverse_1::<V, AD<V> >,
+        forward_der_value : add_vv_forward_der::<V, V>,
+        forward_der_ad    : add_vv_forward_der::<V, AD<V> >,
+        reverse_der_value : add_vv_reverse_der::<V, V>,
+        reverse_der_ad    : add_vv_reverse_der::<V, AD<V> >,
         rust_src          : add_vv_rust_src,
         reverse_depend    : binary::reverse_depend,
     };
