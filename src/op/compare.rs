@@ -11,6 +11,7 @@ use crate::{
     AD,
     IndexT,
     CompareAsLeft,
+    CompareAsRight,
 };
 use crate::adfn::optimize;
 use crate::ad::ADType;
@@ -59,36 +60,44 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
     ) ]
     fn [< $name _forward_dyp >] <V, E> (
         dyp_both    : &mut Vec<E> ,
-        _cop        : &Vec<V>     ,
+        cop         : &Vec<V>     ,
         _flag_all   : &Vec<bool>  ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        V : CompareAsLeft,
-        E : CompareAsLeft,
+        V : CompareAsLeft<V> + CompareAsRight<E>,
+        E : CompareAsLeft<E> + CompareAsLeft<V>,
     {
         debug_assert!( arg.len() == 2);
         debug_assert!(
             ! ( arg_type[0].is_constant() && arg_type[1].is_constant() )
         );
-        //
-        // lhs_ref
+        // lhs, rhs
         let lhs = arg[0] as usize;
-        let lhs_ref = match arg_type[0] {
-            // ADType::ConstantP => &cop[lhs],
-            ADType::DynamicP  => &dyp_both[lhs],
-            _ => { panic!( "CompareAsLeft: constants not yet implemented" );},
-        };
-        //
-        // rhs_ref
         let rhs = arg[1] as usize;
-        let rhs_ref = match arg_type[1] {
-            // ADType::ConstantP => &cop[rhs],
-            ADType::DynamicP  => &dyp_both[rhs],
-            _ => { panic!( "CompareAsLeft: constants not yet implemented" );},
+        //
+        match( arg_type[0].clone(), arg_type[1].clone() ) {
+            (ADType::DynamicP, ADType::DynamicP) => {
+                let left  = &dyp_both[lhs];
+                let right = &dyp_both[rhs];
+                dyp_both[ res ] = left. [< left_ $name >] ( right );
+            },
+            (ADType::DynamicP, ADType::ConstantP) => {
+                let left  = &dyp_both[lhs];
+                let right = &cop[rhs];
+                dyp_both[ res ] = left. [< left_ $name >] ( right );
+            },
+            (ADType::ConstantP, ADType::DynamicP) => {
+                let left  = &cop[lhs];
+                let right = &dyp_both[rhs];
+                dyp_both[ res ] = left. [< $name _right >] ( right );
+            },
+
+            _ => { debug_assert!( false,
+                    "forward_dyp: compare: invalid argument types"
+            ); },
         };
-        dyp_both[ res ] = lhs_ref. [< left_ $name >] ( rhs_ref );
     }
     #[doc = concat!(
         " E zero order forward variable num_", stringify!( $name ),
@@ -103,33 +112,50 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        V : CompareAsLeft<V> ,
-        E : CompareAsLeft<V> + CompareAsLeft<E>,
+        V : CompareAsLeft<V> + CompareAsRight<E>,
+        E : CompareAsLeft<E> + CompareAsLeft<V>,
     {
         debug_assert!( arg.len() == 2);
         //
-        // lhs_ref
+        // lhs, rhs
         let lhs = arg[0] as usize;
-        let lhs_ref = match arg_type[0] {
-            // ADType::ConstantP => &cop[lhs],
-            ADType::DynamicP  => &dyp_both[lhs],
-            ADType::Variable  => &var_both[lhs],
-            _ => { panic!( "CompareAsLeft: constants not yet implemented" );},
-        };
-        //
-        // rhs_ref
         let rhs = arg[1] as usize;
-        match arg_type[1] {
-            ADType::ConstantP => {
-                var_both[ res ] = lhs_ref. [< left_ $name >] ( &cop[rhs] );
+        //
+        // var_both[res]
+        match( arg_type[0].clone(), arg_type[1].clone() ) {
+            // variable op constant
+            (ADType::Variable, ADType::ConstantP) => {
+                let left  = &var_both[lhs];
+                let right = &cop[rhs];
+                var_both[ res ] = left. [< left_ $name >] ( right );
             },
-            ADType::DynamicP  => {
-                var_both[ res ] = lhs_ref. [< left_ $name >] ( &dyp_both[rhs] );
+            // variable op dynamic
+            (ADType::Variable, ADType::DynamicP) => {
+                let left  = &var_both[lhs];
+                let right = &dyp_both[rhs];
+                var_both[ res ] = left. [< left_ $name >] ( right );
             },
-            ADType::Variable  => {
-                var_both[ res ] = lhs_ref. [< left_ $name >] ( &var_both[rhs] );
+            // variable op variable
+            (ADType::Variable, ADType::Variable) => {
+                let left  = &var_both[lhs];
+                let right = &var_both[rhs];
+                var_both[ res ] = left. [< left_ $name >] ( right );
             },
-            _ => { panic!( "CompareAsLeft: constants not yet implemented" );},
+            // constant op variable
+            (ADType::ConstantP, ADType::Variable) => {
+                let left  = &cop[lhs];
+                let right = &var_both[rhs];
+                var_both[ res ] = left. [< $name _right >] ( right );
+            },
+            // dynamic op variable
+            (ADType::DynamicP, ADType::Variable) => {
+                let left  = &dyp_both[lhs];
+                let right = &var_both[rhs];
+                var_both[ res ] = left. [< left_ $name >] ( right );
+            },
+            _ => { debug_assert!(false,
+                "forward_var: compare: invalid argument types"
+            ); },
         };
     }
 } } }
@@ -224,8 +250,11 @@ no_rust_src!(CompareAsLeft);
 /// LT_OP, LE_OP, EQ_OP, NE_OP, GE_OP, GT_OP .
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    V     : Clone + From<f32> + CompareAsLeft,
-    AD<V> : From<f32> + CompareAsLeft<V> + CompareAsLeft< AD<V> >,
+    V     : Clone + From<f32>,
+    V     :  CompareAsLeft<V>  + CompareAsRight< AD<V> >,
+    V     :  CompareAsRight<V> + CompareAsRight< AD<V> >,
+    AD<V> : From<f32>,
+    AD<V> :  CompareAsLeft<V> + CompareAsLeft< AD<V> >,
 {
     op_info_vec[id::LT_OP as usize] = OpInfo{
         name              : "lt",

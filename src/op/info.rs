@@ -15,6 +15,7 @@ use crate::{
     AD,
     IndexT,
     CompareAsLeft,
+    CompareAsRight,
 };
 use crate::op::id::NUMBER_OP;
 use crate::tape::sealed::ThisThreadTape;
@@ -454,7 +455,8 @@ where
     for<'a> &'a V : std::ops::Div<&'a V, Output = V> ,
     //
     V     : Clone + From<f32> + PartialEq,
-    V     : CompareAsLeft + ThisThreadTape + GlobalAtomCallbackVec,
+    V     : ThisThreadTape + GlobalAtomCallbackVec,
+    V     : CompareAsLeft<V> + CompareAsRight<V>,
     AD<V> : From<f32>,
 {
     let empty = OpInfo {
