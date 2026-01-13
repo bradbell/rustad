@@ -20,6 +20,9 @@
 // --------------------------------------------------------------------------
 // use
 //
+use std::ops::Add;
+use std::ops::Sub;
+//
 use crate::ad::ADType;
 use crate::{
     IndexT,
@@ -33,8 +36,6 @@ use crate::op::info::{
     panic_dyp,
     panic_var,
     panic_der,
-    no_reverse_der_value,
-    no_reverse_der_ad,
     no_rust_src,
 };
 use crate::op::id::{
@@ -45,7 +46,8 @@ use crate::op::id::{
 };
 #[cfg(doc)]
 use crate::op::info::{
-    ForwardDer
+    ForwardDer,
+    ReverseDer,
 };
 // -------------------------------------------------------------------------
 // sub_pv_rust_src
@@ -76,7 +78,7 @@ fn sub_pv_forward_der <V, E>(
 where
     E  : Clone + From<V>,
     V  : From<f32>,
-    for<'a> &'a E : std::ops::Sub<&'a E, Output = E> ,
+    for<'a> &'a E : Sub<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let rhs = arg[1] as usize;
@@ -116,7 +118,7 @@ fn sub_vv_forward_der <V, E>(
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
 where
-    for<'a> &'a E : std::ops::Sub<&'a E, Output = E> ,
+    for<'a> &'a E : Sub<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
@@ -124,10 +126,80 @@ where
     var_der[res] = &var_der[lhs]  - &var_der[rhs];
 }
 // ---------------------------------------------------------------------------
+// reverse_der
+// ---------------------------------------------------------------------------
+//
+// sub_pv_reverse_der
+/// first order reverse for parameter - variable; see [ReverseDer]
+fn sub_pv_reverse_der <V, E>(
+    _dyp_both  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
+    var_der    :   &mut Vec<E> ,
+    _cop       :   &Vec<V>     ,
+    _flag_all  :   &Vec<bool>  ,
+    arg        :   &[IndexT]   ,
+    _arg_type  :   &[ADType]   ,
+    res        :   usize       )
+where
+    for<'a> &'a E : Sub<&'a E, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let rhs = arg[1] as usize;
+    //
+    // var_der[rhs] += &var_der[res];
+    let diff     = &var_der[rhs] - &var_der[res];
+    var_der[rhs] = diff;
+}
+//
+// sub_vp_reverse_der
+/// first order reverse for variable - parameter; see [ReverseDer]
+fn sub_vp_reverse_der <V, E>(
+    _dyp_both  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
+    var_der    :   &mut Vec<E> ,
+    _cop       :   &Vec<V>     ,
+    _flag_all  :   &Vec<bool>  ,
+    arg        :   &[IndexT]   ,
+    _arg_type  :   &[ADType]   ,
+    res        :   usize       )
+where
+    for<'a> &'a E : Add<&'a E, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    //
+    // var_der[lhs] += &var_der[res];
+    let sum      = &var_der[lhs] + &var_der[res];
+    var_der[lhs] = sum;
+}
+//
+// sub_vv_reverse_der
+/// first order reverse for variable - variable; see [ReverseDer]
+fn sub_vv_reverse_der <V, E>(
+    _dyp_both  :   &Vec<E>     ,
+    _var_both  :   &Vec<E>     ,
+    var_der    :   &mut Vec<E> ,
+    _cop       :   &Vec<V>     ,
+    _flag_all  :   &Vec<bool>  ,
+    arg        :   &[IndexT]   ,
+    _arg_type  :   &[ADType]   ,
+    res        :   usize       )
+where
+    for<'a> &'a E : Add<&'a E, Output = E> + Sub<&'a E, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    let lhs = arg[0] as usize;
+    let rhs = arg[1] as usize;
+    //
+    // var_der[lhs] += &var_der[res];
+    // var_der[rhs] += &var_der[res];
+    let diff     = &var_der[rhs] - &var_der[res];
+    var_der[rhs] = diff;
+    let sum      = &var_der[lhs] + &var_der[res];
+    var_der[lhs] = sum;
+}
 // set_op_info
 //
-no_reverse_der_value!(Sub);
-no_reverse_der_ad!(Sub);
 no_rust_src!(Sub);
 //
 /// Set the operator information for all the Sub operators.
@@ -137,8 +209,8 @@ no_rust_src!(Sub);
 /// The the map results for SUB_PV_OP, SUB_VP_OP, and SUB_VV_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    for<'a> &'a V : std::ops::Sub<&'a AD<V>, Output = AD<V> > ,
-    for<'a> &'a V : std::ops::Sub<&'a V, Output = V>          ,
+    for<'a> &'a V : Add<&'a V, Output = V> + Add<&'a AD<V>, Output = AD<V> > ,
+    for<'a> &'a V : Sub<&'a V, Output = V> + Sub<&'a AD<V>, Output = AD<V> > ,
     V             : Clone + From<f32> + PartialEq + ThisThreadTape ,
     AD<V>         : From<V>
 {
@@ -163,8 +235,8 @@ where
         forward_var_ad    : sub_pv_forward_0::<V, AD<V> >,
         forward_der_value : sub_pv_forward_der::<V, V>,
         forward_der_ad    : sub_pv_forward_der::<V, AD<V>>,
-        reverse_der_value : reverse_der_value_none::<V>,
-        reverse_der_ad    : reverse_der_ad_none::<V>,
+        reverse_der_value : sub_pv_reverse_der::<V, V>,
+        reverse_der_ad    : sub_pv_reverse_der::<V, AD<V> >,
         rust_src          : sub_pv_rust_src,
         reverse_depend    : binary::reverse_depend,
     };
@@ -176,8 +248,8 @@ where
         forward_var_ad    : sub_vp_forward_0::<V, AD<V> >,
         forward_der_value : sub_vp_forward_der::<V, V>,
         forward_der_ad    : sub_vp_forward_der::<V, AD<V> >,
-        reverse_der_value : reverse_der_value_none::<V>,
-        reverse_der_ad    : reverse_der_ad_none::<V>,
+        reverse_der_value : sub_vp_reverse_der::<V, V>,
+        reverse_der_ad    : sub_vp_reverse_der::<V, AD<V> >,
         rust_src          : sub_vp_rust_src,
         reverse_depend    : binary::reverse_depend,
     };
@@ -189,8 +261,8 @@ where
         forward_var_ad    : sub_vv_forward_0::<V, AD<V> >,
         forward_der_value : sub_vv_forward_der::<V, V>,
         forward_der_ad    : sub_vv_forward_der::<V, AD<V> >,
-        reverse_der_value : reverse_der_value_none::<V>,
-        reverse_der_ad    : reverse_der_ad_none::<V>,
+        reverse_der_value : sub_vv_reverse_der::<V, V>,
+        reverse_der_ad    : sub_vv_reverse_der::<V, AD<V> >,
         rust_src          : sub_vv_rust_src,
         reverse_depend    : binary::reverse_depend,
     };
