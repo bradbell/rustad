@@ -22,6 +22,7 @@
 use crate::{
     AzFloat,
     CompareAsLeft,
+    CompareAsRight,
 };
 //
 // NumVec
@@ -237,18 +238,23 @@ num_vec_compound_op!(SubAssign, -=);
 num_vec_compound_op!(MulAssign, *=);
 num_vec_compound_op!(DivAssign, /=);
 // ---------------------------------------------------------------------------
-// CompareAsLeft for NumVec
-/// CompareAsLeft trait for `NumVec<S>`
+// CompareAsLeft and CompareAsRight for NumVec
+/// CompareAsLeft and CompareAdRight when both operands are `NumVec<S>`
 ///
 /// * S : is the type of the elements of the numeric vector.
 ///
 /// Note that these functions act element-wise on each `NumVec<S>` object.
+/// In addition, when both argument have the same time, CompareAsLeft
+/// and CompareAsRight are equivalent.
 ///
 /// # Example :
 /// ```
-/// use rustad::NumVec;
-/// use rustad::AzFloat;
-/// use rustad::CompareAsLeft;
+/// use rustad::{
+///     NumVec,
+///     AzFloat,
+///     CompareAsLeft,
+///     CompareAsRight,
+/// };
 ///
 /// type S = AzFloat<f32>;
 /// //
@@ -258,6 +264,9 @@ num_vec_compound_op!(DivAssign, /=);
 /// let lt        = two_three.left_lt(&three);
 /// let check     = NumVec::new( vec![ S::from(1), S::from(0) ] );
 /// assert_eq!( lt, check);
+///
+/// let lt        = two_three.lt_right(&three);
+/// assert_eq!(lt, check);
 ///
 /// let one       = NumVec::from( S::from(1) );
 /// let not_lt    = &one - &lt;
@@ -316,6 +325,18 @@ where
     impl_compare_num_vec!( left_ne, != );
     impl_compare_num_vec!( left_ge, >= );
     impl_compare_num_vec!( left_gt, >  );
+}
+//
+impl<S> CompareAsRight for NumVec<S>
+where
+    S  : Copy + From<f32> + From<usize> + PartialOrd + CompareAsRight,
+{
+    impl_compare_num_vec!( lt_right, <  );
+    impl_compare_num_vec!( le_right, <= );
+    impl_compare_num_vec!( eq_right, == );
+    impl_compare_num_vec!( ne_right, != );
+    impl_compare_num_vec!( ge_right, >= );
+    impl_compare_num_vec!( gt_right, >  );
 }
 // ----------------------------------------------------------------------------`
 /// Displays a `NumVec` < *S* > object.
