@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! This pub(crate) module does setup for the possible value types.
@@ -38,7 +38,6 @@ use crate::{
 macro_rules! setup_this_value_type{ ($V:ty) => {
         crate::tape::impl_this_thread_tape!($V);
         crate::ad::binary::impl_value_op_ad!($V);
-        crate::ad::impl_ad_from_f32!($V);
         crate::atom::impl_global_atom_callback_vec!($V);
         crate::checkpoint::impl_global_checkpoint_info!($V);
         crate::op::info::impl_global_op_info_vec!($V);

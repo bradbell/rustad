@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! This pub module defines the automatic differentiation class `AD<V>`.
@@ -295,7 +295,17 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
 /// Convert an f32 value to an AD object with no function information;
 /// i.e., constant parameter.
 ///
-/// **See Also** : example in [ad_from_value], [ad_from_vector]
+/// See Also :
+/// example in [ad_from_value], [ad_from_vector]
+///
+/// Syntax :
+/// ```text
+/// az = AD<V>::from( f32_value )
+/// ```
+///
+/// * V : see [doc_generic_v]
+///
+/// * f32_value : is an f32 value
 ///
 /// # Example
 /// ```
@@ -307,29 +317,18 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
 /// let x  = ax.to_value();
 /// assert_eq!( x.get(0).to_inner(), 3.0 as f64);
 /// ```
-pub fn doc_impl_ad_from_f32() { }
-//
-/// Implement from f32 for `AD<V>` .
-///
-/// * V : see [doc_generic_v]
-///
-/// This macro must be executed once for any type *V*  where
-/// `AD<V>` is used. The rustad package automatically executes it
-/// for the following types: `f32` , `f64` , `NumVec<f32>`, `NumVec<f64>`.
-///
-/// This macro can be invoked from anywhere.
-macro_rules! impl_ad_from_f32{ ($V:ty) => {
-    impl From<f32> for crate::AD<$V> {
-        fn from( f32_value : f32 ) -> crate::AD<$V> {
-            let tape_id         = 0;
-            let index           = 0;
-            let ad_type         = crate::ad::ADType::ConstantP;
-            let value      : $V = f32_value.into();
-            crate::AD::new(tape_id, index, ad_type, value)
-        }
+impl<V> From<f32> for AD<V>
+where
+    V : From<f32>,
+{
+    fn from( f32_value : f32 ) -> AD<V> {
+        let tape_id    = 0;
+        let index      = 0;
+        let ad_type    = crate::ad::ADType::ConstantP;
+        let value      = V::from(f32_value);
+        AD::new(tape_id, index, ad_type, value)
     }
-} }
-pub(crate) use impl_ad_from_f32;
+}
 // -------------------------------------------------------------------------
 // impl_ad_from_f64
 /// Convert an f64 value to an AD object with no function information;
