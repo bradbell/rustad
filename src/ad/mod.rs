@@ -291,7 +291,6 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
     vec
 }
 // -------------------------------------------------------------------------
-// impl_ad_from_f32
 /// Convert an f32 value to an AD object with no function information;
 /// i.e., constant parameter.
 ///
@@ -300,7 +299,7 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
 ///
 /// Syntax :
 /// ```text
-/// az = AD<V>::from( f32_value )
+/// az  = AD::<V>::from( f32_value )
 /// ```
 ///
 /// * V : see [doc_generic_v]
@@ -312,10 +311,11 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
 /// use rustad::AD;
 /// use rustad::NumVec;
 /// use rustad::AzFloat;
-/// type V = rustad::AzFloat<f32>;
-/// let ax : AD< NumVec< AzFloat<f64> > >  = (3.0 as f32).into();
+/// type S = rustad::AzFloat<f32>;
+/// type V = NumVec<S>;
+/// let ax = AD::<V>::from(3.0 as f32);
 /// let x  = ax.to_value();
-/// assert_eq!( x.get(0).to_inner(), 3.0 as f64);
+/// assert_eq!( x.get(0).to_inner(), 3.0 as f32);
 /// ```
 impl<V> From<f32> for AD<V>
 where
@@ -330,24 +330,29 @@ where
     }
 }
 // -------------------------------------------------------------------------
-// impl_ad_from_f64
 /// Convert an f64 value to an AD object with no function information;
 /// i.e., constant parameter.
 ///
-/// Only AD objects with f64 precision are supported; e.g.,
-/// `AD<f32>` is not supported.
+/// See Also :
+/// example in [ad_from_value], [ad_from_vector]
 ///
-/// **See Also** : example in [ad_from_value], [ad_from_vector]
+/// Syntax :
+/// ```text
+/// az = AD<V>::from( f64_value )
+/// ```
+///
+/// * V : see [doc_generic_v] . In addition, this type must support
+/// `V::from<f64>` .
 ///
 /// # Example
 /// ```
 /// use rustad::AD;
 /// use rustad::AzFloat;
 /// use rustad::NumVec;
-/// type S          = AzFloat<f64>;
-/// type V          = NumVec<S>;
-/// let ax : AD<V>  = (3.0 as f64).into();
-/// let x           = ax.to_value();
+/// type S  = AzFloat<f64>;
+/// type V  = NumVec<S>;
+/// let ax  = AD::<V>::from(3.0 as f64);
+/// let x   = ax.to_value();
 /// assert_eq!( x.get(0), S::from(3.0) );
 /// ```
 pub fn doc_impl_ad_from_f64() { }
@@ -361,15 +366,15 @@ pub fn doc_impl_ad_from_f64() { }
 /// for the following types: `f64` , `NumVec<f64>` .
 ///
 /// This macro can be invoked from anywhere.
-macro_rules! impl_ad_from_f64{ ($V:ty) => {
-    impl From<f64> for crate::AD<$V> {
-        fn from( f64_value : f64 ) -> crate::AD<$V> {
-            let tape_id         = 0;
-            let index           = 0;
-            let ad_type         = crate::ad::ADType::ConstantP;
-            let value      : $V = f64_value.into();
-            crate::AD::new(tape_id, index, ad_type, value)
-        }
+impl<V> From<f64> for AD<V>
+where
+    V : From<f64>,
+{
+    fn from( f64_value : f64 ) -> AD<V> {
+        let tape_id    = 0;
+        let index      = 0;
+        let ad_type    = crate::ad::ADType::ConstantP;
+        let value      = V::from(f64_value);
+        AD::new(tape_id, index, ad_type, value)
     }
-} }
-pub(crate) use impl_ad_from_f64;
+}
