@@ -20,6 +20,12 @@
 // --------------------------------------------------------------------------
 // use
 //
+use std::ops::{
+    Add,
+    Mul,
+    AddAssign,
+};
+//
 use crate::ad::ADType;
 use crate::{
     IndexT,
@@ -76,8 +82,8 @@ fn mul_pv_forward_der <V, E>(
     arg_type   :   &[ADType]   ,
     res        :   usize       )
 where
-    for<'a> &'a V : std::ops::Mul<&'a E, Output = E> ,
-    for<'a> &'a E : std::ops::Mul<&'a E, Output = E> ,
+    for<'a> &'a V : Mul<&'a E, Output = E> ,
+    for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
@@ -102,8 +108,8 @@ fn mul_vp_forward_der <V, E>(
     arg_type   :   &[ADType]   ,
     res        :   usize       )
 where
-    for<'a> &'a E : std::ops::Mul<&'a V, Output = E> ,
-    for<'a> &'a E : std::ops::Mul<&'a E, Output = E> ,
+    for<'a> &'a E : Mul<&'a V, Output = E> ,
+    for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
@@ -128,8 +134,8 @@ fn mul_vv_forward_der <V, E>(
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
 where
-    for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
-    for<'a> &'a E : std::ops::Mul<&'a E, Output = E> ,
+    for<'a> &'a E : Add<&'a E, Output = E> ,
+    for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
@@ -154,9 +160,9 @@ fn mul_pv_reverse_der <V, E>(
     arg_type   :   &[ADType]   ,
     res        :   usize       )
 where
-    for<'a> E : std::ops::AddAssign<&'a E> ,
-    for<'a> &'a E : std::ops::Mul<&'a V, Output = E> ,
-    for<'a> &'a E : std::ops::Mul<&'a E, Output = E> ,
+    for<'a> E : AddAssign<&'a E> ,
+    for<'a> &'a E : Mul<&'a V, Output = E> ,
+    for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
@@ -183,9 +189,9 @@ fn mul_vp_reverse_der <V, E>(
     arg_type   :   &[ADType]   ,
     res        :   usize       )
 where
-    for<'a> E : std::ops::AddAssign<&'a E> ,
-    for<'a> &'a E : std::ops::Mul<&'a V, Output = E> ,
-    for<'a> &'a E : std::ops::Mul<&'a E, Output = E> ,
+    for<'a> E : AddAssign<&'a E> ,
+    for<'a> &'a E : Mul<&'a V, Output = E> ,
+    for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
@@ -212,8 +218,8 @@ fn mul_vv_reverse_der <V, E>(
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
 where
-    for<'a> E : std::ops::AddAssign<&'a E> ,
-    for<'a> &'a E : std::ops::Mul<&'a E, Output = E> ,
+    for<'a> E : AddAssign<&'a E> ,
+    for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
@@ -238,13 +244,13 @@ no_rust_src!(Mul);
 /// The the map results for MUL_PV_OP, MUL_VP_OP, and MUL_VV_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    for<'a> V : std::ops::AddAssign<&'a V> ,
+    for<'a> V : AddAssign<&'a V> ,
     //
-    for<'a> &'a V : std::ops::Add<&'a AD<V>, Output = AD<V> > ,
-    for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
+    for<'a> &'a V : Add<&'a AD<V>, Output = AD<V> > ,
+    for<'a> &'a V : Add<&'a V, Output = V> ,
     //
-    for<'a> &'a V : std::ops::Mul<&'a AD<V>, Output = AD<V> > ,
-    for<'a> &'a V : std::ops::Mul<&'a V, Output = V> ,
+    for<'a> &'a V : Mul<&'a AD<V>, Output = AD<V> > ,
+    for<'a> &'a V : Mul<&'a V, Output = V> ,
     V             : Clone + From<f32> + PartialEq + ThisThreadTape ,
 {
     op_info_vec[MUL_PP_OP as usize] = OpInfo{

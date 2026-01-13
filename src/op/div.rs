@@ -20,6 +20,10 @@
 // --------------------------------------------------------------------------
 // use
 //
+use std::ops::{
+    Div,
+};
+//
 use crate::ad::ADType;
 use crate::{
     IndexT,
@@ -71,8 +75,8 @@ no_rust_src!(Div);
 /// The the map results for DIV_PV_OP, DIV_VP_OP, and DIV_VV_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    for<'a> &'a V : std::ops::Div<&'a AD<V>, Output = AD<V> > ,
-    for<'a> &'a V : std::ops::Div<&'a V, Output = V> ,
+    for<'a> &'a V : Div<&'a AD<V>, Output = AD<V> > ,
+    for<'a> &'a V : Div<&'a V, Output = V> ,
     V             : Clone + From<f32> + PartialEq + ThisThreadTape ,
 {
     op_info_vec[DIV_PP_OP as usize] = OpInfo{

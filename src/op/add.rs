@@ -20,6 +20,11 @@
 // --------------------------------------------------------------------------
 // use
 //
+use std::ops::{
+    Add,
+    AddAssign,
+};
+//
 use crate::ad::ADType;
 use crate::{
     IndexT,
@@ -111,7 +116,7 @@ fn add_vv_forward_der <V, E>(
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
 where
-    for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
+    for<'a> &'a E : Add<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
@@ -134,7 +139,7 @@ fn add_pv_reverse_der <V, E>(
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
 where
-    for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
+    for<'a> &'a E : Add<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let rhs = arg[1] as usize;
@@ -156,7 +161,7 @@ fn add_vp_reverse_der <V, E>(
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
 where
-    for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
+    for<'a> &'a E : Add<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
@@ -178,7 +183,7 @@ fn add_vv_reverse_der <V, E>(
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
 where
-    for<'a> &'a E : std::ops::Add<&'a E, Output = E> ,
+    for<'a> &'a E : Add<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
@@ -204,10 +209,10 @@ no_rust_src!(Add);
 /// The the map results for ADD_PV_OP, ADD_VP_OP, and ADD_VV_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    for<'a> &'a V : std::ops::Add<&'a AD<V>, Output = AD<V> > ,
-    for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
+    for<'a> &'a V : Add<&'a AD<V>, Output = AD<V> > ,
+    for<'a> &'a V : Add<&'a V, Output = V> ,
     for<'a> V     : Clone + From<f32> + PartialEq +
-                    ThisThreadTape + std::ops::AddAssign<&'a V>,
+                    ThisThreadTape + AddAssign<&'a V>,
 {
     op_info_vec[ADD_PP_OP as usize] = OpInfo{
         name              : "add_pp",
