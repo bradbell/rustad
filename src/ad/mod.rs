@@ -14,6 +14,10 @@
 pub mod binary;
 pub mod compare;
 // ---------------------------------------------------------------------------
+// use
+//
+use crate::AzFloat;
+// ---------------------------------------------------------------------------
 //
 // ADType
 /// The AD types satisfy the following order:
@@ -355,17 +359,6 @@ where
 /// let x   = ax.to_value();
 /// assert_eq!( x.get(0), S::from(3.0) );
 /// ```
-pub fn doc_impl_ad_from_f64() { }
-//
-/// Implement from f64 for `AD<V>` .
-///
-/// * V : see [doc_generic_v]
-///
-/// This macro must be executed once for any type *V*  where
-/// `AD<V>` is used. The rustad package automatically executes it
-/// for the following types: `f64` , `NumVec<f64>` .
-///
-/// This macro can be invoked from anywhere.
 impl<V> From<f64> for AD<V>
 where
     V : From<f64>,
@@ -375,6 +368,39 @@ where
         let index      = 0;
         let ad_type    = crate::ad::ADType::ConstantP;
         let value      = V::from(f64_value);
+        AD::new(tape_id, index, ad_type, value)
+    }
+}
+// -------------------------------------------------------------------------
+/// Convert V to an `AD<V>` object with no function information;
+/// i.e., constant parameter.
+///
+/// See Also :
+/// example in [ad_from_value], [ad_from_vector]
+///
+/// Syntax :
+/// ```text
+/// av = AD<V>::from( v )
+/// ```
+///
+/// * v : is an [doc_generic_v] object.
+///
+/// # Example
+/// ```
+/// use rustad::AD;
+/// use rustad::AzFloat;
+/// type V  = AzFloat<f32>;
+/// let  v  = V::from(3.0 as f32);
+/// let ax  = AD::<V>::from(v);
+/// let x   = ax.to_value();
+/// assert_eq!( x, V::from(3.0) );
+/// ```
+impl<B> From< AzFloat<B> > for AD< AzFloat<B> >
+{
+    fn from( value : AzFloat<B> ) -> AD< AzFloat<B> > {
+        let tape_id    = 0;
+        let index      = 0;
+        let ad_type    = crate::ad::ADType::ConstantP;
         AD::new(tape_id, index, ad_type, value)
     }
 }
