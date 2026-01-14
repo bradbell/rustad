@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! Implement the [ADfn] forward_der method (directional derivatives).
@@ -9,10 +9,12 @@
 // ---------------------------------------------------------------------------
 // use
 //
-use crate::AD;
-use crate::ADfn;
+use crate::{
+    AD,
+    ADfn,
+    SimpleFloat,
+};
 use crate::op::info::sealed::GlobalOpInfoVec;
-use crate::adfn::eval_from::eval_from_f32;
 //
 #[cfg(doc)]
 use crate::{
@@ -162,10 +164,10 @@ macro_rules! forward_der {
             let op_info_vec = &*GlobalOpInfoVec::get();
             //
             // zero_e
-            let zero_e        : $E = eval_from_f32!($suffix, $V, f32::NAN);
+            let zero_e        : $E = SimpleFloat::zero();
             //
             // var_der
-            let nan_e         : $E = eval_from_f32!($suffix, $V, f32::NAN);
+            let nan_e         : $E = SimpleFloat::nan();
             let mut var_der        = dom_der;
             var_der.resize( n_var, nan_e );
             //
@@ -244,7 +246,7 @@ macro_rules! forward_der {
 //
 impl<V> ADfn<V>
 where
-    V     : From<f32> + Clone + std::fmt::Display + GlobalOpInfoVec,
+    V : Clone + std::fmt::Display + GlobalOpInfoVec + SimpleFloat,
 {   //
     // forward_der
     forward_der!( value, V, V );

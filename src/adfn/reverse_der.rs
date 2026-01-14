@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! Implement the [ADfn] reverse_der method (partial derivatives).
@@ -9,10 +9,12 @@
 // ---------------------------------------------------------------------------
 // use
 //
-use crate::AD;
-use crate::ADfn;
+use crate::{
+    AD,
+    ADfn,
+    SimpleFloat,
+};
 use crate::op::info::sealed::GlobalOpInfoVec;
-use crate::adfn::eval_from::eval_from_f32;
 //
 #[cfg(doc)]
 use crate::{
@@ -156,7 +158,7 @@ macro_rules! reverse_der {
             let op_info_vec = &*GlobalOpInfoVec::get();
             //
             // zero_e
-            let zero_e : $E = eval_from_f32!($suffix, $V, 0 as f32);
+            let zero_e : $E = SimpleFloat::zero();
             //
             // var_der
             let mut var_der       = vec![ zero_e; n_var ];
@@ -224,7 +226,7 @@ macro_rules! reverse_der {
             }
             //
             // domain_der
-            let nan_e  : $E    = eval_from_f32!($suffix, $V,  f32::NAN);
+            let nan_e  : $E    = SimpleFloat::nan();
             let mut domain_der = var_der;
             domain_der.resize(self.var.n_dom, nan_e);
             domain_der.shrink_to_fit();
@@ -235,7 +237,7 @@ macro_rules! reverse_der {
 //
 impl<V> ADfn<V>
 where
-    V     : From<f32> + Clone + std::fmt::Display + GlobalOpInfoVec,
+    V : Clone + std::fmt::Display + GlobalOpInfoVec + SimpleFloat,
 {   //
     // reverse_der
     reverse_der!( value, V, V );

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! Implement the [ADfn] forward_var method (function values).
@@ -13,10 +13,9 @@ use crate::ad::ADType;
 use crate::{
     AD,
     ADfn,
+    SimpleFloat,
 };
 use crate::op::info::sealed::GlobalOpInfoVec;
-use crate::adfn::eval_from::eval_from_f32;
-use crate::adfn::eval_from::eval_from_value;
 //
 #[cfg(doc)]
 use crate::{
@@ -169,7 +168,7 @@ macro_rules! forward_var {
             let n_var = self.var.n_dom + self.var.n_dep;
             //
             // var_both
-            let nan_e  : $E  = eval_from_f32!($suffix, $V,  f32::NAN);
+            let nan_e  : $E  = SimpleFloat::nan();
             let mut var_both = var_dom;
             var_both.resize( n_var, nan_e );
             //
@@ -245,7 +244,7 @@ macro_rules! forward_var {
                     ,
                     ADType::ConstantP => {
                         let cop_v = self.cop[index].clone();
-                        let cop_e = eval_from_value!($suffix, $V, cop_v);
+                        let cop_e = $E::from( cop_v );
                         range.push( cop_e )
                     },
                     _ => {
@@ -260,7 +259,7 @@ macro_rules! forward_var {
 //
 impl<V> ADfn<V>
 where
-    V     : From<f32> + Clone + std::fmt::Display + GlobalOpInfoVec,
+    V : Clone + std::fmt::Display + GlobalOpInfoVec + SimpleFloat,
 {   //
     // forward_var
     forward_var!( value, V, V );

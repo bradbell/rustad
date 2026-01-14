@@ -158,11 +158,11 @@ where
 ///
 pub fn doc_impl_from() {}
 //
-macro_rules! impl_from_primitive{ ($F:ident, $T:ident) => {
+macro_rules! impl_from_primitive{ ($P:ident, $T:ident) => {
     #[doc = "see [doc_impl_from]" ]
-    impl From<$F> for AzFloat<$T> {
-        fn from(f : $F) -> AzFloat<$T> {
-            AzFloat( f as $T )
+    impl From<$P> for AzFloat<$T> {
+        fn from(p : $P) -> AzFloat<$T> {
+            AzFloat( p as $T )
         }
     }
 } }
