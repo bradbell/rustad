@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! This pub module defines the numeric binary operations for the `AD<V>`.
@@ -12,6 +12,7 @@ use std::thread::LocalKey;
 use std::cell::RefCell;
 //
 use crate::{
+    SimpleFloat,
     AD,
     IndexT,
 };
@@ -97,7 +98,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         rhs:       &AD<V>  ,
     ) -> (usize, usize, ADType)
     where
-        V : Clone + From<f32> + PartialEq ,
+        V : Clone + SimpleFloat + PartialEq ,
     {
         // new_tape_id, new_index, new_ad_type
         let mut new_tape_id   = 0;
@@ -145,17 +146,17 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 //
                 id::ADD_VV_OP => {
                     // add with left operand the constant zero
-                    if( lhs.value == V::from(0f32) ) {
+                    if( lhs.value == V::zero() ) {
                         return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
                     }
                 },
                 id::MUL_VV_OP => {
                     // multiply with left operand the constant zero
-                    if( lhs.value == V::from(0f32) ) {
+                    if( lhs.value == V::zero() ) {
                         return (new_tape_id, new_index, new_ad_type);
                     }
                     // multiply with left operand the constant one
-                    if( lhs.value == V::from(1f32) ) {
+                    if( lhs.value == V::one() ) {
                         return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
                     }
                 },
@@ -163,7 +164,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 Not optimized out because not a special case for AzFloat.
                 id::DIV_VV_OP => {
                     // divide with left operand the constant zero
-                    if( lhs.value == V::from(0f32) ) {
+                    if( lhs.value == V::zero() ) {
                         return (new_tape_id, new_index, new_ad_type);
                     }
                 },
@@ -175,23 +176,23 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
                 //
                 id::ADD_VV_OP => {
                     // add with right operand the constant zero
-                    if( rhs.value == V::from(0f32) ) {
+                    if( rhs.value == V::zero() ) {
                         return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
                     }
                 },
                 id::MUL_VV_OP => {
                     // multiply with right operand the constant zero
-                    if( rhs.value == V::from(0f32) ) {
+                    if( rhs.value == V::zero() ) {
                         return (new_tape_id, new_index, new_ad_type);
                     }
                     // multiply with right operand the constant one
-                    if( rhs.value == V::from(1f32) ) {
+                    if( rhs.value == V::one() ) {
                         return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
                     }
                 },
                 id::DIV_VV_OP => {
                     // divide with right operand the constant one
-                    if( rhs.value == V::from(1f32) ) {
+                    if( rhs.value == V::one() ) {
                         return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
                     }
                 },
@@ -278,7 +279,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     impl<V> std::ops::$Name< &AD<V> > for &AD<V>
     where
         for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
-        V    : Clone + From<f32> + PartialEq + crate::ThisThreadTapePublic ,
+        V    : Clone + SimpleFloat + PartialEq + crate::ThisThreadTapePublic ,
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self , rhs : &AD<V> ) -> AD<V>
@@ -307,7 +308,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         rhs:       &V      ,
     ) -> (usize, usize, ADType)
     where
-        V : Clone + From<f32> + PartialEq,
+        V : Clone + SimpleFloat + PartialEq,
     {
         // new_tape_id, new_index, new_ad_type, cop_lhs
         let mut new_tape_id   = 0;
@@ -339,23 +340,23 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             //
             id::ADD_VV_OP => {
                 // add with right operand the constant zero
-                if( *rhs == V::from(0f32) ) {
+                if( *rhs == V::zero() ) {
                     return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
                 }
             },
             id::MUL_VV_OP => {
                 // multiply with right operand the constant zero
-                if( *rhs == V::from(0f32) ) {
+                if( *rhs == V::zero() ) {
                     return (new_tape_id, new_index, new_ad_type);
                 }
                 // multiply with right operand the constant one
-                if( *rhs == V::from(1f32) ) {
+                if( *rhs == V::one() ) {
                     return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
                 }
             },
             id::DIV_VV_OP => {
                 // divide with right operand the constant one
-                if( *rhs == V::from(1f32) ) {
+                if( *rhs == V::one() ) {
                     return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
                 }
             },
@@ -415,7 +416,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     impl<V> std::ops::$Name< &V> for &AD<V>
     where
         for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
-        V            : Clone + From<f32> + PartialEq +
+        V            : Clone + SimpleFloat + PartialEq +
                        crate::ThisThreadTapePublic ,
     {   type Output = AD<V>;
         //
@@ -514,7 +515,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     )]
     impl<V> std::ops::[< $Name Assign >] < &AD<V> > for AD<V>
     where
-        V: Clone + From<f32> + PartialEq +
+        V: Clone + SimpleFloat + PartialEq +
             for<'a> std::ops::[< $Name Assign >] <&'a V> +
             crate::ThisThreadTapePublic  ,
     {   //
@@ -545,7 +546,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     )]
     impl<V> std::ops::[< $Name Assign >] <&V> for AD<V>
     where
-        V: Clone + From<f32> + PartialEq +
+        V: Clone + SimpleFloat + PartialEq +
             for<'a> std::ops::[< $Name Assign >] <&'a V> +
             crate::ThisThreadTapePublic  ,
     {   //
@@ -598,7 +599,7 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
         rhs:       &AD<V>  ,
     ) -> (usize, usize, ADType)
     where
-        V : Clone + From<f32> + PartialEq ,
+        V : Clone + SimpleFloat + PartialEq ,
     {
         // new_tape_id, new_index, new_ad_type
         let mut new_tape_id   = 0;
@@ -630,23 +631,23 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
             //
             id::ADD_VV_OP => {
                 // add with left operand the constant zero
-                if( *lhs == V::from(0f32) ) {
+                if( *lhs == V::zero() ) {
                     return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
                 }
             },
             id::MUL_VV_OP => {
                 // multiply with left operand the constant zero
-                if( *lhs == V::from(0f32) ) {
+                if( *lhs == V::zero() ) {
                     return (new_tape_id, new_index, new_ad_type);
                 }
                 // multiply with left operand the constant one
-                if( *lhs == V::from(1f32) ) {
+                if( *lhs == V::one() ) {
                     return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
                 }
             },
             id::DIV_VV_OP => {
                 // divide with left operand the constant zero
-                if( *lhs == V::from(0f32) ) {
+                if( *lhs == V::zero() ) {
                     return (new_tape_id, new_index, new_ad_type);
                 }
             },

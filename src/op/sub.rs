@@ -27,6 +27,7 @@ use crate::ad::ADType;
 use crate::{
     IndexT,
     AD,
+    SimpleFloat,
 };
 //
 use crate::op::binary;
@@ -77,7 +78,7 @@ fn sub_pv_forward_der <V, E>(
     res        :   usize       )
 where
     E  : Clone + From<V>,
-    V  : From<f32>,
+    V  : From<f32> + SimpleFloat,
     for<'a> &'a E : Sub<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
@@ -211,7 +212,8 @@ pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
     for<'a> &'a V : Add<&'a V, Output = V> + Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Sub<&'a V, Output = V> + Sub<&'a AD<V>, Output = AD<V> > ,
-    V             : Clone + From<f32> + PartialEq + ThisThreadTape ,
+    V             : Clone + From<f32> + SimpleFloat,
+    V             : PartialEq + ThisThreadTape ,
     AD<V>         : From<V>
 {
     op_info_vec[SUB_PP_OP as usize] = OpInfo{

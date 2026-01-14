@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // --------------------------------------------------------------------------
 //! Operator that calls an atomic function
 //!
@@ -64,6 +64,7 @@ use crate::{
     AtomCallback,
     ThisThreadTapePublic,
     ad_from_value,
+    SimpleFloat,
 };
 // ----------------------------------------------------------------------
 // BEGIN_DOM
@@ -1010,7 +1011,8 @@ no_reverse_depend!(Call);
 /// The map results for CALL_OP and CALL_RES_OP are set.
 pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    V     : Clone + From<f32> + PartialEq + GlobalAtomCallbackVec + ThisThreadTapePublic,
+    V     : Clone + From<f32> + SimpleFloat,
+    V     : PartialEq + GlobalAtomCallbackVec + ThisThreadTapePublic,
     for<'a> V : AddAssign<&'a V> ,
 {
     op_info_vec[CALL_OP as usize] = OpInfo{

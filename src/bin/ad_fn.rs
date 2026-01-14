@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 use std::cell::RefCell;
 //
@@ -13,6 +13,7 @@ use rustad::{
     stop_recording,
     ad_from_value,
     ThisThreadTapePublic,
+    SimpleFloat,
 };
 //
 // V_Scalar, V_NumVec
@@ -36,7 +37,7 @@ thread_local! {
 // normsq_fn
 fn normsq_fn<V>()->ADfn<V>
 where
-    V : From<f32> + PartialEq + Clone +
+    V : From<f32> + SimpleFloat + PartialEq + Clone +
         Sized + 'static + ThisThreadTapePublic ,
     for<'a> &'a V : std::ops::Mul<&'a V, Output=V> ,
     for<'a>     V : std::ops::AddAssign<&'a V> ,

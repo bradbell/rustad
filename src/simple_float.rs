@@ -16,6 +16,7 @@ use crate::{
 pub trait SimpleFloat {
     fn nan() -> Self;
     fn zero() -> Self;
+    fn one() -> Self;
 }
 //
 // impl_simple_float_from_function
@@ -38,12 +39,14 @@ pub(crate) use simple_float_function;
 /// * P : is a primitive type; i.e., f32 or f64;
 macro_rules! impl_simple_float_for_az_float{ ($P:ident) => {
     impl crate::simple_float::SimpleFloat for crate::AzFloat<$P> {
-        crate::simple_float::simple_float_function!(nan, $P::NAN );
-        crate::simple_float::simple_float_function!(zero, (0 as $P) );
+    crate::simple_float::simple_float_function!(nan, $P::NAN );
+    crate::simple_float::simple_float_function!(zero, (0 as $P) );
+    crate::simple_float::simple_float_function!(one, (1 as $P) );
     }
     impl crate::simple_float::SimpleFloat for crate::NumVec< AzFloat<$P> > {
-        crate::simple_float::simple_float_function!(nan, AzFloat::<$P>::nan() );
-        crate::simple_float::simple_float_function!(zero, AzFloat::<$P>::zero() );
+    crate::simple_float::simple_float_function!(nan, AzFloat::<$P>::nan() );
+    crate::simple_float::simple_float_function!(zero, AzFloat::<$P>::zero() );
+    crate::simple_float::simple_float_function!(one, AzFloat::<$P>::one() );
     }
 } }
 pub(crate) use impl_simple_float_for_az_float;
@@ -55,4 +58,5 @@ where
 {
     simple_float_function!(nan, V::nan() );
     simple_float_function!(zero, V::zero() );
+    simple_float_function!(one, V::one() );
 }

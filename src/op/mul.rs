@@ -30,6 +30,7 @@ use crate::ad::ADType;
 use crate::{
     IndexT,
     AD,
+    SimpleFloat,
 };
 //
 use crate::op::binary;
@@ -251,7 +252,8 @@ where
     //
     for<'a> &'a V : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Mul<&'a V, Output = V> ,
-    V             : Clone + From<f32> + PartialEq + ThisThreadTape ,
+    V             : Clone + From<f32> + SimpleFloat,
+    V             : PartialEq + ThisThreadTape ,
 {
     op_info_vec[MUL_PP_OP as usize] = OpInfo{
         name              : "mul_pp",

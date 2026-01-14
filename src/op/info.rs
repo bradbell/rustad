@@ -16,6 +16,7 @@ use crate::{
     IndexT,
     CompareAsLeft,
     CompareAsRight,
+    SimpleFloat,
 };
 use crate::op::id::NUMBER_OP;
 use crate::tape::sealed::ThisThreadTape;
@@ -454,7 +455,7 @@ where
     for<'a> &'a V : std::ops::Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Div<&'a V, Output = V> ,
     //
-    V     : Clone + From<f32> + PartialEq,
+    V     : Clone + From<f32> + SimpleFloat + PartialEq,
     V     : ThisThreadTape + GlobalAtomCallbackVec,
     V     : CompareAsLeft<V> + CompareAsRight<V>,
     AD<V> : From<V>,
