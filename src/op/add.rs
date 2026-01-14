@@ -212,7 +212,7 @@ pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
     for<'a> &'a V : Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Add<&'a V, Output = V> ,
-    for<'a> V     : Clone + From<f32> + SimpleFloat + PartialEq +
+    for<'a> V     : Clone + SimpleFloat + PartialEq +
                     ThisThreadTape + AddAssign<&'a V>,
 {
     op_info_vec[ADD_PP_OP as usize] = OpInfo{

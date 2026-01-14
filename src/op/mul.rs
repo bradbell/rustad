@@ -252,7 +252,7 @@ where
     //
     for<'a> &'a V : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Mul<&'a V, Output = V> ,
-    V             : Clone + From<f32> + SimpleFloat,
+    V             : Clone + SimpleFloat,
     V             : PartialEq + ThisThreadTape ,
 {
     op_info_vec[MUL_PP_OP as usize] = OpInfo{
