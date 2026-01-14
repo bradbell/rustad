@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! This pub module defines tape objects and functions
@@ -16,6 +16,7 @@ use crate::ad::ADType;
 use crate::{
     AD,
     ADfn,
+    SimpleFloat,
 };
 //
 #[cfg(doc)]
@@ -240,7 +241,7 @@ pub fn start_recording<V>(
     var_dom : Vec<V>            ,
 ) -> ( Vec< AD<V> >, Vec< AD<V> > )
 where
-    V : From<f32> + Clone + Sized + 'static + sealed::ThisThreadTape ,
+    V : SimpleFloat + Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
     assert_ne!( var_dom.len(), 0 );
     //
@@ -287,7 +288,7 @@ where
         //
         // tape.cop:
         // initialize with NAN at index zero
-        tape.cop.push( f32::NAN.into() );
+        tape.cop.push( V::nan() );
         //
         // tape.dyp: n_dom, n_dep
         tape.dyp.n_dom   = dyp_dom.len();
