@@ -17,6 +17,11 @@
 //!
 //! * Copy, Clone :
 //!  The NumVec types implement Clone, but not the Copy trait.
+//!
+//! This module does not have any dependencies outside the standard rust
+//! and az_float.
+//! This enables it source code to be directly included as part of a
+//! Dll library (This has not yet been tested).
 // ---------------------------------------------------------------------------
 // use
 use crate::{
