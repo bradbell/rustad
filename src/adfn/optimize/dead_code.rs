@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! Implement the [ADfn] dead_code method.
@@ -10,6 +10,7 @@
 // use
 //
 use crate::{
+    SimpleFloat,
     ADfn,
     IndexT,
 };
@@ -241,11 +242,11 @@ where
     pub(crate) fn dead_code(&self, depend : &Depend, trace : bool,
     ) -> ( Tape<V>, Old2New)
     where
-        V : Clone + From<f32> + PartialEq ,
+        V : Clone + SimpleFloat + PartialEq ,
     {
         //
         // self.cop[0]
-        let nan :  V  = f32::NAN.into();
+        let nan :  V  = SimpleFloat::nan();
         assert!( nan == self.cop[0] );
         //
         // tape
