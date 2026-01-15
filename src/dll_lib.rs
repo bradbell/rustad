@@ -28,8 +28,14 @@ pub fn create_src_dir(
     if result.is_err() { panic!(
         "dll_lib::create_src_dir: Cannot create the directory {}", src_dir
     ); }
+    //
     let src_file  = src_dir.to_string() + "/lib.rs";
     let result    = std::fs::write(src_file.clone(), lib_src);
+    if result.is_err() {
+        panic!( "Cannot write {src_file}"  );
+    }
+    let src_file  = src_dir.to_string() + "/az_float.rs";
+    let result    = std::fs::write(src_file.clone(), crate::AZ_FLOAT_SRC);
     if result.is_err() {
         panic!( "Cannot write {src_file}"  );
     }

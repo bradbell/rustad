@@ -53,9 +53,8 @@ fn main () {
     let g             = stop_recording(adx);
     //
     // lib_src
-    let lib_src  = String::from( rustad::AZ_FLOAT_SRC );
     let gn_name  = "sumsq_reverse_der";
-    let lib_src  = lib_src + &g.rust_src(gn_name);
+    let lib_src  = g.rust_src(gn_name);
     //
     // src_dir
     let src_dir = "tmp/example_rust_src";

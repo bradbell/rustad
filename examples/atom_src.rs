@@ -114,9 +114,6 @@ fn main() {
     // nx
     let nx = 3;
     //
-    // az_float_src
-    let az_float_src = rustad::AZ_FLOAT_SRC;
-    //
     // f
     let x    = vec![ V::from(1.0) ; nx];
     let (_, ax) = start_recording(None, x);
@@ -150,7 +147,7 @@ fn main() {
     //
     // src_dir
     let src_dir   = "tmp/example_atom_src";
-    let lib_src   = String::from(az_float_src) + &atom_src + &rust_src;
+    let lib_src   = atom_src + &rust_src;
     create_src_dir(src_dir, &lib_src);
     //
     // lib

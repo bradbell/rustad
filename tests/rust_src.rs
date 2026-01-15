@@ -47,9 +47,8 @@ fn test_sub () {
     let g             = stop_recording(adx);
     //
     // lib_src
-    let lib_src  = String::from( rustad::AZ_FLOAT_SRC );
     let gn_name  = "sub_reverse_der";
-    let lib_src  = lib_src + &g.rust_src(gn_name);
+    let lib_src  = g.rust_src(gn_name);
     //
     // src_dir
     let src_dir = "tmp/test_sub_rust_src";

@@ -234,16 +234,13 @@ fn atom_dyp_src() {
     assert_eq!( y[1], p[1] * x[0] );
     assert_eq!( y[2], V::from(5.0) );
     //
-    // az_float_src
-    let az_float_src = String::from( rustad::AZ_FLOAT_SRC );
-    //
     // atom_src
     let atom_src  = build_atom_src();
     //
     // lib_src
     let fn_name   = "h";
     let rust_src  = f.rust_src(fn_name);
-    let lib_src   = az_float_src + &atom_src + &rust_src;
+    let lib_src   =  atom_src + &rust_src;
     //
     // src_dir
     let src_dir  = "tmp/test_atom_dyp_src";

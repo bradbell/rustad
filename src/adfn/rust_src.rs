@@ -57,6 +57,10 @@ pub type RustSrcFn<V> = fn(
 fn prototype_src(fn_name : &str, v_str : &str) -> String {
     let result = String::new();
     let result = result +
+        "#[allow(unused)]\n" +
+        "mod az_float;\n" +
+        "use az_float::AzFloat;\n" +
+        "\n" +
         "#[no_mangle]\n" +
         "pub fn rust_src_"  + fn_name + "(\n" +
         "   dyp_dom     : &Vec<&"    + v_str  + ">,\n" +
