@@ -37,8 +37,8 @@ pub mod checkpoint;
 // dll_lib
 pub mod dll_lib;
 //
-// simple_float
-pub mod simple_float;
+// float
+pub mod float;
 //
 // ----------------------------------------------------------------------------
 // private sub-modules
@@ -97,7 +97,7 @@ pub use dll_lib::{
     RustSrcLink,
     get_rust_src_fn,
 };
-pub use simple_float::{
+pub use float::{
     SimpleFloat,
 };
 // ---------------------------------------------------------------------------
@@ -150,9 +150,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2026.1.14");
+/// assert_eq!(date, "2026.1.15");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2026.1.14";
+pub const YEAR_MONTH_DAY : &str = "2026.1.15";
 //
 // AZ_FLOAT_SRC
 /// is the source code for the [AzFloat] class.

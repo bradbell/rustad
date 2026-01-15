@@ -25,12 +25,12 @@ pub trait SimpleFloat {
 ///
 /// * P : is a primitive type; i.e., f32 or f64;
 macro_rules! impl_simple_float_for_az_float{ ($P:ident) => {
-    impl crate::simple_float::SimpleFloat for crate::AzFloat<$P> {
+    impl crate::float::SimpleFloat for crate::AzFloat<$P> {
         fn nan()  -> Self { Self::from( $P::NAN ) }
         fn zero() -> Self { Self::from( 0 as $P ) }
         fn one()  -> Self { Self::from( 1 as $P ) }
     }
-    impl crate::simple_float::SimpleFloat for crate::NumVec< AzFloat<$P> > {
+    impl crate::float::SimpleFloat for crate::NumVec< AzFloat<$P> > {
         fn nan()  -> Self { Self::from( AzFloat::<$P>::nan() ) }
         fn zero() -> Self { Self::from( AzFloat::<$P>::zero() ) }
         fn one()  -> Self { Self::from( AzFloat::<$P>::one() ) }
