@@ -17,3 +17,6 @@
 //
 // core
 pub mod core;
+//
+// az_float
+pub mod az_float;

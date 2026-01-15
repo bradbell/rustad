@@ -13,9 +13,6 @@
 // utility
 pub mod utility;
 //
-// az_float
-pub mod az_float;
-//
 // num_vec
 pub mod num_vec;
 //
@@ -58,11 +55,6 @@ pub(crate) mod setup;
 // ---------------------------------------------------------------------------
 // re-export
 //
-pub use az_float::{
-    AzFloat,
-    CompareAsLeft,
-    CompareAsRight,
-};
 pub use num_vec::{
     NumVec,
 };
@@ -100,6 +92,9 @@ pub use dll_lib::{
 };
 pub use float::{
     core::FloatCore,
+    az_float::AzFloat,
+    az_float::CompareAsLeft,
+    az_float::CompareAsRight,
 };
 // ---------------------------------------------------------------------------
 // Sealed Traits
@@ -159,4 +154,4 @@ pub const YEAR_MONTH_DAY : &str = "2026.1.15";
 /// is the source code for the [AzFloat] class.
 /// This is needed at the beginning of a dll library that include
 /// [ADfn::rust_src] .
-pub const AZ_FLOAT_SRC : &str = include_str!( "az_float.rs" );
+pub const AZ_FLOAT_SRC : &str = include_str!( "float/az_float.rs" );

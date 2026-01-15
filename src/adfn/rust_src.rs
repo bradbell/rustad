@@ -100,7 +100,9 @@ where
         //
         // v_str
         let v_str   = String::from( type_name::<V>() );
-        let v_str   = v_str.replace( "rustad::az_float::AzFloat", "AzFloat" );
+        let v_str   = v_str.replace(
+            "rustad::float::az_float::AzFloat", "AzFloat"
+        );
         //
         // v_is_f32, v_is_f64
         let v_is_f32 = v_str.contains("f32");
