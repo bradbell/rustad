@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 /*
 Example converting an ADfn, that has an atomic function, call to source code.
 
@@ -18,6 +18,7 @@ use rustad::{
     get_lib,
     RustSrcLink,
     get_rust_src_fn,
+    create_src_dir
 };
 //
 // V
@@ -147,18 +148,15 @@ fn main() {
     let fn_name   = "sumsq";
     let rust_src  = f.rust_src(fn_name);
     //
-    // src_file
-    let src_file  = "tmp/example_atom_src.rs";
-    let src       = String::from(az_float_src) + &atom_src + &rust_src;
-    let result    = std::fs::write(src_file, src);
-    if result.is_err() {
-        panic!( "Cannot write {src_file}"  );
-    }
+    // src_dir
+    let src_dir   = "tmp/example_atom_src";
+    let lib_src   = String::from(az_float_src) + &atom_src + &rust_src;
+    create_src_dir(src_dir, &lib_src);
     //
     // lib
     let lib_file    = "tmp/example_atom_src.so";
     let replace_lib = true;
-    let lib         = get_lib(src_file, lib_file, replace_lib);
+    let lib         = get_lib(src_dir, lib_file, replace_lib);
     //
     // sumsq_fn
     let sumsq_fn : RustSrcLink<V> = get_rust_src_fn(&lib, &fn_name);

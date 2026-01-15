@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 /*
 Test rust_src with an atomic function and dynamic parameters.
 
@@ -30,6 +30,7 @@ use rustad::{
     get_lib,
     RustSrcLink,
     get_rust_src_fn,
+    create_src_dir,
 };
 //
 // V
@@ -239,22 +240,19 @@ fn atom_dyp_src() {
     // atom_src
     let atom_src  = build_atom_src();
     //
-    // rust_src
+    // lib_src
     let fn_name   = "h";
     let rust_src  = f.rust_src(fn_name);
+    let lib_src   = az_float_src + &atom_src + &rust_src;
     //
-    // src_file
-    let src_file  = "tmp/test_atom_dyp_src.rs";
-    let src       = az_float_src + &atom_src + &rust_src;
-    let result    = std::fs::write(src_file, src);
-    if result.is_err() {
-        panic!( "Cannot write {src_file}"  );
-    }
+    // src_dir
+    let src_dir  = "tmp/test_atom_dyp_src";
+    create_src_dir(src_dir, &lib_src);
     //
     // lib
     let lib_file    = "tmp/test_atom_dyp_src.so";
     let replace_lib = true;
-    let lib         = get_lib(src_file, lib_file, replace_lib);
+    let lib         = get_lib(src_dir, lib_file, replace_lib);
     //
     // h_fn
     let h_fn : RustSrcLink<V> = get_rust_src_fn(&lib, &fn_name);

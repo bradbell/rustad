@@ -1,25 +1,54 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //! This pub module compiles and links to a dll library routines.
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
-///
+// use
 use crate::adfn::rust_src::RustSrcFn;
+// ----------------------------------------------------------------------------
+// create_src_dir
+/// Create a get_lib source code directory
 ///
+/// * src_dir  :
+/// is the directory we are creating. If it already exists, any files
+/// there are left in place except for the lib.rs file.
+///
+///  * lib_src :
+/// is an in memory representation of the data that is written to the
+/// file *src_dir* `/lib.rs` .
+///
+pub fn create_src_dir(
+    src_dir  :  &str ,
+    lib_src  :  &str ,
+) {
+    let result    = std::fs::create_dir_all(src_dir);
+    if result.is_err() { panic!(
+        "dll_lib::create_src_dir: Cannot create the directory {}", src_dir
+    ); }
+    let src_file  = src_dir.to_string() + "/lib.rs";
+    let result    = std::fs::write(src_file.clone(), lib_src);
+    if result.is_err() {
+        panic!( "Cannot write {src_file}"  );
+    }
+}
+
+// ----------------------------------------------------------------------------
 // get_lib
 /// Compile and link to a dll library.
 ///
 /// * Syntax :
 /// ```text
-///     lib = dll_lib.get_lib(src_file, lib_file, replace_lib)
+///     lib = dll_lib.get_lib(src_dir, lib_file, replace_lib)
 /// ```
 ///
-/// * src_file :
-/// is the name of the file that contains the source for the dll library.
-/// This file need not exist if *lib_file* exists and *replace_lib* is false.
+/// * src_dir :
+/// is the name of the directory that contains the source for the dll library.
+/// If *lib_file* exists and *replace_lib* is false, *src_dir* need not exist.
+/// If it does exist, the top level source code file for the library must be
+/// *src_dir* `/lib.rs` .
 ///
 /// * lib_file :
 /// is the name of the file that contains the dll library.
@@ -38,7 +67,7 @@ use crate::adfn::rust_src::RustSrcFn;
 /// ```
 ///
 pub fn get_lib(
-    src_file      : &str,
+    src_dir       : &str,
     lib_file      : &str,
     replace_lib   : bool,
 ) -> libloading::Library {
@@ -55,9 +84,16 @@ pub fn get_lib(
     }
     if ! lib_path.is_file() {
         //
+        // src_file
+        let src_file = src_dir.to_string() + "/lib.rs";
+        let src_path = std::path::Path::new(&src_file);
+        if ! src_path.is_file() { panic!(
+            "dll_lib::get_lib: Cannot find lib.rs in src_dir = {}", src_dir
+        ); }
+        //
         // cmd
         let mut cmd = String::from("rustc");
-        cmd  = cmd + " " + src_file;
+        cmd = cmd + " " + &src_file;
         cmd = cmd + " --crate-type dylib";
         cmd = cmd + " -o " + lib_file;
         //
@@ -89,7 +125,7 @@ pub fn get_lib(
     }
     lib
 }
-//
+// ----------------------------------------------------------------------------
 // RustSrcLink
 /// This type is used for function like objects in a dll library.
 ///

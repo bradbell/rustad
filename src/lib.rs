@@ -93,6 +93,7 @@ pub use checkpoint::{
     call_checkpoint,
 };
 pub use dll_lib::{
+    create_src_dir,
     get_lib,
     RustSrcLink,
     get_rust_src_fn,

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 // Example converting a derivative calculation to rust source code
 //
@@ -14,6 +14,7 @@ use rustad::{
     RustSrcLink,
     get_rust_src_fn,
     ad_from_vector,
+    create_src_dir,
 };
 //
 fn main () {
@@ -51,22 +52,19 @@ fn main () {
     let adx           = f.reverse_der_ad(None, &av, ady, trace);
     let g             = stop_recording(adx);
     //
-    // src
-    let src      = String::from( rustad::AZ_FLOAT_SRC );
+    // lib_src
+    let lib_src  = String::from( rustad::AZ_FLOAT_SRC );
     let gn_name  = "sumsq_reverse_der";
-    let src      = src + &g.rust_src(gn_name);
+    let lib_src  = lib_src + &g.rust_src(gn_name);
     //
-    // src_file
-    let src_file = "tmp/example_rust_src.rs";
-    let result = std::fs::write(src_file, src);
-    if result.is_err() {
-        panic!( "Cannot write {src_file}"  );
-    }
+    // src_dir
+    let src_dir = "tmp/example_rust_src";
+    create_src_dir(src_dir, &lib_src);
     //
     // lib
     let lib_file    = "tmp/example_rust_src.so";
     let replace_lib = true;
-    let lib         = get_lib(src_file, lib_file, replace_lib);
+    let lib         = get_lib(src_dir, lib_file, replace_lib);
     //
     // sumsq_fn_reverse_der_fn
     let sumsq_reverse_der_fn : RustSrcLink<V> = get_rust_src_fn(&lib, &gn_name);
