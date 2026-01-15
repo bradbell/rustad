@@ -12,7 +12,7 @@ use std::thread::LocalKey;
 use std::cell::RefCell;
 //
 use crate::{
-    SimpleFloat,
+    FloatCore,
     AD,
     IndexT,
 };
@@ -98,7 +98,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         rhs:       &AD<V>  ,
     ) -> (usize, usize, ADType)
     where
-        V : Clone + SimpleFloat + PartialEq ,
+        V : Clone + FloatCore + PartialEq ,
     {
         // new_tape_id, new_index, new_ad_type
         let mut new_tape_id   = 0;
@@ -279,7 +279,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     impl<V> std::ops::$Name< &AD<V> > for &AD<V>
     where
         for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
-        V    : Clone + SimpleFloat + PartialEq + crate::ThisThreadTapePublic ,
+        V    : Clone + FloatCore + PartialEq + crate::ThisThreadTapePublic ,
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self , rhs : &AD<V> ) -> AD<V>
@@ -308,7 +308,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         rhs:       &V      ,
     ) -> (usize, usize, ADType)
     where
-        V : Clone + SimpleFloat + PartialEq,
+        V : Clone + FloatCore + PartialEq,
     {
         // new_tape_id, new_index, new_ad_type, cop_lhs
         let mut new_tape_id   = 0;
@@ -416,7 +416,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     impl<V> std::ops::$Name< &V> for &AD<V>
     where
         for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
-        V            : Clone + SimpleFloat + PartialEq +
+        V            : Clone + FloatCore + PartialEq +
                        crate::ThisThreadTapePublic ,
     {   type Output = AD<V>;
         //
@@ -515,7 +515,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     )]
     impl<V> std::ops::[< $Name Assign >] < &AD<V> > for AD<V>
     where
-        V: Clone + SimpleFloat + PartialEq +
+        V: Clone + FloatCore + PartialEq +
             for<'a> std::ops::[< $Name Assign >] <&'a V> +
             crate::ThisThreadTapePublic  ,
     {   //
@@ -546,7 +546,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     )]
     impl<V> std::ops::[< $Name Assign >] <&V> for AD<V>
     where
-        V: Clone + SimpleFloat + PartialEq +
+        V: Clone + FloatCore + PartialEq +
             for<'a> std::ops::[< $Name Assign >] <&'a V> +
             crate::ThisThreadTapePublic  ,
     {   //
@@ -599,7 +599,7 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
         rhs:       &AD<V>  ,
     ) -> (usize, usize, ADType)
     where
-        V : Clone + SimpleFloat + PartialEq ,
+        V : Clone + FloatCore + PartialEq ,
     {
         // new_tape_id, new_index, new_ad_type
         let mut new_tape_id   = 0;

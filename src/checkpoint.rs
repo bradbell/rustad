@@ -20,7 +20,7 @@ use crate::{
     register_atom,
     start_recording,
     stop_recording,
-    SimpleFloat,
+    FloatCore,
 };
 //
 use sealed::{
@@ -190,7 +190,7 @@ pub(crate) fn register_checkpoint_atom<V>()-> IndexT
 where
     V : Clone + From<f32> + std::fmt::Display,
     V : GlobalOpInfoVec + GlobalCheckpointInfoVec + GlobalAtomCallbackVec,
-    V : ThisThreadTape + SimpleFloat,
+    V : ThisThreadTape + FloatCore,
 {
     //
     // checkpoint_callback
@@ -265,7 +265,7 @@ pub fn register_checkpoint<V>(
     mut hash_map  : HashMap<&str, String>   ,
 ) -> IndexT
 where
-    V : Clone + From<f32> + std::fmt::Display + SimpleFloat,
+    V : Clone + From<f32> + std::fmt::Display + FloatCore,
     V : ThisThreadTape + GlobalOpInfoVec + GlobalCheckpointInfoVec,
 {   //
     if 0 < ad_fn.dyp_len() { panic!(
@@ -413,7 +413,7 @@ fn checkpoint_forward_fun_value<V>(
 ) -> Result< Vec<V>, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + SimpleFloat,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FloatCore,
 {   //
     // domain_clone
     let domain_clone = ref_slice2vec(domain);
@@ -442,7 +442,7 @@ fn checkpoint_forward_der_value<V>(
 ) -> Result< Vec<V>, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + SimpleFloat,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FloatCore,
 {   //
     assert_eq!( domain.len(), domain_der.len() );
     //
@@ -478,7 +478,7 @@ fn checkpoint_reverse_der_value<V>(
 ) -> Result< Vec<V>, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + SimpleFloat,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FloatCore,
 {   //
     // domain_clone
     let domain_clone = ref_slice2vec(domain);

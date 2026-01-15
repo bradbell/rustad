@@ -12,7 +12,7 @@
 use crate::{
     AD,
     ADfn,
-    SimpleFloat,
+    FloatCore,
 };
 use crate::op::info::sealed::GlobalOpInfoVec;
 //
@@ -158,7 +158,7 @@ macro_rules! reverse_der {
             let op_info_vec = &*GlobalOpInfoVec::get();
             //
             // zero_e
-            let zero_e : $E = SimpleFloat::zero();
+            let zero_e : $E = FloatCore::zero();
             //
             // var_der
             let mut var_der       = vec![ zero_e; n_var ];
@@ -226,7 +226,7 @@ macro_rules! reverse_der {
             }
             //
             // domain_der
-            let nan_e  : $E    = SimpleFloat::nan();
+            let nan_e  : $E    = FloatCore::nan();
             let mut domain_der = var_der;
             domain_der.resize(self.var.n_dom, nan_e);
             domain_der.shrink_to_fit();
@@ -237,7 +237,7 @@ macro_rules! reverse_der {
 //
 impl<V> ADfn<V>
 where
-    V : Clone + std::fmt::Display + GlobalOpInfoVec + SimpleFloat,
+    V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore,
 {   //
     // reverse_der
     reverse_der!( value, V, V );

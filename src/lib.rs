@@ -98,7 +98,7 @@ pub use dll_lib::{
     get_rust_src_fn,
 };
 pub use float::{
-    SimpleFloat,
+    core::FloatCore,
 };
 // ---------------------------------------------------------------------------
 // Sealed Traits

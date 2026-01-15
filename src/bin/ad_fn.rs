@@ -13,7 +13,7 @@ use rustad::{
     stop_recording,
     ad_from_value,
     ThisThreadTapePublic,
-    SimpleFloat,
+    FloatCore,
 };
 //
 // V_Scalar, V_NumVec
@@ -37,7 +37,7 @@ thread_local! {
 // normsq_fn
 fn normsq_fn<V>()->ADfn<V>
 where
-    V : From<f32> + SimpleFloat + PartialEq + Clone +
+    V : From<f32> + FloatCore + PartialEq + Clone +
         Sized + 'static + ThisThreadTapePublic ,
     for<'a> &'a V : std::ops::Mul<&'a V, Output=V> ,
     for<'a>     V : std::ops::AddAssign<&'a V> ,

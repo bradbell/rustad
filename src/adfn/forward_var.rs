@@ -13,7 +13,7 @@ use crate::ad::ADType;
 use crate::{
     AD,
     ADfn,
-    SimpleFloat,
+    FloatCore,
 };
 use crate::op::info::sealed::GlobalOpInfoVec;
 //
@@ -168,7 +168,7 @@ macro_rules! forward_var {
             let n_var = self.var.n_dom + self.var.n_dep;
             //
             // var_both
-            let nan_e  : $E  = SimpleFloat::nan();
+            let nan_e  : $E  = FloatCore::nan();
             let mut var_both = var_dom;
             var_both.resize( n_var, nan_e );
             //
@@ -259,7 +259,7 @@ macro_rules! forward_var {
 //
 impl<V> ADfn<V>
 where
-    V : Clone + std::fmt::Display + GlobalOpInfoVec + SimpleFloat,
+    V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore,
 {   //
     // forward_var
     forward_var!( value, V, V );

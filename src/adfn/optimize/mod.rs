@@ -10,7 +10,7 @@
 // use
 //
 use crate::{
-    SimpleFloat,
+    FloatCore,
     ADfn,
     IndexT,
     GlobalAtomCallbackVecPublic,
@@ -160,7 +160,7 @@ pub(crate) fn renumber_op_seq(
 /// ```
 impl<V> ADfn<V>
 where
-    V : Clone + SimpleFloat + Eq + std::fmt::Display + std::hash::Hash +
+    V : Clone + FloatCore + Eq + std::fmt::Display + std::hash::Hash +
         GlobalAtomCallbackVecPublic + GlobalOpInfoVecPublic,
 {   //
     // optimize

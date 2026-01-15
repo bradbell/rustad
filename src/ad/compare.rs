@@ -12,7 +12,7 @@ use std::thread::LocalKey;
 use std::cell::RefCell;
 //
 use crate::{
-    SimpleFloat,
+    FloatCore,
     AD,
     IndexT,
     CompareAsLeft,
@@ -189,7 +189,7 @@ macro_rules! impl_compare_aa{ ($name:ident) => { paste::paste! {
 } } }
 impl<V> CompareAsLeft< AD<V> > for AD<V>
 where
-    V : Clone + SimpleFloat + PartialEq + CompareAsLeft + ThisThreadTape ,
+    V : Clone + FloatCore + PartialEq + CompareAsLeft + ThisThreadTape ,
 {
     impl_compare_aa!( lt );
     impl_compare_aa!( le );
@@ -229,7 +229,7 @@ macro_rules! impl_compare_av{ ($name:ident) => { paste::paste! {
 } } }
 impl<V> CompareAsLeft<V> for AD<V>
 where
-    V : Clone + SimpleFloat + PartialEq + CompareAsLeft + ThisThreadTape ,
+    V : Clone + FloatCore + PartialEq + CompareAsLeft + ThisThreadTape ,
 {
     impl_compare_av!( lt );
     impl_compare_av!( le );
@@ -269,7 +269,7 @@ macro_rules! impl_compare_va{ ($name:ident) => { paste::paste! {
 } } }
 impl<V> CompareAsRight< AD<V> > for V
 where
-    V : Clone + SimpleFloat + PartialEq + CompareAsLeft + ThisThreadTape ,
+    V : Clone + FloatCore + PartialEq + CompareAsLeft + ThisThreadTape ,
 {
     impl_compare_va!( lt );
     impl_compare_va!( le );
@@ -288,7 +288,7 @@ fn record_compare_aa <V> (
     op_id:     u8      ,
 ) -> (usize, usize, ADType)
 where
-    V : Clone + SimpleFloat + PartialEq ,
+    V : Clone + FloatCore + PartialEq ,
 {
     // new_tape_id, new_index, new_ad_type
     let mut new_tape_id   = 0;
@@ -408,7 +408,7 @@ fn record_compare_av <V> (
     op_id:     u8      ,
 ) -> (usize, usize, ADType)
 where
-    V : Clone + SimpleFloat + PartialEq ,
+    V : Clone + FloatCore + PartialEq ,
 {
     // new_tape_id, new_index, new_ad_type
     let mut new_tape_id   = 0;
@@ -493,7 +493,7 @@ fn record_compare_va <V> (
     op_id:     u8      ,
 ) -> (usize, usize, ADType)
 where
-    V : Clone + SimpleFloat + PartialEq ,
+    V : Clone + FloatCore + PartialEq ,
 {
     // new_tape_id, new_index, new_ad_type
     let mut new_tape_id   = 0;

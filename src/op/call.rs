@@ -64,7 +64,7 @@ use crate::{
     AtomCallback,
     ThisThreadTapePublic,
     ad_from_value,
-    SimpleFloat,
+    FloatCore,
 };
 // ----------------------------------------------------------------------
 // BEGIN_DOM
@@ -1011,7 +1011,7 @@ no_reverse_depend!(Call);
 /// The map results for CALL_OP and CALL_RES_OP are set.
 pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
-    V     : Clone + From<f32> + SimpleFloat,
+    V     : Clone + From<f32> + FloatCore,
     V     : PartialEq + GlobalAtomCallbackVec + ThisThreadTapePublic,
     for<'a> V : AddAssign<&'a V> ,
 {

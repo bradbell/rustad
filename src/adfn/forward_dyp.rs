@@ -12,7 +12,7 @@
 use crate::{
     AD,
     ADfn,
-    SimpleFloat,
+    FloatCore,
 };
 use crate::op::info::sealed::GlobalOpInfoVec;
 //
@@ -87,7 +87,7 @@ macro_rules! forward_dyp {
             let n_dyp = self.dyp.n_dom + self.dyp.n_dep;
             //
             // dyp_both
-            let nan_e  : $E  = SimpleFloat::nan();
+            let nan_e  : $E  = FloatCore::nan();
             let mut dyp_both = dyp_dom;
             dyp_both.resize(n_dyp, nan_e );
             //
@@ -143,7 +143,7 @@ macro_rules! forward_dyp {
 //
 impl<V> ADfn<V>
 where
-    V : Clone + std::fmt::Display + GlobalOpInfoVec + SimpleFloat,
+    V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore,
 {   //
     // forward_dyp
     forward_dyp!( value, V, V );
