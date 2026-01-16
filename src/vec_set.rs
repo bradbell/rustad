@@ -96,7 +96,7 @@ impl VecSet {
     ///
     /// * Example : Select the source code link in [example_empty] .
     ///
-    pub fn empty(self : &mut Self) -> usize
+    pub fn empty(&mut self) -> usize
     {   // link, start, data
         let link  = &mut self.link;
         let start = &mut self.start;
@@ -144,7 +144,7 @@ impl VecSet {
     ///
     /// * Example : Select the source code link in [example_singleton] .
     ///
-    pub fn singleton(self : &mut Self, element : usize) -> usize
+    pub fn singleton(&mut self, element : usize) -> usize
     {   // link, start, data
         let link  = &mut self.link;
         let start = &mut self.start;
@@ -196,7 +196,7 @@ impl VecSet {
     ///
     /// * Example : Select the source code link in [example_get] .
     ///
-    pub fn get(self : &Self, mut id_set : usize) -> &[usize]
+    pub fn get(&self, mut id_set : usize) -> &[usize]
     {   //
         // link, start, data
         let link  = &self.link;
@@ -250,7 +250,7 @@ impl VecSet {
     /// * Example : Select the source code link in [example_n_data] .
     ///
     #[cfg( any(test,doc) )]
-    pub fn n_element(self : &Self) -> usize
+    pub fn n_element(&self) -> usize
     {   self.data.len() }
 
 }
@@ -299,7 +299,7 @@ impl VecSet {
 ///
 /// * Example : Select the source code link in [example_union] .
 ///
-pub fn union(self : &mut Self, sub_sets : &Vec<usize> ) -> usize
+pub fn union(&mut self, sub_sets : &Vec<usize> ) -> usize
 {   //
     // link, start, data, arg, next, equal
     let link  = &mut self.link;
