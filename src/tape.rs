@@ -116,14 +116,14 @@ pub struct Tape<V> {
     pub(crate) cop : Vec<V>,
 }
 // ---------------------------------------------------------------------------
-// GTape::new
+// Tape::default
 //
-impl<V> Tape<V> {
+impl<V> Default for Tape<V> {
     //
-    // Tape::new
+    // Tape::default
     /// Sets dyp, var to new, recording to false, and tape_id to zero.
     /// (The tape with tape_id zero never has recording true.)
-    pub fn new() -> Self {
+    fn default() -> Self {
         Self {
             dyp           : OpSequence::new(),
             var           : OpSequence::new(),
@@ -188,7 +188,7 @@ macro_rules! impl_this_thread_tape{ ($V:ty) => {
             thread_local! {
                 pub(crate) static THIS_THREAD_TAPE : RefCell<
                     crate::tape::Tape<$V>
-                > = RefCell::new( crate::tape::Tape::new() );
+                > = RefCell::new( crate::tape::Tape::default() );
             }
             &THIS_THREAD_TAPE
         }

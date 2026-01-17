@@ -250,7 +250,7 @@ where
         assert!( nan == self.cop[0] );
         //
         // tape
-        let mut tape : Tape<V> = Tape::new();
+        let mut tape : Tape<V> = Tape::default();
         //
         // n_cop, n_dyp, n_var
         let n_cop = self.cop_len();
