@@ -61,7 +61,7 @@ impl<S> NumVec<S>
 {   //
     /// Length of this numeric vector
     pub fn len(self : &NumVec<S> ) -> usize {
-        if self.vec.len() == 0 {
+        if self.vec.is_empty() {
             1
         } else {
             self.vec.len()

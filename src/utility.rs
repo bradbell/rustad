@@ -47,6 +47,6 @@ pub fn avg_seconds_to_execute( fun : fn() , min_seconds : f64 ) -> f64 {
         repeat *= 2;
         duration = ( start.elapsed().as_nanos() as f64) / 1e9;
     }
-    repeat = repeat / 2;
+    repeat /= 2;
     duration / (repeat as f64)
 }

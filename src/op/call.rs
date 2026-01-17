@@ -1087,8 +1087,8 @@ where
     AtomCallback<V> : Clone,
 {
     atom_depend.clear();
-    debug_assert!( dyp_depend.len() == 0 );
-    debug_assert!( var_depend.len() == 0 );
+    debug_assert!( dyp_depend.is_empty() );
+    debug_assert!( var_depend.is_empty() );
     //
     // id_all, op_id
     let id_all = &op_seq.id_all;
