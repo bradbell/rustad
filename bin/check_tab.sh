@@ -5,7 +5,7 @@ set -e -u
 # SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 # SPDX-FileContributor: 2020-25 Bradley M. Bell
 # -----------------------------------------------------------------------------
-# bin/check_tabls.h
+# bin/check_tab.sh
 # Checks for tabs in the source and returns an error if it finds any.
 # Files that are not checked can be specified in bin/dev_settings.sh.
 # -----------------------------------------------------------------------------
@@ -35,7 +35,6 @@ source bin/dev_settings.sh
 # sed.$$
 cat << EOF > sed.$$
 s|.*-> *||
-/sed.$$/d
 EOF
 for name in $invisible_and_tab_ok
 do
@@ -64,7 +63,6 @@ fi
 ok='yes'
 for file in $file_list
 do
-   echo "check tab: $file"
    if $grep -P '\t' $file > /dev/null
    then
       echo "$file has a tab"
