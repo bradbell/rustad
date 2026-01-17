@@ -418,14 +418,14 @@ where
     //
     // rng_ad_type, rng_index, cop
     // TODO: figure out how to do this without any cloning of values.
-    for i in 0 .. arange.len() {
-        if arange[i].tape_id == tape_id {
-            ad_fn.rng_ad_type.push( arange[i].ad_type.clone() );
-            ad_fn.rng_index.push( arange[i].index as IndexT );
+    for ay_i in &arange {
+        if ay_i.tape_id == tape_id {
+            ad_fn.rng_ad_type.push( ay_i.ad_type.clone() );
+            ad_fn.rng_index.push( ay_i.index as IndexT );
         } else {
             ad_fn.rng_ad_type.push( ADType::ConstantP );
             ad_fn.rng_index.push( ad_fn.cop.len() as IndexT  );
-            ad_fn.cop.push( arange[i].value.clone() );
+            ad_fn.cop.push( ay_i.value.clone() );
         }
     }
     ad_fn
