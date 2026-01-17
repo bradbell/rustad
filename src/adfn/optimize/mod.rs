@@ -75,22 +75,22 @@ pub(crate) struct Old2New {
 /// Renumber an operation sequence using the the first equivalent operator map.
 ///
 /// * equal_type *
-/// Type of operator that first_equal refers to.
+///   Type of operator that first_equal refers to.
 ///
 /// * first_equal :
-/// If first_equal\[op_index\] is not equal to op_index,
-/// depend\[op_index\] is true and the operator with index op_index
-/// is equivalent to the operator with index first_equal\[op_index\].
-/// In addition, this is the first operator that is known to be equivalent.
+///   If first_equal\[op_index\] is not equal to op_index,
+///   depend\[op_index\] is true and the operator with index op_index
+///   is equivalent to the operator with index first_equal\[op_index\].
+///   In addition, this is the first operator that is known to be equivalent.
 ///
 /// * depend :
-/// This identifies which operators, in the operation sequence,
-/// are necessary to compute the results
-/// for the function this operation sequence appears in.
+///   This identifies which operators, in the operation sequence,
+///   are necessary to compute the results
+///   for the function this operation sequence appears in.
 ///
 /// * op_seq :
-/// This is the operator sequence that we are renumbering.
-/// Only the field op_seq.arg_all is modified.
+///   This is the operator sequence that we are renumbering.
+///   Only the field op_seq.arg_all is modified.
 ///
 ///
 pub(crate) fn renumber_op_seq(

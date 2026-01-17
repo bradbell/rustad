@@ -246,9 +246,9 @@ no_rust_src!(CompareAsLeft);
 /// Set the operator information for the CompareAsLeft operators
 ///
 /// * op_info_vec :
-/// The map from [op::id](crate::op::id) to operator information.
-/// The the map results for the following operators are set:
-/// LT_OP, LE_OP, EQ_OP, NE_OP, GE_OP, GT_OP .
+///   The map from [op::id](crate::op::id) to operator information.
+///   The the map results for the following operators are set:
+///   LT_OP, LE_OP, EQ_OP, NE_OP, GE_OP, GT_OP .
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
     V     : Clone + From<f32>,

@@ -13,12 +13,12 @@ use crate::adfn::rust_src::RustSrcFn;
 /// Create a get_lib source code directory
 ///
 /// * src_dir  :
-/// is the directory we are creating. If it already exists, any files
-/// there are left in place except for the lib.rs file.
+///   is the directory we are creating. If it already exists, any files
+///   there are left in place except for the lib.rs file.
 ///
-///  * lib_src :
-/// is an in memory representation of the data that is written to the
-/// file *src_dir* `/lib.rs` .
+/// * lib_src :
+///   is an in memory representation of the data that is written to the
+///   file *src_dir* `/lib.rs` .
 ///
 pub fn create_src_dir(
     src_dir  :  &str ,
@@ -46,31 +46,31 @@ pub fn create_src_dir(
 /// Compile and link to a dll library.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     lib = dll_lib.get_lib(src_dir, lib_file, replace_lib)
-/// ```
+///   ```
 ///
 /// * src_dir :
-/// is the name of the directory that contains the source for the dll library.
-/// If *lib_file* exists and *replace_lib* is false, *src_dir* need not exist.
-/// If it does exist, the top level source code file for the library must be
-/// *src_dir* `/lib.rs` .
+///   is the name of the directory that contains the source for the dll library.
+///   If *lib_file* exists and *replace_lib* is false, *src_dir* need not exist.
+///   If it does exist, the top level source code file for the library must be
+///   *src_dir* `/lib.rs` .
 ///
 /// * lib_file :
-/// is the name of the file that contains the dll library.
-/// If this file does not exist, it will be created.
+///   is the name of the file that contains the dll library.
+///   If this file does not exist, it will be created.
 ///
 /// * replace_lib :
-/// If this is true,
-/// a new version of the dll library will be created even if it already exists.
+///   If this is true,
+///   a new version of the dll library will be created even if it already exists.
 ///
 /// * lib :
-/// an object that can be used to call any of the public in the
-/// library that are declared starting with:
-/// ```text
+///   an object that can be used to call any of the public in the
+///   library that are declared starting with:
+///   ```text
 ///     #[no_mangle]
 ///     pub fn
-/// ```
+///   ```
 ///
 pub fn get_lib(
     src_dir       : &str,
@@ -143,10 +143,10 @@ pub type RustSrcLink<'a, V> = libloading::Symbol<'a, RustSrcFn<V> >;
 /// Get a link to an [RustSrcFn] function.
 ///
 /// * lib :
-/// is a library returned by the [get_lib] function.
+///   is a library returned by the [get_lib] function.
 ///
 /// * fn_name :
-/// is the name of the function without it's leading `rust_src_` .
+///   is the name of the function without it's leading `rust_src_` .
 ///
 pub fn get_rust_src_fn<'a, V>(
     lib     : &'a libloading::Library,

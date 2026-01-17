@@ -36,21 +36,21 @@ use crate::{
 /// * E : see [doc_generic_e]
 ///
 /// * dyp_both :
-/// vector of all the dynamic parameters in the following order:
-/// the domain dynamic parameters followed by the dependent dynamic parameters.
+///   vector of all the dynamic parameters in the following order:
+///   the domain dynamic parameters followed by the dependent dynamic parameters.
 ///
 /// * var_both :
-/// vector of all the variables in the following order:
-/// the domain variables followed by the dependent variables.
+///   vector of all the variables in the following order:
+///   the domain variables followed by the dependent variables.
 ///
 /// * cop :
-/// vector of all the constant values used by operators.
+///   vector of all the constant values used by operators.
 ///
 /// * flag_all :
-/// vector of all the boolean values used by operators.
+///   vector of all the boolean values used by operators.
 ///
 /// * arg :
-/// The arguments for this operator as a sub-vector of all the arguments.
+///   The arguments for this operator as a sub-vector of all the arguments.
 ///
 /// * arg_type :
 ///     *   If arg_type\[i\] is ConstantP, then arg\[i\]
@@ -61,8 +61,8 @@ use crate::{
 ///         is an index in var_both.
 ///
 /// * res :
-/// If this is a dynamic parameter operator (variable operator),
-/// res is the dyp_both (var_both) index for the value being computed.
+///   If this is a dynamic parameter operator (variable operator),
+///   res is the dyp_both (var_both) index for the value being computed.
 ///
 #[cfg(doc)]
 pub fn doc_common_arguments() {}
@@ -71,11 +71,11 @@ pub fn doc_common_arguments() {}
 /// Evaluation of dependent dynamic parameters.
 ///
 /// * Arguments :  see [doc_common_arguments] .
-/// In addition, there is the following extra condition:
+///   In addition, there is the following extra condition:
 ///
 /// * dyp_both :
-/// This is an input for dynamic parameters less than *res* and an output
-/// for the results of this operator.
+///   This is an input for dynamic parameters less than *res* and an output
+///   for the results of this operator.
 ///
 pub(crate) type ForwardDyp<V, E> = fn(
     _dyp_both : &mut Vec<E> ,
@@ -103,11 +103,11 @@ pub(crate) fn panic_dyp<V, E> (
 /// Evaluation of variables.
 ///
 /// * Arguments :  see [doc_common_arguments] .
-/// In addition, there is the following extra condition:
+///   In addition, there is the following extra condition:
 ///
 /// * var_both :
-/// This is an input for variable indices less than *res* and an output
-/// for the results of this operator.
+///   This is an input for variable indices less than *res* and an output
+///   for the results of this operator.
 ///
 pub(crate) type ForwardVar<V, E> = fn(
     _dyp_both : &Vec<E>     ,
@@ -137,12 +137,12 @@ pub(crate) fn panic_var<V, E> (
 /// Evaluation of first order forward mode.
 ///
 /// * var_der :
-/// The sub-vector of var_der corresponding to the domain variables
-/// specifies the direction for the derivative.
-/// For i_var greater than the domain variable indices,
-/// var_dir\[ i_var \] is the directional derivative of variable i_var.
-/// This is an input for i_var <= res and an output for the results
-/// of this operator.
+///   The sub-vector of var_der corresponding to the domain variables
+///   specifies the direction for the derivative.
+///   For i_var greater than the domain variable indices,
+///   var_dir\[ i_var \] is the directional derivative of variable i_var.
+///   This is an input for i_var <= res and an output for the results
+///   of this operator.
 ///
 /// * Other Arguments :  see [doc_common_arguments]
 pub(crate) type ForwardDer<V, E> = fn(
@@ -175,12 +175,12 @@ pub(crate) fn panic_der<V, E>  (
 /// Evaluation of first order reverse mode.
 ///
 /// * var_der :
-/// A scalar function is defined by the weight sum of the range components.
-/// On input, var_der contains the partial derivatives of the
-/// scalar as a function of variable i_var <= res + n_res - 1
-/// (where n_res is the number of results for the current operator).
-/// On input, var_der contains the partial derivatives of the
-/// scalar as a function of i_var < res.
+///   A scalar function is defined by the weight sum of the range components.
+///   On input, var_der contains the partial derivatives of the
+///   scalar as a function of variable i_var <= res + n_res - 1
+///   (where n_res is the number of results for the current operator).
+///   On input, var_der contains the partial derivatives of the
+///   scalar as a function of i_var < res.
 ///
 /// * Other Arguments :  see [doc_common_arguments]
 pub(crate) type ReverseDer<V, E> = fn(
@@ -198,12 +198,12 @@ pub(crate) type ReverseDer<V, E> = fn(
 /// Reverse dependency analysis; i.e., which arguments does a result depend on.
 ///
 /// * depend :
-/// On input, depend contains the the dependencies given the dependent values
-/// with index greater than res.
-/// In addition, depend\[res\] is true.
-/// Upon return,
-/// depend contains the the dependencies given the dependent values
-///  with index greater or equal res.
+///   On input, depend contains the the dependencies given the dependent values
+///   with index greater than res.
+///   In addition, depend\[res\] is true.
+///   Upon return,
+///   depend contains the the dependencies given the dependent values
+///   with index greater or equal res.
 pub(crate) type ReverseDepend = fn(
     _depend   : &mut optimize::Depend ,
     _flag_all : &Vec<bool>            ,
@@ -354,22 +354,22 @@ pub(crate) use no_reverse_depend;
 /// evaluation.
 ///
 /// * not_used :
-/// This argument is only used to determine the value type V.
+///   This argument is only used to determine the value type V.
 ///
 /// * res_type :
-/// This is the type of the dependent object being computed and must be
-/// ADType::DynamicP or ADType::Variable.
+///   This is the type of the dependent object being computed and must be
+///   ADType::DynamicP or ADType::Variable.
 ///
 /// * dyp_n_dom :
-/// is the number of domain dynamic parameters.
+///   is the number of domain dynamic parameters.
 ///
 /// * var_n_dom :
-/// is the number of domain variables.
+///   is the number of domain variables.
 ///
 /// * Other Arguments :  see [doc_common_arguments]
 ///
 /// * return
-/// The return value is the rust source code from this operation.
+///   The return value is the rust source code from this operation.
 ///
 pub(crate) type RustSrc<V> = fn(
     _not_used : V           ,
@@ -507,7 +507,7 @@ pub(crate) mod sealed {
         /// * Self : must be a value type V in [doc_generic_v]
         ///
         /// * op_info_vec :
-        /// is the global vector of operator information.
+        ///   is the global vector of operator information.
         ///
         fn get() -> &'static std::sync::LazyLock< Vec< OpInfo<Self> > >;
     }

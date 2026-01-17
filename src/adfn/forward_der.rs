@@ -28,49 +28,49 @@ use crate::{
 /// First order forward mode evaluation with dynamic parameters.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     range_der = f.forward_der_value(dyp_both, &var_both, dom_der, trace)
 ///     range_der = f.forward_der_ad(dyp_both, &var_both, dom_der, trace)
-/// ```
+///   ```
 ///
 /// * Prototype :
-/// see [ADfn::forward_der_value] and [ADfn::forward_der_ad]
+///   see [ADfn::forward_der_value] and [ADfn::forward_der_ad]
 ///
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
 /// * f : is an [ADfn] object.
 ///
 /// * dyp_both :
-/// If there are no dynamic parameters in f, this should be None
-/// or the empty vector.
-/// Otherwise it is the dynamic parameter sub-vectors in the following order:
-/// the domain dynamic parameters followed by the dependent dynamic parameters.
-/// This is normally computed by
-/// [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
+///   If there are no dynamic parameters in f, this should be None
+///   or the empty vector.
+///   Otherwise it is the dynamic parameter sub-vectors in the following order:
+///   the domain dynamic parameters followed by the dependent dynamic parameters.
+///   This is normally computed by
+///   [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
 ///
 /// * var_both :
-/// is both the variable sub-vectors in the following order:
-/// the domain variables followed by the dependent variables.
-/// This is normally computed by
-/// [forward_var](crate::adfn::forward_var::doc_forward_var) .
+///   is both the variable sub-vectors in the following order:
+///   the domain variables followed by the dependent variables.
+///   This is normally computed by
+///   [forward_var](crate::adfn::forward_var::doc_forward_var) .
 ///
 /// * domain_der :
-/// specifies the domain space direction along which the directional
-/// derivative is evaluated. This is a direction in variable space.
+///   specifies the domain space direction along which the directional
+///   derivative is evaluated. This is a direction in variable space.
 ///
 /// * trace :
-/// if true, a trace of the calculations is printed on stdout.
+///   if true, a trace of the calculations is printed on stdout.
 ///
 /// * range_der
-/// The return value is the directional derivative; i.e,
-/// ```text
+///   The return value is the directional derivative; i.e,
+///   ```text
 ///     range_der = f_var (dyp_dom, var_dom )  * domain_der
-/// ```
-/// Here `f_var` is the derivative of f with respect to the variables,
-/// `dyp_dom` is its value in the call to
-/// [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) , and
-/// `var_dom` is its value in the call to
-/// [forward_var](crate::adfn::forward_var::doc_forward_var) .
+///   ```
+///   Here `f_var` is the derivative of f with respect to the variables,
+///   `dyp_dom` is its value in the call to
+///   [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) , and
+///   `var_dom` is its value in the call to
+///   [forward_var](crate::adfn::forward_var::doc_forward_var) .
 ///
 /// # Example
 /// Computing one partial derivative using forward_der :

@@ -11,11 +11,11 @@
 /// Compute the average time required to execute a function.
 ///
 /// * fun :
-/// The function that we are executing.
+///   The function that we are executing.
 ///
 /// * min_seconds :
-/// The execution will be repeated until the test execution time is at least
-/// *min_seconds* .
+///   The execution will be repeated until the test execution time is at least
+///   *min_seconds* .
 ///
 /// # return :
 /// The return value is the test execution time, in seconds,

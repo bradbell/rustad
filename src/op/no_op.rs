@@ -81,8 +81,8 @@ pub fn no_op_reverse_depend<V>(
 /// Set the operator information for all the Sub operators.
 ///
 /// * op_info_vec :
-/// The map from [op::id](crate::op::id) to operator information.
-/// The the map results for SUB_PV_OP, SUB_VP_OP, and SUB_VV_OP are set.
+///   The map from [op::id](crate::op::id) to operator information.
+///   The the map results for SUB_PV_OP, SUB_VP_OP, and SUB_VV_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 {
     op_info_vec[NO_OP as usize] = OpInfo{

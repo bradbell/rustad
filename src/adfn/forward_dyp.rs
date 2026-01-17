@@ -27,12 +27,12 @@ use crate::{
 /// Compute the dependent dynamic parameters.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     dyp_both = f.forward_dyp_value(dyp_dom, trace)
 ///     dyp_both = f.forward_dyp_ad(dyp_dom, trace)
-/// ```
+///   ```
 /// * Prototype :
-/// see [ADfn::forward_dyp_value] and [ADfn::forward_dyp_ad]
+///   see [ADfn::forward_dyp_value] and [ADfn::forward_dyp_ad]
 ///
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
@@ -40,28 +40,28 @@ use crate::{
 /// * f : is an [ADfn] object.
 ///
 /// * trace :
-/// if true, a trace of the calculation is printed on stdout.
+///   if true, a trace of the calculation is printed on stdout.
 ///
 /// * dyp_dom :
-/// specifies the domain space dynamic parameter values.
+///   specifies the domain space dynamic parameter values.
 ///
 /// * dyp_both :
-/// is both the dynamic parameter sub-vectors in the following order:
-/// the domain dynamic parameters followed by the dependent dynamic parameters.
-/// Note that *dyp_dom* gets moved to the beginning of *dyp_both* .
+///   is both the dynamic parameter sub-vectors in the following order:
+///   the domain dynamic parameters followed by the dependent dynamic parameters.
+///   Note that *dyp_dom* gets moved to the beginning of *dyp_both* .
 ///
 pub fn doc_forward_dyp() { }
 //
 /// Create the member function that evaluates the dependent dynamic parameters.
 ///
 /// * suffix :
-/// is either `value` or `ad` ;
+///   is either `value` or `ad` ;
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * E : see [doc_generic_e] .
-/// If *suffix* is `value` , *E must be be the value type *V* .
-/// If *suffix* is `ad` , *E must be be the type `AD<V>` .
+///   If *suffix* is `value` , *E must be be the value type *V* .
+///   If *suffix* is `ad` , *E must be be the type `AD<V>` .
 ///
 /// See [doc_forward_dyp]
 macro_rules! forward_dyp {

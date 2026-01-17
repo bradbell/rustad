@@ -41,16 +41,16 @@ use crate::{
 /// Common arguments for atomic function callbacks.
 ///
 /// * domain :
-/// this contains a value for the atomic function domain vector.
-/// It will have the same length as the domain vector in the
-/// corresponding [call_atom].
+///   this contains a value for the atomic function domain vector.
+///   It will have the same length as the domain vector in the
+///   corresponding [call_atom].
 ///
 /// * call_info :
-/// is the *call_info* value used when the atomic function was called.
+///   is the *call_info* value used when the atomic function was called.
 ///
 /// * trace :
-/// if true, a trace of the calculations may be printed on stdout.
-/// (The callback function can decide not the print any output.)
+///   if true, a trace of the calculations may be printed on stdout.
+///   (The callback function can decide not the print any output.)
 #[cfg(doc)]
 pub fn doc_common_arguments() {}
 // -------------------------------------------------------------------------
@@ -59,38 +59,38 @@ pub fn doc_common_arguments() {}
 ///
 ///
 /// * Required :
-/// This callback is required for all atomic functions.
+///   This callback is required for all atomic functions.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     error_msg = rev_depend(&mut depend, rng_index, n_dom, call_info, trace)
-/// ```
+///   ```
 ///
 /// * rev_depend :
-/// is the AtomRevDepend callback for this atomic function.
+///   is the AtomRevDepend callback for this atomic function.
 ///
 /// * depend :
-/// This vector is empty on input,
-/// only its capacity matters on input (to avoid reallocating memory).
-/// Upon return, it contains the domain index values that the specified
-/// range index value depends on.
-/// If range component i does not depend on domain component j,
-/// domain component j may be any value when computing range component i;
-/// e.g. nan.
+///   This vector is empty on input,
+///   only its capacity matters on input (to avoid reallocating memory).
+///   Upon return, it contains the domain index values that the specified
+///   range index value depends on.
+///   If range component i does not depend on domain component j,
+///   domain component j may be any value when computing range component i;
+///   e.g. nan.
 ///
 /// * rng_index   :
-/// is the range index that that the dependencies are computed for.
+///   is the range index that that the dependencies are computed for.
 ///
 /// * n_dom :
-/// This has the length as the domain vector in the corresponding
-/// [call_atom].
+///   This has the length as the domain vector in the corresponding
+///   [call_atom].
 ///
 /// Other Arguments : see [doc_common_arguments]
 ///
 /// * error_msg :
-/// If *error_msg* is empty, there was no error.
-/// Otherwise it contains an error message and the value in *depend* is not
-/// specified.
+///   If *error_msg* is empty, there was no error.
+///   Otherwise it contains an error message and the value in *depend* is not
+///   specified.
 ///
 pub type AtomRevDepend = fn(
     _depend          : &mut Vec<usize>   ,
@@ -106,26 +106,26 @@ pub type AtomRevDepend = fn(
 /// forward_dyp_value and forward_var_value.
 ///
 /// * Required :
-/// This callback is required for all atomic functions.
+///   This callback is required for all atomic functions.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     range = forward_fun_value(&use_range, &domain, call_info, trace) ?
-/// ```
+///   ```
 ///
 /// * forward_fun_value :
-/// is the AtomForwardFunValue callback for this atomic function.
+///   is the AtomForwardFunValue callback for this atomic function.
 ///
 /// * use_range :
-/// If use_range\[i\] is true (false),
-/// the value range\[i\] is used (is not used).
-/// This may be used to avoid computations that are not needed.
-/// This vector has length equal to n_range in [call_atom] .
+///   If use_range\[i\] is true (false),
+///   the value range\[i\] is used (is not used).
+///   This may be used to avoid computations that are not needed.
+///   This vector has length equal to n_range in [call_atom] .
 ///
 /// * Arguments : see [doc_common_arguments]
 ///
 /// * range :
-/// contains the value of the atomic function range variables.
+///   contains the value of the atomic function range variables.
 ///
 pub type AtomForwardFunValue<V> = fn(
     _use_range     : &[bool]     ,
@@ -139,28 +139,28 @@ pub type AtomForwardFunValue<V> = fn(
 /// forward_dyp_ad and forward_var_ad.
 ///
 /// * Required :
-/// If you do not use this atomic function with
-/// [ADfn::forward_dyp_ad] or [ADfn::forward_var_ad]
-/// the callback in [AtomCallback] can be None.
+///   If you do not use this atomic function with
+///   [ADfn::forward_dyp_ad] or [ADfn::forward_var_ad]
+///   the callback in [AtomCallback] can be None.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     range = forward_fun_ad(&use_range, &domain, call_info, trace) ?
-/// ```
+///   ```
 ///
 /// * forward_fun_ad :
-/// is the AtomForwardFunAD callback for this atomic function.
+///   is the AtomForwardFunAD callback for this atomic function.
 ///
 /// * use_range :
-/// If use_range\[i\] is true (false),
-/// the value range\[i\] is used (is not used).
-/// This may be used to avoid computations that are not needed.
-/// This vector has length equal to n_range in [call_atom] .
+///   If use_range\[i\] is true (false),
+///   the value range\[i\] is used (is not used).
+///   This may be used to avoid computations that are not needed.
+///   This vector has length equal to n_range in [call_atom] .
 ///
 /// * Arguments : see [doc_common_arguments]
 ///
 /// * range :
-/// contains the value of the atomic function range variables.
+///   contains the value of the atomic function range variables.
 ///
 pub type AtomForwardFunAD<V> = fn(
     _use_range     : &[bool]            ,
@@ -174,33 +174,33 @@ pub type AtomForwardFunAD<V> = fn(
 /// Callback to atomic functions during forward_der_value
 ///
 /// * Required :
-/// If you do not use this atomic function with [ADfn::forward_der_value],
-/// this callback in [AtomCallback] can be None.
+///   If you do not use this atomic function with [ADfn::forward_der_value],
+///   this callback in [AtomCallback] can be None.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     range_der = forward_der_value(Some(&domain), domain_der, call_info, trace) ?
-/// ```
+///   ```
 ///
 /// * forward_der_value :
-/// is the AtomForwardDerValue callback for this atomic function.
+///   is the AtomForwardDerValue callback for this atomic function.
 ///
 /// * use_range :
-/// If use_range\[i\] is true (false),
-/// the value range_der\[i\] is used (is not used).
-/// This may be used to avoid computations that are not needed.
-/// This vector has length equal to n_range in [call_atom] .
+///   If use_range\[i\] is true (false),
+///   the value range_der\[i\] is used (is not used).
+///   This may be used to avoid computations that are not needed.
+///   This vector has length equal to n_range in [call_atom] .
 ///
 /// * domain_der    :
-/// this contains the domain space direction for the directional derivatives.
+///   this contains the domain space direction for the directional derivatives.
 ///
 /// * Other Arguments : see [doc_common_arguments]
 ///
 /// * range_der :
-/// is the directional derivative for each of the range space variables.
-/// ```text
+///   is the directional derivative for each of the range space variables.
+///   ```text
 ///     range_der = f'(domain) * domain_der
-/// ```
+///   ```
 pub type AtomForwardDerValue<V> = fn(
     _use_range     : &[bool]     ,
     _domain        : &[&V]       ,
@@ -213,27 +213,27 @@ pub type AtomForwardDerValue<V> = fn(
 /// Callback to atomic functions during forward_der_ad
 ///
 /// * Required :
-/// If you do not use this atomic function with [ADfn::forward_der_ad],
-/// this callback in [AtomCallback] can be None.
+///   If you do not use this atomic function with [ADfn::forward_der_ad],
+///   this callback in [AtomCallback] can be None.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     range_der = forward_der_ad(Some(&domain), domain_der, call_info, trace) ?
-/// ```
+///   ```
 ///
 /// * forward_der_ad :
-/// is the AtomForwardDerAD callback for this atomic function.
+///   is the AtomForwardDerAD callback for this atomic function.
 ///
 /// * domain_der :
-/// this contains the domain space direction for the directional derivative.
+///   this contains the domain space direction for the directional derivative.
 ///
 /// * Other Arguments : see [doc_common_arguments]
 ///
 /// * range_der :
-/// is the directional derivative for each of the range space variables.
-/// ```text
+///   is the directional derivative for each of the range space variables.
+///   ```text
 ///     range_der = f'(domain) * domain_der
-/// ```
+///   ```
 pub type AtomForwardDerAD<V> = fn(
     _use_range     : &[bool]           ,
     _domain        : &[& AD<V>]        ,
@@ -247,27 +247,27 @@ pub type AtomForwardDerAD<V> = fn(
 /// Callback to atomic functions during reverse_der_value
 ///
 /// * Required :
-/// If you do not use this atomic function with [ADfn::reverse_der_value],
-/// this callback in [AtomCallback] can be None.
+///   If you do not use this atomic function with [ADfn::reverse_der_value],
+///   this callback in [AtomCallback] can be None.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     domain_der = reverse_der_value(Some(&domain), &range_der, call_info, trace) ?
-/// ```
+///   ```
 ///
 /// * reverse_der_value :
-/// is the AtomReverseDerValue callback for this atomic function.
+///   is the AtomReverseDerValue callback for this atomic function.
 ///
 /// * range_der :
-/// this contains the range space weights for the partial derivatives.
+///   this contains the range space weights for the partial derivatives.
 ///
 /// * Other Arguments : see [doc_common_arguments]
 ///
 /// * domain_der :
-/// is the partial derivative for each of the domain space variables.
-/// ```text
+///   is the partial derivative for each of the domain space variables.
+///   ```text
 ///     domain_der = range_der * f'(domain)
-/// ```
+///   ```
 pub type AtomReverseDerValue<V> = fn(
     _domain        : &[&V]       ,
     _range_der     : &[&V]       ,
@@ -279,27 +279,27 @@ pub type AtomReverseDerValue<V> = fn(
 /// Callback to atomic functions during reverse_der_ad
 ///
 /// * Required :
-/// If you do not use this atomic function with [ADfn::reverse_der_ad],
-/// this callback in [AtomCallback] can be None.
+///   If you do not use this atomic function with [ADfn::reverse_der_ad],
+///   this callback in [AtomCallback] can be None.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     domain_der = reverse_der_ad(Some(&domain), &range_der, call_info, trace) ?
-/// ```
+///   ```
 ///
 /// * reverse_der_ad :
-/// is the AtomReverseDerAD callback for this atomic function.
+///   is the AtomReverseDerAD callback for this atomic function.
 ///
 /// * range_der :
-/// this contains the range space weights for the partial derivatives.
+///   this contains the range space weights for the partial derivatives.
 ///
 /// * Other Arguments : see [doc_common_arguments]
 ///
 /// * return :
-/// is the partial derivative for each of the domain space variables.
-/// ```text
+///   is the partial derivative for each of the domain space variables.
+///   ```text
 ///     domain_der = range_der * f'(domain)
-/// ```
+///   ```
 pub type AtomReverseDerAD<V> = fn(
     _domain        : &[& AD<V>]     ,
     _range_der     : &[& AD<V>]     ,
@@ -351,23 +351,23 @@ pub (crate) mod sealed {
         /// * Self : must be a value type V in [doc_generic_v]
         ///
         /// * rw_lock :
-        /// is a read-write lock object [std::sync::RwLock]
+        ///   is a read-write lock object [std::sync::RwLock]
         ///
         /// * write_lock :
-        /// ``` text
+        ///   ``` text
         ///     let write_lock    = rw_lock.write();
         ///     let callback_vec  = write_lock.unwrap();
-        /// ```
+        ///   ```
         ///
         /// * read_lock :
-        /// ``` text
+        ///   ``` text
         ///     let read_lock    = rw_lock.read();
         ///     let callback_vec = read_lock.unwrap();
-        /// ```
+        ///   ```
         ///
         /// * callback_vec :
-        /// callback_vec\[atom_id\] is the callback information
-        /// for the atomic function corresponding to atom_id.
+        ///   callback_vec\[atom_id\] is the callback information
+        ///   for the atomic function corresponding to atom_id.
         ///
         fn get() -> &'static RwLock< Vec< AtomCallback<Self> > >;
     }
@@ -414,9 +414,9 @@ pub(crate) use impl_global_atom_callback_vec;
 /// * See Also : [register_checkpoint](crate::checkpoint::register_checkpoint)
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     atom_id = register_atom(callback)
-/// ```
+///   ```
 ///
 /// * V : see [doc_generic_v]
 ///
@@ -618,36 +618,36 @@ where
 /// if this thread is currently recording, include the call in its tape.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     arange= call_atom(n_range, adomain, atom_id, call_info, trace)
-/// ```
+///   ```
 ///
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * n_range :
-/// is the range space dimension for this atomic function call.
-/// Note that the dimension of the range space may depend on the call.
+///   is the range space dimension for this atomic function call.
+///   Note that the dimension of the range space may depend on the call.
 ///
 /// * adomain :
-/// This is the value of the arguments for this atomic function call.
-/// Note that the dimension of the domain space may depend on the call.
+///   This is the value of the arguments for this atomic function call.
+///   Note that the dimension of the domain space may depend on the call.
 ///
 /// * atom_id :
-/// The [atom_id](register_atom#atom_id) returned by register_atom for this
-/// atomic function.
+///   The [atom_id](register_atom#atom_id) returned by register_atom for this
+///   atomic function.
 ///
 /// * call_info :
-/// This is information about this call that is be passed on to the
-/// callback functions specified by [callback](register_atom#callback).
+///   This is information about this call that is be passed on to the
+///   callback functions specified by [callback](register_atom#callback).
 ///
 /// * trace :
-/// if true, a trace of the calculations may be printed on stdout.
-/// This may be useful for debugging atomic functions.
+///   if true, a trace of the calculations may be printed on stdout.
+///   This may be useful for debugging atomic functions.
 ///
 /// * arange :
-/// The return value *arange* is the range, as a function of the domain,
-/// for this atomic function.
+///   The return value *arange* is the range, as a function of the domain,
+///   for this atomic function.
 ///
 pub fn call_atom<V>(
     n_range     : usize        ,

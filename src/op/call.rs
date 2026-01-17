@@ -30,11 +30,11 @@
 //! | n_rng    | is last result a dependent for this call                 |
 //!
 //! * CALL_RES_OP
-//! The operation index for a CALL_OP operator, corresponds to the first
-//! dependent created by the call.
-//! There are n_dep - 1 CALL_RES_OP operators corresponding to the
-//! other dependents created by the call operator.
-//! Each such operator has the following arguments:
+//!   The operation index for a CALL_OP operator, corresponds to the first
+//!   dependent created by the call.
+//!   There are n_dep - 1 CALL_RES_OP operators corresponding to the
+//!   other dependents created by the call operator.
+//!   Each such operator has the following arguments:
 //!
 //! ## Operator Arguments
 //! | Index | Meaning |
@@ -1007,8 +1007,8 @@ no_reverse_depend!(Call);
 /// Set the operator information for call.
 ///
 /// * op_info_vec :
-/// The map from operator id to operator information [OpInfo] .
-/// The map results for CALL_OP and CALL_RES_OP are set.
+///   The map from operator id to operator information [OpInfo] .
+///   The map results for CALL_OP and CALL_RES_OP are set.
 pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
     V     : Clone + From<f32> + FloatCore,
@@ -1049,31 +1049,31 @@ where
 ///  a call operator's result depends on.
 ///
 /// * op_index ;
-/// This is a index in the operation sequence. The corresponding operator is
-/// an CALL_OP or CALL_RES_OP.
+///   This is a index in the operation sequence. The corresponding operator is
+///   an CALL_OP or CALL_RES_OP.
 ///
 /// * op_seq :
-/// This is the operation sequence that call or call result operator
-/// appears in.
+///   This is the operation sequence that call or call result operator
+///   appears in.
 ///
 /// * atom_depend :
-/// Only the capacity of this vector matters
-/// (it is passed in to avoid reallocating memory).
+///   Only the capacity of this vector matters
+///   (it is passed in to avoid reallocating memory).
 ///
 /// * cop_depend :
-/// On input this vector has size zero.
-/// Upon return it contains the set of constant parameter indices that
-/// identifies the constamts that the op_index result depends on.
+///   On input this vector has size zero.
+///   Upon return it contains the set of constant parameter indices that
+///   identifies the constamts that the op_index result depends on.
 ///
 /// * dyp_depend :
-/// On input this vector has size zero.
-/// Upon return it contains the set of dynamic parameter indices that
-/// identifies the dynamics that the op_index result depends on.
+///   On input this vector has size zero.
+///   Upon return it contains the set of dynamic parameter indices that
+///   identifies the dynamics that the op_index result depends on.
 ///
 /// * var_depend :
-/// On input this vector has size zero.
-/// Upon return it contains the set of variables indices that
-/// identifies the variables that the op_index result depends on.
+///   On input this vector has size zero.
+///   Upon return it contains the set of variables indices that
+///   identifies the variables that the op_index result depends on.
 ///
 pub(crate) fn call_depend<V>(
     atom_depend     : &mut Vec<usize> ,

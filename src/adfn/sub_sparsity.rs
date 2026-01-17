@@ -37,40 +37,40 @@ where
     /// * See Also : [ADfn::for_sparsity]
     ///
     /// * Syntax :
-    /// ```text
+    ///   ```text
     ///     (dyp_pattern, var_pattern) = f.sub_sparsity(trace, compute_dyp)
-    /// ```
+    ///   ```
     ///
     /// * V : see [doc_generic_v]
     ///
     /// * f :
-    /// is this [ADfn] object. The sparsity pattern is for the Jacobian
-    /// of the function defined by the operation sequence stored in f.
+    ///   is this [ADfn] object. The sparsity pattern is for the Jacobian
+    ///   of the function defined by the operation sequence stored in f.
     ///
     /// * trace :
-    /// If this is true, a trace of the sparsity calculation
-    /// is printed on standard output.
-    /// Note that in the trace, the cases where *var_index* is less
-    /// that the number of domain variables will end up in the pattern
-    /// with the corresponding row.
+    ///   If this is true, a trace of the sparsity calculation
+    ///   is printed on standard output.
+    ///   Note that in the trace, the cases where *var_index* is less
+    ///   that the number of domain variables will end up in the pattern
+    ///   with the corresponding row.
     ///
     /// * compute_dyp :
-    /// If this is true (false),
-    /// the dynamic parameter pattern is (is not) computed.
+    ///   If this is true (false),
+    ///   the dynamic parameter pattern is (is not) computed.
     ///
     /// * dyp_pattern :
-    /// This return is vector of [row, column] pairs.
-    /// Each row (column) is less than the range (dynamic parameter domain)
-    /// dimension for this function.
-    /// If a pair [i, j] does not appear, the range component
-    /// with index i does not depend on the domain dynamic parameter with index j.
+    ///   This return is vector of [row, column] pairs.
+    ///   Each row (column) is less than the range (dynamic parameter domain)
+    ///   dimension for this function.
+    ///   If a pair [i, j] does not appear, the range component
+    ///   with index i does not depend on the domain dynamic parameter with index j.
     ///
     /// * var_pattern :
-    /// This return is vector of [row, column] pairs.
-    /// Each row (column) is less than the range (variable domain)
-    /// dimension for this function.
-    /// If a pair [i, j] does not appear, the range component
-    /// with index i does not depend on the domain variable with index j.
+    ///   This return is vector of [row, column] pairs.
+    ///   Each row (column) is less than the range (variable domain)
+    ///   dimension for this function.
+    ///   If a pair [i, j] does not appear, the range component
+    ///   with index i does not depend on the domain variable with index j.
     ///
     /// ## dependency :
     /// This is a dependency pattern. For example,

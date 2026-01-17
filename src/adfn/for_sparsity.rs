@@ -40,40 +40,40 @@ where
     /// See Also : [ADfn::sub_sparsity]
     ///
     /// * Syntax :
-    /// ```text
+    ///   ```text
     ///     pattern = f.for_sparsity(trace, compute_dyp)
-    /// ```
+    ///   ```
     ///
     /// * V : see [doc_generic_v]
     ///
     /// * f :
-    /// is this [ADfn] object. The sparsity pattern is for the Jacobian
-    /// of the function defined by the operation sequence stored in f.
+    ///   is this [ADfn] object. The sparsity pattern is for the Jacobian
+    ///   of the function defined by the operation sequence stored in f.
     ///
     /// * trace :
-    /// If trace is true, a trace of the sparsity calculation
-    /// is printed on standard output.
+    ///   If trace is true, a trace of the sparsity calculation
+    ///   is printed on standard output.
     ///
     /// * compute_dyp :
-    /// If this is true, the return is a sparsity pattern
-    /// for the range of f w.r.t. the domain dynamic parameters.
-    /// Otherwise, the sparsity pattern is w.r.t. the domain variables.
+    ///   If this is true, the return is a sparsity pattern
+    ///   for the range of f w.r.t. the domain dynamic parameters.
+    ///   Otherwise, the sparsity pattern is w.r.t. the domain variables.
     ///
     /// * pattern :
-    /// The the return value *pattern* is vector of [row, column] pairs.
-    /// Each row is a range index and is less that [ADfn::rng_len] .
-    /// If compute_dyp is true (false) eah column is a
-    /// dynamic parameter (variable) domain index and is less than
-    /// [ADfn::dyp_dom_len] ( [ADfn::var_dom_len] ).
-    /// If a pair [i, j] does not appear, the range component
-    /// with index i does not depend on the domain component with index j.
+    ///   The the return value *pattern* is vector of [row, column] pairs.
+    ///   Each row is a range index and is less that [ADfn::rng_len] .
+    ///   If compute_dyp is true (false) eah column is a
+    ///   dynamic parameter (variable) domain index and is less than
+    ///   [ADfn::dyp_dom_len] ( [ADfn::var_dom_len] ).
+    ///   If a pair [i, j] does not appear, the range component
+    ///   with index i does not depend on the domain component with index j.
     ///
     /// * dependency :
-    /// This is a dependency pattern. For example,
-    /// if an range variable was equal to the
-    /// Heaviside function of a domain variable,
-    /// the corresponding pair would be in the sparisty pattern even though
-    /// the corresponding derivative is always zero.
+    ///   This is a dependency pattern. For example,
+    ///   if an range variable was equal to the
+    ///   Heaviside function of a domain variable,
+    ///   the corresponding pair would be in the sparisty pattern even though
+    ///   the corresponding derivative is always zero.
     ///
     /// # Example
     /// ```

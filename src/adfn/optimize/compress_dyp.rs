@@ -31,25 +31,25 @@ where
     /// identical dynamic parameter.
     ///
     /// * Syntax :
-    /// ```text
+    ///   ```text
     ///     f.compress_dyp(depend, trace)
-    /// ```
+    ///   ```
     ///
     /// * Assumption :
-    /// The constants have already been compressed using compress_cop.
+    ///   The constants have already been compressed using compress_cop.
     ///
     /// * f :
-    /// The [ADfn] object for which the dynamic parameters are compressed.
-    /// The input and output f represent the same domain to range map.
-    /// The fields f.dyp.arg_all, f.var.arg_all, and f.rng_index are modified.
+    ///   The [ADfn] object for which the dynamic parameters are compressed.
+    ///   The input and output f represent the same domain to range map.
+    ///   The fields f.dyp.arg_all, f.var.arg_all, and f.rng_index are modified.
     ///
     /// * depend :
-    /// On input and output, this is the [Depend] structure for the input f .
-    /// The depend.dyp field is modified because only the first
-    /// of identical dynamic parameters is used.
+    ///   On input and output, this is the [Depend] structure for the input f .
+    ///   The depend.dyp field is modified because only the first
+    ///   of identical dynamic parameters is used.
     ///
     /// * trace :
-    /// if true, a trace of the compression is printed on std::out.
+    ///   if true, a trace of the compression is printed on std::out.
     pub(crate) fn compress_dyp(
         &mut self            ,
         depend : &mut Depend ,

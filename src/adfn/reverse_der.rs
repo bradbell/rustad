@@ -27,38 +27,38 @@ use crate::{
 /// First order reverse mode evaluation with dynamic parameters.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     dom_der = f.reverse_der_value(dyp_both, &var_both, range_der, trace)
 ///     dom_der = f.reverse_der_ad(dyp_both, &var_both, range_der, trace)
-/// ```
+///   ```
 ///
 /// * Prototype :
-/// see [ADfn::reverse_der_value] and [ADfn::reverse_der_ad]
+///   see [ADfn::reverse_der_value] and [ADfn::reverse_der_ad]
 ///
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
 /// * f : is an [ADfn] object.
 ///
 /// * dyp_both :
-/// If there are no dynamic parameters in f, this should be None
-/// or the empty vector.
-/// Otherwise it is the dynamic parameter sub-vectors in the following order:
-/// the domain dynamic parameters followed by the dependent dynamic parameters.
-/// This is normally computed by
-/// [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
+///   If there are no dynamic parameters in f, this should be None
+///   or the empty vector.
+///   Otherwise it is the dynamic parameter sub-vectors in the following order:
+///   the domain dynamic parameters followed by the dependent dynamic parameters.
+///   This is normally computed by
+///   [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
 ///
 /// * var_both :
-/// is both the variable sub-vectors in the following order:
-/// the domain variables followed by the dependent variables.
-/// This is normally computed by
-/// [forward_var](crate::adfn::forward_var::doc_forward_var) .
+///   is both the variable sub-vectors in the following order:
+///   the domain variables followed by the dependent variables.
+///   This is normally computed by
+///   [forward_var](crate::adfn::forward_var::doc_forward_var) .
 ///
 /// * range_der :
-/// specifies the range space weights that define the scalar function
-/// that this call will evaluate the gradient for.
+///   specifies the range space weights that define the scalar function
+///   that this call will evaluate the gradient for.
 ///
 /// * trace :
-/// if true, a trace of the operations is printed on stdout.
+///   if true, a trace of the operations is printed on stdout.
 ///
 /// The return value *dom_der* is the gradient of *range_der* times
 /// the derivative of f with respect to the variables; i.e.,
@@ -112,13 +112,13 @@ pub fn doc_reverse_der() { }
 /// Create the first order reverse mode member functions.
 ///
 /// * suffix :
-/// is either `value` or `ad` ;
+///   is either `value` or `ad` ;
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * E : see [doc_generic_e] .
-/// If *suffix* is `value` , *E must be be the value type *V* .
-/// If *suffix* is `ad` , *E must be be the type `AD<V>` .
+///   If *suffix* is `value` , *E must be be the value type *V* .
+///   If *suffix* is `ad` , *E must be be the type `AD<V>` .
 ///
 /// See [doc_reverse_der]
 macro_rules! reverse_der {

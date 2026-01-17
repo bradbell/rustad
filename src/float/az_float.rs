@@ -83,37 +83,37 @@ pub trait CompareAsRight<Rhs = Self> {
 /// * Motivation :
 ///
 ///     * Forward Mode :
-///         During forward mode AD, the partial derivaitve of f(x) w.r.t x_i
-///         is evaluated as f'(x) * e
-///         where e_j is one (zero) if j is equal to i (not equal to i).
-///         If zero times nan were nan, and one of the elements of f'(x)
-///         were nan, the partial of f w.r.t. x_i would evaluate to nan
-///         (even if the corresponding column of f'(x) did not have a nan).
+///       During forward mode AD, the partial derivaitve of f(x) w.r.t x_i
+///       is evaluated as f'(x) * e
+///       where e_j is one (zero) if j is equal to i (not equal to i).
+///       If zero times nan were nan, and one of the elements of f'(x)
+///       were nan, the partial of f w.r.t. x_i would evaluate to nan
+///       (even if the corresponding column of f'(x) did not have a nan).
 ///
 ///     * Reverse Mode :
-///         A similar effect to forward mode is present in reverse mode.
+///       A similar effect to forward mode is present in reverse mode.
 ///
 ///     * Optimization :
-///         Because zero times anything (including a variable)
-///         is the constant zero, multiplications by the
-///         constant zero does not need to be recorded in the tape.
+///       Because zero times anything (including a variable)
+///       is the constant zero, multiplications by the
+///       constant zero does not need to be recorded in the tape.
 ///
 ///     * Conditional Expressions :
-///         Comparison operators; e.g. <=, are represented by 1 for
-///         true and 0 for false. It follows that the two expressions
-///         below are equivalent :
-///         ```text
-///             if x <= y { u } else {v}
-///             x.le(y) * u + x.gt(y) * v
-///         ```
-///         Note that this works element wise when x, y, u, v
-///         are numeric vectors.
+///       Comparison operators; e.g. <=, are represented by 1 for
+///       true and 0 for false. It follows that the two expressions
+///       below are equivalent :
+///       ```text
+///           if x <= y { u } else {v}
+///           x.le(y) * u + x.gt(y) * v
+///       ```
+///       Note that this works element wise when x, y, u, v
+///       are numeric vectors.
 ///
 /// * B : the floating point base class is either f32 or f64
 ///
 ///
 /// * Zero : is an absolute zero; i.e. multiplication by zero
-/// always results in zero (even if the other operand is nan).
+///   always results in zero (even if the other operand is nan).
 ///
 /// *  Nan : is equal to Nan.
 ///
@@ -151,10 +151,10 @@ where
 /// AzFloat From
 ///
 /// * `AzFloat<f32>` :
-/// From is implemented for usize and f32 .
+///   From is implemented for usize and f32 .
 ///
 /// * `AzFloat<f64>` :
-/// From is implemented for :usize, f32, f64, and `AzFloat<f32>` .
+///   From is implemented for :usize, f32, f64, and `AzFloat<f32>` .
 ///
 pub fn doc_impl_from() {}
 //

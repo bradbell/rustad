@@ -8,15 +8,15 @@
 //! Link to [parent module](super)
 //!
 //! * S :
-//! is the scalar type; i.e., the type of elements of the vector.
+//!   is the scalar type; i.e., the type of elements of the vector.
 //!
 //! * Scalars :
-//! If a NunVec has one element, it acts like a scalar; i.e.,
-//! a vector with any required length and all the element
-//! equal to the scalar value.
+//!   If a NunVec has one element, it acts like a scalar; i.e.,
+//!   a vector with any required length and all the element
+//!   equal to the scalar value.
 //!
 //! * Copy, Clone :
-//!  The NumVec types implement Clone, but not the Copy trait.
+//!   The NumVec types implement Clone, but not the Copy trait.
 //!
 //! This module does not have any dependencies outside the standard rust
 //! and az_float.

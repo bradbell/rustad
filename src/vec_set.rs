@@ -27,14 +27,14 @@ pub struct VecSet {
     /// The number of sets is also equal to the length of start.
     ///
     /// * If `link[this_set]` is true,
-    /// `other_set = data[ start[this_set] ]` is the index of
-    /// another set that has the same elements as this set.
-    /// In addition, `other_set < this_set`, so it you follow links
-    /// you must eventually some to a set that is not a link.
+    ///   `other_set = data[ start[this_set] ]` is the index of
+    ///   another set that has the same elements as this set.
+    ///   In addition, `other_set < this_set`, so it you follow links
+    ///   you must eventually some to a set that is not a link.
     ///
     /// * If `link[this_set]` is false, `start[this_set]` is the first element
-    /// of the this set. It is possible to have an empty set; i.e.,
-    ///  `start[this_set] == start[this_set+1]` .
+    ///   of the this set. It is possible to have an empty set; i.e.,
+    ///   `start[this_set] == start[this_set+1]` .
     start : Vec<usize> ,
     //
     /// This vector that holds all the elements, and links, for all the sets.
@@ -91,8 +91,8 @@ impl VecSet {
     /// is this [VecSet] object.
     ///
     /// * target :
-    /// is the identifier for the new set.
-    /// It is one greater that the previous identifier returned by vs.
+    ///   is the identifier for the new set.
+    ///   It is one greater that the previous identifier returned by vs.
     ///
     /// * Example : Select the source code link in [example_empty] .
     ///
@@ -139,8 +139,8 @@ impl VecSet {
     /// is the value of the element in the new set.
     ///
     /// * target :
-    /// is the identifier for the new set.
-    /// It is one greater that the previous identifier returned by vs.
+    ///   is the identifier for the new set.
+    ///   It is one greater that the previous identifier returned by vs.
     ///
     /// * Example : Select the source code link in [example_singleton] .
     ///
@@ -190,9 +190,9 @@ impl VecSet {
     /// is the identifier for the set.
     ///
     /// * set :
-    /// is the set corresponding to id_set as a vector.
-    /// The elements are in increasing order; i.e.,
-    /// if `i+1 < set.len()` then `set[i] < set[i+1]`.
+    ///   is the set corresponding to id_set as a vector.
+    ///   The elements are in increasing order; i.e.,
+    ///   if `i+1 < set.len()` then `set[i] < set[i+1]`.
     ///
     /// * Example : Select the source code link in [example_get] .
     ///
@@ -287,15 +287,15 @@ impl VecSet {
 /// ```
 ///
 /// * vs :
-/// is this [VecSet] object.
+///   is this [VecSet] object.
 ///
 /// * sub_sets :
-/// is a vector is set identifiers that specifies which sets
-/// are included in the union.
+///   is a vector is set identifiers that specifies which sets
+///   are included in the union.
 ///
 /// * target :
-/// is the identifier for the new set that is the result of the union.
-/// It is one greater that the previous identifier returned by vs.
+///   is the identifier for the new set that is the result of the union.
+///   It is one greater that the previous identifier returned by vs.
 ///
 /// * Example : Select the source code link in [example_union] .
 ///

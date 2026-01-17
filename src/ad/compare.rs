@@ -98,7 +98,7 @@ pub fn doc_ad_compare_left() { }
 ///
 /// * V    : see [doc_generic_v]
 /// * name : is the operator name; i.e., one of the following:
-///     lt, le, eq, ne, ge, gt.
+///   lt, le, eq, ne, ge, gt.
 ///
 /// see [doc_ad_compare_left]
 // ---------------------------------------------------------------------------

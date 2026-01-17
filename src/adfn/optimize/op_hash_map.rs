@@ -91,42 +91,42 @@ impl OpHashMap {
     /// Try to insert an operator in this hash map.
     ///
     /// * Syntax :
-    /// ```text
+    ///   ```text
     ///     option = op_hash_map.try_insert(
-    ///         op_seq, op_seq_type, op_index, &first_equal, map_value_in
+    ///       op_seq, op_seq_type, op_index, &first_equal, map_value_in
     ///     )
-    /// ```
+    ///   ```
     ///
     /// * op_seq :
-    /// is the operation sequence that this operator appears in.
+    ///   is the operation sequence that this operator appears in.
     ///
     /// * op_seq_type :
-    /// is the type of this operation sequence. Must be one of
-    /// ADType::DynamicP, ADType::VariableP.
+    ///   is the type of this operation sequence. Must be one of
+    ///   ADType::DynamicP, ADType::VariableP.
     ///
     /// * op_index :
-    /// is the index of this operator in the operation sequence.
+    ///   is the index of this operator in the operation sequence.
     ///
     /// * first_equal :
-    /// For each operator index i_op < op_index,
-    /// first_equal\[i_op\] is the index of the first operator
-    /// that is known to be equivalent to the operator with index i_op.
+    ///   For each operator index i_op < op_index,
+    ///   first_equal\[i_op\] is the index of the first operator
+    ///   that is known to be equivalent to the operator with index i_op.
     ///
     /// * map_value_in :
-    /// If the hash map does not contain this operator,
-    /// it is inserted with this value.
-    /// This value is different for each call to try_insert.
+    ///   If the hash map does not contain this operator,
+    ///   it is inserted with this value.
+    ///   This value is different for each call to try_insert.
     ///
     /// * option :
     ///     * None : try_insert only handles the following operators:
-    ///         binary operators, CALL_OP operators.
-    ///         If this is not one of these, try_insert returns None.
+    ///       binary operators, CALL_OP operators.
+    ///       If this is not one of these, try_insert returns None.
     ///     * Some(map_value_out) : If map_value_out is equal to map_value_in,
-    ///         this operator was inserted in the hash map
-    ///         with the specified value. Otherwise,
-    ///         this operation is equivalent to a previous operator and
-    ///         is map_value_out is the map value for the first equivalent
-    ///         operator.
+    ///       this operator was inserted in the hash map
+    ///       with the specified value. Otherwise,
+    ///       this operation is equivalent to a previous operator and
+    ///       is map_value_out is the map value for the first equivalent
+    ///       operator.
     ///
     pub(crate) fn try_insert(
         &mut self                   ,
@@ -196,26 +196,26 @@ impl OpHashMap {
 /// to be equivalent; i.e., the results for the two operators will be equal.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     first_equal = first_equal_op(op_seq_type, depend, op_seq)
-/// ```
+///   ```
 ///
 /// * op_seq_type :
-/// is the type of this operation sequence. Must be one of
-/// ADType::DynamicP, ADType::VariableP.
+///   is the type of this operation sequence. Must be one of
+///   ADType::DynamicP, ADType::VariableP.
 ///
 /// * depend :
-/// This identifies which operators are necessary to compute the results
-/// for the function this operation sequence appears in.
+///   This identifies which operators are necessary to compute the results
+///   for the function this operation sequence appears in.
 ///
 /// * op_seq :
-/// is the operation sequence.
+///   is the operation sequence.
 ///
 /// * first_equal :
-/// If first_equal\[op_index\] is not equal to op_index,
-/// depend\[op_index\] is true and the operator with index op_index
-/// is equivalent to the operator with index first_equal\[op_index\].
-/// In addition, this is the first operator that is known to be equivalent.
+///   If first_equal\[op_index\] is not equal to op_index,
+///   depend\[op_index\] is true and the operator with index op_index
+///   is equivalent to the operator with index first_equal\[op_index\].
+///   In addition, this is the first operator that is known to be equivalent.
 ///
 /// If depend\[op_index\] is false,
 /// first_equal\[op_index\] is equal to op_index.

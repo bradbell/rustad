@@ -31,25 +31,25 @@ where
     /// identical variable.
     ///
     /// * Syntax :
-    /// ```text
+    ///   ```text
     ///     f.compress_var(depend, trace)
-    /// ```
+    ///   ```
     ///
     /// * Assumption :
-    /// The constants have already been compressed using compress_cop.
+    ///   The constants have already been compressed using compress_cop.
     ///
     /// * f :
-    /// The [ADfn] object for which the variables are compressed.
-    /// The input and output f represent the same domain to range map.
-    /// The fields f.var.arg_all and f.rng_index are modified.
+    ///   The [ADfn] object for which the variables are compressed.
+    ///   The input and output f represent the same domain to range map.
+    ///   The fields f.var.arg_all and f.rng_index are modified.
     ///
     /// * depend :
-    /// On input and output, this is the [Depend] structure for the input f .
-    /// The depend.var field is modified because only the first
-    /// of identical variables is used.
+    ///   On input and output, this is the [Depend] structure for the input f .
+    ///   The depend.var field is modified because only the first
+    ///   of identical variables is used.
     ///
     /// * trace :
-    /// if true, a trace of the compression is printed on std::out.
+    ///   if true, a trace of the compression is printed on std::out.
     pub(crate) fn compress_var(
         &mut self            ,
         depend : &mut Depend ,

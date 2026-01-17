@@ -27,15 +27,15 @@ use crate::doc_generic_v;
 /// Binary `AD<V>` operators.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///        az = &ax Op &ay
 ///        az = &ay Op &y
-/// ```
+///   ```
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * Op : is the source code token for this binary operator;
-/// i.e., `+` , `-` , `*` , or `/` .
+///   i.e., `+` , `-` , `*` , or `/` .
 ///
 /// * ax : left hand side `AD<V>` object
 /// * ay : right hand side `AD<V>` object
@@ -457,7 +457,7 @@ ad_binary_op!(Div, /);
 /// * V : see [doc_generic_v]
 ///
 /// * Op : is the source code token for this binary operator;
-/// i.e., `+=` , `-=` , `*=` , or `/=` .
+///   i.e., `+=` , `-=` , `*=` , or `/=` .
 ///
 /// * ax : left hand side `AD<V>` object.
 /// * ay : right hand size `AD<V>` object
@@ -502,7 +502,7 @@ pub fn doc_ad_compound_op() { }
 /// * V : see [doc_generic_v]
 ///
 /// * Name : is the operator name with Assign at end;
-/// i.e., Add, Sub, Mul, or Div.
+///   i.e., Add, Sub, Mul, or Div.
 ///
 /// * Op : is the operator token; i.e., +=, -=, *=, or /= .
 ///
@@ -587,7 +587,7 @@ ad_compound_op!(Div, /=);
 /// * Op           : is the operator token; i.e., +, -, *, or /.
 ///
 /// * Function Name: `record_value_` *name* `_ad` where *name* is
-///  a lower case version of Name.
+///   a lower case version of Name.
 ///
 macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
     #[doc = concat!( "record one ", stringify!($Name),

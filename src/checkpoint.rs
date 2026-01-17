@@ -119,29 +119,29 @@ pub(crate) mod sealed {
         /// * Self : must be a value type V in [doc_generic_v]
         ///
         /// * atom_id:
-        /// is the [atom_id](crate::atom::register_atom) used to evaluate
-        /// checkpoint functions.
+        ///   is the [atom_id](crate::atom::register_atom) used to evaluate
+        ///   checkpoint functions.
         ///
         /// * rw_lock :
-        /// is a read-write lock object [std::sync::RwLock]
+        ///   is a read-write lock object [std::sync::RwLock]
         ///
         /// * write_lock :
-        /// ``` text
+        ///   ``` text
         ///     let write_lock = rw_lock.write();
         ///     let mut info_vec : &Vec< CheckpointInfo<V> >
         ///         = &*write_lock.unwrap();
-        /// ```
+        ///   ```
         ///
         /// * read_lock :
-        /// ``` text
+        ///   ``` text
         ///     let read_lock  = rw_lock.read();
         ///     let info_vec : &Vec< CheckpointINfo<V> >
         ///         = &*read_lock.unwrap();
-        /// ```
+        ///   ```
         ///
         /// * info_vec :
-        /// info_vec\[checkpoint_id\] is the [CheckpointInfo' corresponding to
-        /// checkpoint_id; see [register_checkpoint] .
+        ///   info_vec\[checkpoint_id\] is the [CheckpointInfo' corresponding to
+        ///   checkpoint_id; see [register_checkpoint] .
         ///
         fn get() -> &'static RwLock< Vec< CheckpointInfo<Self> > >;
         fn atom_id()-> &'static LazyLock<IndexT>;
@@ -224,36 +224,36 @@ where
 /// * See Also : [register_atom]
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     checkpoint_id = register_checkpoint(ad_fn, directions, hash_map)
-/// ```
+///   ```
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * ad_fn :
-/// is the ad_fn that is being moved to the global checkpoint vector.
+///   is the ad_fn that is being moved to the global checkpoint vector.
 ///
 /// * hash_map :
-/// The following is a description of the valid key :
+///   The following is a description of the valid key :
 ///
-///     name :
-///     the value is the name that identifies this checkpoint function
-///     (default no_name).
+///     * name :
+///       the value is the name that identifies this checkpoint function
+///       (default no_name).
 ///
-///     trace :
-///     the value is true or false (the default is false).
-///     If trace is true, and 0 < directions.len(), the creation
-///     of the new [ADfn] objects use for AD derivative evaluation is traced.
+///     * trace :
+///       the value is true or false (the default is false).
+///       If trace is true, and 0 < directions.len(), the creation
+///       of the new [ADfn] objects use for AD derivative evaluation is traced.
 ///
 /// * directions :
-/// If directions\[k\] is Forward (Reverse), then (k+1)-th order forward
-/// (reverse) AD derivatives of this checkpoint function can be computed.
-/// This requires creating new ADfn objects for each element of directions.
-/// To be more specific, if direction\[k\] is Forward (Reverse)
-/// the (k+1)-th order derivative is computer using
-/// the ADfn that is the forward (reverse) derivative of
-/// the k-th order derivative.
-/// (The zero order derivative corresponds to ad_fn.)
+///   If directions\[k\] is Forward (Reverse), then (k+1)-th order forward
+///   (reverse) AD derivatives of this checkpoint function can be computed.
+///   This requires creating new ADfn objects for each element of directions.
+///   To be more specific, if direction\[k\] is Forward (Reverse)
+///   the (k+1)-th order derivative is computer using
+///   the ADfn that is the forward (reverse) derivative of
+///   the k-th order derivative.
+///   (The zero order derivative corresponds to ad_fn.)
 ///
 ///
 /// ## checkpoint_id :
@@ -365,16 +365,16 @@ where
 /// if this thread is currently recording, include the call in its tape.
 ///
 /// * adomain :
-/// This is the value of the arguments for this atomic function call.
-/// Note that the dimension of the domain only depends on checkpoint_id.
+///   This is the value of the arguments for this atomic function call.
+///   Note that the dimension of the domain only depends on checkpoint_id.
 ///
 /// * checkpoint_id :
-/// The [checkpoint_id](register_checkpoint#checkpoint_id)
-/// returned by register_checkpoint for this checkpoint function.
+///   The [checkpoint_id](register_checkpoint#checkpoint_id)
+///   returned by register_checkpoint for this checkpoint function.
 ///
 /// * trace :
-/// if true, a trace of the calculations may be printed on stdout.
-/// This may be useful for debugging.
+///   if true, a trace of the calculations may be printed on stdout.
+///   This may be useful for debugging.
 ///
 pub fn call_checkpoint<V>(
     adomain       : Vec< AD<V> > ,

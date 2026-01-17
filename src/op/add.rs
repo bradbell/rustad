@@ -206,8 +206,8 @@ no_rust_src!(Add);
 /// Set the operator information for all the Add operators.
 ///
 /// * op_info_vec :
-/// The map from [op::id](crate::op::id) to operator information.
-/// The the map results for ADD_PV_OP, ADD_VP_OP, and ADD_VV_OP are set.
+///   The map from [op::id](crate::op::id) to operator information.
+///   The the map results for ADD_PV_OP, ADD_VP_OP, and ADD_VV_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
 where
     for<'a> &'a V : Add<&'a AD<V>, Output = AD<V> > ,

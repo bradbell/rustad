@@ -28,42 +28,42 @@ use crate::{
 /// Zero order forward mode variable evaluation with dynamic parameters.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     (range, var_both) = f.forward_var_value(dyp_both, var_dom, trace)
 ///     (range, var_both)  = f.forward_var_ad(dyp_both, var_dom, trace)
-/// ```
+///   ```
 /// * Prototype :
-/// see [ADfn::forward_var_value] and [ADfn::forward_var_ad]
+///   see [ADfn::forward_var_value] and [ADfn::forward_var_ad]
 ///
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
 /// * f : is an [ADfn] object.
 ///
 /// * dyp_both :
-/// If there are no dynamic parameters in f, this should be None
-/// or the empty vector.
-/// Otherwise it is the dynamic parameter sub-vectors in the following order:
-/// the domain dynamic parameters followed by the dependent dynamic parameters.
-/// This is normally computed by
-/// [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
+///   If there are no dynamic parameters in f, this should be None
+///   or the empty vector.
+///   Otherwise it is the dynamic parameter sub-vectors in the following order:
+///   the domain dynamic parameters followed by the dependent dynamic parameters.
+///   This is normally computed by
+///   [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
 ///
 /// * var_dom :
-/// This the the domain variable values.
+///   This the the domain variable values.
 ///
 /// * trace :
-/// if true, a trace of the calculation is printed on stdout.
+///   if true, a trace of the calculation is printed on stdout.
 ///
 /// * range :
-/// is the range vector corresponding to the
-/// domain variable and parameter values;
-/// i.e., the value of the function correspdong the operation sequence in f.
-/// Note that a range space component may be a
-/// variable, a dynamic parameter, or a constant parameter.
+///   is the range vector corresponding to the
+///   domain variable and parameter values;
+///   i.e., the value of the function correspdong the operation sequence in f.
+///   Note that a range space component may be a
+///   variable, a dynamic parameter, or a constant parameter.
 ///
 /// * var_both :
-/// is both the variable sub-vectors in the following order:
-/// the domain variables followed by the dependent variables.
-/// Note that *var_dom* gets moved to the beginning of *var_both* .
+///   is both the variable sub-vectors in the following order:
+///   the domain variables followed by the dependent variables.
+///   Note that *var_dom* gets moved to the beginning of *var_both* .
 ///
 /// # Example
 /// Computing function values using forward_var :
@@ -128,8 +128,8 @@ pub fn doc_forward_var() { }
 /// * V : see [doc_generic_v]
 ///
 /// * E : see [doc_generic_e] .
-/// If *suffix* is `value` , *E must be be the value type *V* .
-/// If *suffix* is `ad` , *E must be be the type `AD<V>` .
+///   If *suffix* is `value` , *E must be be the value type *V* .
+///   If *suffix* is `ad` , *E must be be the type `AD<V>` .
 ///
 /// See [doc_forward_var]
 macro_rules! forward_var {

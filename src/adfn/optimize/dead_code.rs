@@ -219,25 +219,25 @@ where
     /// and the map from ADfn indices to tape indices.
     ///
     /// * Syntax :
-    /// ```text
+    ///   ```text
     ///     (tape, old2new) = f.dead_code(depend, trace)
-    /// ```
+    ///   ```
     ///
     /// * f :
-    /// is an [ADfn] object.
+    ///   is an [ADfn] object.
     ///
     /// * depend :
-    /// is the [Depend] structure for *f* .
+    ///   is the [Depend] structure for *f* .
     ///
     /// * trace :
-    /// if true, a trace is printed on standard output.
+    ///   if true, a trace is printed on standard output.
     ///
     /// * tape :
-    /// is a [Tape] corresponding to the optimized version of *f* .
+    ///   is a [Tape] corresponding to the optimized version of *f* .
     ///
     /// * old2new  :
-    /// is the [Old2New] structure that maps indices in *f* to
-    /// indices in *tape* .
+    ///   is the [Old2New] structure that maps indices in *f* to
+    ///   indices in *tape* .
     ///
     pub(crate) fn dead_code(&self, depend : &Depend, trace : bool,
     ) -> ( Tape<V>, Old2New)

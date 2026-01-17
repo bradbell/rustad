@@ -202,37 +202,37 @@ pub(crate) use impl_this_thread_tape;
 /// dynamic parameters.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     (adyp_dom, avar_dom) = start_recording(dyp_dom, var_dom)
-/// ```
+///   ```
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * Recording :
-/// There must not currently be a recording in process on the current thread
-/// when start_recording is called.
-/// The recording is stopped when [stop_recording] is called.
+///   There must not currently be a recording in process on the current thread
+///   when start_recording is called.
+///   The recording is stopped when [stop_recording] is called.
 ///
 /// * dyp_dom :
-/// If this is None or an empty vector, there must be no dynamic parameters.
-/// Otherwise, vector contains the value of the domain dynamic parameters
-/// used during the recording.
+///   If this is None or an empty vector, there must be no dynamic parameters.
+///   Otherwise, vector contains the value of the domain dynamic parameters
+///   used during the recording.
 ///
 /// * var_dom :
-/// This vector contains the value of the domain variables
-/// used during the recording.  It can't be empty.
+///   This vector contains the value of the domain variables
+///   used during the recording.  It can't be empty.
 ///
 /// *adyp_dom :
-/// This return is the vector of domain dynamic parameters.
-/// It has the same length and values as *dyp_dom* .
-/// Dependencies with respect to these parameters will be recorded on the
-/// tape for this thread.
+///   This return is the vector of domain dynamic parameters.
+///   It has the same length and values as *dyp_dom* .
+///   Dependencies with respect to these parameters will be recorded on the
+///   tape for this thread.
 ///
 /// *avar_dom :
-/// This return is the vector of domain variables.
-/// It has the same length and values as *var_dom* .
-/// Dependencies with respect to these variables will be recorded on the
-/// tape for this thread.
+///   This return is the vector of domain variables.
+///   It has the same length and values as *var_dom* .
+///   Dependencies with respect to these variables will be recorded on the
+///   tape for this thread.
 ///
 /// * Example : see [stop_recording]
 ///
@@ -323,25 +323,25 @@ where
 /// Stops a recordng and moves it to an ADfn object.
 ///
 /// * Syntax :
-/// ```text
+///   ```text
 ///     ad_fn = stop_recording(arange)
-/// ```
+///   ```
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * Recording :
-/// There must currently be a recording in process on the current thread
-/// when stop_recording is called.
+///   There must currently be a recording in process on the current thread
+///   when stop_recording is called.
 ///
 /// * arange :
-/// This is a `Vec< AD<V> >` vector that specifies
-/// the range space variables.
+///   This is a `Vec< AD<V> >` vector that specifies
+///   the range space variables.
 ///
 /// * ad_fn :
-/// The return value is an `ADfn<V>` containing the operation sequence
-/// that computed arange as a function of the domain variables and
-/// dynamic parameters specified by [start_recording] .
-/// It can be used to compute the values for the function and its derivatives.
+///   The return value is an `ADfn<V>` containing the operation sequence
+///   that computed arange as a function of the domain variables and
+///   dynamic parameters specified by [start_recording] .
+///   It can be used to compute the values for the function and its derivatives.
 ///
 /// # Example
 /// ```
