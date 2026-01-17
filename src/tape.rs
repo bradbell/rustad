@@ -246,11 +246,7 @@ where
     assert_ne!( var_dom.len(), 0 );
     //
     // dyp_dom
-    let dyp_dom : Vec<V> = if dyp_dom.is_none() {
-        Vec::new()
-    } else {
-        dyp_dom.unwrap()
-    };
+    let dyp_dom = dyp_dom.unwrap_or_else(|| Vec::new() );
     //
     // tape_id
     let tape_id : usize;
@@ -377,24 +373,23 @@ where
         );
         tape.recording = false;
         //
+        // index_t_limit
+        let index_t_limit : usize = IndexT::MAX as usize;
+        //
         // check documented assumptions
-        match IndexT::try_from( tape.tape_id ) {
-            Err(_) => panic!( "tape.tape_id > IndexT::MAX" ),
-            Ok(_)  => (),
+        if index_t_limit < tape.tape_id {
+            panic!( "tape.tape_id > IndexT::MAX" );
         }
-        match IndexT::try_from( tape.dyp.arg_all.len() ) {
-            Err(_) => panic!( "tape.dyp.arg_all.len() > IndexT::MAX" ),
-            Ok(_)  => (),
+        if index_t_limit < tape.dyp.arg_all.len() {
+            panic!( "tape.dyp.arg_all.len() > IndexT::MAX" );
         }
-        match IndexT::try_from( tape.var.arg_all.len() ) {
-            Err(_) => panic!( "tape.var.arg_all.len() > IndexT::MAX" ),
-            Ok(_)  => (),
+        if index_t_limit < tape.var.arg_all.len() {
+            panic!( "tape.var.arg_all.len() > IndexT::MAX" );
         }
         let par_len = tape.cop.len()
             + tape.dyp.n_dom + tape.dyp.n_dep + arange.len();
-        match IndexT::try_from( par_len ) {
-            Err(_) => panic!( "par_len > IndexT::MAX" ),
-            Ok(_)  => (),
+        if index_t_limit < par_len  {
+            panic!( "par_len > IndexT::MAX" );
         }
         //
         // more checks
