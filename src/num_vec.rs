@@ -465,7 +465,7 @@ impl_from_scalar!( AzFloat<f64>, AzFloat<f64>);
 /// assert_ne!(b, c);
 /// ```
 pub fn doc_partial_equal() {}
-///
+//
 impl<S> PartialEq for NumVec<S>
 where
     S : PartialEq,

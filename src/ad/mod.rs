@@ -236,8 +236,7 @@ pub fn ad_from_value<V>(value : V) -> AD<V> {
 /// ```
 pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
     assert_ne!( vec.len() , 0 );
-    let avec = vec.into_iter().map( |value| AD::<V>::from(value) ).collect();
-    avec
+    vec.into_iter().map( |value| AD::<V>::from(value) ).collect()
 }
 // ---------------------------------------------------------------------------
 // ad_to_vector
@@ -279,8 +278,7 @@ pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
 /// ```
 pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
     assert_ne!( avec.len() , 0 );
-    let vec  = avec.into_iter().map( |ad| ad.value).collect();
-    vec
+    avec.into_iter().map( |ad| ad.value).collect()
 }
 // -------------------------------------------------------------------------
 /// Convert V to an `AD<V>` object with no function information;

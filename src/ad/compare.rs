@@ -328,10 +328,8 @@ where
         var_rhs      = rhs.ad_type.is_variable();
     };
     //
-    if cop_lhs {
-        if cop_rhs {
-            return (new_tape_id, new_index, new_ad_type);
-        }
+    if cop_lhs && cop_rhs {
+        return (new_tape_id, new_index, new_ad_type);
     }
     //
     // new_tape_id
