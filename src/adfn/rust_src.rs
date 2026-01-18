@@ -96,7 +96,7 @@ where
     pub fn rust_src(&self, fn_name : &str) -> String {
         //
         // op_info_vec
-        let op_info_vec = &*<V as GlobalOpInfoVec>::get();
+        let op_info_vec = <V as GlobalOpInfoVec>::get();
         //
         // v_str
         let v_str   = String::from( type_name::<V>() );

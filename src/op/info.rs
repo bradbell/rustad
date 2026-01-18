@@ -509,7 +509,7 @@ pub(crate) mod sealed {
         /// * op_info_vec :
         ///   is the global vector of operator information.
         ///
-        fn get() -> &'static std::sync::LazyLock< Vec< OpInfo<Self> > >;
+        fn get() -> &'static Vec< OpInfo<Self> >;
     }
 }
 // impl_global_op_info_vec!
@@ -527,15 +527,13 @@ macro_rules! impl_global_op_info_vec{ ($V:ty) => {
             "Operator information used to evaluate `",
             stringify!($V), "`, and `AD<", stringify!($V), ">` operations"
         ) ]
-        fn get() -> &'static LazyLock<
-            Vec< crate::op::info::OpInfo<$V> >
-        > {
+        fn get() -> &'static Vec< crate::op::info::OpInfo<$V> > {
             pub static OP_INFO_VEC :
                 LazyLock< Vec< crate::op::info::OpInfo<$V> > > =
                     LazyLock::new(
                         || crate::op::info::op_info_vec::<$V>()
                     );
-            &OP_INFO_VEC
+            &*OP_INFO_VEC
         }
     }
 } }

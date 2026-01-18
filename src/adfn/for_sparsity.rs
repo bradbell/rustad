@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 //! Implements [ADfn] forward sparsity method.
 //!
@@ -111,7 +111,7 @@ where
     ) -> Vec< [usize; 2] >
     {   //
         // op_info_vec
-        let op_info_vec : &Vec< OpInfo<V> >  = &*GlobalOpInfoVec::get();
+        let op_info_vec : &Vec< OpInfo<V> >  = GlobalOpInfoVec::get();
         //
         // rng_ad_type, range_ad_index, n_range
         let rng_ad_type       = &self.rng_ad_type;

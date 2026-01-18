@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! Implement the [ADfn] reverse_depend method.
@@ -84,7 +84,7 @@ where
         }
         //
         // op_info_vec
-        let op_info_vec = &*<V as GlobalOpInfoVec>::get();
+        let op_info_vec = <V as GlobalOpInfoVec>::get();
         //
         //
         // i_op_seq

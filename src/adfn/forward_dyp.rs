@@ -81,7 +81,7 @@ macro_rules! forward_dyp {
             );
             //
             // op_info_vec
-            let op_info_vec = &*GlobalOpInfoVec::get();
+            let op_info_vec = GlobalOpInfoVec::get();
             //
             // n_dyp
             let n_dyp = self.dyp.n_dom + self.dyp.n_dep;

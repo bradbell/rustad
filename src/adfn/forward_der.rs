@@ -161,7 +161,7 @@ macro_rules! forward_der {
             );
             //
             // op_info_vec
-            let op_info_vec = &*GlobalOpInfoVec::get();
+            let op_info_vec = GlobalOpInfoVec::get();
             //
             // zero_e
             let zero_e        : $E = FloatCore::zero();
