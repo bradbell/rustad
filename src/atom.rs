@@ -682,9 +682,9 @@ where
         // Rest of this block has a lock, so it should be fast and not fail.
         let callback_vec   = read_lock.unwrap();
         let callback       = &callback_vec[atom_id as usize];
-        forward_fun_value  = callback.forward_fun_value.clone();
+        forward_fun_value  = callback.forward_fun_value;
         name               = callback.name;
-        rev_depend         = callback.rev_depend.clone();
+        rev_depend         = callback.rev_depend;
     }
     if rev_depend.is_none() { panic!(
         "{} : rev_depend is not implemented for this atomic function",

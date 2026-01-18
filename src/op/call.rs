@@ -621,7 +621,7 @@ where
     let callback = get_callback(atom_id);
     //
     // forward_der_ad
-    let forward_der_ad       = callback.forward_der_ad.clone();
+    let forward_der_ad       = callback.forward_der_ad;
     if forward_der_ad.is_none() {
         panic!(
             "{} : forward_der_ad is not implemented for this atomic function",

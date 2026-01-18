@@ -214,11 +214,11 @@ where
                     );
                     for dep_index in var_depend.iter() {
                         debug_assert!( i_op_seq != 0 || ! compute_dyp );
-                        depend_usize.push(dep_index.clone() as usize + n_dyp );
+                        depend_usize.push(*dep_index as usize + n_dyp );
                     }
                     if compute_dyp {
                         for dep_index in dyp_depend.iter() {
-                            depend_usize.push( dep_index.clone() as usize );
+                            depend_usize.push( *dep_index as usize );
                         }
                     }
                 } else {

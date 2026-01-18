@@ -227,11 +227,11 @@ where
                                 op_index
                             );
                             for dep_index in var_depend.iter() {
-                                var_index_stack.push( dep_index.clone() );
+                                var_index_stack.push( *dep_index );
                             }
                             if compute_dyp {
                                 for dep_index in dyp_depend.iter() {
-                                    dyp_index_stack.push( dep_index.clone() );
+                                    dyp_index_stack.push( *dep_index );
                                 }
                             }
                         } else {
@@ -297,7 +297,7 @@ where
                             );
                             assert_eq!( var_depend.len(), 0 );
                             for dep_index in dyp_depend.iter() {
-                                dyp_index_stack.push( dep_index.clone() );
+                                dyp_index_stack.push( *dep_index );
                             }
                         } else {
                             // arg, arg_type
