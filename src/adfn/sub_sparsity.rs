@@ -187,7 +187,7 @@ where
             //
             // var_index
             // range[row] depends on this variable
-            while var_index_stack.len() > 0 {
+            while ! var_index_stack.is_empty() {
                 let var_index = var_index_stack.pop().unwrap() as usize;
                 //
                 if var_done[var_index] != row {
@@ -255,7 +255,7 @@ where
             }
             // dyp_index
             // range[row] depends on this dynamic parameter
-            while dyp_index_stack.len() > 0 {
+            while ! dyp_index_stack.is_empty() {
                 debug_assert!( compute_dyp );
                 let dyp_index = dyp_index_stack.pop().unwrap() as usize;
                 //

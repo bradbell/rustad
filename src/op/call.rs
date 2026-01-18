@@ -1158,7 +1158,7 @@ where
     let error_msg = rev_depend(
         atom_depend, rng_index, n_dom, call_info, trace
     );
-    if error_msg != "" {
+    if ! error_msg.is_empty() {
         panic!(
             "{} : rev_depend error_msg = {}", callback.name, error_msg
         );

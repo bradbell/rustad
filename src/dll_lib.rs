@@ -113,7 +113,7 @@ pub fn get_lib(
         }
         let stderr = result.unwrap().stderr;
         let stderr = String::from_utf8( stderr ).unwrap();
-        if stderr != "" {
+        if ! stderr.is_empty() {
             eprint!("\ndll_lib::get_lib: can't compile and link library\n\n");
             eprint!("{}", stderr);
             panic!();

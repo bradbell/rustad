@@ -149,7 +149,7 @@ where
             "   let nan = V::from( f32::NAN );\n";
         //
         // cop
-        if 0 < self.cop.len() {
+        if ! self.cop.is_empty() {
             let n_cop = self.cop.len().to_string();
             src = src +
                 "   // cop\n" +

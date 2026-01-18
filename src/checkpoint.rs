@@ -242,7 +242,7 @@ where
 ///
 ///     * trace :
 ///       the value is true or false (the default is false).
-///       If trace is true, and 0 < directions.len(), the creation
+///       If trace is true, and ! directions.is_empty(), the creation
 ///       of the new [ADfn] objects use for AD derivative evaluation is traced.
 ///
 /// * directions :
@@ -298,7 +298,7 @@ where
     // ad_forward_id, ad_reverse_id
     let mut ad_forward_id : Option<IndexT> = None;
     let mut ad_reverse_id : Option<IndexT> = None;
-    if 0 < directions.len()  {
+    if ! directions.is_empty()  {
         let directions_tail = &directions[1 .. directions.len()];
         if directions[0] == Direction::Forward {
             hash_map.insert( "name", name.clone() + ".forward" );

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //! This pub module implements AD atomic functions
 //!
@@ -491,7 +491,7 @@ where
         let error_msg = rev_depend(
             &mut depend, rng_index, n_dom, call_info, trace
         );
-        if error_msg.len() != 0 {
+        if ! error_msg.is_empty() {
             panic!( "atom {} rev_depend error_msg : {}", name, error_msg);
         }
         let mut ad_type = ADType::ConstantP;
