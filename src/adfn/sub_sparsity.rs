@@ -181,10 +181,8 @@ where
             dyp_index_stack.clear();
             if rng_ad_type[row].is_variable() {
                 var_index_stack.push( rng_index[row] );
-            } else {
-                if compute_dyp && rng_ad_type[row].is_dynamic() {
-                    dyp_index_stack.push( rng_index[row] );
-                }
+            } else if compute_dyp && rng_ad_type[row].is_dynamic() {
+                dyp_index_stack.push( rng_index[row] );
             }
             //
             // var_index

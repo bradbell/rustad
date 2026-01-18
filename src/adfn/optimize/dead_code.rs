@@ -350,7 +350,7 @@ where
                         );
                     }
                     old_op_index += 1;
-                } else { if op_id == CALL_OP {
+                } else if op_id == CALL_OP {
                     let flag_all       = &old_op_seq.flag_all;
                     let n_rng          = arg[NUMBER_RNG] as usize;
                     let start          = arg[BEGIN_FLAG] as usize;
@@ -391,12 +391,11 @@ where
                     old_op_index += old_n_dep;
                 } else {
                     panic!( "dead_code: op_id = {}", op_id );
-                }
+                } // is_binary_op
             } // while old_op_index <
         } // for i_op_seq in 0 .. 2
-    }
-    if trace {
-        println!( "End Trace: dead_code" );
+        if trace {
+            println!( "End Trace: dead_code" );
         }
         return (tape, old2new);
     } // fn dead_code
