@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------
 # SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 # SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-# SPDX-FileContributor: 2003-25 Bradley M. Bell
+# SPDX-FileContributor: 2003-26 Bradley M. Bell
 # ---------------------------------------------------------------------------
 # source bin/dev_settings.sh
 # Sets the value of the the development tool variables for this package.
@@ -76,6 +76,7 @@ contributor_list='
 # BEGIN_SORT_THIS_LINE_PLUS_2
 no_copyright_list='
    .gitignore
+   clippy.toml
    readme.md
    typos.toml
 '
