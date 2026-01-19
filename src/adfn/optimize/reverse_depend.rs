@@ -153,9 +153,9 @@ where
                             op_info_vec[op_id as usize].reverse_depend;
                         reverse_depend(
                             &mut depend,
-                            &flag_all,
-                            &arg,
-                            &arg_type,
+                            flag_all,
+                            arg,
+                            arg_type,
                             res,
                             res_type.clone(),
                         );

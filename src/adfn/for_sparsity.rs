@@ -209,7 +209,7 @@ where
                         &mut cop_depend,
                         &mut dyp_depend,
                         &mut var_depend,
-                        &op_seq,
+                        op_seq,
                         op_index
                     );
                     for dep_index in var_depend.iter() {

@@ -122,8 +122,8 @@ macro_rules! forward_dyp {
                     &mut dyp_both,
                     &self.cop,
                     &self.dyp.flag_all,
-                    &arg,
-                    &arg_type,
+                    arg,
+                    arg_type,
                     res
                 );
                 if trace {

@@ -206,8 +206,8 @@ macro_rules! forward_var {
                     &mut var_both,
                     &self.cop,
                     &self.var.flag_all,
-                    &arg,
-                    &arg_type,
+                    arg,
+                    arg_type,
                     res
                 );
                 if trace {

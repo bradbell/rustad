@@ -207,8 +207,8 @@ macro_rules! forward_der {
                     &mut var_der,
                     &self.cop,
                     &self.var.flag_all,
-                    &arg,
-                    &arg_type,
+                    arg,
+                    arg_type,
                     res
                 );
                 if trace {

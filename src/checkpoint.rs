@@ -195,7 +195,7 @@ where
     //
     // checkpoint_callback
     let checkpoint_callback = AtomCallback {
-        name                 : &"checkpoint",
+        name                 : "checkpoint",
         rev_depend           :  Some( checkpoint_rev_depend::<V> ),
         //
         forward_fun_value    :  Some( checkpoint_forward_fun_value::<V> ),

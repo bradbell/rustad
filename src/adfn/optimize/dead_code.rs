@@ -116,7 +116,7 @@ fn new_binary_op(
     for i_arg in 0 .. 2 {
         let arg_type_i = arg_type[i_arg].clone();
         let old_index = arg[i_arg] as usize;
-        let option    = get_old2new( &old2new, &arg_type_i, old_index );
+        let option    = get_old2new( old2new, &arg_type_i, old_index );
         let new_index = option.unwrap();
         new_op_seq.arg_all.push( new_index );
         new_op_seq.arg_type_all.push( arg_type_i );
@@ -151,7 +151,7 @@ fn new_call_op(
     for i_dom in 0 .. n_dom {
         let old_index  = arg[BEGIN_DOM + i_dom] as usize;
         let ad_type    = &arg_type[BEGIN_DOM + i_dom];
-        let option  = get_old2new(&old2new, ad_type, old_index);
+        let option  = get_old2new(old2new, ad_type, old_index);
         if option.is_none() {
             // A call argument will get optimized out if it is not
             // necessary to obtain the call results that are used.
@@ -378,7 +378,7 @@ where
                         // old2new, new_op_seq
                         new_call_op(
                             &mut old2new,
-                            &old_rng_is_dep,
+                            old_rng_is_dep,
                             &new_flag,
                             i_op_seq,
                             arg,
