@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! Implement [OpHashMap]
@@ -133,7 +133,7 @@ impl OpHashMap {
         op_seq       : &OpSequence  ,
         op_seq_type  : ADType       ,
         op_index     : usize        ,
-        first_equal  : &Vec<IndexT> ,
+        first_equal  : &[IndexT]    ,
         map_value_in : IndexT       ,
     ) -> Option<IndexT> {
         let n_dom_indext = op_seq.n_dom as IndexT;
@@ -222,7 +222,7 @@ impl OpHashMap {
 //
 pub(crate) fn first_equal_op(
     op_seq_type : ADType      ,
-    depend      : &Vec<bool>  ,
+    depend      : &[bool]     ,
     op_seq      : &OpSequence ,
 ) -> Vec<IndexT>
 {   //

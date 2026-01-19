@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 //! Evaluate the No Op operator
 //!
@@ -26,7 +26,7 @@ use crate::op::id::NO_OP;
 fn no_op_dyp<V, E> (
     _dyp_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag_all : &Vec<bool>  ,
+    _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -37,7 +37,7 @@ fn no_op_var<V, E> (
     _dyp_both : &Vec<E>     ,
     _var_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag_all : &Vec<bool>  ,
+    _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -49,7 +49,7 @@ fn no_op_der<V, E>  (
     _var_both : &Vec<E>     ,
     _var_der  : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag_all : &Vec<bool>  ,
+    _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -61,7 +61,7 @@ pub fn no_op_rust_src<V>(
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
     _var_n_dom : usize       ,
-    _flag_all  : &Vec<bool>  ,
+    _flag_all  : &[bool]     ,
     _arg       : &[IndexT]   ,
     _arg_type  : &[ADType]   ,
     _res       : usize       ,
@@ -71,7 +71,7 @@ pub fn no_op_rust_src<V>(
 // no_op_reverse_depend
 pub fn no_op_reverse_depend<V>(
     _depend   : &mut optimize::Depend ,
-    _flag_all : &Vec<bool>            ,
+    _flag_all : &[bool]               ,
     _arg      : &[IndexT]             ,
     _arg_type : &[ADType]             ,
     _res      : usize                 ,

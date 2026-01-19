@@ -246,7 +246,7 @@ where
 fn call_forward_dyp_value<V> (
     dyp_both   : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag_all   : &Vec<bool>    ,
+    flag_all   : &[bool]       ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -314,7 +314,7 @@ where
 fn call_forward_dyp_ad<V> (
     adyp_both  : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
-    flag_all   : &Vec<bool>          ,
+    flag_all   : &[bool]             ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -388,7 +388,7 @@ fn call_forward_var_value<V> (
     dyp_both   : &Vec<V>       ,
     var_both   : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag_all   : &Vec<bool>    ,
+    flag_all   : &[bool]       ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -455,7 +455,7 @@ fn call_forward_var_ad<V> (
     adyp_both  : &Vec< AD<V> >       ,
     avar_both  : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
-    flag_all   : &Vec<bool>          ,
+    flag_all   : &[bool]             ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -527,7 +527,7 @@ fn call_forward_der_value<V> (
     var_both   : &Vec<V>       ,
     var_der    : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag_all   : &Vec<bool>    ,
+    flag_all   : &[bool]       ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -602,7 +602,7 @@ fn call_forward_der_ad<V> (
     avar_both  : &Vec< AD<V> >       ,
     avar_der   : &mut Vec< AD<V> >   ,
     cop        : &Vec<V>             ,
-    flag_all   : &Vec<bool>          ,
+    flag_all   : &[bool]             ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -682,7 +682,7 @@ fn call_reverse_der_value<V> (
     var_both   : &Vec<V>       ,
     var_der    : &mut Vec<V>   ,
     cop        : &Vec<V>       ,
-    flag_all   : &Vec<bool>    ,
+    flag_all   : &[bool]       ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -754,7 +754,7 @@ fn call_reverse_der_ad<V> (
     avar_both   : &Vec< AD<V> >       ,
     avar_der    : &mut Vec< AD<V> >   ,
     cop         : &Vec<V>             ,
-    flag_all   : &Vec<bool>           ,
+    flag_all   : &[bool]              ,
     arg        : &[IndexT]            ,
     arg_type   : &[ADType]            ,
     res        : usize                )
@@ -827,7 +827,7 @@ where
 fn call_res_dyp<V, E>(
     _dyp_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag_all : &Vec<bool>  ,
+    _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -839,7 +839,7 @@ fn call_res_var<V, E>(
     _dyp_both : &Vec<E>     ,
     _var_both : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag_all : &Vec<bool>  ,
+    _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -853,7 +853,7 @@ fn call_res_der<V, E>(
     _var_both : &Vec<E>     ,
     _var_der  : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag_all : &Vec<bool>  ,
+    _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -866,7 +866,7 @@ fn call_res_rust_src<V> (
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
     _var_n_dom : usize       ,
-    _flag_all  : &Vec<bool>  ,
+    _flag_all  : &[bool]     ,
     _arg       : &[IndexT]   ,
     _arg_type  : &[ADType]   ,
     _res       : usize       ,
@@ -882,7 +882,7 @@ fn call_rust_src<V> (
     res_type  : ADType      ,
     dyp_n_dom : usize       ,
     var_n_dom : usize       ,
-    flag_all  : &Vec<bool>  ,
+    flag_all  : &[bool]     ,
     arg       : &[IndexT]   ,
     arg_type  : &[ADType]   ,
     res       : usize       ) -> String

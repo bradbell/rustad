@@ -95,8 +95,8 @@ pub(crate) struct Old2New {
 ///
 pub(crate) fn renumber_op_seq(
     equal_type  : ADType           ,
-    first_equal : &Vec<IndexT>     ,
-    depend      : &Vec<bool>       ,
+    first_equal : &[IndexT]        ,
+    depend      : &[bool]          ,
     op_seq      : &mut OpSequence  ,
 ) {
     //

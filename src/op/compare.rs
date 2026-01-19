@@ -61,7 +61,7 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
     fn [< $name _forward_dyp >] <V, E> (
         dyp_both    : &mut Vec<E> ,
         cop         : &Vec<V>     ,
-        _flag_all   : &Vec<bool>  ,
+        _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       )
@@ -107,7 +107,7 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
         dyp_both    : &Vec<E>     ,
         var_both    : &mut Vec<E> ,
         cop         : &Vec<V>     ,
-        _flag_all   : &Vec<bool>  ,
+        _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       )
@@ -172,7 +172,7 @@ eval_compare_forward_fun!( gt );
 ///
 pub(crate) fn binary_reverse_depend(
     depend    : &mut optimize::Depend ,
-    _flag_all : &Vec<bool>            ,
+    _flag_all : &[bool]               ,
     arg       : &[IndexT]             ,
     arg_type  : &[ADType]             ,
     res       : usize                 ,
@@ -214,7 +214,7 @@ fn zero_forward_der<V, E>  (
     _var_both : &Vec<E>     ,
     var_der   : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag_all : &Vec<bool>  ,
+    _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     res        : usize      ,
@@ -232,7 +232,7 @@ fn zero_reverse_der<V, E>  (
     _var_both : &Vec<E>     ,
     _var_der  : &mut Vec<E> ,
     _cop      : &Vec<V>     ,
-    _flag_all : &Vec<bool>  ,
+    _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _re       : usize      ,
