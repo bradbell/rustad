@@ -360,7 +360,7 @@ where
     V : Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
     // ad_fn
-    let mut ad_fn : ADfn<V> = ADfn::new();
+    let mut ad_fn : ADfn<V> = ADfn::default();
     //
     // tape
     let local_key : &LocalKey< RefCell< Tape<V> > > =

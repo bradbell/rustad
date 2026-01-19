@@ -26,12 +26,12 @@ const N_SUM : usize = 15;
 //
 thread_local! {
     static NORMSQ_F64 : RefCell< ADfn<ScalarV> > =
-        RefCell::new( ADfn::new() );
+        RefCell::new( ADfn::default() );
 }
 //
 thread_local! {
     static NORMSQ_NUMVEC_F64 : RefCell< ADfn<NumVecV> > =
-        RefCell::new( ADfn::new() );
+        RefCell::new( ADfn::default() );
 }
 //
 // normsq_fn

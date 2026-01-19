@@ -93,9 +93,8 @@ pub struct ADfn<V> {
 }
 //
 // ---------------------------------------------------------------------------
-impl<V> ADfn<V> {
-    //
-    // new
+// ADfn<V>::default
+impl<V> Default for ADfn<V> {
     /// This creates an ADfn object with an empty operation sequence.
     ///
     /// To be more specific,
@@ -104,13 +103,13 @@ impl<V> ADfn<V> {
     /// # Example
     /// ```
     /// use rustad::adfn::ADfn;
-    /// let f : ADfn<f32> = ADfn::new();
+    /// let f : ADfn<f32> = ADfn::default();
     /// assert_eq!( f.dyp_dom_len() + f.dyp_dep_len(), 0 );
     /// assert_eq!( f.var_dom_len() + f.var_dep_len(), 0 );
     /// assert_eq!( f.rng_len(), 0 );
     /// assert_eq!( f.cop_len(), 0 );
     /// ```
-    pub fn new() -> Self {
+    fn default() -> Self {
         Self {
             dyp              : OpSequence::new(),
             var              : OpSequence::new(),
@@ -119,6 +118,8 @@ impl<V> ADfn<V> {
             cop              : Vec::new() ,
         }
     }
+}
+impl<V> ADfn<V> {
     //
     // dyp_dom_len
     /// number of domain dynamic parameters
