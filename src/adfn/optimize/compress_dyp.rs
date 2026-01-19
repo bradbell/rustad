@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! Implement the [ADfn] compress_dyp method.
@@ -67,10 +67,11 @@ where
         let first_equal = first_equal_op(
             op_seq_type, &depend.dyp, &self.dyp
         );
+        debug_assert!( first_equal.len() == n_dep );
         //
         // depend.dyp
-        for op_index in 0 .. n_dep {
-            if first_equal[op_index] as usize != op_index {
+        for (op_index, equal_index) in first_equal.iter().enumerate() {
+            if *equal_index as usize != op_index {
                 depend.dyp[op_index + n_dom] = false;
             }
         }
@@ -78,10 +79,10 @@ where
         if trace {
             println!("Begin Trace compress_dyp");
             println!("original_index, compressed_index");
-            for op_index in 0 .. n_dep {
-                if first_equal[op_index] != op_index as IndexT {
+            for (op_index, equal_index) in first_equal.iter().enumerate() {
+                if *equal_index as usize != op_index {
                     let dep_index   = op_index + n_dom;
-                    let match_index = first_equal[op_index] + n_dom_indext;
+                    let match_index = *equal_index + n_dom_indext;
                     println!( "{}, {}", dep_index, match_index );
                 }
             }
