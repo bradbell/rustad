@@ -151,15 +151,14 @@ fn new_call_op(
     for i_dom in 0 .. n_dom {
         let old_index  = arg[BEGIN_DOM + i_dom] as usize;
         let ad_type    = &arg_type[BEGIN_DOM + i_dom];
-        let option  = get_old2new(old2new, ad_type, old_index);
-        if option.is_none() {
+        let option     = get_old2new(old2new, ad_type, old_index);
+        if let Some(new_index) = option {
+            new_arg[BEGIN_DOM + i_dom] = new_index;
+        } else {
             // A call argument will get optimized out if it is not
-            // necessary to obtain the call results that are used.
+            // necessary to obtain the call results that it affects.
             new_arg[BEGIN_DOM + i_dom]      = 0; // nan
             new_arg_type[BEGIN_DOM + i_dom] = ADType::ConstantP;
-        } else {
-            let new_index              = option.unwrap();
-            new_arg[BEGIN_DOM + i_dom] = new_index;
         }
     }
     //
@@ -397,6 +396,6 @@ where
         if trace {
             println!( "End Trace: dead_code" );
         }
-        return (tape, old2new);
+        (tape, old2new)
     } // fn dead_code
 } // impl
