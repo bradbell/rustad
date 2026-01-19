@@ -136,7 +136,7 @@ pub(crate) mod sealed {
         ///   ``` text
         ///     let read_lock  = rw_lock.read();
         ///     let info_vec : &Vec< CheckpointINfo<V> >
-        ///         = &*read_lock.unwrap();
+        ///         = &read_lock.unwrap();
         ///   ```
         ///
         /// * info_vec :
@@ -397,7 +397,7 @@ where
     let n_range =
     {   let rw_lock   = GlobalCheckpointInfoVec::get();
         let read_lock  = rw_lock.read();
-        let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+        let info_vec : &Vec< CheckpointInfo<V> > = &read_lock.unwrap();
         let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
         ad_fn.rng_len()
     };
@@ -431,7 +431,7 @@ where
     // rw_lock, ad_fn
     let rw_lock   = GlobalCheckpointInfoVec::get();
     let read_lock  = rw_lock.read();
-    let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+    let info_vec : &Vec< CheckpointInfo<V> > = &read_lock.unwrap();
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // range
@@ -465,7 +465,7 @@ where
     // rw_lock, ad_fn
     let rw_lock           = GlobalCheckpointInfoVec::get();
     let read_lock         = rw_lock.read();
-    let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+    let info_vec : &Vec< CheckpointInfo<V> > = &read_lock.unwrap();
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // range_der
@@ -499,7 +499,7 @@ where
     // rw_lock, ad_fn
     let rw_lock           = GlobalCheckpointInfoVec::get();
     let read_lock         = rw_lock.read();
-    let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+    let info_vec : &Vec< CheckpointInfo<V> > = &read_lock.unwrap();
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // domain_der
@@ -533,7 +533,7 @@ where
     // rw_lock, ad_fn
     let rw_lock           = GlobalCheckpointInfoVec::get();
     let read_lock         = rw_lock.read();
-    let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+    let info_vec : &Vec< CheckpointInfo<V> > = &read_lock.unwrap();
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // pattern
@@ -577,7 +577,7 @@ where
     let n_range =
     {   let rw_lock   = GlobalCheckpointInfoVec::get();
         let read_lock  = rw_lock.read();
-        let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+        let info_vec : &Vec< CheckpointInfo<V> > = &read_lock.unwrap();
         let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
             ad_fn.rng_len()
     };
@@ -615,7 +615,7 @@ where
     // rw_lock, ad_forward_id
     let rw_lock           = GlobalCheckpointInfoVec::get();
     let read_lock         = rw_lock.read();
-    let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+    let info_vec : &Vec< CheckpointInfo<V> > = &read_lock.unwrap();
     let ad_forward_id = &info_vec[checkpoint_id as usize].ad_forward_id;
     let name          = &info_vec[checkpoint_id as usize].name;
     if ad_forward_id.is_none() {
@@ -652,7 +652,7 @@ where
     // rw_lock, ad_reverser_id
     let rw_lock           = GlobalCheckpointInfoVec::get();
     let read_lock         = rw_lock.read();
-    let info_vec : &Vec< CheckpointInfo<V> > = &*read_lock.unwrap();
+    let info_vec : &Vec< CheckpointInfo<V> > = &read_lock.unwrap();
     let ad_reverse_id = &info_vec[checkpoint_id as usize].ad_reverse_id;
     let name          = &info_vec[checkpoint_id as usize].name;
     if ad_reverse_id.is_none() {
