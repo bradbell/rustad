@@ -352,7 +352,7 @@ where
     );
     //
     // arange_zero
-    let result = forward_fun_ad( &rng_is_dep, &adomain, call_info, trace );
+    let result = forward_fun_ad( rng_is_dep, &adomain, call_info, trace );
     let mut arange = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_ad error : {}", callback.name, msg);
@@ -490,7 +490,7 @@ where
     );
     //
     // arange
-    let result = forward_fun_ad( &rng_is_dep, &adomain, call_info, trace );
+    let result = forward_fun_ad( rng_is_dep, &adomain, call_info, trace );
     let mut arange = match result {
         Err(msg) => { panic!(
             "atom {} forward_fun_ad error : {}", callback.name, msg);
@@ -573,7 +573,7 @@ where
     }
     // range_der
     let result = forward_der_value(
-        &rng_is_dep, &domain, &domain_der, call_info, trace
+        rng_is_dep, &domain, &domain_der, call_info, trace
     );
     let mut range_der = match result {
         Err(msg) => { panic!(
@@ -651,7 +651,7 @@ where
     }
     // arange_der
     let result = forward_der_ad(
-        &rng_is_dep, &adomain, &adomain_der, call_info, trace
+        rng_is_dep, &adomain, &adomain_der, call_info, trace
     );
     let mut arange_der = match result {
         Err(msg) => { panic!(
@@ -965,7 +965,7 @@ where
         "   let call_info  = " + &call_info.to_string() + ";\n" +
         "   let trace      = " + &trace.to_string() + ";\n" +
         "   let mut call_range = " +
-            "atom_" + &name + "(&use_range, &call_dom, call_info, trace) ?;\n";
+            "atom_" + name + "(&use_range, &call_dom, call_info, trace) ?;\n";
     //
     // res_name, res_dep
     let res_name   : &str;

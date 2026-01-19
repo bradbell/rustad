@@ -461,7 +461,7 @@ where
     AD<V> : From<V>,
 {
     let empty = OpInfo {
-        name               : &"panic",
+        name               : "panic",
         forward_dyp_value  : panic_dyp::<V, V>,
         forward_dyp_ad     : panic_dyp::<V, AD<V>>,
         forward_var_value  : panic_var::<V, V>,

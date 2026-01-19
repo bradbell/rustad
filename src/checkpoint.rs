@@ -484,7 +484,7 @@ where
     let domain_clone = ref_slice2vec(domain);
     //
     // range_der_clone
-    let range_der_clone = ref_slice2vec(&range_der);
+    let range_der_clone = ref_slice2vec(range_der);
     //
     // checkpoint_id
     let checkpoint_id = call_info;
@@ -636,7 +636,7 @@ where
 {   //
     // adomain_both
     let mut adomain_both    = ref_slice2vec(adomain);
-    let mut arange_der_clone = ref_slice2vec(&arange_der);
+    let mut arange_der_clone = ref_slice2vec(arange_der);
     adomain_both.append( &mut arange_der_clone );
     //
     // checkpoint_id
