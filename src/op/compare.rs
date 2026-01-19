@@ -59,7 +59,7 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
         "; see [ForwardDyp](crate::op::info::ForwardDyp)"
     ) ]
     fn [< $name _forward_dyp >] <V, E> (
-        dyp_both    : &mut Vec<E> ,
+        dyp_both    : &mut [E]    ,
         cop         : &[V]        ,
         _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
@@ -105,7 +105,7 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
     ) ]
     fn [< $name _forward_var >] <V, E> (
         dyp_both    : &[E]        ,
-        var_both    : &mut Vec<E> ,
+        var_both    : &mut [E]    ,
         cop         : &[V]        ,
         _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
@@ -212,7 +212,7 @@ pub(crate) fn binary_reverse_depend(
 fn zero_forward_der<V, E>  (
     _dyp_both : &[E]        ,
     _var_both : &[E]        ,
-    var_der   : &mut Vec<E> ,
+    var_der   : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -230,7 +230,7 @@ where
 fn zero_reverse_der<V, E>  (
     _dyp_both : &[E]        ,
     _var_both : &[E]        ,
-    _var_der  : &mut Vec<E> ,
+    _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,

@@ -24,7 +24,7 @@ use crate::op::id::NO_OP;
 //
 // no_op_dyp
 fn no_op_dyp<V, E> (
-    _dyp_both : &mut Vec<E> ,
+    _dyp_both : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -35,7 +35,7 @@ fn no_op_dyp<V, E> (
 // no_op_var
 fn no_op_var<V, E> (
     _dyp_both : &[E]        ,
-    _var_both : &mut Vec<E> ,
+    _var_both : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -47,7 +47,7 @@ fn no_op_var<V, E> (
 fn no_op_der<V, E>  (
     _dyp_both : &[E]        ,
     _var_both : &[E]        ,
-    _var_der  : &mut Vec<E> ,
+    _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,

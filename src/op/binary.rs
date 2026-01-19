@@ -63,7 +63,7 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
         " parameter; see [ForwardDyp](crate::op::info::ForwardDyp)"
     ) ]
     fn [< $Name:lower _forward_dyp >] <V, E> (
-        dyp_both    : &mut Vec<E> ,
+        dyp_both    : &mut [E]    ,
         cop         : &[V]        ,
         _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
@@ -94,7 +94,7 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
     ) ]
     fn [< $Name:lower _pv_forward_var >] <V, E> (
         dyp_both    : &[E]        ,
-        var_both    : &mut Vec<E> ,
+        var_both    : &mut [E]    ,
         cop         : &[V]        ,
         _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
@@ -120,7 +120,7 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
     ) ]
     fn [< $Name:lower _vp_forward_var >] <V, E> (
         dyp_both    : &[E]        ,
-        var_both    : &mut Vec<E> ,
+        var_both    : &mut [E]    ,
         cop         : &[V]        ,
         _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
@@ -146,7 +146,7 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
     ) ]
     fn [< $Name:lower _vv_forward_var >] <V, E> (
         _dyp_both   : &[E]        ,
-        var_both    : &mut Vec<E> ,
+        var_both    : &mut [E]    ,
         _cop        : &[V]        ,
         _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,

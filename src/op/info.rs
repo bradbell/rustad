@@ -78,7 +78,7 @@ pub fn doc_common_arguments() {}
 ///   for the results of this operator.
 ///
 pub(crate) type ForwardDyp<V, E> = fn(
-    _dyp_both : &mut Vec<E> ,
+    _dyp_both : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -91,7 +91,7 @@ pub(crate) type ForwardDyp<V, E> = fn(
 /// that only have a variable argument (because they should not be in the
 /// dynamic parameter operation sequence).
 pub(crate) fn panic_dyp<V, E> (
-    _dyp_both : &mut Vec<E> ,
+    _dyp_both : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -111,7 +111,7 @@ pub(crate) fn panic_dyp<V, E> (
 ///
 pub(crate) type ForwardVar<V, E> = fn(
     _dyp_both : &[E]        ,
-    _var_both : &mut Vec<E> ,
+    _var_both : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -125,7 +125,7 @@ pub(crate) type ForwardVar<V, E> = fn(
 /// variable operation sequence).
 pub(crate) fn panic_var<V, E> (
     _dyp_both : &[E]        ,
-    _var_both : &mut Vec<E> ,
+    _var_both : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -148,7 +148,7 @@ pub(crate) fn panic_var<V, E> (
 pub(crate) type ForwardDer<V, E> = fn(
     _dyp_both : &[E]        ,
     _var_both : &[E]        ,
-    _var_der  : &mut Vec<E> ,
+    _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -163,7 +163,7 @@ pub(crate) type ForwardDer<V, E> = fn(
 pub(crate) fn panic_der<V, E>  (
     _dyp_both : &[E]        ,
     _var_both : &[E]        ,
-    _var_der  : &mut Vec<E> ,
+    _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -186,7 +186,7 @@ pub(crate) fn panic_der<V, E>  (
 pub(crate) type ReverseDer<V, E> = fn(
     _dyp_both : &[E]        ,
     _var_both : &[E]        ,
-    _var_der  : &mut Vec<E> ,
+    _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -230,7 +230,7 @@ macro_rules! no_forward_der_value{ ($Op:ident) => {
     pub fn forward_der_value_none<V> (
         _dyp_both : &[V]        ,
         _var_both : &[V]        ,
-        _var_der  : &mut Vec<V> ,
+        _var_der  : &mut [V]    ,
         _cop      : &[V]        ,
         _flag_all : &[bool]     ,
         _arg      : &[IndexT]   ,
@@ -251,7 +251,7 @@ macro_rules! no_forward_der_ad{ ($Op:ident) => {
     pub fn forward_der_ad_none<V> (
         _dyp_both : &[ AD<V> ]        ,
         _var_both : &[ AD<V> ]        ,
-        _var_der  : &mut Vec< AD<V> > ,
+        _var_der  : &mut [ AD<V> ]    ,
         _cop      : &[V]              ,
         _flag_all : &[bool]           ,
         _arg      : &[IndexT]         ,
@@ -272,7 +272,7 @@ macro_rules! no_reverse_der_value{ ($Op:ident) => {
     pub fn reverse_der_value_none<V> (
         _dyp_both : &[V]        ,
         _var_both : &[V]        ,
-        _var_der  : &mut Vec<V> ,
+        _var_der  : &mut [V]    ,
         _cop      : &[V]        ,
         _flag_all : &[bool]     ,
         _arg      : &[IndexT]   ,
@@ -293,7 +293,7 @@ macro_rules! no_reverse_der_ad{ ($Op:ident) => {
     pub fn reverse_der_ad_none<V> (
         _dyp_both : &[ AD<V> ]       ,
         _var_both : &[ AD<V> ]        ,
-        _var_der  : &mut Vec< AD<V> > ,
+        _var_der  : &mut [ AD<V> ]    ,
         _cop      : &[V]              ,
         _flag_all : &[bool]           ,
         _arg      : &[IndexT]         ,

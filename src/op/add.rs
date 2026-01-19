@@ -72,7 +72,7 @@ binary::eval_binary_forward_var!(Add, +);
 fn add_pv_forward_der <V, E>(
     _dyp_both  :   &[E]        ,
     _var_both  :   &[E]        ,
-    var_der    :   &mut Vec<E> ,
+    var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
@@ -91,7 +91,7 @@ where
 fn add_vp_forward_der <V, E>(
     _dyp_both  :   &[E]        ,
     _var_both  :   &[E]        ,
-    var_der    :   &mut Vec<E> ,
+    var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
@@ -110,7 +110,7 @@ where
 fn add_vv_forward_der <V, E>(
     _dyp_both  :   &[E]        ,
     _var_both  :   &[E]        ,
-    var_der    :   &mut Vec<E> ,
+    var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
@@ -133,7 +133,7 @@ where
 fn add_pv_reverse_der <V, E>(
     _dyp_both  :   &[E]        ,
     _var_both  :   &[E]        ,
-    var_der    :   &mut Vec<E> ,
+    var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
@@ -155,7 +155,7 @@ where
 fn add_vp_reverse_der <V, E>(
     _dyp_both  :   &[E]        ,
     _var_both  :   &[E]        ,
-    var_der    :   &mut Vec<E> ,
+    var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
@@ -177,7 +177,7 @@ where
 fn add_vv_reverse_der <V, E>(
     _dyp_both  :   &[E]        ,
     _var_both  :   &[E]        ,
-    var_der    :   &mut Vec<E> ,
+    var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,

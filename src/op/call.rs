@@ -244,7 +244,7 @@ where
 /// Call operator V evaluation of dynamic parameters;
 /// see [ForwardDyp](crate::op::info::ForwardDyp)
 fn call_forward_dyp_value<V> (
-    dyp_both   : &mut Vec<V>   ,
+    dyp_both   : &mut [V]      ,
     cop        : &[V]          ,
     flag_all   : &[bool]       ,
     arg        : &[IndexT]     ,
@@ -312,7 +312,7 @@ where
 /// Call operator `AD<V>` evaluation of dynamic parameters;
 /// see [ForwardDyp](crate::op::info::ForwardDyp)
 fn call_forward_dyp_ad<V> (
-    adyp_both  : &mut Vec< AD<V> >   ,
+    adyp_both  : &mut [ AD<V> ]      ,
     cop        : &[V]                ,
     flag_all   : &[bool]             ,
     arg        : &[IndexT]           ,
@@ -386,7 +386,7 @@ where
 /// see [ForwardVar](crate::op::info::ForwardVar)
 fn call_forward_var_value<V> (
     dyp_both   : &[V]          ,
-    var_both   : &mut Vec<V>   ,
+    var_both   : &mut [V]      ,
     cop        : &[V]          ,
     flag_all   : &[bool]       ,
     arg        : &[IndexT]     ,
@@ -453,7 +453,7 @@ where
 /// see [ForwardVar](crate::op::info::ForwardVar)
 fn call_forward_var_ad<V> (
     adyp_both  : &[ AD<V> ]          ,
-    avar_both  : &mut Vec< AD<V> >   ,
+    avar_both  : &mut [ AD<V> ]      ,
     cop        : &[V]                ,
     flag_all   : &[bool]             ,
     arg        : &[IndexT]           ,
@@ -525,7 +525,7 @@ where
 fn call_forward_der_value<V> (
     dyp_both   : &[V]          ,
     var_both   : &[V]          ,
-    var_der    : &mut Vec<V>   ,
+    var_der    : &mut [V]      ,
     cop        : &[V]          ,
     flag_all   : &[bool]       ,
     arg        : &[IndexT]     ,
@@ -600,7 +600,7 @@ where
 fn call_forward_der_ad<V> (
     adyp_both  : &[ AD<V> ]          ,
     avar_both  : &[ AD<V> ]          ,
-    avar_der   : &mut Vec< AD<V> >   ,
+    avar_der   : &mut [ AD<V> ]      ,
     cop        : &[V]                ,
     flag_all   : &[bool]             ,
     arg        : &[IndexT]           ,
@@ -680,7 +680,7 @@ where
 fn call_reverse_der_value<V> (
     dyp_both   : &[V]          ,
     var_both   : &[V]          ,
-    var_der    : &mut Vec<V>   ,
+    var_der    : &mut [V]      ,
     cop        : &[V]          ,
     flag_all   : &[bool]       ,
     arg        : &[IndexT]     ,
@@ -752,7 +752,7 @@ where
 fn call_reverse_der_ad<V> (
     adyp_both   : &[ AD<V> ]          ,
     avar_both   : &[ AD<V> ]          ,
-    avar_der    : &mut Vec< AD<V> >   ,
+    avar_der    : &mut [ AD<V> ]      ,
     cop         : &[V]                ,
     flag_all   : &[bool]              ,
     arg        : &[IndexT]            ,
@@ -825,7 +825,7 @@ where
 // call_res_dyp
 /// [ForwardDyp](crate::op::info::ForwardDyp) function for call result operator
 fn call_res_dyp<V, E>(
-    _dyp_both : &mut Vec<E> ,
+    _dyp_both : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -837,7 +837,7 @@ fn call_res_dyp<V, E>(
 /// [ForwardVar](crate::op::info::ForwardVar) function for call result operator
 fn call_res_var<V, E>(
     _dyp_both : &[E]        ,
-    _var_both : &mut Vec<E> ,
+    _var_both : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -851,7 +851,7 @@ fn call_res_var<V, E>(
 fn call_res_der<V, E>(
     _dyp_both : &[E]        ,
     _var_both : &[E]        ,
-    _var_der  : &mut Vec<E> ,
+    _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
