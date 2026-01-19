@@ -548,8 +548,7 @@ where
             depend.push( *j );
         }
     }
-    let error_msg = String::from("");
-    error_msg
+    String::new()
 }
 // -------------------------------------------------------------------------
 // AD routines
