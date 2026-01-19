@@ -187,7 +187,7 @@ impl OpHashMap {
                 self.call_hash_map.entry(key).or_insert(map_value_in);
             return Some(*map_value_out);
         }
-        return None;
+        None
     }
 }
 // ---------------------------------------------------------------------------
@@ -255,7 +255,7 @@ pub(crate) fn first_equal_op(
             if id_all[op_index] == CALL_RES_OP {
                 let start    = op_seq.arg_start[op_index] as usize;
                 let offset   = op_seq.arg_all[start] as usize;
-                op_index     = op_index - offset;
+                op_index    -= offset;
                 debug_assert!( id_all[op_index] == CALL_OP );
             }
             //
@@ -287,14 +287,12 @@ pub(crate) fn first_equal_op(
                 increment = n_call;
                 //
             } else {
-                if option.is_some() {
-                    let map_value_out = option.unwrap();
-                    if map_value_out != map_value_in {
-                        debug_assert!( map_value_out < map_value_in );
-                        let dep_index = op_index;
-                        let dep_match = map_value_out;
-                        first_equal[dep_index]    = dep_match;
-                    }
+                if let Some(map_value_out) = option
+                    && map_value_out != map_value_in {
+                    debug_assert!( map_value_out < map_value_in );
+                    let dep_index = op_index;
+                    let dep_match = map_value_out;
+                    first_equal[dep_index]    = dep_match;
                 }
                 //
                 // increment
