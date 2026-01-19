@@ -80,8 +80,6 @@ where
                 println!( "{}, {}, {:?}", i, index, &rng_ad_type[i])
             }
         }
-        if trace {
-        }
         //
         // op_info_vec
         let op_info_vec = <V as GlobalOpInfoVec>::get();
