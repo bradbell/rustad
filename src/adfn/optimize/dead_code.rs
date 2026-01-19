@@ -293,7 +293,7 @@ where
         for i_op_seq in start_op_seq .. 2 {
             let old_depend      : &Vec<bool>;
             let old_op_seq      : &OpSequence;
-            let mut new_op_seq  : &mut OpSequence;
+            let new_op_seq      : &mut OpSequence;
             if i_op_seq == 0 {
                 old_depend = &depend.dyp;
                 old_op_seq = &self.dyp;
@@ -345,7 +345,7 @@ where
                             arg_type,
                             old_op_index,
                             old_op_seq,
-                            &mut new_op_seq,
+                            new_op_seq,
                             trace,
                         );
                     }
@@ -384,7 +384,7 @@ where
                             arg,
                             arg_type,
                             old_op_index,
-                            &mut new_op_seq,
+                            new_op_seq,
                             trace,
                         );
                     }
