@@ -55,8 +55,7 @@ pub type RustSrcFn<V> = fn(
 //
 // prototype_src
 fn prototype_src(fn_name : &str, v_str : &str) -> String {
-    let result = String::new();
-    let result = result +
+    String::new() +
         "#[allow(unused)]\n" +
         "mod az_float;\n" +
         "use az_float::AzFloat;\n" +
@@ -65,8 +64,7 @@ fn prototype_src(fn_name : &str, v_str : &str) -> String {
         "pub fn rust_src_"  + fn_name + "(\n" +
         "   dyp_dom     : &Vec<&"    + v_str  + ">,\n" +
         "   var_dom     : &Vec<&"    + v_str  + ">,\n" +
-        ") -> Result< Vec<" + v_str  + ">, String >\n" ;
-    result
+        ") -> Result< Vec<" + v_str  + ">, String >\n"
 }
 // -----------------------------------------------------------------------
 // rust_src
@@ -114,7 +112,7 @@ where
         let mut src = prototype_src(fn_name, &v_str);
         //
         // begin function body
-        src = src + "{\n";
+        src += "{\n";
         //
         // check dyp_dom
         let expect = self.dyp.n_dom.to_string();
@@ -170,7 +168,7 @@ where
                         c_str + "f64"
                     };
                 };
-                if c_str.to_ascii_lowercase() == "nan" {
+                if c_str.eq_ignore_ascii_case("nan") {
                     // If we did nothing in this case, we would get a warning
                     // when all the entries in cop are nan.
                     src = src +
