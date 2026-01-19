@@ -245,7 +245,7 @@ where
 /// see [ForwardDyp](crate::op::info::ForwardDyp)
 fn call_forward_dyp_value<V> (
     dyp_both   : &mut Vec<V>   ,
-    cop        : &Vec<V>       ,
+    cop        : &[V]          ,
     flag_all   : &[bool]       ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
@@ -313,7 +313,7 @@ where
 /// see [ForwardDyp](crate::op::info::ForwardDyp)
 fn call_forward_dyp_ad<V> (
     adyp_both  : &mut Vec< AD<V> >   ,
-    cop        : &Vec<V>             ,
+    cop        : &[V]                ,
     flag_all   : &[bool]             ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
@@ -385,9 +385,9 @@ where
 /// Call operator V evaluation of variables;
 /// see [ForwardVar](crate::op::info::ForwardVar)
 fn call_forward_var_value<V> (
-    dyp_both   : &Vec<V>       ,
+    dyp_both   : &[V]          ,
     var_both   : &mut Vec<V>   ,
-    cop        : &Vec<V>       ,
+    cop        : &[V]          ,
     flag_all   : &[bool]       ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
@@ -452,9 +452,9 @@ where
 /// Call operator `AD<V>` evaluation of variables;
 /// see [ForwardVar](crate::op::info::ForwardVar)
 fn call_forward_var_ad<V> (
-    adyp_both  : &Vec< AD<V> >       ,
+    adyp_both  : &[ AD<V> ]          ,
     avar_both  : &mut Vec< AD<V> >   ,
-    cop        : &Vec<V>             ,
+    cop        : &[V]                ,
     flag_all   : &[bool]             ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
@@ -523,10 +523,10 @@ where
 /// Call operator V evaluation of forward mode derivatives;
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn call_forward_der_value<V> (
-    dyp_both   : &Vec<V>       ,
-    var_both   : &Vec<V>       ,
+    dyp_both   : &[V]          ,
+    var_both   : &[V]          ,
     var_der    : &mut Vec<V>   ,
-    cop        : &Vec<V>       ,
+    cop        : &[V]          ,
     flag_all   : &[bool]       ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
@@ -598,10 +598,10 @@ where
 /// Call operator `AD<V>` evaluation of forward mode derivatives;
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn call_forward_der_ad<V> (
-    adyp_both  : &Vec< AD<V> >       ,
-    avar_both  : &Vec< AD<V> >       ,
+    adyp_both  : &[ AD<V> ]          ,
+    avar_both  : &[ AD<V> ]          ,
     avar_der   : &mut Vec< AD<V> >   ,
-    cop        : &Vec<V>             ,
+    cop        : &[V]                ,
     flag_all   : &[bool]             ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
@@ -678,10 +678,10 @@ where
 /// Call operator V evaluation of reverse mode derivatives;
 /// see [ReverseDer](crate::op::info::ReverseDer)
 fn call_reverse_der_value<V> (
-    dyp_both   : &Vec<V>       ,
-    var_both   : &Vec<V>       ,
+    dyp_both   : &[V]          ,
+    var_both   : &[V]          ,
     var_der    : &mut Vec<V>   ,
-    cop        : &Vec<V>       ,
+    cop        : &[V]          ,
     flag_all   : &[bool]       ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
@@ -750,10 +750,10 @@ where
 /// Call operator `AD<V>` evaluation of reverse mode derivatives;
 /// see [ReverseDer](crate::op::info::ReverseDer)
 fn call_reverse_der_ad<V> (
-    adyp_both   : &Vec< AD<V> >       ,
-    avar_both   : &Vec< AD<V> >       ,
+    adyp_both   : &[ AD<V> ]          ,
+    avar_both   : &[ AD<V> ]          ,
     avar_der    : &mut Vec< AD<V> >   ,
-    cop         : &Vec<V>             ,
+    cop         : &[V]                ,
     flag_all   : &[bool]              ,
     arg        : &[IndexT]            ,
     arg_type   : &[ADType]            ,
@@ -826,7 +826,7 @@ where
 /// [ForwardDyp](crate::op::info::ForwardDyp) function for call result operator
 fn call_res_dyp<V, E>(
     _dyp_both : &mut Vec<E> ,
-    _cop      : &Vec<V>     ,
+    _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
@@ -836,9 +836,9 @@ fn call_res_dyp<V, E>(
 // call_res_var
 /// [ForwardVar](crate::op::info::ForwardVar) function for call result operator
 fn call_res_var<V, E>(
-    _dyp_both : &Vec<E>     ,
+    _dyp_both : &[E]        ,
     _var_both : &mut Vec<E> ,
-    _cop      : &Vec<V>     ,
+    _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
@@ -849,10 +849,10 @@ fn call_res_var<V, E>(
 /// [ForwardDer](crate::op::info::ForwardDer) or
 /// [ReverseDer](crate::op::info::ReverseDer) function for call result operator
 fn call_res_der<V, E>(
-    _dyp_both : &Vec<E>     ,
-    _var_both : &Vec<E>     ,
+    _dyp_both : &[E]        ,
+    _var_both : &[E]        ,
     _var_der  : &mut Vec<E> ,
-    _cop      : &Vec<V>     ,
+    _cop      : &[V]        ,
     _flag_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,

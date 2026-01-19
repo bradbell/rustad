@@ -70,10 +70,10 @@ binary::eval_binary_forward_var!(Add, +);
 // add_pv_forward_der
 /// first order forward for parameter + variable; see [ForwardDer]
 fn add_pv_forward_der <V, E>(
-    _dyp_both  :   &Vec<E>     ,
-    _var_both  :   &Vec<E>     ,
+    _dyp_both  :   &[E]        ,
+    _var_both  :   &[E]        ,
     var_der    :   &mut Vec<E> ,
-    _cop       :   &Vec<V>     ,
+    _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,
@@ -89,10 +89,10 @@ where
 // add_vp_forward_der
 /// first order forward for variable + parameter; see [ForwardDer]
 fn add_vp_forward_der <V, E>(
-    _dyp_both  :   &Vec<E>     ,
-    _var_both  :   &Vec<E>     ,
+    _dyp_both  :   &[E]        ,
+    _var_both  :   &[E]        ,
     var_der    :   &mut Vec<E> ,
-    _cop       :   &Vec<V>     ,
+    _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,
@@ -108,10 +108,10 @@ where
 // add_vv_forward_der
 /// first order forward for variable + variable; see [ForwardDer]
 fn add_vv_forward_der <V, E>(
-    _dyp_both  :   &Vec<E>     ,
-    _var_both  :   &Vec<E>     ,
+    _dyp_both  :   &[E]        ,
+    _var_both  :   &[E]        ,
     var_der    :   &mut Vec<E> ,
-    _cop       :   &Vec<V>     ,
+    _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,
@@ -131,10 +131,10 @@ where
 // add_pv_reverse_der
 /// first order reverse for parameter + variable; see [ReverseDer]
 fn add_pv_reverse_der <V, E>(
-    _dyp_both  :   &Vec<E>     ,
-    _var_both  :   &Vec<E>     ,
+    _dyp_both  :   &[E]        ,
+    _var_both  :   &[E]        ,
     var_der    :   &mut Vec<E> ,
-    _cop       :   &Vec<V>     ,
+    _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,
@@ -153,10 +153,10 @@ where
 // add_vp_reverse_der
 /// first order reverse for variable + parameter; see [ReverseDer]
 fn add_vp_reverse_der <V, E>(
-    _dyp_both  :   &Vec<E>     ,
-    _var_both  :   &Vec<E>     ,
+    _dyp_both  :   &[E]        ,
+    _var_both  :   &[E]        ,
     var_der    :   &mut Vec<E> ,
-    _cop       :   &Vec<V>     ,
+    _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,
@@ -175,10 +175,10 @@ where
 // add_vv_reverse_der
 /// first order reverse for variable + variable; see [ReverseDer]
 fn add_vv_reverse_der <V, E>(
-    _dyp_both  :   &Vec<E>     ,
-    _var_both  :   &Vec<E>     ,
+    _dyp_both  :   &[E]        ,
+    _var_both  :   &[E]        ,
     var_der    :   &mut Vec<E> ,
-    _cop       :   &Vec<V>     ,
+    _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,

@@ -64,7 +64,7 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
     ) ]
     fn [< $Name:lower _forward_dyp >] <V, E> (
         dyp_both    : &mut Vec<E> ,
-        cop         : &Vec<V>     ,
+        cop         : &[V]        ,
         _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
@@ -93,9 +93,9 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
         " variable; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _pv_forward_var >] <V, E> (
-        dyp_both    : &Vec<E>     ,
+        dyp_both    : &[E]        ,
         var_both    : &mut Vec<E> ,
-        cop         : &Vec<V>     ,
+        cop         : &[V]        ,
         _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
@@ -119,9 +119,9 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
         " parameter; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _vp_forward_var >] <V, E> (
-        dyp_both    : &Vec<E>     ,
+        dyp_both    : &[E]        ,
         var_both    : &mut Vec<E> ,
-        cop         : &Vec<V>     ,
+        cop         : &[V]        ,
         _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
@@ -145,9 +145,9 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
         " variable; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _vv_forward_var >] <V, E> (
-        _dyp_both   : &Vec<E>     ,
+        _dyp_both   : &[E]        ,
         var_both    : &mut Vec<E> ,
-        _cop        : &Vec<V>     ,
+        _cop        : &[V]        ,
         _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         _arg_type   : &[ADType]   ,
