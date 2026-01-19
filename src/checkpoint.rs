@@ -49,8 +49,8 @@ where
 {
     let n                 = ref_slice.len();
     let mut vec  : Vec<E> = Vec::with_capacity(n);
-    for i in 0 .. n {
-        vec.push( (*ref_slice[i]).clone() );
+    for ref_slice_i in ref_slice {
+        vec.push( (*ref_slice_i).clone() );
     }
     vec
 }
@@ -209,8 +209,7 @@ where
     };
     //
     // atom_id
-    let atom_id = register_atom( checkpoint_callback );
-    atom_id
+    register_atom( checkpoint_callback )
 }
 //
 // register_checkpoint
@@ -275,11 +274,11 @@ where
     // name, trace
     let mut name  = "no_name".to_string();
     let mut trace = false;
-    for key in hash_map.keys() { match key {
-        &"name" => {
+    for key in hash_map.keys() { match *key {
+        "name" => {
             name = hash_map.get(key).unwrap().clone();
         },
-        &"trace" => {
+        "trace" => {
             let value = hash_map.get( "trace").unwrap();
             if value != "true" && value != "false" { panic!(
                 "registem_checkpoint: hash_map.get(trace): \
@@ -364,9 +363,14 @@ where
 /// Compute the result of a checkpoint function and,
 /// if this thread is currently recording, include the call in its tape.
 ///
+/// * Syntax :
+/// ```text
+///     arange = call_checkpoint(adomain, check_point_id, trace)
+/// ```
+///
 /// * adomain :
 ///   This is the value of the arguments for this atomic function call.
-///   Note that the dimension of the domain only depends on checkpoint_id.
+///   Note that the dimension of the domain depends on checkpoint_id.
 ///
 /// * checkpoint_id :
 ///   The [checkpoint_id](register_checkpoint#checkpoint_id)
@@ -375,6 +379,10 @@ where
 /// * trace :
 ///   if true, a trace of the calculations may be printed on stdout.
 ///   This may be useful for debugging.
+///
+/// * arange :
+///   is the value of the results for this checkpoint function call.
+///   Note that the dimension of the range depends on checkpoint_id.
 ///
 pub fn call_checkpoint<V>(
     adomain       : Vec< AD<V> > ,
@@ -397,8 +405,7 @@ where
     // arange
     let atom_id   = **< V as GlobalCheckpointInfoVec>::atom_id();
     let call_info = checkpoint_id;
-    let arange    = call_atom(n_range, adomain, atom_id, call_info, trace);
-    arange
+    call_atom(n_range, adomain, atom_id, call_info, trace)
 }
 // ----------------------------------------------------------------------------
 // Value Routines
