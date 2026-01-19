@@ -116,12 +116,11 @@ pub(crate) fn renumber_op_seq(
             let arg        = &mut op_seq.arg_all[start .. end];
             let arg_type   = &op_seq.arg_type_all[start .. end];
             for i_arg in 0 .. arg.len() {
-                if n_dom_indext <= arg[i_arg] {
-                    if arg_type[i_arg] == equal_type {
-                        let both_index = arg[i_arg] as usize;
-                        let dep_index  = both_index - n_dom;
-                        arg[i_arg]     = first_equal[dep_index] + n_dom_indext;
-                    }
+                if n_dom_indext <= arg[i_arg]
+                    && arg_type[i_arg] == equal_type {
+                    let both_index = arg[i_arg] as usize;
+                    let dep_index  = both_index - n_dom;
+                    arg[i_arg]     = first_equal[dep_index] + n_dom_indext;
                 }
             }
         }
