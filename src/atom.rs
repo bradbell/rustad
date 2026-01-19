@@ -495,9 +495,8 @@ where
             panic!( "atom {} rev_depend error_msg : {}", name, error_msg);
         }
         let mut ad_type = ADType::ConstantP;
-        for k in 0 .. depend.len() {
-            let j = depend[k];
-            if  n_dom <= j {
+        for (k, j) in depend.iter().enumerate()  {
+            if  n_dom <= *j {
                 panic!(
                     "atom {} rev_depend : \
                     rng_index   = {},
@@ -507,7 +506,7 @@ where
                     name, rng_index, n_dom, k, depend[k]
                 );
             }
-            ad_type = max( ad_type, domain_ad_type[j].clone() );
+            ad_type = max( ad_type, domain_ad_type[*j].clone() );
         }
         rng_ad_type.push( ad_type );
     }
@@ -589,10 +588,11 @@ where
             }
             //
             // op_seq.flag_all
+            debug_assert!( flag.len() == n_res );
             op_seq.flag_all.push( trace );  // flag_all[ arg[5] ]
-            for i in 0 .. n_res {
+            for flag_i in flag.iter() {
                 //flag_all[ arg[5] + i + 1 ]
-                op_seq.flag_all.push( flag[i] )
+                op_seq.flag_all.push( *flag_i )
             }
             //
             // op_seq.n_dep
@@ -699,8 +699,8 @@ where
     //
     // domain
     let mut domain      : Vec<&V> = Vec::with_capacity( adomain.len() );
-    for j in 0 .. adomain.len() {
-        domain.push( &adomain[j].value );
+    for adomain_j in adomain.iter() {
+        domain.push( &adomain_j.value );
     }
     //
     // use_range
@@ -721,11 +721,10 @@ where
     ); }
     //
     // arange
-    let arange : Vec< AD<V> >;
-    if ! recording {
-        arange = ad_from_vector(range);
+    let arange : Vec< AD<V> > = if ! recording {
+        ad_from_vector(range)
     } else {
-        arange = local_key.with_borrow_mut( |tape| record_call_atom::<V>(
+        local_key.with_borrow_mut( |tape| record_call_atom::<V>(
             tape,
             name,
             rev_depend,
@@ -734,7 +733,7 @@ where
             atom_id,
             call_info,
             trace,
-        ) );
-    }
+        ) )
+    };
     arange
 }
