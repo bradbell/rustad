@@ -209,7 +209,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         } else if lhs < dyp_n_dom {
             lhs_str = format!("dyp_dom[{lhs}]");
         } else {
-            lhs = lhs - dyp_n_dom;
+            lhs -= dyp_n_dom;
             lhs_str = format!("&dyp_dep[{lhs}]");
         }
         //
@@ -219,7 +219,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         if rhs < var_n_dom  {
             rhs_str = format!("var_dom[{rhs}]");
         } else {
-            rhs = rhs - var_n_dom;
+            rhs -= var_n_dom;
             rhs_str = format!("&var_dep[{rhs}]");
         }
         //
@@ -262,7 +262,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         if lhs < var_n_dom  {
             lhs_str = format!("var_dom[{lhs}]");
         } else {
-            lhs = lhs - var_n_dom;
+            lhs -= var_n_dom;
             lhs_str = format!("&var_dep[{lhs}]");
         }
         //
@@ -274,7 +274,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         } else if rhs < dyp_n_dom {
             rhs_str = format!("dyp_dom[{rhs}]");
         } else {
-            rhs = rhs - dyp_n_dom;
+            rhs -= dyp_n_dom;
             rhs_str = format!("&dyp_dep[{rhs}]");
         }
         //
@@ -317,7 +317,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         if lhs < var_n_dom  {
             lhs_str = format!("var_dom[{lhs}]");
         } else {
-            lhs = lhs - var_n_dom;
+            lhs -= var_n_dom;
             lhs_str = format!("&var_dep[{lhs}]");
         }
         //
@@ -327,7 +327,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         if rhs < var_n_dom  {
             rhs_str = format!("var_dom[{rhs}]");
         } else {
-            rhs = rhs - var_n_dom;
+            rhs -= var_n_dom;
             rhs_str = format!("&var_dep[{rhs}]");
         }
         //
