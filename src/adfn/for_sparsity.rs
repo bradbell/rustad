@@ -267,19 +267,15 @@ where
             if rng_ad_type[i].is_variable() {
                 let row_var_index = rng_index[i] as usize + n_dyp;
                 let set           = set_vec.get(row_var_index);
-                for j in 0 .. set.len() {
-                    let row =  i as usize;
-                    let col = set[j] as usize;
-                    pattern.push( [row, col] );
+                for j in set {
+                    pattern.push( [i, *j] );
                 }
             }
             if compute_dyp && rng_ad_type[i].is_dynamic() {
                 let row_var_index = rng_index[i] as usize;
                 let set           = set_vec.get(row_var_index);
-                for j in 0 .. set.len() {
-                    let row =  i as usize;
-                    let col = set[j] as usize;
-                    pattern.push( [row, col] );
+                for j in set {
+                    pattern.push( [i, *j] );
                 }
             }
         }
