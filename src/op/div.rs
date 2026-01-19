@@ -74,7 +74,7 @@ no_rust_src!(Div);
 /// * op_info_vec :
 ///   The map from [op::id](crate::op::id) to operator information.
 ///   The the map results for DIV_PV_OP, DIV_VP_OP, and DIV_VV_OP are set.
-pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
+pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
     for<'a> &'a V : Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Div<&'a V, Output = V> ,

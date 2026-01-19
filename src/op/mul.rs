@@ -243,7 +243,7 @@ no_rust_src!(Mul);
 /// * op_info_vec :
 ///   The map from [op::id](crate::op::id) to operator information.
 ///   The the map results for MUL_PV_OP, MUL_VP_OP, and MUL_VV_OP are set.
-pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
+pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
     for<'a> V : AddAssign<&'a V> ,
     //

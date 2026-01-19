@@ -208,7 +208,7 @@ no_rust_src!(Sub);
 /// * op_info_vec :
 ///   The map from [op::id](crate::op::id) to operator information.
 ///   The the map results for SUB_PV_OP, SUB_VP_OP, and SUB_VV_OP are set.
-pub fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
+pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
     for<'a> &'a V : Add<&'a V, Output = V> + Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Sub<&'a V, Output = V> + Sub<&'a AD<V>, Output = AD<V> > ,

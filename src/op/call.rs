@@ -1009,7 +1009,7 @@ no_reverse_depend!(Call);
 /// * op_info_vec :
 ///   The map from operator id to operator information [OpInfo] .
 ///   The map results for CALL_OP and CALL_RES_OP are set.
-pub(crate) fn set_op_info<V>( op_info_vec : &mut Vec< OpInfo<V> > )
+pub(crate) fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
     V     : Clone + From<f32> + FloatCore,
     V     : PartialEq + GlobalAtomCallbackVec + ThisThreadTapePublic,
