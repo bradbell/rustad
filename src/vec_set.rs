@@ -299,7 +299,7 @@ impl VecSet {
 ///
 /// * Example : Select the source code link in [example_union] .
 ///
-pub fn union(&mut self, sub_sets : &Vec<usize> ) -> usize
+pub fn union(&mut self, sub_sets : &[usize] ) -> usize
 {   //
     // link, start, data, arg, next, equal
     let link  = &mut self.link;
@@ -323,10 +323,10 @@ pub fn union(&mut self, sub_sets : &Vec<usize> ) -> usize
     equal.clear();
     //
     // arg, next, equal
-    for i in 0 .. sub_sets.len() {
+    for id_set_ref in sub_sets.iter() {
         //
         // id_set
-        let id_set = sub_sets[i];
+        let id_set = *id_set_ref;
         debug_assert!( id_set < target );
         //
         // sub_set_empty
@@ -354,8 +354,8 @@ pub fn union(&mut self, sub_sets : &Vec<usize> ) -> usize
             // arg, next, equal
             debug_assert!( start[id_equal] < start[id_equal + 1] );
             let mut in_arg = false;
-            for j in 0 .. arg.len() {
-                if id_equal == arg[j] {
+            for arg_j in arg.iter() {
+                if id_equal == *arg_j {
                     in_arg = true;
                 }
             }
@@ -408,13 +408,11 @@ pub fn union(&mut self, sub_sets : &Vec<usize> ) -> usize
                 // i_min
                 i_min = arg.len();
                 for i in 0 .. arg.len() {
+                    #[allow(clippy::collapsible_if)]
                     if next[i] < start[ arg[i] + 1 ] {
-                        if i_min == arg.len() {
+                        if i_min == arg.len()
+                            || data[ next[i] ] < data[ next[i_min] ] {
                             i_min = i;
-                        } else {
-                            if data[ next[i] ] < data[ next[i_min] ] {
-                                i_min = i;
-                            }
                         }
                     }
                 }
@@ -423,14 +421,8 @@ pub fn union(&mut self, sub_sets : &Vec<usize> ) -> usize
             // i_min
             i_min = arg.len();
             for i in 0 .. arg.len() {
-                if equal[i] {
-                    if i_min == arg.len() {
-                        i_min = i;
-                    } else {
-                        if arg[i] < arg[i_min] {
-                            i_min = i;
-                        }
-                    }
+                if equal[i] && (i_min == arg.len() || arg[i] < arg[i_min] ) {
+                    i_min = i;
                 }
             }
             //
