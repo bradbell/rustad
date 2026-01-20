@@ -137,6 +137,7 @@ where
     //
     // is_nan
     /// Determine if the floating point base is nan for this object
+    #[allow(clippy::eq_op)]
     pub fn is_nan(&self) -> bool {
         self.0 != self.0
     }
