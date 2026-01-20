@@ -91,6 +91,7 @@ fn get_old2new(
 }
 // -----------------------------------------------------------------------
 // new_binary_op
+#[allow(clippy::too_many_arguments)]
 fn new_binary_op(
     old2new      : &mut Old2New   ,
     i_op_seq     : usize           ,
@@ -128,6 +129,7 @@ fn new_binary_op(
     //
 }
 // -----------------------------------------------------------------------
+#[allow(clippy::too_many_arguments)]
 fn new_call_op(
     old2new          : &mut Old2New    ,
     old_rng_is_dep   : &[bool]          ,
