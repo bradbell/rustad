@@ -7,5 +7,5 @@ use rustad;
 #[test]
 fn year_month_day() {
     let year_month_day = rustad::YEAR_MONTH_DAY;
-    assert_eq!(year_month_day, "2026.1.19");
+    assert_eq!(year_month_day, "2026.1.20");
 }

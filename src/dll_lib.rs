@@ -80,12 +80,10 @@ pub fn get_lib(
     //
     // lib_path
     let lib_path = std::path::Path::new(lib_file);
-    if replace_lib {
-        if lib_path.is_file() {
-            let result = std::fs::remove_file(lib_file);
-            if result.is_err() {
-                panic!("dll_lib::get_lib: Cannot remove old library");
-            }
+    if replace_lib && lib_path.is_file() {
+        let result = std::fs::remove_file(lib_file);
+        if result.is_err() {
+            panic!("dll_lib::get_lib: Cannot remove old library");
         }
     }
     if ! lib_path.is_file() {
@@ -99,9 +97,9 @@ pub fn get_lib(
         //
         // cmd
         let mut cmd = String::from("rustc");
-        cmd = cmd + " " + &src_file;
-        cmd = cmd + " --crate-type dylib";
-        cmd = cmd + " -o " + lib_file;
+        cmd  = cmd + " " + &src_file;
+        cmd += " --crate-type dylib";
+        cmd  = cmd + " -o " + lib_file;
         //
         // lib_path
         let result = std::process::Command::new("bash")
