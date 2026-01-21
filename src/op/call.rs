@@ -197,10 +197,10 @@ where
     acop
 }
 // ----------------------------------------------------------------------
-// domain_ad
-fn domain_ad<'a, 'b, V>(
+// domain_ad_dyp
+fn domain_ad_dyp<'a, 'b, V>(
     dyp_both   : &'a [AD<V>]    ,
-    var_both   : &'a [AD<V>]    ,
+    anan       : &'a AD<V>      ,
     acop       : &'a [AD<V>]    ,
     arg        : &'b [IndexT]   ,
     arg_type   : &'b [ADType]   ,
@@ -209,12 +209,6 @@ fn domain_ad<'a, 'b, V>(
 where
     V : PartialEq,
 {
-    // no_var_both
-    // This case is used during zero forward mode for dynamic parameters.
-    // If no_var_both, then var_both[0] is nan.
-    let no_var_both = var_both.len() == 1 &&
-        var_both[0].value != var_both[0].value;
-    //
     //
     let mut domain      : Vec<& AD<V> > = Vec::with_capacity( n_dom );
     let mut j_cop : usize = 0;
@@ -228,11 +222,38 @@ where
             domain.push( &dyp_both[index] );
         } else {
             debug_assert!( ad_type.is_variable() );
-            if no_var_both {
-                domain.push( &var_both[0] );
-            } else {
-                domain.push( &var_both[index] );
-            }
+            domain.push( anan );
+        }
+    }
+    domain
+}
+// ----------------------------------------------------------------------
+// domain_ad_var
+fn domain_ad_var<'a, 'b, V>(
+    dyp_both   : &'a [AD<V>]    ,
+    var_both   : &'a [AD<V>]    ,
+    acop       : &'a [AD<V>]    ,
+    arg        : &'b [IndexT]   ,
+    arg_type   : &'b [ADType]   ,
+    n_dom      : usize          ,
+) -> Vec<&'a AD<V> >
+where
+    V : PartialEq,
+{
+    //
+    let mut domain      : Vec<& AD<V> > = Vec::with_capacity( n_dom );
+    let mut j_cop : usize = 0;
+    for j_arg in 0 .. n_dom {
+        let index   = arg[BEGIN_DOM + j_arg] as usize;
+        let ad_type = &arg_type[BEGIN_DOM + j_arg];
+        if ad_type.is_constant() {
+            domain.push( &acop[j_cop] );
+            j_cop += 1;
+        } else if ad_type.is_dynamic() {
+            domain.push( &dyp_both[index] );
+        } else {
+            debug_assert!( ad_type.is_variable() );
+            domain.push( &var_both[index] );
         }
     }
     domain
@@ -346,9 +367,8 @@ where
     let acop     = domain_acop(cop, arg, arg_type, n_dom);
     let nan_v : V = f32::NAN.into();
     let anan      = ad_from_value( nan_v );
-    let avar_both = vec! [ anan ];
-    let adomain   = domain_ad(
-        adyp_both, &avar_both, &acop, arg, arg_type, n_dom
+    let adomain   = domain_ad_dyp(
+        adyp_both, &anan, &acop, arg, arg_type, n_dom
     );
     //
     // arange_zero
@@ -485,7 +505,7 @@ where
     //
     // adomain
     let acop     = domain_acop(cop, arg, arg_type, n_dom);
-    let adomain  = domain_ad(
+    let adomain  = domain_ad_var(
         adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
@@ -632,7 +652,7 @@ where
     //
     // adomain
     let acop    = domain_acop(cop, arg, arg_type, n_dom);
-    let adomain = domain_ad(
+    let adomain = domain_ad_var(
         adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
@@ -785,7 +805,7 @@ where
     //
     // adomain
     let acop     = domain_acop(cop, arg, arg_type, n_dom);
-    let adomain  = domain_ad(
+    let adomain  = domain_ad_var(
         adyp_both, avar_both, &acop, arg, arg_type, n_dom
     );
     //
