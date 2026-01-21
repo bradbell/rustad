@@ -177,11 +177,11 @@ where
 }
 // ----------------------------------------------------------------------
 // domain_acop
-fn domain_acop <'a, 'b, V>(
-    cop        : &'a [V]       ,
-    arg        : &'b [IndexT]  ,
-    arg_type   : &'b [ADType]  ,
-    n_dom      : usize         ,
+fn domain_acop <V>(
+    cop        : &[V]       ,
+    arg        : &[IndexT]  ,
+    arg_type   : &[ADType]  ,
+    n_dom      : usize      ,
 ) -> Vec< AD<V> >
 where
     V : Clone,
@@ -945,7 +945,7 @@ where
                 src = src + "   " +
                     &format!("call_dom[{j_dom}] = dyp_dom[{index}];\n");
             } else {
-                index = index - dyp_n_dom;
+                index -= dyp_n_dom;
                 src = src + "   " +
                     &format!("call_dom[{j_dom}] = &dyp_dep[{index}];\n");
             }
@@ -958,7 +958,7 @@ where
                 src = src + "   " +
                     &format!("call_dom[{j_dom}] = var_dom[{index}];\n");
             } else {
-                index = index - var_n_dom;
+                index -= var_n_dom;
                 src = src + "   " +
                     &format!("call_dom[{j_dom}] = &var_dep[{index}];\n");
             }
@@ -966,15 +966,15 @@ where
     }
     //
     // use_range
+    debug_assert!( rng_is_dep.len() == n_rng );
     src = src +
         "   //\n" +
         "   let mut use_range : Vec<bool> = " +
             &format!("vec![false; {n_rng}];\n");
-    for i_rng in 0 .. n_rng {
-        if rng_is_dep[i_rng] {
-            let rng_is_dep_i = rng_is_dep[i_rng];
+    for (i_rng, rng_is_dep_i) in rng_is_dep.iter().enumerate() {
+        if *rng_is_dep_i {
             src = src + "    " +
-                &format!( "use_range[{i_rng}] = {rng_is_dep_i};\n");
+                &format!( "use_range[{i_rng}] = true;\n");
         }
     }
     //
@@ -1001,11 +1001,11 @@ where
     };
     //
     let mut dep_index = res_dep;
-    for rng_index in 0 .. n_rng {
-        if rng_is_dep[rng_index] {
+    for (i_rng, rng_is_dep_i) in rng_is_dep.iter().enumerate() {
+        if *rng_is_dep_i {
             src = src + "   " +
                 &format!( "std::mem::swap(\
-                    &mut {res_name}[{dep_index}], &mut call_range[{rng_index}] \
+                    &mut {res_name}[{dep_index}], &mut call_range[{i_rng}] \
                 );\n");
             dep_index += 1;
         }
@@ -1128,7 +1128,7 @@ where
         dep_index   = arg_all[begin] as usize;
         debug_assert!( 0 < dep_index );
         debug_assert!( dep_index <= op_index );
-        op_index    = op_index - dep_index;
+        op_index   -= dep_index;
         debug_assert!( id_all[op_index] == CALL_OP );
     } else {
         dep_index = 0;
