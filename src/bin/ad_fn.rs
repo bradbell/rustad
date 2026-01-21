@@ -48,14 +48,13 @@ where
     //
     // sumsq
     let mut sumsq  = ad_from_value(zero_v);
-    for j in 0 .. ax.len() {
-        sumsq += &( &ax[j] * &ax[j] );
+    for ax_j in &ax {
+        sumsq += &( ax_j * ax_j );
     }
     //
     // f
     let ay  = vec![ sumsq ];
-    let f   = stop_recording(ay);
-    f
+    stop_recording(ay)
 }
 //
 // six_times_normsq
@@ -89,12 +88,8 @@ fn record_normsq_num_vec()
 //
 // forward_var_normsq_scalar
 fn forward_var_normsq_scalar()
-{   let zero   = ScalarV::from(0.0);
-    let mut x  = vec![zero; N_SUM];
-    for j in 0 .. N_SUM {
-        x[j] = ScalarV::from( (j + 1) as f64 );
-    }
-    let trace                  = false;
+{   let x = (0 .. N_SUM).map( |j| ScalarV::from(j + 1) ).collect();
+    let trace = false;
     let sumsq = NORMSQ_F64.with_borrow_mut( |f_static| {
         let (y, _) = f_static.forward_var_value(None, x, trace);
         y[0]
@@ -107,12 +102,8 @@ fn forward_var_normsq_scalar()
 //
 // forward_var_normsq_num_vec
 fn forward_var_normsq_num_vec()
-{   let zero     = NumVecV::from(0.0);
-    let mut x    = vec![zero; N_SUM];
-    for j in 0 .. N_SUM {
-        x[j] = NumVecV::from( (j+1) as f64 );
-    }
-    let trace                             = false;
+{   let x = (0 .. N_SUM).map( |j| NumVec::from( (j+1) as f64 ) ).collect();
+    let trace = false;
     let sumsq = NORMSQ_NUMVEC_F64.with_borrow_mut( |f_static| {
         let (y, _) = f_static.forward_var_value(None, x, trace);
         let mut y_itr = y.into_iter();

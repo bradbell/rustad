@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 use rustad::utility::avg_seconds_to_execute;
 use rustad::{
@@ -58,7 +58,7 @@ pub fn normsq_f64()
 pub fn normsq_az_f64()
 {   let mut sumsq  = AzFloat(0 as f64);
     for j in 1 .. (N_SUM+1) {
-        sumsq += &( &AzFloat(j as f64) * &AzFloat(j as f64) );
+        sumsq += &( AzFloat(j as f64) * AzFloat(j as f64) );
     }
     assert_eq!( 6.0 * sumsq.to_inner(), six_times_normsq() as f64 );
 }
