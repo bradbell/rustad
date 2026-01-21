@@ -329,12 +329,12 @@ macro_rules! no_rust_src{ ($Op:ident) => {
 pub(crate) use no_rust_src;
 //
 // no_reverse_depend
-/// defines reverse_depend_none `<V>`
+/// defines reverse_depend_none
 ///
 /// The types IndexT, ADType and optimize::Depend
 /// must be in scope where this macro is used.
 macro_rules! no_reverse_depend{ ($Op:ident) => {
-    pub fn reverse_depend_none<V>(
+    pub fn reverse_depend_none(
         _depend   : &mut optimize::Depend ,
         _flag_all : &[bool]               ,
         _arg      : &[IndexT]             ,

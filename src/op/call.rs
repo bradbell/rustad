@@ -1046,7 +1046,7 @@ where
         reverse_der_value : call_reverse_der_value::<V>,
         reverse_der_ad    : call_reverse_der_ad::<V>,
         rust_src          : call_rust_src::<V>,
-        reverse_depend    : reverse_depend_none::<V>,
+        reverse_depend    : reverse_depend_none,
     };
     op_info_vec[CALL_RES_OP as usize] = OpInfo{
         name              : "call_res" ,
@@ -1059,7 +1059,7 @@ where
         reverse_der_value : call_res_der::<V, V>,
         reverse_der_ad    : call_res_der::<V, AD<V> >,
         rust_src          : call_res_rust_src::<V>,
-        reverse_depend    : reverse_depend_none::<V>,
+        reverse_depend    : reverse_depend_none,
     };
 }
 // ===========================================================================
@@ -1185,16 +1185,16 @@ where
     }
     //
     // dyp_depend, var_depend
-    for k in 0 .. atom_depend.len() {
-        if n_dom <= atom_depend[k] {
+    for (k, atom_depend_k) in atom_depend.iter().enumerate() {
+        if n_dom <= *atom_depend_k {
             panic!(
                 "atom {} rev_depend : \
                 rng_index   = {},
                 n_dom = {}, \
                 k = {} \
                 depend[k] = {} >= n_dom",
-                callback.name, rng_index, n_dom, k, atom_depend[k]
-           );
+                callback.name, rng_index, n_dom, k, atom_depend_k
+           )
         }
         let arg_index = BEGIN_DOM + atom_depend[k];
         match arg_type[arg_index] {
