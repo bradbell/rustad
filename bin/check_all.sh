@@ -67,6 +67,10 @@ then
 fi
 echo_eval typos
 #
+# clippy
+echo_eval cargo clippy
+
+#
 if [ "$skip_check_copy" == 'no' ]
 then
    bin/check_copy.sh
