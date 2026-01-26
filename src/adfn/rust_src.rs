@@ -57,7 +57,8 @@ pub type RustSrcFn<V> = fn(
 fn prototype_src(fn_name : &str, v_str : &str) -> String {
     String::new() +
         "#[allow(unused)]\n" +
-        "mod az_float;\n" +
+        "pub mod cmp_as;\n" +
+        "pub mod az_float;\n" +
         "use az_float::AzFloat;\n" +
         "\n" +
         "#[no_mangle]\n" +

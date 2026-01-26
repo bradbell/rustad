@@ -93,8 +93,8 @@ pub use dll_lib::{
 pub use float::{
     core::FloatCore,
     az_float::AzFloat,
-    az_float::CmpAsLhs,
-    az_float::CmpAsRhs,
+    cmp_as::CmpAsLhs,
+    cmp_as::CmpAsRhs,
 };
 // ---------------------------------------------------------------------------
 // Sealed Traits
@@ -151,7 +151,13 @@ where
 pub const YEAR_MONTH_DAY : &str = "2026.1.26";
 //
 // AZ_FLOAT_SRC
-/// is the source code for the [AzFloat] class.
+/// is the source code for the [az_float](crate::float::az_float) module.
 /// This is needed at the beginning of a dll library that include
 /// [ADfn::rust_src] .
 pub const AZ_FLOAT_SRC : &str = include_str!( "float/az_float.rs" );
+//
+// CMP_AS_SRC
+/// is the source code for the [cmp_as](crate::float::cmp_as) module.
+/// This is needed at the beginning of a dll library that include
+/// [ADfn::rust_src] .
+pub const CMP_AS_SRC : &str = include_str!( "float/cmp_as.rs" );

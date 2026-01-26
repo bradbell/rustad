@@ -39,6 +39,11 @@ pub fn create_src_dir(
     if result.is_err() {
         panic!( "Cannot write {src_file}"  );
     }
+    let src_file  = src_dir.to_string() + "/cmp_as.rs";
+    let result    = std::fs::write(src_file.clone(), crate::CMP_AS_SRC);
+    if result.is_err() {
+        panic!( "Cannot write {src_file}"  );
+    }
 }
 
 // ----------------------------------------------------------------------------

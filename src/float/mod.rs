@@ -17,5 +17,8 @@
 // core
 pub mod core;
 //
+// cmp_as
+pub mod cmp_as;
+//
 // az_float
 pub mod az_float;

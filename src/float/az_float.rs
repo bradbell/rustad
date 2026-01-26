@@ -26,56 +26,11 @@ use std::ops::{
     MulAssign,
     DivAssign,
 };
-// ---------------------------------------------------------------------------
-// CmpAsLhs Trait
 //
-/// These comparisons results are 1 for true and 0 for false and
-/// have the same type as the left operand.
-///
-/// For cmp equal to lt, le, eq, ne, ge, gt :
-/// The left_cmp function returns one (zero) if
-/// self compare other is true (false).
-///
-/// The not operator will return zero (one)
-pub trait CmpAsLhs<Rhs = Self> {
-    /// self < other
-    fn left_lt(&self, other : &Rhs) -> Self;
-    /// self <= other
-    fn left_le(&self, other : &Rhs) -> Self;
-    /// self == other
-    fn left_eq(&self, other : &Rhs) -> Self;
-    /// self != other
-    fn left_ne(&self, other : &Rhs) -> Self;
-    /// self >= other
-    fn left_ge(&self, other : &Rhs) -> Self;
-    /// self > other
-    fn left_gt(&self, other : &Rhs) -> Self;
-}
-// ---------------------------------------------------------------------------
-// CmpAsRhs Trait
-//
-/// These comparisons results are 1 for true and 0 for false and
-/// have the same type as the right operand.
-///
-/// For cmp equal to lt, le, eq, ne, ge, gt :
-/// The cmp_right function returns one (zero) if
-/// self compare other is true (false).
-///
-/// The not operator will return zero (one)
-pub trait CmpAsRhs<Rhs = Self> {
-    /// self < other
-    fn lt_right(&self, other : &Rhs) -> Rhs;
-    /// self <= other
-    fn le_right(&self, other : &Rhs) -> Rhs;
-    /// self == other
-    fn eq_right(&self, other : &Rhs) -> Rhs;
-    /// self != other
-    fn ne_right(&self, other : &Rhs) -> Rhs;
-    /// self >= other
-    fn ge_right(&self, other : &Rhs) -> Rhs;
-    /// self > other
-    fn gt_right(&self, other : &Rhs) -> Rhs;
-}
+use super::cmp_as::{
+    CmpAsLhs,
+    CmpAsRhs,
+};
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
 ///
