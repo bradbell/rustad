@@ -12,7 +12,7 @@
 pub mod id;
 pub mod info;
 pub mod binary;
-pub mod compare;
+pub mod cmp_as;
 //
 pub mod add;
 pub mod sub;

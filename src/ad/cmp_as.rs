@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This pub module defines the CompareAsLeft trait for AD types
+//! This pub module defines the CmpAsLhs trait for AD types
 //!
 //! Link to [parent module](super)
 //!
@@ -15,8 +15,8 @@ use crate::{
     FloatCore,
     AD,
     IndexT,
-    CompareAsLeft,
-    CompareAsRight,
+    CmpAsLhs,
+    CmpAsRhs,
 };
 use crate::ad::ADType;
 use crate::tape::Tape;
@@ -33,8 +33,8 @@ use crate::op::id::{
 #[cfg(doc)]
 use crate::doc_generic_v;
 // ---------------------------------------------------------------------------
-// CompareAsLeft for AD<V>
-/// CompareAsLeft trait for `AD<V>`
+// CmpAsLhs for AD<V>
+/// CmpAsLhs trait for `AD<V>`
 ///
 /// * Syntax : lhs.compare(&rhs)
 ///
@@ -47,7 +47,7 @@ use crate::doc_generic_v;
 /// use rustad::{
 ///     AD,
 ///     ad_from_value,
-///     CompareAsLeft,
+///     CmpAsLhs,
 /// };
 ///
 /// type V       = rustad::AzFloat<f64>;
@@ -72,7 +72,7 @@ use crate::doc_generic_v;
 ///     AzFloat,
 ///     ad_from_value,
 ///     NumVec,
-///     CompareAsLeft,
+///     CmpAsLhs,
 /// };
 ///
 /// type S    = AzFloat<f32>;
@@ -102,8 +102,8 @@ pub fn doc_ad_compare_left() { }
 ///
 /// see [doc_ad_compare_left]
 // ---------------------------------------------------------------------------
-// CompareAsRight for AD<V>
-/// CompareAsLeft trait for `AD<V>`
+// CmpAsRhs for AD<V>
+/// CmpAsLhs trait for `AD<V>`
 ///
 /// * Syntax : lhs.compare(&rhs)
 ///
@@ -116,7 +116,7 @@ pub fn doc_ad_compare_left() { }
 /// use rustad::{
 ///     AD,
 ///     ad_from_value,
-///     CompareAsRight,
+///     CmpAsRhs,
 /// };
 ///
 /// type V       = rustad::AzFloat<f64>;
@@ -137,7 +137,7 @@ pub fn doc_ad_compare_left() { }
 ///     AzFloat,
 ///     ad_from_value,
 ///     NumVec,
-///     CompareAsRight,
+///     CmpAsRhs,
 /// };
 ///
 /// type S    = AzFloat<f32>;
@@ -187,9 +187,9 @@ macro_rules! impl_compare_aa{ ($name:ident) => { paste::paste! {
         AD::new(new_tape_id, new_index, new_ad_type, new_value)
     }
 } } }
-impl<V> CompareAsLeft< AD<V> > for AD<V>
+impl<V> CmpAsLhs< AD<V> > for AD<V>
 where
-    V : Clone + FloatCore + PartialEq + CompareAsLeft + ThisThreadTape ,
+    V : Clone + FloatCore + PartialEq + CmpAsLhs + ThisThreadTape ,
 {
     impl_compare_aa!( lt );
     impl_compare_aa!( le );
@@ -227,9 +227,9 @@ macro_rules! impl_compare_av{ ($name:ident) => { paste::paste! {
         AD::new(new_tape_id, new_index, new_ad_type, new_value)
     }
 } } }
-impl<V> CompareAsLeft<V> for AD<V>
+impl<V> CmpAsLhs<V> for AD<V>
 where
-    V : Clone + FloatCore + PartialEq + CompareAsLeft + ThisThreadTape ,
+    V : Clone + FloatCore + PartialEq + CmpAsLhs + ThisThreadTape ,
 {
     impl_compare_av!( lt );
     impl_compare_av!( le );
@@ -267,9 +267,9 @@ macro_rules! impl_compare_va{ ($name:ident) => { paste::paste! {
         AD::new(new_tape_id, new_index, new_ad_type, new_value)
     }
 } } }
-impl<V> CompareAsRight< AD<V> > for V
+impl<V> CmpAsRhs< AD<V> > for V
 where
-    V : Clone + FloatCore + PartialEq + CompareAsLeft + ThisThreadTape ,
+    V : Clone + FloatCore + PartialEq + CmpAsLhs + ThisThreadTape ,
 {
     impl_compare_va!( lt );
     impl_compare_va!( le );

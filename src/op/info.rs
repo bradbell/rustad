@@ -14,8 +14,8 @@ use crate::ad::ADType;
 use crate::{
     AD,
     IndexT,
-    CompareAsLeft,
-    CompareAsRight,
+    CmpAsLhs,
+    CmpAsRhs,
     FloatCore,
 };
 use crate::op::id::NUMBER_OP;
@@ -457,7 +457,7 @@ where
     //
     V     : Clone + From<f32> + FloatCore + PartialEq,
     V     : ThisThreadTape + GlobalAtomCallbackVec,
-    V     : CompareAsLeft<V> + CompareAsRight<V>,
+    V     : CmpAsLhs<V> + CmpAsRhs<V>,
     AD<V> : From<V>,
 {
     let empty = OpInfo {
@@ -480,7 +480,7 @@ where
     crate::op::div::set_op_info::<V>(&mut result);
     crate::op::call::set_op_info::<V>(&mut result);
     crate::op::no_op::set_op_info::<V>(&mut result);
-    crate::op::compare::set_op_info::<V>(&mut result);
+    crate::op::cmp_as::set_op_info::<V>(&mut result);
     result
 }
 // ---------------------------------------------------------------------------

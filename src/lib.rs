@@ -93,8 +93,8 @@ pub use dll_lib::{
 pub use float::{
     core::FloatCore,
     az_float::AzFloat,
-    az_float::CompareAsLeft,
-    az_float::CompareAsRight,
+    az_float::CmpAsLhs,
+    az_float::CmpAsRhs,
 };
 // ---------------------------------------------------------------------------
 // Sealed Traits

@@ -12,7 +12,7 @@
 // sub-modules
 //
 pub mod binary;
-pub mod compare;
+pub mod cmp_as;
 // ---------------------------------------------------------------------------
 //
 // ADType

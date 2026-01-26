@@ -2,11 +2,11 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
-// Example using CompareAsLeft and CompareRight operators
+// Example using CmpAsLhs and CompareRight operators
 //
 use rustad::{
-    CompareAsLeft,
-    CompareAsRight,
+    CmpAsLhs,
+    CmpAsRhs,
     AzFloat,
     start_recording,
     stop_recording,

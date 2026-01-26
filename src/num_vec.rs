@@ -26,8 +26,8 @@
 // use
 use crate::{
     AzFloat,
-    CompareAsLeft,
-    CompareAsRight,
+    CmpAsLhs,
+    CmpAsRhs,
 };
 //
 // NumVec
@@ -243,22 +243,22 @@ num_vec_compound_op!(SubAssign, -=);
 num_vec_compound_op!(MulAssign, *=);
 num_vec_compound_op!(DivAssign, /=);
 // ---------------------------------------------------------------------------
-// CompareAsLeft and CompareAsRight for NumVec
-/// CompareAsLeft and CompareAdRight when both operands are `NumVec<S>`
+// CmpAsLhs and CmpAsRhs for NumVec
+/// CmpAsLhs and CompareAdRight when both operands are `NumVec<S>`
 ///
 /// * S : is the type of the elements of the numeric vector.
 ///
 /// Note that these functions act element-wise on each `NumVec<S>` object.
-/// In addition, when both argument have the same time, CompareAsLeft
-/// and CompareAsRight are equivalent.
+/// In addition, when both argument have the same time, CmpAsLhs
+/// and CmpAsRhs are equivalent.
 ///
 /// # Example :
 /// ```
 /// use rustad::{
 ///     NumVec,
 ///     AzFloat,
-///     CompareAsLeft,
-///     CompareAsRight,
+///     CmpAsLhs,
+///     CmpAsRhs,
 /// };
 ///
 /// type S = AzFloat<f32>;
@@ -320,9 +320,9 @@ macro_rules! impl_compare_num_vec{ ($name:ident, $op:tt) => {
     }
 } }
 //
-impl<S> CompareAsLeft for NumVec<S>
+impl<S> CmpAsLhs for NumVec<S>
 where
-    S  : Copy + From<f32> + From<usize> + PartialOrd + CompareAsLeft,
+    S  : Copy + From<f32> + From<usize> + PartialOrd + CmpAsLhs,
 {
     impl_compare_num_vec!( left_lt, <  );
     impl_compare_num_vec!( left_le, <= );
@@ -332,9 +332,9 @@ where
     impl_compare_num_vec!( left_gt, >  );
 }
 //
-impl<S> CompareAsRight for NumVec<S>
+impl<S> CmpAsRhs for NumVec<S>
 where
-    S  : Copy + From<f32> + From<usize> + PartialOrd + CompareAsRight,
+    S  : Copy + From<f32> + From<usize> + PartialOrd + CmpAsRhs,
 {
     impl_compare_num_vec!( lt_right, <  );
     impl_compare_num_vec!( le_right, <= );

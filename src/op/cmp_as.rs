@@ -10,8 +10,8 @@
 use crate::{
     AD,
     IndexT,
-    CompareAsLeft,
-    CompareAsRight,
+    CmpAsLhs,
+    CmpAsRhs,
 };
 use crate::adfn::optimize;
 use crate::ad::ADType;
@@ -23,7 +23,7 @@ use crate::op::info::{
 //
 // ---------------------------------------------------------------------------
 /*
-TODO: Uncomment when optimizer handles CompareAsLeft operators.
+TODO: Uncomment when optimizer handles CmpAsLhs operators.
 pub(crate) fn is_compare_op(op_id : u8) -> bool {
     match op_id {
         id::LT_OP => true ,
@@ -66,8 +66,8 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        V : CompareAsLeft<V> + CompareAsRight<E>,
-        E : CompareAsLeft<E> + CompareAsLeft<V>,
+        V : CmpAsLhs<V> + CmpAsRhs<E>,
+        E : CmpAsLhs<E> + CmpAsLhs<V>,
     {
         debug_assert!( arg.len() == 2);
         debug_assert!(
@@ -112,8 +112,8 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        V : CompareAsLeft<V> + CompareAsRight<E>,
-        E : CompareAsLeft<E> + CompareAsLeft<V>,
+        V : CmpAsLhs<V> + CmpAsRhs<E>,
+        E : CmpAsLhs<E> + CmpAsLhs<V>,
     {
         debug_assert!( arg.len() == 2);
         //
@@ -241,9 +241,9 @@ fn zero_reverse_der<V, E>  (
 // set_op_info
 //
 // rust_src_none
-no_rust_src!(CompareAsLeft);
+no_rust_src!(CmpAsLhs);
 //
-/// Set the operator information for the CompareAsLeft operators
+/// Set the operator information for the CmpAsLhs operators
 ///
 /// * op_info_vec :
 ///   The map from [op::id](crate::op::id) to operator information.
@@ -252,10 +252,10 @@ no_rust_src!(CompareAsLeft);
 pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
     V     : Clone + From<f32>,
-    V     :  CompareAsLeft<V>  + CompareAsRight< AD<V> >,
-    V     :  CompareAsRight<V> + CompareAsRight< AD<V> >,
+    V     :  CmpAsLhs<V>  + CmpAsRhs< AD<V> >,
+    V     :  CmpAsRhs<V> + CmpAsRhs< AD<V> >,
     AD<V> : From<V>,
-    AD<V> :  CompareAsLeft<V> + CompareAsLeft< AD<V> >,
+    AD<V> :  CmpAsLhs<V> + CmpAsLhs< AD<V> >,
 {
     op_info_vec[id::LT_OP as usize] = OpInfo{
         name              : "lt",
