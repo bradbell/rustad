@@ -8,9 +8,8 @@
 //!
 //! Link to [parent module](super)
 //!
-//! This module does not have any dependencies outside the standard rust.
-//! This enables it source code to be directly included as part of a
-//! Dll library.
+//! This module does not have dependencies outside standard rust and src/float.
+//! This enables src/float to be directly included as part of a Dll library.
 //!
 // ---------------------------------------------------------------------------
 // modules

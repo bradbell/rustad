@@ -5,6 +5,10 @@
 //! This pub(crate) module defines the FloatCore trait
 //!
 //! Link to [parent module](super)
+//!
+//! This module does not have dependencies outside standard rust src/float.
+//! This enables src/float to be directly included as part of a Dll library.
+//!
 // ----------------------------------------------------------------------------
 // use
 use crate::{
