@@ -22,3 +22,6 @@ pub mod cmp_as;
 //
 // az_float
 pub mod az_float;
+//
+// num_vec
+pub mod num_vec;

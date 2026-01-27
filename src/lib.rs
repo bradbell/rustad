@@ -13,9 +13,6 @@
 // utility
 pub mod utility;
 //
-// num_vec
-pub mod num_vec;
-//
 // ad
 pub mod ad;
 //
@@ -55,7 +52,7 @@ pub(crate) mod setup;
 // ---------------------------------------------------------------------------
 // re-export
 //
-pub use num_vec::{
+pub use float::num_vec::{
     NumVec,
 };
 pub use ad::{
@@ -146,9 +143,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2026.1.26");
+/// assert_eq!(date, "2026.1.27");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2026.1.26";
+pub const YEAR_MONTH_DAY : &str = "2026.1.27";
 //
 // AZ_FLOAT_SRC
 /// is the source code for the [az_float](crate::float::az_float) module.
