@@ -17,6 +17,9 @@
 // core
 pub mod core;
 //
+// value
+pub mod value;
+//
 // cmp_as
 pub mod cmp_as;
 //

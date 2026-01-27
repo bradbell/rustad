@@ -89,6 +89,7 @@ pub use dll_lib::{
 };
 pub use float::{
     core::FloatCore,
+    value::FloatValue,
     az_float::AzFloat,
     cmp_as::CmpAsLhs,
     cmp_as::CmpAsRhs,

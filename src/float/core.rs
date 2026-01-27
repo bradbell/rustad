@@ -24,8 +24,7 @@ pub trait FloatCore {
 }
 //
 // impl_float_core_for_az_float
-/// Implements the FloatCore trait for
-/// `AzFloat<P>` and `NumVec< AzFloat<P> >`
+/// Implements the FloatCore trait for value types
 ///
 /// * P : is a primitive type; i.e., f32 or f64;
 macro_rules! impl_float_core_for_az_float{ ($P:ident) => {
@@ -42,7 +41,7 @@ macro_rules! impl_float_core_for_az_float{ ($P:ident) => {
 } }
 pub(crate) use impl_float_core_for_az_float;
 //
-/// Implements the FloatCore trait for `AD<V>`
+/// Implements the FloatCore trait for AD types
 impl<V> FloatCore for AD<V>
 where
     V : FloatCore,
