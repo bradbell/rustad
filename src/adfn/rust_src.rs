@@ -13,6 +13,7 @@
 use crate::ad::ADType;
 use crate::{
     ADfn,
+    FloatValue,
 };
 //
 use std::any::type_name;
@@ -71,7 +72,7 @@ fn prototype_src(fn_name : &str, v_str : &str) -> String {
 // rust_src
 impl<V> ADfn<V>
 where
-    V : ToString + From<f32> +  GlobalOpInfoVec ,
+    V : ToString + From<f32> +  FloatValue + GlobalOpInfoVec ,
 {
     /// Rust source code for zero order forward mode evaluation; i.e.,
     /// function value.
@@ -102,12 +103,6 @@ where
         let v_str   = v_str.replace(
             "rustad::float::az_float::AzFloat", "AzFloat"
         );
-        //
-        // v_is_f32, v_is_f64
-        let v_is_f32 = v_str.contains("f32");
-        let v_is_f64 = v_str.contains("f64");
-        debug_assert!( v_is_f32 || v_is_f64 );
-        debug_assert!( ! ( v_is_f32 && v_is_f64 ) );
         //
         // prototype
         let mut src = prototype_src(fn_name, &v_str);
@@ -155,29 +150,9 @@ where
                 "   let mut cop : Vec<V> = " + "vec![nan; " + &n_cop + "];\n";
             for i in 0 .. self.cop.len() {
                 let i_str = i.to_string();
-                let mut c_str = self.cop[i].to_string();
-                if c_str == "NaN" {
-                    c_str = if v_is_f32 {
-                        "f32::NAN".to_string()
-                    } else {
-                        "f64::NAN".to_string()
-                    };
-                } else {
-                    c_str = if v_is_f32 {
-                        c_str + "f32"
-                    } else {
-                        c_str + "f64"
-                    };
-                };
-                if c_str.eq_ignore_ascii_case("nan") {
-                    // If we did nothing in this case, we would get a warning
-                    // when all the entries in cop are nan.
-                    src = src +
-                        "   cop[" + &i_str + "] = nan;\n";
-                } else {
-                    src = src +
-                        "   cop[" + &i_str + "] = V::from(" + &c_str + ");\n";
-                }
+                let c_str = self.cop[i].to_src();
+                src = src +
+                    "   cop[" + &i_str + "] = " + &c_str + ";\n";
             }
         }
         //
