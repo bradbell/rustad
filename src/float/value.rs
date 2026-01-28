@@ -19,6 +19,7 @@ use crate::{
 ///
 pub trait FloatValue : FloatCore {
     //
+    // is_zero
     /// True if all the components of self are zero.
     ///
     /// # Example
@@ -32,6 +33,7 @@ pub trait FloatValue : FloatCore {
     /// ```
     fn is_zero(&self) -> bool;
     //
+    // is_one
     /// True if all the components of self are one.
     ///
     /// # Example
@@ -49,6 +51,7 @@ pub trait FloatValue : FloatCore {
     /// ```
     fn is_one(&self) -> bool;
     //
+    // is_nan
     /// True if all the components of self are nan.
     ///
     /// # Example
@@ -66,6 +69,21 @@ pub trait FloatValue : FloatCore {
     /// assert!( value.is_nan() );
     /// ```
     fn is_nan(&self) -> bool;
+    //
+    // to_src
+    /// Generates rust source code that corresponds to this value.
+    /// The exact form of this source is unspecified and may change.
+    ///
+    /// # Example
+    ///
+    /// # Example
+    /// ```
+    /// use rustad::AzFloat;
+    /// use rustad::FloatValue;
+    /// let two : AzFloat<f32> = 2.0.into();
+    /// assert_eq!( two.to_src(), "AzFloat(2 as f32)" );
+    /// ```
+    fn to_src(&self) -> String;
 }
 //
 // impl_float_value_for_az_float
@@ -78,8 +96,18 @@ macro_rules! impl_float_value_for_az_float{ ($P:ident) => {
         fn is_zero(&self)  -> bool { self.0 == ( 0 as $P ) }
         fn is_one(&self)   -> bool { self.0 == ( 1 as $P ) }
         fn is_nan(&self)   -> bool { self.0 != self.0 }
+        fn to_src(&self)   -> String {
+            if self.is_nan() {
+                "AzFloat( f32::NAN as ".to_string() + stringify!($P) + ")"
+            } else {
+                "AzFloat(".to_string() +
+                    &self.0.to_string() + " as " + stringify!($P) +
+                ")"
+            }
+        }
     }
     impl crate::float::value::FloatValue for crate::NumVec< AzFloat<$P> > {
+        // is_zero
         fn is_zero(&self)  -> bool {
             let mut all_zero = true;
             for i in 0 .. self.len() {
@@ -88,6 +116,7 @@ macro_rules! impl_float_value_for_az_float{ ($P:ident) => {
             }
             all_zero
         }
+        // is_one
         fn is_one(&self)  -> bool {
             let mut all_one = true;
             for i in 0 .. self.len() {
@@ -96,6 +125,7 @@ macro_rules! impl_float_value_for_az_float{ ($P:ident) => {
             }
             all_one
         }
+        // is_nan
         fn is_nan(&self)  -> bool {
             let mut all_nan = true;
             for i in 0 .. self.len() {
@@ -103,6 +133,21 @@ macro_rules! impl_float_value_for_az_float{ ($P:ident) => {
                 all_nan       = all_nan && primitive != primitive;
             }
             all_nan
+        }
+        // to_src
+        fn to_src(&self) -> String {
+            let mut src = "NumVec::new( vec![ ".to_string();
+            for i in 0 .. self.len() {
+                if self.get(i).is_nan() {
+                    src = src + "AzFloat( f32::NAN as " + stringify!($P) + ")";
+                } else {
+                    src = src + "AzFloat(" +
+                        &self.get(i).to_string() + " as " + stringify!($P) +
+                    "), ";
+                }
+            }
+            src += "]";
+            src
         }
     }
 } }

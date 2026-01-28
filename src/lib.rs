@@ -144,9 +144,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2026.1.27");
+/// assert_eq!(date, "2026.1.28");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2026.1.27";
+pub const YEAR_MONTH_DAY : &str = "2026.1.28";
 //
 // AZ_FLOAT_SRC
 /// is the source code for the [az_float](crate::float::az_float) module.
