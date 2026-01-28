@@ -9,16 +9,30 @@
 // use
 use crate::adfn::rust_src::RustSrcFn;
 // ----------------------------------------------------------------------------
+// write_src_file
+fn write_src_file(src_dir : &str, name : &str, source : &str) {
+    let src_file  = src_dir.to_string() + "/" + name;
+    let result    = std::fs::write(src_file.clone(), source);
+    if result.is_err() {
+        panic!( "Cannot write {src_file}"  );
+    }
+}
+// ----------------------------------------------------------------------------
 // create_src_dir
 /// Create a get_lib source code directory
 ///
 /// * src_dir  :
 ///   is the directory we are creating. If it already exists, any files
-///   there are left in place except for the lib.rs file.
+///   there are left in place except for:
+///   lib.rs, cmp_as.rs, az_float.rs.
 ///
 /// * lib_src :
 ///   is an in memory representation of the data that is written to the
 ///   file *src_dir* `/lib.rs` .
+///
+/// * Other Files :
+///   cmp_as.rs, az_float.rs
+///   are copies of the corresponding rustad files in src/float.
 ///
 pub fn create_src_dir(
     src_dir  :  &str ,
@@ -28,22 +42,9 @@ pub fn create_src_dir(
     if result.is_err() { panic!(
         "dll_lib::create_src_dir: Cannot create the directory {}", src_dir
     ); }
-    //
-    let src_file  = src_dir.to_string() + "/lib.rs";
-    let result    = std::fs::write(src_file.clone(), lib_src);
-    if result.is_err() {
-        panic!( "Cannot write {src_file}"  );
-    }
-    let src_file  = src_dir.to_string() + "/az_float.rs";
-    let result    = std::fs::write(src_file.clone(), crate::AZ_FLOAT_SRC);
-    if result.is_err() {
-        panic!( "Cannot write {src_file}"  );
-    }
-    let src_file  = src_dir.to_string() + "/cmp_as.rs";
-    let result    = std::fs::write(src_file.clone(), crate::CMP_AS_SRC);
-    if result.is_err() {
-        panic!( "Cannot write {src_file}"  );
-    }
+    write_src_file(src_dir, "lib.rs", lib_src);
+    write_src_file(src_dir, "cmp_as.rs",   crate::CMP_AS_SRC);
+    write_src_file(src_dir, "az_float.rs", crate::AZ_FLOAT_SRC);
 }
 
 // ----------------------------------------------------------------------------

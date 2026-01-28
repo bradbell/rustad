@@ -82,6 +82,11 @@ pub trait FloatValue : FloatCore {
     /// use rustad::FloatValue;
     /// let two : AzFloat<f32> = 2.0.into();
     /// assert_eq!( two.to_src(), "AzFloat(2 as f32)" );
+    ///
+    /// use rustad::NumVec;
+    /// let three : NumVec<AzFloat<f32>> = 3.0.into();
+    /// let check = "NumVec::new( vec![ AzFloat(3 as f32), ] )";
+    /// assert_eq!(three.to_src(), check);
     /// ```
     fn to_src(&self) -> String;
 }
@@ -139,14 +144,14 @@ macro_rules! impl_float_value_for_az_float{ ($P:ident) => {
             let mut src = "NumVec::new( vec![ ".to_string();
             for i in 0 .. self.len() {
                 if self.get(i).is_nan() {
-                    src = src + "AzFloat( f32::NAN as " + stringify!($P) + ")";
+                    src = src + "AzFloat(f32::NAN as " + stringify!($P) + "), ";
                 } else {
                     src = src + "AzFloat(" +
                         &self.get(i).to_string() + " as " + stringify!($P) +
                     "), ";
                 }
             }
-            src += "]";
+            src += "] )";
             src
         }
     }
