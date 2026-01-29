@@ -52,9 +52,6 @@ pub(crate) mod setup;
 // ---------------------------------------------------------------------------
 // re-export
 //
-pub use float::num_vec::{
-    NumVec,
-};
 pub use ad::{
     AD,
     ad_from_value,
@@ -65,6 +62,7 @@ pub use ad::{
 pub use adfn::{
     ADfn,
     doc_generic_e,
+    SparsityPattern,
 };
 pub use tape::{
     IndexT,
@@ -91,6 +89,7 @@ pub use float::{
     core::FloatCore,
     value::FloatValue,
     az_float::AzFloat,
+    num_vec::NumVec,
     cmp_as::CmpAsLhs,
     cmp_as::CmpAsRhs,
 };

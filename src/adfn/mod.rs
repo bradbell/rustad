@@ -39,6 +39,9 @@ use crate::IndexT;
 // OpSequence
 use crate::tape::OpSequence;
 //
+// Sparsity
+pub type SparsityPattern = Vec<[usize; 2]>;
+//
 // ---------------------------------------------------------------------------
 /// Documentation for the rustad generic type parameter E.
 ///

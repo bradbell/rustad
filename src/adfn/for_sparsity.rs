@@ -17,6 +17,7 @@ use crate::{
     ADfn,
     IndexT,
     GlobalAtomCallbackVecPublic,
+    SparsityPattern,
 };
 use crate::op::id::{
     CALL_OP,
@@ -108,7 +109,7 @@ where
     ///
     pub fn for_sparsity(
         &self, trace : bool, compute_dyp : bool
-    ) -> Vec< [usize; 2] >
+    ) -> SparsityPattern
     {   //
         // op_info_vec
         let op_info_vec : &Vec< OpInfo<V> >  = GlobalOpInfoVec::get();
@@ -119,7 +120,7 @@ where
         let n_range           = rng_ad_type.len();
         //
         // pattern, depend_usize
-        let mut pattern         : Vec< [usize; 2] > = Vec::new();
+        let mut pattern         : SparsityPattern   = Vec::new();
         let mut depend_usize    : Vec<usize>        = Vec::new();
         //
         // atom_depend, cop_depend, dyp_depend, var_depend

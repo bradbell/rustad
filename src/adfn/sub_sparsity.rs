@@ -8,8 +8,11 @@
 //!
 // ---------------------------------------------------------------------------
 //
-use crate::ADfn;
-use crate::IndexT;
+use crate::{
+    ADfn,
+    IndexT,
+    SparsityPattern
+};
 use crate::op::call::call_depend;
 use crate::atom::sealed::GlobalAtomCallbackVec;
 use crate::atom::AtomCallback;
@@ -62,8 +65,8 @@ where
     ///   This return is vector of [row, column] pairs.
     ///   Each row (column) is less than the range (dynamic parameter domain)
     ///   dimension for this function.
-    ///   If a pair [i, j] does not appear, the range component
-    ///   with index i does not depend on the domain dynamic parameter with index j.
+    ///   If a pair [i, j] does not appear, the range component with index i
+    ///   does not depend on the domain dynamic parameter with index j.
     ///
     /// * var_pattern :
     ///   This return is vector of [row, column] pairs.
@@ -117,7 +120,7 @@ where
     /// ```
     pub fn sub_sparsity(
         &self, trace : bool, compute_dyp : bool
-    ) -> ( Vec< [usize; 2] > , Vec< [ usize; 2 ] > )
+    ) -> ( SparsityPattern, SparsityPattern )
     {   //
         // op_info_vec
         let op_info_vec : &Vec< OpInfo<V> >  = GlobalOpInfoVec::get();
@@ -149,11 +152,11 @@ where
         let mut dyp_done = vec![n_var; n_var];
         //
         // var_pattern, var_index_stack
-        let mut var_pattern     : Vec< [usize; 2] > = Vec::new();
+        let mut var_pattern     : SparsityPattern   = Vec::new();
         let mut var_index_stack : Vec<IndexT>       = Vec::new();
         //
         // dyp_pattern, dyp_index_stack
-        let mut dyp_pattern     : Vec< [usize; 2] > = Vec::new();
+        let mut dyp_pattern     : SparsityPattern   = Vec::new();
         let mut dyp_index_stack : Vec<IndexT>       = Vec::new();
         //
         if trace { println!(
