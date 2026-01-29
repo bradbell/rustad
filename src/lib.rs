@@ -148,14 +148,20 @@ where
 /// ```
 pub const YEAR_MONTH_DAY : &str = "2026.1.29";
 //
-// AZ_FLOAT_SRC
-/// is the source code for the [az_float](crate::float::az_float) module.
-/// This is needed at the beginning of a dll library that include
-/// [ADfn::rust_src] .
-pub const AZ_FLOAT_SRC : &str = include_str!( "float/az_float.rs" );
-//
-// CMP_AS_SRC
+// CMP_AS_RS
 /// is the source code for the [cmp_as](crate::float::cmp_as) module.
 /// This is needed at the beginning of a dll library that include
 /// [ADfn::rust_src] .
-pub const CMP_AS_SRC : &str = include_str!( "float/cmp_as.rs" );
+pub const CMP_AS_RS : &str = include_str!( "float/cmp_as.rs" );
+//
+// AZ_FLOAT_RS
+/// is the source code for the [az_float](crate::float::az_float) module.
+/// This is needed at the beginning of a dll library that include
+/// [ADfn::rust_src] .
+pub const AZ_FLOAT_RS : &str = include_str!( "float/az_float.rs" );
+//
+// NUM_VEC_RS
+/// is the source code for the [num_vec](crate::float::num_vec) module.
+/// This is needed at the beginning of a dll library that include
+/// [ADfn::rust_src] .
+pub const NUM_VEC_RS : &str = include_str!( "float/num_vec.rs" );

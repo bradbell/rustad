@@ -43,8 +43,9 @@ pub fn create_src_dir(
         "dll_lib::create_src_dir: Cannot create the directory {}", src_dir
     ); }
     write_src_file(src_dir, "lib.rs", lib_src);
-    write_src_file(src_dir, "cmp_as.rs",   crate::CMP_AS_SRC);
-    write_src_file(src_dir, "az_float.rs", crate::AZ_FLOAT_SRC);
+    write_src_file(src_dir, "cmp_as.rs",   crate::CMP_AS_RS);
+    write_src_file(src_dir, "az_float.rs", crate::AZ_FLOAT_RS);
+    write_src_file(src_dir, "num_vec.rs",  crate::NUM_VEC_RS);
 }
 
 // ----------------------------------------------------------------------------

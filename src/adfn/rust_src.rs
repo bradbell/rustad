@@ -56,17 +56,31 @@ pub type RustSrcFn<V> = fn(
 //
 // prototype_src
 fn prototype_src(fn_name : &str, v_str : &str) -> String {
-    String::new() +
+    let mut src = String::new();
+    src = src +
         "#[allow(unused)]\n" +
         "pub mod cmp_as;\n" +
+        "#[allow(unused)]\n" +
+        "use crate::{\n" +
+        "   cmp_as::CmpAsLhs,\n" +
+        "   cmp_as::CmpAsRhs,\n" +
+        "};\n" +
         "pub mod az_float;\n" +
         "use az_float::AzFloat;\n" +
-        "\n" +
+        "\n";
+    if v_str.contains("NumVec") {
+        src = src +
+            "pub mod num_vec;\n" +
+            "use num_vec::NumVec;\n" +
+            "\n";
+    }
+    src = src +
         "#[no_mangle]\n" +
         "pub fn rust_src_"  + fn_name + "(\n" +
         "   dyp_dom     : &Vec<&"    + v_str  + ">,\n" +
         "   var_dom     : &Vec<&"    + v_str  + ">,\n" +
-        ") -> Result< Vec<" + v_str  + ">, String >\n"
+        ") -> Result< Vec<" + v_str  + ">, String >\n";
+    src
 }
 // -----------------------------------------------------------------------
 // rust_src
@@ -102,6 +116,9 @@ where
         let v_str   = String::from( type_name::<V>() );
         let v_str   = v_str.replace(
             "rustad::float::az_float::AzFloat", "AzFloat"
+        );
+        let v_str   = v_str.replace(
+            "rustad::float::num_vec::NumVec", "NumVec"
         );
         //
         // prototype
@@ -147,7 +164,8 @@ where
             let n_cop = self.cop.len().to_string();
             src = src +
                 "   // cop\n" +
-                "   let mut cop : Vec<V> = " + "vec![nan; " + &n_cop + "];\n";
+                "   let mut cop : Vec<V> = " +
+                    "vec![nan.clone(); " + &n_cop + "];\n";
             for i in 0 .. self.cop.len() {
                 let i_str = i.to_string();
                 let c_str = self.cop[i].to_src();
@@ -163,7 +181,8 @@ where
                 "   //\n" +
                 "   // dyp_dep\n" +
                 "   // vector of dependent variables\n" +
-                "   let mut dyp_dep : Vec<V> = vec![nan; " + &n_dep + "];\n";
+                "   let mut dyp_dep : Vec<V> = " +
+                    "vec![nan.clone(); " + &n_dep + "];\n";
             //
             // dyp_dep
             for op_index in 0 .. self.dyp.id_all.len() {
