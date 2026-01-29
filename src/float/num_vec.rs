@@ -118,7 +118,7 @@ pub fn doc_num_vec_binary_op() { }
 //
 /// Add one binary operator to the `NumVec` < *S* > class;
 /// see [doc_num_vec_binary_op]
-macro_rules! num_vec_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
+macro_rules! num_vec_binary_op { ($Name:ident, $name:ident, $Op:tt) => {
 
     #[doc = concat!(
         "& `NumVec` < *S* > ", stringify!($Op), " & `NumVec` < *S* >",
@@ -129,7 +129,7 @@ macro_rules! num_vec_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         S : From<f32> + Copy + std::ops::$Name<Output=S> ,
     {   type Output = NumVec<S>;
         //
-        fn [< $Name:lower >](self : &'a NumVec<S>, rhs : &'a NumVec<S> )
+        fn $name(self : &'a NumVec<S>, rhs : &'a NumVec<S> )
         -> NumVec<S>
         {   let mut v : Vec<S>;
             let e     : S;
@@ -161,12 +161,12 @@ macro_rules! num_vec_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             NumVec{ vec : v, s : e }
         }
     }
-} } }
+} }
 //
-num_vec_binary_op!(Add, +);
-num_vec_binary_op!(Sub, -);
-num_vec_binary_op!(Mul, *);
-num_vec_binary_op!(Div, /);
+num_vec_binary_op!(Add, add, +);
+num_vec_binary_op!(Sub, sub,  -);
+num_vec_binary_op!(Mul, mul, *);
+num_vec_binary_op!(Div, div, /);
 // ----------------------------------------------------------------------------`
 /// Compound Assignment `NumVec` < *S* > operators.
 ///
@@ -201,7 +201,7 @@ pub fn doc_num_vec_compound_op() { }
 //
 /// Add one compound assignment operator to the `NumVec` < *S* > class;
 /// see [doc_num_vec_compound_op]
-macro_rules! num_vec_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
+macro_rules! num_vec_compound_op { ($Name:ident, $name:ident, $Op:tt) => {
 
     #[doc = concat!(
         "`NumVec` < *S* > ", stringify!($Op), " & `NumVec` < *S* >",
@@ -211,7 +211,7 @@ macro_rules! num_vec_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
     where
         S : Copy + std::ops::$Name<&'a S>,
     {   //
-        fn [< $Name:snake >] (&mut self, rhs : &'a NumVec<S> )
+        fn $name(&mut self, rhs : &'a NumVec<S> )
         {   //
             if self.len() == 1 {
                 if rhs.len() == 1 {
@@ -236,12 +236,12 @@ macro_rules! num_vec_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             }
         }
     }
-} } }
+} }
 //
-num_vec_compound_op!(AddAssign, +=);
-num_vec_compound_op!(SubAssign, -=);
-num_vec_compound_op!(MulAssign, *=);
-num_vec_compound_op!(DivAssign, /=);
+num_vec_compound_op!(AddAssign, add_assign, +=);
+num_vec_compound_op!(SubAssign, sub_assign, -=);
+num_vec_compound_op!(MulAssign, mul_assign, *=);
+num_vec_compound_op!(DivAssign, div_assign, /=);
 // ---------------------------------------------------------------------------
 // CmpAsLhs and CmpAsRhs for NumVec
 /// CmpAsLhs and CompareAdRight when both operands are `NumVec<S>`
