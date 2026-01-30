@@ -93,29 +93,28 @@ pub fn coloring(
     // col_begin
     let mut col_begin = vec![0; n+1];
     let mut j         = 0;
-    for ell in &col_major {
-        let [_i1, j1] = pattern[*ell];
-        while j < j1 {
-            col_begin[j+1] = *ell;
+    for (ell, p) in col_major.iter().enumerate() {
+        let [_i1, j1] = pattern[*p];
+        if j < j1 {
+            col_begin[j+1] = ell;
             j += 1;
         }
     }
-    for begin_j in col_begin[j .. n+1 ].iter_mut() {
+    for begin_j in col_begin[j+1 .. n+1 ].iter_mut() {
         *begin_j = pattern.len();
     }
-    println!("col_begin = {:?}", col_begin );
     //
     // row_begin
     let mut row_begin = vec![0; m+1];
     let mut i         = 0;
-    for ell in &row_major {
-        let [i1, _j] = sub_pattern[*ell];
-        while i < i1 {
-            row_begin[i+1] = *ell;
+    for (ell, p) in row_major.iter().enumerate() {
+        let [i1, _j1] = sub_pattern[*p];
+        if i < i1 {
+            row_begin[i+1] = ell;
             i += 1;
         }
     }
-    for begin_i in row_begin[i .. m+1].iter_mut() {
+    for begin_i in row_begin[i+1 .. m+1].iter_mut() {
         *begin_i = sub_pattern.len();
     }
     //
@@ -128,8 +127,8 @@ pub fn coloring(
     // color
     let mut color : Vec<usize> = Vec::with_capacity(n);
     let mut k = 0;
-    for j in 0 .. n {
-        if col_in_sub_pattern[j] {
+    for flag in col_in_sub_pattern.iter() {
+        if *flag {
             color.push( k );
             k += 1;
         } else {
@@ -140,12 +139,15 @@ pub fn coloring(
     // forbidden
     let mut forbidden = vec![true; n];
     //
+    // n_color
+    let mut n_color = 0;
+    //
     // color[j]
     // determine the final color for index j
-    for j in 1 .. n { if color[j] < n {
+    for j in 0 .. n { if color[j] < n {
         //
         // forbidden
-        for forbidden_k in forbidden[0 .. color[j]].iter_mut() {
+        for forbidden_k in forbidden[0 .. n_color].iter_mut() {
             *forbidden_k = false;
         }
         //
@@ -155,9 +157,7 @@ pub fn coloring(
         for ell in &col_major[begin_j .. end_j] {
             //
             // i
-            let [i, j1] = pattern[*ell];
-            println!( "i={i}, j={j}, j1={j1}");
-
+            let [i, _j1] = pattern[*ell];
             debug_assert!( pattern[*ell][1] == j );
             //
             // p
@@ -177,11 +177,15 @@ pub fn coloring(
         }
         // color[j]
         let mut k = 0;
-        while forbidden[k] {
+        while k < n_color && forbidden[k] {
             k += 1;
-            debug_assert!( k < color[j] );
         }
         color[j] = k;
+        //
+        // n_color
+        if k == n_color {
+            n_color += 1;
+        }
     } }
     color
 }
