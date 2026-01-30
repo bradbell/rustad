@@ -34,6 +34,9 @@ pub mod dll_lib;
 // float
 pub mod float;
 //
+// sparse
+pub mod sparse;
+//
 // ----------------------------------------------------------------------------
 // private sub-modules
 //
@@ -92,6 +95,9 @@ pub use float::{
     num_vec::NumVec,
     cmp_as::CmpAsLhs,
     cmp_as::CmpAsRhs,
+};
+pub use sparse::{
+    coloring,
 };
 // ---------------------------------------------------------------------------
 // Sealed Traits
