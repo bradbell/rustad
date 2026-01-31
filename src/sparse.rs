@@ -10,6 +10,13 @@
 use crate::{
     SparsityPattern,
 };
+#[cfg(doc)]
+use crate::ADfn;
+#[cfg(doc)]
+use crate::adfn::{
+    forward_der::doc_forward_der,
+    reverse_der::doc_reverse_der,
+};
 // ----------------------------------------------------------------------------
 // coloring
 /// Compute a coloring that can be used for a sparse derivative calculation
@@ -33,36 +40,36 @@ use crate::{
 ///   is a subset of *pattern* that we wish to calculate.
 ///
 /// * color :
-///   This is a coloring for the subset of the Jacobain. 
-///   If color[j] == n, (i, j) does not appear in *sub_pattern* for any i.
-///   Otherwise, color[j] < n. 
+///   This is a coloring for the subset of the Jacobain.
+///   If color(j) == n, (i, j) does not appear in *sub_pattern* for any i.
+///   Otherwise, color(j) < n.
 ///
-///   Suppose j1 != j2, color[j1] == color[j2], (i, j1) is in *pattern*,
+///   Suppose j1 != j2, color(j1) == color(j2), (i, j1) is in *pattern*,
 ///   (i, j2) is in *pattern*. It follows that neither (i, j1) or (i, j2)
 ///   is in *sub_pattern* .
 ///
-///   Given the conditions above, this routine tries to minimuze the number 
+///   Given the conditions above, this routine tries to minimuze the number
 ///   of different colors used in color. In addition, the colors are sequential
 ///   starting at zero, (except for the special color n mentioned above).
 ///
 /// * Forward Mode :
-///   Suppose *pattern* is a sparsity pattern for the Jacobian of an [ADfn] 
+///   Suppose *pattern* is a sparsity pattern for the Jacobian of an [ADfn]
 ///   object f. Fix a color k and suppose that the
 ///   [forward derivative](doc_forward_der) is calculated,
-///   for this function object, with the domain derivative one (zero) 
-///   for each domain component j that has color[j] = k (color[j] != k).
-///   For each j with color[j] = k and each i with (i, j) is *sub_pattern*, 
-///   the forward mode range component i is the (i, j) component of the 
+///   for this function object, with the domain derivative one (zero)
+///   for each domain component j that has color(j) = k (color(j) != k).
+///   For each j with color(j) = k and each i with (i, j) is *sub_pattern*,
+///   the forward mode range component i is the (i, j) component of the
 ///   Jacobain of f.
 ///
 /// * Reverse Mode :
 ///   Suppose *pattern* is a sparsity pattern for the transpose of the
 ///   Jacobian of an [ADfn] object f. Fix a color k and suppose that the
 ///   [reverse derivative](doc_reverse_der) is calculated,
-///   for this function object, with the range derivative one (zero) 
-///   for each range component i that has color[i] = k (color[i] != k).
-///   For each i with color[i] = k and each j with (j, i) is *sub_pattern*, 
-///   the reverse mode domain component j is the (i, j) component of the 
+///   for this function object, with the range derivative one (zero)
+///   for each range component i that has color(i) = k (color(i) != k).
+///   For each i with color(i) = k and each j with (j, i) is *sub_pattern*,
+///   the reverse mode domain component j is the (i, j) component of the
 ///   Jacobain of f.
 ///
 /// * Reference :
@@ -151,7 +158,7 @@ pub fn coloring(
             *forbidden_k = false;
         }
         //
-        // ell 
+        // ell
         let begin_j = col_begin[j];
         let end_j   = col_begin[j+1];
         for ell in &col_major[begin_j .. end_j] {
