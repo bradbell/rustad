@@ -23,7 +23,7 @@ use crate::adfn::{
 /// of a subset of a Jacobian.
 ///
 /// ```text
-///     color = coloring(m, n, pattern, sub_pattern)
+///     color_vec = coloring(m, n, pattern, sub_pattern)
 /// ```
 ///
 /// * m :
@@ -39,26 +39,30 @@ use crate::adfn::{
 /// * sub_pattern :
 ///   is a subset of *pattern* that we wish to calculate.
 ///
-/// * color :
+/// * color_vec :
 ///   This is a coloring for the subset of the Jacobain.
-///   If color(j) == n, (i, j) does not appear in *sub_pattern* for any i.
-///   Otherwise, color(j) < n.
+///   If color_vec(j) == n, (i, j) does not appear in *sub_pattern* for any i.
+///   Otherwise, color_vec(j) < n.
 ///
-///   Suppose j1 != j2, color(j1) == color(j2), (i, j1) is in *pattern*,
-///   (i, j2) is in *pattern*. It follows that neither (i, j1) or (i, j2)
-///   is in *sub_pattern* .
+///   Suppose j1 != j2, color_vec(j1) == color_vec(j2),
+///   (i, j1) is in *pattern*, (i, j2) is in *pattern*.
+///   It follows that neither (i, j1) or (i, j2) is in *sub_pattern* .
 ///
-///   Given the conditions above, this routine tries to minimuze the number
-///   of different colors used in color. In addition, the colors are sequential
-///   starting at zero, (except for the special color n mentioned above).
+///   Given the conditions above, this routine tries to minimize the number
+///   of colors used in color. In addition, the colors are sequential
+///   starting at zero. The value *n* in color_vec is not considered a color.
+///   Thus, the number of colors is
+///   ```text
+///     n_color = color_vec.iter().filter( |&color| color < n ).max() + 1
+///   ```
 ///
 /// * Forward Mode :
 ///   Suppose *pattern* is a sparsity pattern for the Jacobian of an [ADfn]
 ///   object f. Fix a color k and suppose that the
 ///   [forward derivative](doc_forward_der) is calculated,
-///   for this function object, with the domain derivative one (zero)
-///   for each domain component j that has color(j) = k (color(j) != k).
-///   For each j with color(j) = k and each i with (i, j) is *sub_pattern*,
+///   for this function object, with the domain derivative one (zero) for each
+///   domain component j that has color_vec(j) = k (color_vec(j) != k).
+///   For each j with color_vec(j) = k and each i with (i, j) is *sub_pattern*,
 ///   the forward mode range component i is the (i, j) component of the
 ///   Jacobain of f.
 ///
@@ -66,8 +70,8 @@ use crate::adfn::{
 ///   Suppose *pattern* is a sparsity pattern for the transpose of the
 ///   Jacobian of an [ADfn] object f. Fix a color k and suppose that the
 ///   [reverse derivative](doc_reverse_der) is calculated,
-///   for this function object, with the range derivative one (zero)
-///   for each range component i that has color(i) = k (color(i) != k).
+///   for this function object, with the range derivative one (zero) for each
+///   range component i that has color_vec(i) = k (color_vec(i) != k).
 ///   For each i with color(i) = k and each j with (j, i) is *sub_pattern*,
 ///   the reverse mode domain component j is the (i, j) component of the
 ///   Jacobain of f.
@@ -131,15 +135,15 @@ pub fn coloring(
         col_in_sub_pattern[*j] = true;
     }
     //
-    // color
-    let mut color : Vec<usize> = Vec::with_capacity(n);
+    // color_vec
+    let mut color_vec : Vec<usize> = Vec::with_capacity(n);
     let mut k = 0;
     for flag in col_in_sub_pattern.iter() {
         if *flag {
-            color.push( k );
+            color_vec.push( k );
             k += 1;
         } else {
-            color.push( n );
+            color_vec.push( n );
         }
     }
     //
@@ -149,13 +153,13 @@ pub fn coloring(
     // n_color
     let mut n_color = 0;
     //
-    // color[j]
+    // color_vec[j]
     // determine the final color for index j
-    for j in 0 .. n { if color[j] < n {
+    for j in 0 .. n { if color_vec[j] < n {
         //
         // forbidden
-        for forbidden_k in forbidden[0 .. n_color].iter_mut() {
-            *forbidden_k = false;
+        for color in forbidden[0 .. n_color].iter_mut() {
+            *color = false;
         }
         //
         // ell
@@ -177,22 +181,22 @@ pub fn coloring(
                 debug_assert!( sub_pattern[*p][0] == i );
                 //
                 // forbidden
-                if j1 < j && color[j1] < n {
-                    forbidden[ color[j1] ] = true;
+                if j1 < j && color_vec[j1] < n {
+                    forbidden[ color_vec[j1] ] = true;
                 }
             }
         }
-        // color[j]
-        let mut k = 0;
-        while k < n_color && forbidden[k] {
-            k += 1;
+        // color_vec[j]
+        let mut color = 0;
+        while color < n_color && forbidden[color] {
+            color += 1;
         }
-        color[j] = k;
+        color_vec[j] = color;
         //
         // n_color
-        if k == n_color {
+        if color == n_color {
             n_color += 1;
         }
     } }
-    color
+    color_vec
 }
