@@ -10,15 +10,12 @@
 // sub-modules
 //
 pub mod forward_dyp;
-//
 pub mod forward_var;
-//
 pub mod forward_der;
-//
 pub mod reverse_der;
-//
 pub mod sub_sparsity;
 pub mod for_sparsity;
+pub mod for_sparse_jac;
 pub mod rust_src;
 pub mod optimize;
 //

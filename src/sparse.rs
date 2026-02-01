@@ -53,8 +53,12 @@ use crate::adfn::{
 ///   starting at zero. The value *n* in color_vec is not considered a color.
 ///   Thus, the number of colors is
 ///   ```text
-///     n_color = color_vec.iter().filter( |&color| color < n ).max() + 1
+///     n_color = color_vec.iter().filter( |&k| k < &n ).max().unwrap() + 1
 ///   ```
+///   If pattern is a sparsity pattern for a Jacobian
+///   (transpose of a Jacobian),
+///   n_color is also the number of forward (reverse) passes required
+///   to calculate the Jacobian on sub_pattern.
 ///
 /// * Forward Mode :
 ///   Suppose *pattern* is a sparsity pattern for the Jacobian of an [ADfn]
