@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 // ---------------------------------------------------------------------------
 // Example of doing checkpointing using atomic functions.
 //
 // TODO: convert this example in to a general purpose checkpoint utility.
 // ---------------------------------------------------------------------------
-//
-use std::collections::HashMap;
 //
 use rustad::{
     Direction,
@@ -52,11 +50,11 @@ fn no_ad_derivative() {
     //
     // checkpoint_id
     let directions  : Vec<Direction> = Vec::new();
-    let hash_map    = HashMap::from( [
-        ("name",  "example".to_string() ),
-        ("trace", "false".to_string() ),
-    ] );
-    let checkpoint_id  = register_checkpoint(f, &directions, hash_map);
+    let arg_vec     = vec![
+        ["name",  "example"],
+        ["trace", "false"  ],
+    ];
+    let checkpoint_id  = register_checkpoint(f, &directions, &arg_vec);
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
@@ -102,11 +100,11 @@ fn forward_ad_derivative() {
     //
     // checkpoint_id
     let directions  = vec![ Direction::Forward ];
-    let hash_map    = HashMap::from( [
-        ("name",  "example".to_string() ),
-        ("trace", "false".to_string() ),
-    ] );
-    let checkpoint_id  = register_checkpoint(f, &directions, hash_map);
+    let arg_vec     = vec![
+        ["name",  "example"],
+        ["trace", "false"  ],
+    ];
+    let checkpoint_id  = register_checkpoint(f, &directions, &arg_vec);
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
@@ -139,11 +137,11 @@ fn reverse_ad_derivative() {
     //
     // checkpoint_id
     let directions  = vec![ Direction::Reverse ];
-    let hash_map    = HashMap::from( [
-        ("name",  "example".to_string() ),
-        ("trace", "false".to_string() ),
-    ] );
-    let checkpoint_id  = register_checkpoint(f, &directions, hash_map);
+    let arg_vec     = vec![
+        ["name",  "example"],
+        ["trace", "false"  ],
+    ];
+    let checkpoint_id  = register_checkpoint(f, &directions, &arg_vec);
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];

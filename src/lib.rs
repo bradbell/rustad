@@ -149,9 +149,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2026.1.29");
+/// assert_eq!(date, "2026.2.1");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2026.1.29";
+pub const YEAR_MONTH_DAY : &str = "2026.2.1";
 //
 // CMP_AS_RS
 /// is the source code for the [cmp_as](crate::float::cmp_as) module.
@@ -170,3 +170,23 @@ pub const AZ_FLOAT_RS : &str = include_str!( "float/az_float.rs" );
 /// This is needed at the beginning of a dll library that include
 /// [ADfn::rust_src] .
 pub const NUM_VEC_RS : &str = include_str!( "float/num_vec.rs" );
+//
+// ----------------------------------------------------------------------------
+// arg_vec
+/// Convention for a variable number of arguments to a function.
+///
+/// A function argument called *arg_vec* is will hold a vector of
+/// key, value pairs. This enables us to add key, value pairs in a backward
+/// compatible way.
+///
+/// * Prototype :
+///   This argument will have the prototype:
+///   ```text
+///     arg_vec : &Vec< [&str; 2] >
+///   ```
+/// where the each element of the vector is a `[key, value]` .
+///
+/// The documentation of *arg_vec* for a particular function specifies
+/// what the possible keys are, the meaning of the corresponding values,
+/// and the default value (which is used if the key is not present).
+pub fn doc_arg_vec() { }

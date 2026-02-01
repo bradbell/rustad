@@ -10,7 +10,6 @@
 // ---------------------------------------------------------------------------
 // use
 use std::sync::RwLock;
-use std::collections::HashMap;
 //
 use crate::{
     AD,
@@ -33,7 +32,10 @@ use crate::atom::call_atom;
 use crate::tape::sealed::ThisThreadTape;
 //
 #[cfg(doc)]
-use crate::doc_generic_v;
+use crate::{
+    doc_generic_v,
+    doc_arg_vec,
+};
 // ---------------------------------------------------------------------------
 // Direction
 #[derive(PartialEq)]
@@ -224,16 +226,18 @@ where
 ///
 /// * Syntax :
 ///   ```text
-///     checkpoint_id = register_checkpoint(ad_fn, directions, hash_map)
+///     checkpoint_id = register_checkpoint(ad_fn, directions, arg_vec)
 ///   ```
 ///
 /// * V : see [doc_generic_v]
 ///
 /// * ad_fn :
 ///   is the ad_fn that is being moved to the global checkpoint vector.
+///   This function must not have any dynamic parameters; see,
+///   [start_recording]
 ///
-/// * hash_map :
-///   The following is a description of the valid key :
+/// * arg_vec :
+///   see [doc_arg_vec] and the key descriptions below.
 ///
 ///     * name :
 ///       the value is the name that identifies this checkpoint function
@@ -261,34 +265,37 @@ where
 pub fn register_checkpoint<V>(
     ad_fn         : ADfn<V>                 ,
     directions    : &[Direction]            ,
-    mut hash_map  : HashMap<&str, String>   ,
+    arg_vec       : &Vec< [&str; 2] >       ,
 ) -> IndexT
 where
     V : Clone + From<f32> + std::fmt::Display + FloatCore,
     V : ThisThreadTape + GlobalOpInfoVec + GlobalCheckpointInfoVec,
 {   //
     if 0 < ad_fn.dyp_len() { panic!(
-        "register_checkpoint: 0 > ad_fun.dyp_len()"
+        "register_checkpoint: 0 < ad_fun.dyp_len()"
     ); }
     //
     // name, trace
-    let mut name  = "no_name".to_string();
-    let mut trace = false;
-    for key in hash_map.keys() { match *key {
-        "name" => {
-            name = hash_map.get(key).unwrap().clone();
-        },
-        "trace" => {
-            let value = hash_map.get( "trace").unwrap();
-            if value != "true" && value != "false" { panic!(
-                "registem_checkpoint: hash_map.get(trace): \
-                {} is not a valid value", value
-            ); }
-            trace = value == "true";
-        },
-        _ => panic!(
-            "registem_checkpoint hash_map : {} is not a valid key", key
-        ),
+    let mut name      = "no_name";
+    let mut trace     = false;
+    let mut trace_str = "false";
+    for pair in arg_vec {
+        let [key, value] = *pair;
+        match key {
+            "name" => {
+                name = value;
+            },
+            "trace" => {
+                if value != "true" && value != "false" { panic!(
+                    "registem_checkpoint: trace: value = {value} \
+                    is not a valid value for the trace key"
+                ); }
+                trace     = value == "true";
+                trace_str = value;
+            },
+            _ => panic!(
+                "registem_checkpoint hash_map : {key} is not a valid key"
+            ),
     } }
     //
     // one_v
@@ -300,7 +307,11 @@ where
     if ! directions.is_empty()  {
         let directions_tail = &directions[1 .. directions.len()];
         if directions[0] == Direction::Forward {
-            hash_map.insert( "name", name.clone() + ".forward" );
+            let name_tmp    = name.to_string() + ".forward";
+            let arg_vec_tmp = vec![
+                [ "name",  &name_tmp ],
+                [ "trace", trace_str ],
+            ];
             let nx            = ad_fn.var_dom_len();
             let x_dx          = vec![one_v; 2 * nx ];
             let (_, ax_dx)    = start_recording(None, x_dx);
@@ -310,12 +321,16 @@ where
             let ady           = ad_fn.forward_der_ad(None, &av, adx, trace);
             let ad_fn_for     = stop_recording(ady);
             let checkpoint_id = register_checkpoint(
-                ad_fn_for, directions_tail, hash_map
+                ad_fn_for, directions_tail, &arg_vec_tmp
             );
             ad_forward_id     = Some(checkpoint_id);
         } else {
             debug_assert!( directions[0] == Direction::Reverse );
-            hash_map.insert( "name", name.clone() + ".reverse" );
+            let name_tmp    = name.to_string() + ".reverse";
+            let arg_vec_tmp = vec![
+                [ "name",  &name_tmp ],
+                [ "trace", trace_str ],
+            ];
             let nx            = ad_fn.var_dom_len();
             let ny            = ad_fn.rng_len();
             let x_dy          = vec![one_v; nx + ny ];
@@ -326,7 +341,7 @@ where
             let adx           = ad_fn.reverse_der_ad(None, &av, ady, trace);
             let ad_fn_rev     = stop_recording(adx);
             let checkpoint_id = register_checkpoint(
-                ad_fn_rev, directions_tail, hash_map
+                ad_fn_rev, directions_tail, &arg_vec_tmp
             );
             ad_reverse_id     = Some(checkpoint_id);
         }
@@ -349,7 +364,7 @@ where
         id_too_large           = (IndexT::MAX as usize) < id_usize;
         checkpoint_id          = info_vec.len() as IndexT;
         let info               = CheckpointInfo::new(
-            name, ad_fn, ad_forward_id, ad_reverse_id
+            name.to_string(), ad_fn, ad_forward_id, ad_reverse_id
         );
         info_vec.push( info );
     }
