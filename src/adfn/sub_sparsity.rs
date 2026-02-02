@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
-//! Implements [ADfn] sub-graph sparsity method.
+//! Implements [ADfn] sub-graph sparsity pattern method.
 //!
 //! Link to [parent module](super)
 //!
@@ -29,7 +29,7 @@ use crate::op::id::{
 use crate::doc_generic_v;
 //
 // ---------------------------------------------------------------------------
-// ADfn::subsparsity
+// ADfn::sub_sparsity
 impl<V> ADfn<V>
 where
     V               : GlobalAtomCallbackVec + GlobalOpInfoVec,

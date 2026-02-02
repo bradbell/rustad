@@ -125,8 +125,16 @@ macro_rules! for_sparse_jac {
             // jacobian
             let mut jacobian = vec![zero_e.clone(); sub_pattern.len()];
             //
+            if trace {
+                println!("Begin Trace: for_sparse_jac: n = {}", n);
+                println!("color_vec = {:?}", color_vec);
+            }
+            //
             // color
             for color in 0 .. n_color {
+                if trace {
+                    println!( "color = {}", color);
+                }
                 //
                 // dom_der
                 let mut dom_der : Vec<$E> = Vec::with_capacity(n);
@@ -153,6 +161,9 @@ macro_rules! for_sparse_jac {
                 }
             }
             debug_assert!( index == sub_pattern.len() );
+            if trace {
+                println!("End Trace: for_sparse_jac");
+            }
             //
             jacobian
         }

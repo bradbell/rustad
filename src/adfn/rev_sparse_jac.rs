@@ -66,14 +66,14 @@ use crate::{
 ///   the range dimension (variable domain dimension) for this ADfn object.
 ///
 /// * color_vec :
-///   This is a coloring correspoding to the transpose of the Jacobian matrix 
+///   This is a coloring corresponding to the transpose of the Jacobian matrix
 ///   for f evalued on the subset specified by *sub_pattern*.
 ///
 /// * trace :
 ///   if true, a trace of the calculations is printed on stdout.
 ///
 /// * jacobian :
-///   The return is the transpose of the Jacobian on the 
+///   The return is the transpose of the Jacobian on the
 ///   subset sparsity pattern.
 ///   To be specific, it has the same length as *sub_pattern* and for each k,
 ///   `jacobian[k]` is the Jacobian at row index `sub_pattern[k][1]`
@@ -127,10 +127,18 @@ macro_rules! rev_sparse_jac {
             // jacobian
             let mut jacobian = vec![zero_e.clone(); sub_pattern.len()];
             //
+            if trace {
+                println!("Begin Trace: rev_sparse_jac: m = {}", m);
+                println!("color_vec = {:?}", color_vec);
+            }
+            //
             // color
             for color in 0 .. n_color {
+                if trace {
+                    println!( "color = {}", color);
+                }
                 //
-                // dom_der
+                // range_der
                 let mut range_der : Vec<$E> = Vec::with_capacity(m);
                 for i in 0 .. m {
                     if color_vec[i] == color {
@@ -155,6 +163,9 @@ macro_rules! rev_sparse_jac {
                 }
             }
             debug_assert!( index == sub_pattern.len() );
+            if trace {
+                println!("End Trace: rev_sparse_jac");
+            }
             //
             jacobian
         }
