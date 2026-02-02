@@ -81,7 +81,6 @@ pub fn doc_for_sparse_jac() {}
 /// Create the for_sparse_jac functions
 ///
 /// * suffix : is either `value` or `ad` ;
-/// * V      : see [doc_generic_v]
 /// * E      : see [doc_generic_e] .
 ///
 /// If *suffix* is `value` , *E must be be the value type *V* .
