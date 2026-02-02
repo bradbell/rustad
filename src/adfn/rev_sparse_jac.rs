@@ -26,20 +26,20 @@ use crate::{
 //
 // -----------------------------------------------------------------------
 // sparse_jac
-/// Sparse Jacobian evaluation using forward mode.
+/// Sparse Jacobian evaluation using reverse mode.
 ///
 /// * Syntax :
 ///   ```text
-///     jacobian = f.for_sparse_jac_value(
+///     jacobian = f.rev_sparse_jac_value(
 ///         dyp_both, &var_both, &sub_pattern, &color_vec, trace
 ///     )
-///     jacobian = f.for_sparse_jac_ad(
+///     jacobian = f.rev_sparse_jac_ad(
 ///         dyp_both, &var_both, &sub_pattern, &color_vec, trace
 ///     )
 ///   ```
 ///
 /// * Prototype :
-///   see [ADfn::for_sparse_jac_value] and  [ADfn::for_sparse_jac_ad]
+///   see [ADfn::rev_sparse_jac_value] and  [ADfn::rev_sparse_jac_ad]
 ///
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
@@ -60,25 +60,27 @@ use crate::{
 ///   [forward_var](crate::adfn::forward_var::doc_forward_var) .
 ///
 /// * sub_pattern :
-///   This is a subset of the sparsity for the Jacobian of f.
+///   This is a subset of the sparsity pattern for
+///   the transpose of the Jacobain of f.
 ///   All of the column (row) indices must be less than
-///   the variable domain dimension (range dimension) for this ADfn object.
+///   the range dimension (variable domain dimension) for this ADfn object.
 ///
 /// * color_vec :
-///   This is a coloring for the Jacobian matrix for f evaluated on the
-///   subset specified by *sub_pattern* .
+///   This is a coloring correspoding to the transpose of the Jacobian matrix 
+///   for f evalued on the subset specified by *sub_pattern*.
 ///
 /// * trace :
 ///   if true, a trace of the calculations is printed on stdout.
 ///
 /// * jacobian :
-///   The return is the Jacobian on the subset sparsity pattern.
+///   The return is the transpose of the Jacobian on the 
+///   subset sparsity pattern.
 ///   To be specific, it has the same length as *sub_pattern* and for each k,
-///   `jacobian[k]` is the Jacobian at row index `sub_pattern[k][0]`
-///   and column index `sub_pattern[k][1]` .
-pub fn doc_for_sparse_jac() {}
+///   `jacobian[k]` is the Jacobian at row index `sub_pattern[k][1]`
+///   and column index `sub_pattern[k][2]` .
+pub fn doc_rev_sparse_jac() {}
 //
-/// Create the for_sparse_jac functions
+/// Create the rev_sparse_jac functions
 ///
 /// * suffix : is either `value` or `ad` ;
 /// * V      : see [doc_generic_v]
@@ -87,14 +89,14 @@ pub fn doc_for_sparse_jac() {}
 /// If *suffix* is `value` , *E must be be the value type *V* .
 /// If *suffix* is `ad` , *E must be be the type `AD<V>` .
 ///
-/// See [doc_for_sparse_jac]
-macro_rules! for_sparse_jac {
+/// See [doc_rev_sparse_jac]
+macro_rules! rev_sparse_jac {
     ($suffix:ident, $V:ident, $E:ty) => {paste::paste! {
         #[doc = concat!(
             "`", stringify!($E), "` evaluation of of sparse Jacobians; ",
-            "see [doc_for_sparse_jac]",
+            "see [doc_rev_sparse_jac]",
         )]
-        pub fn [< for_sparse_jac_ $suffix >] (
+        pub fn [< rev_sparse_jac_ $suffix >] (
             &self,
             dyp_both     : Option< &Vec<$E> >  ,
             var_both     : &Vec<$E>            ,
@@ -104,12 +106,12 @@ macro_rules! for_sparse_jac {
         ) -> Vec<$E>
         {   //
             // n
-            let n = self.var_dom_len();
-            debug_assert!( n == color_vec.len() );
+            let m = self.rng_len();
+            debug_assert!( m == color_vec.len() );
             //
             // n_color
             let n_color =
-                color_vec.iter().filter(|&k| k < &n ).max().unwrap() + 1;
+                color_vec.iter().filter(|&k| k < &m ).max().unwrap() + 1;
             //
             // zero_e, one_e
             let zero_e : $E = FloatCore::zero();
@@ -129,26 +131,26 @@ macro_rules! for_sparse_jac {
             for color in 0 .. n_color {
                 //
                 // dom_der
-                let mut dom_der : Vec<$E> = Vec::with_capacity(n);
-                for j in 0 .. n {
-                    if color_vec[j] == color {
-                        dom_der.push( one_e.clone() );
+                let mut range_der : Vec<$E> = Vec::with_capacity(m);
+                for i in 0 .. m {
+                    if color_vec[i] == color {
+                        range_der.push( one_e.clone() );
                     } else {
-                        dom_der.push( zero_e.clone() );
+                        range_der.push( zero_e.clone() );
                     }
                 }
-                // range_der
-                let range_der = self. [< forward_der_ $suffix >](
-                    dyp_both, &var_both, dom_der, trace
+                // dom_der
+                let dom_der = self. [< reverse_der_ $suffix >](
+                    dyp_both, &var_both, range_der, trace
                 );
                 //
-                let [mut i, mut j] = sub_pattern[ order[index] ];
-                while index < sub_pattern.len() && color_vec[j] == color {
+                let [mut j, mut i] = sub_pattern[ order[index] ];
+                while index < sub_pattern.len() && color_vec[i] == color {
                     // TODO: figure out how to do this without a clone
-                    jacobian[ order[index] ] = range_der[i].clone();
+                    jacobian[ order[index] ] = dom_der[j].clone();
                     index                   += 1;
                     if index < sub_pattern.len() {
-                        [i, j] = sub_pattern[ order[index] ];
+                        [j, i] = sub_pattern[ order[index] ];
                     }
                 }
             }
@@ -163,7 +165,7 @@ impl<V> ADfn<V>
 where
     V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore,
 {   //
-    // for_sparse_jac
-    for_sparse_jac!( value, V, V );
-    for_sparse_jac!( ad,    V, AD::<V> );
+    // rev_sparse_jac
+    rev_sparse_jac!( value, V, V );
+    rev_sparse_jac!( ad,    V, AD::<V> );
 }

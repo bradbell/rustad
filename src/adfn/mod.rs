@@ -16,6 +16,7 @@ pub mod reverse_der;
 pub mod sub_sparsity;
 pub mod for_sparsity;
 pub mod for_sparse_jac;
+pub mod rev_sparse_jac;
 pub mod rust_src;
 pub mod optimize;
 //
