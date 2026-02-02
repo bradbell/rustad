@@ -133,7 +133,7 @@ pub fn doc_forward_var() { }
 ///
 /// See [doc_forward_var]
 macro_rules! forward_var {
-    ( $suffix:ident, $V:ident, $E:ty ) => { paste::paste! {
+    ( $suffix:ident, $E:ty ) => { paste::paste! {
         #[doc = concat!(
             " `", stringify!($E), "`",
             " evaluation of dependent variables; see [doc_forward_var]",
@@ -262,6 +262,6 @@ where
     V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore,
 {   //
     // forward_var
-    forward_var!( value, V, V );
-    forward_var!( ad,    V, AD::<V> );
+    forward_var!( value, V );
+    forward_var!( ad,    AD::<V> );
 }

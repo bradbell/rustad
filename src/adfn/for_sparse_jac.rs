@@ -89,7 +89,7 @@ pub fn doc_for_sparse_jac() {}
 ///
 /// See [doc_for_sparse_jac]
 macro_rules! for_sparse_jac {
-    ($suffix:ident, $V:ident, $E:ty) => {paste::paste! {
+    ($suffix:ident, $E:ty) => {paste::paste! {
         #[doc = concat!(
             "`", stringify!($E), "` evaluation of of sparse Jacobians; ",
             "see [doc_for_sparse_jac]",
@@ -175,6 +175,6 @@ where
     V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore,
 {   //
     // for_sparse_jac
-    for_sparse_jac!( value, V, V );
-    for_sparse_jac!( ad,    V, AD::<V> );
+    for_sparse_jac!( value, V );
+    for_sparse_jac!( ad,    AD::<V> );
 }

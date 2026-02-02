@@ -65,7 +65,7 @@ pub fn doc_forward_dyp() { }
 ///
 /// See [doc_forward_dyp]
 macro_rules! forward_dyp {
-    ( $suffix:ident, $V:ident, $E:ty ) => { paste::paste! {
+    ( $suffix:ident, $E:ty ) => { paste::paste! {
         #[doc = concat!( " `", stringify!($E), "`",
         " evaluation of dependent dynamic parameters; see [doc_forward_dyp]" ,
         )]
@@ -146,8 +146,8 @@ where
     V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore,
 {   //
     // forward_dyp
-    forward_dyp!( value, V, V );
-    forward_dyp!( ad,    V, AD::<V> );
+    forward_dyp!( value, V );
+    forward_dyp!( ad,    AD::<V> );
 }
 
 #[cfg(test)]

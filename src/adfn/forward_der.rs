@@ -113,7 +113,6 @@ pub fn doc_forward_der() { }
 /// Create the first order forward mode member functions.
 ///
 /// * suffix : is either `value` or `ad` ;
-/// * V      : see [doc_generic_v]
 /// * E      : see [doc_generic_e] .
 ///
 /// If *suffix* is `value` , *E must be be the value type *V* .
@@ -121,7 +120,7 @@ pub fn doc_forward_der() { }
 ///
 /// See [doc_forward_der]
 macro_rules! forward_der {
-    ( $suffix:ident, $V:ident, $E:ty ) => { paste::paste! {
+    ( $suffix:ident, $E:ty ) => { paste::paste! {
         #[doc = concat!(
             " `", stringify!($E), "` evaluation of first order forward mode; ",
             "see [doc_forward_der]",
@@ -249,6 +248,6 @@ where
     V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore,
 {   //
     // forward_der
-    forward_der!( value, V, V );
-    forward_der!( ad,    V, AD::<V> );
+    forward_der!( value, V );
+    forward_der!( ad,    AD::<V> );
 }

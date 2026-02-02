@@ -41,9 +41,9 @@ use crate::{
 ///
 /// * dyp_both :
 ///   If there are no dynamic parameters in f, this should be None
-///   or the empty vector.
-///   Otherwise it is the dynamic parameter sub-vectors in the following order:
-///   the domain dynamic parameters followed by the dependent dynamic parameters.
+///   or the empty vector. Otherwise
+///   it is the dynamic parameter sub-vectors in the following order: the
+///   domain dynamic parameters followed by the dependent dynamic parameters.
 ///   This is normally computed by
 ///   [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
 ///
@@ -114,15 +114,13 @@ pub fn doc_reverse_der() { }
 /// * suffix :
 ///   is either `value` or `ad` ;
 ///
-/// * V : see [doc_generic_v]
-///
 /// * E : see [doc_generic_e] .
 ///   If *suffix* is `value` , *E must be be the value type *V* .
 ///   If *suffix* is `ad` , *E must be be the type `AD<V>` .
 ///
 /// See [doc_reverse_der]
 macro_rules! reverse_der {
-    ( $suffix:ident, $V:ident, $E:ty ) => { paste::paste! {
+    ( $suffix:ident, $E:ty ) => { paste::paste! {
         #[doc = concat!(
             " `", stringify!($E), "` evaluation of first order reverse mode; ",
             "see [doc_reverse_der]",
@@ -230,9 +228,8 @@ macro_rules! reverse_der {
             }
             //
             // domain_der
-            let nan_e  : $E    = FloatCore::nan();
             let mut domain_der = var_der;
-            domain_der.resize(self.var.n_dom, nan_e);
+            domain_der.truncate(self.var.n_dom);
             domain_der.shrink_to_fit();
             domain_der
         }
@@ -244,6 +241,6 @@ where
     V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore,
 {   //
     // reverse_der
-    reverse_der!( value, V, V );
-    reverse_der!( ad,    V, AD::<V> );
+    reverse_der!( value, V );
+    reverse_der!( ad,    AD::<V> );
 }
