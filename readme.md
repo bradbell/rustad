@@ -76,15 +76,13 @@ This package is intended to include (and extend) most of the features in
 
     Note that this has a natural extension to numeric vectors where it
     acts element wise.
-    
+
+12. Forward, reverse, and subgraph sparse derivative calculations
 
 ## Goals Before Stable API
 
 1.  Division and all the standard math functions.
     
-2.  Forward and reverse sparse derivative calculations
-    (sparsity patterns are already implemented). 
-
 ## Wish List
 
 1.  Generate llvm, similar to the source code generation and use it
