@@ -149,9 +149,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2026.2.1");
+/// assert_eq!(date, "2026.2.2");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2026.2.1";
+pub const YEAR_MONTH_DAY : &str = "2026.2.2";
 //
 // CMP_AS_RS
 /// is the source code for the [cmp_as](crate::float::cmp_as) module.

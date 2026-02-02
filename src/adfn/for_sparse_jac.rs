@@ -145,8 +145,8 @@ macro_rules! for_sparse_jac {
                 let [mut i, mut j] = sub_pattern[ order[index] ];
                 while index < sub_pattern.len() && color_vec[j] == color {
                     // TODO: figure out how to do this without a clone
-                    jacobian[index] = range_der[i].clone();
-                    index          += 1;
+                    jacobian[ order[index] ] = range_der[i].clone();
+                    index                   += 1;
                     if index < sub_pattern.len() {
                         [i, j] = sub_pattern[ order[index] ];
                     }
