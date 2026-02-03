@@ -492,12 +492,12 @@ impl_hash_trait!(f64);
 // ----------------------------------------------------------------------------
 /// FloatCore trait for az_float types
 ///
-/// * P : is a primitive type; i.e., f32 or f64;
-macro_rules! impl_float_core{ ($P:ident) => {
-    impl FloatCore for crate::AzFloat<$P> {
-        fn nan()  -> Self { Self( $P::NAN ) }
-        fn zero() -> Self { Self( 0 as $P ) }
-        fn one()  -> Self { Self( 1 as $P ) }
+/// * B : is the floating point base type
+macro_rules! impl_float_core{ ($B:ident) => {
+    impl FloatCore for crate::AzFloat<$B> {
+        fn nan()  -> Self { Self( $B::NAN ) }
+        fn zero() -> Self { Self( 0 as $B ) }
+        fn one()  -> Self { Self( 1 as $B ) }
     }
 }}
 impl_float_core!(f32);
