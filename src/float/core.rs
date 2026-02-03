@@ -13,7 +13,7 @@
 /// The FloatCore trait
 ///
 pub trait FloatCore {
-    fn nan() -> Self;
+    fn nan()  -> Self;
     fn zero() -> Self;
-    fn one() -> Self;
+    fn one()  -> Self;
 }

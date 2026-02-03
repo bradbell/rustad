@@ -479,7 +479,7 @@ pub fn doc_hash_trait() {}
 macro_rules! impl_hash_trait{ ($B:ident) => {
     /// see [doc_hash_trait]
     impl std::hash::Hash for AzFloat<$B>
-    {
+    {   // see [doc_hash_trait]
         fn hash<H : std::hash::Hasher>(&self, state : &mut H) {
             let bits       = self.0.to_bits();
             let uint : u64 = bits.into();
@@ -490,14 +490,14 @@ macro_rules! impl_hash_trait{ ($B:ident) => {
 impl_hash_trait!(f32);
 impl_hash_trait!(f64);
 // ----------------------------------------------------------------------------
-/// Implements the FloatCore trait for az_float types
+/// FloatCore trait for az_float types
 ///
 /// * P : is a primitive type; i.e., f32 or f64;
 macro_rules! impl_float_core{ ($P:ident) => {
     impl FloatCore for crate::AzFloat<$P> {
-        fn nan()  -> Self { Self::from( $P::NAN ) }
-        fn zero() -> Self { Self::from( 0 as $P ) }
-        fn one()  -> Self { Self::from( 1 as $P ) }
+        fn nan()  -> Self { Self( $P::NAN ) }
+        fn zero() -> Self { Self( 0 as $P ) }
+        fn one()  -> Self { Self( 1 as $P ) }
     }
 }}
 impl_float_core!(f32);
