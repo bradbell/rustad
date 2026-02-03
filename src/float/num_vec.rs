@@ -28,6 +28,7 @@ use crate::{
     AzFloat,
     CmpAsLhs,
     CmpAsRhs,
+    FloatCore,
 };
 //
 // NumVec
@@ -438,7 +439,7 @@ impl_from_scalar!( AzFloat<f64>, AzFloat<f64>);
 // PartialEq, Eq
 /// `NumVec<S>` Eq operator
 ///
-/// S : is the type of the elements of the numeric vector.
+/// * S : is the type of the elements of the numeric vector.
 ///
 /// Two NumVec object are equal it they have the same length
 /// and their corresponding elements are equal.
@@ -484,7 +485,7 @@ impl<S: PartialEq> Eq for NumVec<S> { }
 // ---------------------------------------------------------------------------
 /// Hash function for `NumVec<AzFloat>` objects
 ///
-/// * B : is the floating point base type
+/// * S : is the type of the elements of the numeric vector.
 ///
 /// # Example
 /// ```
@@ -527,3 +528,14 @@ where
         }
     }
  }
+// ---------------------------------------------------------------------------
+/// Implements the FloatCore trait for NumVec types
+impl<S> FloatCore for NumVec<S>
+where
+    S         : FloatCore,
+    NumVec<S> : From<S>
+{
+        fn nan()  -> Self { Self::from( S::nan() ) }
+        fn zero() -> Self { Self::from( S::zero() ) }
+        fn one()  -> Self { Self::from( S::one() ) }
+}

@@ -153,6 +153,12 @@ where
 /// ```
 pub const YEAR_MONTH_DAY : &str = "2026.2.3";
 //
+// CORE_RS
+/// is the source code for the [core](crate::float::core) module.
+/// This is needed at the beginning of a dll library that include
+/// [ADfn::rust_src] .
+pub const CORE_RS : &str = include_str!( "float/core.rs" );
+//
 // CMP_AS_RS
 /// is the source code for the [cmp_as](crate::float::cmp_as) module.
 /// This is needed at the beginning of a dll library that include

@@ -51,12 +51,6 @@ setup_this_value_type!( AzFloat<f64> );
 setup_this_value_type!( NumVec< AzFloat<f32> > );
 setup_this_value_type!( NumVec< AzFloat<f64> > );
 //
-// Define the FloatCore trait for value types
-crate::float::core::impl_float_core_for_az_float!(f32);
-crate::float::core::impl_float_core_for_az_float!(f64);
-crate::float::core::impl_float_core_for_num_vec!(f32);
-crate::float::core::impl_float_core_for_num_vec!(f64);
-//
-// Define the FloatValue trait for value types
+// Implement the FloatValue trait for value types
 crate::float::value::impl_float_value_from_primitive!(f32);
 crate::float::value::impl_float_value_from_primitive!(f64);

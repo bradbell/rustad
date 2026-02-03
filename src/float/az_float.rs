@@ -31,6 +31,7 @@ use super::cmp_as::{
     CmpAsLhs,
     CmpAsRhs,
 };
+use super::core::FloatCore;
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
 ///
@@ -488,6 +489,16 @@ macro_rules! impl_hash_trait{ ($B:ident) => {
 } }
 impl_hash_trait!(f32);
 impl_hash_trait!(f64);
-// ===========================================================================
-// END az_float.rs
-// ============================================================================
+// ----------------------------------------------------------------------------
+/// Implements the FloatCore trait for az_float types
+///
+/// * P : is a primitive type; i.e., f32 or f64;
+macro_rules! impl_float_core{ ($P:ident) => {
+    impl FloatCore for crate::AzFloat<$P> {
+        fn nan()  -> Self { Self::from( $P::NAN ) }
+        fn zero() -> Self { Self::from( 0 as $P ) }
+        fn one()  -> Self { Self::from( 1 as $P ) }
+    }
+}}
+impl_float_core!(f32);
+impl_float_core!(f64);
