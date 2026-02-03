@@ -10,11 +10,6 @@
 //! This enables src/float to be directly included as part of a Dll library.
 //!
 // ----------------------------------------------------------------------------
-// use
-use crate::{
-    AD,
-};
-// ----------------------------------------------------------------------------
 /// The FloatCore trait
 ///
 pub trait FloatCore {
@@ -23,11 +18,11 @@ pub trait FloatCore {
     fn one() -> Self;
 }
 //
-// impl_float_core_for_az_float
+// impl_float_core_from_primitive
 /// Implements the FloatCore trait for value types
 ///
 /// * P : is a primitive type; i.e., f32 or f64;
-macro_rules! impl_float_core_for_az_float{ ($P:ident) => {
+macro_rules! impl_float_core_from_primitive{ ($P:ident) => {
     impl crate::float::core::FloatCore for crate::AzFloat<$P> {
         fn nan()  -> Self { Self::from( $P::NAN ) }
         fn zero() -> Self { Self::from( 0 as $P ) }
@@ -39,14 +34,4 @@ macro_rules! impl_float_core_for_az_float{ ($P:ident) => {
         fn one()  -> Self { Self::from( AzFloat::<$P>::one() ) }
     }
 } }
-pub(crate) use impl_float_core_for_az_float;
-//
-/// Implements the FloatCore trait for AD types
-impl<V> FloatCore for AD<V>
-where
-    V : FloatCore,
-{
-        fn nan()  -> Self { Self::from( V::nan() ) }
-        fn zero() -> Self { Self::from( V::zero() ) }
-        fn one()  -> Self { Self::from( V::one() ) }
-}
+pub(crate) use impl_float_core_from_primitive;

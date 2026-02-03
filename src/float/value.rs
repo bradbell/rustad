@@ -91,12 +91,12 @@ pub trait FloatValue : FloatCore {
     fn to_src(&self) -> String;
 }
 //
-// impl_float_value_for_az_float
+// impl_float_value_from_primitive
 /// Implements the FloatValue trait for value types
 /// `AzFloat<P>` and `NumVec< AzFloat<P> >`
 ///
 /// * P : is a primitive type; i.e., f32 or f64;
-macro_rules! impl_float_value_for_az_float{ ($P:ident) => {
+macro_rules! impl_float_value_from_primitive{ ($P:ident) => {
     impl crate::float::value::FloatValue for crate::AzFloat<$P> {
         fn is_zero(&self)  -> bool { self.0 == ( 0 as $P ) }
         fn is_one(&self)   -> bool { self.0 == ( 1 as $P ) }
@@ -156,4 +156,4 @@ macro_rules! impl_float_value_for_az_float{ ($P:ident) => {
         }
     }
 } }
-pub(crate) use impl_float_value_for_az_float;
+pub(crate) use impl_float_value_from_primitive;
