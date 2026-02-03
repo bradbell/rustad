@@ -535,7 +535,7 @@ where
     S         : FloatCore,
     NumVec<S> : From<S>
 {
-        fn nan()  -> Self { Self::from( S::nan() ) }
-        fn zero() -> Self { Self::from( S::zero() ) }
-        fn one()  -> Self { Self::from( S::one() ) }
+    fn nan()  -> Self { Self::from( S::nan() ) }
+    fn zero() -> Self { Self::from( S::zero() ) }
+    fn one()  -> Self { Self::from( S::one() ) }
 }
