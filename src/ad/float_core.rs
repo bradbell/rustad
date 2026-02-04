@@ -22,32 +22,29 @@ use crate::op::id;
 // ---------------------------------------------------------------------------
 macro_rules! impl_unary_float_core{ ($name:ident) => { paste::paste! {
     #[doc = concat!( "& `AD<V>.`", stringify!( $name ), "()")]
-    fn $name(self) -> Self {
+    fn $name(&self) -> Self {
         //
         // record
         fn record<V : FloatCore>(
             tape : &mut Tape<V> ,
-            arg  : AD<V>        ,
+            arg  : &AD<V>       ,
         ) -> AD<V> {
             //
-            // tape_id, ad_type, value
-            let AD::<V> { tape_id, ad_type, value, .. } = arg;
-            //
             // new_value
-            let new_value = value.$name();
+            let new_value = arg.value.$name();
             //
             // new_tape_id, new_index, new_ad_type
             let mut new_tape_id   = 0;
             let mut new_index     = 0;
             let mut new_ad_type   = ADType::ConstantP;
-            if (! tape.recording) || (tape_id != tape.tape_id) {
+            if (! tape.recording) || (arg.tape_id != tape.tape_id) {
                 return AD::new(new_tape_id, new_index, new_ad_type, new_value);
             }
-            debug_assert!( ad_type != ADType::ConstantP );
+            debug_assert!( arg.ad_type != ADType::ConstantP );
             //
             // new_tape_id, new_ad_type
             new_tape_id = tape.tape_id;
-            new_ad_type = ad_type.clone();
+            new_ad_type = arg.ad_type.clone();
             //
             // op_seq
             let op_seq = if new_ad_type == ADType::Variable {
@@ -72,11 +69,11 @@ macro_rules! impl_unary_float_core{ ($name:ident) => { paste::paste! {
         // local_key
         let local_key : &LocalKey<RefCell< Tape<V> >> = ThisThreadTape::get();
         //
-        // new_tape_id, new_index, new_ad_type
-        let new_ad = local_key.with_borrow_mut(
+        // result
+        let result = local_key.with_borrow_mut(
             |tape| record( tape, self)
         );
-        new_ad
+        result
     }
 } } }
 //

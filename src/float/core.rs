@@ -18,5 +18,5 @@ pub trait FloatCore {
     fn one()  -> Self;
     //
     // unary functions
-    fn sin(self) -> Self;
+    fn sin(&self) -> Self;
 }

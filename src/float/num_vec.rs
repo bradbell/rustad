@@ -530,11 +530,11 @@ where
  }
 // ---------------------------------------------------------------------------
 macro_rules! impl_unary_float_core{ ($name:ident) => {
-    fn $name(self) -> Self {
+    fn $name(&self) -> Self {
         if self.len() == 1 {
             Self { s : self.s.$name() , vec : Vec::new() }
         } else {
-            let v = self.vec.into_iter().map( |s| s.$name() ).collect();
+            let v = self.vec.iter().map( |s| s.$name() ).collect();
             Self { s : f32::NAN.into() , vec : v }
         }
     }
