@@ -18,6 +18,7 @@ use crate::op::info::{
     OpInfo,
     sealed::GlobalOpInfoVec
 };
+use crate::tape::sealed::ThisThreadTape;
 //
 #[cfg(doc)]
 use crate::{
@@ -220,9 +221,8 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
     }
 }}}
 //
-impl<V> ADfn<V>
-where
-    V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore,
+impl<V> ADfn<V> where
+V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore + ThisThreadTape,
 {   //
     // subgraph_der
     subgraph_der!( value, V, V );

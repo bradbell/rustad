@@ -15,6 +15,7 @@ use crate::{
     FloatCore,
 };
 use crate::op::info::sealed::GlobalOpInfoVec;
+use crate::tape::sealed::ThisThreadTape;
 //
 #[cfg(doc)]
 use crate::{
@@ -141,9 +142,8 @@ macro_rules! forward_dyp {
     }
 } }
 //
-impl<V> ADfn<V>
-where
-    V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore,
+impl<V> ADfn<V> where
+V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore + ThisThreadTape,
 {   //
     // forward_dyp
     forward_dyp!( value, V );

@@ -15,6 +15,7 @@ use crate::{
     FloatCore,
 };
 use crate::op::info::sealed::GlobalOpInfoVec;
+use crate::tape::sealed::ThisThreadTape;
 //
 #[cfg(doc)]
 use crate::{
@@ -236,9 +237,8 @@ macro_rules! reverse_der {
     }
 } }
 //
-impl<V> ADfn<V>
-where
-    V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore,
+impl<V> ADfn<V> where
+V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore + ThisThreadTape,
 {   //
     // reverse_der
     reverse_der!( value, V );

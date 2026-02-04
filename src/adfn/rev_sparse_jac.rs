@@ -16,6 +16,7 @@ use crate::{
     SparsityPattern,
 };
 use crate::op::info::sealed::GlobalOpInfoVec;
+use crate::tape::sealed::ThisThreadTape;
 //
 #[cfg(doc)]
 use crate::{
@@ -171,9 +172,8 @@ macro_rules! rev_sparse_jac {
     }
 }}
 //
-impl<V> ADfn<V>
-where
-    V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore,
+impl<V> ADfn<V> where
+V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore + ThisThreadTape,
 {   //
     // rev_sparse_jac
     rev_sparse_jac!( value, V );

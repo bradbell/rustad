@@ -432,10 +432,9 @@ fn checkpoint_forward_fun_value<V>(
     domain           : &[&V]        ,
     call_info        : IndexT      ,
     trace            : bool        ,
-) -> Result< Vec<V>, String >
-where
+) -> Result< Vec<V>, String > where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FloatCore,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FloatCore + ThisThreadTape,
 {   //
     // domain_clone
     let domain_clone = ref_slice2vec(domain);
@@ -464,7 +463,7 @@ fn checkpoint_forward_der_value<V>(
 ) -> Result< Vec<V>, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FloatCore,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FloatCore + ThisThreadTape,
 {   //
     assert_eq!( domain.len(), domain_der.len() );
     //
@@ -500,7 +499,7 @@ fn checkpoint_reverse_der_value<V>(
 ) -> Result< Vec<V>, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FloatCore,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FloatCore + ThisThreadTape,
 {   //
     // domain_clone
     let domain_clone = ref_slice2vec(domain);

@@ -16,4 +16,7 @@ pub trait FloatCore {
     fn nan()  -> Self;
     fn zero() -> Self;
     fn one()  -> Self;
+    //
+    // unary functions
+    fn sin(self) -> Self;
 }
