@@ -60,8 +60,8 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
 /// [IndexT] must be defined in any module that uses eval_binary_forward_var
 macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! {
     #[doc = concat!(
-        " E zero order forward for parameter ", stringify!( $op ),
-        " parameter; see [ForwardDyp](crate::op::info::ForwardDyp)"
+        " E evaluation of parameter ", stringify!( $op ), " parameter",
+        "; see [ForwardDyp](crate::op::info::ForwardDyp)"
     ) ]
     fn [< $Name:lower _forward_dyp >] <V, E> (
         dyp_both    : &mut [E]    ,
@@ -93,8 +93,8 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
         };
     }
     #[doc = concat!(
-        " E zero order forward for parameter ", stringify!( $op ),
-        " variable; see [ForwardVar](crate::op::info::ForwardVar)"
+        " E evaluation of parameter ", stringify!( $op ), " variable",
+        "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _pv_forward_var >] <V, E> (
         dyp_both    : &[E]        ,
@@ -119,8 +119,8 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
         }
     }
     #[doc = concat!(
-        " E zero order forward variable ", stringify!( $op ),
-        " parameter; see [ForwardVar](crate::op::info::ForwardVar)"
+        " E evaluation of variable ", stringify!( $op ), " parameter",
+        "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _vp_forward_var >] <V, E> (
         dyp_both    : &[E]        ,
@@ -145,8 +145,8 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
         }
     }
     #[doc = concat!(
-        " E zero order forward variable ", stringify!( $op ),
-        " variable; see [ForwardVar](crate::op::info::ForwardVar)"
+        " E evaluation of variable ", stringify!( $op ), " variable",
+        "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _vv_forward_var >] <V, E> (
         _dyp_both   : &[E]        ,
@@ -188,7 +188,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
     // TODO: the {name}_pp_ruse_src case is missing. Create a test
     // that needs this and then fix it.
     #[doc = concat!(
-        " rust source code for parameter ", stringify!( $op ),
+        " rust source code generation for parameter ", stringify!( $op ),
         " variable; see [RustSrc](crate::op::info::RustSrc)"
     ) ]
     fn [< $Name:lower _pv_rust_src >]<V> (
@@ -243,7 +243,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         src
     }
     #[doc = concat!(
-        " rust source code for variable ", stringify!( $op ),
+        " rust source code generation for variable ", stringify!( $op ),
         " parameter; see [RustSrc](crate::op::info::RustSrc)"
     ) ]
     fn [< $Name:lower _vp_rust_src >]<V> (
@@ -298,7 +298,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         src
     }
     #[doc = concat!(
-        " rust source code for variable ", stringify!( $op ),
+        " rust source code generation for variable ", stringify!( $op ),
         " variable; see [RustSrc](crate::op::info::RustSrc)"
     ) ]
     fn [< $Name:lower _vv_rust_src >]<V> (

@@ -54,8 +54,7 @@ pub(crate) fn is_compare_op(op_id : u8) -> bool {
 /// [IndexT] must be defined in any module that uses eval_compare_op
 macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
     #[doc = concat!(
-        " E zero order forward for dynamic parameter num_",
-        stringify!( $name ),
+        " E evaluation of compare as for ", stringify!( $name ),
         "; see [ForwardDyp](crate::op::info::ForwardDyp)"
     ) ]
     fn [< $name _forward_dyp >] <V, E> (
@@ -100,7 +99,7 @@ macro_rules! eval_compare_forward_fun { ($name:ident) => { paste::paste! {
         };
     }
     #[doc = concat!(
-        " E zero order forward variable num_", stringify!( $name ),
+        " E evaluation of compare as for ", stringify!( $name ),
         "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $name _forward_var >] <V, E> (

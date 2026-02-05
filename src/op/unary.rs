@@ -39,8 +39,8 @@ pub(crate) fn is_unary_op(op_id : u8) -> bool {
 macro_rules! forward_dyp{ ($name:ident) => { paste::paste! {
     //
     #[doc = concat!(
-        " E zero order forward for ", stringify!( $name ), "() ",
-        "for dynamic parameers"
+        " E evaluation of ", stringify!( $name ), " for dynamic parameters",
+        "; see [ForwardDer](crate::op::info::ForwardDyp)"
     ) ]
     fn [< $name _forward_dyp >] <V, E> (
         dyp_both    : &mut [E]    ,
@@ -66,8 +66,8 @@ pub(crate) use forward_dyp;
 macro_rules! forward_var{ ($name:ident) => { paste::paste! {
     //
     #[doc = concat!(
-        " E zero order forward for ", stringify!( $name ), "() ",
-        "for variables"
+        " E evaluation of ", stringify!( $name ), " for variables",
+        "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $name _forward_var >] <V, E> (
         _dyp_both   : &[E]        ,
@@ -95,7 +95,8 @@ pub(crate) use forward_var;
 macro_rules! rust_src { ($name:ident) => { paste::paste! {
     //
     #[doc = concat!(
-        " rust source code for ", stringify!( $op ), "() ",
+        " rust source code gnerattion for ", stringify!( $op ),
+        "; see [RustSrc](crate::op::info::RustSrc)"
     ) ]
     fn [< $name _rust_src >]<V> (
         _not_used   : V           ,
