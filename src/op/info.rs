@@ -478,9 +478,12 @@ where
     crate::op::sub::set_op_info::<V>(&mut result);
     crate::op::mul::set_op_info::<V>(&mut result);
     crate::op::div::set_op_info::<V>(&mut result);
+    //
     crate::op::call::set_op_info::<V>(&mut result);
     crate::op::no_op::set_op_info::<V>(&mut result);
     crate::op::cmp_as::set_op_info::<V>(&mut result);
+    //
+    crate::op::sin::set_op_info::<V>(&mut result);
     result
 }
 // ---------------------------------------------------------------------------

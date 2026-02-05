@@ -11,6 +11,7 @@
 //
 pub mod id;
 pub mod info;
+pub mod unary;
 pub mod binary;
 pub mod cmp_as;
 //
@@ -18,6 +19,8 @@ pub mod add;
 pub mod sub;
 pub mod mul;
 pub mod div;
+//
+pub mod sin;
 //
 pub mod call;
 pub mod no_op;

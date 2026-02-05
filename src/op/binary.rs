@@ -49,6 +49,7 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
 ///
 /// This defines the following functions in the current module:
 /// ```text
+///     {name}_forward_dyp<V, E>
 ///     {name}_pv_forward_var<V, E>
 ///     {name}_vp_forward_var<V, E>
 ///     {name}_vv_forward_var<V, E>
@@ -77,6 +78,9 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
         debug_assert!( arg.len() == 2);
         debug_assert!(
             ! ( arg_type[0].is_constant() && arg_type[1].is_constant() )
+        );
+        debug_assert!(
+            ! ( arg_type[0].is_variable() || arg_type[1].is_variable() )
         );
         let lhs       = arg[0] as usize;
         let rhs       = arg[1] as usize;
@@ -181,6 +185,8 @@ pub(crate) use eval_binary_forward_var;
 ///
 /// [IndexT] must be defined in any module that uses binary_rust_src
 macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
+    // TODO: the {name}_pp_ruse_src case is missing. Create a test
+    // that needs this and then fix it.
     #[doc = concat!(
         " rust source code for parameter ", stringify!( $op ),
         " variable; see [RustSrc](crate::op::info::RustSrc)"
