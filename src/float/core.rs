@@ -13,10 +13,71 @@
 /// The FloatCore trait
 ///
 pub trait FloatCore {
+    // nan
+    /// ```
+    /// use rustad::{
+    ///     AzFloat,
+    ///     FloatCore,
+    /// };
+    /// type V = AzFloat<f32>;
+    /// let nan_v : V = FloatCore::nan();
+    /// // AzFloat<f32> defines nan as equal to itself
+    /// assert_eq!( nan_v, nan_v );
+    /// // f32 defines nan as not equal to itself
+    /// assert_ne!( nan_v.to_inner(), nan_v.to_inner() );
+    /// ```
     fn nan()  -> Self;
+    //
+    // zero
+    /// ```
+    /// use rustad::{
+    ///     AzFloat,
+    ///     NumVec,
+    ///     FloatCore,
+    /// };
+    /// type S = AzFloat<f64>;
+    /// type V = NumVec<S>;
+    /// let zero_v : V = FloatCore::zero();
+    /// let two_v      = V::from( S::from(2) );
+    /// assert_eq!( two_v , &zero_v + &two_v );
+    /// ```
     fn zero() -> Self;
+    //
+    // one
+    /// ```
+    /// use rustad::{
+    ///     AzFloat,
+    ///     NumVec,
+    ///     FloatCore,
+    /// };
+    /// type S = AzFloat<f64>;
+    /// type V = NumVec<S>;
+    /// let one_v : V  = FloatCore::one();
+    /// let two_v      = V::from( S::from(2) );
+    /// assert_eq!( two_v , &one_v * &two_v );
+    /// ```
     fn one()  -> Self;
     //
     // unary functions
+    //
+    // sin
+    /// ```
+    /// use rustad::{
+    ///     AzFloat,
+    ///     NumVec,
+    ///     FloatCore,
+    ///     start_recording,
+    ///     stop_recording,
+    /// };
+    /// type V = AzFloat<f64>;
+    /// let trace    = false;
+    /// let  x       = vec![ V::from(0) ];
+    /// let (_, ax)  = start_recording(None, x);
+    /// let ay       = vec![ ax[0].sin() ];
+    /// let f        = stop_recording(ay);
+    /// let x        = vec![ V::from(1) ];
+    /// let (y,_)    = f.forward_var_value(None, x, trace);
+    /// assert_eq!( y[0].to_inner(), f64::sin(1.0)  );
+    /// ```
     fn sin(&self) -> Self;
 }

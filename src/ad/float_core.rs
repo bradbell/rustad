@@ -57,10 +57,11 @@ macro_rules! impl_unary_float_core{ ($name:ident) => { paste::paste! {
             new_index = op_seq.n_dep + op_seq.n_dom;
             //
             // op_seq: n_dep, arg_start, arg_type, id_all
+            op_seq.id_all.push( id::[< $name:upper _OP >] );
             op_seq.n_dep += 1;
             op_seq.arg_start.push( op_seq.arg_all.len() as IndexT );
+            op_seq.arg_all.push( arg.index as IndexT );
             op_seq.arg_type_all.push( new_ad_type.clone() );
-            op_seq.id_all.push( id::[< $name:upper _OP >] );
             //
             AD::new(new_tape_id, new_index, new_ad_type, new_value)
 
