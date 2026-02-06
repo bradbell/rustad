@@ -60,6 +60,10 @@ pub trait FloatCore {
     //
     // unary functions
     //
+    // cos
+    fn cos(&self) -> Self;
+    //
+    //
     // sin
     /// ```
     /// use rustad::{
