@@ -61,21 +61,30 @@ pub trait FloatCore {
     // unary functions
     //
     // minus
-    fn minus(&self) -> Self;
-    //
-    // cos
-    fn cos(&self) -> Self;
     /// ```
     /// use rustad::{
     ///     AzFloat,
-    ///     NumVec,
+    ///     FloatCore,
+    /// };
+    /// type V = AzFloat<f64>;
+    /// let one_v : V  = FloatCore::one();
+    /// let minus_one  = one_v.minus();
+    /// assert_eq!( minus_one.to_inner(), - 1.0f64 );
+    /// ```
+    fn minus(&self) -> Self;
+    //
+    // cos
+    /// ```
+    /// use rustad::{
+    ///     AzFloat,
     ///     FloatCore,
     /// };
     /// type V = AzFloat<f32>;
     /// let one_v : V  = FloatCore::one();
-    /// let cos_one    = FloatCore::cos(&one_v);
+    /// let cos_one    = one_v.cos();
     /// assert_eq!( cos_one.to_inner(), f32::cos( 1.0 ) );
     /// ```
+    fn cos(&self) -> Self;
     //
     // sin
     /// ```
