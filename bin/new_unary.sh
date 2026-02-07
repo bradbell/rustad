@@ -69,6 +69,26 @@ s|\$|\\
 EOF
 sed -i $file -f temp.sed
 #
+# info.rs
+file='src/op/info.rs'
+cat << EOF > temp.sed
+/^    [/][/] unary operators/! b end
+s|\$|\\
+    crate::op::$name::set_op_info::<V>(\\&mut result);|
+: end
+EOF
+sed -i $file -f temp.sed
+#
+# mod.rs
+file='src/op/mod.rs'
+cat << EOF > temp.sed
+/^    [/][/] unary functions/! b end
+s|\$|\\
+    pub mod $name;|
+: end
+EOF
+sed -i $file -f temp.sed
+#
 # $name.rs
 cat << EOF > temp.sed
 s|\\([": (]\\)sin\\(["_ ()]\\)|\\1$name\\2|g
