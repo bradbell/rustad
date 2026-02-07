@@ -53,8 +53,7 @@ where
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     let index    = arg[0] as usize;
-    // TODO: change sin below to cos when cos is added to FloatCore.
-    var_der[res] = &FloatCore::sin( &var_both[index] ) *  &var_der[index];
+    var_der[res] = &FloatCore::cos( &var_both[index] ) *  &var_der[index];
 }
 // sin_reverse_der
 /// First order reverse mode for sin(variable);
@@ -75,10 +74,9 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let index     = arg[0] as usize;
-    // TODO: change sin below to cos when cos is added to FloatCore.
-    let term      = &FloatCore::sin( &var_both[index] ) * &var_der[res];
-    var_der[res] += &term;
+    let index       = arg[0] as usize;
+    let term        = &FloatCore::cos( &var_both[index] ) * &var_der[res];
+    var_der[index] += &term;
 }
 // ---------------------------------------------------------------------------
 // set_op_info

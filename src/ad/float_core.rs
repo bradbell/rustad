@@ -88,6 +88,7 @@ where
     fn one()  -> Self { AD::<V>::from( V::one() ) }
     //
     // unary functions
+    impl_unary_float_core!(minus);
     impl_unary_float_core!(cos);
     impl_unary_float_core!(sin);
 }

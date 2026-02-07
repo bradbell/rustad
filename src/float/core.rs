@@ -60,6 +60,9 @@ pub trait FloatCore {
     //
     // unary functions
     //
+    // minus
+    fn minus(&self) -> Self;
+    //
     // cos
     fn cos(&self) -> Self;
     //

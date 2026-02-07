@@ -8,7 +8,9 @@ set -e -u
 # name
 echo 'Warning, this will git reset --hard: use control-C to abort'
 read -p 'Input name of new unary function: ' name
+mv bin/new_unary.sh new_unary.tmp
 git reset --hard
+mv new_unary.tmp bin/new_unary.sh
 #
 # NAME
 NAME=$(echo $name | tr [a-z] [A-Z])
@@ -20,8 +22,7 @@ cat << EOF > temp.sed
 s|\$|\\
     //\\
     // $name\\
-    fn $name(\\&self) -> Self;\\
-    //|
+    fn $name(\\&self) -> Self;|
 : end
 EOF
 sed -i $file -f temp.sed
@@ -66,11 +67,11 @@ s|\$|\\
 : end
 EOF
 sed -i $file -f temp.sed
-
 #
 # $name.rs
 cat << EOF > temp.sed
-s|\\([": (]\\)sin\\(["_ ()]\\)|\\1cos\\2|g
+s|\\([": (]\\)sin\\(["_ ()]\\)|\\1$name\\2|g
+s|\\([": (]\\)SIN\\(["_ ()]\\)|\\1$NAME\\2|g
 EOF
 sed -f temp.sed src/op/sin.rs > src/op/$name.rs
 #
