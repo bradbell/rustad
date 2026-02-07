@@ -74,9 +74,9 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let index       = arg[0] as usize;
-    let term        = var_der[res].clone();
-    var_der[index] -= &term;
+    let index          = arg[0] as usize;
+    let (left, right)  = var_der.split_at_mut(res);
+    left[index]       -= &right[0];
 }
 // ---------------------------------------------------------------------------
 // set_op_info
