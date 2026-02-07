@@ -23,7 +23,7 @@ use crate::ad::ADType;
 use crate::op::unary;
 use crate::tape::sealed::ThisThreadTape;
 use crate::op::info::OpInfo;
-use crate::op::id::SIN_OP;
+use crate::op::id::COS_OP;
 // -------------------------------------------------------------------------
 // cos_forward_dyp
 unary::forward_dyp!(cos);
@@ -54,7 +54,7 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let index    = arg[0] as usize;
     let term     = &FloatCore::sin( &var_both[index] ) *  &var_der[index];
-    var_der[res] = &FloatCore::minus( &term );
+    var_der[res] = FloatCore::minus( &term );
 }
 // cos_reverse_der
 /// First order reverse mode for cos(variable);
@@ -75,9 +75,9 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let index     = arg[0] as usize;
-    let term      = &FloatCore::sin( &var_both[index] ) * &var_der[res];
-    var_der[res] -= &term;
+    let index       = arg[0] as usize;
+    let term        = &FloatCore::sin( &var_both[index] ) * &var_der[res];
+    var_der[index] -= &term;
 }
 // ---------------------------------------------------------------------------
 // set_op_info
@@ -93,7 +93,7 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> V         : SubAssign<&'a V>,
     for<'a> AD<V>     : SubAssign<&'a AD<V> >,
 {
-    op_info_vec[SIN_OP as usize] = OpInfo{
+    op_info_vec[COS_OP as usize] = OpInfo{
         name              : "cos",
         forward_dyp_value : cos_forward_dyp::<V, V>,
         forward_dyp_ad    : cos_forward_dyp::<V, AD<V> >,

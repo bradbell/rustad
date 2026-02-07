@@ -4,6 +4,7 @@ set -e -u
 # SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 # SPDX-FileContributor: 2026 Bradley M. Bell
 # -----------------------------------------------------------------------------
+# TODO: edit info.rs and src/op/mod.rs
 #
 # name
 echo 'Warning, this will git reset --hard: use control-C to abort'
@@ -72,6 +73,7 @@ sed -i $file -f temp.sed
 cat << EOF > temp.sed
 s|\\([": (]\\)sin\\(["_ ()]\\)|\\1$name\\2|g
 s|\\([": (]\\)SIN\\(["_ ()]\\)|\\1$NAME\\2|g
+s|SIN_OP as usize|${NAME}_OP as usize|
 EOF
 sed -f temp.sed src/op/sin.rs > src/op/$name.rs
 #

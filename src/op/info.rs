@@ -440,8 +440,9 @@ pub struct OpInfo<V> {
 ///
 pub(crate) fn op_info_vec<V>() -> Vec< OpInfo<V> >
 where
-    // add_assign
+    // add_assign, sub_assign
     for<'a> V : std::ops::AddAssign<&'a V> ,
+    for<'a> V : std::ops::SubAssign<&'a V> ,
     // add
     for<'a> &'a V : std::ops::Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Add<&'a V, Output = V> ,
@@ -483,6 +484,9 @@ where
     crate::op::no_op::set_op_info::<V>(&mut result);
     crate::op::cmp_as::set_op_info::<V>(&mut result);
     //
+    // unary operators
+    crate::op::minus::set_op_info::<V>(&mut result);
+    crate::op::cos::set_op_info::<V>(&mut result);
     crate::op::sin::set_op_info::<V>(&mut result);
     result
 }

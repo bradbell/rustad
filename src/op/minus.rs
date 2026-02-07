@@ -10,7 +10,7 @@
 //
 use std::ops::{
     Mul,
-    AddAssign,
+    SubAssign,
 };
 //
 use crate::{
@@ -39,7 +39,7 @@ unary::rust_src!(minus);
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn minus_forward_der<V, E>(
     _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _var_both  :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
@@ -53,15 +53,14 @@ where
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     let index    = arg[0] as usize;
-    // TODO: change minus below to cos when cos is added to FloatCore.
-    var_der[res] = &FloatCore::minus( &var_both[index] ) *  &var_der[index];
+    var_der[res] = FloatCore::minus( &var_der[index] );
 }
 // minus_reverse_der
 /// First order reverse mode for minus(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn minus_reverse_der<V, E>(
     _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _var_both  :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
@@ -69,16 +68,15 @@ fn minus_reverse_der<V, E>(
     arg_type   :   &[ADType]   ,
     res        :   usize       )
 where
-    for<'a> E     : AddAssign<&'a E> ,
-    E             : FloatCore,
+    for<'a> E     : SubAssign<&'a E> ,
+    E             : Clone + FloatCore,
     for<'a> &'a E : Mul<&'a E, Output=E>,
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let index     = arg[0] as usize;
-    // TODO: change minus below to cos when cos is added to FloatCore.
-    let term      = &FloatCore::minus( &var_both[index] ) * &var_der[res];
-    var_der[res] += &term;
+    let index       = arg[0] as usize;
+    let term        = var_der[res].clone();
+    var_der[index] -= &term;
 }
 // ---------------------------------------------------------------------------
 // set_op_info
@@ -91,10 +89,10 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> &'a AD<V> : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
     V                 : Clone + FloatCore + ThisThreadTape ,
-    for<'a> V         : AddAssign<&'a V>,
-    for<'a> AD<V>     : AddAssign<&'a AD<V> >,
+    for<'a> V         : SubAssign<&'a V>,
+    for<'a> AD<V>     : SubAssign<&'a AD<V> >,
 {
-    op_info_vec[SIN_OP as usize] = OpInfo{
+    op_info_vec[MINUS_OP as usize] = OpInfo{
         name              : "minus",
         forward_dyp_value : minus_forward_dyp::<V, V>,
         forward_dyp_ad    : minus_forward_dyp::<V, AD<V> >,

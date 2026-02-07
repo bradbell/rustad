@@ -65,7 +65,17 @@ pub trait FloatCore {
     //
     // cos
     fn cos(&self) -> Self;
-    //
+    /// ```
+    /// use rustad::{
+    ///     AzFloat,
+    ///     NumVec,
+    ///     FloatCore,
+    /// };
+    /// type V = AzFloat<f32>;
+    /// let one_v : V  = FloatCore::one();
+    /// let cos_one    = FloatCore::cos(&one_v);
+    /// assert_eq!( cos_one.to_inner(), f32::cos( 1.0 ) );
+    /// ```
     //
     // sin
     /// ```
@@ -73,18 +83,11 @@ pub trait FloatCore {
     ///     AzFloat,
     ///     NumVec,
     ///     FloatCore,
-    ///     start_recording,
-    ///     stop_recording,
     /// };
-    /// type V = AzFloat<f64>;
-    /// let trace    = false;
-    /// let  x       = vec![ V::from(0) ];
-    /// let (_, ax)  = start_recording(None, x);
-    /// let ay       = vec![ ax[0].sin() ];
-    /// let f        = stop_recording(ay);
-    /// let x        = vec![ V::from(1) ];
-    /// let (y,_)    = f.forward_var_value(None, x, trace);
-    /// assert_eq!( y[0].to_inner(), f64::sin(1.0)  );
+    /// type V = AzFloat<f32>;
+    /// let one_v : V  = FloatCore::one();
+    /// let sin_one    = FloatCore::sin(&one_v);
+    /// assert_eq!( sin_one.to_inner(), f32::sin( 1.0 ) );
     /// ```
     fn sin(&self) -> Self;
 }
