@@ -21,6 +21,7 @@ pub mod mul;
 pub mod div;
 //
 // unary functions
+pub mod exp;
 pub mod sin;
 pub mod cos;
 pub mod minus;

@@ -82,9 +82,9 @@ sed -i $file -f temp.sed
 # mod.rs
 file='src/op/mod.rs'
 cat << EOF > temp.sed
-/^    [/][/] unary functions/! b end
+/[/][/] unary functions/! b end
 s|\$|\\
-    pub mod $name;|
+pub mod $name;|
 : end
 EOF
 sed -i $file -f temp.sed
@@ -96,5 +96,11 @@ s|\\([": (]\\)SIN\\(["_ ()]\\)|\\1$NAME\\2|g
 s|SIN_OP as usize|${NAME}_OP as usize|
 EOF
 sed -f temp.sed src/op/sin.rs > src/op/$name.rs
+#
+cat << EOF
+src/op/$name.rs: Fix the functions ${name}_forward_der and ${name}_reverse_der
+src/float/core.rs: Add an example for $name function values.
+test/unary.rs: Add a test for $name derivatives.
+EOF
 #
 echo 'new_unary.sh: OK'

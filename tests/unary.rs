@@ -34,6 +34,29 @@ fn test_cos() {
     assert_eq!( dx[0], FloatCore::minus(&temp) );
 }
 //
+// test_exp
+fn test_exp() {
+    type V      = AzFloat<f64>;
+    let trace   = false;
+    //
+    let x  : Vec<V>  = vec![ V::from(2.0) ];
+    //
+    let (_, ax)      = start_recording(None,  x.clone() );
+    let ay           = vec! [ FloatCore::exp( &ax[0] ) ];
+    let f            = stop_recording(ay);
+    //
+    let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
+    let dx           = vec![ V::from(3.0) ];
+    let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
+    //
+    assert_eq!( dy[0], FloatCore::exp( &x[0] ) * dx[0] );
+    //
+    let dy           = vec![ V::from(4.0) ];
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    //
+    assert_eq!( dx[0], FloatCore::exp( &x[0] ) * dy[0] );
+}
+//
 // test_minus
 fn test_minus() {
     type V      = AzFloat<f64>;
@@ -82,6 +105,7 @@ fn test_sin() {
 #[test]
 fn unary() {
     test_cos();
+    test_exp();
     test_minus();
     test_sin();
 }

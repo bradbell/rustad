@@ -60,6 +60,19 @@ pub trait FloatCore {
     //
     // unary functions
     //
+    // exp
+    /// ```
+    /// use rustad::{
+    ///     AzFloat,
+    ///     FloatCore,
+    /// };
+    /// type V = AzFloat<f64>;
+    /// let three_v   = V::from( 3.0 );
+    /// let exp_three = FloatCore::exp( &three_v );
+    /// assert_eq!( exp_three.to_inner(), f64::exp(3.0) );
+    /// ```
+    fn exp(&self) -> Self;
+    //
     // minus
     /// ```
     /// use rustad::{
@@ -90,7 +103,6 @@ pub trait FloatCore {
     /// ```
     /// use rustad::{
     ///     AzFloat,
-    ///     NumVec,
     ///     FloatCore,
     /// };
     /// type V = AzFloat<f32>;
