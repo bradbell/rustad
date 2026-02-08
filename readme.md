@@ -14,14 +14,14 @@
 This package is intended to include (and extend) most of the features in
 [CppAD](https://cppad.readthedocs.io/latest/) in a way that :
 
-1.  The API is easy to use.
-2.  Its representation of functions using tapes is easy to manipulate.
-    This makes its source code easy to understand and helps developers
-    of other AD packages.
-3.  The package works well with many threads; e.g,
+1.  It's API is easy to use.
+2.  It's representation of functions is easy to understand and manipulate.
+    This makes the package very flexible and helps developers of other AD packages.
+3.  It works well with many threads; e.g,
     AD function objects do not have state
     and hence can be shared by many threads.
-4.  The package has special types that supports machine learning algorithms.
+4.  It has special types that supports machine learning algorithms; i.e,
+    element wise vector operations.
 
 ## Releases
 
@@ -81,7 +81,7 @@ This package is intended to include (and extend) most of the features in
 
 ## Goals Before Stable API
 
-1.  Division and all the standard math functions.
+We are currently implementing the standard math functions.
     
 ## Wish List
 
