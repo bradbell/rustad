@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
-//! Utilities used by the uniary operators.
+//! Utilities that are common to all the  uniary operators.
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------

@@ -485,10 +485,10 @@ where
     crate::op::cmp_as::set_op_info::<V>(&mut result);
     //
     // unary operators
-    crate::op::exp::set_op_info::<V>(&mut result);
-    crate::op::minus::set_op_info::<V>(&mut result);
-    crate::op::cos::set_op_info::<V>(&mut result);
-    crate::op::sin::set_op_info::<V>(&mut result);
+    crate::op::unary::exp::set_op_info::<V>(&mut result);
+    crate::op::unary::minus::set_op_info::<V>(&mut result);
+    crate::op::unary::cos::set_op_info::<V>(&mut result);
+    crate::op::unary::sin::set_op_info::<V>(&mut result);
     result
 }
 // ---------------------------------------------------------------------------

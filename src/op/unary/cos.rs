@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
-//! Evaluate the minus operator
+//! Evaluate the cos operator
 //!
 //! Link to [parent module](super)
 // --------------------------------------------------------------------------
@@ -20,26 +20,26 @@ use crate::{
 };
 //
 use crate::ad::ADType;
-use crate::op::unary;
+use crate::op::unary::common;
 use crate::tape::sealed::ThisThreadTape;
 use crate::op::info::OpInfo;
-use crate::op::id::MINUS_OP;
+use crate::op::id::COS_OP;
 // -------------------------------------------------------------------------
-// minus_forward_dyp
-unary::forward_dyp!(minus);
+// cos_forward_dyp
+common::forward_dyp!(cos);
 //
 // sim_forward_var
-unary::forward_var!(minus);
+common::forward_var!(cos);
 //
-// minus_rust_src
-unary::rust_src!(minus);
+// cos_rust_src
+common::rust_src!(cos);
 //
-// minus_forward_der
-/// First order forward mode for minus(variable);
+// cos_forward_der
+/// First order forward mode for cos(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
-fn minus_forward_der<V, E>(
+fn cos_forward_der<V, E>(
     _dyp_both  :   &[E]        ,
-    _var_both  :   &[E]        ,
+    var_both   :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
@@ -53,14 +53,15 @@ where
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     let index    = arg[0] as usize;
-    var_der[res] = FloatCore::minus( &var_der[index] );
+    let term     = &FloatCore::sin( &var_both[index] ) *  &var_der[index];
+    var_der[res] = FloatCore::minus( &term );
 }
-// minus_reverse_der
-/// First order reverse mode for minus(variable);
+// cos_reverse_der
+/// First order reverse mode for cos(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
-fn minus_reverse_der<V, E>(
+fn cos_reverse_der<V, E>(
     _dyp_both  :   &[E]        ,
-    _var_both  :   &[E]        ,
+    var_both   :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _flag_all  :   &[bool]     ,
@@ -69,22 +70,22 @@ fn minus_reverse_der<V, E>(
     res        :   usize       )
 where
     for<'a> E     : SubAssign<&'a E> ,
-    E             : Clone + FloatCore,
+    E             : FloatCore,
     for<'a> &'a E : Mul<&'a E, Output=E>,
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let index          = arg[0] as usize;
-    let (left, right)  = var_der.split_at_mut(res);
-    left[index]       -= &right[0];
+    let index       = arg[0] as usize;
+    let term        = &FloatCore::sin( &var_both[index] ) * &var_der[res];
+    var_der[index] -= &term;
 }
 // ---------------------------------------------------------------------------
 // set_op_info
-/// Set the operator information for all the MINUS_OP operator.
+/// Set the operator information for all the SIN_OP operator.
 ///
 /// * op_info_vec :
 ///   The map from [op::id](crate::op::id) to operator information.
-///   The the map results for MINUS_OP are set.
+///   The the map results for SIN_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> &'a AD<V> : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
@@ -92,17 +93,17 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> V         : SubAssign<&'a V>,
     for<'a> AD<V>     : SubAssign<&'a AD<V> >,
 {
-    op_info_vec[MINUS_OP as usize] = OpInfo{
-        name              : "minus",
-        forward_dyp_value : minus_forward_dyp::<V, V>,
-        forward_dyp_ad    : minus_forward_dyp::<V, AD<V> >,
-        forward_var_value : minus_forward_var::<V, V>,
-        forward_var_ad    : minus_forward_var::<V, AD<V> >,
-        forward_der_value : minus_forward_der::<V, V>,
-        forward_der_ad    : minus_forward_der::<V, AD<V> >,
-        reverse_der_value : minus_reverse_der::<V, V>,
-        reverse_der_ad    : minus_reverse_der::<V, AD<V> >,
-        rust_src          : minus_rust_src,
-        reverse_depend    : unary::reverse_depend,
+    op_info_vec[COS_OP as usize] = OpInfo{
+        name              : "cos",
+        forward_dyp_value : cos_forward_dyp::<V, V>,
+        forward_dyp_ad    : cos_forward_dyp::<V, AD<V> >,
+        forward_var_value : cos_forward_var::<V, V>,
+        forward_var_ad    : cos_forward_var::<V, AD<V> >,
+        forward_der_value : cos_forward_der::<V, V>,
+        forward_der_ad    : cos_forward_der::<V, AD<V> >,
+        reverse_der_value : cos_reverse_der::<V, V>,
+        reverse_der_ad    : cos_reverse_der::<V, AD<V> >,
+        rust_src          : cos_rust_src,
+        reverse_depend    : common::reverse_depend,
     };
 }
