@@ -8,6 +8,7 @@
 // ---------------------------------------------------------------------------
 // sub-modules
 pub mod common;
+pub mod signum;
 pub mod exp;
 pub mod sin;
 pub mod cos;

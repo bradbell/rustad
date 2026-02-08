@@ -80,6 +80,29 @@ fn test_minus() {
     assert_eq!( dx[0].to_inner(), - dy[0].to_inner() );
 }
 //
+// test_signum
+fn test_signum() {
+    type V      = AzFloat<f32>;
+    let trace   = false;
+    //
+    let x  : Vec<V>  = vec![ V::from(2.0) ];
+    //
+    let (_, ax)      = start_recording(None,  x.clone() );
+    let ay           = vec! [ FloatCore::signum( &ax[0] ) ];
+    let f            = stop_recording(ay);
+    //
+    let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
+    let dx           = vec![ V::from(3.0) ];
+    let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
+    //
+    assert_eq!( dy[0], FloatCore::zero() );
+    //
+    let dy           = vec![ V::from(4.0) ];
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    //
+    assert_eq!( dx[0], FloatCore::zero() );
+}
+//
 // test_sin
 fn test_sin() {
     type V      = AzFloat<f64>;
@@ -107,5 +130,6 @@ fn unary() {
     test_cos();
     test_exp();
     test_minus();
+    test_signum();
     test_sin();
 }

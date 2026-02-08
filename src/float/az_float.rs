@@ -500,6 +500,7 @@ macro_rules! impl_float_core{ ($B:ident) => {
         fn one()  -> Self { Self( 1 as $B ) }
         //
         // unary functions
+        fn signum(&self) -> Self { Self( self.0.signum() ) }
         fn exp(&self) -> Self { Self( self.0.exp() ) }
         fn minus(&self) -> Self { Self( - self.0 ) }
         fn cos(&self) -> Self { Self( self.0.cos() ) }

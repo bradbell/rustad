@@ -551,6 +551,7 @@ where
     fn one()  -> Self { Self::from( S::one() ) }
     //
     // unary functions
+    impl_unary_float_core!(signum);
     impl_unary_float_core!(exp);
     impl_unary_float_core!(minus);
     impl_unary_float_core!(cos);

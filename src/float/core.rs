@@ -60,6 +60,9 @@ pub trait FloatCore {
     //
     // unary functions
     //
+    // signum
+    fn signum(&self) -> Self;
+    //
     // exp
     /// ```
     /// use rustad::{
