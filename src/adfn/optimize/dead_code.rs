@@ -18,7 +18,7 @@ use crate::adfn::optimize::Depend;
 use crate::adfn::optimize::Old2New;
 use crate::tape::Tape;
 use crate::tape::OpSequence;
-use crate::op::binary::is_binary_op;
+use crate::op::binary::common::is_binary_op;
 use crate::ad::ADType;
 use crate::op::id::{
     CALL_OP,

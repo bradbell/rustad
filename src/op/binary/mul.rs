@@ -33,7 +33,7 @@ use crate::{
     FloatCore,
 };
 //
-use crate::op::binary;
+use crate::op::binary::common;
 use crate::tape::sealed::ThisThreadTape;
 use crate::op::info::{
     OpInfo,
@@ -59,14 +59,14 @@ use crate::op::info::{
 // mul_pv_rust_src
 // mul_vp_rust_src
 // mul_vv_rust_src
-binary::binary_rust_src!(Mul, *);
+common::binary_rust_src!(Mul, *);
 // -------------------------------------------------------------------------
 // forward_var
 // -------------------------------------------------------------------------
 // mul_pv_forward_var
 // mul_vp_forward_var
 // mul_vv_forward_var
-binary::eval_binary_forward_var!(Mul, *);
+common::eval_binary_forward_var!(Mul, *);
 // ---------------------------------------------------------------------------
 // forward_der
 // ---------------------------------------------------------------------------
@@ -266,7 +266,7 @@ where
         reverse_der_value : panic_der::<V, V>,
         reverse_der_ad    : panic_der::<V, AD<V> >,
         rust_src          : rust_src_none,
-        reverse_depend    : binary::reverse_depend,
+        reverse_depend    : common::reverse_depend,
     };
     op_info_vec[MUL_PV_OP as usize] = OpInfo{
         name              : "mul_pv",
@@ -279,7 +279,7 @@ where
         reverse_der_value : mul_pv_reverse_der::<V, V>,
         reverse_der_ad    : mul_pv_reverse_der::<V, AD<V> >,
         rust_src          : mul_pv_rust_src,
-        reverse_depend    : binary::reverse_depend,
+        reverse_depend    : common::reverse_depend,
     };
     op_info_vec[MUL_VP_OP as usize] = OpInfo{
         name              : "mul_vp",
@@ -292,7 +292,7 @@ where
         reverse_der_value : mul_vp_reverse_der::<V, V>,
         reverse_der_ad    : mul_vp_reverse_der::<V, AD<V> >,
         rust_src          : mul_vp_rust_src,
-        reverse_depend    : binary::reverse_depend,
+        reverse_depend    : common::reverse_depend,
     };
     op_info_vec[MUL_VV_OP as usize] = OpInfo{
         name              : "mul_vv",
@@ -305,6 +305,6 @@ where
         reverse_der_value : mul_vv_reverse_der::<V, V>,
         reverse_der_ad    : mul_vv_reverse_der::<V, AD<V> >,
         rust_src          : mul_vv_rust_src,
-        reverse_depend    : binary::reverse_depend,
+        reverse_depend    : common::reverse_depend,
     };
 }

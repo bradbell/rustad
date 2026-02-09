@@ -15,7 +15,7 @@ use crate::{
 };
 use crate::ad::ADType;
 use crate::tape::OpSequence;
-use crate::op::binary::is_binary_op;
+use crate::op::binary::common::is_binary_op;
 use crate::op::id::{
     CALL_OP,
     CALL_RES_OP,

@@ -475,14 +475,14 @@ where
         reverse_depend     : panic_reverse_depend,
     };
     let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
-    crate::op::add::set_op_info::<V>(&mut result);
-    crate::op::sub::set_op_info::<V>(&mut result);
-    crate::op::mul::set_op_info::<V>(&mut result);
-    crate::op::div::set_op_info::<V>(&mut result);
+    crate::op::binary::add::set_op_info::<V>(&mut result);
+    crate::op::binary::sub::set_op_info::<V>(&mut result);
+    crate::op::binary::mul::set_op_info::<V>(&mut result);
+    crate::op::binary::div::set_op_info::<V>(&mut result);
     //
     crate::op::call::set_op_info::<V>(&mut result);
     crate::op::no_op::set_op_info::<V>(&mut result);
-    crate::op::cmp_as::set_op_info::<V>(&mut result);
+    crate::op::binary::cmp_as::set_op_info::<V>(&mut result);
     //
     // unary operators
     crate::op::unary::signum::set_op_info::<V>(&mut result);
