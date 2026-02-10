@@ -92,6 +92,34 @@ where
     let factor   = &var_both[res] / &var_both[rhs];
     var_der[res] = (&factor * &var_der[rhs]).minus()
 }
+//
+// div_pv_forward_der
+/// first order forward for variable / parameter; see [ForwardDer]
+fn div_vp_forward_der <V, E>(
+    dyp_both   :   &[E]        ,
+    _var_both  :   &[E]        ,
+    var_der    :   &mut [E]    ,
+    cop        :   &[V]        ,
+    _flag_all  :   &[bool]     ,
+    arg        :   &[IndexT]   ,
+    arg_type   :   &[ADType]   ,
+    res        :   usize       )
+where
+    for<'a> &'a E : Div<&'a V, Output = E> ,
+    for<'a> &'a E : Div<&'a E, Output = E> ,
+{
+    debug_assert!( arg.len() == 2);
+    debug_assert!( arg_type[0].is_variable() );
+    debug_assert!( arg_type[1].is_parameter() );
+    let lhs       = arg[0] as usize;
+    let rhs       = arg[1] as usize;
+    if arg_type[1].is_constant() {
+        var_der[ res ] = &var_der[lhs] / &cop[rhs];
+    } else {
+        debug_assert!( arg_type[1].is_dynamic() );
+        var_der[ res ] = &var_der[lhs] / &dyp_both[rhs];
+    }
+}
 // ---------------------------------------------------------------------------
 // set_op_info
 //
@@ -146,8 +174,8 @@ where
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : div_vp_forward_var::<V, V>,
         forward_var_ad    : div_vp_forward_var::<V, AD<V> >,
-        forward_der_value : forward_der_value_none::<V>,
-        forward_der_ad    : forward_der_ad_none::<V>,
+        forward_der_value : div_vp_forward_der::<V, V>,
+        forward_der_ad    : div_vp_forward_der::<V, AD<V> >,
         reverse_der_value : reverse_der_value_none::<V>,
         reverse_der_ad    : reverse_der_ad_none::<V>,
         rust_src          : div_vp_rust_src,
