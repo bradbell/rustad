@@ -22,6 +22,7 @@
 //
 use std::ops::{
     Div,
+    Mul,
 };
 //
 use crate::ad::ADType;
@@ -49,6 +50,10 @@ use crate::op::id::{
     DIV_VP_OP,
     DIV_VV_OP,
 };
+#[cfg(doc)]
+use crate::op::info::{
+        ForwardDer,
+};
 // -------------------------------------------------------------------------
 // div_pv_rust_src
 // div_vp_rust_src
@@ -59,6 +64,34 @@ common::binary_rust_src!(Div, /);
 // div_vp_forward_var
 // div_vv_forward_var
 common::eval_binary_forward_var!(Div, /);
+// ---------------------------------------------------------------------------
+// forward_der
+// ---------------------------------------------------------------------------
+//
+// div_pv_forward_der
+/// first order forward for parameter / variable; see [ForwardDer]
+fn div_pv_forward_der <V, E>(
+    _dyp_both  :   &[E]        ,
+    var_both   :   &[E]        ,
+    var_der    :   &mut [E]    ,
+    _cop       :   &[V]        ,
+    _flag_all  :   &[bool]     ,
+    arg        :   &[IndexT]   ,
+    arg_type   :   &[ADType]   ,
+    res        :   usize       )
+where
+    for<'a> &'a V : Mul<&'a E, Output = E> ,
+    for<'a> &'a E : Mul<&'a E, Output = E> ,
+    for<'a> &'a E : Div<&'a E, Output = E> ,
+    E             : FloatCore ,
+{   // d(p / v) = - p * dv / (v * v) = - [ (p / v) / v ] * dv
+    debug_assert!( arg.len() == 2);
+    debug_assert!( arg_type[0].is_parameter() );
+    debug_assert!( arg_type[1].is_variable() );
+    let rhs      = arg[1] as usize;
+    let factor   = &var_both[res] / &var_both[rhs];
+    var_der[res] = (&factor * &var_der[rhs]).minus()
+}
 // ---------------------------------------------------------------------------
 // set_op_info
 //
@@ -75,7 +108,9 @@ no_reverse_der_ad!(Div);
 pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
     for<'a> &'a V : Div<&'a AD<V>, Output = AD<V> > ,
+    for<'a> &'a V : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Div<&'a V, Output = V> ,
+    for<'a> &'a V : Mul<&'a V, Output = V> ,
     V             : Clone + FloatCore,
     V             : PartialEq + ThisThreadTape ,
 {
@@ -98,8 +133,8 @@ where
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
         forward_var_value : div_pv_forward_var::<V, V>,
         forward_var_ad    : div_pv_forward_var::<V, AD<V> >,
-        forward_der_value : forward_der_value_none::<V>,
-        forward_der_ad    : forward_der_ad_none::<V>,
+        forward_der_value : div_pv_forward_der::<V, V>,
+        forward_der_ad    : div_pv_forward_der::<V, AD<V>>,
         reverse_der_value : reverse_der_value_none::<V>,
         reverse_der_ad    : reverse_der_ad_none::<V>,
         rust_src          : div_pv_rust_src,
