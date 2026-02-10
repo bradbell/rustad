@@ -39,7 +39,6 @@ use crate::op::info::{
     panic_dyp,
     panic_var,
     panic_der,
-    no_rust_src,
 };
 use crate::op::id::{
     ADD_PP_OP,
@@ -200,9 +199,6 @@ where
 // ---------------------------------------------------------------------------
 // set_op_info
 //
-// rust_src_none
-no_rust_src!(Add);
-//
 /// Set the operator information for all the Add operators.
 ///
 /// * op_info_vec :
@@ -225,7 +221,7 @@ where
         forward_der_ad    : panic_der::<V, AD<V> >,
         reverse_der_value : panic_der::<V, V>,
         reverse_der_ad    : panic_der::<V, AD<V> >,
-        rust_src          : rust_src_none,
+        rust_src          : add_pp_rust_src,
         reverse_depend    : common::reverse_depend,
     };
     op_info_vec[ADD_PV_OP as usize] = OpInfo{

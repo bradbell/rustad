@@ -42,7 +42,6 @@ use crate::op::info::{
     no_forward_der_ad,
     no_reverse_der_value,
     no_reverse_der_ad,
-    no_rust_src,
 };
 use crate::op::id::{
     DIV_PP_OP,
@@ -67,7 +66,6 @@ no_forward_der_value!(Div);
 no_forward_der_ad!(Div);
 no_reverse_der_value!(Div);
 no_reverse_der_ad!(Div);
-no_rust_src!(Div);
 //
 /// Set the operator information for all the Div operators.
 ///
@@ -91,7 +89,7 @@ where
         forward_der_ad    : panic_der::<V, AD<V> >,
         reverse_der_value : panic_der::<V, V>,
         reverse_der_ad    : panic_der::<V, AD<V> >,
-        rust_src          : rust_src_none,
+        rust_src          : div_pp_rust_src,
         reverse_depend    : common::reverse_depend,
     };
     op_info_vec[DIV_PV_OP as usize] = OpInfo{

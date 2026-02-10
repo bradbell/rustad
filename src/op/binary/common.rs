@@ -185,8 +185,55 @@ pub(crate) use eval_binary_forward_var;
 ///
 /// [IndexT] must be defined in any module that uses binary_rust_src
 macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
-    // TODO: the {name}_pp_ruse_src case is missing. Create a test
-    // that needs this and then fix it.
+    fn [< $Name:lower _pp_rust_src >]<V> (
+        _not_used   : V           ,
+        res_type    : ADType      ,
+        dyp_n_dom   : usize       ,
+        _var_n_dom  : usize       ,
+        _flag_all   : &[bool]     ,
+        arg         : &[IndexT]   ,
+        arg_type    : &[ADType]   ,
+        res         : usize       ) -> String
+    {   //
+        debug_assert!( arg.len() == 2);
+        debug_assert!( res_type.is_dynamic() );
+        debug_assert!( arg_type[0].is_dynamic() );
+        debug_assert!( arg_type[1].is_dynamic() );
+        debug_assert!( dyp_n_dom <= res );
+        //
+        // lhs_str
+        let mut lhs = arg[0] as usize;
+        let lhs_str : String;
+        if lhs < dyp_n_dom  {
+            lhs_str = format!("dyp_dom[{lhs}]");
+        } else {
+            lhs -= dyp_n_dom;
+            lhs_str = format!("&dyp_dep[{lhs}]");
+        }
+        //
+        // rhs_str
+        let mut rhs = arg[1] as usize;
+        let rhs_str : String;
+        if rhs < dyp_n_dom  {
+            rhs_str = format!("dyp_dom[{rhs}]");
+        } else {
+            rhs -= dyp_n_dom;
+            rhs_str = format!("&dyp_dep[{rhs}]");
+        }
+        //
+        // res_str
+        let res              = res - dyp_n_dom;
+        let res_str : String = format!("dyp_dep[{res}]");
+        //
+        // op_str
+        let op_str  = stringify!($op);
+        //
+        // src
+        let src = String::from("   ");
+        let src = src + &res_str +
+            " = " + &lhs_str + " " + op_str + " " + &rhs_str + ";\n";
+        src
+    }
     #[doc = concat!(
         " rust source code generation for parameter ", stringify!( $op ),
         " variable; see [RustSrc](crate::op::info::RustSrc)"
@@ -199,7 +246,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
-        res       : usize       ) -> String
+        res         : usize       ) -> String
     {   //
         debug_assert!( arg.len() == 2);
         debug_assert!( res_type.is_variable() );
@@ -254,7 +301,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
-        res       : usize       ) -> String
+        res         : usize       ) -> String
     {   //
         debug_assert!( arg.len() == 2);
         debug_assert!( res_type.is_variable() );
@@ -309,7 +356,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         _flag_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
-        res       : usize       ) -> String
+        res         : usize       ) -> String
     {   //
         debug_assert!( arg.len() == 2);
         debug_assert!( res_type.is_variable() );
