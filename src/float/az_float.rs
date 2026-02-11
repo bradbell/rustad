@@ -495,9 +495,10 @@ impl_hash_trait!(f64);
 /// * B : is the floating point base type
 macro_rules! impl_float_core{ ($B:ident) => {
     impl FloatCore for crate::AzFloat<$B> {
-        fn nan()  -> Self { Self( $B::NAN ) }
-        fn zero() -> Self { Self( 0 as $B ) }
-        fn one()  -> Self { Self( 1 as $B ) }
+        fn nan()     -> Self { Self( $B::NAN ) }
+        fn zero()    -> Self { Self( 0 as $B ) }
+        fn one()     -> Self { Self( 1 as $B ) }
+        fn epsilon() -> Self { Self( $B::EPSILON ) }
         //
         // unary functions
         fn signum(&self) -> Self { Self( self.0.signum() ) }

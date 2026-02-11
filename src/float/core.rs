@@ -13,6 +13,9 @@
 /// The FloatCore trait
 ///
 pub trait FloatCore {
+    // ------------------------------------------------------------------------
+    // No Arguments
+    // ------------------------------------------------------------------------
     // nan
     /// ```
     /// use rustad::{
@@ -58,7 +61,23 @@ pub trait FloatCore {
     /// ```
     fn one()  -> Self;
     //
+    // epsilon
+    /// ```
+    /// use rustad::{
+    ///     AzFloat,
+    ///     FloatCore,
+    /// };
+    /// type V = AzFloat<f32>;
+    /// let one_v     : V  = FloatCore::one();
+    /// let two_v          = V::from(2);
+    /// let epsilon_v : V  = FloatCore::epsilon();
+    /// assert_ne!( one_v , one_v + epsilon_v );
+    /// assert_eq!( one_v , one_v + ( epsilon_v / two_v ) );
+    /// ```
+    fn epsilon() -> Self;
+    // ------------------------------------------------------------------------
     // unary functions
+    // ------------------------------------------------------------------------
     //
     // signum
     fn signum(&self) -> Self;
