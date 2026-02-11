@@ -97,7 +97,7 @@ pub trait FloatValue : FloatCore {
 ///
 /// * P : is a primitive type; i.e., f32 or f64;
 macro_rules! impl_float_value_from_primitive{ ($P:ident) => {
-    impl crate::float::value::FloatValue for crate::AzFloat<$P> {
+    impl crate::float_value::FloatValue for crate::AzFloat<$P> {
         fn is_zero(&self)  -> bool { self.0 == ( 0 as $P ) }
         fn is_one(&self)   -> bool { self.0 == ( 1 as $P ) }
         fn is_nan(&self)   -> bool { self.0 != self.0 }
@@ -111,7 +111,7 @@ macro_rules! impl_float_value_from_primitive{ ($P:ident) => {
             }
         }
     }
-    impl crate::float::value::FloatValue for crate::NumVec< AzFloat<$P> > {
+    impl crate::float_value::FloatValue for crate::NumVec< AzFloat<$P> > {
         // is_zero
         fn is_zero(&self)  -> bool {
             let mut all_zero = true;

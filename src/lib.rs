@@ -34,6 +34,9 @@ pub mod dll_lib;
 // float
 pub mod float;
 //
+// float_value
+pub mod float_value;
+//
 // sparse
 pub mod sparse;
 //
@@ -90,11 +93,13 @@ pub use dll_lib::{
 };
 pub use float::{
     core::FloatCore,
-    value::FloatValue,
     az_float::AzFloat,
     num_vec::NumVec,
     cmp_as::CmpAsLhs,
     cmp_as::CmpAsRhs,
+};
+pub use float_value::{
+    FloatValue,
 };
 pub use sparse::{
     coloring,
