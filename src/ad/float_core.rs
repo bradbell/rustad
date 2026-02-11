@@ -83,10 +83,11 @@ impl<V> FloatCore for AD<V>
 where
     V : Clone + FloatCore + ThisThreadTape,
 {
-    fn nan()      -> Self { AD::<V>::from( V::nan() ) }
-    fn zero()     -> Self { AD::<V>::from( V::zero() ) }
-    fn one()      -> Self { AD::<V>::from( V::one() ) }
-    fn epsilon()  -> Self { AD::<V>::from( V::epsilon() ) }
+    fn nan()           -> Self { AD::<V>::from( V::nan() ) }
+    fn zero()          -> Self { AD::<V>::from( V::zero() ) }
+    fn one()           -> Self { AD::<V>::from( V::one() ) }
+    fn epsilon()       -> Self { AD::<V>::from( V::epsilon() ) }
+    fn min_positive()  -> Self { AD::<V>::from( V::min_positive() ) }
     //
     // unary functions
     impl_unary_float_core!(signum);

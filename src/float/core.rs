@@ -75,6 +75,22 @@ pub trait FloatCore {
     /// assert_eq!( one_v , one_v + ( epsilon_v / two_v ) );
     /// ```
     fn epsilon() -> Self;
+    //
+    // min_positive
+    /// ```
+    /// use rustad::{
+    ///     AzFloat,
+    ///     FloatCore,
+    /// };
+    /// type V = AzFloat<f32>;
+    /// let zero_v         : V  = FloatCore::zero();
+    /// let two_v          = V::from(2);
+    /// let epsilon_v      : V  = FloatCore::epsilon();
+    /// let min_positive_v : V  = FloatCore::min_positive();
+    /// assert!( zero_v < min_positive_v * epsilon_v );
+    /// assert_eq!( zero_v, min_positive_v * epsilon_v / two_v );
+    /// ```
+    fn min_positive() -> Self;
     // ------------------------------------------------------------------------
     // unary functions
     // ------------------------------------------------------------------------

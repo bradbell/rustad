@@ -546,10 +546,11 @@ where
     S         : FloatCore + From<f32>,
     NumVec<S> : From<S>
 {
-    fn nan()     -> Self { Self::from( S::nan() ) }
-    fn zero()    -> Self { Self::from( S::zero() ) }
-    fn one()     -> Self { Self::from( S::one() ) }
-    fn epsilon() -> Self{ Self::from( S::epsilon() ) }
+    fn nan()          -> Self { Self::from( S::nan() ) }
+    fn zero()         -> Self { Self::from( S::zero() ) }
+    fn one()          -> Self { Self::from( S::one() ) }
+    fn epsilon()      -> Self{ Self::from( S::epsilon() ) }
+    fn min_positive() -> Self{ Self::from( S::min_positive() ) }
     //
     // unary functions
     impl_unary_float_core!(signum);
