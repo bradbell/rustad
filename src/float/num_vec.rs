@@ -353,7 +353,6 @@ where
 ///
 /// # Example using NumVec
 /// ```
-/// use rustad::AD;
 /// use rustad::NumVec;
 /// type S    = f64;
 /// let x     = vec![ S::from(5.0) , S::from(6.0) ];
