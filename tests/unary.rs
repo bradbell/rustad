@@ -9,6 +9,35 @@ use rustad::{
     stop_recording,
 };
 //
+// test_abs
+fn test_abs() {
+    type V      = AzFloat<f64>;
+    let trace   = false;
+    //
+    let x  : Vec<V>  = vec![ V::from(3.0), V::from(-2.0) ];
+    //
+    let (_, ax)      = start_recording(None,  x.clone() );
+    let ay           = vec! [ ax[0].abs(), ax[1].abs() ];
+    let f            = stop_recording(ay);
+    //
+    let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
+    let dx           = vec![ V::from(3.0) , V::from(4.0) ];
+    let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
+    //
+    for j in 0 .. 2 {
+        let temp  = FloatCore::signum( &x[j] ) * dx[j];
+        assert_eq!( dy[j], temp );
+    }
+    //
+    let dy           = vec![ V::from(5.0), V::from(6.0) ];
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    //
+    for j in 0 .. 2 {
+        let temp  = FloatCore::signum( &x[j] ) * dy[j];
+        assert_eq!( dx[j], temp );
+    }
+}
+//
 // test_cos
 fn test_cos() {
     type V      = AzFloat<f64>;
@@ -127,6 +156,7 @@ fn test_sin() {
 }
 #[test]
 fn unary() {
+    test_abs();
     test_cos();
     test_exp();
     test_minus();

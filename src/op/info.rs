@@ -485,6 +485,7 @@ where
     crate::op::binary::cmp_as::set_op_info::<V>(&mut result);
     //
     // unary operators
+    crate::op::unary::abs::set_op_info::<V>(&mut result);
     crate::op::unary::signum::set_op_info::<V>(&mut result);
     crate::op::unary::exp::set_op_info::<V>(&mut result);
     crate::op::unary::minus::set_op_info::<V>(&mut result);

@@ -553,6 +553,7 @@ where
     fn min_positive() -> Self{ Self::from( S::min_positive() ) }
     //
     // unary functions
+    impl_unary_float_core!(abs);
     impl_unary_float_core!(signum);
     impl_unary_float_core!(exp);
     impl_unary_float_core!(minus);

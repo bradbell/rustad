@@ -93,10 +93,21 @@ pub trait FloatCore {
     fn min_positive() -> Self;
     // ------------------------------------------------------------------------
     // unary functions
-    // ------------------------------------------------------------------------
     //
-    // signum
-    fn signum(&self) -> Self;
+    // abs
+    /// ```
+    /// use rustad::{
+    ///     AzFloat,
+    ///     FloatCore,
+    /// };
+    /// type V = AzFloat<f64>;
+    /// let minus_3_v      = V::from( - 3.0 );
+    /// let abs_minus_3_v  = minus_3_v.abs();
+    /// let sum_v          = &minus_3_v + &abs_minus_3_v;
+    /// assert_eq!( sum_v, FloatCore::zero() );
+    /// ```
+    fn abs(&self) -> Self;
+    // ------------------------------------------------------------------------
     //
     // exp
     /// ```
@@ -136,6 +147,19 @@ pub trait FloatCore {
     /// assert_eq!( cos_one.to_inner(), f32::cos( 1.0 ) );
     /// ```
     fn cos(&self) -> Self;
+    //
+    // signum
+    /// ```
+    /// use rustad::{
+    ///     AzFloat,
+    ///     FloatCore,
+    /// };
+    /// type V = AzFloat<f64>;
+    /// let minus_1_v       = V::from( -1.0 );
+    /// let minus_3_v       = V::from( - 3.0 );
+    /// assert_eq!( minus_3_v.signum(), minus_1_v );
+    /// ```
+    fn signum(&self) -> Self;
     //
     // sin
     /// ```
