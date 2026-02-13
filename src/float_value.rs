@@ -2,17 +2,21 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2026 Bradley M. Bell
 // ---------------------------------------------------------------------------
-//! This pub(crate) module defines the FloatValue trait
+//! This pub(crate) module defines the FloatValue trait and related functions
 //!
 //! Link to [parent module](super)
-//!
-//! This module does not have dependencies outside standard rust src/float.
-//! This enables src/float to be directly included as part of a Dll library.
-//!
 // ----------------------------------------------------------------------------
 // use
+use std::ops::{
+    Add,
+    Mul,
+    Sub,
+    Div,
+};
+//
 use crate::{
     FloatCore,
+    CmpAsLhs,
 };
 // ----------------------------------------------------------------------------
 /// The FloatValue trait
@@ -157,3 +161,109 @@ macro_rules! impl_float_value_from_primitive{ ($P:ident) => {
     }
 } }
 pub(crate) use impl_float_value_from_primitive;
+// ----------------------------------------------------------------------------
+// nearly_eq
+/// Check if two values are nearly equal.
+///
+/// x :
+/// one of the values that we are comparing.
+///
+/// y :
+/// the other value that we are comparing.
+///
+/// s :
+/// is an optional scale factor. It it is None,
+/// the factor 100 is used.
+///
+/// m :
+/// use use *m* to denote [FloatCore::min_positive] for *V* .
+///
+/// e :
+/// we use *e* to denote [FloatCore::epsilon] for *V* .
+///
+/// return :
+/// the return value is true if either of the following conditions hold:
+/// ```text
+/// |x| + |y|             < m * 100
+/// |x - y| / (|x| + |y|) < e * 100
+/// ```
+/// Note that for a [NumVec](crate::NumVec) type,
+/// the conditions must hold for all elements of the vector.
+///
+/// # AzFloat Example :
+/// ```
+/// use rustad::{
+///     AzFloat,
+///     FloatCore,
+///     nearly_eq,
+/// };
+/// type V = AzFloat<f32>;
+/// //
+/// let one_v       : V = FloatCore::one();
+/// let epsilon_v   : V = FloatCore::epsilon();
+/// let near_one_v      = one_v + V::from(10) * epsilon_v;
+/// let x      = V::from( 1e-20 );
+/// let y      = x * near_one_v;
+/// let option = Some( V::from(2) );
+/// assert!( nearly_eq::<V>(&x, &y, None) );
+/// assert!( ! nearly_eq::<V>(&x, &y, option) );
+/// ```
+///
+/// # NumVec Example :
+/// ```
+/// use rustad::{
+///     AzFloat,
+///     NumVec,
+///     FloatCore,
+///     nearly_eq,
+/// };
+/// type S = AzFloat<f32>;
+/// type V = NumVec<S>;
+/// //
+/// let one_v       : V = FloatCore::one();
+/// let epsilon_v   : V = FloatCore::epsilon();
+/// let near_one_v      = &one_v + &( &V::from(10f32) * &epsilon_v );
+/// //
+/// let x  = V::new( vec![ S::from(1e-20) ,  S::from(1e+20) ] );
+/// let y  = &x * &near_one_v;
+/// assert!( nearly_eq::<V>(&x, &y, None) );
+/// //
+/// let y  = V::new( vec![ S::from(1.01e-20) ,  S::from(1e+20) ] );
+/// assert!( ! nearly_eq::<V>(&x, &y, None) );
+/// ```
+///
+pub fn nearly_eq<V>(x : &V, y : &V, s : Option<V>) -> bool
+where
+    V             : FloatCore + FloatValue + CmpAsLhs + From<f32>,
+    for<'a> &'a V : Add<&'a V, Output=V> ,
+    for<'a> &'a V : Mul<&'a V, Output=V> ,
+    for<'a> &'a V : Sub<&'a V, Output=V> ,
+    for<'a> &'a V : Div<&'a V, Output=V> ,
+{   //
+    // s
+    let s = s.unwrap_or_else(|| V::from(100f32));
+    //
+    // sum_abs, min_sum
+    let sum_abs     = &x.abs() + &y.abs();
+    let min_pos : V = FloatCore::min_positive();
+    let min_sum     = &s * &min_pos;
+    //
+    // check first condition
+    let lt_min  = sum_abs.left_lt(&min_sum);
+    if lt_min.is_one() {
+        return true;
+    }
+    //
+    // abs_diff, min_diff
+    let abs_diff = (x - y).abs();
+    let min_diff = &s * &FloatCore::epsilon();
+    //
+    // check second condition
+    let ratio  = &abs_diff / &sum_abs;
+    let lt_min = ratio.left_lt(&min_diff);
+    if lt_min.is_one() {
+        return true;
+    }
+    //
+    false
+}

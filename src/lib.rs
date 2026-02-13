@@ -100,6 +100,7 @@ pub use float::{
 };
 pub use float_value::{
     FloatValue,
+    nearly_eq,
 };
 pub use sparse::{
     coloring,
@@ -154,9 +155,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2026.2.11");
+/// assert_eq!(date, "2026.2.13");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2026.2.11";
+pub const YEAR_MONTH_DAY : &str = "2026.2.13";
 //
 // CORE_RS
 /// is the source code for the [core](crate::float::core) module.
