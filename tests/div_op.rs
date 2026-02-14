@@ -31,6 +31,11 @@ fn test_div_pv() {
     let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
     assert_eq!( dy[0].minus(), dx[0] * V::from(4.0) / (x[0] * x[0]) );
     assert_eq!( dy[1].minus(), dx[1] * V::from(5.0) / (x[1] * x[1]) );
+    //
+    let dy           = vec![ V::from(8.0), V::from(9.0) ];
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    assert_eq!( dx[0].minus(), dy[0] * V::from(4.0) / (x[0] * x[0]) );
+    assert_eq!( dx[1].minus(), dy[1] * V::from(5.0) / (x[1] * x[1]) );
 }
 //
 // test_div_vp

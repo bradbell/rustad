@@ -24,6 +24,7 @@ use std::ops::{
     Div,
     Mul,
     Sub,
+    SubAssign,
 };
 //
 use crate::ad::ADType;
@@ -52,6 +53,7 @@ use crate::op::id::{
 #[cfg(doc)]
 use crate::op::info::{
         ForwardDer,
+        ReverseDer,
 };
 // -------------------------------------------------------------------------
 // div_pv_rust_src
@@ -147,6 +149,36 @@ where
     var_der[res]  = &numerator / &var_both[rhs];
 }
 // ---------------------------------------------------------------------------
+// reverse_der
+// ---------------------------------------------------------------------------
+//
+// div_pv_reverse_der
+/// first order reverse for parameter / variable; see [ReverseDer]
+fn div_pv_reverse_der <V, E>(
+    _dyp_both  :   &[E]        ,
+    var_both   :   &[E]        ,
+    var_der    :   &mut [E]    ,
+    _cop       :   &[V]        ,
+    _flag_all  :   &[bool]     ,
+    arg        :   &[IndexT]   ,
+    arg_type   :   &[ADType]   ,
+    res        :   usize       )
+where
+    for<'a> E     : SubAssign<&'a E>       ,
+    for<'a> &'a E : Div<&'a E, Output = E> ,
+    for<'a> &'a E : Mul<&'a E, Output = E> ,
+{
+    // g(v)      = f(w, v) = f[ p / v, v ]
+    // dg / dv   = df/dv - df/dw * dw/dv
+    // dw / dv   = - w / v
+    debug_assert!( arg.len() == 2);
+    debug_assert!( arg_type[0].is_parameter() );
+    debug_assert!( arg_type[1].is_variable() );
+    let rhs = arg[1] as usize;
+    let term      = &var_der[res] * &( &var_both[res] / &var_both[rhs] );
+    var_der[rhs] -= &term;
+}
+// ---------------------------------------------------------------------------
 // set_op_info
 //
 no_reverse_der_value!(Div);
@@ -159,9 +191,12 @@ no_reverse_der_ad!(Div);
 ///   The the map results for DIV_PV_OP, DIV_VP_OP, and DIV_VV_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
+    for<'a> V     : SubAssign<&'a V> ,
+    //
     for<'a> &'a V : Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Sub<&'a AD<V>, Output = AD<V> > ,
+    //
     for<'a> &'a V : Div<&'a V, Output = V> ,
     for<'a> &'a V : Mul<&'a V, Output = V> ,
     for<'a> &'a V : Sub<&'a V, Output = V> ,
@@ -188,9 +223,9 @@ where
         forward_var_value : div_pv_forward_var::<V, V>,
         forward_var_ad    : div_pv_forward_var::<V, AD<V> >,
         forward_der_value : div_pv_forward_der::<V, V>,
-        forward_der_ad    : div_pv_forward_der::<V, AD<V>>,
-        reverse_der_value : reverse_der_value_none::<V>,
-        reverse_der_ad    : reverse_der_ad_none::<V>,
+        forward_der_ad    : div_pv_forward_der::<V, AD<V> >,
+        reverse_der_value : div_pv_reverse_der::<V, V>,
+        reverse_der_ad    : div_pv_reverse_der::<V, AD<V> >,
         rust_src          : div_pv_rust_src,
         reverse_depend    : common::reverse_depend,
     };
