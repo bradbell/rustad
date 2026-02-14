@@ -7,6 +7,7 @@ use rustad::{
     start_recording,
     stop_recording,
     FloatCore,
+    nearly_eq,
 };
 //
 // test_div_pv
@@ -54,9 +55,30 @@ fn test_div_vp() {
     assert_eq!( dy[0], dx[0] / V::from(4.0) );
     assert_eq!( dy[1], dx[1] / V::from(5.0) );
 }
+//
+// test_div_vv
+fn test_div_vv() {
+    type V      = AzFloat<f64>;
+    let trace   = false;
+    //
+    let x  : Vec<V>  = vec![ V::from(2.0), V::from(3.0) ];
+    //
+    let (_, ax)      = start_recording(None,  x.clone() );
+    let ay           = vec! [ &ax[0] / &ax[1] ];
+    let f            = stop_recording(ay);
+    //
+    let (y, v)       = f.forward_var_value(None, x.clone(), trace);
+    assert_eq!( y[0], x[0] / x[1] );
+    //
+    let dx : Vec<V>  = vec![ V::from(6.0), V::from(7.0) ];
+    let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
+    let check        = ( x[1] * dx[0] - x[0] * dx[1] ) / ( x[1] * x[1] );
+    assert!( nearly_eq::<V>( &dy[0], &check, None ) );
+}
 
 #[test]
 fn div_op() {
     test_div_pv();
     test_div_vp();
+    test_div_vv();
 }

@@ -223,9 +223,12 @@ pub(crate) fn panic_reverse_depend(
 ) { panic!(); }
 // --------------------------------------------------------------------------
 // no_forward_der_value
-/// defines forward_der_value_none `<V>`
+/// Defines the `forward_der_value_none<V>` function.
 ///
 /// The types IndexT and ADType must be in scope where this macro is used.
+/// We allow unused because it is intended for new operators that have not
+/// yet been completely implemented.
+#[allow(unused_macros)]
 macro_rules! no_forward_der_value{ ($Op:ident) => {
     pub fn forward_der_value_none<V> (
         _dyp_both : &[V]        ,
@@ -241,12 +244,16 @@ macro_rules! no_forward_der_value{ ($Op:ident) => {
         ": forward_der_value not implemented for this operator" ,
     ))}
 }}
+#[allow(unused_imports)]
 pub(crate) use no_forward_der_value;
 //
 // no_forward_der_ad
-/// defines forward_der_ad_none `<V>`
+/// Defines the `forward_der_ad_none<V>` function.
 ///
 /// The types IndexT and ADType must be in scope where this macro is used.
+/// We allow unused because it is intended for new operators that have not
+/// yet been completely implemented.
+#[allow(unused_macros)]
 macro_rules! no_forward_der_ad{ ($Op:ident) => {
     pub fn forward_der_ad_none<V> (
         _dyp_both : &[ AD<V> ]        ,
@@ -262,6 +269,7 @@ macro_rules! no_forward_der_ad{ ($Op:ident) => {
         ": forward_der_ad not implemented for this operator" ,
     ))}
 }}
+#[allow(unused_imports)]
 pub(crate) use no_forward_der_ad;
 //
 // no_reverse_der_value
