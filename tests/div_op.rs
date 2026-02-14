@@ -7,7 +7,7 @@ use rustad::{
     start_recording,
     stop_recording,
     FloatCore,
-    nearly_eq,
+    check_nearly_eq,
 };
 //
 // test_div_pv
@@ -73,7 +73,8 @@ fn test_div_vv() {
     let dx : Vec<V>  = vec![ V::from(6.0), V::from(7.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
     let check        = ( x[1] * dx[0] - x[0] * dx[1] ) / ( x[1] * x[1] );
-    assert!( nearly_eq::<V>( &dy[0], &check, None ) );
+    let arg_vec      = Vec::<[&str; 2]>::new();
+    check_nearly_eq::<V>( &dy[0], &check, &arg_vec );
 }
 
 #[test]

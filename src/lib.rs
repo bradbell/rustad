@@ -100,7 +100,7 @@ pub use float::{
 };
 pub use float_value::{
     FloatValue,
-    nearly_eq,
+    check_nearly_eq,
 };
 pub use sparse::{
     coloring,

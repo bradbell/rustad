@@ -79,8 +79,6 @@ pub trait FloatValue : FloatCore {
     /// The exact form of this source is unspecified and may change.
     ///
     /// # Example
-    ///
-    /// # Example
     /// ```
     /// use rustad::AzFloat;
     /// use rustad::FloatValue;
@@ -162,63 +160,84 @@ macro_rules! impl_float_value_from_primitive{ ($P:ident) => {
 } }
 pub(crate) use impl_float_value_from_primitive;
 // ----------------------------------------------------------------------------
-// nearly_eq
+// check_nearly_eq
 /// Check if two values are nearly equal.
 ///
-/// x :
-/// one of the values that we are comparing.
-///
-/// y :
-/// the other value that we are comparing.
-///
-/// s :
-/// is an optional scale factor. It it is None,
-/// the factor 100 is used.
-///
-/// m :
-/// use use *m* to denote [FloatCore::min_positive] for *V* .
-///
-/// e :
-/// we use *e* to denote [FloatCore::epsilon] for *V* .
-///
-/// return :
-/// the return value is true if either of the following conditions hold:
+/// * Syntax :
 /// ```text
-/// |x| + |y|             < m * 100
-/// |x - y| / (|x| + |y|) < e * 100
+///     flag = check_nearly_eq(x, y, arg_vec)
 /// ```
-/// Note that for a [NumVec](crate::NumVec) type,
-/// the conditions must hold for all elements of the vector.
+///
+/// * V : see [doc_generic_v](crate::doc_generic_v)
+///
+/// * x :
+///   one of the values that we are comparing.
+///
+/// * y :
+///   the other value that we are comparing.
+///
+/// * arg_vec :
+///   see [doc_arg_vec](crate::doc_arg_vec) and the key descriptions below:
+///
+///     * factor :
+///       is a string representation of an f32 value that multiplies
+///       the minimum positive value and machine epsilon; see below.
+///       The default factor is 100.
+///
+///     * assert :
+///       must be true or false. If it is true, check_nearly_eq
+///       will panic with an error message when the comparison (flag) is false.
+///       The default value for assert is true.
+///
+/// * min_positive :
+///   use use the notaiton [min_positive](FloatCore::min_positive) below.
+///
+/// * epsilon :
+///   use use the notaiton [epsilon](FloatCore::epsilon) below.
+///
+/// * flag :
+///   the return value is true if either of the following conditions hold:
+///   ```text
+///   |x| + |y|             < factor * min_positive
+///   |x - y| / (|x| + |y|) < factor * epsilon
+///   ```
+///   Note that for a [NumVec](crate::NumVec) type,
+///   one of the conditions must hold for each elements of the vector.
 ///
 /// # AzFloat Example :
 /// ```
 /// use rustad::{
 ///     AzFloat,
 ///     FloatCore,
-///     nearly_eq,
+///     check_nearly_eq,
 /// };
 /// type V = AzFloat<f32>;
 /// //
+/// //
 /// let one_v           = V::from(1);
-/// let two_v           = V::from(2);
 /// let epsilon_v   : V = FloatCore::epsilon();
 /// let near_one_v      = one_v + V::from(10) * epsilon_v;
-/// let x      = V::from( 1e-20 );
-/// let y      = x * near_one_v;
-/// assert!( nearly_eq::<V>(&x, &y, None) );
-/// assert!( ! nearly_eq::<V>( &x, &y, Some(&two_v) ) );
+/// let x               = V::from( 1e-20 );
+/// let y               = x * near_one_v;
+/// let mut arg_vec     = vec![ ["assert", "false"] ];
+/// assert!( check_nearly_eq::<V>(&x, &y, &arg_vec) );
+/// arg_vec.push( ["factor", "2"] );
+/// assert!( ! check_nearly_eq::<V>( &x, &y, &arg_vec ) );
 /// ```
 ///
+/*
 /// # NumVec Example :
 /// ```
 /// use rustad::{
 ///     AzFloat,
 ///     NumVec,
 ///     FloatCore,
-///     nearly_eq,
+///     check_nearly_eq,
 /// };
 /// type S = AzFloat<f32>;
 /// type V = NumVec<S>;
+/// //
+/// let arg_vec = vec![ ["assert", "false"] ];
 /// //
 /// let one_v       : V = FloatCore::one();
 /// let epsilon_v   : V = FloatCore::epsilon();
@@ -226,28 +245,53 @@ pub(crate) use impl_float_value_from_primitive;
 /// //
 /// let x  = V::new( vec![ S::from(1e-20) ,  S::from(1e+20) ] );
 /// let y  = &x * &near_one_v;
-/// assert!( nearly_eq::<V>(&x, &y, None) );
+/// assert!( check_nearly_eq::<V>(&x, &y, &arg_vec) );
 /// //
 /// let y  = V::new( vec![ S::from(1.01e-20) ,  S::from(1e+20) ] );
-/// assert!( ! nearly_eq::<V>(&x, &y, None) );
+/// assert!( ! check_nearly_eq::<V>(&x, &y, &arg_vec) );
 /// ```
 ///
-pub fn nearly_eq<V>(x : &V, y : &V, s : Option<&V>) -> bool
+*/
+pub fn check_nearly_eq<V>(x : &V, y : &V, arg_vec : &Vec< [&str; 2] >) -> bool
 where
-    V             : FloatCore + FloatValue + CmpAsLhs + From<f32>,
+    V  : FloatCore + FloatValue + CmpAsLhs + From<f32> + std::fmt::Debug,
     for<'a> &'a V : Add<&'a V, Output=V> ,
     for<'a> &'a V : Mul<&'a V, Output=V> ,
     for<'a> &'a V : Sub<&'a V, Output=V> ,
     for<'a> &'a V : Div<&'a V, Output=V> ,
 {   //
-    // s
-    let s100 = V::from(100f32);
-    let s = s.unwrap_or(&s100);
+    // factor, assert
+    let mut factor  = V::from(100f32);
+    let mut assert  = true;
+    for arg in arg_vec.iter() {
+        match arg[0] {
+            "factor" => {
+                let result = arg[1].parse::<f32>();
+                if result.is_err() {
+                    panic!( "check_nearly_eq: Cannot convert factor to f32" );
+                }
+                factor = V::from( result.unwrap() );
+            },
+            "assert" => {
+                if arg[1] == "true" {
+                    assert = true;
+                } else if arg[1] == "false" {
+                    assert = false;
+                } else {
+                    panic!( "check_nearly_eq: assert is not true of false" );
+                }
+            },
+            _ => {
+                panic!( "check_nearly_eq: key is not assert of factor" );
+            }
+        }
+    }
+    //
     //
     // sum_abs, min_sum
     let sum_abs     = &x.abs() + &y.abs();
     let min_pos : V = FloatCore::min_positive();
-    let min_sum     = s * &min_pos;
+    let min_sum     = &factor * &min_pos;
     //
     // check first condition
     let lt_min  = sum_abs.left_lt(&min_sum);
@@ -257,13 +301,24 @@ where
     //
     // abs_diff, min_diff
     let abs_diff = (x - y).abs();
-    let min_diff = s * &FloatCore::epsilon();
+    let min_diff = &factor * &FloatCore::epsilon();
     //
     // check second condition
     let ratio  = &abs_diff / &sum_abs;
     let lt_min = ratio.left_lt(&min_diff);
     if lt_min.is_one() {
         return true;
+    }
+    if assert {
+        panic!(
+            "check_nearly_eq panic:\n\
+            x                     = {:?}\n\
+            y                     = {:?}\n\
+            factor * min_positive = {:?}\n\
+            factor * epsilon      = {:?}\n\
+            Set RUST_BACKTRACE=1 to see this call to check_nearly_eq",
+            x, y, min_sum, min_diff
+        );
     }
     //
     false
