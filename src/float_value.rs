@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2026 Bradley M. Bell
 // ---------------------------------------------------------------------------
-//! This pub(crate) module defines the FloatValue trait and related functions
+//! This pub(crate) module defines the FloatValue trait and related functions.
 //!
 //! Link to [parent module](super)
 // ----------------------------------------------------------------------------
@@ -199,14 +199,14 @@ pub(crate) use impl_float_value_from_primitive;
 /// };
 /// type V = AzFloat<f32>;
 /// //
-/// let one_v       : V = FloatCore::one();
+/// let one_v           = V::from(1);
+/// let two_v           = V::from(2);
 /// let epsilon_v   : V = FloatCore::epsilon();
 /// let near_one_v      = one_v + V::from(10) * epsilon_v;
 /// let x      = V::from( 1e-20 );
 /// let y      = x * near_one_v;
-/// let option = Some( V::from(2) );
 /// assert!( nearly_eq::<V>(&x, &y, None) );
-/// assert!( ! nearly_eq::<V>(&x, &y, option) );
+/// assert!( ! nearly_eq::<V>( &x, &y, Some(&two_v) ) );
 /// ```
 ///
 /// # NumVec Example :
@@ -232,7 +232,7 @@ pub(crate) use impl_float_value_from_primitive;
 /// assert!( ! nearly_eq::<V>(&x, &y, None) );
 /// ```
 ///
-pub fn nearly_eq<V>(x : &V, y : &V, s : Option<V>) -> bool
+pub fn nearly_eq<V>(x : &V, y : &V, s : Option<&V>) -> bool
 where
     V             : FloatCore + FloatValue + CmpAsLhs + From<f32>,
     for<'a> &'a V : Add<&'a V, Output=V> ,
@@ -241,12 +241,13 @@ where
     for<'a> &'a V : Div<&'a V, Output=V> ,
 {   //
     // s
-    let s = s.unwrap_or_else(|| V::from(100f32));
+    let s100 = V::from(100f32);
+    let s = s.unwrap_or(&s100);
     //
     // sum_abs, min_sum
     let sum_abs     = &x.abs() + &y.abs();
     let min_pos : V = FloatCore::min_positive();
-    let min_sum     = &s * &min_pos;
+    let min_sum     = s * &min_pos;
     //
     // check first condition
     let lt_min  = sum_abs.left_lt(&min_sum);
@@ -256,7 +257,7 @@ where
     //
     // abs_diff, min_diff
     let abs_diff = (x - y).abs();
-    let min_diff = &s * &FloatCore::epsilon();
+    let min_diff = s * &FloatCore::epsilon();
     //
     // check second condition
     let ratio  = &abs_diff / &sum_abs;
