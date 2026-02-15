@@ -203,6 +203,7 @@ macro_rules! reverse_der {
                 let arg_type  = &self.var.arg_type_all[start .. end];
                 let res       = self.var.n_dom + op_index;
                 let reverse_1 = op_info_vec[op_id].[< reverse_der_ $suffix >];
+                println!( "op_id = {}", op_id );
                 reverse_1(
                     &dyp_both,
                     &var_both,

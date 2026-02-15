@@ -59,6 +59,11 @@ fn test_div_vp() {
     let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
     assert_eq!( dy[0], dx[0] / V::from(4.0) );
     assert_eq!( dy[1], dx[1] / V::from(5.0) );
+    //
+    let dy           = vec![ V::from(8.0), V::from(9.0) ];
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    assert_eq!( dx[0], dy[0] / V::from(4.0) );
+    assert_eq!( dx[1], dy[1] / V::from(5.0) );
 }
 //
 // test_div_vv

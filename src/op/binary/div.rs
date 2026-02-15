@@ -24,6 +24,7 @@ use std::ops::{
     Div,
     Mul,
     Sub,
+    AddAssign,
     SubAssign,
 };
 //
@@ -94,7 +95,7 @@ where
     var_der[res]   = (&numerator / &var_both[rhs]).minus()
 }
 //
-// div_pv_forward_der
+// div_vp_forward_der
 /// first order forward for variable / parameter; see [ForwardDer]
 fn div_vp_forward_der <V, E>(
     dyp_both   :   &[E]        ,
@@ -169,7 +170,7 @@ where
     for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
     // g(v)      = f(w, v) = f[ p / v, v ]
-    // dg / dv   = df/dv - df/dw * dw/dv
+    // dg / dv   = df/dv + df/dw * dw/dv
     // dw / dv   = - w / v
     debug_assert!( arg.len() == 2);
     debug_assert!( arg_type[0].is_parameter() );
@@ -177,6 +178,39 @@ where
     let rhs = arg[1] as usize;
     let term      = &var_der[res] * &( &var_both[res] / &var_both[rhs] );
     var_der[rhs] -= &term;
+}
+//
+// div_vp_reverse_der
+/// first order reverse for variable / parameter; see [ReverseDer]
+fn div_vp_reverse_der <V, E>(
+    dyp_both   :   &[E]        ,
+    _var_both  :   &[E]        ,
+    var_der    :   &mut [E]    ,
+    cop        :   &[V]        ,
+    _flag_all  :   &[bool]     ,
+    arg        :   &[IndexT]   ,
+    arg_type   :   &[ADType]   ,
+    res        :   usize       )
+where
+    for<'a> E     : AddAssign<&'a E>       ,
+    for<'a> &'a E : Div<&'a V, Output = E> ,
+    for<'a> &'a E : Div<&'a E, Output = E> ,
+{
+    // g(v)      = f(w, v) = f[ v / p, v ]
+    // dg / dv   = df/dv + df/dw * dw/dv
+    // dw / dv   = 1 / p
+    debug_assert!( arg.len() == 2);
+    debug_assert!( arg_type[0].is_variable() );
+    debug_assert!( arg_type[1].is_parameter() );
+    let lhs  = arg[0] as usize;
+    let rhs  = arg[1] as usize;
+    let term = if arg_type[1].is_constant() {
+        &var_der[res] / &cop[rhs]
+    } else {
+        debug_assert!( arg_type[1].is_dynamic() );
+        &var_der[res] / &dyp_both[rhs]
+    };
+    var_der[lhs] += &term;
 }
 // ---------------------------------------------------------------------------
 // set_op_info
@@ -192,6 +226,7 @@ no_reverse_der_ad!(Div);
 pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
     for<'a> V     : SubAssign<&'a V> ,
+    for<'a> V     : AddAssign<&'a V> ,
     //
     for<'a> &'a V : Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Mul<&'a AD<V>, Output = AD<V> > ,
@@ -237,8 +272,8 @@ where
         forward_var_ad    : div_vp_forward_var::<V, AD<V> >,
         forward_der_value : div_vp_forward_der::<V, V>,
         forward_der_ad    : div_vp_forward_der::<V, AD<V> >,
-        reverse_der_value : reverse_der_value_none::<V>,
-        reverse_der_ad    : reverse_der_ad_none::<V>,
+        reverse_der_value : div_vp_reverse_der::<V, V>,
+        reverse_der_ad    : div_vp_reverse_der::<V, AD<V> >,
         rust_src          : div_vp_rust_src,
         reverse_depend    : common::reverse_depend,
     };
