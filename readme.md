@@ -30,9 +30,7 @@ This package is intended to include (and extend) most of the features in
 
 ## Features Implemented
 
-1.  Addition, subtraction and multiplication: 
-    We have held off on other simple numerical
-    operations while we focus on more complicated features.
+1.  Addition, subtraction, multiplication and division.
 
 2.  Forward and reverse mode derivatives with optional tracing
     of the computation.
@@ -81,7 +79,11 @@ This package is intended to include (and extend) most of the features in
 
 ## Goals Before Stable API
 
-We are currently implementing the standard math functions.
+1. We are currently implementing more the standard math functions.
+
+2. Allow for AD operations without borrowing when the corresponding
+   value type implements Copy; e.g., numeircal vectors do not
+   implement copy.
     
 ## Wish List
 
