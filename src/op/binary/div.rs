@@ -42,8 +42,6 @@ use crate::op::info::{
     panic_dyp,
     panic_var,
     panic_der,
-    no_reverse_der_value,
-    no_reverse_der_ad,
 };
 use crate::op::id::{
     DIV_PP_OP,
@@ -212,11 +210,42 @@ where
     };
     var_der[lhs] += &term;
 }
+//
+// div_vv_reverse_der
+/// first order reverse for variable / variable; see [ReverseDer]
+fn div_vv_reverse_der <V, E>(
+    _dyp_both  :   &[E]        ,
+    var_both   :   &[E]        ,
+    var_der    :   &mut [E]    ,
+    _cop       :   &[V]        ,
+    _flag_all  :   &[bool]     ,
+    arg        :   &[IndexT]   ,
+    arg_type   :   &[ADType]   ,
+    res        :   usize       )
+where
+    for<'a> E : AddAssign<&'a E> ,
+    for<'a> E : SubAssign<&'a E> ,
+    for<'a> &'a E : Mul<&'a E, Output = E> ,
+    for<'a> &'a E : Div<&'a E, Output = E> ,
+{
+    // g(u, v)   = f(w, u, v) = f[ u / v, u, v ]
+    // dg / du   = df/du + df/dw * dw/du
+    // dg / dv   = df/dv + df/dw * dw/dv
+    // dw / du   = 1 / v,  dw / dv   = - w / v
+    debug_assert!( arg.len() == 2);
+    debug_assert!( arg_type[0].is_variable() );
+    debug_assert!( arg_type[1].is_variable() );
+    let lhs = arg[0] as usize;
+    let rhs = arg[1] as usize;
+    //
+    let term      = &var_der[res] / &var_both[rhs];
+    var_der[lhs] += &term;
+    //
+    let term      = &var_der[res] * &( &var_both[res] / &var_both[rhs] );
+    var_der[rhs] -= &term;
+}
 // ---------------------------------------------------------------------------
 // set_op_info
-//
-no_reverse_der_value!(Div);
-no_reverse_der_ad!(Div);
 //
 /// Set the operator information for all the Div operators.
 ///
@@ -285,8 +314,8 @@ where
         forward_var_ad    : div_vv_forward_var::<V, AD<V> >,
         forward_der_value : div_vv_forward_der::<V, V>,
         forward_der_ad    : div_vv_forward_der::<V, AD<V> >,
-        reverse_der_value : reverse_der_value_none::<V>,
-        reverse_der_ad    : reverse_der_ad_none::<V>,
+        reverse_der_value : div_vv_reverse_der::<V, V>,
+        reverse_der_ad    : div_vv_reverse_der::<V, AD<V> >,
         rust_src          : div_vv_rust_src,
         reverse_depend    : common::reverse_depend,
     };

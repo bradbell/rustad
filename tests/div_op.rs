@@ -85,6 +85,11 @@ fn test_div_vv() {
     let check        = ( x[1] * dx[0] - x[0] * dx[1] ) / ( x[1] * x[1] );
     let arg_vec      = Vec::<[&str; 2]>::new();
     check_nearly_eq::<V>( &dy[0], &check, &arg_vec );
+    //
+    let dy           = vec![ V::from(8.0) ];
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    assert_eq!( dx[0],          dy[0] / x[1] );
+    assert_eq!( dx[1].minus(),  dy[0] * x[0] / (x[1] * x[1]) );
 }
 
 #[test]
