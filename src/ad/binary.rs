@@ -302,7 +302,10 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         }
     }
     // -----------------------------------------------------------------------
-    fn [< record_ $Name:lower _av >]<V> (
+    // record_name_ac
+    // We use _ac when left is an AD object and right is known to be constant.
+    // We do not use _av to avoid confusion between values and variables.
+    fn [< record_ $Name:lower _ac >]<V> (
         tape: &mut Tape<V> ,
         lhs:       &AD<V>  ,
         rhs:       &V      ,
@@ -432,7 +435,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             // new_tape_id, new_index, new_ad_type
             let (new_tape_id, new_index, new_ad_type) =
                 local_key.with_borrow_mut( |tape|
-                    [< record_ $Name:lower _av >]::<V> ( tape, self, rhs )
+                    [< record_ $Name:lower _ac >]::<V> ( tape, self, rhs )
             );
             //
             // result
@@ -559,7 +562,7 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             // tape, self.tape_id, self.index
             let (new_tape_id, new_index, new_ad_type) =
                 local_key.with_borrow_mut( |tape|
-                    [< record_ $Name:lower _av >]::<V> ( tape, self, rhs )
+                    [< record_ $Name:lower _ac >]::<V> ( tape, self, rhs )
             );
             //
             // self
