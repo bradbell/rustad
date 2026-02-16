@@ -83,7 +83,7 @@ This package is intended to include (and extend) most of the features in
 
 2. Combine CmpAsLhs and CmpAsRhs into one trait.
 
-3. Add `is_zero` and `is_one` funcitions to AD types.
+3. Add `is_zero` and `is_one` functions to AD types.
 
 ## Wish List
 
