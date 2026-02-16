@@ -97,6 +97,7 @@ pub use float::{
     num_vec::NumVec,
     cmp_as::CmpAsLhs,
     cmp_as::CmpAsRhs,
+    num_cmp::NumCmp,
 };
 pub use float_value::{
     FloatValue,
@@ -170,6 +171,12 @@ pub const CORE_RS : &str = include_str!( "float/core.rs" );
 /// This is needed at the beginning of a dll library that include
 /// [ADfn::rust_src] .
 pub const CMP_AS_RS : &str = include_str!( "float/cmp_as.rs" );
+//
+// NUM_CMP_RS
+/// is the source code for the [num_cmp](crate::float::num_cmp) module.
+/// This is needed at the beginning of a dll library that include
+/// [ADfn::rust_src] .
+pub const NUM_CMP_RS : &str = include_str!( "float/num_cmp.rs" );
 //
 // AZ_FLOAT_RS
 /// is the source code for the [az_float](crate::float::az_float) module.

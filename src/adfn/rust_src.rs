@@ -61,12 +61,15 @@ fn prototype_src(fn_name : &str, v_str : &str) -> String {
         "#[allow(unused)]\n" +
         "pub mod cmp_as;\n" +
         "#[allow(unused)]\n" +
+        "pub mod num_cmp;\n" +
+        "#[allow(unused)]\n" +
         "pub mod core;\n" +
         "\n" +
         "#[allow(unused)]\n" +
         "use crate::{\n" +
         "   cmp_as::CmpAsLhs,\n" +
         "   cmp_as::CmpAsRhs,\n" +
+        "   num_cmp::NumCmp,\n" +
         "   core::FloatCore,\n"  +
         "};\n" +
         "pub mod az_float;\n" +

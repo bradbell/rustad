@@ -25,9 +25,10 @@ use std::ops::{
     DivAssign,
 };
 //
-use super::cmp_as::{
+use crate::{
     CmpAsLhs,
     CmpAsRhs,
+    NumCmp,
 };
 use super::core::FloatCore;
 // ---------------------------------------------------------------------------
@@ -426,6 +427,58 @@ where
     impl_compare_right_az_float!( ne_right, != );
     impl_compare_right_az_float!( ge_right, >= );
     impl_compare_right_az_float!( gt_right, >  );
+}
+// ---------------------------------------------------------------------------
+// NumCmp for AzFloat
+/// NumCmp when both operands are `AzFloat<B>`
+///
+/// * B : Is the floating point base type
+///
+/// # Example :
+/// ```
+/// use rustad::AzFloat;
+/// use rustad::NumCmp;
+/// type V = AzFloat<f64>;
+/// //
+/// let zero  = V::from(0);
+/// let one   = V::from(1);
+/// let two   = V::from(2);
+/// let three = V::from(3);
+/// let lt     = two.num_lt(&three);
+/// let not_lt = &one - &lt;
+/// assert_eq!(lt, one);
+/// assert_eq!(not_lt, zero);
+/// ```
+pub fn doc_num_cmp_az_float() {}
+//
+/// see [doc_num_cmp_az_float]
+macro_rules! impl_num_cmp_az_float{ ($name:ident, $op:tt) => {
+    #[doc = concat!( " AzFloat::", stringify!($name)  ) ]
+    fn $name(&self, other : & AzFloat<B> ) -> AzFloat<B> {
+        let zero : AzFloat<B> = FloatCore::zero();
+        let one  : AzFloat<B> = FloatCore::one();
+        //
+        if self.0 $op other.0 {
+            one
+        } else {
+            zero
+        }
+    }
+} }
+//
+impl<B> NumCmp for AzFloat<B>
+where
+    B          : PartialOrd,
+    AzFloat<B> : FloatCore,
+{
+    type Output = AzFloat<B>;
+    //
+    impl_num_cmp_az_float!( num_lt, <  );
+    impl_num_cmp_az_float!( num_le, <= );
+    impl_num_cmp_az_float!( num_eq, == );
+    impl_num_cmp_az_float!( num_ne, != );
+    impl_num_cmp_az_float!( num_ge, >= );
+    impl_num_cmp_az_float!( num_gt, >  );
 }
 // ---------------------------------------------------------------------------
 // PartialEq, Eq
