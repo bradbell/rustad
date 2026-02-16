@@ -26,13 +26,19 @@ use crate::doc_generic_v;
 // ---------------------------------------------------------------------------
 /// Binary `AD<V>` operators.
 ///
-/// * Syntax :
+/// * Borrow Syntax :
 ///   ```text
 ///        az = &ax Op &ay
 ///        az = &ay Op &y
 ///   ```
 ///
-/// * V : see [doc_generic_v]
+/// * Own Syntax :
+///   Currently, no advantage is taken of the ownership of ax and ay.
+///   ```text
+///        az = ax Op ay
+///        az = ay Op y
+///   ```
+///
 ///
 /// * Op : is the source code token for this binary operator;
 ///   i.e., `+` , `-` , `*` , or `/` .
@@ -41,7 +47,6 @@ use crate::doc_generic_v;
 /// * ay : right hand side `AD<V>` object
 /// * az : result `AD<V>` object
 ///
-/// * x  : left hand side *V* object
 /// * y  : right hand side *V* object
 ///
 /// # Example
@@ -52,7 +57,7 @@ use crate::doc_generic_v;
 /// type V  = rustad::AzFloat<f64>;
 /// let ax  = ad_from_value( V::from(3.0) );
 /// let y   = V::from(4.0);
-/// let az  = &ax * &y;
+/// let az  = ax * y;
 /// assert_eq!( az.to_value(), V::from(12.0) );
 ///
 /// let x   = V::from(3.0);
@@ -301,6 +306,21 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             AD::new(new_tape_id, new_index, new_ad_type, new_value)
         }
     }
+    //
+    #[doc = concat!(
+        "`AD<V>` ", stringify!($Op), "`AD<V>`",
+        "; see [doc_ad_binary_op]"
+    )]
+    impl<V> std::ops::$Name< AD<V> > for AD<V>
+    where
+        for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
+        V    : Clone + FloatCore + PartialEq + crate::ThisThreadTapePublic ,
+    {   type Output = AD<V>;
+        //
+        fn [< $Name:lower >](self , rhs : AD<V> ) -> AD<V> {
+            &self $Op &rhs
+        }
+    }
     // -----------------------------------------------------------------------
     // record_name_ac
     // We use _ac when left is an AD object and right is known to be constant.
@@ -440,6 +460,22 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
             //
             // result
             AD::new(new_tape_id, new_index, new_ad_type, new_value)
+        }
+    }
+    //
+    #[doc = concat!(
+        "`AD<V>` ", stringify!($Op), "`V`",
+        "; see [doc_ad_binary_op]"
+    )]
+    impl<V> std::ops::$Name<V> for AD<V>
+    where
+        for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
+        V            : Clone + FloatCore + PartialEq +
+                       crate::ThisThreadTapePublic ,
+    {   type Output = AD<V>;
+        //
+        fn [< $Name:lower >](self , rhs : V ) -> AD<V> {
+            &self $Op &rhs
         }
     }
 } } }
