@@ -253,21 +253,29 @@ impl_binary_reference!(Div, div);
 ///
 /// * B : Is the floating point base type
 ///
-/// * Syntax : lhs op &rhs
+/// * Syntax :
+///   ```text
+///     lhs op rhs
+///     lhs op &rhs
+///   ```
 ///
-///     * lhs : is the AzFloat`<B>` left operand
-///     * rhs : is the AzFloat`<B>` right operand
-///     * op  : is one of `+` , `-` , `*` , `/`
+/// * lhs : is the `AzFloat<B>` left operand
+/// * rhs : is the `AzFloat<B>` right operand
+/// * op  : is one of `+=` , `-=` , `*=` , `/=`
 ///
 /// # Example :
 /// ```
 /// use rustad::AzFloat;
-/// type B = f32;
+/// type V = AzFloat<f32>;
 /// //
-/// let mut z12_4 : AzFloat<B> = (12.0 as B).into();
-/// let z4        : AzFloat<B> = (4.0 as B).into();
-/// z12_4         /= &z4;
-/// assert_eq!( z12_4.to_inner(), (3.0 as B) );
+/// let mut x = V::from(12.0);
+/// let y     = V::from(4.0);
+/// //
+/// x        /= &y;
+/// assert_eq!( x, V::from(3.0) );
+/// //
+/// x        -= y;
+/// assert_eq!( x, V::from(-1.0) );
 /// ```
 pub fn doc_binary_assign() {}
 //
@@ -285,6 +293,21 @@ where
         }
     }
 }
+//
+/// see [doc_binary_assign]
+impl<B> MulAssign<AzFloat<B> > for AzFloat<B>
+where
+    B : From<f32> + PartialEq + for<'a> MulAssign<&'a B>,
+{
+    fn mul_assign(&mut self, rhs : AzFloat<B>) {
+        let zero_b : B = 0f32.into();
+        if (self.0) == zero_b || (rhs.0) == zero_b {
+                self.0 = zero_b;
+        } else {
+            self.0.mul_assign( &rhs.0 );
+        }
+    }
+}
 macro_rules! impl_binary_assign{ ($Name:ident, $name:ident) => {
     #[doc = "see [doc_binary_assign]"]
     impl<B> $Name <& AzFloat<B> > for AzFloat<B>
@@ -292,6 +315,15 @@ macro_rules! impl_binary_assign{ ($Name:ident, $name:ident) => {
         B : From<f32> + PartialEq +  for<'a> $Name <&'a B>,
     {
         fn $name(& mut self, rhs : & AzFloat<B> ) {
+            self.0.$name(&rhs.0);
+        }
+    }
+    #[doc = "see [doc_binary_assign]"]
+    impl<B> $Name <AzFloat<B> > for AzFloat<B>
+    where
+        B : From<f32> + PartialEq +  for<'a> $Name <&'a B>,
+    {
+        fn $name(& mut self, rhs : AzFloat<B> ) {
             self.0.$name(&rhs.0);
         }
     }
