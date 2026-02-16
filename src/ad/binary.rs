@@ -510,8 +510,19 @@ ad_binary_op!(Div, /);
 /// type V       = rustad::AzFloat<f64>;
 /// let mut ax   = ad_from_value( V::from(3.0) );
 /// let y        = V::from(4.0);
+/// let ay       = ad_from_value(y.clone());
+/// //
+/// ax          -= &ay;
+/// assert_eq!( ax.clone().to_value(), V::from(-1.0) );
+/// //
+/// ax          -= ay;
+/// assert_eq!( ax.clone().to_value(), V::from(-5.0) );
+/// //
 /// ax          -= &y;
-/// assert_eq!( ax.to_value(), V::from(-1.0) );
+/// assert_eq!( ax.clone().to_value(), V::from(-9.0) );
+/// //
+/// ax          -= y;
+/// assert_eq!( ax.to_value(), V::from(-13.0) );
 /// ```
 ///
 /// # Example using NumVec
@@ -579,6 +590,21 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             self.value $Op &rhs.value;
         }
     }
+    //
+    #[doc = concat!(
+        "`AD<V>` ", stringify!($Op), " `AD<V>`",
+        "; see [doc_ad_compound_op]"
+    )]
+    impl<V> std::ops::[< $Name Assign >] < AD<V> > for AD<V>
+    where
+        V: Clone + FloatCore + PartialEq +
+            for<'a> std::ops::[< $Name Assign >] <&'a V> +
+            crate::ThisThreadTapePublic  ,
+    {   //
+        fn [< $Name:lower _assign >] (&mut self, rhs : AD<V> ) {
+            *self $Op &rhs;
+        }
+    }
     // ------------------------------------------------------------------------
     #[doc = concat!(
         "`AD<V>` ", stringify!($Op), " & V; see [doc_ad_compound_op]"
@@ -607,6 +633,19 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             self.ad_type   = new_ad_type;
             //
             self.value $Op &rhs;
+        }
+    }
+    #[doc = concat!(
+        "`AD<V>` ", stringify!($Op), " V; see [doc_ad_compound_op]"
+    )]
+    impl<V> std::ops::[< $Name Assign >] <V> for AD<V>
+    where
+        V: Clone + FloatCore + PartialEq +
+            for<'a> std::ops::[< $Name Assign >] <&'a V> +
+            crate::ThisThreadTapePublic  ,
+    {   //
+        fn [< $Name:lower _assign >] (&mut self, rhs : V) {
+            *self $Op &rhs;
         }
     }
 } } }
