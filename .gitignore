@@ -9,6 +9,8 @@
 /Cargo.lock
 # bin/git_commit.sh log file
 /git_commit.log
+# html version of readme file
+/readme.html
 # vim swap files
 *.swp
 # temporary files

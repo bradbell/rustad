@@ -79,12 +79,12 @@ This package is intended to include (and extend) most of the features in
 
 ## Goals Before Stable API
 
-1. We are currently implementing more the standard math functions.
+1. Implement more of the standard math functions.
 
-2. Allow for AD operations without borrowing when the corresponding
-   value type implements Copy; e.g., numeircal vectors do not
-   implement copy.
-    
+2. Combine CmpAsLhs and CmpAsRhs into one trait.
+
+3. Add `is_zero` and `is_one` funcitions to AD types.
+
 ## Wish List
 
 1.  Generate llvm, similar to the source code generation and use it
