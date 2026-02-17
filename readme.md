@@ -81,9 +81,7 @@ This package is intended to include (and extend) most of the features in
 
 1. Implement more of the standard math functions.
 
-2. Combine CmpAsLhs and CmpAsRhs into one trait.
-
-3. Add `is_zero` and `is_one` functions to AD types.
+2. Add `is_zero` and `is_one` functions to AD types.
 
 ## Wish List
 

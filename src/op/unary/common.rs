@@ -12,7 +12,7 @@ use crate::adfn::optimize;
 use crate::ad::ADType;
 //
 /* ---------------------------------------------------------------------------
-TODO: Uncomment when optimizer handles CmpAsLhs operators.
+TODO: Uncomment when optimizer handles unary operators.
 pub(crate) fn is_unary_op(op_id : u8) -> bool {
     match op_id {
         id::SIN_OP => true ,

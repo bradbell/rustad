@@ -24,14 +24,14 @@ fn write_src_file(src_dir : &str, name : &str, source : &str) {
 /// * src_dir  :
 ///   is the directory we are creating. If it already exists, any files
 ///   there are left in place except for:
-///   lib.rs, core.rs, cmp_as.rs, num_cmp.rs, az_float.rs.
+///   lib.rs, core.rs, num_cmp.rs, az_float.rs.
 ///
 /// * lib_src :
 ///   is an in memory representation of the data that is written to the
 ///   file *src_dir* `/lib.rs` .
 ///
 /// * Other Files :
-///   core.rs, cmp_as.rs, num_cmp.rs, az_float.rs
+///   core.rs, num_cmp.rs, az_float.rs
 ///   are copies of the corresponding rustad files in src/float.
 ///
 pub fn create_src_dir(
@@ -44,7 +44,6 @@ pub fn create_src_dir(
     ); }
     write_src_file(src_dir, "lib.rs", lib_src);
     write_src_file(src_dir, "core.rs",     crate::CORE_RS);
-    write_src_file(src_dir, "cmp_as.rs",   crate::CMP_AS_RS);
     write_src_file(src_dir, "num_cmp.rs",  crate::NUM_CMP_RS);
     write_src_file(src_dir, "az_float.rs", crate::AZ_FLOAT_RS);
     write_src_file(src_dir, "num_vec.rs",  crate::NUM_VEC_RS);

@@ -59,8 +59,6 @@ fn prototype_src(fn_name : &str, v_str : &str) -> String {
     let mut src = String::new();
     src = src +
         "#[allow(unused)]\n" +
-        "pub mod cmp_as;\n" +
-        "#[allow(unused)]\n" +
         "pub mod num_cmp;\n" +
         "#[allow(unused)]\n" +
         "pub mod core;\n" +

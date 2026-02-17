@@ -95,8 +95,6 @@ pub use float::{
     core::FloatCore,
     az_float::AzFloat,
     num_vec::NumVec,
-    cmp_as::CmpAsLhs,
-    cmp_as::CmpAsRhs,
     num_cmp::NumCmp,
 };
 pub use float_value::{
@@ -165,12 +163,6 @@ pub const YEAR_MONTH_DAY : &str = "2026.2.16";
 /// This is needed at the beginning of a dll library that include
 /// [ADfn::rust_src] .
 pub const CORE_RS : &str = include_str!( "float/core.rs" );
-//
-// CMP_AS_RS
-/// is the source code for the [cmp_as](crate::float::cmp_as) module.
-/// This is needed at the beginning of a dll library that include
-/// [ADfn::rust_src] .
-pub const CMP_AS_RS : &str = include_str!( "float/cmp_as.rs" );
 //
 // NUM_CMP_RS
 /// is the source code for the [num_cmp](crate::float::num_cmp) module.
