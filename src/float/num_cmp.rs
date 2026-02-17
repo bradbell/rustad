@@ -28,7 +28,7 @@
 /// * cmp : is one of the following :
 ///   `num_lt` , `num_le`, `num_eq`, `num_ne`, `num_ge`, `num_gt`
 /// * res : is one (zero) if the comparison result is true (false).
-pub trait NumCmp<Rhs = Self> {
+pub trait NumCmp<Rhs> {
     type Output;
     //
     /// self < rhs

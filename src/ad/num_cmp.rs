@@ -132,8 +132,8 @@ macro_rules! impl_num_cmp_aa{ ($name:ident, $OpId:ident) =>  {
 } }
 impl<V> NumCmp< AD<V> > for AD<V>
 where
-    V : Clone + FloatCore + PartialEq + NumCmp + ThisThreadTape ,
-    V : NumCmp<Output = V> ,
+    V : Clone + FloatCore + PartialEq + ThisThreadTape ,
+    V : NumCmp<V, Output = V> ,
 {
     type Output = AD<V>;
     //
@@ -174,8 +174,8 @@ macro_rules! impl_num_cmp_ac{ ($name:ident, $OpId:ident) => {
 } }
 impl<V> NumCmp<V> for AD<V>
 where
-    V : Clone + FloatCore + PartialEq + NumCmp + ThisThreadTape ,
-    V : NumCmp<Output = V> ,
+    V : Clone + FloatCore + PartialEq + ThisThreadTape ,
+    V : NumCmp<V, Output = V> ,
 {
     type Output = AD<V>;
     //
@@ -216,8 +216,8 @@ macro_rules! impl_num_cmp_ca{ ($name:ident, $OpId:ident) => {
 } }
 impl<V> NumCmp< AD<V> > for V
 where
-    V : Clone + FloatCore + PartialEq + NumCmp + ThisThreadTape ,
-    V : NumCmp<Output = V>
+    V : Clone + FloatCore + PartialEq + ThisThreadTape ,
+    V : NumCmp<V, Output = V>
 {
     type Output = AD<V>;
     //
