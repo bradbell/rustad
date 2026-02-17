@@ -16,6 +16,7 @@ use crate::{
     IndexT,
     CmpAsLhs,
     CmpAsRhs,
+    NumCmp,
     FloatCore,
 };
 use crate::op::id::NUMBER_OP;
@@ -469,6 +470,7 @@ where
     V     : Clone + From<f32> + FloatCore + PartialEq,
     V     : ThisThreadTape + GlobalAtomCallbackVec,
     V     : CmpAsLhs<V> + CmpAsRhs<V>,
+    V     : NumCmp<V, Output = V> ,
     AD<V> : From<V>,
 {
     let empty = OpInfo {
@@ -493,6 +495,7 @@ where
     crate::op::call::set_op_info::<V>(&mut result);
     crate::op::no_op::set_op_info::<V>(&mut result);
     crate::op::binary::cmp_as::set_op_info::<V>(&mut result);
+    crate::op::binary::num_cmp::set_op_info::<V>(&mut result);
     //
     // unary operators
     crate::op::unary::abs::set_op_info::<V>(&mut result);
