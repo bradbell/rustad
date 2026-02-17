@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 /*
 Test ADfn::optimize
@@ -12,6 +12,7 @@ use rustad::{
     stop_recording,
     AzFloat,
     call_atom,
+    NumCmp,
 };
 //
 mod atom_test;
@@ -286,6 +287,46 @@ fn find_first_equal_binary() {
     assert_eq!( f.var_dep_len(), 0 );
 }
 //
+// find_equal_num_cmp()
+fn find_equal_num_cmp() {
+    //
+    // trace
+    let trace = false;
+    //
+    // p, x, ap, ax
+    let p        = vec![ W::from(2.0) ];
+    let x        = vec![ W::from(3.0) ];
+    let (ap, ax) = start_recording( Some(p.clone()), x.clone());
+    //
+    // aq0, aq1, aq2, aq3
+    // Optimizer should detect that aq0 and aq1 are identical.
+    let aq0 = ap[0].num_lt( &ax[0] );
+    let aq1 = ap[0].num_lt( &ax[0] );
+    //
+    // f
+    let ay     = vec![ aq0, aq1 ];
+    let mut f  = stop_recording(ay);
+    //
+    // check f
+    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    assert_eq!( y[0], p[0].num_lt( &x[0] ) );
+    assert_eq!( y[1], y[1] );
+    assert_eq!( f.dyp_dep_len(), 0 );
+    assert_eq!( f.var_dep_len(), 2 );
+    //
+    // f
+    f.optimize(trace);
+    //
+    // check f
+    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    assert_eq!( y[0], p[0].num_lt( &x[0] ) );
+    assert_eq!( y[1], y[1] );
+    assert_eq!( f.dyp_dep_len(), 0 );
+    assert_eq!( f.var_dep_len(), 1 );
+}
+//
 // an_atom_result_not_used
 fn an_atom_result_not_used() {
     //
@@ -361,5 +402,6 @@ fn optimize() {
     compress_var();
     find_first_equal_call();
     find_first_equal_binary();
+    find_equal_num_cmp();
     an_atom_result_not_used();
 }

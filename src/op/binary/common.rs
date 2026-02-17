@@ -35,12 +35,22 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
         id::DIV_VP_OP => true ,
         id::DIV_VV_OP => true ,
         //
+        id::LT_OP     => true  ,
+        id::LE_OP     => true  ,
+        id::EQ_OP     => true  ,
+        id::NE_OP     => true  ,
+        id::GE_OP     => true  ,
+        id::GT_OP     => true  ,
+        //
         _         => false,
     }
 }
 // ---------------------------------------------------------------------------
 // eval_binary_forward_var
-/// Evaluation of zero order forward for binary operators.
+/// Evaluation of zero order forward for binary operators;
+/// see [num_cmp](crate::op::binary::num_cmp)
+/// for numerical comparison operators.
+///
 ///
 /// * V      : see [doc_generic_v](crate::doc_generic_v)
 /// * E      : see [doc_generic_e](crate::doc_generic_e)
