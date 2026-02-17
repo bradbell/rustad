@@ -29,6 +29,7 @@ use crate::{
     AzFloat,
     CmpAsLhs,
     CmpAsRhs,
+    NumCmp,
     FloatCore,
 };
 //
@@ -345,6 +346,92 @@ where
     impl_compare_num_vec!( ge_right, >= );
     impl_compare_num_vec!( gt_right, >  );
 }
+// ---------------------------------------------------------------------------
+// NumCmp for NumVec
+/// NumCmp when both operands are `NumVec<S>`
+///
+/// * S : is the type of the elements of the numeric vector.
+///
+/// Note that these functions act element-wise on each `NumVec<S>` object.
+///
+/// # Example :
+/// ```
+/// use rustad::{
+///     NumVec,
+///     AzFloat,
+///     NumCmp,
+/// };
+///
+/// type S = AzFloat<f32>;
+/// //
+/// let two_three = NumVec::new( vec![ S::from(2), S::from(3) ] );
+/// let three     = NumVec::from( S::from(3) );
+///
+/// let lt        = two_three.num_lt(&three);
+/// let check     = NumVec::new( vec![ S::from(1), S::from(0) ] );
+/// assert_eq!( lt, check);
+///
+/// let lt        = two_three.num_lt(&three);
+/// assert_eq!(lt, check);
+///
+/// let one       = NumVec::from( S::from(1) );
+/// let not_lt    = &one - &lt;
+/// let check     = NumVec::new( vec![ S::from(0), S::from(1) ] );
+/// assert_eq!(not_lt, check);
+/// ```
+pub fn doc_num_cmp_num_vec() {}
+//
+/// see [doc_num_cmp_num_vec]
+macro_rules! impl_num_cmp_num_vec{ ($name:ident, $op:tt) => {
+    #[doc = concat!( "NumVec::", stringify!( $name ) ) ]
+    fn $name(&self, rhs : & NumVec<S> ) -> NumVec<S> {
+        //
+        let mut v : Vec<S>;
+        let e     : S;
+        //
+        if self.len() == 1 {
+            if rhs.len() == 1 {
+                e = self.s.$name( &rhs.s );
+                v = Vec::new();
+            } else {
+                e = FloatCore::nan();
+                v = Vec::with_capacity( rhs.len() );
+                for j in 0 .. rhs.len() { v.push(
+                    self.s.$name(&rhs.vec[j])
+                ); }
+            }
+        } else {
+            e = FloatCore::nan();
+            v = Vec::with_capacity( self.len() );
+            if rhs.len() == 1 {
+                for j in 0 .. self.len() { v.push(
+                    self.vec[j].$name(&rhs.s )
+                ); }
+            } else {
+                assert_eq!( self.len(), rhs.len() );
+                for j in 0 .. self.len() { v.push(
+                    self.vec[j].$name(& rhs.vec[j] )
+                ); }
+            }
+        }
+        NumVec{ vec : v, s : e }
+    }
+} }
+//
+impl<S> NumCmp for NumVec<S>
+where
+    S         : NumCmp<Output = S> + FloatCore,
+{
+    type Output = NumVec<S>;
+    //
+    impl_num_cmp_num_vec!( num_lt, <  );
+    impl_num_cmp_num_vec!( num_le, <= );
+    impl_num_cmp_num_vec!( num_eq, == );
+    impl_num_cmp_num_vec!( num_ne, != );
+    impl_num_cmp_num_vec!( num_ge, >= );
+    impl_num_cmp_num_vec!( num_gt, >  );
+}
+//
 // ----------------------------------------------------------------------------`
 /// Displays a `NumVec` < *S* > object.
 ///
