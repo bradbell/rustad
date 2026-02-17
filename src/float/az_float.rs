@@ -26,8 +26,6 @@ use std::ops::{
 };
 //
 use crate::{
-    CmpAsLhs,
-    CmpAsRhs,
     NumCmp,
 };
 use super::core::FloatCore;
@@ -330,104 +328,6 @@ macro_rules! impl_binary_assign{ ($Name:ident, $name:ident) => {
 impl_binary_assign!(AddAssign, add_assign);
 impl_binary_assign!(SubAssign, sub_assign);
 impl_binary_assign!(DivAssign, div_assign);
-// ---------------------------------------------------------------------------
-// CmpAsLhs for AzFloat
-/// CmpAsLhs when both operands are `AzFloat<B>`
-///
-/// * B : Is the floating point base type
-///
-/// # Example :
-/// ```
-/// use rustad::AzFloat;
-/// use rustad::CmpAsLhs;
-/// type B = f64;
-/// //
-/// let one   : AzFloat<B> = (1.0 as B).into();
-/// let two   : AzFloat<B> = (2.0 as B).into();
-/// let three : AzFloat<B> = (3.0 as B).into();
-/// let lt     = two.left_lt(&three);
-/// let not_lt = &one - &lt;
-/// assert_eq!( lt.to_inner(), (1.0 as B) );
-/// assert_eq!( not_lt.to_inner(), (0.0 as B) );
-/// ```
-pub fn doc_compare_left_az_float() {}
-//
-/// see [doc_compare_left_az_float]
-macro_rules! impl_compare_left_az_float{ ($name:ident, $op:tt) => {
-    #[doc = concat!( "CompareLeft trait for ", stringify!( $op ) ) ]
-    fn $name(&self, other : & AzFloat<B> ) -> AzFloat<B> {
-        let zero : AzFloat<B> = 0.into();
-        let one  : AzFloat<B> = 1.into();
-        //
-        if self.0 $op other.0 {
-            one
-        } else {
-            zero
-        }
-    }
-} }
-//
-impl<B> CmpAsLhs for AzFloat<B>
-where
-    B          :  PartialOrd,
-    AzFloat<B> : From<usize>,
-{
-    impl_compare_left_az_float!( left_lt, <  );
-    impl_compare_left_az_float!( left_le, <= );
-    impl_compare_left_az_float!( left_eq, == );
-    impl_compare_left_az_float!( left_ne, != );
-    impl_compare_left_az_float!( left_ge, >= );
-    impl_compare_left_az_float!( left_gt, >  );
-}
-// ---------------------------------------------------------------------------
-// CmpAsRhs for AzFloat
-/// CmpAsRhs when both operands are `AzFloat<B>`
-///
-/// * B : Is the floating point base type
-///
-/// # Example :
-/// ```
-/// use rustad::AzFloat;
-/// use rustad::CmpAsRhs;
-/// type B = f64;
-/// //
-/// let one   : AzFloat<B> = (1.0 as B).into();
-/// let two   : AzFloat<B> = (2.0 as B).into();
-/// let three : AzFloat<B> = (3.0 as B).into();
-/// let lt     = two.lt_right(&three);
-/// let not_lt = &one - &lt;
-/// assert_eq!( lt.to_inner(), (1.0 as B) );
-/// assert_eq!( not_lt.to_inner(), (0.0 as B) );
-/// ```
-pub fn doc_compare_right_az_float() {}
-//
-/// see [doc_compare_right_az_float]
-macro_rules! impl_compare_right_az_float{ ($name:ident, $op:tt) => {
-    #[doc = concat!( "CmpAsRhs trait for ", stringify!( $op ) ) ]
-    fn $name(&self, other : & AzFloat<B> ) -> AzFloat<B> {
-        let zero : AzFloat<B> = 0.into();
-        let one  : AzFloat<B> = 1.into();
-        //
-        if self.0 $op other.0 {
-            one
-        } else {
-            zero
-        }
-    }
-} }
-//
-impl<B> CmpAsRhs for AzFloat<B>
-where
-    B          :  PartialOrd,
-    AzFloat<B> : From<usize>,
-{
-    impl_compare_right_az_float!( lt_right, <  );
-    impl_compare_right_az_float!( le_right, <= );
-    impl_compare_right_az_float!( eq_right, == );
-    impl_compare_right_az_float!( ne_right, != );
-    impl_compare_right_az_float!( ge_right, >= );
-    impl_compare_right_az_float!( gt_right, >  );
-}
 // ---------------------------------------------------------------------------
 // NumCmp for AzFloat
 /// NumCmp when both operands are `AzFloat<B>`
