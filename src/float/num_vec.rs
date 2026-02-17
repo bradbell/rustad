@@ -27,8 +27,6 @@
 // use
 use crate::{
     AzFloat,
-    CmpAsLhs,
-    CmpAsRhs,
     NumCmp,
     FloatCore,
 };
@@ -245,107 +243,6 @@ num_vec_compound_op!(AddAssign, add_assign, +=);
 num_vec_compound_op!(SubAssign, sub_assign, -=);
 num_vec_compound_op!(MulAssign, mul_assign, *=);
 num_vec_compound_op!(DivAssign, div_assign, /=);
-// ---------------------------------------------------------------------------
-// CmpAsLhs and CmpAsRhs for NumVec
-/// CmpAsLhs and CompareAdRight when both operands are `NumVec<S>`
-///
-/// * S : is the type of the elements of the numeric vector.
-///
-/// Note that these functions act element-wise on each `NumVec<S>` object.
-/// In addition, when both argument have the same time, CmpAsLhs
-/// and CmpAsRhs are equivalent.
-///
-/// # Example :
-/// ```
-/// use rustad::{
-///     NumVec,
-///     AzFloat,
-///     CmpAsLhs,
-///     CmpAsRhs,
-/// };
-///
-/// type S = AzFloat<f32>;
-/// //
-/// let two_three = NumVec::new( vec![ S::from(2), S::from(3) ] );
-/// let three     = NumVec::from( S::from(3) );
-///
-/// let lt        = two_three.left_lt(&three);
-/// let check     = NumVec::new( vec![ S::from(1), S::from(0) ] );
-/// assert_eq!( lt, check);
-///
-/// let lt        = two_three.lt_right(&three);
-/// assert_eq!(lt, check);
-///
-/// let one       = NumVec::from( S::from(1) );
-/// let not_lt    = &one - &lt;
-/// let check     = NumVec::new( vec![ S::from(0), S::from(1) ] );
-/// assert_eq!(not_lt, check);
-/// ```
-pub fn doc_compare_num_vec() {}
-//
-/// see [doc_compare_num_vec]
-macro_rules! impl_compare_num_vec{ ($name:ident, $op:tt) => {
-    #[doc = concat!( "compare trait for ", stringify!( $op ) ) ]
-    fn $name(&self, other : & Self ) -> Self {
-        //
-        let zero  : S = 0.into();
-        let one   : S = 1.into();
-        //
-        let mut v : Vec<S>;
-        let e     : S;
-        //
-        if self.len() == 1 {
-            if other.len() == 1 {
-                e = if self.s $op other.s { one } else { zero };
-                v = Vec::new();
-            } else {
-                e = f32::NAN.into();
-                v = Vec::with_capacity( other.len() );
-                for j in 0 .. other.len() { v.push(
-                    if self.s $op other.vec[j] { one } else { zero }
-                ); }
-            }
-        } else {
-            e = f32::NAN.into();
-            v = Vec::with_capacity( self.len() );
-            if other.len() == 1 {
-                for j in 0 .. self.len() { v.push(
-                    if self.vec[j] $op other.s { one } else { zero }
-                ); }
-            } else {
-                assert_eq!( self.len(), other.len() );
-                for j in 0 .. self.len() { v.push(
-                    if self.vec[j] $op other.vec[j] { one } else { zero }
-                ); }
-            }
-        }
-        NumVec{ vec : v, s : e }
-    }
-} }
-//
-impl<S> CmpAsLhs for NumVec<S>
-where
-    S  : Copy + From<f32> + From<usize> + PartialOrd + CmpAsLhs,
-{
-    impl_compare_num_vec!( left_lt, <  );
-    impl_compare_num_vec!( left_le, <= );
-    impl_compare_num_vec!( left_eq, == );
-    impl_compare_num_vec!( left_ne, != );
-    impl_compare_num_vec!( left_ge, >= );
-    impl_compare_num_vec!( left_gt, >  );
-}
-//
-impl<S> CmpAsRhs for NumVec<S>
-where
-    S  : Copy + From<f32> + From<usize> + PartialOrd + CmpAsRhs,
-{
-    impl_compare_num_vec!( lt_right, <  );
-    impl_compare_num_vec!( le_right, <= );
-    impl_compare_num_vec!( eq_right, == );
-    impl_compare_num_vec!( ne_right, != );
-    impl_compare_num_vec!( ge_right, >= );
-    impl_compare_num_vec!( gt_right, >  );
-}
 // ---------------------------------------------------------------------------
 // NumCmp for NumVec
 /// NumCmp when both operands are `NumVec<S>`
