@@ -19,27 +19,15 @@
 ///
 /// * Syntax :
 ///   ```text
-///     result = lhs.num_lt(&rhs)
-///     result = lhs.num_le(&rhs)
-///     result = lhs.num_eq(&rhs)
-///     result = lhs.num_ne(&rhs)
-///     result = lhs.num_ge(&rhs)
-///     result = lhs.num_gt(&rhs)
+///     res = lhs.cmp(&rhs)
 ///   ```
+///   where either lhs or rhs has type `AD<V>` .
 ///
-/// * lhs  : is the left hand side operand in the comparison
-/// * rhs  : is the right hand side operand in the comparison
-/// * result :
-///   * Type :
-///     If lhs and rhs have the same type, result has that type.
-///     Otherwise either lhs or rhs has type `AD<V>` .
-///     If lhs (rhs) has type `AD<V>` and rhs (lhs) has type `V` ,
-///     result has type `AD<V>` .
-///   * Value :
-///     The result will have value one (zero) if the comparison is true (false).
-///     If the result is a [NumVec](crate::NumVec) type or `AD<V>` where `V`
-///     is an NumVec type, the result is an element wise comparison.
-///
+/// * lhs : is the left comparison operand .
+/// * rhs : is the right comparison operand .
+/// * cmp : is one of the following :
+///   `num_lt` , `num_le`, `num_eq`, `num_ne`, `num_ge`, `num_gt`
+/// * res : is one (zero) if the comparison result is true (false).
 pub trait NumCmp<Rhs = Self> {
     type Output;
     //
