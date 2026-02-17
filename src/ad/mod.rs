@@ -12,7 +12,6 @@
 // sub-modules
 //
 pub mod binary;
-pub mod cmp_as;
 pub mod num_cmp;
 pub mod float_core;
 // ---------------------------------------------------------------------------
