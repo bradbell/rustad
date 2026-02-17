@@ -67,8 +67,6 @@ fn prototype_src(fn_name : &str, v_str : &str) -> String {
         "\n" +
         "#[allow(unused)]\n" +
         "use crate::{\n" +
-        "   cmp_as::CmpAsLhs,\n" +
-        "   cmp_as::CmpAsRhs,\n" +
         "   num_cmp::NumCmp,\n" +
         "   core::FloatCore,\n"  +
         "};\n" +
