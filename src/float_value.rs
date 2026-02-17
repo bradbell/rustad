@@ -16,7 +16,7 @@ use std::ops::{
 //
 use crate::{
     FloatCore,
-    CmpAsLhs,
+    NumCmp,
 };
 // ----------------------------------------------------------------------------
 /// The FloatValue trait
@@ -254,7 +254,8 @@ pub(crate) use impl_float_value_from_primitive;
 */
 pub fn check_nearly_eq<V>(x : &V, y : &V, arg_vec : &Vec< [&str; 2] >) -> bool
 where
-    V  : FloatCore + FloatValue + CmpAsLhs + From<f32> + std::fmt::Debug,
+    V  : FloatCore + FloatValue + From<f32> + std::fmt::Debug,
+    V  : NumCmp<V, Output = V> ,
     for<'a> &'a V : Add<&'a V, Output=V> ,
     for<'a> &'a V : Mul<&'a V, Output=V> ,
     for<'a> &'a V : Sub<&'a V, Output=V> ,
@@ -294,7 +295,7 @@ where
     let min_sum     = &factor * &min_pos;
     //
     // check first condition
-    let lt_min  = sum_abs.left_lt(&min_sum);
+    let lt_min  = sum_abs.num_lt(&min_sum);
     if lt_min.is_one() {
         return true;
     }
@@ -305,7 +306,7 @@ where
     //
     // check second condition
     let ratio  = &abs_diff / &sum_abs;
-    let lt_min = ratio.left_lt(&min_diff);
+    let lt_min = ratio.num_lt(&min_diff);
     if lt_min.is_one() {
         return true;
     }
