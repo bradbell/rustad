@@ -9,7 +9,6 @@
 // sub-modules
 pub mod common;
 pub mod add;
-pub mod cmp_as;
 pub mod num_cmp;
 pub mod div;
 pub mod mul;
