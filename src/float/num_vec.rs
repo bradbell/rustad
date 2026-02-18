@@ -315,9 +315,9 @@ macro_rules! impl_num_cmp_num_vec{ ($name:ident, $op:tt) => {
     }
 } }
 //
-impl<S> NumCmp< NumVec<S> > for NumVec<S>
+impl<S> NumCmp< &NumVec<S> > for NumVec<S>
 where
-    S  : NumCmp<S, Output = S> + FloatCore,
+    S  : for<'a> NumCmp<&'a S, Output = S> + FloatCore,
 {
     type Output = NumVec<S>;
     //

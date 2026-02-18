@@ -154,9 +154,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2026.2.17");
+/// assert_eq!(date, "2026.2.18");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2026.2.17";
+pub const YEAR_MONTH_DAY : &str = "2026.2.18";
 //
 // CORE_RS
 /// is the source code for the [core](crate::float::core) module.

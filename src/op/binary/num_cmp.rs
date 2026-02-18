@@ -21,22 +21,6 @@ use crate::op::info::{
 };
 //
 // ---------------------------------------------------------------------------
-/*
-TODO: Uncomment when optimizer handles NumCmp operators.
-pub(crate) fn is_num_cmp_op(op_id : u8) -> bool {
-    match op_id {
-        id::LT_OP => true ,
-        id::LE_OP => true ,
-        id::EQ_OP => true ,
-        id::NE_OP => true ,
-        id::GE_OP => true ,
-        id::GT_OP => true ,
-        //
-        _         => false,
-    }
-}
-*/
-// ---------------------------------------------------------------------------
 // eval_num_cmp_forward_fun
 /// Evaluation of forward function values for numeric compare operators.
 ///
@@ -63,8 +47,8 @@ macro_rules! eval_num_cmp_forward_fun { ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        V : NumCmp<V, Output = V> + NumCmp<E, Output = E>,
-        E : NumCmp<E, Output = E> + NumCmp<V, Output = E>,
+        for<'a> V : NumCmp<&'a V, Output = V> + NumCmp<&'a E, Output = E>,
+        for<'a> E : NumCmp<&'a E, Output = E> + NumCmp<&'a V, Output = E>,
     {
         debug_assert!( arg.len() == 2);
         debug_assert!(
@@ -109,8 +93,8 @@ macro_rules! eval_num_cmp_forward_fun { ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        V : NumCmp<V, Output = V> + NumCmp<E, Output = E>,
-        E : NumCmp<E, Output = E> + NumCmp<V, Output = E>,
+        for<'a> V : NumCmp<&'a V, Output = V> + NumCmp<&'a E, Output = E>,
+        for<'a> E : NumCmp<&'a E, Output = E> + NumCmp<&'a V, Output = E>,
     {
         debug_assert!( arg.len() == 2);
         //
@@ -249,10 +233,12 @@ no_rust_src!(NumCmp);
 pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
     V     : Clone + From<f32>,
-    V     :  NumCmp<V, Output = V>  + NumCmp< AD<V>, Output =  AD<V> >,
-    V     : NumCmp< AD<V>, Output =  AD<V> >,
-    AD<V> : From<V>,
-    AD<V> :  NumCmp<V, Output = AD<V> > + NumCmp<AD<V>, Output = AD<V> >,
+    for<'a> V     : NumCmp<&'a V, Output = V>,
+    for<'a> V     : NumCmp<&'a AD<V>, Output = AD<V> >,
+    for<'a> V     : NumCmp<&'a AD<V>, Output = AD<V> >,
+            AD<V> : From<V>,
+    for<'a> AD<V> : NumCmp<&'a V, Output = AD<V> >,
+    for<'a> AD<V> : NumCmp<&'a AD<V>, Output = AD<V> >,
 {
     op_info_vec[id::LT_OP as usize] = OpInfo{
         name              : "lt",

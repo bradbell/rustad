@@ -366,7 +366,7 @@ macro_rules! impl_num_cmp_az_float{ ($name:ident, $op:tt) => {
     }
 } }
 //
-impl<B> NumCmp< AzFloat<B> > for AzFloat<B>
+impl<B> NumCmp< &AzFloat<B> > for AzFloat<B>
 where
     B          : PartialOrd,
     AzFloat<B> : FloatCore,
