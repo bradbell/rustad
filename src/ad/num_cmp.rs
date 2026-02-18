@@ -64,13 +64,13 @@ use crate::op::id::{
 /// let ay  = ad_from_value( V::from(4.0) );
 /// let z   = V::from(4.0);
 ///
-/// let ax_lt_y  = ax.num_lt(&ay);
+/// let ax_lt_y  = NumCmp::num_lt( &ax, &ay);
 /// assert_eq!(ax_lt_y.to_value(), V::from(1) );
 ///
-/// let ax_ge_y  = ax.num_ge(&ay);
+/// let ax_ge_y  = (&ax).num_ge(&ay);
 /// assert_eq!(ax_ge_y.to_value(), V::from(0) );
 ///
-/// let ay_eq_z  = ay.num_eq(&z);
+/// let ay_eq_z  = (&ay).num_eq(&z);
 /// assert_eq!(ay_eq_z.to_value(), V::from(1) );
 /// ```
 ///
@@ -104,12 +104,11 @@ use crate::op::id::{
 pub fn doc_num_cmp_ad() { }
 // ---------------------------------------------------------------------------
 //
-// impl_num_cmp_aa
-macro_rules! impl_num_cmp_aa{ ($name:ident, $OpId:ident) =>  {
+// impl_num_cmp_aa_borrow
+macro_rules! impl_num_cmp_aa_borrow{ ($name:ident, $OpId:ident) =>  {
     //
     #[doc = concat!(
-        " & `AD<V>` ", stringify!($name), "( & `AD<V>` )",
-        "; see [doc_num_cmp_ad]"
+        " `&AD<V>` ", stringify!($name), " `&AD<V>`; see [doc_num_cmp_ad]"
     )]
     fn $name(self, rhs : &AD<V> ) -> AD<V>
     {
@@ -137,17 +136,43 @@ where
 {
     type Output = AD<V>;
     //
-    impl_num_cmp_aa!( num_lt, LT_OP);
-    impl_num_cmp_aa!( num_le, LE_OP );
-    impl_num_cmp_aa!( num_eq, EQ_OP );
-    impl_num_cmp_aa!( num_ne, NE_OP );
-    impl_num_cmp_aa!( num_ge, GE_OP );
-    impl_num_cmp_aa!( num_gt, GT_OP );
+    impl_num_cmp_aa_borrow!( num_lt, LT_OP);
+    impl_num_cmp_aa_borrow!( num_le, LE_OP );
+    impl_num_cmp_aa_borrow!( num_eq, EQ_OP );
+    impl_num_cmp_aa_borrow!( num_ne, NE_OP );
+    impl_num_cmp_aa_borrow!( num_ge, GE_OP );
+    impl_num_cmp_aa_borrow!( num_gt, GT_OP );
+}
+//
+/// see [doc_num_cmp_ad]
+macro_rules! impl_num_cmp_aa_own{ ($name:ident) => {
+    //
+    #[doc = concat!(
+        " `AD<V>` ", stringify!($name), " `AD<V>`; see [doc_num_cmp_ad]"
+    )]
+    fn $name(self : AD<V>, rhs : AD<V>) -> AD<V> {
+        NumCmp::$name( &self,  &rhs )
+    }
+} }
+//
+impl<V> NumCmp< AD<V> > for AD<V>
+where
+    V                 : FloatCore + PartialOrd + ThisThreadTape ,
+    for<'a> &'a AD<V> : NumCmp< &'a AD<V>, Output = AD<V> >,
+{
+    type Output = AD<V>;
+    //
+    impl_num_cmp_aa_own!( num_lt );
+    impl_num_cmp_aa_own!( num_le );
+    impl_num_cmp_aa_own!( num_eq );
+    impl_num_cmp_aa_own!( num_ne );
+    impl_num_cmp_aa_own!( num_ge );
+    impl_num_cmp_aa_own!( num_gt );
 }
 // ---------------------------------------------------------------------------
 //
-// impl_num_cmp_ac
-macro_rules! impl_num_cmp_ac{ ($name:ident, $OpId:ident) => {
+// impl_num_cmp_ac_borrow
+macro_rules! impl_num_cmp_ac_borrow{ ($name:ident, $OpId:ident) => {
     //
     #[doc = concat!(
         "& `AD<V>` ", stringify!($name), "( &V )",
@@ -179,12 +204,12 @@ where
 {
     type Output = AD<V>;
     //
-    impl_num_cmp_ac!( num_lt, LT_OP);
-    impl_num_cmp_ac!( num_le, LE_OP );
-    impl_num_cmp_ac!( num_eq, EQ_OP );
-    impl_num_cmp_ac!( num_ne, NE_OP );
-    impl_num_cmp_ac!( num_ge, GE_OP );
-    impl_num_cmp_ac!( num_gt, GT_OP );
+    impl_num_cmp_ac_borrow!( num_lt, LT_OP);
+    impl_num_cmp_ac_borrow!( num_le, LE_OP );
+    impl_num_cmp_ac_borrow!( num_eq, EQ_OP );
+    impl_num_cmp_ac_borrow!( num_ne, NE_OP );
+    impl_num_cmp_ac_borrow!( num_ge, GE_OP );
+    impl_num_cmp_ac_borrow!( num_gt, GT_OP );
 }
 // ---------------------------------------------------------------------------
 //

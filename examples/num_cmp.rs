@@ -23,7 +23,7 @@ fn heaviside() {
     //
     // heaviside
     let zero           = V::from(0);
-    let ay             = vec![ ax[0].num_ge(&zero) ];
+    let ay             = vec![ NumCmp::num_ge( &ax[0], &zero) ];
     let heaviside      = stop_recording(ay);
     //
     let x       = vec![ V::from(-1.0f32) ];
