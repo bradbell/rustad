@@ -67,10 +67,13 @@ use crate::op::id::{
 /// let ax_lt_y  = NumCmp::num_lt( &ax, &ay);
 /// assert_eq!(ax_lt_y.to_value(), V::from(1) );
 ///
-/// let ax_ge_y  = (&ax).num_ge(&ay);
-/// assert_eq!(ax_ge_y.to_value(), V::from(0) );
+/// let ax_lt_y  = NumCmp::num_lt( ax.clone(), ay.clone());
+/// assert_eq!(ax_lt_y.to_value(), V::from(1) );
 ///
-/// let ay_eq_z  = (&ay).num_eq(&z);
+/// let ax_ge_z  = NumCmp::num_ge(&ax, &z);
+/// assert_eq!(ax_ge_z.to_value(), V::from(0) );
+///
+/// let ay_eq_z  = NumCmp::num_eq(ay, z);
 /// assert_eq!(ay_eq_z.to_value(), V::from(1) );
 /// ```
 ///
@@ -90,14 +93,14 @@ use crate::op::id::{
 /// let y     = vec![ S::from(2.0), S::from(2.0) ];
 /// let x_nv  = NumVec::new(x);
 /// let y_nv  = NumVec::new(y);
-/// let ax    = ad_from_value(x_nv);
-/// let ay    = ad_from_value(y_nv);
+/// let ax  : AD<V>  = ad_from_value(x_nv.clone());
+/// let ay  : AD<V>  = ad_from_value(y_nv.clone());
 ///
-/// let ax_lt_y  = ax.num_lt(&ay);
+/// let ax_lt_y  = NumCmp::num_lt(&ax, &ay);
 /// let check    = NumVec::new( vec![ S::from(1), S::from(0) ] );
 /// assert_eq!(ax_lt_y.to_value(), check );
 ///
-/// let ax_gt_y  = ax.num_gt(&ay);
+/// let ax_gt_y  = NumCmp::num_gt( &ax, &y_nv );
 /// let check    = NumVec::new( vec![ S::from(0), S::from(1) ] );
 /// assert_eq!(ax_gt_y.to_value(), check );
 /// ```
@@ -210,6 +213,32 @@ where
     impl_num_cmp_ac_borrow!( num_ne, NE_OP );
     impl_num_cmp_ac_borrow!( num_ge, GE_OP );
     impl_num_cmp_ac_borrow!( num_gt, GT_OP );
+}
+//
+/// see [doc_num_cmp_ad]
+macro_rules! impl_num_cmp_ac_own{ ($name:ident) => {
+    //
+    #[doc = concat!(
+        " `AD<V>` ", stringify!($name), " `V`; see [doc_num_cmp_ad]"
+    )]
+    fn $name(self : AD<V>, rhs : V) -> AD<V> {
+        NumCmp::$name( &self,  &rhs )
+    }
+} }
+//
+impl<V> NumCmp<V> for AD<V>
+where
+    V                 : FloatCore + PartialOrd + ThisThreadTape ,
+    for<'a> &'a AD<V> : NumCmp< &'a V, Output = AD<V> >,
+{
+    type Output = AD<V>;
+    //
+    impl_num_cmp_ac_own!( num_lt );
+    impl_num_cmp_ac_own!( num_le );
+    impl_num_cmp_ac_own!( num_eq );
+    impl_num_cmp_ac_own!( num_ne );
+    impl_num_cmp_ac_own!( num_ge );
+    impl_num_cmp_ac_own!( num_gt );
 }
 // ---------------------------------------------------------------------------
 //
