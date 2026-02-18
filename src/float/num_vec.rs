@@ -328,7 +328,7 @@ where
 }
 //
 /// see [doc_num_cmp_num_vec]
-macro_rules! impl_num_cmp_nu_vec_own{ ($name:ident) => {
+macro_rules! impl_num_cmp_num_vec_own{ ($name:ident) => {
     #[doc = concat!( " NumVec::", stringify!($name)  ) ]
     fn $name(self : NumVec<S>, rhs : NumVec<S>) -> NumVec<S> {
         NumCmp::$name( &self,  &rhs )
@@ -343,12 +343,12 @@ where
 {
     type Output = NumVec<S>;
     //
-    impl_num_cmp_nu_vec_own!( num_lt );
-    impl_num_cmp_nu_vec_own!( num_le );
-    impl_num_cmp_nu_vec_own!( num_eq );
-    impl_num_cmp_nu_vec_own!( num_ne );
-    impl_num_cmp_nu_vec_own!( num_ge );
-    impl_num_cmp_nu_vec_own!( num_gt );
+    impl_num_cmp_num_vec_own!( num_lt );
+    impl_num_cmp_num_vec_own!( num_le );
+    impl_num_cmp_num_vec_own!( num_eq );
+    impl_num_cmp_num_vec_own!( num_ne );
+    impl_num_cmp_num_vec_own!( num_ge );
+    impl_num_cmp_num_vec_own!( num_gt );
 }
 //
 // ----------------------------------------------------------------------------`
