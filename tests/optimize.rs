@@ -310,7 +310,7 @@ fn find_equal_num_cmp() {
     // check f
     let p_      = f.forward_dyp_value(p.clone(), trace);
     let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
-    assert_eq!( y[0], p[0].num_lt( &x[0] ) );
+    assert_eq!( y[0], p[0].num_lt( x[0] ) );
     assert_eq!( y[1], y[1] );
     assert_eq!( f.dyp_dep_len(), 0 );
     assert_eq!( f.var_dep_len(), 2 );
@@ -321,7 +321,7 @@ fn find_equal_num_cmp() {
     // check f
     let p_      = f.forward_dyp_value(p.clone(), trace);
     let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
-    assert_eq!( y[0], p[0].num_lt( &x[0] ) );
+    assert_eq!( y[0], p[0].num_lt( x[0] ) );
     assert_eq!( y[1], y[1] );
     assert_eq!( f.dyp_dep_len(), 0 );
     assert_eq!( f.var_dep_len(), 1 );

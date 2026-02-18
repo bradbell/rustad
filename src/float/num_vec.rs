@@ -245,7 +245,7 @@ num_vec_compound_op!(MulAssign, mul_assign, *=);
 num_vec_compound_op!(DivAssign, div_assign, /=);
 // ---------------------------------------------------------------------------
 // NumCmp for NumVec
-/// NumCmp when both operands are `NumVec<S>`
+/// Implement [NumCmp] when both operands are `NumVec<S>` or `&NumVec<S>` .
 ///
 /// * S : is the type of the elements of the numeric vector.
 ///
@@ -264,12 +264,9 @@ num_vec_compound_op!(DivAssign, div_assign, /=);
 /// let two_three = NumVec::new( vec![ S::from(2), S::from(3) ] );
 /// let three     = NumVec::from( S::from(3) );
 ///
-/// let lt        = two_three.num_lt(&three);
+/// let lt        = NumCmp::num_lt( &two_three, &three );
 /// let check     = NumVec::new( vec![ S::from(1), S::from(0) ] );
 /// assert_eq!( lt, check);
-///
-/// let lt        = two_three.num_lt(&three);
-/// assert_eq!(lt, check);
 ///
 /// let one       = NumVec::from( S::from(1) );
 /// let not_lt    = &one - &lt;
@@ -279,7 +276,7 @@ num_vec_compound_op!(DivAssign, div_assign, /=);
 pub fn doc_num_cmp_num_vec() {}
 //
 /// see [doc_num_cmp_num_vec]
-macro_rules! impl_num_cmp_num_vec{ ($name:ident, $op:tt) => {
+macro_rules! impl_num_cmp_num_vec_borrow{ ($name:ident, $op:tt) => {
     #[doc = concat!( "NumVec::", stringify!( $name ) ) ]
     fn $name(self, rhs : & NumVec<S> ) -> NumVec<S> {
         //
@@ -322,12 +319,36 @@ where
 {
     type Output = NumVec<S>;
     //
-    impl_num_cmp_num_vec!( num_lt, <  );
-    impl_num_cmp_num_vec!( num_le, <= );
-    impl_num_cmp_num_vec!( num_eq, == );
-    impl_num_cmp_num_vec!( num_ne, != );
-    impl_num_cmp_num_vec!( num_ge, >= );
-    impl_num_cmp_num_vec!( num_gt, >  );
+    impl_num_cmp_num_vec_borrow!( num_lt, <  );
+    impl_num_cmp_num_vec_borrow!( num_le, <= );
+    impl_num_cmp_num_vec_borrow!( num_eq, == );
+    impl_num_cmp_num_vec_borrow!( num_ne, != );
+    impl_num_cmp_num_vec_borrow!( num_ge, >= );
+    impl_num_cmp_num_vec_borrow!( num_gt, >  );
+}
+//
+/// see [doc_num_cmp_num_vec]
+macro_rules! impl_num_cmp_nu_vec_own{ ($name:ident) => {
+    #[doc = concat!( " NumVec::", stringify!($name)  ) ]
+    fn $name(self : NumVec<S>, rhs : NumVec<S>) -> NumVec<S> {
+        NumCmp::$name( &self,  &rhs )
+    }
+} }
+//
+impl<S> NumCmp< NumVec<S> > for NumVec<S>
+where
+    S          : PartialOrd,
+    NumVec<S> : FloatCore,
+    for<'a> &'a NumVec<S> : NumCmp< &'a NumVec<S>, Output = NumVec<S> >,
+{
+    type Output = NumVec<S>;
+    //
+    impl_num_cmp_nu_vec_own!( num_lt );
+    impl_num_cmp_nu_vec_own!( num_le );
+    impl_num_cmp_nu_vec_own!( num_eq );
+    impl_num_cmp_nu_vec_own!( num_ne );
+    impl_num_cmp_nu_vec_own!( num_ge );
+    impl_num_cmp_nu_vec_own!( num_gt );
 }
 //
 // ----------------------------------------------------------------------------`

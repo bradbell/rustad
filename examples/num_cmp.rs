@@ -76,8 +76,8 @@ fn abs() {
     //
     // abs
     let z        = V::from(0);
-    let az_lt_x  = z.num_lt( &ax[0] );
-    let az_ge_x  = z.num_ge( &ax[0] );
+    let az_lt_x  = NumCmp::num_lt( &z, &ax[0] );
+    let az_ge_x  = NumCmp::num_ge( &z, &ax[0] );
     let ax_neg   = &z - &ax[0];
     let ay      = vec![  &(&az_lt_x * &ax[0]) + &(&az_ge_x * &ax_neg) ];
     let abs     = stop_recording(ay);

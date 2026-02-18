@@ -330,9 +330,9 @@ impl_binary_assign!(SubAssign, sub_assign);
 impl_binary_assign!(DivAssign, div_assign);
 // ---------------------------------------------------------------------------
 // NumCmp for AzFloat
-/// NumCmp when both operands are `AzFloat<B>`
+/// Implement [NumCmp] when both operands are `AzFloat<B>` or `&AzFloat<B>` .
 ///
-/// * B : Is the floating point base type
+/// * B : Is the floating point base type; see [AzFloat]
 ///
 /// # Example :
 /// ```
@@ -344,21 +344,21 @@ impl_binary_assign!(DivAssign, div_assign);
 /// let one   = V::from(1);
 /// let two   = V::from(2);
 /// let three = V::from(3);
-/// let lt     = two.num_lt(&three);
-/// let not_lt = &one - &lt;
+/// let lt     = two.num_lt(three);
+/// let not_lt = one - lt;
 /// assert_eq!(lt, one);
 /// assert_eq!(not_lt, zero);
 /// ```
 pub fn doc_num_cmp_az_float() {}
 //
 /// see [doc_num_cmp_az_float]
-macro_rules! impl_num_cmp_az_float{ ($name:ident, $op:tt) => {
+macro_rules! impl_num_cmp_az_float_borrow{ ($name:ident, $op:tt) => {
     #[doc = concat!( " AzFloat::", stringify!($name)  ) ]
-    fn $name(self, other : & AzFloat<B> ) -> AzFloat<B> {
+    fn $name(self, rhs : & AzFloat<B> ) -> AzFloat<B> {
         let zero : AzFloat<B> = FloatCore::zero();
         let one  : AzFloat<B> = FloatCore::one();
         //
-        if self.0 $op other.0 {
+        if self.0 $op rhs.0 {
             one
         } else {
             zero
@@ -373,12 +373,36 @@ where
 {
     type Output = AzFloat<B>;
     //
-    impl_num_cmp_az_float!( num_lt, <  );
-    impl_num_cmp_az_float!( num_le, <= );
-    impl_num_cmp_az_float!( num_eq, == );
-    impl_num_cmp_az_float!( num_ne, != );
-    impl_num_cmp_az_float!( num_ge, >= );
-    impl_num_cmp_az_float!( num_gt, >  );
+    impl_num_cmp_az_float_borrow!( num_lt, <  );
+    impl_num_cmp_az_float_borrow!( num_le, <= );
+    impl_num_cmp_az_float_borrow!( num_eq, == );
+    impl_num_cmp_az_float_borrow!( num_ne, != );
+    impl_num_cmp_az_float_borrow!( num_ge, >= );
+    impl_num_cmp_az_float_borrow!( num_gt, >  );
+}
+//
+/// see [doc_num_cmp_az_float]
+macro_rules! impl_num_cmp_az_float_own{ ($name:ident) => {
+    #[doc = concat!( " AzFloat::", stringify!($name)  ) ]
+    fn $name(self : AzFloat<B>, rhs : AzFloat<B>) -> AzFloat<B> {
+        NumCmp::$name( &self,  &rhs )
+    }
+} }
+//
+impl<B> NumCmp< AzFloat<B> > for AzFloat<B>
+where
+    B          : PartialOrd,
+    AzFloat<B> : FloatCore,
+    for<'a> &'a AzFloat<B> : NumCmp< &'a AzFloat<B>, Output = AzFloat<B> >,
+{
+    type Output = AzFloat<B>;
+    //
+    impl_num_cmp_az_float_own!( num_lt );
+    impl_num_cmp_az_float_own!( num_le );
+    impl_num_cmp_az_float_own!( num_eq );
+    impl_num_cmp_az_float_own!( num_ne );
+    impl_num_cmp_az_float_own!( num_ge );
+    impl_num_cmp_az_float_own!( num_gt );
 }
 // ---------------------------------------------------------------------------
 // PartialEq, Eq
