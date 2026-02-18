@@ -354,7 +354,7 @@ pub fn doc_num_cmp_az_float() {}
 /// see [doc_num_cmp_az_float]
 macro_rules! impl_num_cmp_az_float{ ($name:ident, $op:tt) => {
     #[doc = concat!( " AzFloat::", stringify!($name)  ) ]
-    fn $name(&self, other : & AzFloat<B> ) -> AzFloat<B> {
+    fn $name(self, other : & AzFloat<B> ) -> AzFloat<B> {
         let zero : AzFloat<B> = FloatCore::zero();
         let one  : AzFloat<B> = FloatCore::one();
         //
@@ -366,7 +366,7 @@ macro_rules! impl_num_cmp_az_float{ ($name:ident, $op:tt) => {
     }
 } }
 //
-impl<B> NumCmp< &AzFloat<B> > for AzFloat<B>
+impl<B> NumCmp< &AzFloat<B> > for &AzFloat<B>
 where
     B          : PartialOrd,
     AzFloat<B> : FloatCore,

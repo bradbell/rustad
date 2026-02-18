@@ -32,20 +32,20 @@ pub trait NumCmp<Rhs> {
     type Output;
     //
     /// self < rhs
-    fn num_lt(&self, rhs : Rhs) -> Self::Output;
+    fn num_lt(self, rhs : Rhs) -> Self::Output;
     //
     /// self <= rhs
-    fn num_le(&self, rhs : Rhs) -> Self::Output;
+    fn num_le(self, rhs : Rhs) -> Self::Output;
     //
     /// self == rhs
-    fn num_eq(&self, rhs : Rhs) -> Self::Output;
+    fn num_eq(self, rhs : Rhs) -> Self::Output;
     //
     /// self != rhs
-    fn num_ne(&self, rhs : Rhs) -> Self::Output;
+    fn num_ne(self, rhs : Rhs) -> Self::Output;
     //
     /// self >= rhs
-    fn num_ge(&self, rhs : Rhs) -> Self::Output;
+    fn num_ge(self, rhs : Rhs) -> Self::Output;
     //
     /// self > rhs
-    fn num_gt(&self, rhs : Rhs) -> Self::Output;
+    fn num_gt(self, rhs : Rhs) -> Self::Output;
 }

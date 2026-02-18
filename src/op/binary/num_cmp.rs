@@ -47,8 +47,8 @@ macro_rules! eval_num_cmp_forward_fun { ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        for<'a> V : NumCmp<&'a V, Output = V> + NumCmp<&'a E, Output = E>,
-        for<'a> E : NumCmp<&'a E, Output = E> + NumCmp<&'a V, Output = E>,
+        for<'a> &'a V : NumCmp<&'a V, Output = V> + NumCmp<&'a E, Output = E>,
+        for<'a> &'a E : NumCmp<&'a E, Output = E> + NumCmp<&'a V, Output = E>,
     {
         debug_assert!( arg.len() == 2);
         debug_assert!(
@@ -93,8 +93,8 @@ macro_rules! eval_num_cmp_forward_fun { ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        for<'a> V : NumCmp<&'a V, Output = V> + NumCmp<&'a E, Output = E>,
-        for<'a> E : NumCmp<&'a E, Output = E> + NumCmp<&'a V, Output = E>,
+        for<'a> &'a V : NumCmp<&'a V, Output = V> + NumCmp<&'a E, Output = E>,
+        for<'a> &'a E : NumCmp<&'a E, Output = E> + NumCmp<&'a V, Output = E>,
     {
         debug_assert!( arg.len() == 2);
         //
@@ -232,13 +232,13 @@ no_rust_src!(NumCmp);
 ///   LT_OP, LE_OP, EQ_OP, NE_OP, GE_OP, GT_OP .
 pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
+    AD<V> : From<V>,
     V     : Clone + From<f32>,
-    for<'a> V     : NumCmp<&'a V, Output = V>,
-    for<'a> V     : NumCmp<&'a AD<V>, Output = AD<V> >,
-    for<'a> V     : NumCmp<&'a AD<V>, Output = AD<V> >,
-            AD<V> : From<V>,
-    for<'a> AD<V> : NumCmp<&'a V, Output = AD<V> >,
-    for<'a> AD<V> : NumCmp<&'a AD<V>, Output = AD<V> >,
+    for<'a> &'a V     : NumCmp<&'a V, Output = V>,
+    for<'a> &'a V     : NumCmp<&'a AD<V>, Output = AD<V> >,
+    for<'a> &'a V     : NumCmp<&'a AD<V>, Output = AD<V> >,
+    for<'a> &'a AD<V> : NumCmp<&'a V, Output = AD<V> >,
+    for<'a> &'a AD<V> : NumCmp<&'a AD<V>, Output = AD<V> >,
 {
     op_info_vec[id::LT_OP as usize] = OpInfo{
         name              : "lt",

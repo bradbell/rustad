@@ -111,7 +111,7 @@ macro_rules! impl_num_cmp_aa{ ($name:ident, $OpId:ident) =>  {
         " & `AD<V>` ", stringify!($name), "( & `AD<V>` )",
         "; see [doc_num_cmp_ad]"
     )]
-    fn $name(&self , rhs : &AD<V> ) -> AD<V>
+    fn $name(self, rhs : &AD<V> ) -> AD<V>
     {
         // new_value
         let new_value : V = self.value.$name( &rhs.value );
@@ -130,10 +130,10 @@ macro_rules! impl_num_cmp_aa{ ($name:ident, $OpId:ident) =>  {
         AD::new(new_tape_id, new_index, new_ad_type, new_value)
     }
 } }
-impl<V> NumCmp< &AD<V> > for AD<V>
+impl<V> NumCmp< &AD<V> > for &AD<V>
 where
     V : Clone + FloatCore + PartialEq + ThisThreadTape ,
-    V : for<'a> NumCmp<&'a V, Output = V> ,
+    for<'a> &'a V : NumCmp<&'a V, Output = V> ,
 {
     type Output = AD<V>;
     //
@@ -153,7 +153,7 @@ macro_rules! impl_num_cmp_ac{ ($name:ident, $OpId:ident) => {
         "& `AD<V>` ", stringify!($name), "( &V )",
         "; see [doc_num_cmp_ad]"
     )]
-    fn $name(&self , rhs : &V ) -> AD<V>
+    fn $name(self, rhs : &V ) -> AD<V>
     {
         // new_value
         let new_value : V = self.value.$name( rhs );
@@ -172,10 +172,10 @@ macro_rules! impl_num_cmp_ac{ ($name:ident, $OpId:ident) => {
         AD::new(new_tape_id, new_index, new_ad_type, new_value)
     }
 } }
-impl<V> NumCmp<&V> for AD<V>
+impl<V> NumCmp<&V> for &AD<V>
 where
     V : Clone + FloatCore + PartialEq + ThisThreadTape ,
-    V : for<'a> NumCmp<&'a V, Output = V> ,
+    for<'a> &'a V : NumCmp<&'a V, Output = V> ,
 {
     type Output = AD<V>;
     //
@@ -195,7 +195,7 @@ macro_rules! impl_num_cmp_ca{ ($name:ident, $OpId:ident) => {
         "& V" , stringify!($name), "( & `AD<V>` )",
         "; see [doc_num_cmp_ad]"
     )]
-    fn $name(&self , rhs : &AD<V> ) -> AD<V>
+    fn $name(self, rhs : &AD<V> ) -> AD<V>
     {
         // new_value
         let new_value  : V = self.$name( &rhs.value );
@@ -214,10 +214,10 @@ macro_rules! impl_num_cmp_ca{ ($name:ident, $OpId:ident) => {
         AD::new(new_tape_id, new_index, new_ad_type, new_value)
     }
 } }
-impl<V> NumCmp< &AD<V> > for V
+impl<V> NumCmp< &AD<V> > for &V
 where
     V : Clone + FloatCore + PartialEq + ThisThreadTape ,
-    V : for<'a> NumCmp<&'a V, Output = V>
+    for<'a> &'a V : NumCmp<&'a V, Output = V>
 {
     type Output = AD<V>;
     //

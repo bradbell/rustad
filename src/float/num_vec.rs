@@ -281,7 +281,7 @@ pub fn doc_num_cmp_num_vec() {}
 /// see [doc_num_cmp_num_vec]
 macro_rules! impl_num_cmp_num_vec{ ($name:ident, $op:tt) => {
     #[doc = concat!( "NumVec::", stringify!( $name ) ) ]
-    fn $name(&self, rhs : & NumVec<S> ) -> NumVec<S> {
+    fn $name(self, rhs : & NumVec<S> ) -> NumVec<S> {
         //
         let mut v : Vec<S>;
         let e     : S;
@@ -315,9 +315,10 @@ macro_rules! impl_num_cmp_num_vec{ ($name:ident, $op:tt) => {
     }
 } }
 //
-impl<S> NumCmp< &NumVec<S> > for NumVec<S>
+impl<S> NumCmp< &NumVec<S> > for &NumVec<S>
 where
-    S  : for<'a> NumCmp<&'a S, Output = S> + FloatCore,
+    S              : FloatCore,
+    for<'a> &'a S  : NumCmp<&'a S, Output = S>,
 {
     type Output = NumVec<S>;
     //

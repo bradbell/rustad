@@ -467,7 +467,7 @@ where
     //
     V     : Clone + From<f32> + FloatCore + PartialEq,
     V     : ThisThreadTape + GlobalAtomCallbackVec,
-    V     : for<'a> NumCmp<&'a V, Output = V> ,
+    for<'a> &'a V : NumCmp<&'a V, Output = V> ,
     AD<V> : From<V>,
 {
     let empty = OpInfo {
