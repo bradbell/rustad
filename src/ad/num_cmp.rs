@@ -73,8 +73,15 @@ use crate::op::id::{
 /// let ax_ge_z  = NumCmp::num_ge(&ax, &z);
 /// assert_eq!(ax_ge_z.to_value(), V::from(0) );
 ///
-/// let ay_eq_z  = NumCmp::num_eq(ay, z);
+/// let ay_eq_z  = NumCmp::num_eq(ay.clone(), z.clone());
 /// assert_eq!(ay_eq_z.to_value(), V::from(1) );
+///
+/// let z_gt_ay  = NumCmp::num_gt(&z, &ay);
+/// assert_eq!(z_gt_ay.to_value(), V::from(0) );
+///
+/// let z_gt_ay  = NumCmp::num_gt(z, ay);
+/// assert_eq!(z_gt_ay.to_value(), V::from(0) );
+///
 /// ```
 ///
 /// # Example using NumVec
@@ -116,7 +123,7 @@ macro_rules! impl_num_cmp_aa_borrow{ ($name:ident, $OpId:ident) =>  {
     fn $name(self, rhs : &AD<V> ) -> AD<V>
     {
         // new_value
-        let new_value : V = self.value.$name( &rhs.value );
+        let new_value : V = NumCmp::$name( &self.value, &rhs.value );
         //
         // local_key
         let local_key : &LocalKey< RefCell< Tape<V> > > =
@@ -178,13 +185,13 @@ where
 macro_rules! impl_num_cmp_ac_borrow{ ($name:ident, $OpId:ident) => {
     //
     #[doc = concat!(
-        "& `AD<V>` ", stringify!($name), "( &V )",
+        " `&AD<V>` ", stringify!($name), "( &V )",
         "; see [doc_num_cmp_ad]"
     )]
     fn $name(self, rhs : &V ) -> AD<V>
     {
         // new_value
-        let new_value : V = self.value.$name( rhs );
+        let new_value : V = NumCmp::$name( &self.value, rhs );
         //
         // local_key
         let local_key : &LocalKey< RefCell< Tape<V> > > =
@@ -242,12 +249,11 @@ where
 }
 // ---------------------------------------------------------------------------
 //
-// impl_num_cmp_ca
-macro_rules! impl_num_cmp_ca{ ($name:ident, $OpId:ident) => {
+// impl_num_cmp_ca_borrow
+macro_rules! impl_num_cmp_ca_borrow{ ($name:ident, $OpId:ident) => {
     //
     #[doc = concat!(
-        "& V" , stringify!($name), "( & `AD<V>` )",
-        "; see [doc_num_cmp_ad]"
+        "&V" , stringify!($name), " `&AD<V>`; see [doc_num_cmp_ad]"
     )]
     fn $name(self, rhs : &AD<V> ) -> AD<V>
     {
@@ -275,12 +281,37 @@ where
 {
     type Output = AD<V>;
     //
-    impl_num_cmp_ca!( num_lt, LT_OP);
-    impl_num_cmp_ca!( num_le, LE_OP );
-    impl_num_cmp_ca!( num_eq, EQ_OP );
-    impl_num_cmp_ca!( num_ne, NE_OP );
-    impl_num_cmp_ca!( num_ge, GE_OP );
-    impl_num_cmp_ca!( num_gt, GT_OP );
+    impl_num_cmp_ca_borrow!( num_lt, LT_OP);
+    impl_num_cmp_ca_borrow!( num_le, LE_OP );
+    impl_num_cmp_ca_borrow!( num_eq, EQ_OP );
+    impl_num_cmp_ca_borrow!( num_ne, NE_OP );
+    impl_num_cmp_ca_borrow!( num_ge, GE_OP );
+    impl_num_cmp_ca_borrow!( num_gt, GT_OP );
+}
+//
+// impl_num_cmp_ca_own
+macro_rules! impl_num_cmp_ca_own{ ($name:ident) => {
+    //
+    #[doc = concat!(
+        "V" , stringify!($name), " `AD<V>`; see [doc_num_cmp_ad]"
+    )]
+    fn $name(self, rhs : AD<V> ) -> AD<V> {
+        NumCmp::$name( &self, &rhs )
+    }
+} }
+impl<V> NumCmp< AD<V> > for V
+where
+    V : Clone + FloatCore + PartialEq + ThisThreadTape ,
+    for<'a> &'a V : NumCmp<&'a AD<V>, Output = AD<V> >
+{
+    type Output = AD<V>;
+    //
+    impl_num_cmp_ca_own!( num_lt);
+    impl_num_cmp_ca_own!( num_le );
+    impl_num_cmp_ca_own!( num_eq );
+    impl_num_cmp_ca_own!( num_ne );
+    impl_num_cmp_ca_own!( num_ge );
+    impl_num_cmp_ca_own!( num_gt );
 }
 // ---------------------------------------------------------------------------
 // record_num_cmp_aa
