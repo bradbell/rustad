@@ -49,31 +49,35 @@ This package is intended to include (and extend) most of the features in
 6.  Atomic functions and Checkpointing. These have been extended
     (from the CppAD implementations)
     so that they stay atomic when used in functions that are AD evaluated.
+    This includes an aribtraity sequence of derivatives with each derivative
+    using either forward or reverse mode.
 
 7.  Generate compile and link source code for derivative calculations.
 
 8.  Dynamic parameters; i.e., function arguments that are treated as constant
     during differeniation.
 
-9.  Absolute zero multiplication; i.e., zero times nan is also zero.
-    This is important when computing derivatives where some of the components
-    are nan, but they are not used.
-
-10. Optimization: Reduce tape size both during recording; e.g.,
+9.  Optimization: Reduce tape size both during recording; e.g.,
     multiplication by the constants zero and one does not need to be recorded.
     Reduce size and avoid recomputaiton in AD function objects by detecting
     equivalent constants, dynamic parameters, and variables..
 
+10. Absolute zero multiplication; i.e., zero times nan is also zero.
+    This is important when computing derivatives where some of the components
+    (that are not used) are nan.
+
 11. Conditional Expressions allow for if then else values to be recorded
     in an AD function object. Rustad implements this using comparison operators
     that have numerical results (instead of boolean results).
-    For example, the following pseudo syntax would represent the absolute
-    value of x: 
+    For example, the following pseudo code selects f(x) [ g(x) ] when
+    x is positive, [not positive] :
 
-        y = (x >= 0) * x + (x < 0) * -x
+        y = (x > 0) * f(x) + (x <= 0) * g(x)
 
     Note that this has a natural extension to numeric vectors where it
-    acts element wise.
+    acts element wise. Also note that absolute zero multiplication 
+    makes this selection work even if f(x) [ g(x) ] is nan when 
+    x is not positive [positive].
 
 12. Forward, reverse, and subgraph sparse derivative calculations
 

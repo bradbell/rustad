@@ -13,6 +13,7 @@ use rustad::{
     AzFloat,
     call_atom,
     NumCmp,
+    FloatCore,
 };
 //
 mod atom_test;
@@ -240,8 +241,8 @@ fn find_first_equal_call() {
     assert_eq!( f.var_dep_len(), 0 );
 }
 //
-// find_first_equal_binary
-fn find_first_equal_binary() {
+// find_first_equal_unary
+fn find_first_equal_unary() {
     //
     // trace
     let trace = false;
@@ -253,7 +254,7 @@ fn find_first_equal_binary() {
     //
     // aq0, aq1, aq2, aq3
     // Optimizer should detect that aq0 and aq1 are identical.
-    // GIven that, it should detect that aq2 and aq3 are identical.
+    // Given that, it should detect that aq2 and aq3 are identical.
     let aq0 = &ap[0] + &ap[0];   // q0 = p[0] + p[0]
     let aq1 = &ap[0] + &ap[0];   // q1 = p[0] + p[0]
     let aq2 = &ap[0] * &aq0;     // q2 = p[0] * q0
@@ -283,6 +284,53 @@ fn find_first_equal_binary() {
     assert_eq!( y[1], &p[0] + &p[0] );
     assert_eq!( y[2], &p[0] * &( &p[0] + &p[0] ) ) ;
     assert_eq!( y[3], &p[0] * &( &p[0] + &p[0] ) ) ;
+    assert_eq!( f.dyp_dep_len(), 2 );
+    assert_eq!( f.var_dep_len(), 0 );
+}
+//
+// find_first_equal_binary
+fn find_first_equal_binary() {
+    //
+    // trace
+    let trace = false;
+    //
+    // p, x, ap, ax
+    let p    = vec![ V::from(2.0) ];
+    let x    = vec![ V::from(3.0) ];
+    let (ap, _ax) = start_recording( Some(p.clone()), x.clone());
+    //
+    // aq0, aq1, aq2, aq3
+    // Optimizer should detect that aq0 and aq1 are identical.
+    // Given that, it should detect that aq2 and aq3 are identical.
+    let aq0 = FloatCore::sin( &ap[0] );   // q0 = sin( p[0] )
+    let aq1 = FloatCore::sin( &ap[0] );   // q1 = sin( p[0] )
+    let aq2 = FloatCore::cos( &aq0 );     // q2 = cos( q0 )
+    let aq3 = FloatCore::cos( &aq1 );     // q3 = cos( q1 )
+    //
+    // f
+    let ay     = vec![ aq0, aq1, aq2, aq3 ];
+    let mut f  = stop_recording(ay);
+    //
+    // check f
+    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    assert_eq!( y[0], FloatCore::sin( &p[0] ) );
+    assert_eq!( y[1], FloatCore::sin( &p[0] ) );
+    assert_eq!( y[2], FloatCore::cos( &FloatCore::sin( &p[0] ) ) );
+    assert_eq!( y[3], FloatCore::cos( &FloatCore::sin( &p[0] ) ) );
+    assert_eq!( f.dyp_dep_len(), 4 );
+    assert_eq!( f.var_dep_len(), 0 );
+    //
+    // f
+    f.optimize(trace);
+    //
+    // check f
+    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    assert_eq!( y[0], FloatCore::sin( &p[0] ) );
+    assert_eq!( y[1], FloatCore::sin( &p[0] ) );
+    assert_eq!( y[2], FloatCore::cos( &FloatCore::sin( &p[0] ) ) );
+    assert_eq!( y[3], FloatCore::cos( &FloatCore::sin( &p[0] ) ) );
     assert_eq!( f.dyp_dep_len(), 2 );
     assert_eq!( f.var_dep_len(), 0 );
 }
@@ -401,6 +449,7 @@ fn optimize() {
     compress_dyp();
     compress_var();
     find_first_equal_call();
+    find_first_equal_unary();
     find_first_equal_binary();
     find_equal_num_cmp();
     an_atom_result_not_used();

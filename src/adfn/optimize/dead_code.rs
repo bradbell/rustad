@@ -19,6 +19,7 @@ use crate::adfn::optimize::Old2New;
 use crate::tape::Tape;
 use crate::tape::OpSequence;
 use crate::op::binary::common::is_binary_op;
+use crate::op::unary::common::is_unary_op;
 use crate::ad::ADType;
 use crate::op::id::{
     CALL_OP,
@@ -90,6 +91,43 @@ fn get_old2new(
     option
 }
 // -----------------------------------------------------------------------
+// new_unary_op
+#[allow(clippy::too_many_arguments)]
+fn new_unary_op(
+    old2new      : &mut Old2New   ,
+    i_op_seq     : usize           ,
+    op_id        : u8              ,
+    arg          : &[IndexT]       ,
+    arg_type     : &[ADType]       ,
+    old_op_index : usize           ,
+    old_op_seq   : &OpSequence     ,
+    new_op_seq   : &mut OpSequence ,
+    trace        : bool            ,
+) {
+    assert_eq!( arg.len(), 1);
+    //
+    // new_op_index
+    let new_op_index = new_op_seq.id_all.len();
+    //
+    // new_op_seq: id_all, arg_start, n_dep
+    new_op_seq.n_dep += 1;
+    new_op_seq.id_all.push( op_id );
+    new_op_seq.arg_start.push( new_op_seq.arg_all.len() as IndexT );
+    //
+    // new_op_seq: arg_all, arg_type_all
+    let arg_type_0   = arg_type[0].clone();
+    let old_index    = arg[0] as usize;
+    let option       = get_old2new( old2new, &arg_type_0, old_index );
+    let new_index    = option.unwrap();
+    new_op_seq.arg_all.push( new_index );
+    new_op_seq.arg_type_all.push( arg_type_0 );
+    //
+    // old2new
+    let new_index    = new_op_index + new_op_seq.n_dom;
+    let old_index    = old_op_index + old_op_seq.n_dom;
+    set_old2new(old2new, i_op_seq, old_index, new_index, trace);
+}
+// -----------------------------------------------------------------------
 // new_binary_op
 #[allow(clippy::too_many_arguments)]
 fn new_binary_op(
@@ -126,7 +164,6 @@ fn new_binary_op(
     let new_index    = new_op_index + new_op_seq.n_dom;
     let old_index    = old_op_index + old_op_seq.n_dom;
     set_old2new(old2new, i_op_seq, old_index, new_index, trace);
-    //
 }
 // -----------------------------------------------------------------------
 #[allow(clippy::too_many_arguments)]
@@ -334,7 +371,24 @@ where
                 let arg       = &old_op_seq.arg_all[start .. end];
                 let arg_type  = &old_op_seq.arg_type_all[start .. end];
                 //
-                if is_binary_op(op_id) {
+                if is_unary_op(op_id) {
+                    if old_depend[old_res] {
+                        //
+                        // old2new, new_op_seq
+                        new_unary_op(
+                            &mut old2new,
+                            i_op_seq,
+                            op_id,
+                            arg,
+                            arg_type,
+                            old_op_index,
+                            old_op_seq,
+                            new_op_seq,
+                            trace,
+                        );
+                    }
+                    old_op_index += 1;
+                } else if is_binary_op(op_id) {
                     if old_depend[old_res] {
                         //
                         // old2new, new_op_seq

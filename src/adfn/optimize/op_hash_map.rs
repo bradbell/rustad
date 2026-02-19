@@ -15,6 +15,7 @@ use crate::{
 };
 use crate::ad::ADType;
 use crate::tape::OpSequence;
+use crate::op::unary::common::is_unary_op;
 use crate::op::binary::common::is_binary_op;
 use crate::op::id::{
     CALL_OP,
@@ -24,6 +25,28 @@ use crate::op::call::{
     BEGIN_FLAG,
     NUMBER_RNG,
 };
+//
+// ---------------------------------------------------------------------------
+#[derive(Eq, Hash, PartialEq)]
+struct UnaryOp {
+    op_id     : u8          ,
+    arg       : IndexT      ,
+    arg_type  : ADType      ,
+}
+impl UnaryOp {
+    pub fn new(
+        op_id_in    : u8          ,
+        arg_in      : IndexT      ,
+        arg_type_in : ADType      ,
+    ) -> Self {
+        debug_assert!( is_unary_op(op_id_in) );
+        Self {
+            op_id    : op_id_in    ,
+            arg      : arg_in      ,
+            arg_type : arg_type_in ,
+        }
+    }
+}
 //
 // ---------------------------------------------------------------------------
 #[derive(Eq, Hash, PartialEq)]
@@ -73,8 +96,9 @@ impl CallOp {
 /// operators uses that will always yield the same results.
 ///
 struct OpHashMap {
+    unary_hash_map  : FxHashMap<UnaryOp,  IndexT> ,
     binary_hash_map : FxHashMap<BinaryOp, IndexT> ,
-    call_hash_map   : FxHashMap<CallOp, IndexT> ,
+    call_hash_map   : FxHashMap<CallOp,   IndexT> ,
 }
 //
 impl OpHashMap {
@@ -82,6 +106,7 @@ impl OpHashMap {
     // OpHashMap::new
     fn new() -> Self {
         Self {
+            unary_hash_map  : FxHashMap::default() ,
             binary_hash_map : FxHashMap::default() ,
             call_hash_map   : FxHashMap::default() ,
         }
@@ -119,7 +144,7 @@ impl OpHashMap {
     ///
     /// * option :
     ///     * None : try_insert only handles the following operators:
-    ///       binary operators, CALL_OP operators.
+    ///       unary operators, binary operators, CALL_OP operators.
     ///       If this is not one of these, try_insert returns None.
     ///     * Some(map_value_out) : If map_value_out is equal to map_value_in,
     ///       this operator was inserted in the hash map
@@ -142,7 +167,26 @@ impl OpHashMap {
         let end          = op_seq.arg_start[op_index + 1] as usize;
         let arg          = &op_seq.arg_all[start .. end];
         let arg_type     = &op_seq.arg_type_all[start .. end];
-        if is_binary_op(op_id) {
+        if is_unary_op (op_id) {
+            //
+            // arg_0
+            let match_0 = arg_type[0] == op_seq_type && n_dom_indext <= arg[0];
+            let arg_0 = if match_0 {
+                let dep_index = (arg[0] - n_dom_indext) as usize;
+                first_equal[dep_index] + n_dom_indext
+            } else {
+                arg[0]
+            };
+            //
+            // arg_type_0
+            let arg_type_0 = arg_type[0].clone();
+            //
+            // map_value_out
+            let key           = UnaryOp::new(op_id, arg_0, arg_type_0);
+            let map_value_out =
+                self.unary_hash_map.entry(key).or_insert(map_value_in);
+            return Some(*map_value_out);
+        } else if is_binary_op(op_id) {
             //
             // arg_0
             let match_0 = arg_type[0] == op_seq_type && n_dom_indext <= arg[0];
@@ -161,6 +205,8 @@ impl OpHashMap {
             } else {
                 arg[1]
             };
+            //
+            // map_value_out
             let arg_match     = [arg_0, arg_1];
             let key           = BinaryOp::new(op_id, arg_match, arg_type);
             let map_value_out =
@@ -180,6 +226,7 @@ impl OpHashMap {
                     arg_match[i_arg] = first_equal[dep_index] + n_dom_indext;
                 }
             }
+            // map_value_out
             // position where flags start does not matter.
             arg_match[BEGIN_FLAG] = 0;
             let key   = CallOp::new(arg_match, arg_type, flag);

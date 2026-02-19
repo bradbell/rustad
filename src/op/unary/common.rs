@@ -10,17 +10,21 @@
 use crate::IndexT;
 use crate::adfn::optimize;
 use crate::ad::ADType;
+use crate::op::id;
 //
-/* ---------------------------------------------------------------------------
-TODO: Uncomment when optimizer handles unary operators.
+// ---------------------------------------------------------------------------
 pub(crate) fn is_unary_op(op_id : u8) -> bool {
     match op_id {
-        id::SIN_OP => true ,
+        id::ABS_OP      => true,
+        id::SIGNUM_OP   => true,
+        id::EXP_OP      => true,
+        id::MINUS_OP    => true,
+        id::COS_OP      => true,
+        id::SIN_OP      => true,
         //
-        _         => false,
+        _               => false,
     }
 }
-*/
 // ---------------------------------------------------------------------------
 // eval_forward_var
 /// Evaluation of zero order forward for unary operators.
