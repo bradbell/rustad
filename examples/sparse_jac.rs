@@ -20,6 +20,7 @@ fn main () {
     let n          = 5;
     let m          = n - 1;
     let trace      = false;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     // f
     let zero_v : V = 0.into();
@@ -50,7 +51,7 @@ fn main () {
     //
     // jacobian
     let jacobian = f.for_sparse_jac_value(
-        None, &var_both, &pattern, &color_vec, trace
+        None, &var_both, &pattern, &color_vec, &arg_vec
     );
     //
     // row_major
