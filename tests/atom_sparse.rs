@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 /*
 Test rust_src with an atomic function and dynamic parameters.
 
@@ -109,6 +109,9 @@ fn register_h()-> IndexT {
 #[test]
 fn atom_sparse() {
     //
+    // arg_vec
+    let mut arg_vec : Vec<[&str; 2]> = Vec::new();
+    //
     // h_atom_id, call_info, trace, compute_dyp, np, nx
     let h_atom_id   = register_h();
     let call_info   = 0;
@@ -146,14 +149,13 @@ fn atom_sparse() {
     assert_eq!( var_pattern, var_check );
     //
     // var_pattern
-    let compute_dyp = false;
-    let mut var_pattern = f.for_sparsity(trace, compute_dyp);
+    let mut var_pattern = f.for_sparsity(&arg_vec);
     var_pattern.sort();
     assert_eq!( var_pattern, var_check );
     //
     // dyp_pattern
-    let compute_dyp = true;
-    let mut dyp_pattern = f.for_sparsity(trace, compute_dyp);
+    arg_vec.push( [ "compute_dyp", "true" ] );
+    let mut dyp_pattern = f.for_sparsity(&arg_vec);
     dyp_pattern.sort();
     assert_eq!( dyp_pattern, dyp_check );
 }

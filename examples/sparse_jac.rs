@@ -33,8 +33,7 @@ fn main () {
     let f = stop_recording(ay);
     //
     // pattern
-    let compute_dyp = false;
-    let mut pattern = f.for_sparsity(trace, compute_dyp);
+    let mut pattern = f.for_sparsity(&arg_vec);
     assert_eq!( pattern.len(), 2 * m );
     //
     // x
