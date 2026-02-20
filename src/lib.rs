@@ -154,9 +154,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2026.2.19");
+/// assert_eq!(date, "2026.2.20");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2026.2.19";
+pub const YEAR_MONTH_DAY : &str = "2026.2.20";
 //
 // CORE_RS
 /// is the source code for the [core](crate::float::core) module.
@@ -187,7 +187,7 @@ pub const NUM_VEC_RS : &str = include_str!( "float/num_vec.rs" );
 /// Convention for a variable number of arguments to a function.
 ///
 /// A function argument called *arg_vec* is will hold a vector of
-/// key, value pairs. This enables us to add key, value pairs in a backward
+/// key, value pairs. This enables one to add key, value pairs in a backward
 /// compatible way.
 ///
 /// * Prototype :

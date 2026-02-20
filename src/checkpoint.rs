@@ -34,7 +34,6 @@ use crate::tape::sealed::ThisThreadTape;
 #[cfg(doc)]
 use crate::{
     doc_generic_v,
-    doc_arg_vec,
 };
 // ---------------------------------------------------------------------------
 // Direction
@@ -237,7 +236,7 @@ where
 ///   [start_recording]
 ///
 /// * arg_vec :
-///   see [doc_arg_vec] and the key descriptions below.
+///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
 ///
 ///     * name :
 ///       the value is the name that identifies this checkpoint function
@@ -279,24 +278,21 @@ where
     let mut name      = "no_name";
     let mut trace     = false;
     let mut trace_str = "false";
-    for pair in arg_vec {
-        let [key, value] = *pair;
-        match key {
-            "name" => {
-                name = value;
-            },
+    for arg in arg_vec {
+        match arg[0] {
+            "name" => { name = arg[1]; },
             "trace" => {
-                if value != "true" && value != "false" { panic!(
-                    "registem_checkpoint: trace: value = {value} \
-                    is not a valid value for the trace key"
-                ); }
-                trace     = value == "true";
-                trace_str = value;
+                match arg[1] {
+                    "true"  => { trace = true;  trace_str = "true"; },
+                    "false" => { trace = false; trace_str = "false"; },
+                    _ => panic!(
+                        "for_sparse_jac arg_vec: invalid value for trace"
+                    ),
+                }
             },
-            _ => panic!(
-                "registem_checkpoint hash_map : {key} is not a valid key"
-            ),
-    } }
+            _ => panic!( "registem_checkpoint arg_vec: invalid key"),
+        }
+    }
     //
     // one_v
     let one_v : V = 0f32.into();

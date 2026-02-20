@@ -177,7 +177,7 @@ pub(crate) use impl_float_value_from_primitive;
 ///   the other value that we are comparing.
 ///
 /// * arg_vec :
-///   see [doc_arg_vec](crate::doc_arg_vec) and the key descriptions below:
+///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
 ///
 ///     * factor :
 ///       is a string representation of an f32 value that multiplies
@@ -225,7 +225,6 @@ pub(crate) use impl_float_value_from_primitive;
 /// assert!( ! check_nearly_eq::<V>( &x, &y, &arg_vec ) );
 /// ```
 ///
-/*
 /// # NumVec Example :
 /// ```
 /// use rustad::{
@@ -251,7 +250,6 @@ pub(crate) use impl_float_value_from_primitive;
 /// assert!( ! check_nearly_eq::<V>(&x, &y, &arg_vec) );
 /// ```
 ///
-*/
 pub fn check_nearly_eq<V>(x : &V, y : &V, arg_vec : &Vec< [&str; 2] >) -> bool
 where
     V  : FloatCore + FloatValue + From<f32> + std::fmt::Debug,
@@ -264,27 +262,25 @@ where
     // factor, assert
     let mut factor  = V::from(100f32);
     let mut assert  = true;
-    for arg in arg_vec.iter() {
+    for arg in arg_vec {
         match arg[0] {
             "factor" => {
                 let result = arg[1].parse::<f32>();
-                if result.is_err() {
-                    panic!( "check_nearly_eq: Cannot convert factor to f32" );
-                }
+                if result.is_err() { panic!(
+                    "check_nearly_eq arg_vec: can't convert factor to f32"
+                ); }
                 factor = V::from( result.unwrap() );
             },
             "assert" => {
-                if arg[1] == "true" {
-                    assert = true;
-                } else if arg[1] == "false" {
-                    assert = false;
-                } else {
-                    panic!( "check_nearly_eq: assert is not true of false" );
+                match arg[1] {
+                    "true"  => { assert = true; }
+                    "false" => { assert = false; }
+                    _ => { panic!(
+                        "check_nearly_eq arg_vec: assert is not true of false"
+                    ); }
                 }
             },
-            _ => {
-                panic!( "check_nearly_eq: key is not assert of factor" );
-            }
+            _ => panic!( "check_nearly_eq arg_vec: invalid key" ),
         }
     }
     //
