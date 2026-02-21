@@ -63,6 +63,7 @@ where
     ///     If this is true, the return is a sparsity pattern
     ///     for the range of f w.r.t. the domain dynamic parameters.
     ///     Otherwise, the sparsity pattern is w.r.t. the domain variables.
+    ///     The default for compute_dyp is false.
     ///
     /// * pattern :
     ///   The the return value *pattern* is vector of [row, column] pairs.

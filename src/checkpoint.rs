@@ -542,8 +542,12 @@ where
 {
     assert_eq!( depend.len(), 0 );
     //
-    // compute_dyp
-    let compute_dyp = false;
+    // arg_vec
+    let arg_vec = if trace {
+        vec![ [ "trace", "true" ], [ "compute_dyp", "false" ] ]
+    } else {
+        vec![ [ "trace", "false" ], [ "compute_dyp", "false" ] ]
+    };
     //
     // checkpoint_id
     let checkpoint_id = call_info;
@@ -558,7 +562,7 @@ where
     // TODO: store the sparsity pattern in a static structure for this
     // checkpoint function so do not need to recompute. Also sort it so it
     // and store point to beginning of each row so depend computes faster.
-    let (_, pattern)    = ad_fn.sub_sparsity(trace, compute_dyp);
+    let (_, pattern) = ad_fn.sub_sparsity(&arg_vec);
     //
     // depend
     for [i, j] in pattern.iter() {

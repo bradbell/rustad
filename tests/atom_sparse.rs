@@ -109,14 +109,14 @@ fn register_h()-> IndexT {
 #[test]
 fn atom_sparse() {
     //
-    // arg_vec
-    let mut arg_vec : Vec<[&str; 2]> = Vec::new();
+    // arg_vec, arg_sub
+    let arg_vec = vec![ ["trace", "false"] ];
+    let arg_sub = vec![ ["trace", "false"], ["compute_dyp", "true"] ];
     //
-    // h_atom_id, call_info, trace, compute_dyp, np, nx
+    // h_atom_id, call_info, trace, np, nx
     let h_atom_id   = register_h();
     let call_info   = 0;
     let trace       = false;
-    let compute_dyp = true;
     let np          = 2;
     let nx          = 2;
     //
@@ -136,7 +136,7 @@ fn atom_sparse() {
     assert_eq!(f.var_dom_len(), nx);
     //
     // dyp_pattern, var_pattern
-    let (mut dyp_pattern, mut var_pattern) = f.sub_sparsity(trace, compute_dyp);
+    let (mut dyp_pattern, mut var_pattern) = f.sub_sparsity(&arg_sub);
     dyp_pattern.sort();
     var_pattern.sort();
     //
@@ -154,8 +154,7 @@ fn atom_sparse() {
     assert_eq!( var_pattern, var_check );
     //
     // dyp_pattern
-    arg_vec.push( [ "compute_dyp", "true" ] );
-    let mut dyp_pattern = f.for_sparsity(&arg_vec);
+    let mut dyp_pattern = f.for_sparsity(&arg_sub);
     dyp_pattern.sort();
     assert_eq!( dyp_pattern, dyp_check );
 }

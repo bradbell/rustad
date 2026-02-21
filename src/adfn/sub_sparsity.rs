@@ -41,7 +41,7 @@ where
     ///
     /// * Syntax :
     ///   ```text
-    ///     (dyp_pattern, var_pattern) = f.sub_sparsity(trace, compute_dyp)
+    ///     (dyp_pattern, var_pattern) = f.sub_sparsity(arg_vec)
     ///   ```
     ///
     /// * V : see [doc_generic_v]
@@ -50,16 +50,20 @@ where
     ///   is this [ADfn] object. The sparsity pattern is for the Jacobian
     ///   of the function defined by the operation sequence stored in f.
     ///
-    /// * trace :
-    ///   If this is true, a trace of the sparsity calculation
-    ///   is printed on standard output.
-    ///   Note that in the trace, the cases where *var_index* is less
-    ///   that the number of domain variables will end up in the pattern
-    ///   with the corresponding row.
+    /// * arg_vec :
+    ///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
     ///
-    /// * compute_dyp :
-    ///   If this is true (false),
-    ///   the dynamic parameter pattern is (is not) computed.
+    ///   * trace
+    ///     The corresponding value must be true of false (default is false).
+    ///     If it is true, a trace of sub_sparsity is printed on stdout.
+    ///     The cases (in the trace) where *var_index* is less than
+    ///     the number of domain variables will end up in the pattern with the
+    ///     corresponding row index.
+    ///
+    ///   * compute_dyp :
+    ///     If this is true (false),
+    ///     the dynamic parameter pattern dyp_pattern is (is not) computed.
+    ///     THe default for compute_dyp is false;
     ///
     /// * dyp_pattern :
     ///   This return is vector of [row, column] pairs.
@@ -109,9 +113,8 @@ where
     /// let f           = stop_recording(ay);
     /// //
     /// // pattern
-    /// let trace            = false;
-    /// let compute_dyp      = false;
-    /// let (_, mut pattern) = f.sub_sparsity(trace, compute_dyp);
+    /// let arg_vec : Vec<[&str; 2]> = Vec::new();
+    /// let (_, mut pattern) = f.sub_sparsity(&arg_vec);
     /// pattern.sort();
     /// assert_eq!( pattern.len(), nx - 1 );
     /// for j in 1 .. nx {
@@ -119,9 +122,37 @@ where
     /// }
     /// ```
     pub fn sub_sparsity(
-        &self, trace : bool, compute_dyp : bool
+        &self                     ,
+        arg_vec : &Vec<[&str; 2]> ,
     ) -> ( SparsityPattern, SparsityPattern )
     {   //
+        // trace, compute_dyp
+        let mut trace       = false;
+        let mut compute_dyp = false;
+        for arg in arg_vec {
+            match arg[0] {
+                "trace" => {
+                    match arg[1] {
+                        "true"  => { trace = true; },
+                        "false" => { trace = false; },
+                        _ => { panic!(
+                        "sub_sparsity arg_vec: invalid value for trace"
+                        ); }
+                    }
+                },
+                "compute_dyp" => {
+                    match arg[1] {
+                        "true"  => { compute_dyp = true; },
+                        "false" => { compute_dyp = false; },
+                        _ => { panic!(
+                        "sub_sparsity arg_vec: invalid value for compute_dyp"
+                        ); }
+                    }
+                },
+                _ => panic!("sub_sparsity arg_vec: invalid key"),
+            }
+        }
+        //
         // op_info_vec
         let op_info_vec : &Vec< OpInfo<V> >  = GlobalOpInfoVec::get();
         //
