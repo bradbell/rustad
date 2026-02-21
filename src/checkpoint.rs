@@ -274,7 +274,7 @@ where
         "register_checkpoint: 0 < ad_fun.dyp_len()"
     ); }
     //
-    // name, trace
+    // name, trace_str
     let mut name      = "no_name";
     let mut trace_str = "false";
     for arg in arg_vec {

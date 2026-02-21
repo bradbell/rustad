@@ -25,7 +25,7 @@ type W = AzFloat<f32>;
 // compress_cop
 fn compress_cop() {
     //
-    // trace, arg_vec, n_repeat
+    // arg_vec, n_repeat
     let arg_vec  = vec![ ["trace", "false"] ];
     let n_repeat = 5;
     //
@@ -74,7 +74,7 @@ fn compress_cop() {
 // compress_dyp
 fn compress_dyp() {
     //
-    // trace, arg_vec, n_repeat
+    // arg_vec, n_repeat
     let arg_vec  = vec![ ["trace", "false"] ];
     let n_repeat = 5;
     //
@@ -124,7 +124,7 @@ fn compress_dyp() {
 // compress_var
 fn compress_var() {
     //
-    // trace, arg_vec, n_repeat
+    // arg_vec, n_repeat
     let arg_vec  = vec![ ["trace", "false"] ];
     let n_repeat = 5;
     //
