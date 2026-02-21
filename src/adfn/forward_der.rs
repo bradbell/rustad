@@ -30,8 +30,8 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     range_der = f.forward_der_value(dyp_both, &var_both, dom_der, trace)
-///     range_der = f.forward_der_ad(dyp_both, &var_both, dom_der, trace)
+///     range_der = f.forward_der_value(dyp_both, &var_both, dom_der, arg_vec)
+///     range_der = f.forward_der_ad(dyp_both, &var_both, dom_der, arg_vec)
 ///   ```
 ///
 /// * Prototype :
@@ -59,8 +59,12 @@ use crate::{
 ///   specifies the domain space direction along which the directional
 ///   derivative is evaluated. This is a direction in variable space.
 ///
-/// * trace :
-///   if true, a trace of the calculations is printed on stdout.
+/// * arg_vec :
+///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+///
+///   * trace
+///     The corresponding value must be true of false (default is false).
+///     If it is true, a trace of forward_der is printed on stdout.
 ///
 /// * range_der
 ///   The return value is the directional derivative; i.e,
@@ -97,12 +101,13 @@ use crate::{
 /// //
 /// // dy = partial f(p, x) w.r.t. x[0]
 /// let trace           = false;
+/// let arg_vec : Vec<[&str; 2]> = Vec::new();
 /// let p      : Vec<V> = vec![ V::from(2.0), V::from(3.0) ];
 /// let x      : Vec<V> = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
 /// let dyp             = f.forward_dyp_value(p, trace);
 /// let (y, var)        = f.forward_var_value(Some(&dyp), x, trace);
 /// let dx     : Vec<V> = vec![ V::from(1.0), V::from(0.0), V::from(0.0) ];
-/// let dy              = f.forward_der_value(Some(&dyp), &var, dx,  trace);
+/// let dy              = f.forward_der_value(Some(&dyp), &var, dx, &arg_vec);
 /// //
 /// // check
 /// // derivative w.r.t x[0] is p[0] * p[1] * x[1] * x[2] * x[3]
@@ -131,9 +136,26 @@ macro_rules! forward_der {
             dyp_both    : Option< &Vec<$E> >  ,
             var_both    : &Vec<$E>            ,
             dom_der     : Vec<$E>             ,
-            trace       : bool                ,
+            arg_vec     : &Vec<[&str; 2]>     ,
         ) -> Vec<$E>
         {
+            // trace
+            let mut trace = false;
+            for arg in arg_vec {
+                match arg[0] {
+                    "trace" => {
+                        match arg[1] {
+                            "true"  => { trace = true; },
+                            "false" => { trace = false; },
+                            _ => { panic!(
+                            "forward_der arg_vec: invalid value for trace"
+                            ); }
+                        }
+                    },
+                    _ => panic!("forward_der arg_vec: invalid key"),
+                }
+            }
+            //
             // dyp_both
             let dyp_both : &Vec<$E> = if dyp_both.is_none() {
                 &Vec::new()

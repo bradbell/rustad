@@ -16,6 +16,7 @@ type V = AzFloat<f32>;
 fn heaviside() {
     // trace
     let trace = false;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     // ax
     let x : Vec<V> = vec![ V::from(2) ];
@@ -45,7 +46,7 @@ fn heaviside() {
     assert_eq!(y[0], V::from(0));
     //
     let dx      = vec![ V::from(2.0f32) ];
-    let dy      = heaviside.forward_der_value(None, &v, dx, trace);
+    let dy      = heaviside.forward_der_value(None, &v, dx, &arg_vec);
     assert_eq!(dy[0], V::from(0));
     // ------------------------------------------------------------------------
     // forward_var_ad
@@ -69,6 +70,7 @@ fn heaviside() {
 fn abs() {
     // trace
     let trace = false;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     // ax
     let x : Vec<V> = vec![ V::from(1) ];
@@ -91,7 +93,7 @@ fn abs() {
     assert_eq!(y[0], V::from(3));
     //
     let dx      = vec![ V::from(1.0f32) ];
-    let dy      = abs.forward_der_value(None, &v, dx, trace);
+    let dy      = abs.forward_der_value(None, &v, dx, &arg_vec);
     assert_eq!(dy[0], V::from(1));
     // ------------------------------------------------------------------------
     // forward_var_ad

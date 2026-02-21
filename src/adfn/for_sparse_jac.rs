@@ -168,7 +168,7 @@ macro_rules! for_sparse_jac {
                 }
                 // range_der
                 let range_der = self. [< forward_der_ $suffix >](
-                    dyp_both, &var_both, dom_der, trace
+                    dyp_both, &var_both, dom_der, arg_vec
                 );
                 //
                 let [mut i, mut j] = sub_pattern[ order[index] ];

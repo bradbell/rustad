@@ -301,32 +301,25 @@ where
     let mut ad_forward_id : Option<IndexT> = None;
     let mut ad_reverse_id : Option<IndexT> = None;
     if ! directions.is_empty()  {
+        let mut arg_tmp = vec![ ["trace", trace_str] ];
         let directions_tail = &directions[1 .. directions.len()];
         if directions[0] == Direction::Forward {
-            let name_tmp    = name.to_string() + ".forward";
-            let arg_vec_tmp = vec![
-                [ "name",  &name_tmp ],
-                [ "trace", trace_str ],
-            ];
             let nx            = ad_fn.var_dom_len();
             let x_dx          = vec![one_v; 2 * nx ];
             let (_, ax_dx)    = start_recording(None, x_dx);
             let ax            = ax_dx[0 .. nx].to_vec();
             let adx           = ax_dx[nx .. 2*nx].to_vec();
             let (_ay, av)     = ad_fn.forward_var_ad(None, ax, trace);
-            let ady           = ad_fn.forward_der_ad(None, &av, adx, trace);
+            let ady           = ad_fn.forward_der_ad(None, &av, adx, &arg_tmp);
             let ad_fn_for     = stop_recording(ady);
+            let name_tmp      = name.to_string() + ".forward";
+            arg_tmp.push( ["name", &name_tmp] );
             let checkpoint_id = register_checkpoint(
-                ad_fn_for, directions_tail, &arg_vec_tmp
+                ad_fn_for, directions_tail, &arg_tmp
             );
             ad_forward_id     = Some(checkpoint_id);
         } else {
             debug_assert!( directions[0] == Direction::Reverse );
-            let name_tmp    = name.to_string() + ".reverse";
-            let arg_vec_tmp = vec![
-                [ "name",  &name_tmp ],
-                [ "trace", trace_str ],
-            ];
             let nx            = ad_fn.var_dom_len();
             let ny            = ad_fn.rng_len();
             let x_dy          = vec![one_v; nx + ny ];
@@ -336,8 +329,10 @@ where
             let (_ay, av)     = ad_fn.forward_var_ad(None, ax, trace);
             let adx           = ad_fn.reverse_der_ad(None, &av, ady, trace);
             let ad_fn_rev     = stop_recording(adx);
+            let name_tmp      = name.to_string() + ".reverse";
+            arg_tmp.push( ["name", &name_tmp] );
             let checkpoint_id = register_checkpoint(
-                ad_fn_rev, directions_tail, &arg_vec_tmp
+                ad_fn_rev, directions_tail, &arg_tmp
             );
             ad_reverse_id     = Some(checkpoint_id);
         }
@@ -463,6 +458,13 @@ where
 {   //
     assert_eq!( domain.len(), domain_der.len() );
     //
+    // arg_vec
+    let arg_vec : Vec<[&str; 2]> = if trace {
+        vec![ ["trace", "true"] ]
+    } else {
+        Vec::new()
+    };
+    //
     // domain_clone
     let domain_clone = ref_slice2vec(domain);
     //
@@ -481,7 +483,7 @@ where
     // range_der
     let (_, var_both)     = ad_fn.forward_var_value(None, domain_clone, trace);
     let range_der         = ad_fn.forward_der_value(
-        None, &var_both, domain_der_clone, trace
+        None, &var_both, domain_der_clone, &arg_vec
     );
     Ok( range_der )
 }

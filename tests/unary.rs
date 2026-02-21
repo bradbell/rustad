@@ -13,6 +13,7 @@ use rustad::{
 fn test_abs() {
     type V      = AzFloat<f64>;
     let trace   = false;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(3.0), V::from(-2.0) ];
     //
@@ -22,7 +23,7 @@ fn test_abs() {
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
     let dx           = vec![ V::from(3.0) , V::from(4.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
     for j in 0 .. 2 {
         let temp  = FloatCore::signum( &x[j] ) * dx[j];
@@ -42,6 +43,7 @@ fn test_abs() {
 fn test_cos() {
     type V      = AzFloat<f64>;
     let trace   = false;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -51,7 +53,7 @@ fn test_cos() {
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
     let temp         = FloatCore::sin( &x[0] ) * dx[0];
     assert_eq!( dy[0], FloatCore::minus(&temp) );
@@ -67,6 +69,7 @@ fn test_cos() {
 fn test_exp() {
     type V      = AzFloat<f64>;
     let trace   = false;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -76,7 +79,7 @@ fn test_exp() {
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
     assert_eq!( dy[0], FloatCore::exp( &x[0] ) * dx[0] );
     //
@@ -90,6 +93,7 @@ fn test_exp() {
 fn test_minus() {
     type V      = AzFloat<f64>;
     let trace   = false;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -99,7 +103,7 @@ fn test_minus() {
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
     assert_eq!( dy[0].to_inner(), - dx[0].to_inner() );
     //
@@ -113,6 +117,7 @@ fn test_minus() {
 fn test_signum() {
     type V      = AzFloat<f32>;
     let trace   = false;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -122,7 +127,7 @@ fn test_signum() {
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
     assert_eq!( dy[0], FloatCore::zero() );
     //
@@ -136,6 +141,7 @@ fn test_signum() {
 fn test_sin() {
     type V      = AzFloat<f64>;
     let trace   = false;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -145,7 +151,7 @@ fn test_sin() {
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), trace);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
     assert_eq!( dy[0], FloatCore::cos( &x[0] ) * dx[0] );
     //
