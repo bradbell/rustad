@@ -19,7 +19,6 @@ fn main () {
     // n, m, trace
     let n          = 5;
     let m          = n - 1;
-    let trace      = false;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     // f
@@ -38,7 +37,7 @@ fn main () {
     //
     // x
     let x : Vec<V>     = (0 .. n).map( |j| V::from(j+1) ).collect();
-    let (_y, var_both) = f.forward_var_value(None, x.clone(), trace);
+    let (_y, var_both) = f.forward_var_value(None, x.clone(), &arg_vec);
     //
     // -----------------------------------------------------------------------
     // for_sparse_jac_value

@@ -93,7 +93,7 @@ use crate::{
 /// let row_index = n / 2;
 /// //
 /// // dom_der
-/// let (_y, v) = f.forward_var_value(None, x.clone(), trace);
+/// let (_y, v) = f.forward_var_value(None, x.clone(), &arg_vec);
 /// let dom_der = f.subgraph_der_value(None, &v, row_index, &arg_vec);
 /// //
 /// // check

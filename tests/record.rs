@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 /*
 Tests optimizations done during recording
@@ -15,7 +15,6 @@ use rustad::{
 // test_left_zero_one_both_ad
 fn test_left_zero_one_both_ad() {
     type V      = AzFloat<f64>;
-    let trace   = false;
     //
     let x  : Vec<V>  = vec![ V::from(3.0) ];
     //
@@ -27,7 +26,8 @@ fn test_left_zero_one_both_ad() {
     let ay  = vec![ a4 ];
     let f   = stop_recording(ay);
     //
-    let (y, _)       = f.forward_var_value(None, x.clone(), trace);
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let (y, _)       = f.forward_var_value(None, x.clone(), &arg_vec);
     //
     // f.var_dep_len()
     // Not necessary to create any dependent variables.
@@ -39,7 +39,6 @@ fn test_left_zero_one_both_ad() {
 // test_left_zero_one_right_ad
 fn test_left_zero_one_right_ad() {
     type V      = AzFloat<f64>;
-    let trace   = false;
     //
     let x  : Vec<V>  = vec![ V::from(3.0) ];
     //
@@ -53,7 +52,8 @@ fn test_left_zero_one_right_ad() {
     let ay  = vec![ a6 ];
     let f   = stop_recording(ay);
     //
-    let (y, _)       = f.forward_var_value(None, x.clone(), trace);
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let (y, _)       = f.forward_var_value(None, x.clone(), &arg_vec);
     //
     // f.var_dep_len()
     // Not necessary to create any dependent variables.
@@ -65,7 +65,6 @@ fn test_left_zero_one_right_ad() {
 // test_right_zero_one_both_ad
 fn test_right_zero_one_both_ad() {
     type V      = AzFloat<f64>;
-    let trace   = false;
     //
     let x  : Vec<V>  = vec![ V::from(3.0) ];
     //
@@ -78,7 +77,8 @@ fn test_right_zero_one_both_ad() {
     let ay  = vec![ a5 ];
     let f   = stop_recording(ay);
     //
-    let (y, _)       = f.forward_var_value(None, x.clone(), trace);
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let (y, _)       = f.forward_var_value(None, x.clone(), &arg_vec);
     //
     // f.var_dep_len()
     // Not necessary to create any dependent variables.
@@ -90,7 +90,6 @@ fn test_right_zero_one_both_ad() {
 // test_right_zero_one_left_ad
 fn test_right_zero_one_left_ad() {
     type V      = AzFloat<f64>;
-    let trace   = false;
     //
     let x  : Vec<V>  = vec![ V::from(3.0) ];
     //
@@ -103,7 +102,8 @@ fn test_right_zero_one_left_ad() {
     let ay  = vec![ a5 ];
     let f   = stop_recording(ay);
     //
-    let (y, _)       = f.forward_var_value(None, x.clone(), trace);
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let (y, _)       = f.forward_var_value(None, x.clone(), &arg_vec);
     //
     // f.var_dep_len()
     // Not necessary to create any dependent variables.

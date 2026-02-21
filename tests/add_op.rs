@@ -11,7 +11,6 @@ use rustad::{
 // test_add_vv
 fn test_add_vv() {
     type V      = AzFloat<f64>;
-    let trace   = false;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(1.0), V::from(2.0), V::from(3.0) ];
@@ -22,7 +21,7 @@ fn test_add_vv() {
     let ay           = vec! [ ay_0, ay_1 ];
     let f            = stop_recording(ay);
     //
-    let (y, v)       = f.forward_var_value(None, x.clone(), trace);
+    let (y, v)       = f.forward_var_value(None, x.clone(), &arg_vec);
     assert_eq!( y[0], x[0] + x[1] );
     assert_eq!( y[1], x[1] + x[2] );
     //
@@ -42,7 +41,6 @@ fn test_add_vv() {
 // test_add_vc
 fn test_add_vc() {
     type V      = AzFloat<f64>;
-    let trace   = false;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(1.0), V::from(2.0) ];
@@ -53,7 +51,7 @@ fn test_add_vc() {
     let ay           = vec! [ ay_0, ay_1 ];
     let f            = stop_recording(ay);
     //
-    let (y, v)       = f.forward_var_value(None, x.clone(), trace);
+    let (y, v)       = f.forward_var_value(None, x.clone(), &arg_vec);
     assert_eq!( y[0], x[0] + (V::from(4.0)) );
     assert_eq!( y[1], x[1] + (V::from(5.0)) );
     //
@@ -72,7 +70,6 @@ fn test_add_vc() {
 // test_add_cv
 fn test_add_cv() {
     type V      = AzFloat<f64>;
-    let trace   = false;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(1.0), V::from(2.0) ];
@@ -83,7 +80,7 @@ fn test_add_cv() {
     let ay           = vec! [ ay_0, ay_1 ];
     let f            = stop_recording(ay);
     //
-    let (y, v)       = f.forward_var_value(None, x.clone(), trace);
+    let (y, v)       = f.forward_var_value(None, x.clone(), &arg_vec);
     assert_eq!( y[0], (V::from(4.0)) + x[1] );
     assert_eq!( y[1], (V::from(5.0)) + x[0] );
     //

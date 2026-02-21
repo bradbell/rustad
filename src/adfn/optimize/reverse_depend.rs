@@ -270,7 +270,7 @@ mod tests {
     fn test_reverse_depend() {
         //
         // trace, arg_vec
-        let trace = false;
+        let trace   = false;
         let arg_vec = vec![ ["trace", "false"] ];
         //
         // eye_atom_id, call_info
@@ -309,7 +309,7 @@ mod tests {
         let f  = stop_recording(aw);
         //
         let p_both      = f.forward_dyp_value(p, &arg_vec);
-        f.forward_var_value(Some(&p_both), x, trace);
+        f.forward_var_value(Some(&p_both), x, &arg_vec);
         //
         // depend
         let depend = f.reverse_depend(trace);

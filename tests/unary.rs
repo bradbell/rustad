@@ -12,7 +12,6 @@ use rustad::{
 // test_abs
 fn test_abs() {
     type V      = AzFloat<f64>;
-    let trace   = false;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(3.0), V::from(-2.0) ];
@@ -21,7 +20,7 @@ fn test_abs() {
     let ay           = vec! [ ax[0].abs(), ax[1].abs() ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) , V::from(4.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
@@ -42,7 +41,6 @@ fn test_abs() {
 // test_cos
 fn test_cos() {
     type V      = AzFloat<f64>;
-    let trace   = false;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
@@ -51,7 +49,7 @@ fn test_cos() {
     let ay           = vec! [ FloatCore::cos( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
@@ -68,7 +66,6 @@ fn test_cos() {
 // test_exp
 fn test_exp() {
     type V      = AzFloat<f64>;
-    let trace   = false;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
@@ -77,7 +74,7 @@ fn test_exp() {
     let ay           = vec! [ FloatCore::exp( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
@@ -92,7 +89,6 @@ fn test_exp() {
 // test_minus
 fn test_minus() {
     type V      = AzFloat<f64>;
-    let trace   = false;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
@@ -101,7 +97,7 @@ fn test_minus() {
     let ay           = vec! [ FloatCore::minus( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
@@ -116,7 +112,6 @@ fn test_minus() {
 // test_signum
 fn test_signum() {
     type V      = AzFloat<f32>;
-    let trace   = false;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
@@ -125,7 +120,7 @@ fn test_signum() {
     let ay           = vec! [ FloatCore::signum( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
@@ -140,7 +135,6 @@ fn test_signum() {
 // test_sin
 fn test_sin() {
     type V      = AzFloat<f64>;
-    let trace   = false;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
@@ -149,7 +143,7 @@ fn test_sin() {
     let ay           = vec! [ FloatCore::sin( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), trace);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //

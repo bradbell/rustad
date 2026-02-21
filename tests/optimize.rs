@@ -26,7 +26,6 @@ type W = AzFloat<f32>;
 fn compress_cop() {
     //
     // trace, arg_vec, n_repeat
-    let trace    = false;
     let arg_vec  = vec![ ["trace", "false"] ];
     let n_repeat = 5;
     //
@@ -59,7 +58,7 @@ fn compress_cop() {
     //
     // y
     let p_both       = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), trace);
+    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), &arg_vec);
     //
     // check
     let check = &p[0] + &four;
@@ -76,7 +75,6 @@ fn compress_cop() {
 fn compress_dyp() {
     //
     // trace, arg_vec, n_repeat
-    let trace    = false;
     let arg_vec  = vec![ ["trace", "false"] ];
     let n_repeat = 5;
     //
@@ -110,7 +108,7 @@ fn compress_dyp() {
     //
     // y
     let p_both       = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), trace);
+    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), &arg_vec);
     //
     // check
     let check = &p[0] + &p[0];
@@ -127,7 +125,6 @@ fn compress_dyp() {
 fn compress_var() {
     //
     // trace, arg_vec, n_repeat
-    let trace    = false;
     let arg_vec  = vec![ ["trace", "false"] ];
     let n_repeat = 5;
     //
@@ -163,7 +160,7 @@ fn compress_var() {
     //
     // y
     let p_both       = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), trace);
+    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), &arg_vec);
     //
     // check
     let check = &p[0] + &x[0];
@@ -223,7 +220,7 @@ fn find_first_equal_call() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), &arg_vec);
     let u_0     = &p[0] + &p[0];
     let u_1     = &p[1] * &p[1];
     assert_eq!(y[0], &u_0 + &u_0);
@@ -236,7 +233,7 @@ fn find_first_equal_call() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), &arg_vec);
     let u_0     = &p[0] + &p[0];
     let u_1     = &p[1] * &p[1];
     assert_eq!(y[0], &u_0 + &u_0);
@@ -248,8 +245,7 @@ fn find_first_equal_call() {
 // find_first_equal_unary
 fn find_first_equal_unary() {
     //
-    // trace, arg_vec
-    let trace    = false;
+    // arg_vec
     let arg_vec  = vec![ ["trace", "false"] ];
     //
     // p, x, ap, ax
@@ -271,7 +267,7 @@ fn find_first_equal_unary() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), &arg_vec);
     assert_eq!( y[0], &p[0] + &p[0] );
     assert_eq!( y[1], &p[0] + &p[0] );
     assert_eq!( y[2], &p[0] * &( &p[0] + &p[0] ) ) ;
@@ -284,7 +280,7 @@ fn find_first_equal_unary() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), &arg_vec);
     assert_eq!( y[0], &p[0] + &p[0] );
     assert_eq!( y[1], &p[0] + &p[0] );
     assert_eq!( y[2], &p[0] * &( &p[0] + &p[0] ) ) ;
@@ -296,8 +292,7 @@ fn find_first_equal_unary() {
 // find_first_equal_binary
 fn find_first_equal_binary() {
     //
-    // trace, arg_vec
-    let trace    = false;
+    // arg_vec
     let arg_vec  = vec![ ["trace", "false"] ];
     //
     // p, x, ap, ax
@@ -319,7 +314,7 @@ fn find_first_equal_binary() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), &arg_vec);
     assert_eq!( y[0], FloatCore::sin( &p[0] ) );
     assert_eq!( y[1], FloatCore::sin( &p[0] ) );
     assert_eq!( y[2], FloatCore::cos( &FloatCore::sin( &p[0] ) ) );
@@ -332,7 +327,7 @@ fn find_first_equal_binary() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), &arg_vec);
     assert_eq!( y[0], FloatCore::sin( &p[0] ) );
     assert_eq!( y[1], FloatCore::sin( &p[0] ) );
     assert_eq!( y[2], FloatCore::cos( &FloatCore::sin( &p[0] ) ) );
@@ -344,8 +339,7 @@ fn find_first_equal_binary() {
 // find_equal_num_cmp()
 fn find_equal_num_cmp() {
     //
-    // trace, arg_vec
-    let trace    = false;
+    // arg_vec
     let arg_vec  = vec![ ["trace", "false"] ];
     //
     // p, x, ap, ax
@@ -364,7 +358,7 @@ fn find_equal_num_cmp() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), &arg_vec);
     assert_eq!( y[0], p[0].num_lt( x[0] ) );
     assert_eq!( y[1], y[1] );
     assert_eq!( f.dyp_dep_len(), 0 );
@@ -375,7 +369,7 @@ fn find_equal_num_cmp() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), &arg_vec);
     assert_eq!( y[0], p[0].num_lt( x[0] ) );
     assert_eq!( y[1], y[1] );
     assert_eq!( f.dyp_dep_len(), 0 );
@@ -427,7 +421,7 @@ fn an_atom_result_not_used() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (u, _u) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    let (u, _u) = f.forward_var_value(Some(&p_), x.clone(), &arg_vec);
     assert_eq!(u[0], &p[1] * &p[1] );
     //
     // n_dyp_dep, n_var_dep
@@ -447,7 +441,7 @@ fn an_atom_result_not_used() {
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (u, _u) = f.forward_var_value(Some(&p_), x.clone(), trace);
+    let (u, _u) = f.forward_var_value(Some(&p_), x.clone(), &arg_vec);
     assert_eq!(u[0], &p[1] * &p[1] );
 }
 //

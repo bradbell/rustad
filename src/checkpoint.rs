@@ -276,15 +276,14 @@ where
     //
     // name, trace
     let mut name      = "no_name";
-    let mut trace     = false;
     let mut trace_str = "false";
     for arg in arg_vec {
         match arg[0] {
             "name" => { name = arg[1]; },
             "trace" => {
                 match arg[1] {
-                    "true"  => { trace = true;  trace_str = "true"; },
-                    "false" => { trace = false; trace_str = "false"; },
+                    "true"  => { trace_str = "true"; },
+                    "false" => { trace_str = "false"; },
                     _ => panic!(
                         "for_sparse_jac arg_vec: invalid value for trace"
                     ),
@@ -309,7 +308,7 @@ where
             let (_, ax_dx)    = start_recording(None, x_dx);
             let ax            = ax_dx[0 .. nx].to_vec();
             let adx           = ax_dx[nx .. 2*nx].to_vec();
-            let (_ay, av)     = ad_fn.forward_var_ad(None, ax, trace);
+            let (_ay, av)     = ad_fn.forward_var_ad(None, ax, &arg_tmp);
             let ady           = ad_fn.forward_der_ad(None, &av, adx, &arg_tmp);
             let ad_fn_for     = stop_recording(ady);
             let name_tmp      = name.to_string() + ".forward";
@@ -326,7 +325,7 @@ where
             let (_, ax_dy)    = start_recording(None, x_dy);
             let ax            = ax_dy[0 .. nx].to_vec();
             let ady           = ax_dy[nx .. nx + ny].to_vec();
-            let (_ay, av)     = ad_fn.forward_var_ad(None, ax, trace);
+            let (_ay, av)     = ad_fn.forward_var_ad(None, ax, &arg_tmp);
             let adx           = ad_fn.reverse_der_ad(None, &av, ady, &arg_tmp);
             let ad_fn_rev     = stop_recording(adx);
             let name_tmp      = name.to_string() + ".reverse";
@@ -430,6 +429,13 @@ fn checkpoint_forward_fun_value<V>(
     // domain_clone
     let domain_clone = ref_slice2vec(domain);
     //
+    // arg_vec
+    let arg_vec : Vec<[&str; 2]> = if trace {
+        vec![ ["trace", "true"] ]
+    } else {
+        Vec::new()
+    };
+    //
     // checkpoint_id
     let checkpoint_id = call_info;
     //
@@ -440,7 +446,7 @@ fn checkpoint_forward_fun_value<V>(
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // range
-    let (range, _)        = ad_fn.forward_var_value(None, domain_clone, trace );
+    let (range, _) = ad_fn.forward_var_value(None, domain_clone, &arg_vec);
     Ok( range )
 }
 //
@@ -481,8 +487,8 @@ where
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // range_der
-    let (_, var_both)     = ad_fn.forward_var_value(None, domain_clone, trace);
-    let range_der         = ad_fn.forward_der_value(
+    let (_, var_both) = ad_fn.forward_var_value(None, domain_clone, &arg_vec);
+    let range_der     = ad_fn.forward_der_value(
         None, &var_both, domain_der_clone, &arg_vec
     );
     Ok( range_der )
@@ -521,8 +527,8 @@ where
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // domain_der
-    let (_, var_both)     = ad_fn.forward_var_value(None, domain_clone, trace);
-    let domain_der        = ad_fn.reverse_der_value(
+    let (_, var_both) = ad_fn.forward_var_value(None, domain_clone, &arg_vec);
+    let domain_der    = ad_fn.reverse_der_value(
         None, &var_both, range_der_clone, &arg_vec
     );
     Ok( domain_der )

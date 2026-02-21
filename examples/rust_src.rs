@@ -22,7 +22,6 @@ fn main () {
     //
     type V     = AzFloat<f32>;
     let nx     = 3;
-    let trace  = false;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     // ax
@@ -44,7 +43,7 @@ fn main () {
     // av
     let x  : Vec<V> = vec![ V::from(2.0); nx ];
     let (_, ax) = start_recording(None, x);
-    let (_, av) = f.forward_var_ad(None, ax, trace);
+    let (_, av) = f.forward_var_ad(None, ax, &arg_vec);
     //
     // g
     // g(x) = df/dx = [ 2 * x[0], ..., 2 * x[nx-1] ]

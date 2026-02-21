@@ -170,7 +170,7 @@ pub(crate) fn renumber_op_seq(
 /// //
 /// // check
 /// let trace   = false;
-/// let (y, _v) = f.forward_var_value(None, x.clone(), trace);
+/// let (y, _v) = f.forward_var_value(None, x.clone(), &arg_vec);
 /// assert_eq!( y[0], &x[0] + &x[0] );
 /// ```
 impl<V> ADfn<V>

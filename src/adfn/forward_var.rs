@@ -30,8 +30,8 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     (range, var_both) = f.forward_var_value(dyp_both, var_dom, trace)
-///     (range, var_both)  = f.forward_var_ad(dyp_both, var_dom, trace)
+///     (range, var_both) = f.forward_var_value(dyp_both, var_dom, &arg_vec)
+///     (range, var_both)  = f.forward_var_ad(dyp_both, var_dom, &arg_vec)
 ///   ```
 /// * Prototype :
 ///   see [ADfn::forward_var_value] and [ADfn::forward_var_ad]
@@ -51,8 +51,12 @@ use crate::{
 /// * var_dom :
 ///   This the the domain variable values.
 ///
-/// * trace :
-///   if true, a trace of the calculation is printed on stdout.
+/// * arg_vec :
+///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+///
+///   * trace
+///     The corresponding value must be true of false (default is false).
+///     If it is true, a trace of forward_var is printed on stdout.
 ///
 /// * range :
 ///   is the range vector corresponding to the
@@ -112,7 +116,7 @@ use crate::{
 /// let trace     = false;
 /// let arg_vec   = vec![ ["trace", "false"] ];
 /// let dyp_both  = f.forward_dyp_value(p.clone(), &arg_vec);
-/// let (y, _v)   = f.forward_var_value( Some(&dyp_both), x.clone(), trace);
+/// let (y, _v)   = f.forward_var_value( Some(&dyp_both), x.clone(), &arg_vec);
 /// //
 /// // check
 /// let p_sum = ( np * (np + 1) ) / 2;
@@ -144,9 +148,26 @@ macro_rules! forward_var {
             &self,
             dyp_both    : Option< &Vec<$E> > ,
             var_dom     : Vec<$E>            ,
-            trace       : bool               ,
+            arg_vec     : &Vec<[&str; 2]>    ,
         ) -> ( Vec<$E> , Vec<$E> )
         {
+            // trace
+            let mut trace = false;
+            for arg in arg_vec {
+                match arg[0] {
+                    "trace" => {
+                        match arg[1] {
+                            "true"  => { trace = true; },
+                            "false" => { trace = false; },
+                            _ => { panic!(
+                            "forward_var arg_vec: invalid value for trace"
+                            ); }
+                        }
+                    },
+                    _ => panic!("forward_var arg_vec: invalid key"),
+                }
+            }
+            //
             assert_eq!(
                 var_dom.len(), self.var.n_dom,
                 "f.forward_var: var_dom vector length does not match f"

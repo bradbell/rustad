@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 /*
 This atomic example uses all the possible AtomCallback function.
 The sumsq_forward_der_ad and reverse_forward_der_ad callbacks each
@@ -116,6 +116,7 @@ fn register_sumsq_atom()-> IndexT {
 // main
 // -------------------------------------------------------------------------
 fn main() {
+    let trace             = false;
     let sumsq_atom_id     = register_sumsq_atom();
     let for_sumsq_atom_id = for_atom::register_for_sumsq_atom();
     let rev_sumsq_atom_id = rev_atom::register_rev_sumsq_atom();
@@ -126,7 +127,6 @@ fn main() {
         atom_id_vec.push( rev_sumsq_atom_id );
         call_info
     } );
-    let trace         = false;
     //
     tests::callback_forward_fun_value(sumsq_atom_id, call_info, trace);
     tests::callback_forward_fun_ad(sumsq_atom_id,    call_info, trace);

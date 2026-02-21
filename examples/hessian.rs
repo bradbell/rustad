@@ -20,7 +20,6 @@ fn example_hessian () {
     //
     type V     = AzFloat<f32>;
     let nx     = 3;
-    let trace  = false;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     // x
@@ -43,7 +42,7 @@ fn example_hessian () {
     //
     // av
     let (_, ax)  = start_recording(None, x);
-    let (_, av)  = f.forward_var_ad(None, ax, trace);
+    let (_, av)  = f.forward_var_ad(None, ax, &arg_vec);
     //
     // g
     // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
@@ -60,7 +59,7 @@ fn example_hessian () {
     }
     //
     // v, y
-    let (y, v) = g.forward_var_value(None, x, trace);
+    let (y, v) = g.forward_var_value(None, x, &arg_vec);
     for j in 0 .. nx {
         let check  = 3 * (j+2) * (j+2);
         assert_eq!( y[j], V::from(check) );
@@ -90,7 +89,6 @@ fn example_num_vec_hessian () {
     type S     = AzFloat<f64>;
     type V     = NumVec<S>;
     let nx     = 3;
-    let trace  = false;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     // x
@@ -116,7 +114,7 @@ fn example_num_vec_hessian () {
     //
     // av
     let (_, ax) = start_recording(None, x);
-    let (_, av) = f.forward_var_ad(None, ax, trace);
+    let (_, av) = f.forward_var_ad(None, ax, &arg_vec);
     //
     // g
     // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
@@ -133,7 +131,7 @@ fn example_num_vec_hessian () {
     }
     //
     // y, v
-    let (y, v)  = g.forward_var_value(None, x, trace);
+    let (y, v)  = g.forward_var_value(None, x, &arg_vec);
     for j in 0 .. nx {
         //
         let check  = 3 * (j+1) * (j+1);
