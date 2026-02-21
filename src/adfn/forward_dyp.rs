@@ -79,7 +79,7 @@ macro_rules! forward_dyp {
             dyp_dom     : Vec<$E>         ,
             arg_vec     : &Vec<[&str; 2]> ,
         ) -> Vec<$E>
-        {   // dyp_dom
+        {
             // trace
             let mut trace = false;
             for arg in arg_vec {
@@ -97,6 +97,7 @@ macro_rules! forward_dyp {
                 }
             }
             //
+            // dyp_dom
             assert_eq!(
                 dyp_dom.len(), self.dyp.n_dom,
                 "f.forward_dyp: dyp_dom vector length does not match f"

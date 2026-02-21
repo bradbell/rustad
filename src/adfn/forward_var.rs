@@ -30,8 +30,8 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     (range, var_both) = f.forward_var_value(dyp_both, var_dom, &arg_vec)
-///     (range, var_both)  = f.forward_var_ad(dyp_both, var_dom, &arg_vec)
+///     (range, var_both) = f.forward_var_value(dyp_both, var_dom, arg_vec)
+///     (range, var_both)  = f.forward_var_ad(dyp_both, var_dom, arg_vec)
 ///   ```
 /// * Prototype :
 ///   see [ADfn::forward_var_value] and [ADfn::forward_var_ad]

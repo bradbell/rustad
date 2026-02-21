@@ -14,7 +14,7 @@ use rustad::{
 type V = AzFloat<f32>;
 //
 fn heaviside() {
-    // trace
+    // arg_vec
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     // ax
@@ -67,7 +67,7 @@ fn heaviside() {
 }
 //
 fn abs() {
-    // trace
+    // arg_vec
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     // ax

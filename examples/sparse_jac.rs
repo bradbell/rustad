@@ -16,7 +16,7 @@ type V = AzFloat<f64>;
 //
 fn main () {
     //
-    // n, m, trace
+    // n, m, arg_vec
     let n          = 5;
     let m          = n - 1;
     let arg_vec : Vec<[&str; 2]> = Vec::new();
