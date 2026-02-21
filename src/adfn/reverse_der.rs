@@ -103,7 +103,7 @@ use crate::{
 /// let arg_vec    = vec![ ["trace", "false"] ];
 /// let p          = vec![ V::from(2.0), V::from(3.0) ];
 /// let x          = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
-/// let dyp        = f.forward_dyp_value(p.clone(), trace);
+/// let dyp        = f.forward_dyp_value(p.clone(), &arg_vec);
 /// let (y, var)   = f.forward_var_value(Some(&dyp), x.clone(), trace);
 /// let dy         = vec![ V::from(1.0) ];
 /// let dx         = f.reverse_der_value(Some(&dyp), &var, dy, &arg_vec);

@@ -39,7 +39,7 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     dom_der = f.subgraph_der(dyp_both, &var_both, row_index, trace)
+///     dom_der = f.subgraph_der(dyp_both, &var_both, row_index, arg_vec)
 ///   ```
 ///
 /// * V : see [doc_generic_v]

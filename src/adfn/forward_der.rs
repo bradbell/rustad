@@ -104,7 +104,7 @@ use crate::{
 /// let arg_vec : Vec<[&str; 2]> = Vec::new();
 /// let p      : Vec<V> = vec![ V::from(2.0), V::from(3.0) ];
 /// let x      : Vec<V> = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
-/// let dyp             = f.forward_dyp_value(p, trace);
+/// let dyp             = f.forward_dyp_value(p, &arg_vec);
 /// let (y, var)        = f.forward_var_value(Some(&dyp), x, trace);
 /// let dx     : Vec<V> = vec![ V::from(1.0), V::from(0.0), V::from(0.0) ];
 /// let dy              = f.forward_der_value(Some(&dyp), &var, dx, &arg_vec);

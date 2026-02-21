@@ -29,8 +29,8 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     dyp_both = f.forward_dyp_value(dyp_dom, trace)
-///     dyp_both = f.forward_dyp_ad(dyp_dom, trace)
+///     dyp_both = f.forward_dyp_value(dyp_dom, arg_vec)
+///     dyp_both = f.forward_dyp_ad(dyp_dom, arg_vec)
 ///   ```
 /// * Prototype :
 ///   see [ADfn::forward_dyp_value] and [ADfn::forward_dyp_ad]
@@ -40,8 +40,12 @@ use crate::{
 ///
 /// * f : is an [ADfn] object.
 ///
-/// * trace :
-///   if true, a trace of the calculation is printed on stdout.
+/// * arg_vec :
+///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+///
+///   * trace
+///     The corresponding value must be true of false (default is false).
+///     If it is true, a trace of forward_dyp is printed on stdout.
 ///
 /// * dyp_dom :
 ///   specifies the domain space dynamic parameter values.
@@ -72,10 +76,27 @@ macro_rules! forward_dyp {
         )]
         pub fn [< forward_dyp_ $suffix >] (
             &self,
-            dyp_dom     : Vec<$E>   ,
-            trace       : bool      ,
+            dyp_dom     : Vec<$E>         ,
+            arg_vec     : &Vec<[&str; 2]> ,
         ) -> Vec<$E>
         {   // dyp_dom
+            // trace
+            let mut trace = false;
+            for arg in arg_vec {
+                match arg[0] {
+                    "trace" => {
+                        match arg[1] {
+                            "true"  => { trace = true; },
+                            "false" => { trace = false; },
+                            _ => { panic!(
+                            "forward_dyp arg_vec: invalid value for trace"
+                            ); }
+                        }
+                    },
+                    _ => panic!("forward_dyp arg_vec: invalid key"),
+                }
+            }
+            //
             assert_eq!(
                 dyp_dom.len(), self.dyp.n_dom,
                 "f.forward_dyp: dyp_dom vector length does not match f"
@@ -184,8 +205,8 @@ mod tests {
         let f  = stop_recording(ay);
         //
         // dyp_both
-        let trace = false;
-        let dyp_both = f.forward_dyp_value(p.clone(), trace);
+        let arg_vec  : Vec<[&str; 2]> = Vec::new();
+        let dyp_both = f.forward_dyp_value(p.clone(), &arg_vec);
         //
         assert_eq!( dyp_both.len(), 2 * np - 1 );
         for j in 0 .. np {

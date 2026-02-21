@@ -98,8 +98,7 @@ use crate::{
 /// let ay = vec![ &ap_sum * &ax_sum ];
 /// let f  = stop_recording(ay);
 /// //
-/// // trace, p, x
-/// let trace           = false;
+/// // p, x
 /// let mut p : Vec<V> = Vec::new();
 /// for j in 1 .. np+1 {
 ///     p.push(V::from(j));
@@ -110,8 +109,10 @@ use crate::{
 /// }
 /// //
 /// // y = f(p, x)
-/// let dyp_both      = f.forward_dyp_value(p.clone(), trace);
-/// let (y, var_both) = f.forward_var_value( Some(&dyp_both), x.clone(), trace);
+/// let trace     = false;
+/// let arg_vec   = vec![ ["trace", "false"] ];
+/// let dyp_both  = f.forward_dyp_value(p.clone(), &arg_vec);
+/// let (y, _v)   = f.forward_var_value( Some(&dyp_both), x.clone(), trace);
 /// //
 /// // check
 /// let p_sum = ( np * (np + 1) ) / 2;

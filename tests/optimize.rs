@@ -25,8 +25,9 @@ type W = AzFloat<f32>;
 // compress_cop
 fn compress_cop() {
     //
-    // trace, n_repeat
+    // trace, arg_vec, n_repeat
     let trace    = false;
+    let arg_vec  = vec![ ["trace", "false"] ];
     let n_repeat = 5;
     //
     // four, p, x, ap, ax
@@ -57,7 +58,7 @@ fn compress_cop() {
     assert_eq!( 2, n_cop);
     //
     // y
-    let p_both       = f.forward_dyp_value(p.clone(), trace);
+    let p_both       = f.forward_dyp_value(p.clone(), &arg_vec);
     let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), trace);
     //
     // check
@@ -74,8 +75,9 @@ fn compress_cop() {
 // compress_dyp
 fn compress_dyp() {
     //
-    // trace, n_repeat
+    // trace, arg_vec, n_repeat
     let trace    = false;
+    let arg_vec  = vec![ ["trace", "false"] ];
     let n_repeat = 5;
     //
     // four, p, x, ap, ax
@@ -107,7 +109,7 @@ fn compress_dyp() {
     assert_eq!(2, n_dyp);
     //
     // y
-    let p_both       = f.forward_dyp_value(p.clone(), trace);
+    let p_both       = f.forward_dyp_value(p.clone(), &arg_vec);
     let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), trace);
     //
     // check
@@ -124,8 +126,9 @@ fn compress_dyp() {
 // compress_var
 fn compress_var() {
     //
-    // trace, n_repeat
+    // trace, arg_vec, n_repeat
     let trace    = false;
+    let arg_vec  = vec![ ["trace", "false"] ];
     let n_repeat = 5;
     //
     // four, p, x, ap, ax
@@ -159,7 +162,7 @@ fn compress_var() {
     assert_eq!(3, n_var);
     //
     // y
-    let p_both       = f.forward_dyp_value(p.clone(), trace);
+    let p_both       = f.forward_dyp_value(p.clone(), &arg_vec);
     let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), trace);
     //
     // check
@@ -176,8 +179,9 @@ fn compress_var() {
 // find_first_equal_call
 fn find_first_equal_call() {
     //
-    // trace
-    let trace = false;
+    // trace, arg_vec
+    let trace   = false;
+    let arg_vec = vec![ ["trace", "false"] ];
     //
     // eye_atom_id, call_info
     let eye_atom_id = atom_test::register_eye::<V>();
@@ -218,7 +222,7 @@ fn find_first_equal_call() {
     let mut f = stop_recording(ay);
     //
     // check f
-    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
     let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
     let u_0     = &p[0] + &p[0];
     let u_1     = &p[1] * &p[1];
@@ -231,7 +235,7 @@ fn find_first_equal_call() {
     f.optimize(trace);
     //
     // check f
-    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
     let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
     let u_0     = &p[0] + &p[0];
     let u_1     = &p[1] * &p[1];
@@ -244,8 +248,9 @@ fn find_first_equal_call() {
 // find_first_equal_unary
 fn find_first_equal_unary() {
     //
-    // trace
-    let trace = false;
+    // trace, arg_vec
+    let trace    = false;
+    let arg_vec  = vec![ ["trace", "false"] ];
     //
     // p, x, ap, ax
     let p    = vec![ W::from(2.0) ];
@@ -265,7 +270,7 @@ fn find_first_equal_unary() {
     let mut f  = stop_recording(ay);
     //
     // check f
-    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
     let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
     assert_eq!( y[0], &p[0] + &p[0] );
     assert_eq!( y[1], &p[0] + &p[0] );
@@ -278,7 +283,7 @@ fn find_first_equal_unary() {
     f.optimize(trace);
     //
     // check f
-    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
     let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
     assert_eq!( y[0], &p[0] + &p[0] );
     assert_eq!( y[1], &p[0] + &p[0] );
@@ -291,8 +296,9 @@ fn find_first_equal_unary() {
 // find_first_equal_binary
 fn find_first_equal_binary() {
     //
-    // trace
-    let trace = false;
+    // trace, arg_vec
+    let trace    = false;
+    let arg_vec  = vec![ ["trace", "false"] ];
     //
     // p, x, ap, ax
     let p    = vec![ V::from(2.0) ];
@@ -312,7 +318,7 @@ fn find_first_equal_binary() {
     let mut f  = stop_recording(ay);
     //
     // check f
-    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
     let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
     assert_eq!( y[0], FloatCore::sin( &p[0] ) );
     assert_eq!( y[1], FloatCore::sin( &p[0] ) );
@@ -325,7 +331,7 @@ fn find_first_equal_binary() {
     f.optimize(trace);
     //
     // check f
-    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
     let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
     assert_eq!( y[0], FloatCore::sin( &p[0] ) );
     assert_eq!( y[1], FloatCore::sin( &p[0] ) );
@@ -338,8 +344,9 @@ fn find_first_equal_binary() {
 // find_equal_num_cmp()
 fn find_equal_num_cmp() {
     //
-    // trace
-    let trace = false;
+    // trace, arg_vec
+    let trace    = false;
+    let arg_vec  = vec![ ["trace", "false"] ];
     //
     // p, x, ap, ax
     let p        = vec![ W::from(2.0) ];
@@ -356,7 +363,7 @@ fn find_equal_num_cmp() {
     let mut f  = stop_recording(ay);
     //
     // check f
-    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
     let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
     assert_eq!( y[0], p[0].num_lt( x[0] ) );
     assert_eq!( y[1], y[1] );
@@ -367,7 +374,7 @@ fn find_equal_num_cmp() {
     f.optimize(trace);
     //
     // check f
-    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
     let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), trace);
     assert_eq!( y[0], p[0].num_lt( x[0] ) );
     assert_eq!( y[1], y[1] );
@@ -378,8 +385,9 @@ fn find_equal_num_cmp() {
 // an_atom_result_not_used
 fn an_atom_result_not_used() {
     //
-    // trace
-    let trace = false;
+    // trace, arg_vec
+    let trace    = false;
+    let arg_vec  = vec![ ["trace", "false"] ];
     //
     // eye_atom_id, call_info
     let eye_atom_id = atom_test::register_eye::<V>();
@@ -418,7 +426,7 @@ fn an_atom_result_not_used() {
     let mut f = stop_recording(au);
     //
     // check f
-    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
     let (u, _u) = f.forward_var_value(Some(&p_), x.clone(), trace);
     assert_eq!(u[0], &p[1] * &p[1] );
     //
@@ -438,7 +446,7 @@ fn an_atom_result_not_used() {
     assert_eq!( n_var_dep, 0);
     //
     // check f
-    let p_      = f.forward_dyp_value(p.clone(), trace);
+    let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
     let (u, _u) = f.forward_var_value(Some(&p_), x.clone(), trace);
     assert_eq!(u[0], &p[1] * &p[1] );
 }

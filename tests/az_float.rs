@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 use rustad::{
     AzFloat,
@@ -74,8 +74,8 @@ fn test_forward_dyp() {
     let f  = stop_recording(ay);
     //
     // dyp_both
-    let trace = false;
-    let dyp_both = f.forward_dyp_value(p.clone(), trace);
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let dyp_both = f.forward_dyp_value(p.clone(), &arg_vec);
     //
     assert_eq!( dyp_both.len(), 2 * np - 1 );
     for j in 0 .. np {
