@@ -130,12 +130,26 @@ pub(crate) fn renumber_op_seq(
 // ADfn::optimize
 /// Reduce the number of operations in an ADfn object.
 ///
+/// * Syntax :
+/// ```text
+///     f.optimize(arg_vec)
+/// ```
+///
+/// * V : see [doc_generic_v](crate::doc_generic_v)
+/// * f : is an [ADfn] object
+///
+/// * arg_vec :
+///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+///
+///   * trace
+///     The corresponding value must be true of false (default is false).
+///     If it is true, a trace of forward_der is printed on stdout.
+///
 /// # Example
 /// ```
 /// use rustad::start_recording;
 /// use rustad::stop_recording;
-/// type V      = rustad::AzFloat<f32>;
-/// let  trace  = false;
+/// type V       = rustad::AzFloat<f32>;
 /// let  x      = vec![ V::from(2.0), V::from(3.0) ];
 /// let (_, ax) = start_recording(None, x.clone());
 /// let _atimes = &ax[0] * &ax[0]; // second dependent variable (not used)
@@ -147,13 +161,15 @@ pub(crate) fn renumber_op_seq(
 /// // x[0] + x[0] and x[0] * x[0] are in original version of f.
 /// assert_eq!( f.var_dep_len(), 2 );
 /// //
-/// f.optimize(trace);
+/// let  arg_vec : Vec<[&str; 2]> = Vec::new();
+/// f.optimize(&arg_vec);
 /// //
 /// // f.var_dep_len
 /// // only x[0] + x[0] is in optimized version of f.
 /// assert_eq!( f.var_dep_len(), 1 );
 /// //
 /// // check
+/// let trace   = false;
 /// let (y, _v) = f.forward_var_value(None, x.clone(), trace);
 /// assert_eq!( y[0], &x[0] + &x[0] );
 /// ```
@@ -163,8 +179,25 @@ where
         GlobalAtomCallbackVecPublic + GlobalOpInfoVecPublic,
 {   //
     // optimize
-    pub fn optimize(&mut self, trace : bool)
+    pub fn optimize(&mut self, arg_vec : &Vec<[&str; 2]> )
     {   //
+        // trace
+        let mut trace = false;
+        for arg in arg_vec {
+            match arg[0] {
+                "trace" => {
+                    match arg[1] {
+                        "true"  => { trace = true; },
+                        "false" => { trace = false; },
+                        _ => { panic!(
+                        "forward_der arg_vec: invalid value for trace"
+                        ); }
+                    }
+                },
+                _ => panic!("forward_der arg_vec: invalid key"),
+            }
+        }
+        //
         // depend
         let mut depend = self.reverse_depend(trace);
         //

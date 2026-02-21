@@ -53,7 +53,7 @@ fn compress_cop() {
     //
     // f, n_cop
     // one version of repeated constant in computation pulse the Nan
-    f.optimize(trace);
+    f.optimize(&arg_vec);
     let n_cop = f.cop_len();
     assert_eq!( 2, n_cop);
     //
@@ -104,7 +104,7 @@ fn compress_dyp() {
     //
     // f, n_dyp
     // one dynamic parameter in computation plus domain dyp
-    f.optimize(trace);
+    f.optimize(&arg_vec);
     let n_dyp = f.dyp_len();
     assert_eq!(2, n_dyp);
     //
@@ -155,7 +155,7 @@ fn compress_var() {
     //
     // f, n_dyp
     // two variable in computation plus domain variable
-    f.optimize(trace);
+    f.optimize(&arg_vec);
     let n_dyp = f.dyp_len();
     let n_var = f.var_len();
     assert_eq!(1, n_dyp);
@@ -232,7 +232,7 @@ fn find_first_equal_call() {
     assert_eq!( f.var_dep_len(), 0 );
     //
     // f
-    f.optimize(trace);
+    f.optimize(&arg_vec);
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
@@ -280,7 +280,7 @@ fn find_first_equal_unary() {
     assert_eq!( f.var_dep_len(), 0 );
     //
     // f
-    f.optimize(trace);
+    f.optimize(&arg_vec);
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
@@ -328,7 +328,7 @@ fn find_first_equal_binary() {
     assert_eq!( f.var_dep_len(), 0 );
     //
     // f
-    f.optimize(trace);
+    f.optimize(&arg_vec);
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
@@ -371,7 +371,7 @@ fn find_equal_num_cmp() {
     assert_eq!( f.var_dep_len(), 2 );
     //
     // f
-    f.optimize(trace);
+    f.optimize(&arg_vec);
     //
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
@@ -437,7 +437,7 @@ fn an_atom_result_not_used() {
     assert_eq!( n_var_dep, 2); // y[0], y[1]
     //
     // optimize
-    f.optimize(trace);
+    f.optimize(&arg_vec);
     //
     // n_dyp_dep, n_var_dep
     let n_dyp_dep = f.dyp_dep_len();
