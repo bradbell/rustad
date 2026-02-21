@@ -84,7 +84,7 @@ fn main () {
     //
     // jacobian
     let jacobian = f.rev_sparse_jac_value(
-        None, &var_both, &pattern, &color_vec, trace
+        None, &var_both, &pattern, &color_vec, &arg_vec
     );
     //
     // col_major

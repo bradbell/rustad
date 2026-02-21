@@ -32,10 +32,10 @@ use crate::{
 /// * Syntax :
 ///   ```text
 ///     jacobian = f.rev_sparse_jac_value(
-///         dyp_both, &var_both, &sub_pattern, &color_vec, trace
+///         dyp_both, &var_both, &sub_pattern, &color_vec, arg_vec
 ///     )
 ///     jacobian = f.rev_sparse_jac_ad(
-///         dyp_both, &var_both, &sub_pattern, &color_vec, trace
+///         dyp_both, &var_both, &sub_pattern, &color_vec, arg_vec
 ///     )
 ///   ```
 ///
@@ -70,8 +70,12 @@ use crate::{
 ///   This is a coloring corresponding to the transpose of the Jacobian matrix
 ///   for f evalued on the subset specified by *sub_pattern*.
 ///
-/// * trace :
-///   if true, a trace of the calculations is printed on stdout.
+/// * arg_vec :
+///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+///
+///   * trace
+///     The corresponding value must be true of false (default is false).
+///     If it is true, a trace of rev_sparse_jac is printed on stdout.
 ///
 /// * jacobian :
 ///   The return is the transpose of the Jacobian on the
@@ -102,9 +106,26 @@ macro_rules! rev_sparse_jac {
             var_both     : &Vec<$E>            ,
             sub_pattern  : &SparsityPattern    ,
             color_vec    : &[usize]            ,
-            trace        : bool                ,
+            arg_vec      : &Vec<[&str; 2]>     ,
         ) -> Vec<$E>
         {   //
+            // trace
+            let mut trace = false;
+            for arg in arg_vec {
+                match arg[0] {
+                    "trace" => {
+                        match arg[1] {
+                            "true"  => { trace = true; },
+                            "false" => { trace = false; },
+                            _ => { panic!(
+                            "rev_sparse_jac arg_vec: invalid value for trace"
+                            ); }
+                        }
+                    },
+                    _ => panic!("rev_sparse_jac arg_vec: invalid key"),
+                }
+            }
+            //
             // arg_vec
             let arg_vec = if trace {
                 vec![ ["trace", "true" ] ]
