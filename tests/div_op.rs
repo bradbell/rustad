@@ -34,7 +34,7 @@ fn test_div_pv() {
     assert_eq!( dy[1].minus(), dx[1] * V::from(5.0) / (x[1] * x[1]) );
     //
     let dy           = vec![ V::from(8.0), V::from(9.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     assert_eq!( dx[0].minus(), dy[0] * V::from(4.0) / (x[0] * x[0]) );
     assert_eq!( dx[1].minus(), dy[1] * V::from(5.0) / (x[1] * x[1]) );
 }
@@ -63,7 +63,7 @@ fn test_div_vp() {
     assert_eq!( dy[1], dx[1] / V::from(5.0) );
     //
     let dy           = vec![ V::from(8.0), V::from(9.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     assert_eq!( dx[0], dy[0] / V::from(4.0) );
     assert_eq!( dx[1], dy[1] / V::from(5.0) );
 }
@@ -90,7 +90,7 @@ fn test_div_vv() {
     check_nearly_eq::<V>( &dy[0], &check, &arg_vec );
     //
     let dy           = vec![ V::from(8.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     assert_eq!( dx[0],          dy[0] / x[1] );
     assert_eq!( dx[1].minus(),  dy[0] * x[0] / (x[1] * x[1]) );
 }

@@ -32,7 +32,7 @@ fn test_sub_vv() {
     assert_eq!( dy[1], dx[1] - dx[2] );
     //
     let dy : Vec<V>  = vec![ V::from(7.0), V::from(8.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
     assert_eq!( dx[0], dy[0] );
     assert_eq!( dx[1], dy[1] - dy[0] );
@@ -64,7 +64,7 @@ fn test_sub_vc() {
     assert_eq!( dy[1], dx[1] );
     //
     let dy : Vec<V>  = vec![ V::from(7.0), V::from(8.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
     assert_eq!( dx[0], dy[0] );
     assert_eq!( dx[1], dy[1] );
@@ -95,7 +95,7 @@ fn test_sub_cv() {
     assert_eq!( dy[1], V::from(0) - dx[0] );
     //
     let dy : Vec<V>  = vec![ V::from(7.0), V::from(8.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
     // 2DO: Replace with unary minuse when defined for V
     assert_eq!( dx[0], V::from(0) - dy[1] );

@@ -327,7 +327,7 @@ where
             let ax            = ax_dy[0 .. nx].to_vec();
             let ady           = ax_dy[nx .. nx + ny].to_vec();
             let (_ay, av)     = ad_fn.forward_var_ad(None, ax, trace);
-            let adx           = ad_fn.reverse_der_ad(None, &av, ady, trace);
+            let adx           = ad_fn.reverse_der_ad(None, &av, ady, &arg_tmp);
             let ad_fn_rev     = stop_recording(adx);
             let name_tmp      = name.to_string() + ".reverse";
             arg_tmp.push( ["name", &name_tmp] );
@@ -499,6 +499,12 @@ where
     V : Clone + From<f32> + std::fmt::Display,
     V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FloatCore + ThisThreadTape,
 {   //
+    // arg_vec
+    let arg_vec = if trace {
+        vec![ ["trace", "true" ] ]
+    } else {
+        vec![ ["trace", "false" ] ]
+    };
     // domain_clone
     let domain_clone = ref_slice2vec(domain);
     //
@@ -517,7 +523,7 @@ where
     // domain_der
     let (_, var_both)     = ad_fn.forward_var_value(None, domain_clone, trace);
     let domain_der        = ad_fn.reverse_der_value(
-        None, &var_both, range_der_clone, trace
+        None, &var_both, range_der_clone, &arg_vec
     );
     Ok( domain_der )
 }

@@ -75,7 +75,7 @@ fn no_ad_derivative() {
     //
     // g.reverse_der_value
     let dy      : Vec<V> = vec![ V::from(5.0) ];
-    let dx               = g.reverse_der_value(None, &v , dy.clone(), trace);
+    let dx               = g.reverse_der_value(None, &v , dy.clone(), &arg_vec);
     assert_eq!( dx[0], V::from(2.0) * x[0]*dy[0] );
     assert_eq!( dx[1], V::from(2.0) * x[1]*dy[0] );
     //
@@ -144,6 +144,7 @@ fn reverse_ad_derivative() {
         ["trace", "false"  ],
     ];
     let checkpoint_id  = register_checkpoint(f, &directions, &arg_vec);
+    let arg_vec        = vec![ ["trace", "false"] ];
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
@@ -157,7 +158,7 @@ fn reverse_ad_derivative() {
     let ady          = ad_from_vector(dy.clone());
     let (_, ax)      = start_recording(None, x);
     let (_ay, av)    = g.forward_var_ad(None, ax, trace);
-    let adx          = g.reverse_der_ad(None, &av , ady, trace);
+    let adx          = g.reverse_der_ad(None, &av , ady, &arg_vec);
     let h            = stop_recording(adx);
     let x   : Vec<V> = vec![ V::from(7.0) , V::from(8.0) ];
     let (dx, _v)     = h.forward_var_value(None, x.clone(), trace);

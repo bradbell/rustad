@@ -31,7 +31,7 @@ fn test_abs() {
     }
     //
     let dy           = vec![ V::from(5.0), V::from(6.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
     for j in 0 .. 2 {
         let temp  = FloatCore::signum( &x[j] ) * dy[j];
@@ -59,7 +59,7 @@ fn test_cos() {
     assert_eq!( dy[0], FloatCore::minus(&temp) );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
     let temp         = FloatCore::sin( &x[0] ) * dy[0];
     assert_eq!( dx[0], FloatCore::minus(&temp) );
@@ -84,7 +84,7 @@ fn test_exp() {
     assert_eq!( dy[0], FloatCore::exp( &x[0] ) * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
     assert_eq!( dx[0], FloatCore::exp( &x[0] ) * dy[0] );
 }
@@ -108,7 +108,7 @@ fn test_minus() {
     assert_eq!( dy[0].to_inner(), - dx[0].to_inner() );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
     assert_eq!( dx[0].to_inner(), - dy[0].to_inner() );
 }
@@ -132,7 +132,7 @@ fn test_signum() {
     assert_eq!( dy[0], FloatCore::zero() );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
     assert_eq!( dx[0], FloatCore::zero() );
 }
@@ -156,7 +156,7 @@ fn test_sin() {
     assert_eq!( dy[0], FloatCore::cos( &x[0] ) * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), trace);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
     assert_eq!( dx[0], FloatCore::cos( &x[0] ) * dy[0] );
 }

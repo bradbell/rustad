@@ -105,6 +105,12 @@ macro_rules! rev_sparse_jac {
             trace        : bool                ,
         ) -> Vec<$E>
         {   //
+            // arg_vec
+            let arg_vec = if trace {
+                vec![ ["trace", "true" ] ]
+            } else {
+                vec![ ["trace", "false" ] ]
+            };
             // n
             let m = self.rng_len();
             debug_assert!( m == color_vec.len() );
@@ -149,7 +155,7 @@ macro_rules! rev_sparse_jac {
                 }
                 // dom_der
                 let dom_der = self. [< reverse_der_ $suffix >](
-                    dyp_both, &var_both, range_der, trace
+                    dyp_both, &var_both, range_der, &arg_vec
                 );
                 //
                 let [mut j, mut i] = sub_pattern[ order[index] ];

@@ -23,6 +23,7 @@ fn main () {
     type V     = AzFloat<f32>;
     let nx     = 3;
     let trace  = false;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     // ax
     let x  : Vec<V> = vec![ V::from(2.0); nx ];
@@ -49,7 +50,7 @@ fn main () {
     // g(x) = df/dx = [ 2 * x[0], ..., 2 * x[nx-1] ]
     let dy  : Vec<V>  = vec![ V::from(1.0) ];
     let ady           = ad_from_vector(dy);
-    let adx           = f.reverse_der_ad(None, &av, ady, trace);
+    let adx           = f.reverse_der_ad(None, &av, ady, &arg_vec);
     let g             = stop_recording(adx);
     //
     // lib_src
