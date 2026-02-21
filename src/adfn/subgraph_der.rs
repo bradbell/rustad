@@ -52,9 +52,12 @@ use crate::{
 ///   is the index in the range vector that are computing the derivative for;
 ///   row_index < f.rng_len() .
 ///
-/// * trace :
-///   If this is true, a trace of the calculation
-///   is printed on standard output.
+/// * arg_vec :
+///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+///
+///   * trace
+///     The corresponding value must be true of false (default is false).
+///     If it is true, a trace of subgraph_der is printed on stdout.
 ///
 /// * dom_der :
 ///   The return value *dom_der* is the gradient of the *row_index*
@@ -71,8 +74,9 @@ use crate::{
 /// // V
 /// type V = rustad::AzFloat<f32>;
 /// //
-/// // trace, n, x
+/// // trace, arg_vec, n, x
 /// let trace      = false;
+/// let arg_vec    = vec![ ["trace", "false"] ];
 /// let n          = 5;
 /// let x          = vec![ V::from(1); n];
 /// //
@@ -89,8 +93,8 @@ use crate::{
 /// let row_index = n / 2;
 /// //
 /// // dom_der
-/// let (_y, varboth) = f.forward_var_value(None, x.clone(), trace);
-/// let dom_der       = f.subgraph_der_value(None, &varboth, row_index, trace);
+/// let (_y, v) = f.forward_var_value(None, x.clone(), trace);
+/// let dom_der = f.subgraph_der_value(None, &v, row_index, &arg_vec);
 /// //
 /// // check
 /// for j in 1 .. n {
@@ -124,9 +128,26 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
         dyp_both  : Option< &Vec<$E> >  ,
         var_both  : &Vec<$E>            ,
         row_index : usize               ,
-        trace     : bool                ,
+        arg_vec   : &Vec<[&str; 2]>     ,
     ) -> Vec<$E>
     {   //
+        // trace
+        let mut trace = false;
+        for arg in arg_vec {
+            match arg[0] {
+                "trace" => {
+                    match arg[1] {
+                        "true"  => { trace = true; },
+                        "false" => { trace = false; },
+                        _ => { panic!(
+                        "subgraph_der arg_vec: invalid value for trace"
+                        ); }
+                    }
+                },
+                _ => panic!("subgraph_der arg_vec: invalid key"),
+            }
+        }
+        //
         // dyp_both
         let dyp_both : &Vec<$E> = if dyp_both.is_none() {
             &Vec::new()
