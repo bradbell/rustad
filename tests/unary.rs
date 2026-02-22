@@ -63,6 +63,29 @@ fn test_cos() {
     assert_eq!( dx[0], FloatCore::minus(&temp) );
 }
 //
+// test_cosh
+fn test_cosh() {
+    type V      = AzFloat<f64>;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    //
+    let x  : Vec<V>  = vec![ V::from(2.0) ];
+    //
+    let (_, ax)      = start_recording(None,  x.clone() );
+    let ay           = vec! [ FloatCore::cosh( &ax[0] ) ];
+    let f            = stop_recording(ay);
+    //
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let dx           = vec![ V::from(3.0) ];
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    //
+    assert_eq!( dy[0], FloatCore::sinh( &x[0] ) * dx[0] );
+    //
+    let dy           = vec![ V::from(4.0) ];
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    //
+    assert_eq!( dx[0], FloatCore::sinh( &x[0] ) * dy[0] );
+}
+//
 // test_exp
 fn test_exp() {
     type V      = AzFloat<f64>;
@@ -154,12 +177,37 @@ fn test_sin() {
     //
     assert_eq!( dx[0], FloatCore::cos( &x[0] ) * dy[0] );
 }
+//
+// test_sinh
+fn test_sinh() {
+    type V      = AzFloat<f64>;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    //
+    let x  : Vec<V>  = vec![ V::from(2.0) ];
+    //
+    let (_, ax)      = start_recording(None,  x.clone() );
+    let ay           = vec! [ FloatCore::sinh( &ax[0] ) ];
+    let f            = stop_recording(ay);
+    //
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let dx           = vec![ V::from(3.0) ];
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    //
+    assert_eq!( dy[0], FloatCore::cosh( &x[0] ) * dx[0] );
+    //
+    let dy           = vec![ V::from(4.0) ];
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    //
+    assert_eq!( dx[0], FloatCore::cosh( &x[0] ) * dy[0] );
+}
 #[test]
 fn unary() {
     test_abs();
     test_cos();
+    test_cosh();
     test_exp();
     test_minus();
     test_signum();
     test_sin();
+    test_sinh();
 }

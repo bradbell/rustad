@@ -25,6 +25,12 @@ pub trait FloatCore {
     fn min_positive() -> Self;
     // ------------------------------------------------------------------------
     // unary functions
+    //
+    // sinh
+    fn sinh(&self) -> Self;
+    //
+    // cosh
+    fn cosh(&self) -> Self;
     // ------------------------------------------------------------------------
     fn abs(&self) -> Self;
     fn exp(&self) -> Self;

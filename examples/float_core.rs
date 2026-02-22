@@ -8,10 +8,7 @@ fn main() {
         NumVec,
         AD,
         FloatCore,
-        check_nearly_eq,
     };
-    // arg_vec
-    let arg_vec = vec![ ["assert", "true"] ];
     //
     // ----------------------------------------------------------------------
     // No Arguments
@@ -70,7 +67,7 @@ fn main() {
         let exp_3        = FloatCore::exp( &V::from(3.0) );
         let exp_minus_3  = FloatCore::exp( &V::from(-3.0) );
         let prod         = exp_3 * exp_minus_3;
-        check_nearly_eq::<V>(&prod, &one, &arg_vec);
+        assert_eq!(prod, one);
     }
     // minus
     {   type V = AzFloat<f64>;
@@ -84,6 +81,16 @@ fn main() {
         let cos_0        = FloatCore::cos( &V::from(0.0) );
         assert_eq!( cos_0, FloatCore::one() );
     }
+    // cosh
+    {   type V = AzFloat<f64>;
+        let two         = V::from(2.0);
+        let cosh_2      = FloatCore::cosh( &two );
+        //
+        let exp_2       = two.exp();
+        let exp_minus_2 = two.minus().exp();
+        let check       = ( exp_2 + exp_minus_2 ) / two;
+        assert_eq!(cosh_2, check);
+    }
     // signum
     {   type V = AzFloat<f32>;
         let minus_1      = V::from( -1.0 );
@@ -95,6 +102,16 @@ fn main() {
         let pi       = V::from(3.14159265358979323846264338327950288419716939);
         let pi_2     = pi / V::from(2);
         let sin_pi_2 = pi_2.sin();
-        check_nearly_eq::<V>(&sin_pi_2, &FloatCore::one(), &arg_vec);
+        assert_eq!(sin_pi_2, FloatCore::one());
+    }
+    // sinh
+    {   type V = AzFloat<f64>;
+        let two         = V::from(2.0);
+        let sinh_2      = FloatCore::sinh( &two );
+        //
+        let exp_2       = two.exp();
+        let exp_minus_2 = two.minus().exp();
+        let check       = ( exp_2 - exp_minus_2 ) / two;
+        assert_eq!(sinh_2, check);
     }
 }

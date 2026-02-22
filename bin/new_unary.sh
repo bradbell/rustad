@@ -4,14 +4,18 @@ set -e -u
 # SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 # SPDX-FileContributor: 2026 Bradley M. Bell
 # -----------------------------------------------------------------------------
-# TODO: edit info.rs and src/op/mod.rs
-#
-# name
-echo 'Warning, this will git reset --hard: use control-C to abort'
-read -p 'Input name of new unary function: ' name
-mv bin/new_unary.sh new_unary.tmp
-git reset --hard
-mv new_unary.tmp bin/new_unary.sh
+if [ $# != 1 ]
+then
+   echo 'bin/new_unary.sh name'
+   echo 'where name is the name of the new unary function; e.g., sin'
+   exit 1
+fi
+name="$1"
+if [ -e "src/op/unary/$name.rs" ]
+then
+   echo "new_unary.sh: aborting because src/op/unary/$name.rs already exists"
+   exit 1
+fi
 #
 # NAME
 NAME=$(echo $name | tr [a-z] [A-Z])

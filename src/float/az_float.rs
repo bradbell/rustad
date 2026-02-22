@@ -509,6 +509,8 @@ macro_rules! impl_float_core{ ($B:ident) => {
         fn min_positive() -> Self { Self( $B::MIN_POSITIVE ) }
         //
         // unary functions
+        fn sinh(&self) -> Self { Self( self.0.sinh() ) }
+        fn cosh(&self) -> Self { Self( self.0.cosh() ) }
         fn abs(&self) -> Self { Self( self.0.abs() ) }
         fn signum(&self) -> Self { Self( self.0.signum() ) }
         fn exp(&self) -> Self { Self( self.0.exp() ) }
