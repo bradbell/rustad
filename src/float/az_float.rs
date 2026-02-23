@@ -502,9 +502,10 @@ impl_hash_trait!(f64);
 /// * B : is the floating point base type
 macro_rules! impl_float_core{ ($B:ident) => {
     impl FloatCore for AzFloat<$B> {
+        fn pi()           -> Self { Self( std::$B::consts::PI ) }
         fn nan()          -> Self { Self( $B::NAN ) }
-        fn zero()         -> Self { Self( 0 as $B ) }
         fn one()          -> Self { Self( 1 as $B ) }
+        fn zero()         -> Self { Self( 0 as $B ) }
         fn epsilon()      -> Self { Self( $B::EPSILON ) }
         fn min_positive() -> Self { Self( $B::MIN_POSITIVE ) }
         //

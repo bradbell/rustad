@@ -83,9 +83,10 @@ impl<V> FloatCore for AD<V>
 where
     V : Clone + FloatCore + ThisThreadTape,
 {
+    fn pi()            -> Self { AD::<V>::from( V::pi() ) }
     fn nan()           -> Self { AD::<V>::from( V::nan() ) }
-    fn zero()          -> Self { AD::<V>::from( V::zero() ) }
     fn one()           -> Self { AD::<V>::from( V::one() ) }
+    fn zero()          -> Self { AD::<V>::from( V::zero() ) }
     fn epsilon()       -> Self { AD::<V>::from( V::epsilon() ) }
     fn min_positive()  -> Self { AD::<V>::from( V::min_positive() ) }
     //

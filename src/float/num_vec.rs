@@ -552,9 +552,10 @@ where
     S         : FloatCore + From<f32>,
     NumVec<S> : From<S>
 {
+    fn pi()           -> Self { Self::from( S::pi() ) }
     fn nan()          -> Self { Self::from( S::nan() ) }
-    fn zero()         -> Self { Self::from( S::zero() ) }
     fn one()          -> Self { Self::from( S::one() ) }
+    fn zero()         -> Self { Self::from( S::zero() ) }
     fn epsilon()      -> Self{ Self::from( S::epsilon() ) }
     fn min_positive() -> Self{ Self::from( S::min_positive() ) }
     //

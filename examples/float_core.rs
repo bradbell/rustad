@@ -14,6 +14,12 @@ fn main() {
     // ----------------------------------------------------------------------
     // No Arguments
     // ----------------------------------------------------------------------
+    // pi
+    {   type V      = AzFloat<f64>;
+        let pi : V  = FloatCore::pi();
+        let check   = V::from(3.14159265358979323846264338327950288);
+        assert_eq!(pi, check);
+    }
     // nan
     {   type V      = AzFloat<f32>;
         let nan : V = FloatCore::nan();
@@ -22,18 +28,18 @@ fn main() {
         // f32 defines nan as not equal to nan
         assert_ne!( nan.to_inner(), nan.to_inner() )
     }
+    // one
+    {   type V          = AzFloat<f32>;
+        let one : AD<V> = FloatCore::one();
+        let two : AD<V> = V::from(2).into();
+        assert_eq!( V::from(2), ( &two * &one).to_value() );
+    }
     // zero
     {   type S       = AzFloat<f64>;
         type V       = NumVec<S>;
         let zero : V = FloatCore::zero();
         let two  : V = NumVec::from( S::from(2) );
         assert_eq!( two, &two + &zero );
-    }
-    // one
-    {   type V          = AzFloat<f32>;
-        let one : AD<V> = FloatCore::one();
-        let two : AD<V> = V::from(2).into();
-        assert_eq!( V::from(2), ( &two * &one).to_value() );
     }
     // epsilon
     {   type V      = AzFloat<f64>;
@@ -100,7 +106,7 @@ fn main() {
     }
     // sin
     {   type V = AzFloat<f64>;
-        let pi       = V::from(3.14159265358979323846264338327950288419716939);
+        let pi : V   = FloatCore::pi();
         let pi_2     = pi / V::from(2);
         let sin_pi_2 = pi_2.sin();
         assert_eq!(sin_pi_2, FloatCore::one());
@@ -124,7 +130,7 @@ fn main() {
     }
     // tan
     {   type V = AzFloat<f32>;
-        let pi       = V::from(3.14159265358979323846264338327950288419716939);
+        let pi : V   = FloatCore::pi();
         let pi_4     = pi / V::from(4);
         let tan_pi_4 = FloatCore::tan( &pi_4 );
         assert_eq!(tan_pi_4, FloatCore::one());

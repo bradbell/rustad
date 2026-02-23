@@ -18,10 +18,11 @@ pub trait FloatCore {
     // ------------------------------------------------------------------------
     // No Arguments
     // ------------------------------------------------------------------------
-    fn nan()  -> Self;
-    fn zero() -> Self;
-    fn one()  -> Self;
-    fn epsilon() -> Self;
+    fn pi()           -> Self;
+    fn nan()          -> Self;
+    fn one()          -> Self;
+    fn zero()         -> Self;
+    fn epsilon()      -> Self;
     fn min_positive() -> Self;
     // ------------------------------------------------------------------------
     // unary functions
