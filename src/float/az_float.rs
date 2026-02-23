@@ -509,6 +509,7 @@ macro_rules! impl_float_core{ ($B:ident) => {
         fn min_positive() -> Self { Self( $B::MIN_POSITIVE ) }
         //
         // unary functions
+        fn sqrt(&self) -> Self { Self( self.0.sqrt() ) }
         fn tanh(&self) -> Self { Self( self.0.tanh() ) }
         fn tan(&self) -> Self { Self( self.0.tan() ) }
         fn sinh(&self) -> Self { Self( self.0.sinh() ) }

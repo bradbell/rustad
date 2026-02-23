@@ -494,6 +494,7 @@ where
     crate::op::binary::num_cmp::set_op_info::<V>(&mut result);
     //
     // unary operators
+    crate::op::unary::sqrt::set_op_info::<V>(&mut result);
     crate::op::unary::tanh::set_op_info::<V>(&mut result);
     crate::op::unary::tan::set_op_info::<V>(&mut result);
     crate::op::unary::sinh::set_op_info::<V>(&mut result);

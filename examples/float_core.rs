@@ -115,6 +115,13 @@ fn main() {
         let check       = ( exp_2 - exp_minus_2 ) / two;
         assert_eq!(sinh_2, check);
     }
+    // sqrt
+    {   type V = AzFloat<f64>;
+        let two         = V::from(2.0);
+        let four        = V::from(4.0);
+        let sqrt_4      = FloatCore::sqrt( &four);
+        assert_eq!(sqrt_4, two);
+    }
     // tan
     {   type V = AzFloat<f32>;
         let pi       = V::from(3.14159265358979323846264338327950288419716939);

@@ -104,7 +104,7 @@ sed -f temp.sed src/op/unary/sin.rs > src/op/unary/$name.rs
 cat << EOF
 src/op/unary/$name.rs: Fix ${name}_forward_der and ${name}_reverse_der
 src/float/az_float.rs: Check implementation of fn $name(&self) -> Self
-src/float/core.rs: Add an example for $name function values.
+examples/float_core.rs: Add an example for $name function values.
 test/unary.rs: Add a test for $name derivatives.
 EOF
 #

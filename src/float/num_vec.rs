@@ -559,6 +559,7 @@ where
     fn min_positive() -> Self{ Self::from( S::min_positive() ) }
     //
     // unary functions
+    impl_unary_float_core!(sqrt);
     impl_unary_float_core!(tanh);
     impl_unary_float_core!(tan);
     impl_unary_float_core!(sinh);

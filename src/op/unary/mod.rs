@@ -8,6 +8,7 @@
 // ---------------------------------------------------------------------------
 // sub-modules
 pub mod common;
+pub mod sqrt;
 pub mod tanh;
 pub mod tan;
 pub mod sinh;
