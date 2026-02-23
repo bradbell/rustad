@@ -24,9 +24,8 @@ NAME=$(echo $name | tr [a-z] [A-Z])
 file='src/float/core.rs'
 cat << EOF > temp.sed
 /^    [/][/] unary functions/! b end
+N
 s|\$|\\
-    //\\
-    // $name\\
     fn $name(\\&self) -> Self;|
 : end
 EOF

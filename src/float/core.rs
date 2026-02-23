@@ -26,10 +26,8 @@ pub trait FloatCore {
     fn min_positive() -> Self;
     // ------------------------------------------------------------------------
     // unary functions
-    //
-    // sqrt
+    // ------------------------------------------------------------------------
     fn sqrt(&self) -> Self;
-    //
     fn tanh(&self) -> Self;
     fn tan(&self) -> Self;
     fn sinh(&self) -> Self;
