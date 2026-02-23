@@ -26,12 +26,10 @@ pub trait FloatCore {
     // ------------------------------------------------------------------------
     // unary functions
     //
-    // sinh
+    fn tanh(&self) -> Self;
+    fn tan(&self) -> Self;
     fn sinh(&self) -> Self;
-    //
-    // cosh
     fn cosh(&self) -> Self;
-    // ------------------------------------------------------------------------
     fn abs(&self) -> Self;
     fn exp(&self) -> Self;
     fn minus(&self) -> Self;

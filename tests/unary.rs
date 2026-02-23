@@ -7,6 +7,7 @@ use rustad::{
     AzFloat,
     start_recording,
     stop_recording,
+    check_nearly_eq,
 };
 //
 // test_abs
@@ -200,6 +201,57 @@ fn test_sinh() {
     //
     assert_eq!( dx[0], FloatCore::cosh( &x[0] ) * dy[0] );
 }
+//
+// test_tan
+fn test_tan() {
+    type V      = AzFloat<f64>;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    //
+    let x  : Vec<V>  = vec![ V::from(2.0) ];
+    //
+    let (_, ax)      = start_recording(None,  x.clone() );
+    let ay           = vec! [ FloatCore::tan( &ax[0] ) ];
+    let f            = stop_recording(ay);
+    //
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let dx           = vec![ V::from(3.0) ];
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    //
+    let cos          = FloatCore::cos( &x[0] );
+    let sec_sq       = V::from(1.0) / ( cos * cos );
+    assert_eq!( dy[0], sec_sq * dx[0] );
+    //
+    let dy           = vec![ V::from(4.0) ];
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    //
+    assert_eq!( dx[0], sec_sq *  dy[0] );
+}
+//
+// test_tanh
+fn test_tanh() {
+    type V      = AzFloat<f64>;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    //
+    let x  : Vec<V>  = vec![ V::from(2.0) ];
+    //
+    let (_, ax)      = start_recording(None,  x.clone() );
+    let ay           = vec! [ FloatCore::tanh( &ax[0] ) ];
+    let f            = stop_recording(ay);
+    //
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let dx           = vec![ V::from(3.0) ];
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    //
+    let cosh         = FloatCore::cosh( &x[0] );
+    let sech_sq      = V::from(1.0) / ( cosh * cosh );
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    check_nearly_eq::<V>( &dy[0], &(sech_sq * dx[0]), &arg_vec );
+    //
+    let dy           = vec![ V::from(4.0) ];
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    //
+    check_nearly_eq::<V>( &dx[0], &(sech_sq *  dy[0]), &arg_vec);
+}
 #[test]
 fn unary() {
     test_abs();
@@ -210,4 +262,6 @@ fn unary() {
     test_signum();
     test_sin();
     test_sinh();
+    test_tan();
+    test_tanh();
 }

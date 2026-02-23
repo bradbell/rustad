@@ -8,6 +8,7 @@ fn main() {
         NumVec,
         AD,
         FloatCore,
+        check_nearly_eq,
     };
     //
     // ----------------------------------------------------------------------
@@ -113,5 +114,21 @@ fn main() {
         let exp_minus_2 = two.minus().exp();
         let check       = ( exp_2 - exp_minus_2 ) / two;
         assert_eq!(sinh_2, check);
+    }
+    // tan
+    {   type V = AzFloat<f32>;
+        let pi       = V::from(3.14159265358979323846264338327950288419716939);
+        let pi_4     = pi / V::from(4);
+        let tan_pi_4 = FloatCore::tan( &pi_4 );
+        assert_eq!(tan_pi_4, FloatCore::one());
+    }
+    // tanh
+    {   type V = AzFloat<f32>;
+        let tanh_2      = V::from(2.0).tanh();
+        let exp_2       = V::from(2.0).exp();
+        let exp_minus_2 = V::from(-2.0).exp();
+        let check       = (exp_2 - exp_minus_2) / (exp_2 + exp_minus_2);
+        let arg_vec : Vec<[&str; 2]> = Vec::new();
+        check_nearly_eq::<V>(&tanh_2, &check, &arg_vec);
     }
 }

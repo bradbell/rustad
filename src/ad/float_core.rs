@@ -90,6 +90,8 @@ where
     fn min_positive()  -> Self { AD::<V>::from( V::min_positive() ) }
     //
     // unary functions
+    impl_unary_float_core!(tanh);
+    impl_unary_float_core!(tan);
     impl_unary_float_core!(sinh);
     impl_unary_float_core!(cosh);
     impl_unary_float_core!(abs);

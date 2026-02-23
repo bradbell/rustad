@@ -44,6 +44,10 @@ macro_rules! set_operator_ids {
 // This ensures that the number of operators is less that u8::MAX.
 set_operator_ids!(
     // Unary Operators
+    /// tanh
+    TANH_OP,
+    /// tan
+    TAN_OP,
     /// sinh
     SINH_OP,
     /// cosh
