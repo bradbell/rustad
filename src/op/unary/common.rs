@@ -120,34 +120,34 @@ macro_rules! rust_src { ($name:ident) => { paste::paste! {
         debug_assert!( res_type == arg_type[0] );
         debug_assert!( res_type.is_dynamic() || res_type.is_variable());
         //
-        let lhs_str : String;
-        let rhs_str : String;
+        let res_str : String;
+        let arg_str : String;
         if res_type.is_dynamic() {
             debug_assert!( dyp_n_dom <= res );
             let res  = res - dyp_n_dom;
-            lhs_str  = format!("dyp_dom[{res}]");
+            res_str  = format!("dyp_dep[{res}]");
             if index < dyp_n_dom {
-                rhs_str = format!("dyp_dom[{index}]");
+                arg_str = format!("dyp_dom[{index}]");
             } else {
                 index  -= dyp_n_dom;
-                rhs_str = format!("dyp_dep[{index}]");
+                arg_str = format!("dyp_dep[{index}]");
             }
         } else {
             debug_assert!( var_n_dom <= res );
             let res  = res - var_n_dom;
-            lhs_str  = format!("var_dom[{res}]");
+            res_str  = format!("var_dep[{res}]");
             if index < var_n_dom {
-                rhs_str = format!("var_dom[{index}]");
+                arg_str = format!("var_dom[{index}]");
             } else {
                 index  -= var_n_dom;
-                rhs_str = format!("var_dep[{index}]");
+                arg_str = format!("var_dep[{index}]");
             }
         }
-        let rhs_str = rhs_str + stringify!($name) + "()";
         //
         // src
         let src = String::from("   ");
-        let src = src + &lhs_str + " = " + &rhs_str + ";\n";
+        let src = src + &res_str + " = ";
+        let src = src + &arg_str + "." + stringify!($name) + "();\n";
         src
     }
 }}}
