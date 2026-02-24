@@ -26,9 +26,9 @@ use std::ops::{
 };
 //
 use crate::{
+    FloatCore,
     NumCmp,
 };
-use super::core::FloatCore;
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
 ///
