@@ -38,4 +38,8 @@ pub trait FloatCore {
     fn cos(&self) -> Self;
     fn signum(&self) -> Self;
     fn sin(&self) -> Self;
+    // ------------------------------------------------------------------------
+    // binary functions
+    // ------------------------------------------------------------------------
+    fn powi(&self, rhs : i32) -> Self;
 }

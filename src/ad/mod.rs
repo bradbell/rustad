@@ -44,7 +44,7 @@ pub(crate) enum ADType {
     Variable,
     //
     // Empty
-    /// This is used for the case where there is no information in this value
+    /// This is used for the case where this is not an AD object.
     Empty,
 }
 impl ADType {
@@ -64,6 +64,10 @@ impl ADType {
     /// is a variable
     pub fn is_variable(&self) -> bool
     {   *self == ADType::Variable }
+    //
+    /// not an AD object
+    pub fn is_empty(&self) -> bool
+    {   *self == ADType::Empty }
 }
 ///
 #[test]

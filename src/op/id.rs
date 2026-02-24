@@ -107,6 +107,9 @@ set_operator_ids!(
     /// variable / variable
     DIV_VV_OP,
     //
+    /// lhs powi rhs
+    POWI_OP,
+    //
     /// lhs lt rhs
     LT_OP,
     /// lhs le rhs

@@ -521,6 +521,9 @@ macro_rules! impl_float_core{ ($B:ident) => {
         fn minus(&self) -> Self { Self( - self.0 ) }
         fn cos(&self) -> Self { Self( self.0.cos() ) }
         fn sin(&self) -> Self { Self( self.0.sin() ) }
+        //
+        // binary functions
+        fn powi(&self, rhs : i32) -> Self{ Self( self.0.powi(rhs) ) }
     }
 }}
 impl_float_core!(f32);

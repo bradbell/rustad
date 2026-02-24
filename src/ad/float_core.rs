@@ -102,4 +102,68 @@ where
     impl_unary_float_core!(minus);
     impl_unary_float_core!(cos);
     impl_unary_float_core!(sin);
+    //
+    // powi
+    fn powi(&self, rhs : i32) -> Self {
+        //
+        // record
+        fn record<V : FloatCore>(
+            tape : &mut Tape<V> ,
+            arg  : &AD<V>       ,
+            rhs  : i32          ,
+        ) -> AD<V> {
+            //
+            // new_value
+            let new_value = arg.value.powi(rhs);
+            //
+            // new_tape_id, new_index, new_ad_type
+            let mut new_tape_id   = 0;
+            let mut new_index     = 0;
+            let mut new_ad_type   = ADType::ConstantP;
+            if (! tape.recording) || (arg.tape_id != tape.tape_id) {
+                return AD::new(new_tape_id, new_index, new_ad_type, new_value);
+            }
+            debug_assert!( arg.ad_type != ADType::ConstantP );
+            //
+            // new_tape_id, new_ad_type
+            new_tape_id = tape.tape_id;
+            new_ad_type = arg.ad_type.clone();
+            //
+            // op_seq
+            let op_seq = if new_ad_type == ADType::Variable {
+                &mut tape.var
+            } else {
+                &mut tape.dyp
+            };
+            //
+            // new_index
+            new_index = op_seq.n_dep + op_seq.n_dom;
+            //
+            // op_seq: n_dep, arg_start, arg_type, id_all
+            op_seq.id_all.push( id::POWI_OP );
+            op_seq.n_dep += 1;
+            op_seq.arg_start.push( op_seq.arg_all.len() as IndexT );
+            op_seq.arg_all.push( arg.index as IndexT );
+            if rhs >= 0 {
+                op_seq.arg_all.push( rhs as IndexT );
+                op_seq.arg_all.push( 0 );
+            } else {
+                op_seq.arg_all.push( - rhs as IndexT );
+                op_seq.arg_all.push( 1 );
+            }
+            op_seq.arg_type_all.push( new_ad_type.clone() );
+            op_seq.arg_type_all.push( ADType::Empty );
+            op_seq.arg_type_all.push( ADType::Empty );
+            //
+            AD::new(new_tape_id, new_index, new_ad_type, new_value)
+        }
+        //
+        // local_key
+        let local_key : &LocalKey<RefCell< Tape<V> >> = ThisThreadTape::get();
+        //
+        // result
+        local_key.with_borrow_mut(
+            |tape| record(tape, self, rhs)
+        )
+    }
 }

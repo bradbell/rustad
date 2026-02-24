@@ -144,4 +144,13 @@ fn main() {
         let arg_vec : Vec<[&str; 2]> = Vec::new();
         check_nearly_eq::<V>(&tanh_2, &check, &arg_vec);
     }
+    // ----------------------------------------------------------------------
+    // powi
+    {   type S = AzFloat<f64>;
+        type V = NumVec<S>;
+        let pair        = V::new( vec![ S::from(2), S::from(3) ] );
+        let pair_pow_2  = pair.powi(2);
+        assert_eq!( pair_pow_2.get(0), S::from(4) );
+        assert_eq!( pair_pow_2.get(1), S::from(9) );
+    }
 }

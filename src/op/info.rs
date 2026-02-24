@@ -484,13 +484,12 @@ where
         reverse_depend     : panic_reverse_depend,
     };
     let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
+    //
+    // binary operators
     crate::op::binary::add::set_op_info::<V>(&mut result);
     crate::op::binary::sub::set_op_info::<V>(&mut result);
     crate::op::binary::mul::set_op_info::<V>(&mut result);
     crate::op::binary::div::set_op_info::<V>(&mut result);
-    //
-    crate::op::call::set_op_info::<V>(&mut result);
-    crate::op::no_op::set_op_info::<V>(&mut result);
     crate::op::binary::num_cmp::set_op_info::<V>(&mut result);
     //
     // unary operators
@@ -505,6 +504,12 @@ where
     crate::op::unary::minus::set_op_info::<V>(&mut result);
     crate::op::unary::cos::set_op_info::<V>(&mut result);
     crate::op::unary::sin::set_op_info::<V>(&mut result);
+    //
+    // call, no_op, powi
+    crate::op::call::set_op_info::<V>(&mut result);
+    crate::op::no_op::set_op_info::<V>(&mut result);
+    crate::op::powi::set_op_info::<V>(&mut result);
+    //
     result
 }
 // ---------------------------------------------------------------------------

@@ -552,6 +552,7 @@ where
     S         : FloatCore + From<f32>,
     NumVec<S> : From<S>
 {
+    // no arguments
     fn pi()           -> Self { Self::from( S::pi() ) }
     fn nan()          -> Self { Self::from( S::nan() ) }
     fn one()          -> Self { Self::from( S::one() ) }
@@ -571,4 +572,15 @@ where
     impl_unary_float_core!(minus);
     impl_unary_float_core!(cos);
     impl_unary_float_core!(sin);
+    //
+    // powi
+    fn powi(&self, rhs : i32) -> Self {
+        if self.len() == 1 {
+            Self { s : self.s.powi(rhs) , vec : Vec::new() }
+        } else {
+            let v = self.vec.iter().map( |s| s.powi(rhs) ).collect();
+            Self { s : f32::NAN.into() , vec : v }
+        }
+    }
+
 }
