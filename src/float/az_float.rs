@@ -497,34 +497,43 @@ macro_rules! impl_hash_trait{ ($B:ident) => {
 impl_hash_trait!(f32);
 impl_hash_trait!(f64);
 // ----------------------------------------------------------------------------
+macro_rules! float_core_unary_function{ ($B:ident, $name:ident) => {
+    #[doc = concat!(
+        "`AzFloat<", stringify!($B), ">`.", stringify!($name), "()"
+    )]
+    fn $name(&self) -> AzFloat<$B> { Self( self.0.$name() ) }
+} }
 /// FloatCore trait for az_float types
 ///
 /// * B : is the floating point base type
 macro_rules! impl_float_core{ ($B:ident) => {
     impl FloatCore for AzFloat<$B> {
-        fn pi()           -> Self { Self( std::$B::consts::PI ) }
-        fn nan()          -> Self { Self( $B::NAN ) }
-        fn one()          -> Self { Self( 1 as $B ) }
-        fn zero()         -> Self { Self( 0 as $B ) }
-        fn epsilon()      -> Self { Self( $B::EPSILON ) }
-        fn min_positive() -> Self { Self( $B::MIN_POSITIVE ) }
+        fn pi()           -> AzFloat<$B> { Self( std::$B::consts::PI ) }
+        fn nan()          -> AzFloat<$B> { Self( $B::NAN ) }
+        fn one()          -> AzFloat<$B> { Self( 1 as $B ) }
+        fn zero()         -> AzFloat<$B> { Self( 0 as $B ) }
+        fn epsilon()      -> AzFloat<$B> { Self( $B::EPSILON ) }
+        fn min_positive() -> AzFloat<$B> { Self( $B::MIN_POSITIVE ) }
         //
         // unary functions
-        fn sqrt(&self) -> Self { Self( self.0.sqrt() ) }
-        fn tanh(&self) -> Self { Self( self.0.tanh() ) }
-        fn tan(&self) -> Self { Self( self.0.tan() ) }
-        fn sinh(&self) -> Self { Self( self.0.sinh() ) }
-        fn cosh(&self) -> Self { Self( self.0.cosh() ) }
-        fn abs(&self) -> Self { Self( self.0.abs() ) }
-        fn signum(&self) -> Self { Self( self.0.signum() ) }
-        fn exp(&self) -> Self { Self( self.0.exp() ) }
-        fn minus(&self) -> Self { Self( - self.0 ) }
-        fn cos(&self) -> Self { Self( self.0.cos() ) }
-        fn sin(&self) -> Self { Self( self.0.sin() ) }
+        float_core_unary_function!($B, sqrt);
+        float_core_unary_function!($B, tanh);
+        float_core_unary_function!($B, tan);
+        float_core_unary_function!($B, sinh);
+        float_core_unary_function!($B, cosh);
+        float_core_unary_function!($B, abs);
+        float_core_unary_function!($B, signum);
+        float_core_unary_function!($B, exp);
+        float_core_unary_function!($B, cos);
+        float_core_unary_function!($B, sin);
+        //
+        // unary function that implements differently
+        #[doc = concat!( "`AzFloat<", stringify!($B), ">`.minus()" )]
+        fn minus(&self) -> AzFloat<$B> { Self( - self.0 ) }
         //
         // binary functions
-        fn powi(&self, rhs : i32) -> Self{ Self( self.0.powi(rhs) ) }
+        fn powi(&self, rhs : i32) -> AzFloat<$B>{ Self( self.0.powi(rhs) ) }
     }
-}}
+} }
 impl_float_core!(f32);
 impl_float_core!(f64);

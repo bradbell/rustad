@@ -36,7 +36,7 @@ file='src/float/az_float.rs'
 cat << EOF > temp.sed
 /^        [/][/] unary functions/! b end
 s|\$|\\
-        fn $name(\\&self) -> Self { Self( self.0.$name() ) }|
+        float_core_unary_function!(\$B, $name);
 : end
 EOF
 sed -i $file -f temp.sed

@@ -536,7 +536,8 @@ where
  }
 // ---------------------------------------------------------------------------
 macro_rules! impl_unary_float_core{ ($name:ident) => {
-    fn $name(&self) -> Self {
+    #[ doc = concat!( "`NumVec<S>.`", stringify!($name), "()" )]
+    fn $name(&self) -> NumVec<S> {
         if self.len() == 1 {
             Self { s : self.s.$name() , vec : Vec::new() }
         } else {
@@ -553,12 +554,12 @@ where
     NumVec<S> : From<S>
 {
     // no arguments
-    fn pi()           -> Self { Self::from( S::pi() ) }
-    fn nan()          -> Self { Self::from( S::nan() ) }
-    fn one()          -> Self { Self::from( S::one() ) }
-    fn zero()         -> Self { Self::from( S::zero() ) }
-    fn epsilon()      -> Self{ Self::from( S::epsilon() ) }
-    fn min_positive() -> Self{ Self::from( S::min_positive() ) }
+    fn pi()           -> NumVec<S> { Self::from( S::pi() ) }
+    fn nan()          -> NumVec<S> { Self::from( S::nan() ) }
+    fn one()          -> NumVec<S> { Self::from( S::one() ) }
+    fn zero()         -> NumVec<S> { Self::from( S::zero() ) }
+    fn epsilon()      -> NumVec<S> { Self::from( S::epsilon() ) }
+    fn min_positive() -> NumVec<S> { Self::from( S::min_positive() ) }
     //
     // unary functions
     impl_unary_float_core!(sqrt);
@@ -574,6 +575,7 @@ where
     impl_unary_float_core!(sin);
     //
     // powi
+    /// `NumVec<S>`.powi(`i32`)
     fn powi(&self, rhs : i32) -> Self {
         if self.len() == 1 {
             Self { s : self.s.powi(rhs) , vec : Vec::new() }

@@ -21,8 +21,8 @@ use crate::tape::sealed::ThisThreadTape;
 use crate::op::id;
 // ---------------------------------------------------------------------------
 macro_rules! impl_unary_float_core{ ($name:ident) => { paste::paste! {
-    #[doc = concat!( "& `AD<V>.`", stringify!( $name ), "()")]
-    fn $name(&self) -> Self {
+    #[doc = concat!( "`AD<V>.`", stringify!( $name ), "()")]
+    fn $name(&self) -> AD<V> {
         //
         // record
         fn record<V : FloatCore>(
@@ -83,12 +83,12 @@ impl<V> FloatCore for AD<V>
 where
     V : Clone + FloatCore + ThisThreadTape,
 {
-    fn pi()            -> Self { AD::<V>::from( V::pi() ) }
-    fn nan()           -> Self { AD::<V>::from( V::nan() ) }
-    fn one()           -> Self { AD::<V>::from( V::one() ) }
-    fn zero()          -> Self { AD::<V>::from( V::zero() ) }
-    fn epsilon()       -> Self { AD::<V>::from( V::epsilon() ) }
-    fn min_positive()  -> Self { AD::<V>::from( V::min_positive() ) }
+    fn pi()            -> AD<V> { AD::<V>::from( V::pi() ) }
+    fn nan()           -> AD<V> { AD::<V>::from( V::nan() ) }
+    fn one()           -> AD<V> { AD::<V>::from( V::one() ) }
+    fn zero()          -> AD<V> { AD::<V>::from( V::zero() ) }
+    fn epsilon()       -> AD<V> { AD::<V>::from( V::epsilon() ) }
+    fn min_positive()  -> AD<V> { AD::<V>::from( V::min_positive() ) }
     //
     // unary functions
     impl_unary_float_core!(sqrt);
@@ -104,7 +104,8 @@ where
     impl_unary_float_core!(sin);
     //
     // powi
-    fn powi(&self, rhs : i32) -> Self {
+    /// `AD<V>`.powi(`i32`)
+    fn powi(&self, rhs : i32) -> AD<V> {
         //
         // record
         fn record<V : FloatCore>(
