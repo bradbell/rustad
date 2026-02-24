@@ -47,7 +47,7 @@ where
     S : From<f32> + Copy,
 {   //
     /// Create a new numeric vector using the specified data
-    pub fn new( v : Vec<S> ) -> Self {
+    pub fn new( v : Vec<S> ) -> NumVec<S> {
         assert_ne!( v.len(), 0);
         if v.len() == 1 {
             Self { vec: Vec::new() , s : v[0]}
@@ -576,7 +576,7 @@ where
     //
     // powi
     /// `NumVec<S>`.powi(`i32`)
-    fn powi(&self, rhs : i32) -> Self {
+    fn powi(&self, rhs : i32) -> NumVec<S> {
         if self.len() == 1 {
             Self { s : self.s.powi(rhs) , vec : Vec::new() }
         } else {

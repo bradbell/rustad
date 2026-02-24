@@ -163,7 +163,7 @@ where
     B : From<f32> + PartialEq + Mul<Output=B>,
 {
     type Output = AzFloat<B>;
-    fn mul(self, rhs : Self) -> Self {
+    fn mul(self, rhs : Self) -> AzFloat<B> {
         let zero_b : B = 0f32.into();
         if (self.0) == zero_b || (rhs.0) == zero_b {
                 Self( zero_b )
@@ -179,7 +179,7 @@ macro_rules! impl_binary_operator{ ($Name:ident, $name:ident) =>  {
         B : From<f32> + PartialEq + $Name<Output=B>,
     {
         type Output = AzFloat<B>;
-        fn $name(self, rhs : Self) -> Self {
+        fn $name(self, rhs : Self) -> AzFloat<B> {
             Self( (self.0).$name(rhs.0) )
         }
     }
