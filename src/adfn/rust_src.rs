@@ -57,15 +57,15 @@ pub type RustSrcFn<V> = fn(
 // prototype_src
 fn prototype_src(fn_name : &str, v_str : &str) -> String {
     let mut src = String::new();
-    for name in [ "num_cmp", "core", "az_float", "num_vec" ] {
+    for name in [ "traits", "az_float", "num_vec" ] {
         src = src + "#[allow(unused)]\n" + &format!( "pub mod {name};\n" );
     }
     src = src +
         "\n" +
         "#[allow(unused)]\n" +
         "use crate::{\n" +
-        "   num_cmp::NumCmp,\n" +
-        "   core::FloatCore,\n"  +
+        "   traits::NumCmp,\n" +
+        "   traits::FloatCore,\n"  +
         "   az_float::AzFloat,\n" +
         "   num_vec::NumVec,\n" +
         "};\n" +

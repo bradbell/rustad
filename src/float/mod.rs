@@ -14,14 +14,6 @@
 // ---------------------------------------------------------------------------
 // modules
 //
-// core
-pub mod core;
-//
-// num_cmp
-pub mod num_cmp;
-//
-// az_float
+pub mod traits;
 pub mod az_float;
-//
-// num_vec
 pub mod num_vec;

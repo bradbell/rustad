@@ -92,10 +92,10 @@ pub use dll_lib::{
     get_rust_src_fn,
 };
 pub use float::{
-    core::FloatCore,
+    traits::FloatCore,
+    traits::NumCmp,
     az_float::AzFloat,
     num_vec::NumVec,
-    num_cmp::NumCmp,
 };
 pub use float_value::{
     FloatValue,
@@ -158,17 +158,11 @@ where
 /// ```
 pub const YEAR_MONTH_DAY : &str = "2026.2.25";
 //
-// CORE_RS
-/// is the source code for the [core](crate::float::core) module.
+// TRAITS_RS
+/// is the source code for the [core](crate::float::traits) module.
 /// This is needed at the beginning of a dll library that include
 /// [ADfn::rust_src] .
-pub const CORE_RS : &str = include_str!( "float/core.rs" );
-//
-// NUM_CMP_RS
-/// is the source code for the [num_cmp](crate::float::num_cmp) module.
-/// This is needed at the beginning of a dll library that include
-/// [ADfn::rust_src] .
-pub const NUM_CMP_RS : &str = include_str!( "float/num_cmp.rs" );
+pub const TRAITS_RS : &str = include_str!( "float/traits.rs" );
 //
 // AZ_FLOAT_RS
 /// is the source code for the [az_float](crate::float::az_float) module.
