@@ -95,7 +95,7 @@ pub fn doc_ad_binary_op() { }
 /// * Op : is the operator token; i.e., +, -, *, or /.
 ///
 /// see [doc_ad_binary_op]
-macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
+macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
     // -----------------------------------------------------------------------
     fn [< record_ $Name:lower _aa >]<V> (
         tape: &mut Tape<V> ,
@@ -278,7 +278,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     }
     //
     #[doc = concat!(
-        "& `AD<V>` ", stringify!($Op), " & `AD<V>`",
+        "& `AD<V>` ", stringify!($Name), " & `AD<V>`",
         "; see [doc_ad_binary_op]"
     )]
     impl<V> std::ops::$Name< &AD<V> > for &AD<V>
@@ -290,7 +290,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         fn [< $Name:lower >](self , rhs : &AD<V> ) -> AD<V>
         {
             // new_value
-            let new_value     = &self.value  $Op &rhs.value;
+            let new_value     = self.value.[< $Name:lower >] ( &rhs.value );
             //
             // local_key
             let local_key : &LocalKey< RefCell< Tape<V> > > =
@@ -308,7 +308,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     }
     //
     #[doc = concat!(
-        "`AD<V>` ", stringify!($Op), "`AD<V>`",
+        "`AD<V>` ", stringify!($Name), "`AD<V>`",
         "; see [doc_ad_binary_op]"
     )]
     impl<V> std::ops::$Name< AD<V> > for AD<V>
@@ -318,7 +318,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self , rhs : AD<V> ) -> AD<V> {
-            &self $Op &rhs
+            (&self).[< $Name:lower >] ( &rhs )
         }
     }
     // -----------------------------------------------------------------------
@@ -433,7 +433,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     }
     //
     #[doc = concat!(
-        "& `AD<V>` ", stringify!($Op), " & V`",
+        "& `AD<V>` ", stringify!($Name), " & V`",
         "; see [doc_ad_binary_op]"
     )]
     impl<V> std::ops::$Name< &V> for &AD<V>
@@ -446,7 +446,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
         fn [< $Name:lower >](self , rhs : &V ) -> AD<V>
         {
             // new_value
-            let new_value     = &self.value  $Op &rhs;
+            let new_value     = self.value.[< $Name:lower >] (rhs);
             //
             // local_key
             let local_key : &LocalKey< RefCell< Tape<V> > > =
@@ -464,7 +464,7 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     }
     //
     #[doc = concat!(
-        "`AD<V>` ", stringify!($Op), "`V`",
+        "`AD<V>` ", stringify!($Name), "`V`",
         "; see [doc_ad_binary_op]"
     )]
     impl<V> std::ops::$Name<V> for AD<V>
@@ -475,15 +475,15 @@ macro_rules! ad_binary_op { ($Name:ident, $Op:tt) => { paste::paste! {
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self , rhs : V ) -> AD<V> {
-            &self $Op &rhs
+            (&self).[< $Name:lower >] ( &rhs )
         }
     }
 } } }
 //
-ad_binary_op!(Add, +);
-ad_binary_op!(Sub, -);
-ad_binary_op!(Mul, *);
-ad_binary_op!(Div, /);
+ad_binary_op!(Add);
+ad_binary_op!(Sub);
+ad_binary_op!(Mul);
+ad_binary_op!(Div);
 // ---------------------------------------------------------------------------
 /// Compound Assignment `AD<V>` operators.
 ///
@@ -557,10 +557,10 @@ pub fn doc_ad_compound_op() { }
 /// * Op : is the operator token; i.e., +=, -=, *=, or /= .
 ///
 /// see [doc_ad_compound_op]
-macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
+macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     //
     #[doc = concat!(
-        "`AD<V>` ", stringify!($Op), " & `AD<V>`",
+        "`AD<V>` ", stringify!($Name), "Assign & `AD<V>`",
         "; see [doc_ad_compound_op]"
     )]
     impl<V> std::ops::[< $Name Assign >] < &AD<V> > for AD<V>
@@ -587,12 +587,12 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             self.index     = new_index;
             self.ad_type   = new_ad_type;
             //
-            self.value $Op &rhs.value;
+            self.value.[< $Name:lower _assign >] ( &rhs.value );
         }
     }
     //
     #[doc = concat!(
-        "`AD<V>` ", stringify!($Op), " `AD<V>`",
+        "`AD<V>` ", stringify!($Name), "Assign `AD<V>`",
         "; see [doc_ad_compound_op]"
     )]
     impl<V> std::ops::[< $Name Assign >] < AD<V> > for AD<V>
@@ -602,12 +602,12 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             crate::ThisThreadTapePublic  ,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : AD<V> ) {
-            *self $Op &rhs;
+            self.[< $Name:lower _assign >] ( &rhs );
         }
     }
     // ------------------------------------------------------------------------
     #[doc = concat!(
-        "`AD<V>` ", stringify!($Op), " & V; see [doc_ad_compound_op]"
+        "`AD<V>` ", stringify!($Name), "Assign & V; see [doc_ad_compound_op]"
     )]
     impl<V> std::ops::[< $Name Assign >] <&V> for AD<V>
     where
@@ -632,11 +632,11 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             self.index     = new_index;
             self.ad_type   = new_ad_type;
             //
-            self.value $Op &rhs;
+            self.value.[< $Name:lower _assign >] ( &rhs );
         }
     }
     #[doc = concat!(
-        "`AD<V>` ", stringify!($Op), " V; see [doc_ad_compound_op]"
+        "`AD<V>` ", stringify!($Name), "Assign V; see [doc_ad_compound_op]"
     )]
     impl<V> std::ops::[< $Name Assign >] <V> for AD<V>
     where
@@ -645,15 +645,15 @@ macro_rules! ad_compound_op { ($Name:ident, $Op:tt) => { paste::paste! {
             crate::ThisThreadTapePublic  ,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : V) {
-            *self $Op &rhs;
+            self.[< $Name:lower _assign >]( &rhs );
         }
     }
 } } }
 //
-ad_compound_op!(Add, +=);
-ad_compound_op!(Sub, -=);
-ad_compound_op!(Mul, *=);
-ad_compound_op!(Div, /=);
+ad_compound_op!(Add);
+ad_compound_op!(Sub);
+ad_compound_op!(Mul);
+ad_compound_op!(Div);
 // ---------------------------------------------------------------------------
 // record_value_op_ad!
 //
