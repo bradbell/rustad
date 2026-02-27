@@ -69,6 +69,13 @@ fn prototype_src(fn_name : &str, v_str : &str) -> String {
         "   az_float::AzFloat,\n" +
         "   num_vec::NumVec,\n" +
         "};\n" +
+        "#[allow(unused)]\n" +
+        "use std::ops::{\n" +
+        "   Add,\n" +
+        "   Sub,\n"  +
+        "   Mul,\n" +
+        "   Div,\n" +
+        "};\n" +
         "\n";
     src = src +
         "#[no_mangle]\n" +

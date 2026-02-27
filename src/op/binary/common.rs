@@ -70,7 +70,7 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
 /// [IndexT] must be defined in any module that uses eval_binary_forward_var
 macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! {
     #[doc = concat!(
-        " E evaluation of parameter ", stringify!( $op ), " parameter",
+        " E evaluation of ", stringify!($Name), "(parameter, parameter)",
         "; see [ForwardDyp](crate::op::info::ForwardDyp)"
     ) ]
     fn [< $Name:lower _forward_dyp >] <V, E> (
@@ -95,15 +95,15 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
         let lhs       = arg[0] as usize;
         let rhs       = arg[1] as usize;
         if arg_type[0].is_constant() {
-            dyp_both[ res ] = &cop[lhs] $op &dyp_both[rhs];
+            dyp_both[res] = (&cop[lhs]).[< $Name:lower >](&dyp_both[rhs]);
         } else if arg_type[1].is_constant() {
-            dyp_both[ res ] = &dyp_both[lhs] $op &cop[rhs];
+            dyp_both[res] = (&dyp_both[lhs]).[< $Name:lower >](&cop[rhs]);
         } else {
-            dyp_both[ res ] = &dyp_both[lhs] $op &dyp_both[rhs];
+            dyp_both[res] = (&dyp_both[lhs]).[< $Name:lower >](&dyp_both[rhs]);
         };
     }
     #[doc = concat!(
-        " E evaluation of parameter ", stringify!( $op ), " variable",
+        " E evaluation of ", stringify!($Name), "(parameter, variable)",
         "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _pv_forward_var >] <V, E> (
@@ -123,13 +123,13 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
         if arg_type[0].is_constant() {
-            var_both[ res ] = &cop[lhs] $op &var_both[rhs];
+            var_both[res] = (&cop[lhs]).[< $Name:lower >](&var_both[rhs]);
         } else {
-            var_both[ res ] = &dyp_both[lhs] $op &var_both[rhs];
+            var_both[res] = (&dyp_both[lhs]).[< $Name:lower >](&var_both[rhs]);
         }
     }
     #[doc = concat!(
-        " E evaluation of variable ", stringify!( $op ), " parameter",
+        " E evaluation of ", stringify!($Name), "(variable, parameter)",
         "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _vp_forward_var >] <V, E> (
@@ -149,13 +149,13 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
         if arg_type[1].is_constant() {
-            var_both[ res ] = &var_both[lhs] $op &cop[rhs];
+            var_both[res] = (&var_both[lhs]).[< $Name:lower >](&cop[rhs]);
         } else {
-            var_both[ res ] = &var_both[lhs] $op &dyp_both[rhs];
+            var_both[res] = (&var_both[lhs]).[< $Name:lower >](&dyp_both[rhs]);
         }
     }
     #[doc = concat!(
-        " E evaluation of variable ", stringify!( $op ), " variable",
+        " E evaluation of ", stringify!($Name), "(variable, variable)",
         "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $Name:lower _vv_forward_var >] <V, E> (
@@ -172,7 +172,7 @@ macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! 
         debug_assert!( arg.len() == 2);
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
-        var_both[ res ] = &var_both[lhs] $op &var_both[rhs];
+        var_both[res] = (&var_both[lhs]).[< $Name:lower >](&var_both[rhs]);
     }
 } } }
 pub(crate) use eval_binary_forward_var;
@@ -195,6 +195,10 @@ pub(crate) use eval_binary_forward_var;
 ///
 /// [IndexT] must be defined in any module that uses binary_rust_src
 macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
+    #[doc = concat!(
+        " rust source for ", stringify!( $Name ), "(parameter, parameter)",
+        "; see [RustSrc](crate::op::info::RustSrc)"
+    ) ]
     fn [< $Name:lower _pp_rust_src >]<V> (
         _not_used   : V           ,
         res_type    : ADType      ,
@@ -218,7 +222,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
             lhs_str = format!("dyp_dom[{lhs}]");
         } else {
             lhs -= dyp_n_dom;
-            lhs_str = format!("&dyp_dep[{lhs}]");
+            lhs_str = format!("(&dyp_dep[{lhs}])");
         }
         //
         // rhs_str
@@ -228,25 +232,25 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
             rhs_str = format!("dyp_dom[{rhs}]");
         } else {
             rhs -= dyp_n_dom;
-            rhs_str = format!("&dyp_dep[{rhs}]");
+            rhs_str = format!("(&dyp_dep[{rhs}])");
         }
         //
         // res_str
         let res              = res - dyp_n_dom;
         let res_str : String = format!("dyp_dep[{res}]");
         //
-        // op_str
-        let op_str  = stringify!($op);
+        // op_name
+        let op_name = stringify!( [< $Name:lower >] );
         //
         // src
         let src = String::from("   ");
         let src = src + &res_str +
-            " = " + &lhs_str + " " + op_str + " " + &rhs_str + ";\n";
+            " = " + &lhs_str + "." + op_name + "(" + &rhs_str + ");\n";
         src
     }
     #[doc = concat!(
-        " rust source code generation for parameter ", stringify!( $op ),
-        " variable; see [RustSrc](crate::op::info::RustSrc)"
+        " rust source for ", stringify!( $Name ), "(parameter, variable)",
+        "; see [RustSrc](crate::op::info::RustSrc)"
     ) ]
     fn [< $Name:lower _pv_rust_src >]<V> (
         _not_used   : V           ,
@@ -268,12 +272,12 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let mut lhs = arg[0] as usize;
         let lhs_str : String;
         if arg_type[0].is_constant() {
-            lhs_str = format!("&cop[{lhs}]");
+            lhs_str = format!("(&cop[{lhs}])");
         } else if lhs < dyp_n_dom {
             lhs_str = format!("dyp_dom[{lhs}]");
         } else {
             lhs -= dyp_n_dom;
-            lhs_str = format!("&dyp_dep[{lhs}]");
+            lhs_str = format!("(&dyp_dep[{lhs}])");
         }
         //
         // rhs_str
@@ -290,18 +294,18 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let res              = res - var_n_dom;
         let res_str : String = format!("var_dep[{res}]");
         //
-        // op_str
-        let op_str  = stringify!($op);
+        // op_name
+        let op_name = stringify!( [< $Name:lower >] );
         //
         // src
         let src = String::from("   ");
         let src = src + &res_str +
-            " = " + &lhs_str + " " + op_str + " " + &rhs_str + ";\n";
+            " = " + &lhs_str + "." + op_name + "(" + &rhs_str + ");\n";
         src
     }
     #[doc = concat!(
-        " rust source code generation for variable ", stringify!( $op ),
-        " parameter; see [RustSrc](crate::op::info::RustSrc)"
+        " rust source for ", stringify!( $Name ), "(variable, parameter)",
+        "; see [RustSrc](crate::op::info::RustSrc)"
     ) ]
     fn [< $Name:lower _vp_rust_src >]<V> (
         _not_used   : V           ,
@@ -326,7 +330,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
             lhs_str = format!("var_dom[{lhs}]");
         } else {
             lhs -= var_n_dom;
-            lhs_str = format!("&var_dep[{lhs}]");
+            lhs_str = format!("(&var_dep[{lhs}])");
         }
         //
         // rhs_str
@@ -345,18 +349,18 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let res              = res - var_n_dom;
         let res_str : String = format!("var_dep[{res}]");
         //
-        // op_str
-        let op_str  = stringify!($op);
+        // op_name
+        let op_name = stringify!( [< $Name:lower >] );
         //
         // src
         let src = String::from("   ");
         let src = src + &res_str +
-            " = " + &lhs_str + " " + op_str + " " + &rhs_str + ";\n";
+            " = " + &lhs_str + "." + op_name + "(" + &rhs_str + ");\n";
         src
     }
     #[doc = concat!(
-        " rust source code generation for variable ", stringify!( $op ),
-        " variable; see [RustSrc](crate::op::info::RustSrc)"
+        " rust source for ", stringify!( $Name ), "(variable, variable)",
+        "; see [RustSrc](crate::op::info::RustSrc)"
     ) ]
     fn [< $Name:lower _vv_rust_src >]<V> (
         _not_used   : V           ,
@@ -381,7 +385,7 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
             lhs_str = format!("var_dom[{lhs}]");
         } else {
             lhs -= var_n_dom;
-            lhs_str = format!("&var_dep[{lhs}]");
+            lhs_str = format!("(&var_dep[{lhs}])");
         }
         //
         // rhs_str
@@ -398,13 +402,13 @@ macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
         let res              = res - var_n_dom;
         let res_str : String = format!("var_dep[{res}]");
         //
-        // op_str
-        let op_str  = stringify!($op);
+        // op_name
+        let op_name = stringify!( [< $Name:lower >] );
         //
         // src
         let src = String::from("   ");
         let src = src + &res_str +
-            " = " + &lhs_str + " " + op_str + " " + &rhs_str + ";\n";
+            " = " + &lhs_str + "." + op_name + "(" + &rhs_str + ");\n";
         src
     }
 } } }
