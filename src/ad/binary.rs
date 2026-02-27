@@ -10,6 +10,12 @@
 // ---------------------------------------------------------------------------
 use std::thread::LocalKey;
 use std::cell::RefCell;
+use std::ops::{
+    Add,
+    Sub,
+    Mul,
+    Div,
+};
 //
 use crate::{
     FloatCore,
@@ -90,9 +96,8 @@ pub fn doc_ad_binary_op() { }
 //
 /// Add one binary operator to the `AD<V>` class;
 ///
-/// * V : see [doc_generic_v]
+/// * V    : see [doc_generic_v]
 /// * Name : is the operator name; i.e., Add, Sub, Mul, or Div.
-/// * Op : is the operator token; i.e., +, -, *, or /.
 ///
 /// see [doc_ad_binary_op]
 macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
@@ -281,9 +286,9 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
         "& `AD<V>` ", stringify!($Name), " & `AD<V>`",
         "; see [doc_ad_binary_op]"
     )]
-    impl<V> std::ops::$Name< &AD<V> > for &AD<V>
+    impl<V> $Name< &AD<V> > for &AD<V>
     where
-        for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
+        for<'a> &'a V: $Name<&'a V, Output=V>,
         V    : Clone + FloatCore + PartialEq + crate::ThisThreadTapePublic ,
     {   type Output = AD<V>;
         //
@@ -311,9 +316,9 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
         "`AD<V>` ", stringify!($Name), "`AD<V>`",
         "; see [doc_ad_binary_op]"
     )]
-    impl<V> std::ops::$Name< AD<V> > for AD<V>
+    impl<V> $Name< AD<V> > for AD<V>
     where
-        for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
+        for<'a> &'a V: $Name<&'a V, Output=V>,
         V    : Clone + FloatCore + PartialEq + crate::ThisThreadTapePublic ,
     {   type Output = AD<V>;
         //
@@ -436,9 +441,9 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
         "& `AD<V>` ", stringify!($Name), " & V`",
         "; see [doc_ad_binary_op]"
     )]
-    impl<V> std::ops::$Name< &V> for &AD<V>
+    impl<V> $Name< &V> for &AD<V>
     where
-        for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
+        for<'a> &'a V: $Name<&'a V, Output=V>,
         V            : Clone + FloatCore + PartialEq +
                        crate::ThisThreadTapePublic ,
     {   type Output = AD<V>;
@@ -467,9 +472,9 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
         "`AD<V>` ", stringify!($Name), "`V`",
         "; see [doc_ad_binary_op]"
     )]
-    impl<V> std::ops::$Name<V> for AD<V>
+    impl<V> $Name<V> for AD<V>
     where
-        for<'a> &'a V: std::ops::$Name<&'a V, Output=V>,
+        for<'a> &'a V: $Name<&'a V, Output=V>,
         V            : Clone + FloatCore + PartialEq +
                        crate::ThisThreadTapePublic ,
     {   type Output = AD<V>;
