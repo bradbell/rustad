@@ -10,6 +10,7 @@
 //! * E : see [doc_generic_e](crate::adfn::doc_generic_e)
 //!
 //! * [op::id](crate::op::id)
+//!     * DIV_PP_OP : parameter / parameter
 //!     * DIV_PV_OP : parameter / variable
 //!     * DIV_VP_OP : variable / parameter
 //!     * DIV_VV_OP : variable / variable
@@ -58,12 +59,12 @@ use crate::op::info::{
 // div_pv_rust_src
 // div_vp_rust_src
 // div_vv_rust_src
-common::binary_rust_src!(Div, /);
+common::binary_rust_src!(Div);
 // -------------------------------------------------------------------------
 // div_pv_forward_var
 // div_vp_forward_var
 // div_vv_forward_var
-common::eval_binary_forward_var!(Div, /);
+common::eval_binary_forward_var!(Div);
 // ---------------------------------------------------------------------------
 // forward_der
 // ---------------------------------------------------------------------------
@@ -251,7 +252,8 @@ where
 ///
 /// * op_info_vec :
 ///   The map from [op::id](crate::op::id) to operator information.
-///   The the map results for DIV_PV_OP, DIV_VP_OP, and DIV_VV_OP are set.
+///   The the map results for
+///   DIV_PP_OP, DIV_PV_OP, DIV_VP_OP, and DIV_VV_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
     for<'a> V     : SubAssign<&'a V> ,

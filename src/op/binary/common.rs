@@ -68,7 +68,7 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
 /// v (p) means the corresponding operand is a variable (parameter) .
 ///
 /// [IndexT] must be defined in any module that uses eval_binary_forward_var
-macro_rules! eval_binary_forward_var { ($Name:ident, $op:tt) => { paste::paste! {
+macro_rules! eval_binary_forward_var { ($Name:ident) => { paste::paste! {
     #[doc = concat!(
         " E evaluation of ", stringify!($Name), "(parameter, parameter)",
         "; see [ForwardDyp](crate::op::info::ForwardDyp)"
@@ -194,7 +194,7 @@ pub(crate) use eval_binary_forward_var;
 /// v (p) means the corresponding operand is a variable (parameter) .
 ///
 /// [IndexT] must be defined in any module that uses binary_rust_src
-macro_rules! binary_rust_src { ($Name:ident, $op:tt) => { paste::paste! {
+macro_rules! binary_rust_src { ($Name:ident) => { paste::paste! {
     #[doc = concat!(
         " rust source for ", stringify!( $Name ), "(parameter, parameter)",
         "; see [RustSrc](crate::op::info::RustSrc)"
