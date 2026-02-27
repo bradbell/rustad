@@ -91,6 +91,7 @@ where
     fn min_positive()  -> AD<V> { AD::<V>::from( V::min_positive() ) }
     //
     // unary functions
+    impl_unary_float_core!(ln);
     impl_unary_float_core!(sqrt);
     impl_unary_float_core!(tanh);
     impl_unary_float_core!(tan);

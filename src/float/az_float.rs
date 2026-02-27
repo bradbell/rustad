@@ -516,6 +516,7 @@ macro_rules! impl_float_core{ ($B:ident) => {
         fn min_positive() -> AzFloat<$B> { Self( $B::MIN_POSITIVE ) }
         //
         // unary functions
+        float_core_unary_function!($B, ln);
         float_core_unary_function!($B, sqrt);
         float_core_unary_function!($B, tanh);
         float_core_unary_function!($B, tan);

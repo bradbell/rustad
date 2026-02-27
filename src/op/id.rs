@@ -44,6 +44,8 @@ macro_rules! set_operator_ids {
 // This ensures that the number of operators is less that u8::MAX.
 set_operator_ids!(
     // Unary Operators
+    /// ln
+    LN_OP,
     /// sqrt
     SQRT_OP,
     /// tanh

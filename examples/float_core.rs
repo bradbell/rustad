@@ -98,6 +98,14 @@ fn main() {
         let check       = ( exp_2 + exp_minus_2 ) / two;
         assert_eq!(cosh_2, check);
     }
+    // ln
+    {   type V = AzFloat<f64>;
+        let two         = V::from(2.0);
+        let ln_2       = two.ln();
+        //
+        let exp_ln_2   = ln_2.exp();
+        assert_eq!(exp_ln_2, two);
+    }
     // signum
     {   type V = AzFloat<f32>;
         let minus_1      = V::from( -1.0 );

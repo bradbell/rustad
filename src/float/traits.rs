@@ -66,6 +66,7 @@ pub trait FloatCore {
     // ------------------------------------------------------------------------
     // unary functions
     // ------------------------------------------------------------------------
+    fn ln(&self) -> Self;
     fn sqrt(&self) -> Self;
     fn tanh(&self) -> Self;
     fn tan(&self) -> Self;

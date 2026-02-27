@@ -20,8 +20,8 @@ fi
 # NAME
 NAME=$(echo $name | tr [a-z] [A-Z])
 #
-# core.rs
-file='src/float/core.rs'
+# traits.rs
+file='src/float/traits.rs'
 cat << EOF > temp.sed
 /^    [/][/] unary functions/! b end
 N
@@ -36,7 +36,7 @@ file='src/float/az_float.rs'
 cat << EOF > temp.sed
 /^        [/][/] unary functions/! b end
 s|\$|\\
-        float_core_unary_function!(\$B, $name);
+        float_core_unary_function!(\$B, $name);|
 : end
 EOF
 sed -i $file -f temp.sed
