@@ -28,6 +28,7 @@ use std::ops::{
 use crate::{
     FloatCore,
     NumCmp,
+    Powf,
 };
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
@@ -497,6 +498,47 @@ macro_rules! impl_hash_trait{ ($B:ident) => {
 } }
 impl_hash_trait!(f32);
 impl_hash_trait!(f64);
+// ---------------------------------------------------------------------------
+/// powf function for AzFloat objects
+///
+/// * B : is the floating point base type
+///
+/// # Example
+/// ```
+/// use rustad::{
+///     AzFloat,
+///     Powf,
+/// };
+/// let two      = AzFloat(2f32);
+/// let three    = AzFloat(3f32);
+/// let eight    = AzFloat(8f32);
+/// let powf_23  = two.powf(three);
+/// assert_eq!(powf_23, eight);
+/// let powf_23  = (&two).powf(&three);
+/// assert_eq!(powf_23, eight);
+/// ```
+pub fn doc_powf_az_float() {}
+//
+macro_rules! impl_powf_trait{ ($B:ident) => {
+    impl Powf for AzFloat<$B> {
+        type Output = AzFloat<$B>;
+        //
+        // see [doc_powf_az_float]
+        fn powf(self, rhs : AzFloat<$B>) -> AzFloat<$B> {
+            AzFloat( self.0.powf( rhs.0 ) )
+        }
+    }
+    impl Powf for &AzFloat<$B> {
+        type Output = AzFloat<$B>;
+        //
+        // see [doc_powf_az_float]
+        fn powf(self, rhs : &AzFloat<$B>) -> AzFloat<$B> {
+            AzFloat( self.0.powf( rhs.0 ) )
+        }
+    }
+} }
+impl_powf_trait!(f32);
+impl_powf_trait!(f64);
 // ----------------------------------------------------------------------------
 macro_rules! float_core_unary_function{ ($B:ident, $name:ident) => {
     #[doc = concat!(

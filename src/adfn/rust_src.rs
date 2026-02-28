@@ -66,6 +66,7 @@ fn prototype_src(fn_name : &str, v_str : &str) -> String {
         "use crate::{\n" +
         "   traits::NumCmp,\n" +
         "   traits::FloatCore,\n"  +
+        "   traits::Powf,\n"  +
         "   az_float::AzFloat,\n" +
         "   num_vec::NumVec,\n" +
         "};\n" +

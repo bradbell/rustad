@@ -83,3 +83,8 @@ pub trait FloatCore {
     // ------------------------------------------------------------------------
     fn powi(&self, rhs : i32) -> Self;
 }
+// ----------------------------------------------------------------------------
+pub trait Powf<Rhs = Self> {
+    type Output;
+    fn powf(self, rhs: Rhs) -> Self::Output;
+}

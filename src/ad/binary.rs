@@ -22,6 +22,7 @@ use std::ops::{
 };
 //
 use crate::{
+    Powf,
     FloatCore,
     AD,
     IndexT,
@@ -512,6 +513,97 @@ ad_binary_op!(Sub);
 ad_binary_op!(Mul);
 ad_binary_op!(Div);
 // ---------------------------------------------------------------------------
+/// Implement Powf for `AD<V>` and `&AD<V>`
+///
+/// # Example
+/// ```
+/// use rustad::{
+///     Powf,
+///     AzFloat,
+///     ad_from_value,
+/// };
+/// type V  = AzFloat<f32>;
+/// let x   = V::from(2.0);
+/// let y   = V::from(3.0);
+/// let ax  = ad_from_value( x.clone() );
+/// let ay  = ad_from_value( y.clone() );
+///
+/// let az  = (&ax).powf( &ay );
+/// assert_eq!( az.to_value(), V::from(8.0) );
+/// let az  = ax.clone().powf( ay.clone() );
+/// assert_eq!( az.to_value(), V::from(8.0) );
+///
+/// let az  = (&ax).powf( &y );
+/// assert_eq!( az.to_value(), V::from(8.0) );
+/// let az  = ax.clone().powf( y.clone() );
+/// assert_eq!( az.to_value(), V::from(8.0) );
+///
+/// let az  = (&x).powf( &ay );
+/// assert_eq!( az.to_value(), V::from(8.0) );
+/// let az  = x.clone().powf( ay.clone() );
+/// assert_eq!( az.to_value(), V::from(8.0) );
+/// ```
+pub fn doc_ad_powf() { }
+//
+impl<V> Powf< &AD<V> > for &AD<V>
+where
+    V : Clone + FloatCore + ThisThreadTape ,
+    for<'a> &'a AD<V> : Mul< &'a AD<V>, Output = AD<V> >,
+{   type Output = AD<V>;
+    #[doc= " see [doc_ad_powf]" ]
+    fn powf(self, rhs : &AD<V>) -> AD<V> {
+        FloatCore::exp( &( &FloatCore::ln( self ) * rhs ) )
+    }
+}
+impl<V> Powf< AD<V> > for AD<V>
+where
+    V : Clone + FloatCore + ThisThreadTape ,
+    for<'a> &'a AD<V> : Mul< &'a AD<V>, Output = AD<V> >,
+{   type Output = AD<V>;
+    fn powf(self, rhs : AD<V>) -> AD<V> {
+        Powf::powf(&self, &rhs)
+    }
+}
+//
+impl<V> Powf<&V> for &AD<V>
+where
+    V : Clone + FloatCore + ThisThreadTape ,
+    for<'a> &'a AD<V> : Mul< &'a V, Output = AD<V> >,
+{   type Output = AD<V>;
+    fn powf(self, rhs : &V) -> AD<V> {
+        FloatCore::exp( &( &FloatCore::ln( self ) * rhs ) )
+    }
+}
+impl<V> Powf<V> for AD<V>
+where
+    V : Clone + FloatCore + ThisThreadTape + PartialEq,
+    for<'a> &'a AD<V> : Mul< &'a V, Output = AD<V> >,
+{   type Output = AD<V>;
+    fn powf(self, rhs : V) -> AD<V> {
+        Powf::powf(&self, &rhs)
+    }
+}
+//
+macro_rules! impl_value_powf_ad{ ( $V:ty ) => {
+    impl crate::Powf< &AD<$V> > for &$V
+    where
+        $V : crate::FloatCore ,
+    {   type Output = AD<$V>;
+        fn powf(self , rhs : &AD<$V>) -> AD<$V> {
+            crate::FloatCore::exp( &( &crate::FloatCore::ln( self ) * rhs ) )
+        }
+    }
+    impl crate::Powf< AD<$V> > for $V
+    where
+        for <'a> &'a $V : crate::Powf<&'a AD<$V>, Output=AD<$V> >,
+    {   type Output = AD<$V>;
+        fn powf(self , rhs : AD<$V>) -> AD<$V> {
+            (&self).powf( &rhs )
+        }
+    }
+} }
+pub(crate) use impl_value_powf_ad;
+// ---------------------------------------------------------------------------
 /// Compound Assignment `AD<V>` operators.
 ///
 /// Syntax :
@@ -837,6 +929,7 @@ macro_rules! impl_value_op_ad{
         crate::ad::binary::impl_value_op_ad!($V, Sub, -);
         crate::ad::binary::impl_value_op_ad!($V, Mul, *);
         crate::ad::binary::impl_value_op_ad!($V, Div, /);
+        crate::ad::binary::impl_value_powf_ad!($V);
     };
     ($V:ty, $Name:ident, $Op:tt) => { paste::paste! {
         #[doc =

@@ -16,13 +16,12 @@
 // use
 use crate::{
     AzFloat,
+    Powf,
     NumCmp,
     FloatCore,
 };
 //
 // NumVec
-/// The numeric vector type
-#[derive(Debug,Clone)]
 /// The numeric vector class.
 ///
 /// * S :
@@ -36,6 +35,7 @@ use crate::{
 /// * Copy, Clone :
 ///   The NumVec types implement Clone, but not the Copy trait.
 ///
+#[derive(Debug,Clone)]
 pub struct NumVec<S> {
     /// The elements of this numeric vector
     vec : Vec<S> ,
@@ -536,6 +536,54 @@ where
         }
     }
  }
+// ---------------------------------------------------------------------------
+/// powf function for NumVec objects
+///
+/// * S : is the floating point scalar type
+///
+/// # Example
+/// ```
+/// use rustad::{
+///     AzFloat,
+///     NumVec,
+///     Powf,
+/// };
+/// let two      = NumVec::new( vec![ AzFloat(2f32) ] );
+/// let three    = NumVec::new( vec![ AzFloat(3f32) ] );
+/// let eight    = NumVec::new( vec![ AzFloat(8f32) ] );
+/// let powf_23  = Powf::powf( &two, &three);
+/// assert_eq!(powf_23, eight);
+/// ```
+pub fn doc_powf_num_vec() {}
+//
+impl<S> Powf< &NumVec<S> > for &NumVec<S>
+where
+    S : FloatCore + Copy + Powf<Output=S> ,
+{   //
+    type Output = NumVec<S>;
+    //
+    #[doc = "see [doc_powf_num_vec]" ]
+    fn powf(self, rhs : &NumVec<S>) -> NumVec<S> {
+        if self.len() == 1 {
+            if rhs.len() == 1 {
+                NumVec::<S> { s : self.s.powf( rhs.s ), vec : Vec::new() }
+            } else {
+                let v = rhs.vec.iter().map( |s| self.s.powf(*s) ).collect();
+                NumVec::<S> { s : FloatCore::nan(), vec : v }
+            }
+        } else if rhs.len() == 1 {
+            let v = self.vec.iter().map( |s| s.powf( rhs.s) ).collect();
+            NumVec::<S> { s : FloatCore::nan() , vec : v }
+        } else {
+            assert_eq!( self.len(), rhs.len() );
+            let mut v : Vec<S> = Vec::with_capacity( self.len() );
+            for j in 0 .. self.len() {
+                v.push( self.vec[j].powf( rhs.vec[j] ) );
+            }
+            NumVec::<S> { s : FloatCore::nan() , vec : v }
+        }
+    }
+}
 // ---------------------------------------------------------------------------
 macro_rules! impl_unary_float_core{ ($name:ident) => {
     #[ doc = concat!( "`NumVec<S>.`", stringify!($name), "()" )]

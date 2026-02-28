@@ -94,6 +94,7 @@ pub use dll_lib::{
 pub use float::{
     traits::FloatCore,
     traits::NumCmp,
+    traits::Powf,
     az_float::AzFloat,
     num_vec::NumVec,
 };
