@@ -63,11 +63,12 @@ use crate::{
 ///
 /// * B : the floating point base class is either f32 or f64
 ///
-///
 /// * Zero : is an absolute zero; i.e. multiplication by zero
 ///   always results in zero (even if the other operand is nan).
 ///
-/// *  Nan : is equal to Nan.
+/// * Nan : is equal to Nan.
+///
+/// * Copy : The Copy trait is implemented for these types.
 ///
 /// # Example
 /// ```

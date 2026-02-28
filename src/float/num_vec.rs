@@ -8,17 +8,6 @@
 //!
 //! Link to [parent module](super)
 //!
-//! * S :
-//!   is the scalar type; i.e., the type of elements of the vector.
-//!
-//! * Scalars :
-//!   If a NunVec has one element, it acts like a scalar; i.e.,
-//!   a vector with any required length and all the element
-//!   equal to the scalar value.
-//!
-//! * Copy, Clone :
-//!   The NumVec types implement Clone, but not the Copy trait.
-//!
 //! This module does not have any dependencies outside the standard rust
 //! and az_float.
 //! This enables it source code to be directly included as part of a
@@ -34,6 +23,19 @@ use crate::{
 // NumVec
 /// The numeric vector type
 #[derive(Debug,Clone)]
+/// The numeric vector class.
+///
+/// * S :
+///   is the scalar type; i.e., the type of elements of the vector.
+///
+/// * Scalars :
+///   If a NunVec has one element, it acts like a scalar; i.e.,
+///   a vector with any required length and all the element
+///   equal to the scalar value.
+///
+/// * Copy, Clone :
+///   The NumVec types implement Clone, but not the Copy trait.
+///
 pub struct NumVec<S> {
     /// The elements of this numeric vector
     vec : Vec<S> ,

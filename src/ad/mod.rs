@@ -86,9 +86,13 @@ fn test_ad_type() {
 pub fn doc_generic_v() {}
 //
 // AD
-/// AD acts like V but in addition can record a function evaluation.
+/// `AD<V>` acts like V but in addition can record a function evaluation.
 ///
 /// * V : see [doc_generic_v]
+///
+/// * Copy :
+///   `AD<V>` does not implement the Copy trait because the
+///   the borrow version of the operators is more efficient.
 ///
 #[derive(Clone, Debug)]
 pub struct AD<V> {

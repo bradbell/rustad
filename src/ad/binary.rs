@@ -15,6 +15,10 @@ use std::ops::{
     Sub,
     Mul,
     Div,
+    AddAssign,
+    SubAssign,
+    MulAssign,
+    DivAssign,
 };
 //
 use crate::{
@@ -32,47 +36,56 @@ use crate::doc_generic_v;
 // ---------------------------------------------------------------------------
 /// Binary `AD<V>` operators.
 ///
-/// * Borrow Syntax :
-///   ```text
-///        az = &ax Op &ay
-///        az = &ay Op &y
-///   ```
-///
-/// * Own Syntax :
-///   Currently, no advantage is taken of the ownership of ax and ay.
+/// * Syntax :
 ///   ```text
 ///        az = ax Op ay
-///        az = ay Op y
+///        az = ax Op y
+///        az = x  Op ay
 ///   ```
-///
 ///
 /// * Op : is the source code token for this binary operator;
 ///   i.e., `+` , `-` , `*` , or `/` .
 ///
-/// * ax : left hand side `AD<V>` object
-/// * ay : right hand side `AD<V>` object
+/// * ax : left hand side `AD<V>` or `&AD<V>` object
+/// * ay : left hand side `AD<V>` or `&AD<V>` object
 /// * az : result `AD<V>` object
 ///
-/// * y  : right hand side *V* object
+/// * y  : left hand side `V` or `&V` object
+/// * y  : right hand side `V` or `&V` object
+///
+/// If the left or right operand is borrowed (&), then both operands
+/// must be borrowed.
 ///
 /// # Example
+/// Note that [AzFloat](crate::AzFloat) implements the Copy trait.
 ///```
 /// use rustad::AD;
 /// use rustad::ad_from_value;
 ///
 /// type V  = rustad::AzFloat<f64>;
-/// let ax  = ad_from_value( V::from(3.0) );
-/// let y   = V::from(4.0);
-/// let az  = ax * y;
-/// assert_eq!( az.to_value(), V::from(12.0) );
+/// let  x  = V::from(12.0);
+/// let  y  = V::from(3.0);
+/// let ax  = ad_from_value(x);
+/// let ay  = ad_from_value(y);
 ///
-/// let x   = V::from(3.0);
-/// let ay  = ad_from_value( V::from(4.0) );
-/// let az  = &x * &ay;
-/// assert_eq!( az.to_value(), V::from(12.0) );
+/// let az  = &ax * &ay;
+/// assert_eq!( az.to_value(), V::from(36.0) );
+/// let az  = ax.clone() * ay.clone();
+/// assert_eq!( az.to_value(), V::from(36.0) );
+///
+/// let az  = &x / &ay;
+/// assert_eq!( az.to_value(), V::from(4.0) );
+/// let az  = x / ay;
+/// assert_eq!( az.to_value(), V::from(4.0) );
+///
+/// let az  = &ax + &y;
+/// assert_eq!( az.to_value(), V::from(15.0) );
+/// let az  = ax + y;
+/// assert_eq!( az.to_value(), V::from(15.0) );
 /// ```
 ///
 /// # Example using NumVec
+/// Note that [NumVec](crate::NumVec) does not implements the Copy trait.
 /// ```
 /// use rustad::AD;
 /// use rustad::AzFloat;
@@ -81,16 +94,25 @@ use crate::doc_generic_v;
 ///
 /// type S    = AzFloat<f32>;
 /// type V    = NumVec<S>;
-/// let x     = vec![ S::from(1.0), S::from(4.0) ];
-/// let y     = vec![ S::from(2.0), S::from(2.0) ];
-/// let x_nv  = NumVec::new(x);
-/// let y_nv  = NumVec::new(y);
-/// let ax    = ad_from_value(x_nv);
-/// let ay    = ad_from_value(y_nv);
-/// let az    = &ax / &ay;
-/// let z_nv  = az.to_value();
-/// assert_eq!( z_nv.get(0), S::from(0.5) );
-/// assert_eq!( z_nv.get(1), S::from(2.0) );
+/// let x     = NumVec::new( vec![ S::from(2.0), S::from(3.0) ] );
+/// let y     = NumVec::new( vec![ S::from(4.0), S::from(6.0) ] );
+/// let ax    = ad_from_value(x.clone());
+/// let ay    = ad_from_value(y.clone());
+///
+/// let az    = &ax - &ay;
+/// let z     = az.to_value();
+/// assert_eq!( z.get(0), S::from(-2.0) );
+/// assert_eq!( z.get(1), S::from(-3.0) );
+///
+/// let az    = &x + &ay;
+/// let z     = az.to_value();
+/// assert_eq!( z.get(0), S::from(6.0) );
+/// assert_eq!( z.get(1), S::from(9.0) );
+///
+/// let az    = &ax * &y;
+/// let z     = az.to_value();
+/// assert_eq!( z.get(0), S::from(8.0) );
+/// assert_eq!( z.get(1), S::from(18.0) );
 /// ```
 pub fn doc_ad_binary_op() { }
 //
@@ -568,10 +590,10 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
         "`AD<V>` ", stringify!($Name), "Assign `&AD<V>`",
         "; see [doc_ad_compound_op]"
     )]
-    impl<V> std::ops::[< $Name Assign >] < &AD<V> > for AD<V>
+    impl<V> [< $Name Assign >] < &AD<V> > for AD<V>
     where
         V: Clone + FloatCore + PartialEq +
-            for<'a> std::ops::[< $Name Assign >] <&'a V> +
+            for<'a> [< $Name Assign >] <&'a V> +
             crate::ThisThreadTapePublic  ,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : &AD<V> )
@@ -600,10 +622,10 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
         "`AD<V>` ", stringify!($Name), "Assign `AD<V>`",
         "; see [doc_ad_compound_op]"
     )]
-    impl<V> std::ops::[< $Name Assign >] < AD<V> > for AD<V>
+    impl<V> [< $Name Assign >] < AD<V> > for AD<V>
     where
         V: Clone + FloatCore + PartialEq +
-            for<'a> std::ops::[< $Name Assign >] <&'a V> +
+            for<'a> [< $Name Assign >] <&'a V> +
             crate::ThisThreadTapePublic  ,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : AD<V> ) {
@@ -614,10 +636,10 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     #[doc = concat!(
         "`AD<V>` ", stringify!($Name), "Assign & V; see [doc_ad_compound_op]"
     )]
-    impl<V> std::ops::[< $Name Assign >] <&V> for AD<V>
+    impl<V> [< $Name Assign >] <&V> for AD<V>
     where
         V: Clone + FloatCore + PartialEq +
-            for<'a> std::ops::[< $Name Assign >] <&'a V> +
+            for<'a> [< $Name Assign >] <&'a V> +
             crate::ThisThreadTapePublic  ,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : &V)
@@ -643,10 +665,10 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     #[doc = concat!(
         "`AD<V>` ", stringify!($Name), "Assign V; see [doc_ad_compound_op]"
     )]
-    impl<V> std::ops::[< $Name Assign >] <V> for AD<V>
+    impl<V> [< $Name Assign >] <V> for AD<V>
     where
         V: Clone + FloatCore + PartialEq +
-            for<'a> std::ops::[< $Name Assign >] <&'a V> +
+            for<'a> [< $Name Assign >] <&'a V> +
             crate::ThisThreadTapePublic  ,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : V) {
@@ -789,9 +811,8 @@ record_value_op_ad!(Div, /=);
 // ---------------------------------------------------------------------------
 // impl_value_op_ad!
 //
-// If you try to make this implementation generic w.r.t V,
-// you get a message saying that f32 and f64 must be covered
-// because they are not local types.
+// If you try to make this implementation generic w.r.t V, you get the message
+// error[E0210]: type parameter `V` must be covered by another type ..
 //
 /// Implement one binary `AD<V>` operator where lhs is a *V* object.
 ///
@@ -830,9 +851,7 @@ macro_rules! impl_value_op_ad{
                 "compute `&", stringify!($V), "` ",
                 stringify!($Op), " `&AD<", stringify!($f1), ">` "
             ) ]
-            fn [< $Name:lower >]
-                (self , rhs : &AD<$V>
-            ) -> AD<$V> {
+            fn [< $Name:lower >] (self , rhs : &AD<$V>) -> AD<$V> {
                 //
                 // new_value
                 let new_value = self $Op &rhs.value;
@@ -851,6 +870,14 @@ macro_rules! impl_value_op_ad{
                 //
                 // result
                 AD::new(new_tape_id, new_index, new_ad_type, new_value)
+            }
+        }
+        impl std::ops::$Name< AD<$V> > for $V
+        where
+            for <'a> &'a $V : std::ops::$Name<&'a AD<$V>, Output=AD<$V> >,
+        {   type Output = AD<$V>;
+            fn [< $Name:lower >] (self , rhs : AD<$V>) -> AD<$V> {
+                (&self).[< $Name:lower >] ( &rhs )
             }
         }
     } }
