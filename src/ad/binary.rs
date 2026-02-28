@@ -283,7 +283,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
     }
     //
     #[doc = concat!(
-        "& `AD<V>` ", stringify!($Name), " & `AD<V>`",
+        "`&AD<V>` ", stringify!($Name), " `&AD<V>`",
         "; see [doc_ad_binary_op]"
     )]
     impl<V> $Name< &AD<V> > for &AD<V>
@@ -438,7 +438,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
     }
     //
     #[doc = concat!(
-        "& `AD<V>` ", stringify!($Name), " & V`",
+        "`&AD<V>` ", stringify!($Name), " & V`",
         "; see [doc_ad_binary_op]"
     )]
     impl<V> $Name< &V> for &AD<V>
@@ -565,7 +565,7 @@ pub fn doc_ad_compound_op() { }
 macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     //
     #[doc = concat!(
-        "`AD<V>` ", stringify!($Name), "Assign & `AD<V>`",
+        "`AD<V>` ", stringify!($Name), "Assign `&AD<V>`",
         "; see [doc_ad_compound_op]"
     )]
     impl<V> std::ops::[< $Name Assign >] < &AD<V> > for AD<V>
@@ -827,8 +827,8 @@ macro_rules! impl_value_op_ad{
         {   type Output = AD<$V>;
             //
             #[ doc = concat!(
-                "compute & `", stringify!($V), "` ",
-                stringify!($Op), " & `AD<", stringify!($f1), ">` "
+                "compute `&", stringify!($V), "` ",
+                stringify!($Op), " `&AD<", stringify!($f1), ">` "
             ) ]
             fn [< $Name:lower >]
                 (self , rhs : &AD<$V>
