@@ -128,7 +128,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
             var_lhs      = false;
         } else {
             debug_assert!( lhs.ad_type != ADType::ConstantP );
-            lhs_arg_type = lhs.ad_type.clone();
+            lhs_arg_type = lhs.ad_type;
             cop_lhs      = false;
             var_lhs      = lhs.ad_type.is_variable();
         };
@@ -143,7 +143,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
             var_rhs      = false;
         } else {
             debug_assert!( rhs.ad_type != ADType::ConstantP );
-            rhs_arg_type = rhs.ad_type.clone();
+            rhs_arg_type = rhs.ad_type;
             cop_rhs      = false;
             var_rhs      = rhs.ad_type.is_variable();
         };
@@ -157,7 +157,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
                 id::ADD_VV_OP => {
                     // add with left operand the constant zero
                     if( lhs.value == V::zero() ) {
-                        return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
+                        return (rhs.tape_id, rhs.index, rhs.ad_type);
                     }
                 },
                 id::MUL_VV_OP => {
@@ -167,7 +167,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
                     }
                     // multiply with left operand the constant one
                     if( lhs.value == V::one() ) {
-                        return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
+                        return (rhs.tape_id, rhs.index, rhs.ad_type);
                     }
                 },
                 /*
@@ -187,7 +187,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
                 id::ADD_VV_OP => {
                     // add with right operand the constant zero
                     if( rhs.value == V::zero() ) {
-                        return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
+                        return (lhs.tape_id, lhs.index, lhs.ad_type);
                     }
                 },
                 id::MUL_VV_OP => {
@@ -197,13 +197,13 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
                     }
                     // multiply with right operand the constant one
                     if( rhs.value == V::one() ) {
-                        return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
+                        return (lhs.tape_id, lhs.index, lhs.ad_type);
                     }
                 },
                 id::DIV_VV_OP => {
                     // divide with right operand the constant one
                     if( rhs.value == V::one() ) {
-                        return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
+                        return (lhs.tape_id, lhs.index, lhs.ad_type);
                     }
                 },
                 _ => { }
@@ -356,7 +356,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
             var_lhs      = false;
         } else {
             debug_assert!( lhs.ad_type != ADType::ConstantP );
-            lhs_arg_type = lhs.ad_type.clone();
+            lhs_arg_type = lhs.ad_type;
             cop_lhs      = false;
             var_lhs      = lhs.ad_type.is_variable();
         };
@@ -369,7 +369,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
             id::ADD_VV_OP => {
                 // add with right operand the constant zero
                 if( *rhs == V::zero() ) {
-                    return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
+                    return (lhs.tape_id, lhs.index, lhs.ad_type);
                 }
             },
             id::MUL_VV_OP => {
@@ -379,13 +379,13 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
                 }
                 // multiply with right operand the constant one
                 if( *rhs == V::one() ) {
-                    return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
+                    return (lhs.tape_id, lhs.index, lhs.ad_type);
                 }
             },
             id::DIV_VV_OP => {
                 // divide with right operand the constant one
                 if( *rhs == V::one() ) {
-                    return (lhs.tape_id, lhs.index, lhs.ad_type.clone());
+                    return (lhs.tape_id, lhs.index, lhs.ad_type);
                 }
             },
             _ => { }
@@ -702,7 +702,7 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
             var_rhs      = false;
         } else {
             debug_assert!( rhs.ad_type != ADType::ConstantP );
-            rhs_arg_type = rhs.ad_type.clone();
+            rhs_arg_type = rhs.ad_type;
             cop_rhs      = false;
             var_rhs      = rhs.ad_type.is_variable();
         };
@@ -715,7 +715,7 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
             id::ADD_VV_OP => {
                 // add with left operand the constant zero
                 if( *lhs == V::zero() ) {
-                    return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
+                    return (rhs.tape_id, rhs.index, rhs.ad_type);
                 }
             },
             id::MUL_VV_OP => {
@@ -725,7 +725,7 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
                 }
                 // multiply with left operand the constant one
                 if( *lhs == V::one() ) {
-                    return (rhs.tape_id, rhs.index, rhs.ad_type.clone());
+                    return (rhs.tape_id, rhs.index, rhs.ad_type);
                 }
             },
             id::DIV_VV_OP => {

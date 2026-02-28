@@ -66,7 +66,7 @@ impl BinaryOp {
         Self {
             op_id    : op_id_in                                           ,
             arg      : arg_in                                             ,
-            arg_type : [ arg_type_in[0].clone(), arg_type_in[1].clone() ] ,
+            arg_type : [ arg_type_in[0], arg_type_in[1] ] ,
         }
     }
 }
@@ -179,7 +179,7 @@ impl OpHashMap {
             };
             //
             // arg_type_0
-            let arg_type_0 = arg_type[0].clone();
+            let arg_type_0 = arg_type[0];
             //
             // map_value_out
             let key           = UnaryOp::new(op_id, arg_0, arg_type_0);
@@ -309,7 +309,7 @@ pub(crate) fn first_equal_op(
             // map_value_in, option
             let map_value_in = op_index as IndexT;
             let option = op_hash_map.try_insert( op_seq,
-                op_seq_type.clone(), op_index, &first_equal, map_value_in
+                op_seq_type, op_index, &first_equal, map_value_in
             );
             //
             // first_equal

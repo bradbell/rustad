@@ -343,7 +343,7 @@ where
         var_lhs      = false;
     } else {
         debug_assert!( lhs.ad_type != ADType::ConstantP );
-        lhs_arg_type = lhs.ad_type.clone();
+        lhs_arg_type = lhs.ad_type;
         cop_lhs      = false;
         var_lhs      = lhs.ad_type.is_variable();
     };
@@ -358,7 +358,7 @@ where
         var_rhs      = false;
     } else {
         debug_assert!( rhs.ad_type != ADType::ConstantP );
-        rhs_arg_type = rhs.ad_type.clone();
+        rhs_arg_type = rhs.ad_type;
         cop_rhs      = false;
         var_rhs      = rhs.ad_type.is_variable();
     };
@@ -461,7 +461,7 @@ where
         var_lhs      = false;
     } else {
         debug_assert!( lhs.ad_type != ADType::ConstantP );
-        lhs_arg_type = lhs.ad_type.clone();
+        lhs_arg_type = lhs.ad_type;
         cop_lhs      = false;
         var_lhs      = lhs.ad_type.is_variable();
     };
@@ -546,7 +546,7 @@ where
         var_rhs      = false;
     } else {
         debug_assert!( rhs.ad_type != ADType::ConstantP );
-        rhs_arg_type = rhs.ad_type.clone();
+        rhs_arg_type = rhs.ad_type;
         cop_rhs      = false;
         var_rhs      = rhs.ad_type.is_variable();
     };

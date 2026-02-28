@@ -480,7 +480,7 @@ where
     //
     // domain_ad_type
     let domain_ad_type : Vec<ADType> = adomain.iter().map(
-        |adomain_j| adomain_j.ad_type.clone()
+        |adomain_j| adomain_j.ad_type
     ).collect();
     //
     // rng_ad_type
@@ -506,7 +506,7 @@ where
                     name, rng_index, n_dom, k, depend[k]
                 );
             }
-            ad_type = max( ad_type, domain_ad_type[*j].clone() );
+            ad_type = max( ad_type, domain_ad_type[*j] );
         }
         rng_ad_type.push( ad_type );
     }
@@ -576,7 +576,7 @@ where
             //
             // op_seq.arg_type_all, op_seq.arg_all
             for j in 0 .. n_dom {
-                op_seq.arg_type_all.push( domain_ad_type[j].clone() );
+                op_seq.arg_type_all.push( domain_ad_type[j] );
                 if domain_ad_type[j].is_constant() {
                     let index = tape.cop.len();
                     tape.cop.push( adomain[j].value.clone() );

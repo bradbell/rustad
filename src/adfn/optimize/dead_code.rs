@@ -115,7 +115,7 @@ fn new_unary_op(
     new_op_seq.arg_start.push( new_op_seq.arg_all.len() as IndexT );
     //
     // new_op_seq: arg_all, arg_type_all
-    let arg_type_0   = arg_type[0].clone();
+    let arg_type_0   = arg_type[0];
     let old_index    = arg[0] as usize;
     let option       = get_old2new( old2new, &arg_type_0, old_index );
     let new_index    = option.unwrap();
@@ -153,7 +153,7 @@ fn new_binary_op(
     //
     // new_op_seq: arg_all, arg_type_all
     for i_arg in 0 .. 2 {
-        let arg_type_i = arg_type[i_arg].clone();
+        let arg_type_i = arg_type[i_arg];
         let old_index = arg[i_arg] as usize;
         let option    = get_old2new( old2new, &arg_type_i, old_index );
         let new_index = option.unwrap();

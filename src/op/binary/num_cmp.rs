@@ -58,7 +58,7 @@ macro_rules! eval_num_cmp_forward_fun { ($name:ident) => { paste::paste! {
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
         //
-        match( arg_type[0].clone(), arg_type[1].clone() ) {
+        match( arg_type[0], arg_type[1] ) {
             (ADType::DynamicP, ADType::DynamicP) => {
                 let left  = &dyp_both[lhs];
                 let right = &dyp_both[rhs];
@@ -103,7 +103,7 @@ macro_rules! eval_num_cmp_forward_fun { ($name:ident) => { paste::paste! {
         let rhs = arg[1] as usize;
         //
         // var_both[res]
-        match( arg_type[0].clone(), arg_type[1].clone() ) {
+        match( arg_type[0], arg_type[1] ) {
             // variable op constant
             (ADType::Variable, ADType::ConstantP) => {
                 let left  = &var_both[lhs];

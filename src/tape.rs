@@ -420,7 +420,7 @@ where
     // TODO: figure out how to do this without any cloning of values.
     for ay_i in &arange {
         if ay_i.tape_id == tape_id {
-            ad_fn.rng_ad_type.push( ay_i.ad_type.clone() );
+            ad_fn.rng_ad_type.push( ay_i.ad_type );
             ad_fn.rng_index.push( ay_i.index as IndexT );
         } else {
             ad_fn.rng_ad_type.push( ADType::ConstantP );

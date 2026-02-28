@@ -44,7 +44,7 @@ macro_rules! impl_unary_float_core{ ($name:ident) => { paste::paste! {
             //
             // new_tape_id, new_ad_type
             new_tape_id = tape.tape_id;
-            new_ad_type = arg.ad_type.clone();
+            new_ad_type = arg.ad_type;
             //
             // op_seq
             let op_seq = if new_ad_type == ADType::Variable {
@@ -61,7 +61,7 @@ macro_rules! impl_unary_float_core{ ($name:ident) => { paste::paste! {
             op_seq.n_dep += 1;
             op_seq.arg_start.push( op_seq.arg_all.len() as IndexT );
             op_seq.arg_all.push( arg.index as IndexT );
-            op_seq.arg_type_all.push( new_ad_type.clone() );
+            op_seq.arg_type_all.push( new_ad_type );
             //
             AD::new(new_tape_id, new_index, new_ad_type, new_value)
 
@@ -129,7 +129,7 @@ where
             //
             // new_tape_id, new_ad_type
             new_tape_id = tape.tape_id;
-            new_ad_type = arg.ad_type.clone();
+            new_ad_type = arg.ad_type;
             //
             // op_seq
             let op_seq = if new_ad_type == ADType::Variable {
@@ -153,7 +153,7 @@ where
                 op_seq.arg_all.push( - rhs as IndexT );
                 op_seq.arg_all.push( 1 );
             }
-            op_seq.arg_type_all.push( new_ad_type.clone() );
+            op_seq.arg_type_all.push( new_ad_type );
             op_seq.arg_type_all.push( ADType::Empty );
             op_seq.arg_type_all.push( ADType::Empty );
             //

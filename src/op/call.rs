@@ -584,7 +584,7 @@ where
     let mut domain_der : Vec<&V> = Vec::with_capacity( n_dom );
     for i_dom in 0 .. n_dom {
         let index   = arg[BEGIN_DOM + i_dom] as usize;
-        let ad_type = arg_type[BEGIN_DOM + i_dom].clone();
+        let ad_type = arg_type[BEGIN_DOM + i_dom];
         if ad_type.is_variable() {
             domain_der.push( &var_der[index] );
         } else {
@@ -662,7 +662,7 @@ where
     let mut adomain_der : Vec<& AD<V> > = Vec::with_capacity(n_dom);
     for i_dom in 0 .. n_dom {
         let index   = arg[BEGIN_DOM + i_dom] as usize;
-        let ad_type = arg_type[BEGIN_DOM + i_dom].clone();
+        let ad_type = arg_type[BEGIN_DOM + i_dom];
         if ad_type.is_variable() {
             adomain_der.push( &avar_der[index] );
         } else {
@@ -759,7 +759,7 @@ where
     // var_der
     for i_arg in 0 .. n_dom {
         let index    = arg[BEGIN_DOM + i_arg] as usize;
-        let ad_type  = arg_type[BEGIN_DOM + i_arg].clone();
+        let ad_type  = arg_type[BEGIN_DOM + i_arg];
         if ad_type.is_variable() {
             var_der[index] += &domain_der[i_arg];
         }
@@ -834,7 +834,7 @@ where
     // avar_der
     for i_arg in 0 .. n_dom {
         let index   = arg[BEGIN_DOM + i_arg] as usize;
-        let ad_type = arg_type[BEGIN_DOM + i_arg].clone();
+        let ad_type = arg_type[BEGIN_DOM + i_arg];
         if ad_type.is_variable() {
             avar_der[index] += &adomain_der[i_arg];
         }
@@ -936,7 +936,7 @@ where
                 "vec![&nan; " + &(call_n_dom.to_string()) + "];\n";
     for j_dom in 0 .. call_n_dom {
         let mut index   = arg[BEGIN_DOM + j_dom] as usize;
-        let ad_type     = arg_type[BEGIN_DOM + j_dom].clone();
+        let ad_type     = arg_type[BEGIN_DOM + j_dom];
         if ad_type.is_constant() {
             src = src + "   " +
                 &format!("call_dom[{j_dom}] = &cop[{index}];\n");

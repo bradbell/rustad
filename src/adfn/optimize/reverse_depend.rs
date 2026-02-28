@@ -155,7 +155,7 @@ where
                             arg,
                             arg_type,
                             res,
-                            res_type.clone(),
+                            res_type,
                         );
                     }
                     if trace {
