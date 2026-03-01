@@ -139,21 +139,32 @@ impl From< AzFloat<f32> > for AzFloat<f64> {
 ///
 /// * B : Is the floating point base type
 ///
-/// * Syntax : lhs op rhs
+/// * Syntax :
+/// ```text
+///     z = x Op y
+/// ```
 ///
-///     * lhs : is the AzFloat`<B>` left operand
-///     * rhs : is the AzFloat`<B>` right operand
-///     * op  : is one of `+` , `-` , `*` , `/`
+/// * Op : is the source code token for this binary operator;
+///   i.e., `+` , `-` , `*` , or `/` .
+///
+/// * x : left hand side `AzFloat<V>` or `&AzFloat<V>` object
+/// * y : left hand side `AzFloat<V>` or `&AzFloat<V>` object
+/// * z : result `AzFloat<V>` object
+///
+/// If the left or right operand is borrowed (&), then both operands
+/// must be borrowed.
 ///
 /// # Example :
 /// ```
 /// use rustad::AzFloat;
-/// type B = f64;
+/// type V = AzFloat<f64>;
 /// //
-/// let z2 : AzFloat<B> = (2.0 as B).into();
-/// let z4 : AzFloat<B> = (4.0 as B).into();
-/// let z6 = z2 + z4;
-/// assert_eq!( z6, (6.0 as B).into() );
+/// let x  = V::from(2.0);
+/// let y  = V::from(4.0);
+/// let z  = x + y;
+/// assert_eq!( z, V::from(6.0) );
+/// let z  = &x * &y;
+/// assert_eq!( z, V::from(8.0) );
 /// ```
 pub fn doc_binary_operator() { }
 ///
@@ -174,44 +185,6 @@ where
         }
     }
 }
-macro_rules! impl_binary_operator{ ($Name:ident, $name:ident) =>  {
-    #[doc = "see [doc_binary_operator]"]
-    impl<B> $Name for AzFloat<B>
-    where
-        B : From<f32> + PartialEq + $Name<Output=B>,
-    {
-        type Output = AzFloat<B>;
-        fn $name(self, rhs : Self) -> AzFloat<B> {
-            Self( (self.0).$name(rhs.0) )
-        }
-    }
-} }
-impl_binary_operator!(Add, add);
-impl_binary_operator!(Sub, sub);
-impl_binary_operator!(Div, div);
-// ---------------------------------------------------------------------------
-// &AzFloat Op &AzFloat
-/// AzFloat binary reference operations
-///
-/// * B : Is the floating point base type
-///
-/// * Syntax : &lhs op &rhs
-///
-///     * lhs : is the AzFloat`<B>` left operand
-///     * rhs : is the AzFloat`<B>` right operand
-///     * op  : is one of `+` , `-` , `*` , `/`
-///
-/// # Example :
-/// ```
-/// use rustad::AzFloat;
-/// type B = f64;
-/// //
-/// let z6 : AzFloat<B> = (6.0 as B).into();
-/// let z4 : AzFloat<B> = (4.0 as B).into();
-/// let z2 = &z6 - &z4;
-/// assert_eq!( z2, (2.0 as B).into() );
-/// ```
-pub fn doc_binary_reference() { }
 //
 // Mul
 impl<B> Mul<& AzFloat<B> > for &AzFloat<B>
@@ -230,8 +203,18 @@ where
         }
     }
 }
-macro_rules! impl_binary_reference{ ($Name:ident, $name:ident) => {
-    #[doc = "see [doc_binary_reference]"]
+macro_rules! impl_binary_operator{ ($Name:ident, $name:ident) =>  {
+    #[doc = "see [doc_binary_operator]"]
+    impl<B> $Name for AzFloat<B>
+    where
+        B : From<f32> + PartialEq + $Name<Output=B>,
+    {
+        type Output = AzFloat<B>;
+        fn $name(self, rhs : Self) -> AzFloat<B> {
+            Self( (self.0).$name(rhs.0) )
+        }
+    }
+    #[doc = "see [doc_binary_operator]"]
     impl<B> $Name<& AzFloat<B> > for &AzFloat<B>
     where
         for<'a> &'a B : $Name<&'a B, Output=B>,
@@ -243,9 +226,9 @@ macro_rules! impl_binary_reference{ ($Name:ident, $name:ident) => {
         }
     }
 } }
-impl_binary_reference!(Add, add);
-impl_binary_reference!(Sub, sub);
-impl_binary_reference!(Div, div);
+impl_binary_operator!(Add, add);
+impl_binary_operator!(Sub, sub);
+impl_binary_operator!(Div, div);
 // ---------------------------------------------------------------------------
 // AzFloat Op &AzFloat
 /// AzFloat binary assign operations
