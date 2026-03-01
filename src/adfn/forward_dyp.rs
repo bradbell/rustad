@@ -12,7 +12,8 @@
 use crate::{
     AD,
     ADfn,
-    FloatCore,
+    FConst,
+    FUnary,
 };
 use crate::op::info::sealed::GlobalOpInfoVec;
 use crate::tape::sealed::ThisThreadTape;
@@ -110,7 +111,7 @@ macro_rules! forward_dyp {
             let n_dyp = self.dyp.n_dom + self.dyp.n_dep;
             //
             // dyp_both
-            let nan_e  : $E  = FloatCore::nan();
+            let nan_e  : $E  = FConst::nan();
             let mut dyp_both = dyp_dom;
             dyp_both.resize(n_dyp, nan_e );
             //
@@ -165,7 +166,7 @@ macro_rules! forward_dyp {
 } }
 //
 impl<V> ADfn<V> where
-V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore + ThisThreadTape,
+V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + FUnary + ThisThreadTape,
 {   //
     // forward_dyp
     forward_dyp!( value, V );

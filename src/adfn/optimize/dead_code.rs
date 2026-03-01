@@ -10,7 +10,8 @@
 // use
 //
 use crate::{
-    FloatCore,
+    FConst,
+    FUnary,
     ADfn,
     IndexT,
 };
@@ -280,11 +281,11 @@ where
     pub(crate) fn dead_code(&self, depend : &Depend, trace : bool,
     ) -> ( Tape<V>, Old2New)
     where
-        V : Clone + FloatCore + PartialEq ,
+        V : Clone + FConst + FUnary + PartialEq ,
     {
         //
         // self.cop[0]
-        let nan :  V  = FloatCore::nan();
+        let nan :  V  = FConst::nan();
         assert!( nan == self.cop[0] );
         //
         // tape

@@ -19,7 +19,7 @@
 ///
 /// * Syntax :
 ///   ```text
-///     res = lhs.cmp(&rhs)
+///     res = lhs.cmp(rhs)
 ///   ```
 ///   where either lhs or rhs has type `AD<V>` .
 ///
@@ -50,10 +50,10 @@ pub trait NumCmp<Rhs> {
     fn num_gt(self, rhs : Rhs) -> Self::Output;
 }
 // ----------------------------------------------------------------------------
-/// The FloatCore trait
+/// The FConst trait
 ///
-/// See the file examples/float_core.rs .
-pub trait FloatCore {
+/// See the file examples/f_const.rs .
+pub trait FConst {
     // ------------------------------------------------------------------------
     // No Arguments
     // ------------------------------------------------------------------------
@@ -63,8 +63,12 @@ pub trait FloatCore {
     fn zero()         -> Self;
     fn epsilon()      -> Self;
     fn min_positive() -> Self;
-    // ------------------------------------------------------------------------
-    // unary functions
+}
+// ----------------------------------------------------------------------------
+/// The FUnary trait
+///
+/// See the file examples/f_unary.rs .
+pub trait FUnary {
     // ------------------------------------------------------------------------
     fn ln(&self) -> Self;
     fn sqrt(&self) -> Self;
@@ -78,8 +82,6 @@ pub trait FloatCore {
     fn cos(&self) -> Self;
     fn signum(&self) -> Self;
     fn sin(&self) -> Self;
-    // ------------------------------------------------------------------------
-    // binary functions
     // ------------------------------------------------------------------------
     fn powi(&self, rhs : i32) -> Self;
 }

@@ -30,7 +30,8 @@ use crate::ad::ADType;
 use crate::{
     IndexT,
     AD,
-    FloatCore,
+    FConst,
+    FUnary,
 };
 //
 use crate::op::binary::common;
@@ -210,7 +211,7 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
     for<'a> &'a V : Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Add<&'a V, Output = V> ,
-    for<'a> V     : Clone + FloatCore + PartialEq +
+    for<'a> V     : Clone + FConst + FUnary + PartialEq +
                     ThisThreadTape + AddAssign<&'a V>,
 {
     op_info_vec[ADD_PP_OP as usize] = OpInfo{

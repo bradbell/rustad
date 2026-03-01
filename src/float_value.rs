@@ -15,13 +15,14 @@ use std::ops::{
 };
 //
 use crate::{
-    FloatCore,
+    FConst,
+    FUnary,
     NumCmp,
 };
 // ----------------------------------------------------------------------------
 /// The FloatValue trait
 ///
-pub trait FloatValue : FloatCore {
+pub trait FloatValue : FConst + FUnary {
     //
     // is_zero
     /// True if all the components of self are zero.
@@ -190,10 +191,10 @@ pub(crate) use impl_float_value_from_primitive;
 ///       The default value for assert is true.
 ///
 /// * min_positive :
-///   use use the notaiton [min_positive](FloatCore::min_positive) below.
+///   use use the notaiton [min_positive](FConst::min_positive) below.
 ///
 /// * epsilon :
-///   use use the notaiton [epsilon](FloatCore::epsilon) below.
+///   use use the notaiton [epsilon](FConst::epsilon) below.
 ///
 /// * flag :
 ///   the return value is true if either of the following conditions hold:
@@ -208,14 +209,15 @@ pub(crate) use impl_float_value_from_primitive;
 /// ```
 /// use rustad::{
 ///     AzFloat,
-///     FloatCore,
+///     FConst,
+///     FUnary,
 ///     check_nearly_eq,
 /// };
 /// type V = AzFloat<f32>;
 /// //
 /// //
 /// let one_v           = V::from(1);
-/// let epsilon_v   : V = FloatCore::epsilon();
+/// let epsilon_v   : V = FConst::epsilon();
 /// let near_one_v      = one_v + V::from(10) * epsilon_v;
 /// let x               = V::from( 1e-20 );
 /// let y               = x * near_one_v;
@@ -230,7 +232,8 @@ pub(crate) use impl_float_value_from_primitive;
 /// use rustad::{
 ///     AzFloat,
 ///     NumVec,
-///     FloatCore,
+///     FConst,
+///     FUnary,
 ///     check_nearly_eq,
 /// };
 /// type S = AzFloat<f32>;
@@ -238,8 +241,8 @@ pub(crate) use impl_float_value_from_primitive;
 /// //
 /// let arg_vec = vec![ ["assert", "false"] ];
 /// //
-/// let one_v       : V = FloatCore::one();
-/// let epsilon_v   : V = FloatCore::epsilon();
+/// let one_v       : V = FConst::one();
+/// let epsilon_v   : V = FConst::epsilon();
 /// let near_one_v      = &one_v + &( &V::from(10f32) * &epsilon_v );
 /// //
 /// let x  = V::new( vec![ S::from(1e-20) ,  S::from(1e+20) ] );
@@ -252,7 +255,7 @@ pub(crate) use impl_float_value_from_primitive;
 ///
 pub fn check_nearly_eq<V>(x : &V, y : &V, arg_vec : &Vec< [&str; 2] >) -> bool
 where
-    V  : FloatCore + FloatValue + From<f32> + std::fmt::Debug,
+    V  : FConst + FUnary + FloatValue + From<f32> + std::fmt::Debug,
     for<'a> &'a V : NumCmp<&'a V, Output = V> ,
     for<'a> &'a V : Add<&'a V, Output=V> ,
     for<'a> &'a V : Mul<&'a V, Output=V> ,
@@ -287,7 +290,7 @@ where
     //
     // sum_abs, min_sum
     let sum_abs     = &x.abs() + &y.abs();
-    let min_pos : V = FloatCore::min_positive();
+    let min_pos : V = FConst::min_positive();
     let min_sum     = &factor * &min_pos;
     //
     // check first condition
@@ -298,7 +301,7 @@ where
     //
     // abs_diff, min_diff
     let abs_diff = (x - y).abs();
-    let min_diff = &factor * &FloatCore::epsilon();
+    let min_diff = &factor * &FConst::epsilon();
     //
     // check second condition
     let ratio  = &abs_diff / &sum_abs;

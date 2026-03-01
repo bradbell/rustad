@@ -10,7 +10,8 @@
 // use
 //
 use crate::{
-    FloatCore,
+    FConst,
+    FUnary,
     ADfn,
     IndexT,
     GlobalAtomCallbackVecPublic,
@@ -175,7 +176,7 @@ pub(crate) fn renumber_op_seq(
 /// ```
 impl<V> ADfn<V>
 where
-    V : Clone + FloatCore + Eq + std::fmt::Display + std::hash::Hash +
+    V : Clone + FConst + FUnary + Eq + std::fmt::Display + std::hash::Hash +
         GlobalAtomCallbackVecPublic + GlobalOpInfoVecPublic,
 {   //
     // optimize

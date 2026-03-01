@@ -17,7 +17,8 @@ use std::ops::{
 use crate::{
     IndexT,
     AD,
-    FloatCore,
+    FConst,
+    FUnary,
 };
 //
 use crate::ad::ADType;
@@ -48,13 +49,13 @@ fn tan_forward_der<V, E>(
     arg_type   :   &[ADType]   ,
     res        :   usize       )
 where
-    E             : FloatCore,
+    E             : FConst + FUnary ,
     for<'a> &'a E : Mul<&'a E, Output=E>,
     for<'a> &'a E : Add<&'a E, Output=E>,
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let one : E  = FloatCore::one();
+    let one : E  = FConst::one();
     let index    = arg[0] as usize;
     let dtan     = &one + &( &var_both[res] * &var_both[res] );
     var_der[res] = &dtan *  &var_der[index];
@@ -73,13 +74,13 @@ fn tan_reverse_der<V, E>(
     res        :   usize       )
 where
     for<'a> E     : AddAssign<&'a E> ,
-    E             : FloatCore,
+    E             : FConst + FUnary ,
     for<'a> &'a E : Mul<&'a E, Output=E>,
     for<'a> &'a E : Add<&'a E, Output=E>,
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let one    : E  = FloatCore::one();
+    let one    : E  = FConst::one();
     let index       = arg[0] as usize;
     let dtan        = &one + &( &var_both[res] * &var_both[res] );
     let term        = &dtan * &var_der[res];
@@ -97,7 +98,7 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> &'a AD<V> : Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
     for<'a> &'a V     : Add<&'a V, Output = V> ,
-    V                 : Clone + FloatCore + ThisThreadTape ,
+    V                 : Clone + FConst + FUnary + ThisThreadTape ,
     for<'a> V         : AddAssign<&'a V>,
     for<'a> AD<V>     : AddAssign<&'a AD<V> >,
 {

@@ -13,7 +13,8 @@
 //
 pub mod binary;
 pub mod num_cmp;
-pub mod float_core;
+pub mod f_const;
+pub mod f_unary;
 // ---------------------------------------------------------------------------
 //
 // ADType

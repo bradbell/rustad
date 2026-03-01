@@ -6,7 +6,7 @@ use rustad::{
     AzFloat,
     start_recording,
     stop_recording,
-    FloatCore,
+    FUnary,
     check_nearly_eq,
 };
 //

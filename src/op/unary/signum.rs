@@ -16,7 +16,8 @@ use std::ops::{
 use crate::{
     IndexT,
     AD,
-    FloatCore,
+    FConst,
+    FUnary,
 };
 //
 use crate::ad::ADType;
@@ -47,12 +48,12 @@ fn signum_forward_der<V, E>(
     arg_type   :   &[ADType]   ,
     res        :   usize       )
 where
-    E             : FloatCore,
+    E             : FConst + FUnary ,
     for<'a> &'a E : Mul<&'a E, Output=E>,
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    var_der[res] = FloatCore::zero();
+    var_der[res] = FConst::zero();
 }
 // signum_reverse_der
 /// First order reverse mode for signum(variable);
@@ -68,14 +69,14 @@ fn signum_reverse_der<V, E>(
     _res        :   usize       )
 where
     for<'a> E     : AddAssign<&'a E> ,
-    E             : FloatCore,
+    E             : FConst + FUnary ,
     for<'a> &'a E : Mul<&'a E, Output=E>,
 {
     /*
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     let index       = arg[0] as usize;
-    var_der[index] += &FloatCore::zero();
+    var_der[index] += &FConst::zero();
     */
 }
 // ---------------------------------------------------------------------------
@@ -88,7 +89,7 @@ where
 pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> &'a AD<V> : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
-    V                 : Clone + FloatCore + ThisThreadTape ,
+    V                 : Clone + FConst + FUnary + ThisThreadTape ,
     for<'a> V         : AddAssign<&'a V>,
     for<'a> AD<V>     : AddAssign<&'a AD<V> >,
 {

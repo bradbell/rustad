@@ -15,7 +15,8 @@ use crate::{
     AD,
     IndexT,
     NumCmp,
-    FloatCore,
+    FConst,
+    FUnary,
 };
 use crate::op::id::NUMBER_OP;
 use crate::tape::sealed::ThisThreadTape;
@@ -465,7 +466,7 @@ where
     for<'a> &'a V : std::ops::Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Div<&'a V, Output = V> ,
     //
-    V     : Clone + From<f32> + FloatCore + PartialEq,
+    V     : Clone + From<f32> + FConst + FUnary + PartialEq,
     V     : ThisThreadTape + GlobalAtomCallbackVec,
     for<'a> &'a V : NumCmp<&'a V, Output = V> ,
     AD<V> : From<V>,

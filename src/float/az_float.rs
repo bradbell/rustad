@@ -26,7 +26,8 @@ use std::ops::{
 };
 //
 use crate::{
-    FloatCore,
+    FConst,
+    FUnary,
     NumCmp,
     Powf,
 };
@@ -340,8 +341,8 @@ pub fn doc_num_cmp_az_float() {}
 macro_rules! impl_num_cmp_az_float_borrow{ ($name:ident, $op:tt) => {
     #[doc = concat!( " AzFloat::", stringify!($name)  ) ]
     fn $name(self, rhs : & AzFloat<B> ) -> AzFloat<B> {
-        let zero : AzFloat<B> = FloatCore::zero();
-        let one  : AzFloat<B> = FloatCore::one();
+        let zero : AzFloat<B> = FConst::zero();
+        let one  : AzFloat<B> = FConst::one();
         //
         if self.0 $op rhs.0 {
             one
@@ -354,7 +355,7 @@ macro_rules! impl_num_cmp_az_float_borrow{ ($name:ident, $op:tt) => {
 impl<B> NumCmp< &AzFloat<B> > for &AzFloat<B>
 where
     B          : PartialOrd,
-    AzFloat<B> : FloatCore,
+    AzFloat<B> : FConst + FUnary ,
 {
     type Output = AzFloat<B>;
     //
@@ -377,7 +378,7 @@ macro_rules! impl_num_cmp_az_float_own{ ($name:ident) => {
 impl<B> NumCmp< AzFloat<B> > for AzFloat<B>
 where
     B          : PartialOrd,
-    AzFloat<B> : FloatCore,
+    AzFloat<B> : FConst + FUnary ,
     for<'a> &'a AzFloat<B> : NumCmp< &'a AzFloat<B>, Output = AzFloat<B> >,
 {
     type Output = AzFloat<B>;
@@ -523,7 +524,7 @@ macro_rules! impl_powf_trait{ ($B:ident) => {
 impl_powf_trait!(f32);
 impl_powf_trait!(f64);
 // ----------------------------------------------------------------------------
-macro_rules! float_core_unary_function{ ($B:ident, $name:ident) => {
+macro_rules! float_unary_function{ ($B:ident, $name:ident) => {
     #[doc = concat!(
         "`AzFloat<", stringify!($B), ">`.", stringify!($name), "()"
     )]
@@ -532,27 +533,31 @@ macro_rules! float_core_unary_function{ ($B:ident, $name:ident) => {
 /// FloatCore trait for az_float types
 ///
 /// * B : is the floating point base type
-macro_rules! impl_float_core{ ($B:ident) => {
-    impl FloatCore for AzFloat<$B> {
+macro_rules! impl_float_const{ ($B:ident) => {
+    impl FConst for AzFloat<$B> {
         fn pi()           -> AzFloat<$B> { Self( std::$B::consts::PI ) }
         fn nan()          -> AzFloat<$B> { Self( $B::NAN ) }
         fn one()          -> AzFloat<$B> { Self( 1 as $B ) }
         fn zero()         -> AzFloat<$B> { Self( 0 as $B ) }
         fn epsilon()      -> AzFloat<$B> { Self( $B::EPSILON ) }
         fn min_positive() -> AzFloat<$B> { Self( $B::MIN_POSITIVE ) }
+    }
+}}
+macro_rules! impl_float_unary{ ($B:ident) => {
+    impl FUnary for AzFloat<$B> {
         //
         // unary functions
-        float_core_unary_function!($B, ln);
-        float_core_unary_function!($B, sqrt);
-        float_core_unary_function!($B, tanh);
-        float_core_unary_function!($B, tan);
-        float_core_unary_function!($B, sinh);
-        float_core_unary_function!($B, cosh);
-        float_core_unary_function!($B, abs);
-        float_core_unary_function!($B, signum);
-        float_core_unary_function!($B, exp);
-        float_core_unary_function!($B, cos);
-        float_core_unary_function!($B, sin);
+        float_unary_function!($B, ln);
+        float_unary_function!($B, sqrt);
+        float_unary_function!($B, tanh);
+        float_unary_function!($B, tan);
+        float_unary_function!($B, sinh);
+        float_unary_function!($B, cosh);
+        float_unary_function!($B, abs);
+        float_unary_function!($B, signum);
+        float_unary_function!($B, exp);
+        float_unary_function!($B, cos);
+        float_unary_function!($B, sin);
         //
         // unary function that implements differently
         #[doc = concat!( "`AzFloat<", stringify!($B), ">`.minus()" )]
@@ -562,5 +567,8 @@ macro_rules! impl_float_core{ ($B:ident) => {
         fn powi(&self, rhs : i32) -> AzFloat<$B>{ Self( self.0.powi(rhs) ) }
     }
 } }
-impl_float_core!(f32);
-impl_float_core!(f64);
+impl_float_const!(f32);
+impl_float_unary!(f32);
+//
+impl_float_const!(f64);
+impl_float_unary!(f64);

@@ -21,7 +21,8 @@ use std::ops::{
 };
 use crate::{
     AD,
-    FloatCore,
+    FConst,
+    FUnary,
     IndexT,
 };
 use crate::tape::sealed::ThisThreadTape;
@@ -40,7 +41,7 @@ fn powi_forward_dyp <V, E> (
     arg_type    : &[ADType]   ,
     res         : usize       )
 where
-    E : FloatCore ,
+    E : FConst + FUnary ,
 {   //
     // index
     let index    = arg[0] as usize;
@@ -66,7 +67,7 @@ fn powi_forward_var <V, E> (
     arg_type    : &[ADType]   ,
     res         : usize       )
 where
-    E : FloatCore ,
+    E : FConst + FUnary ,
 {   //
     // index
     let index    = arg[0] as usize;
@@ -187,7 +188,7 @@ fn powi_forward_der<V, E>(
     res        :   usize       )
 where
     V             : From<f32>,
-    E             : FloatCore,
+    E             : FConst + FUnary ,
     for<'a> &'a E : Mul<&'a E, Output=E>,
     for<'a> &'a E : Mul<&'a V, Output=E>,
 {
@@ -197,7 +198,7 @@ where
     let rhs       = if positive { arg[1] as i32 } else { - (arg[1] as i32) };
     let lhs       = arg[0] as usize;
     if rhs == 0 {
-        var_der[res] = FloatCore::zero();
+        var_der[res] = FConst::zero();
     } else {
         let dpowi    = &( var_both[lhs].powi(rhs-1) ) *  &V::from(rhs as f32);
         var_der[res] = &dpowi *  &var_der[lhs];
@@ -217,7 +218,7 @@ fn powi_reverse_der<V, E>(
     res        :   usize       )
 where
     V             : From<f32>,
-    E             : FloatCore,
+    E             : FConst + FUnary ,
     for<'a> E     : AddAssign<&'a E> ,
     for<'a> &'a E : Mul<&'a E, Output=E>,
     for<'a> &'a E : Mul<&'a V, Output=E>,
@@ -244,7 +245,7 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> &'a AD<V> : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a AD<V> : Mul<&'a V, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
-    V                 : Clone + FloatCore + ThisThreadTape + From<f32>,
+    V                 : Clone + FConst + FUnary + ThisThreadTape + From<f32>,
     for<'a> V         : AddAssign<&'a V>,
     for<'a> AD<V>     : AddAssign<&'a AD<V> >,
 {

@@ -2,16 +2,16 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2026 Bradley M. Bell
 // ---------------------------------------------------------------------------
-//! This pub(crate) module implements FloatCore for AD types
+//! This pub(crate) module implements FUnary for AD types
 //!
 //! Link to [parent module](super)
-//!
 //!
 // ---------------------------------------------------------------------------
 use std::thread::LocalKey;
 use std::cell::RefCell;
 use crate::{
-    FloatCore,
+    FConst,
+    FUnary,
     AD,
     IndexT,
 };
@@ -20,12 +20,12 @@ use crate::tape::Tape;
 use crate::tape::sealed::ThisThreadTape;
 use crate::op::id;
 // ---------------------------------------------------------------------------
-macro_rules! impl_unary_float_core{ ($name:ident) => { paste::paste! {
+macro_rules! impl_float_unary{ ($name:ident) => { paste::paste! {
     #[doc = concat!( "`AD<V>.`", stringify!( $name ), "()")]
     fn $name(&self) -> AD<V> {
         //
         // record
-        fn record<V : FloatCore>(
+        fn record<V : FConst + FUnary >(
             tape : &mut Tape<V> ,
             arg  : &AD<V>       ,
         ) -> AD<V> {
@@ -78,38 +78,32 @@ macro_rules! impl_unary_float_core{ ($name:ident) => { paste::paste! {
     }
 } } }
 //
-/// Implements the FloatCore trait for AD types
-impl<V> FloatCore for AD<V>
+/// Implements the FUnary trait for AD types
+impl<V> FUnary for AD<V>
 where
-    V : Clone + FloatCore + ThisThreadTape,
+    V : Clone + FConst + FUnary + ThisThreadTape,
 {
-    fn pi()            -> AD<V> { AD::<V>::from( V::pi() ) }
-    fn nan()           -> AD<V> { AD::<V>::from( V::nan() ) }
-    fn one()           -> AD<V> { AD::<V>::from( V::one() ) }
-    fn zero()          -> AD<V> { AD::<V>::from( V::zero() ) }
-    fn epsilon()       -> AD<V> { AD::<V>::from( V::epsilon() ) }
-    fn min_positive()  -> AD<V> { AD::<V>::from( V::min_positive() ) }
     //
     // unary functions
-    impl_unary_float_core!(ln);
-    impl_unary_float_core!(sqrt);
-    impl_unary_float_core!(tanh);
-    impl_unary_float_core!(tan);
-    impl_unary_float_core!(sinh);
-    impl_unary_float_core!(cosh);
-    impl_unary_float_core!(abs);
-    impl_unary_float_core!(signum);
-    impl_unary_float_core!(exp);
-    impl_unary_float_core!(minus);
-    impl_unary_float_core!(cos);
-    impl_unary_float_core!(sin);
+    impl_float_unary!(ln);
+    impl_float_unary!(sqrt);
+    impl_float_unary!(tanh);
+    impl_float_unary!(tan);
+    impl_float_unary!(sinh);
+    impl_float_unary!(cosh);
+    impl_float_unary!(abs);
+    impl_float_unary!(signum);
+    impl_float_unary!(exp);
+    impl_float_unary!(minus);
+    impl_float_unary!(cos);
+    impl_float_unary!(sin);
     //
     // powi
     /// `AD<V>`.powi(`i32`)
     fn powi(&self, rhs : i32) -> AD<V> {
         //
         // record
-        fn record<V : FloatCore>(
+        fn record<V : FConst + FUnary >(
             tape : &mut Tape<V> ,
             arg  : &AD<V>       ,
             rhs  : i32          ,

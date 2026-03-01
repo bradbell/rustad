@@ -92,7 +92,8 @@ pub use dll_lib::{
     get_rust_src_fn,
 };
 pub use float::{
-    traits::FloatCore,
+    traits::FConst,
+    traits::FUnary,
     traits::NumCmp,
     traits::Powf,
     az_float::AzFloat,

@@ -16,7 +16,8 @@ use std::ops::{
 use crate::{
     IndexT,
     AD,
-    FloatCore,
+    FConst,
+    FUnary,
 };
 //
 use crate::ad::ADType;
@@ -47,14 +48,14 @@ fn cos_forward_der<V, E>(
     arg_type   :   &[ADType]   ,
     res        :   usize       )
 where
-    E             : FloatCore,
+    E             : FConst + FUnary ,
     for<'a> &'a E : Mul<&'a E, Output=E>,
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     let index    = arg[0] as usize;
-    let term     = &FloatCore::sin( &var_both[index] ) *  &var_der[index];
-    var_der[res] = FloatCore::minus( &term );
+    let term     = &FUnary::sin( &var_both[index] ) *  &var_der[index];
+    var_der[res] = FUnary::minus( &term );
 }
 // cos_reverse_der
 /// First order reverse mode for cos(variable);
@@ -70,13 +71,13 @@ fn cos_reverse_der<V, E>(
     res        :   usize       )
 where
     for<'a> E     : SubAssign<&'a E> ,
-    E             : FloatCore,
+    E             : FConst + FUnary ,
     for<'a> &'a E : Mul<&'a E, Output=E>,
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     let index       = arg[0] as usize;
-    let term        = &FloatCore::sin( &var_both[index] ) * &var_der[res];
+    let term        = &FUnary::sin( &var_both[index] ) * &var_der[res];
     var_der[index] -= &term;
 }
 // ---------------------------------------------------------------------------
@@ -89,7 +90,7 @@ where
 pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> &'a AD<V> : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
-    V                 : Clone + FloatCore + ThisThreadTape ,
+    V                 : Clone + FConst + FUnary + ThisThreadTape ,
     for<'a> V         : SubAssign<&'a V>,
     for<'a> AD<V>     : SubAssign<&'a AD<V> >,
 {

@@ -3,7 +3,8 @@
 // SPDX-FileContributor: 2026 Bradley M. Bell
 //
 use rustad::{
-    FloatCore,
+    FConst,
+    FUnary,
     AzFloat,
     start_recording,
     stop_recording,
@@ -26,7 +27,7 @@ fn test_abs() {
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
     for j in 0 .. 2 {
-        let temp  = FloatCore::signum( &x[j] ) * dx[j];
+        let temp  = FUnary::signum( &x[j] ) * dx[j];
         assert_eq!( dy[j], temp );
     }
     //
@@ -34,7 +35,7 @@ fn test_abs() {
     let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
     for j in 0 .. 2 {
-        let temp  = FloatCore::signum( &x[j] ) * dy[j];
+        let temp  = FUnary::signum( &x[j] ) * dy[j];
         assert_eq!( dx[j], temp );
     }
 }
@@ -47,21 +48,21 @@ fn test_cos() {
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
     let (_, ax)      = start_recording(None,  x.clone() );
-    let ay           = vec! [ FloatCore::cos( &ax[0] ) ];
+    let ay           = vec! [ FUnary::cos( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
-    let temp         = FloatCore::sin( &x[0] ) * dx[0];
-    assert_eq!( dy[0], FloatCore::minus(&temp) );
+    let temp         = FUnary::sin( &x[0] ) * dx[0];
+    assert_eq!( dy[0], FUnary::minus(&temp) );
     //
     let dy           = vec![ V::from(4.0) ];
     let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
-    let temp         = FloatCore::sin( &x[0] ) * dy[0];
-    assert_eq!( dx[0], FloatCore::minus(&temp) );
+    let temp         = FUnary::sin( &x[0] ) * dy[0];
+    assert_eq!( dx[0], FUnary::minus(&temp) );
 }
 //
 // test_cosh
@@ -72,19 +73,19 @@ fn test_cosh() {
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
     let (_, ax)      = start_recording(None,  x.clone() );
-    let ay           = vec! [ FloatCore::cosh( &ax[0] ) ];
+    let ay           = vec! [ FUnary::cosh( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
-    assert_eq!( dy[0], FloatCore::sinh( &x[0] ) * dx[0] );
+    assert_eq!( dy[0], FUnary::sinh( &x[0] ) * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
     let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
-    assert_eq!( dx[0], FloatCore::sinh( &x[0] ) * dy[0] );
+    assert_eq!( dx[0], FUnary::sinh( &x[0] ) * dy[0] );
 }
 //
 // test_exp
@@ -95,19 +96,19 @@ fn test_exp() {
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
     let (_, ax)      = start_recording(None,  x.clone() );
-    let ay           = vec! [ FloatCore::exp( &ax[0] ) ];
+    let ay           = vec! [ FUnary::exp( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
-    assert_eq!( dy[0], FloatCore::exp( &x[0] ) * dx[0] );
+    assert_eq!( dy[0], FUnary::exp( &x[0] ) * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
     let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
-    assert_eq!( dx[0], FloatCore::exp( &x[0] ) * dy[0] );
+    assert_eq!( dx[0], FUnary::exp( &x[0] ) * dy[0] );
 }
 //
 // test_ln
@@ -118,7 +119,7 @@ fn test_ln() {
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
     let (_, ax)      = start_recording(None,  x.clone() );
-    let ay           = vec! [ FloatCore::ln( &ax[0] ) ];
+    let ay           = vec! [ FUnary::ln( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
@@ -141,7 +142,7 @@ fn test_minus() {
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
     let (_, ax)      = start_recording(None,  x.clone() );
-    let ay           = vec! [ FloatCore::minus( &ax[0] ) ];
+    let ay           = vec! [ FUnary::minus( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
@@ -164,19 +165,19 @@ fn test_signum() {
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
     let (_, ax)      = start_recording(None,  x.clone() );
-    let ay           = vec! [ FloatCore::signum( &ax[0] ) ];
+    let ay           = vec! [ FUnary::signum( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
-    assert_eq!( dy[0], FloatCore::zero() );
+    assert_eq!( dy[0], FConst::zero() );
     //
     let dy           = vec![ V::from(4.0) ];
     let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
-    assert_eq!( dx[0], FloatCore::zero() );
+    assert_eq!( dx[0], FConst::zero() );
 }
 //
 // test_sin
@@ -187,19 +188,19 @@ fn test_sin() {
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
     let (_, ax)      = start_recording(None,  x.clone() );
-    let ay           = vec! [ FloatCore::sin( &ax[0] ) ];
+    let ay           = vec! [ FUnary::sin( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
-    assert_eq!( dy[0], FloatCore::cos( &x[0] ) * dx[0] );
+    assert_eq!( dy[0], FUnary::cos( &x[0] ) * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
     let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
-    assert_eq!( dx[0], FloatCore::cos( &x[0] ) * dy[0] );
+    assert_eq!( dx[0], FUnary::cos( &x[0] ) * dy[0] );
 }
 //
 // test_sinh
@@ -210,19 +211,19 @@ fn test_sinh() {
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
     let (_, ax)      = start_recording(None,  x.clone() );
-    let ay           = vec! [ FloatCore::sinh( &ax[0] ) ];
+    let ay           = vec! [ FUnary::sinh( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
-    assert_eq!( dy[0], FloatCore::cosh( &x[0] ) * dx[0] );
+    assert_eq!( dy[0], FUnary::cosh( &x[0] ) * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
     let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     //
-    assert_eq!( dx[0], FloatCore::cosh( &x[0] ) * dy[0] );
+    assert_eq!( dx[0], FUnary::cosh( &x[0] ) * dy[0] );
 }
 //
 // test_sqrt
@@ -233,14 +234,14 @@ fn test_sqrt() {
     let x  : Vec<V>  = vec![ V::from(4.0) ];
     //
     let (_, ax)      = start_recording(None,  x.clone() );
-    let ay           = vec! [ FloatCore::sqrt( &ax[0] ) ];
+    let ay           = vec! [ FUnary::sqrt( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
-    let dsqrt        = V::from(0.5) / FloatCore::sqrt( &x[0] );
+    let dsqrt        = V::from(0.5) / FUnary::sqrt( &x[0] );
     //
     assert_eq!( dy[0], dsqrt * dx[0] );
     //
@@ -258,14 +259,14 @@ fn test_tan() {
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
     let (_, ax)      = start_recording(None,  x.clone() );
-    let ay           = vec! [ FloatCore::tan( &ax[0] ) ];
+    let ay           = vec! [ FUnary::tan( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
-    let cos          = FloatCore::cos( &x[0] );
+    let cos          = FUnary::cos( &x[0] );
     let sec_sq       = V::from(1.0) / ( cos * cos );
     assert_eq!( dy[0], sec_sq * dx[0] );
     //
@@ -283,14 +284,14 @@ fn test_tanh() {
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
     let (_, ax)      = start_recording(None,  x.clone() );
-    let ay           = vec! [ FloatCore::tanh( &ax[0] ) ];
+    let ay           = vec! [ FUnary::tanh( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
-    let cosh         = FloatCore::cosh( &x[0] );
+    let cosh         = FUnary::cosh( &x[0] );
     let sech_sq      = V::from(1.0) / ( cosh * cosh );
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     check_nearly_eq::<V>( &dy[0], &(sech_sq * dx[0]), &arg_vec );

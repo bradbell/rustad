@@ -12,7 +12,8 @@ use crate::{
     AD,
     ADfn,
     IndexT,
-    FloatCore,
+    FConst,
+    FUnary,
 };
 use crate::op::info::{
     OpInfo,
@@ -158,8 +159,8 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
         let var_n_dom = self.var_dom_len();
         //
         // zero_e, one_e
-        let zero_e      : $E  = FloatCore::zero();
-        let one_e       : $E  = FloatCore::one();
+        let zero_e      : $E  = FConst::zero();
+        let one_e       : $E  = FConst::one();
         //
         // var_der
         let n_var             = self.var_len();
@@ -243,7 +244,7 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
 }}}
 //
 impl<V> ADfn<V> where
-V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore + ThisThreadTape,
+V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + FUnary + ThisThreadTape,
 {   //
     // subgraph_der
     subgraph_der!( value, V, V );

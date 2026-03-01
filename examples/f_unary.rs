@@ -7,7 +7,8 @@ fn main() {
         AzFloat,
         NumVec,
         AD,
-        FloatCore,
+        FConst,
+        FUnary,
         check_nearly_eq,
     };
     //
@@ -16,13 +17,13 @@ fn main() {
     // ----------------------------------------------------------------------
     // pi
     {   type V      = AzFloat<f64>;
-        let pi : V  = FloatCore::pi();
+        let pi : V  = FConst::pi();
         let check   = V::from(3.14159265358979323846264338327950288);
         assert_eq!(pi, check);
     }
     // nan
     {   type V      = AzFloat<f32>;
-        let nan : V = FloatCore::nan();
+        let nan : V = FConst::nan();
         // AzFloat defines nan as equal to nan
         assert_eq!( nan, nan );
         // f32 defines nan as not equal to nan
@@ -30,30 +31,30 @@ fn main() {
     }
     // one
     {   type V          = AzFloat<f32>;
-        let one : AD<V> = FloatCore::one();
+        let one : AD<V> = FConst::one();
         let two : AD<V> = V::from(2).into();
         assert_eq!( V::from(2), ( &two * &one).to_value() );
     }
     // zero
     {   type S       = AzFloat<f64>;
         type V       = NumVec<S>;
-        let zero : V = FloatCore::zero();
+        let zero : V = FConst::zero();
         let two  : V = NumVec::from( S::from(2) );
         assert_eq!( two, &two + &zero );
     }
     // epsilon
     {   type V      = AzFloat<f64>;
-        let epsilon : V = FloatCore::epsilon();
-        let one     : V = FloatCore::one();
+        let epsilon : V = FConst::epsilon();
+        let one     : V = FConst::one();
         let two     : V = V::from(2);
         assert_ne!( one, one + epsilon );
         assert_eq!( one, one + epsilon / two );
     }
     // min_positive
     {   type V               = AzFloat<f32>;
-        let min_positive : V = FloatCore::min_positive();
-        let epsilon      : V = FloatCore::epsilon();
-        let zero         : V = FloatCore::zero();
+        let min_positive : V = FConst::min_positive();
+        let epsilon      : V = FConst::epsilon();
+        let zero         : V = FConst::zero();
         let two          : V = V::from(2);
         assert!( zero < min_positive * epsilon );
         assert_eq!( zero , min_positive * epsilon / two );
@@ -66,13 +67,13 @@ fn main() {
         let minus_3      = V::from( - 3.0 );
         let abs_minus_3  = minus_3.abs();
         let sum          = minus_3 + abs_minus_3;
-        assert_eq!( sum, FloatCore::zero() );
+        assert_eq!( sum, FConst::zero() );
     }
     // exp
     {   type V = AzFloat<f32>;
-        let one          = FloatCore::one();
-        let exp_3        = FloatCore::exp( &V::from(3.0) );
-        let exp_minus_3  = FloatCore::exp( &V::from(-3.0) );
+        let one          = FConst::one();
+        let exp_3        = FUnary::exp( &V::from(3.0) );
+        let exp_minus_3  = FUnary::exp( &V::from(-3.0) );
         let prod         = exp_3 * exp_minus_3;
         assert_eq!(prod, one);
     }
@@ -81,17 +82,17 @@ fn main() {
         let three        = V::from(3.0);
         let minus_3      = three.minus();
         let sum          = three + minus_3;
-        assert_eq!( sum, FloatCore::zero() );
+        assert_eq!( sum, FConst::zero() );
     }
     // cos
     {   type V = AzFloat<f64>;
-        let cos_0        = FloatCore::cos( &V::from(0.0) );
-        assert_eq!( cos_0, FloatCore::one() );
+        let cos_0        = FUnary::cos( &V::from(0.0) );
+        assert_eq!( cos_0, FConst::one() );
     }
     // cosh
     {   type V = AzFloat<f64>;
         let two         = V::from(2.0);
-        let cosh_2      = FloatCore::cosh( &two );
+        let cosh_2      = FUnary::cosh( &two );
         //
         let exp_2       = two.exp();
         let exp_minus_2 = two.minus().exp();
@@ -114,15 +115,15 @@ fn main() {
     }
     // sin
     {   type V = AzFloat<f64>;
-        let pi : V   = FloatCore::pi();
+        let pi : V   = FConst::pi();
         let pi_2     = pi / V::from(2);
         let sin_pi_2 = pi_2.sin();
-        assert_eq!(sin_pi_2, FloatCore::one());
+        assert_eq!(sin_pi_2, FConst::one());
     }
     // sinh
     {   type V = AzFloat<f64>;
         let two         = V::from(2.0);
-        let sinh_2      = FloatCore::sinh( &two );
+        let sinh_2      = FUnary::sinh( &two );
         //
         let exp_2       = two.exp();
         let exp_minus_2 = two.minus().exp();
@@ -133,15 +134,15 @@ fn main() {
     {   type V = AzFloat<f64>;
         let two         = V::from(2.0);
         let four        = V::from(4.0);
-        let sqrt_4      = FloatCore::sqrt( &four);
+        let sqrt_4      = FUnary::sqrt( &four);
         assert_eq!(sqrt_4, two);
     }
     // tan
     {   type V = AzFloat<f32>;
-        let pi : V   = FloatCore::pi();
+        let pi : V   = FConst::pi();
         let pi_4     = pi / V::from(4);
-        let tan_pi_4 = FloatCore::tan( &pi_4 );
-        assert_eq!(tan_pi_4, FloatCore::one());
+        let tan_pi_4 = FUnary::tan( &pi_4 );
+        assert_eq!(tan_pi_4, FConst::one());
     }
     // tanh
     {   type V = AzFloat<f32>;

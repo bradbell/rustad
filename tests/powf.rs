@@ -7,7 +7,8 @@ use rustad::{
     AzFloat,
     start_recording,
     stop_recording,
-    FloatCore,
+    FConst,
+    FUnary,
     check_nearly_eq,
 };
 //
@@ -80,7 +81,7 @@ fn test_powf_ac() {
 // test_powf_aa
 fn test_powf_aa() {
     type V      = AzFloat<f64>;
-    let one : V = FloatCore::one();
+    let one : V = FConst::one();
     let arg_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0), V::from(3.0) ];

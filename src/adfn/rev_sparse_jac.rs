@@ -12,7 +12,8 @@
 use crate::{
     AD,
     ADfn,
-    FloatCore,
+    FConst,
+    FUnary,
     SparsityPattern,
 };
 use crate::op::info::sealed::GlobalOpInfoVec;
@@ -141,8 +142,8 @@ macro_rules! rev_sparse_jac {
                 color_vec.iter().filter(|&k| k < &m ).max().unwrap() + 1;
             //
             // zero_e, one_e
-            let zero_e : $E = FloatCore::zero();
-            let one_e  : $E = FloatCore::one();
+            let zero_e : $E = FConst::zero();
+            let one_e  : $E = FConst::one();
             //
             // order
             let mut order : Vec<usize> = (0 .. sub_pattern.len()).collect();
@@ -200,7 +201,7 @@ macro_rules! rev_sparse_jac {
 }}
 //
 impl<V> ADfn<V> where
-V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore + ThisThreadTape,
+V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + FUnary + ThisThreadTape,
 {   //
     // rev_sparse_jac
     rev_sparse_jac!( value, V );

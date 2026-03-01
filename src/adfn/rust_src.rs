@@ -14,7 +14,7 @@ use crate::ad::ADType;
 use crate::{
     ADfn,
     FloatValue,
-    FloatCore,
+    FConst,
 };
 //
 use std::any::type_name;
@@ -65,7 +65,8 @@ fn prototype_src(fn_name : &str, v_str : &str) -> String {
         "#[allow(unused)]\n" +
         "use crate::{\n" +
         "   traits::NumCmp,\n" +
-        "   traits::FloatCore,\n"  +
+        "   traits::FConst,\n" +
+        "   traits::FUnary,\n" +
         "   traits::Powf,\n"  +
         "   az_float::AzFloat,\n" +
         "   num_vec::NumVec,\n" +
@@ -106,9 +107,6 @@ where
     /// * return :
     ///   The returned string is rust source code for an evaluation
     ///   of function values for this ADfn object; see [RustSrcFn] .
-    ///
-    /// * FloatCore : Note the [FloatCore] trait is not used by the
-    ///   generated source code.
     ///
     /// * Example: see examples/rust_src.rs
     pub fn rust_src(&self, fn_name : &str) -> String {
@@ -161,7 +159,7 @@ where
         src = src +
             "   //\n" +
             "   // nan\n" +
-            "   let nan : V = FloatCore::nan();\n";
+            "   let nan : V = FConst::nan();\n";
         //
         // cop
         if ! self.cop.is_empty() {
@@ -197,7 +195,7 @@ where
                 let arg_type = &self.dyp.arg_type_all[start .. end];
                 let res      = self.dyp.n_dom + op_index;
                 let rust_src = op_info_vec[op_id].rust_src;
-                let not_used : V = FloatCore::nan();
+                let not_used : V = FConst::nan();
                 src = src + &rust_src(
                         not_used,
                         ADType::DynamicP,
@@ -227,7 +225,7 @@ where
                 let arg_type = &self.var.arg_type_all[start .. end];
                 let res      = self.var.n_dom + op_index;
                 let rust_src = op_info_vec[op_id].rust_src;
-                let not_used : V = FloatCore::nan();
+                let not_used : V = FConst::nan();
                 src = src + &rust_src(
                         not_used,
                         ADType::Variable,

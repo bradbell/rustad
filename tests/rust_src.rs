@@ -13,7 +13,7 @@ use rustad::{
     RustSrcLink,
     get_rust_src_fn,
     create_src_dir,
-    FloatCore,
+    FUnary,
 };
 //
 fn test_sub () {

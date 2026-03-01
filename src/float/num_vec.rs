@@ -18,7 +18,8 @@ use crate::{
     AzFloat,
     Powf,
     NumCmp,
-    FloatCore,
+    FConst,
+    FUnary,
 };
 //
 // NumVec
@@ -290,14 +291,14 @@ macro_rules! impl_num_cmp_num_vec_borrow{ ($name:ident, $op:tt) => {
                 e = self.s.$name( &rhs.s );
                 v = Vec::new();
             } else {
-                e = FloatCore::nan();
+                e = FConst::nan();
                 v = Vec::with_capacity( rhs.len() );
                 for j in 0 .. rhs.len() { v.push(
                     self.s.$name(&rhs.vec[j])
                 ); }
             }
         } else {
-            e = FloatCore::nan();
+            e = FConst::nan();
             v = Vec::with_capacity( self.len() );
             if rhs.len() == 1 {
                 for j in 0 .. self.len() { v.push(
@@ -316,7 +317,7 @@ macro_rules! impl_num_cmp_num_vec_borrow{ ($name:ident, $op:tt) => {
 //
 impl<S> NumCmp< &NumVec<S> > for &NumVec<S>
 where
-    S              : FloatCore,
+    S              : FConst + FUnary ,
     for<'a> &'a S  : NumCmp<&'a S, Output = S>,
 {
     type Output = NumVec<S>;
@@ -340,7 +341,7 @@ macro_rules! impl_num_cmp_num_vec_own{ ($name:ident) => {
 impl<S> NumCmp< NumVec<S> > for NumVec<S>
 where
     S          : PartialOrd,
-    NumVec<S> : FloatCore,
+    NumVec<S> : FConst + FUnary ,
     for<'a> &'a NumVec<S> : NumCmp< &'a NumVec<S>, Output = NumVec<S> >,
 {
     type Output = NumVec<S>;
@@ -558,7 +559,7 @@ pub fn doc_powf_num_vec() {}
 //
 impl<S> Powf< &NumVec<S> > for &NumVec<S>
 where
-    S : FloatCore + Copy + Powf<Output=S> ,
+    S : FConst + FUnary + Copy + Powf<Output=S> ,
 {   //
     type Output = NumVec<S>;
     //
@@ -569,18 +570,18 @@ where
                 NumVec::<S> { s : self.s.powf( rhs.s ), vec : Vec::new() }
             } else {
                 let v = rhs.vec.iter().map( |s| self.s.powf(*s) ).collect();
-                NumVec::<S> { s : FloatCore::nan(), vec : v }
+                NumVec::<S> { s : FConst::nan(), vec : v }
             }
         } else if rhs.len() == 1 {
             let v = self.vec.iter().map( |s| s.powf( rhs.s) ).collect();
-            NumVec::<S> { s : FloatCore::nan() , vec : v }
+            NumVec::<S> { s : FConst::nan() , vec : v }
         } else {
             assert_eq!( self.len(), rhs.len() );
             let mut v : Vec<S> = Vec::with_capacity( self.len() );
             for j in 0 .. self.len() {
                 v.push( self.vec[j].powf( rhs.vec[j] ) );
             }
-            NumVec::<S> { s : FloatCore::nan() , vec : v }
+            NumVec::<S> { s : FConst::nan() , vec : v }
         }
     }
 }
@@ -597,10 +598,10 @@ macro_rules! impl_unary_float_core{ ($name:ident) => {
     }
 } }
 //
-/// Implements the FloatCore trait for NumVec types
-impl<S> FloatCore for NumVec<S>
+/// Implements the FConst trait for NumVec types
+impl<S> FConst for NumVec<S>
 where
-    S         : FloatCore + From<f32>,
+    S         : FConst + From<f32>,
     NumVec<S> : From<S>
 {
     // no arguments
@@ -610,6 +611,14 @@ where
     fn zero()         -> NumVec<S> { Self::from( S::zero() ) }
     fn epsilon()      -> NumVec<S> { Self::from( S::epsilon() ) }
     fn min_positive() -> NumVec<S> { Self::from( S::min_positive() ) }
+}
+//
+/// Implements the FUnary trait for NumVec types
+impl<S> FUnary for NumVec<S>
+where
+    S         : FConst + FUnary + From<f32>,
+    NumVec<S> : From<S>
+{
     //
     // unary functions
     impl_unary_float_core!(ln);
@@ -635,5 +644,4 @@ where
             Self { s : f32::NAN.into() , vec : v }
         }
     }
-
 }

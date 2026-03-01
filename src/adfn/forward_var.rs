@@ -13,7 +13,8 @@ use crate::ad::ADType;
 use crate::{
     AD,
     ADfn,
-    FloatCore,
+    FConst,
+    FUnary,
 };
 use crate::op::info::sealed::GlobalOpInfoVec;
 use crate::tape::sealed::ThisThreadTape;
@@ -191,7 +192,7 @@ macro_rules! forward_var {
             let n_var = self.var.n_dom + self.var.n_dep;
             //
             // var_both
-            let nan_e  : $E  = FloatCore::nan();
+            let nan_e  : $E  = FConst::nan();
             let mut var_both = var_dom;
             var_both.resize( n_var, nan_e );
             //
@@ -281,7 +282,7 @@ macro_rules! forward_var {
 } }
 //
 impl<V> ADfn<V> where
-V : Clone + std::fmt::Display + GlobalOpInfoVec + FloatCore + ThisThreadTape,
+V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + FUnary + ThisThreadTape,
 {   //
     // forward_var
     forward_var!( value, V );

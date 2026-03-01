@@ -16,7 +16,8 @@ use crate::ad::ADType;
 use crate::{
     AD,
     ADfn,
-    FloatCore,
+    FConst,
+    FUnary,
 };
 //
 #[cfg(doc)]
@@ -241,7 +242,7 @@ pub fn start_recording<V>(
     var_dom : Vec<V>            ,
 ) -> ( Vec< AD<V> >, Vec< AD<V> > )
 where
-    V : FloatCore + Clone + Sized + 'static + sealed::ThisThreadTape ,
+    V : FConst + FUnary + Clone + Sized + 'static + sealed::ThisThreadTape ,
 {
     assert_ne!( var_dom.len(), 0 );
     //

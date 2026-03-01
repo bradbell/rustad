@@ -13,7 +13,7 @@ use rustad::{
     AzFloat,
     call_atom,
     NumCmp,
-    FloatCore,
+    FUnary,
 };
 //
 mod atom_test;
@@ -303,10 +303,10 @@ fn find_first_equal_binary() {
     // aq0, aq1, aq2, aq3
     // Optimizer should detect that aq0 and aq1 are identical.
     // Given that, it should detect that aq2 and aq3 are identical.
-    let aq0 = FloatCore::sin( &ap[0] );   // q0 = sin( p[0] )
-    let aq1 = FloatCore::sin( &ap[0] );   // q1 = sin( p[0] )
-    let aq2 = FloatCore::cos( &aq0 );     // q2 = cos( q0 )
-    let aq3 = FloatCore::cos( &aq1 );     // q3 = cos( q1 )
+    let aq0 = FUnary::sin( &ap[0] );   // q0 = sin( p[0] )
+    let aq1 = FUnary::sin( &ap[0] );   // q1 = sin( p[0] )
+    let aq2 = FUnary::cos( &aq0 );     // q2 = cos( q0 )
+    let aq3 = FUnary::cos( &aq1 );     // q3 = cos( q1 )
     //
     // f
     let ay     = vec![ aq0, aq1, aq2, aq3 ];
@@ -315,10 +315,10 @@ fn find_first_equal_binary() {
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
     let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), &arg_vec);
-    assert_eq!( y[0], FloatCore::sin( &p[0] ) );
-    assert_eq!( y[1], FloatCore::sin( &p[0] ) );
-    assert_eq!( y[2], FloatCore::cos( &FloatCore::sin( &p[0] ) ) );
-    assert_eq!( y[3], FloatCore::cos( &FloatCore::sin( &p[0] ) ) );
+    assert_eq!( y[0], FUnary::sin( &p[0] ) );
+    assert_eq!( y[1], FUnary::sin( &p[0] ) );
+    assert_eq!( y[2], FUnary::cos( &FUnary::sin( &p[0] ) ) );
+    assert_eq!( y[3], FUnary::cos( &FUnary::sin( &p[0] ) ) );
     assert_eq!( f.dyp_dep_len(), 4 );
     assert_eq!( f.var_dep_len(), 0 );
     //
@@ -328,10 +328,10 @@ fn find_first_equal_binary() {
     // check f
     let p_      = f.forward_dyp_value(p.clone(), &arg_vec);
     let (y, _y) = f.forward_var_value(Some(&p_), x.clone(), &arg_vec);
-    assert_eq!( y[0], FloatCore::sin( &p[0] ) );
-    assert_eq!( y[1], FloatCore::sin( &p[0] ) );
-    assert_eq!( y[2], FloatCore::cos( &FloatCore::sin( &p[0] ) ) );
-    assert_eq!( y[3], FloatCore::cos( &FloatCore::sin( &p[0] ) ) );
+    assert_eq!( y[0], FUnary::sin( &p[0] ) );
+    assert_eq!( y[1], FUnary::sin( &p[0] ) );
+    assert_eq!( y[2], FUnary::cos( &FUnary::sin( &p[0] ) ) );
+    assert_eq!( y[3], FUnary::cos( &FUnary::sin( &p[0] ) ) );
     assert_eq!( f.dyp_dep_len(), 2 );
     assert_eq!( f.var_dep_len(), 0 );
 }
