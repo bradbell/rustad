@@ -942,7 +942,7 @@ macro_rules! impl_value_op_ad{
             //
             #[ doc = concat!(
                 "compute `&", stringify!($V), "` ",
-                stringify!($Op), " `&AD<", stringify!($f1), ">` "
+                stringify!($Op), " `&AD<", stringify!($V), ">` "
             ) ]
             fn [< $Name:lower >] (self , rhs : &AD<$V>) -> AD<$V> {
                 //
