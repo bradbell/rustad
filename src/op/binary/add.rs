@@ -211,8 +211,8 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
     for<'a> &'a V : Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Add<&'a V, Output = V> ,
-    for<'a> V     : Clone + FConst + FUnary + PartialEq +
-                    ThisThreadTape + AddAssign<&'a V>,
+        for<'a> V : AddAssign<&'a V>,
+                V : Clone + FConst + FUnary + PartialEq + ThisThreadTape,
 {
     op_info_vec[ADD_PP_OP as usize] = OpInfo{
         name              : "add_pp",
