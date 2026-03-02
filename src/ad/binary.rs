@@ -468,8 +468,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
     impl<V> $Name< &V> for &AD<V>
     where
         for<'a> &'a V: $Name<&'a V, Output=V>,
-        V            : Clone + FConst + FUnary + PartialEq +
-                       crate::ThisThreadTapePublic ,
+        V : Clone + FConst + FUnary + PartialEq + crate::ThisThreadTapePublic,
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self , rhs : &V ) -> AD<V>
@@ -499,8 +498,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
     impl<V> $Name<V> for AD<V>
     where
         for<'a> &'a V: $Name<&'a V, Output=V>,
-        V            : Clone + FConst + FUnary + PartialEq +
-                       crate::ThisThreadTapePublic ,
+        V : Clone + FConst + FUnary + PartialEq + crate::ThisThreadTapePublic,
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self , rhs : V ) -> AD<V> {
@@ -685,9 +683,8 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     )]
     impl<V> [< $Name Assign >] < &AD<V> > for AD<V>
     where
-        V: Clone + FConst + FUnary + PartialEq +
-            for<'a> [< $Name Assign >] <&'a V> +
-            crate::ThisThreadTapePublic  ,
+        V : Clone + FConst + FUnary + PartialEq + crate::ThisThreadTapePublic,
+        V : for<'a> [< $Name Assign >] <&'a V>,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : &AD<V> )
         {   //
@@ -717,9 +714,8 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     )]
     impl<V> [< $Name Assign >] < AD<V> > for AD<V>
     where
-        V: Clone + FConst + FUnary + PartialEq +
-            for<'a> [< $Name Assign >] <&'a V> +
-            crate::ThisThreadTapePublic  ,
+        V : Clone + FConst + FUnary + PartialEq + crate::ThisThreadTapePublic,
+        V : for<'a> [< $Name Assign >] <&'a V>,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : AD<V> ) {
             self.[< $Name:lower _assign >] ( &rhs );
@@ -731,9 +727,8 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     )]
     impl<V> [< $Name Assign >] <&V> for AD<V>
     where
-        V: Clone + FConst + FUnary + PartialEq +
-            for<'a> [< $Name Assign >] <&'a V> +
-            crate::ThisThreadTapePublic  ,
+        V : Clone + FConst + FUnary + PartialEq + crate::ThisThreadTapePublic,
+        V : for<'a> [< $Name Assign >] <&'a V>,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : &V)
         {   //
@@ -760,9 +755,8 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     )]
     impl<V> [< $Name Assign >] <V> for AD<V>
     where
-        V: Clone + FConst + FUnary + PartialEq +
-            for<'a> [< $Name Assign >] <&'a V> +
-            crate::ThisThreadTapePublic  ,
+        V : Clone + FConst + FUnary + PartialEq + crate::ThisThreadTapePublic,
+        V : for<'a> [< $Name Assign >] <&'a V>,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : V) {
             self.[< $Name:lower _assign >]( &rhs );
