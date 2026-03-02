@@ -355,7 +355,7 @@ macro_rules! impl_num_cmp_az_float_borrow{ ($name:ident, $op:tt) => {
 impl<B> NumCmp< &AzFloat<B> > for &AzFloat<B>
 where
     B          : PartialOrd,
-    AzFloat<B> : FConst + FUnary ,
+    AzFloat<B> : FConst,
 {
     type Output = AzFloat<B>;
     //
@@ -378,7 +378,7 @@ macro_rules! impl_num_cmp_az_float_own{ ($name:ident) => {
 impl<B> NumCmp< AzFloat<B> > for AzFloat<B>
 where
     B          : PartialOrd,
-    AzFloat<B> : FConst + FUnary ,
+    AzFloat<B> : FConst,
     for<'a> &'a AzFloat<B> : NumCmp< &'a AzFloat<B>, Output = AzFloat<B> >,
 {
     type Output = AzFloat<B>;

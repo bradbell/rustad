@@ -317,7 +317,7 @@ macro_rules! impl_num_cmp_num_vec_borrow{ ($name:ident, $op:tt) => {
 //
 impl<S> NumCmp< &NumVec<S> > for &NumVec<S>
 where
-    S              : FConst + FUnary ,
+    S              : FConst,
     for<'a> &'a S  : NumCmp<&'a S, Output = S>,
 {
     type Output = NumVec<S>;
@@ -341,7 +341,7 @@ macro_rules! impl_num_cmp_num_vec_own{ ($name:ident) => {
 impl<S> NumCmp< NumVec<S> > for NumVec<S>
 where
     S          : PartialOrd,
-    NumVec<S> : FConst + FUnary ,
+    NumVec<S> : FConst,
     for<'a> &'a NumVec<S> : NumCmp< &'a NumVec<S>, Output = NumVec<S> >,
 {
     type Output = NumVec<S>;
@@ -559,7 +559,7 @@ pub fn doc_powf_num_vec() {}
 //
 impl<S> Powf< &NumVec<S> > for &NumVec<S>
 where
-    S : FConst + FUnary + Copy + Powf<Output=S> ,
+    S : FConst + Copy + Powf<Output=S> ,
 {   //
     type Output = NumVec<S>;
     //
@@ -586,7 +586,7 @@ where
     }
 }
 // ---------------------------------------------------------------------------
-macro_rules! impl_unary_float_core{ ($name:ident) => {
+macro_rules! impl_float_unary{ ($name:ident) => {
     #[ doc = concat!( "`NumVec<S>.`", stringify!($name), "()" )]
     fn $name(&self) -> NumVec<S> {
         if self.len() == 1 {
@@ -621,18 +621,18 @@ where
 {
     //
     // unary functions
-    impl_unary_float_core!(ln);
-    impl_unary_float_core!(sqrt);
-    impl_unary_float_core!(tanh);
-    impl_unary_float_core!(tan);
-    impl_unary_float_core!(sinh);
-    impl_unary_float_core!(cosh);
-    impl_unary_float_core!(abs);
-    impl_unary_float_core!(signum);
-    impl_unary_float_core!(exp);
-    impl_unary_float_core!(minus);
-    impl_unary_float_core!(cos);
-    impl_unary_float_core!(sin);
+    impl_float_unary!(ln);
+    impl_float_unary!(sqrt);
+    impl_float_unary!(tanh);
+    impl_float_unary!(tan);
+    impl_float_unary!(sinh);
+    impl_float_unary!(cosh);
+    impl_float_unary!(abs);
+    impl_float_unary!(signum);
+    impl_float_unary!(exp);
+    impl_float_unary!(minus);
+    impl_float_unary!(cos);
+    impl_float_unary!(sin);
     //
     // powi
     /// `NumVec<S>`.powi(`i32`)

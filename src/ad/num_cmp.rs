@@ -12,7 +12,6 @@ use std::cell::RefCell;
 //
 use crate::{
     FConst,
-    FUnary,
     AD,
     IndexT,
     NumCmp,
@@ -142,7 +141,7 @@ macro_rules! impl_num_cmp_aa_borrow{ ($name:ident, $OpId:ident) =>  {
 } }
 impl<V> NumCmp< &AD<V> > for &AD<V>
 where
-    V : Clone + FConst + FUnary + PartialEq + ThisThreadTape ,
+    V : Clone + FConst + PartialEq + ThisThreadTape ,
     for<'a> &'a V : NumCmp<&'a V, Output = V> ,
 {
     type Output = AD<V>;
@@ -168,7 +167,7 @@ macro_rules! impl_num_cmp_aa_own{ ($name:ident) => {
 //
 impl<V> NumCmp< AD<V> > for AD<V>
 where
-    V                 : FConst + FUnary + PartialOrd + ThisThreadTape ,
+    V                 : FConst + PartialOrd + ThisThreadTape ,
     for<'a> &'a AD<V> : NumCmp< &'a AD<V>, Output = AD<V> >,
 {
     type Output = AD<V>;
@@ -210,7 +209,7 @@ macro_rules! impl_num_cmp_ac_borrow{ ($name:ident, $OpId:ident) => {
 } }
 impl<V> NumCmp<&V> for &AD<V>
 where
-    V : Clone + FConst + FUnary + PartialEq + ThisThreadTape ,
+    V : Clone + FConst + PartialEq + ThisThreadTape ,
     for<'a> &'a V : NumCmp<&'a V, Output = V> ,
 {
     type Output = AD<V>;
@@ -236,7 +235,7 @@ macro_rules! impl_num_cmp_ac_own{ ($name:ident) => {
 //
 impl<V> NumCmp<V> for AD<V>
 where
-    V                 : FConst + FUnary + PartialOrd + ThisThreadTape ,
+    V                 : FConst + PartialOrd + ThisThreadTape ,
     for<'a> &'a AD<V> : NumCmp< &'a V, Output = AD<V> >,
 {
     type Output = AD<V>;
@@ -277,7 +276,7 @@ macro_rules! impl_num_cmp_ca_borrow{ ($name:ident, $OpId:ident) => {
 } }
 impl<V> NumCmp< &AD<V> > for &V
 where
-    V : Clone + FConst + FUnary + PartialEq + ThisThreadTape ,
+    V : Clone + FConst + PartialEq + ThisThreadTape ,
     for<'a> &'a V : NumCmp<&'a V, Output = V>
 {
     type Output = AD<V>;
@@ -302,7 +301,7 @@ macro_rules! impl_num_cmp_ca_own{ ($name:ident) => {
 } }
 impl<V> NumCmp< AD<V> > for V
 where
-    V : Clone + FConst + FUnary + PartialEq + ThisThreadTape ,
+    V : Clone + FConst + PartialEq + ThisThreadTape ,
     for<'a> &'a V : NumCmp<&'a AD<V>, Output = AD<V> >
 {
     type Output = AD<V>;
@@ -324,7 +323,7 @@ fn record_num_cmp_aa <V> (
     op_id:     u8      ,
 ) -> (usize, usize, ADType)
 where
-    V : Clone + FConst + FUnary + PartialEq ,
+    V : Clone + FConst + PartialEq ,
 {
     // new_tape_id, new_index, new_ad_type
     let mut new_tape_id   = 0;
@@ -442,7 +441,7 @@ fn record_num_cmp_ac <V> (
     op_id:     u8      ,
 ) -> (usize, usize, ADType)
 where
-    V : Clone + FConst + FUnary + PartialEq ,
+    V : Clone + FConst + PartialEq ,
 {
     // new_tape_id, new_index, new_ad_type
     let mut new_tape_id   = 0;
@@ -527,7 +526,7 @@ fn record_num_cmp_ca <V> (
     op_id:     u8      ,
 ) -> (usize, usize, ADType)
 where
-    V : Clone + FConst + FUnary + PartialEq ,
+    V : Clone + FConst + PartialEq ,
 {
     // new_tape_id, new_index, new_ad_type
     let mut new_tape_id   = 0;
