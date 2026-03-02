@@ -261,7 +261,8 @@ macro_rules! reverse_der {
 } }
 //
 impl<V> ADfn<V> where
-V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + FUnary + ThisThreadTape,
+V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + ThisThreadTape,
+V : FUnary<Output=V>,
 {   //
     // reverse_der
     reverse_der!( value, V );

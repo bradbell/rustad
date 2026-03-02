@@ -616,9 +616,10 @@ where
 /// Implements the FUnary trait for NumVec types
 impl<S> FUnary for NumVec<S>
 where
-    S         : FConst + FUnary + From<f32>,
+    S         : FConst + From<f32> + FUnary<Output=S>,
     NumVec<S> : From<S>
 {
+    type Output = NumVec<S>;
     //
     // unary functions
     impl_float_unary!(ln);

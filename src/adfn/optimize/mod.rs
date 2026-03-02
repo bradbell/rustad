@@ -176,7 +176,8 @@ pub(crate) fn renumber_op_seq(
 /// ```
 impl<V> ADfn<V>
 where
-    V : Clone + FConst + FUnary + Eq + std::fmt::Display + std::hash::Hash,
+    V : Clone + FConst + Eq + std::fmt::Display + std::hash::Hash,
+    V : FUnary<Output=V>,
     V : GlobalAtomCallbackVecPublic + GlobalOpInfoVecPublic,
 {   //
     // optimize

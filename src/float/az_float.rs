@@ -545,6 +545,7 @@ macro_rules! impl_float_const{ ($B:ident) => {
 }}
 macro_rules! impl_float_unary{ ($B:ident) => {
     impl FUnary for AzFloat<$B> {
+        type Output = AzFloat<$B>;
         //
         // unary functions
         float_unary_function!($B, ln);

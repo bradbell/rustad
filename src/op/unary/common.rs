@@ -54,7 +54,8 @@ macro_rules! forward_dyp{ ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        E : FConst + FUnary ,
+        E : FConst ,
+        E : FUnary<Output=E>,
     {   //
         // index
         let index = arg[0] as usize;
@@ -82,7 +83,8 @@ macro_rules! forward_var{ ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        E : FConst + FUnary ,
+        E : FConst ,
+        E : FUnary<Output=E>,
     {
         //
         // index

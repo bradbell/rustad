@@ -69,21 +69,22 @@ pub trait FConst {
 ///
 /// See the file examples/f_unary.rs .
 pub trait FUnary {
+    type Output;
     // ------------------------------------------------------------------------
-    fn ln(&self) -> Self;
-    fn sqrt(&self) -> Self;
-    fn tanh(&self) -> Self;
-    fn tan(&self) -> Self;
-    fn sinh(&self) -> Self;
-    fn cosh(&self) -> Self;
-    fn abs(&self) -> Self;
-    fn exp(&self) -> Self;
-    fn minus(&self) -> Self;
-    fn cos(&self) -> Self;
-    fn signum(&self) -> Self;
-    fn sin(&self) -> Self;
+    fn ln(&self) -> Self::Output;
+    fn sqrt(&self) -> Self::Output;
+    fn tanh(&self) -> Self::Output;
+    fn tan(&self) -> Self::Output;
+    fn sinh(&self) -> Self::Output;
+    fn cosh(&self) -> Self::Output;
+    fn abs(&self) -> Self::Output;
+    fn exp(&self) -> Self::Output;
+    fn minus(&self) -> Self::Output;
+    fn cos(&self) -> Self::Output;
+    fn signum(&self) -> Self::Output;
+    fn sin(&self) -> Self::Output;
     // ------------------------------------------------------------------------
-    fn powi(&self, rhs : i32) -> Self;
+    fn powi(&self, rhs : i32) -> Self::Output;
 }
 // ----------------------------------------------------------------------------
 pub trait Powf<Rhs = Self> {

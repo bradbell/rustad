@@ -1032,7 +1032,8 @@ no_reverse_depend!(Call);
 ///   The map results for CALL_OP and CALL_RES_OP are set.
 pub(crate) fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
-    V     : Clone + From<f32> + FConst + FUnary ,
+    V     : Clone + From<f32> + FConst ,
+    V     : FUnary<Output=V>,
     V     : PartialEq + GlobalAtomCallbackVec + ThisThreadTapePublic,
     for<'a> V : AddAssign<&'a V> ,
 {

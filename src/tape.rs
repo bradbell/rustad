@@ -242,7 +242,8 @@ pub fn start_recording<V>(
     var_dom : Vec<V>            ,
 ) -> ( Vec< AD<V> >, Vec< AD<V> > )
 where
-    V : FConst + FUnary + Clone + Sized + 'static + sealed::ThisThreadTape ,
+    V : FConst + Clone + Sized + 'static + sealed::ThisThreadTape ,
+    V : FUnary<Output=V>,
 {
     assert_ne!( var_dom.len(), 0 );
     //

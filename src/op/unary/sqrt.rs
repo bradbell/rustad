@@ -49,7 +49,8 @@ fn sqrt_forward_der<V, E>(
     arg_type   :   &[ADType]   ,
     res        :   usize       )
 where
-    E             : FConst + FUnary ,
+    E             : FConst ,
+    E             : FUnary<Output=E>,
     for<'a> &'a E : Mul<&'a E, Output=E>,
     for<'a> &'a V : Div<&'a E, Output=E>,
     V             : From<f32>,
@@ -76,7 +77,8 @@ fn sqrt_reverse_der<V, E>(
     res        :   usize       )
 where
     for<'a> E     : AddAssign<&'a E> ,
-    E             : FConst + FUnary ,
+    E             : FConst ,
+    E             : FUnary<Output=E>,
     for<'a> &'a E : Mul<&'a E, Output=E>,
     for<'a> &'a V : Div<&'a E, Output=E>,
     V             : From<f32>,
@@ -101,7 +103,8 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> &'a V     : Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
     for<'a> &'a V     : Div<&'a V, Output = V> ,
-    V                 : Clone + FConst + FUnary + ThisThreadTape + From<f32>,
+    V                 : Clone + FConst + ThisThreadTape + From<f32>,
+    V                 : FUnary<Output=V>,
     for<'a> V         : AddAssign<&'a V>,
     for<'a> AD<V>     : AddAssign<&'a AD<V> >,
 {

@@ -281,7 +281,8 @@ where
     pub(crate) fn dead_code(&self, depend : &Depend, trace : bool,
     ) -> ( Tape<V>, Old2New)
     where
-        V : Clone + FConst + FUnary + PartialEq ,
+        V : Clone + FConst + PartialEq ,
+        V : FUnary<Output=V>,
     {
         //
         // self.cop[0]

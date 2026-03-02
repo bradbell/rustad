@@ -166,7 +166,8 @@ macro_rules! forward_dyp {
 } }
 //
 impl<V> ADfn<V> where
-V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + FUnary + ThisThreadTape,
+V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + ThisThreadTape,
+V : FUnary<Output=V>,
 {   //
     // forward_dyp
     forward_dyp!( value, V );

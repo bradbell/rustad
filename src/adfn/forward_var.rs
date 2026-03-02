@@ -282,7 +282,8 @@ macro_rules! forward_var {
 } }
 //
 impl<V> ADfn<V> where
-V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + FUnary + ThisThreadTape,
+V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + ThisThreadTape,
+V : FUnary<Output=V>,
 {   //
     // forward_var
     forward_var!( value, V );

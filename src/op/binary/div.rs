@@ -85,7 +85,8 @@ where
     for<'a> &'a V : Mul<&'a E, Output = E> ,
     for<'a> &'a E : Mul<&'a E, Output = E> ,
     for<'a> &'a E : Div<&'a E, Output = E> ,
-    E             : FConst + FUnary ,
+    E             : FConst ,
+    E             : FUnary<Output=E>,
 {   // d(p / v) = - p * dv / (v * v) = -  (p / v) * dv / v
     debug_assert!( arg.len() == 2);
     debug_assert!( arg_type[0].is_parameter() );
@@ -139,7 +140,8 @@ where
     for<'a> &'a E : Mul<&'a E, Output = E> ,
     for<'a> &'a E : Div<&'a E, Output = E> ,
     for<'a> &'a E : Sub<&'a E, Output = E> ,
-    E             : FConst + FUnary ,
+    E             : FConst ,
+    E             : FUnary<Output=E>,
 {   // d(u / v) = ( v * du - u * dv ) / (v * v) = [ du - (u / v) * dv ] / v
     debug_assert!( arg.len() == 2);
     debug_assert!( arg_type[0].is_variable() );
@@ -267,7 +269,8 @@ where
     for<'a> &'a V : Div<&'a V, Output = V> ,
     for<'a> &'a V : Mul<&'a V, Output = V> ,
     for<'a> &'a V : Sub<&'a V, Output = V> ,
-    V             : Clone + FConst + FUnary ,
+    V             : Clone + FConst ,
+    V             : FUnary<Output=V>,
     V             : PartialEq + ThisThreadTape ,
 {
     op_info_vec[DIV_PP_OP as usize] = OpInfo{

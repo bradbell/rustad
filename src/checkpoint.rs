@@ -192,7 +192,8 @@ pub(crate) fn register_checkpoint_atom<V>()-> IndexT
 where
     V : Clone + From<f32> + std::fmt::Display,
     V : GlobalOpInfoVec + GlobalCheckpointInfoVec + GlobalAtomCallbackVec,
-    V : ThisThreadTape + FConst + FUnary ,
+    V : ThisThreadTape + FConst ,
+    V : FUnary<Output=V>,
 {
     //
     // checkpoint_callback
@@ -268,7 +269,8 @@ pub fn register_checkpoint<V>(
     arg_vec       : &Vec< [&str; 2] >       ,
 ) -> IndexT
 where
-    V : Clone + From<f32> + std::fmt::Display + FConst + FUnary ,
+    V : Clone + From<f32> + std::fmt::Display + FConst ,
+    V : FUnary<Output=V>,
     V : ThisThreadTape + GlobalOpInfoVec + GlobalCheckpointInfoVec,
 {   //
     if 0 < ad_fn.dyp_len() { panic!(
@@ -425,7 +427,8 @@ fn checkpoint_forward_fun_value<V>(
     trace            : bool        ,
 ) -> Result< Vec<V>, String > where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FConst + FUnary + ThisThreadTape,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FConst + ThisThreadTape,
+    V : FUnary<Output=V>,
 {   //
     // domain_clone
     let domain_clone = ref_slice2vec(domain);
@@ -461,7 +464,8 @@ fn checkpoint_forward_der_value<V>(
 ) -> Result< Vec<V>, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FConst + FUnary + ThisThreadTape,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FConst + ThisThreadTape,
+    V : FUnary<Output=V>,
 {   //
     assert_eq!( domain.len(), domain_der.len() );
     //
@@ -504,7 +508,8 @@ fn checkpoint_reverse_der_value<V>(
 ) -> Result< Vec<V>, String >
 where
     V : Clone + From<f32> + std::fmt::Display,
-    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FConst + FUnary + ThisThreadTape,
+    V : GlobalOpInfoVec + GlobalCheckpointInfoVec + FConst + ThisThreadTape,
+    V : FUnary<Output=V>,
 {   //
     // arg_vec
     let arg_vec = if trace {

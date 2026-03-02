@@ -466,7 +466,8 @@ where
     for<'a> &'a V : std::ops::Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Div<&'a V, Output = V> ,
     //
-    V     : Clone + From<f32> + FConst + FUnary + PartialEq,
+    V     : Clone + From<f32> + FConst + PartialEq,
+    V     : FUnary<Output=V>,
     V     : ThisThreadTape + GlobalAtomCallbackVec,
     for<'a> &'a V : NumCmp<&'a V, Output = V> ,
     AD<V> : From<V>,

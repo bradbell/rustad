@@ -10,7 +10,6 @@
 use std::thread::LocalKey;
 use std::cell::RefCell;
 use crate::{
-    FConst,
     FUnary,
     AD,
     IndexT,
@@ -25,10 +24,13 @@ macro_rules! impl_float_unary{ ($name:ident) => { paste::paste! {
     fn $name(&self) -> AD<V> {
         //
         // record
-        fn record<V : FConst + FUnary >(
+        fn record<V>(
             tape : &mut Tape<V> ,
             arg  : &AD<V>       ,
-        ) -> AD<V> {
+        ) -> AD<V>
+        where
+            V : FUnary<Output=V>,
+        {
             //
             // new_value
             let new_value = arg.value.$name();
@@ -81,8 +83,9 @@ macro_rules! impl_float_unary{ ($name:ident) => { paste::paste! {
 /// Implements the FUnary trait for AD types
 impl<V> FUnary for AD<V>
 where
-    V : Clone + FConst + FUnary + ThisThreadTape,
+    V : Clone + FUnary<Output=V> + ThisThreadTape,
 {
+    type Output = AD<V>;
     //
     // unary functions
     impl_float_unary!(ln);
@@ -103,11 +106,14 @@ where
     fn powi(&self, rhs : i32) -> AD<V> {
         //
         // record
-        fn record<V : FConst + FUnary >(
+        fn record<V>(
             tape : &mut Tape<V> ,
             arg  : &AD<V>       ,
             rhs  : i32          ,
-        ) -> AD<V> {
+        ) -> AD<V>
+        where
+            V : FUnary<Output=V>,
+        {
             //
             // new_value
             let new_value = arg.value.powi(rhs);

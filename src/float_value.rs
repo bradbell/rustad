@@ -255,7 +255,8 @@ pub(crate) use impl_float_value_from_primitive;
 ///
 pub fn check_nearly_eq<V>(x : &V, y : &V, arg_vec : &Vec< [&str; 2] >) -> bool
 where
-    V  : FConst + FUnary + FloatValue + From<f32> + std::fmt::Debug,
+    V  : FConst + FloatValue + From<f32> + std::fmt::Debug,
+    V  : FUnary<Output=V>,
     for<'a> &'a V : NumCmp<&'a V, Output = V> ,
     for<'a> &'a V : Add<&'a V, Output=V> ,
     for<'a> &'a V : Mul<&'a V, Output=V> ,
