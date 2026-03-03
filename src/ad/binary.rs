@@ -133,7 +133,6 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
     ) -> (usize, usize, ADType)
     where
         V : Clone + FConst + PartialEq ,
-        V : FUnary<Output=V>,
     {
         // new_tape_id, new_index, new_ad_type
         let mut new_tape_id   = 0;
@@ -315,7 +314,6 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
     where
         for<'a> &'a V: $Name<&'a V, Output=V>,
         V    : Clone + FConst + PartialEq + crate::ThisThreadTapePublic ,
-        V    : FUnary<Output=V>,
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self , rhs : &AD<V> ) -> AD<V>
@@ -346,7 +344,6 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
     where
         for<'a> &'a V: $Name<&'a V, Output=V>,
         V    : Clone + FConst + PartialEq + crate::ThisThreadTapePublic ,
-        V    : FUnary<Output=V>,
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self , rhs : AD<V> ) -> AD<V> {
@@ -364,7 +361,6 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
     ) -> (usize, usize, ADType)
     where
         V : Clone + FConst + PartialEq,
-        V : FUnary<Output=V>,
     {
         // new_tape_id, new_index, new_ad_type, cop_lhs
         let mut new_tape_id   = 0;
@@ -473,7 +469,6 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
     where
         for<'a> &'a V: $Name<&'a V, Output=V>,
         V : Clone + FConst + PartialEq + crate::ThisThreadTapePublic,
-        V : FUnary<Output=V>,
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self , rhs : &V ) -> AD<V>
@@ -504,7 +499,6 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
     where
         for<'a> &'a V: $Name<&'a V, Output=V>,
         V : Clone + FConst + PartialEq + crate::ThisThreadTapePublic,
-        V : FUnary<Output=V>,
     {   type Output = AD<V>;
         //
         fn [< $Name:lower >](self , rhs : V ) -> AD<V> {
@@ -694,7 +688,6 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     impl<V> [< $Name Assign >] < &AD<V> > for AD<V>
     where
         V : Clone + FConst + PartialEq + crate::ThisThreadTapePublic,
-        V : FUnary<Output=V>,
         V : for<'a> [< $Name Assign >] <&'a V>,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : &AD<V> )
@@ -726,7 +719,6 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     impl<V> [< $Name Assign >] < AD<V> > for AD<V>
     where
         V : Clone + FConst + PartialEq + crate::ThisThreadTapePublic,
-        V : FUnary<Output=V>,
         V : for<'a> [< $Name Assign >] <&'a V>,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : AD<V> ) {
@@ -740,7 +732,6 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     impl<V> [< $Name Assign >] <&V> for AD<V>
     where
         V : Clone + FConst + PartialEq + crate::ThisThreadTapePublic,
-        V : FUnary<Output=V>,
         V : for<'a> [< $Name Assign >] <&'a V>,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : &V)
@@ -769,7 +760,6 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     impl<V> [< $Name Assign >] <V> for AD<V>
     where
         V : Clone + FConst + PartialEq + crate::ThisThreadTapePublic,
-        V : FUnary<Output=V>,
         V : for<'a> [< $Name Assign >] <&'a V>,
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : V) {
@@ -806,7 +796,6 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
     ) -> (usize, usize, ADType)
     where
         V : Clone + FConst + PartialEq ,
-        V : FUnary<Output=V>,
     {
         // new_tape_id, new_index, new_ad_type
         let mut new_tape_id   = 0;
