@@ -586,18 +586,6 @@ where
     }
 }
 // ---------------------------------------------------------------------------
-macro_rules! impl_float_unary{ ($name:ident) => {
-    #[ doc = concat!( "`NumVec<S>.`", stringify!($name), "()" )]
-    fn $name(&self) -> NumVec<S> {
-        if self.len() == 1 {
-            Self { s : self.s.$name() , vec : Vec::new() }
-        } else {
-            let v = self.vec.iter().map( |s| s.$name() ).collect();
-            Self { s : f32::NAN.into() , vec : v }
-        }
-    }
-} }
-//
 /// Implements the FConst trait for NumVec types
 impl<S> FConst for NumVec<S>
 where
@@ -612,11 +600,22 @@ where
     fn epsilon()      -> NumVec<S> { Self::from( S::epsilon() ) }
     fn min_positive() -> NumVec<S> { Self::from( S::min_positive() ) }
 }
-//
+macro_rules! impl_float_unary{ ($name:ident) => {
+    #[ doc = concat!( "`NumVec<S>.`", stringify!($name), "()" )]
+    fn $name(&self) -> NumVec<S> {
+        if self.len() == 1 {
+            Self { s : self.s.$name() , vec : Vec::new() }
+        } else {
+            let v = self.vec.iter().map( |s| s.$name() ).collect();
+            Self { s : f32::NAN.into() , vec : v }
+        }
+    }
+} }
+// ---------------------------------------------------------------------------
 /// Implements the FUnary trait for NumVec types
 impl<S> FUnary for NumVec<S>
 where
-    S         : FConst + From<f32> + FUnary<Output=S>,
+    S         : From<f32> + FUnary<Output=S>,
     NumVec<S> : From<S>
 {
     type Output = NumVec<S>;

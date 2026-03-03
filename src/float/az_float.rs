@@ -524,13 +524,7 @@ macro_rules! impl_powf_trait{ ($B:ident) => {
 impl_powf_trait!(f32);
 impl_powf_trait!(f64);
 // ----------------------------------------------------------------------------
-macro_rules! float_unary_function{ ($B:ident, $name:ident) => {
-    #[doc = concat!(
-        "`AzFloat<", stringify!($B), ">`.", stringify!($name), "()"
-    )]
-    fn $name(&self) -> AzFloat<$B> { Self( self.0.$name() ) }
-} }
-/// FloatCore trait for az_float types
+/// FConst trait for az_float types
 ///
 /// * B : is the floating point base type
 macro_rules! impl_float_const{ ($B:ident) => {
@@ -543,6 +537,18 @@ macro_rules! impl_float_const{ ($B:ident) => {
         fn min_positive() -> AzFloat<$B> { Self( $B::MIN_POSITIVE ) }
     }
 }}
+impl_float_const!(f32);
+impl_float_const!(f64);
+// ----------------------------------------------------------------------------
+macro_rules! float_unary_function{ ($B:ident, $name:ident) => {
+    #[doc = concat!(
+        "`AzFloat<", stringify!($B), ">`.", stringify!($name), "()"
+    )]
+    fn $name(&self) -> AzFloat<$B> { Self( self.0.$name() ) }
+} }
+/// FUnary trait for az_float types
+///
+/// * B : is the floating point base type
 macro_rules! impl_float_unary{ ($B:ident) => {
     impl FUnary for AzFloat<$B> {
         type Output = AzFloat<$B>;
@@ -568,8 +574,5 @@ macro_rules! impl_float_unary{ ($B:ident) => {
         fn powi(&self, rhs : i32) -> AzFloat<$B>{ Self( self.0.powi(rhs) ) }
     }
 } }
-impl_float_const!(f32);
 impl_float_unary!(f32);
-//
-impl_float_const!(f64);
 impl_float_unary!(f64);
