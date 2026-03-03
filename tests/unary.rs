@@ -9,6 +9,7 @@ use rustad::{
     start_recording,
     stop_recording,
     check_nearly_eq,
+    ad_from_vector,
 };
 //
 // test_abs
@@ -21,8 +22,10 @@ fn test_abs() {
     let (_, ax)      = start_recording(None,  x.clone() );
     let ay           = vec! [ ax[0].abs(), ax[1].abs() ];
     let f            = stop_recording(ay);
-    //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    // ------------------------------------------------------------------
+    // Test value derivatives
+    // ------------------------------------------------------------------
+    let (_, v)       = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) , V::from(4.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
@@ -37,6 +40,29 @@ fn test_abs() {
     for j in 0 .. 2 {
         let temp  = FUnary::signum( &x[j] ) * dy[j];
         assert_eq!( dx[j], temp );
+    }
+    // ------------------------------------------------------------------
+    // Test AD derivatives
+    // ------------------------------------------------------------------
+    let (_, av)      = f.forward_var_ad(None, ax.clone(), &arg_vec);
+    let adx          = ad_from_vector( vec![ V::from(3.0) , V::from(4.0) ] );
+    let ady          = f.forward_der_ad(None, &av, adx.clone(), &arg_vec);
+    //
+    for j in 0 .. 2 {
+        let xj    = ax[j].clone().to_value();
+        let dxj   = adx[j].clone().to_value();
+        let temp  = FUnary::signum( &xj ) * dxj;
+        assert_eq!( ady[j].clone().to_value(), temp );
+    }
+    //
+    let ady          = ad_from_vector( vec![ V::from(5.0), V::from(6.0) ] );
+    let adx          = f.reverse_der_ad(None, &av, ady.clone(), &arg_vec);
+    //
+    for j in 0 .. 2 {
+        let xj    = ax[j].clone().to_value();
+        let dyj   = ady[j].clone().to_value();
+        let temp  = FUnary::signum( &xj ) * dyj;
+        assert_eq!( adx[j].clone().to_value(), temp );
     }
 }
 //
