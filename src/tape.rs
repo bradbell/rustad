@@ -17,7 +17,6 @@ use crate::{
     AD,
     ADfn,
     FConst,
-    FUnary,
 };
 //
 #[cfg(doc)]
@@ -243,7 +242,6 @@ pub fn start_recording<V>(
 ) -> ( Vec< AD<V> >, Vec< AD<V> > )
 where
     V : FConst + Clone + Sized + 'static + sealed::ThisThreadTape ,
-    V : FUnary<Output=V>,
 {
     assert_ne!( var_dom.len(), 0 );
     //
