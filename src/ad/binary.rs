@@ -590,7 +590,7 @@ where
 macro_rules! impl_value_powf_ad{ ( $V:ty ) => {
     impl crate::Powf< &AD<$V> > for &$V
     where
-        $V : crate::FConst + crate::FUnary ,
+        $V : crate::FConst + crate::FUnary<Output=$V> ,
     {   type Output = AD<$V>;
         fn powf(self , rhs : &AD<$V>) -> AD<$V> {
             crate::FUnary::exp( &( &crate::FUnary::ln( self ) * rhs ) )
