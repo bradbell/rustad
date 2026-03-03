@@ -58,7 +58,7 @@ use crate::{
 ///       below are equivalent :
 ///       ```text
 ///           if x <= y { u } else {v}
-///           x.le(y) * u + x.gt(y) * v
+///           x.num_le(y) * u + x.num_gt(y) * v
 ///       ```
 ///       Note that this works element wise when x, y, u, v
 ///       are numeric vectors.
@@ -138,19 +138,20 @@ impl From< AzFloat<f32> > for AzFloat<f64> {
 // AzFloat Op AzFloat
 /// AzFloat binary operations
 ///
-/// * B : Is the floating point base type
 ///
 /// * Syntax :
 /// ```text
 ///     z = x Op y
 /// ```
 ///
+/// * B : Is the floating point base type
+///
 /// * Op : is the source code token for this binary operator;
 ///   i.e., `+` , `-` , `*` , or `/` .
 ///
-/// * x : left hand side `AzFloat<V>` or `&AzFloat<V>` object
-/// * y : left hand side `AzFloat<V>` or `&AzFloat<V>` object
-/// * z : result `AzFloat<V>` object
+/// * x : left hand side `AzFloat<B>` or `&AzFloat<B>` object
+/// * y : left hand side `AzFloat<B>` or `&AzFloat<B>` object
+/// * z : result `AzFloat<B>` object
 ///
 /// If the left or right operand is borrowed (&), then both operands
 /// must be borrowed.
@@ -188,6 +189,7 @@ where
 }
 //
 // Mul
+/// see [doc_binary_operator]
 impl<B> Mul<& AzFloat<B> > for &AzFloat<B>
 where
     for<'a> &'a B : Mul<&'a B, Output=B>,
@@ -242,8 +244,8 @@ impl_binary_operator!(Div, div);
 ///     lhs op &rhs
 ///   ```
 ///
-/// * lhs : is the `AzFloat<B>` left operand
-/// * rhs : is the `AzFloat<B>` right operand
+/// * lhs : is the `&mut AzFloat<B>` left operand
+/// * rhs : is the `AzFloat<B>` or `&AzFloat<B>` right operand
 /// * op  : is one of `+=` , `-=` , `*=` , `/=`
 ///
 /// # Example :
@@ -540,17 +542,72 @@ macro_rules! impl_float_const{ ($B:ident) => {
 impl_float_const!(f32);
 impl_float_const!(f64);
 // ----------------------------------------------------------------------------
+// AzFloat.name()
+/// AzFloat unary functions
+///
+/// * Syntax : ``y = x.Name()``
+///
+/// * B : is the floating point base type
+///
+/// * Name : is the name of one of the [FUnary] functions.
+///
+/// * x : is an `AzFloat<B>` or `&AzFloat<B>` .
+///
+/// * y : is the `AzFloat<B>` result.
+///
+/// # Example
+/// ```
+/// use rustad::{
+///     AzFloat,
+///     FConst,
+///     FUnary,
+///     check_nearly_eq,
+/// };
+/// type V = AzFloat<f64>;
+/// let arg_vec : Vec<[&str; 2]> = Vec::new();
+/// //
+/// let pi  : V = FConst::pi();
+/// let pi_4    = pi / V::from(4.0);
+/// let y       = pi_4.tan();
+/// check_nearly_eq::<V>(&y, &V::from(1.0), &arg_vec);
+/// let y       = FUnary::tan(pi_4);
+/// check_nearly_eq::<V>(&y, &V::from(1.0), &arg_vec);
+/// let y       = FUnary::tan(&pi_4);
+/// check_nearly_eq::<V>(&y, &V::from(1.0), &arg_vec);
+/// ```
 macro_rules! float_unary_function{ ($B:ident, $name:ident) => {
     #[doc = concat!(
         "`AzFloat<", stringify!($B), ">`.", stringify!($name), "()"
     )]
     fn $name(self) -> AzFloat<$B> { AzFloat( self.0.$name() ) }
 } }
-/// FUnary trait for az_float types
-///
-/// * B : is the floating point base type
 macro_rules! impl_float_unary{ ($B:ident) => {
     impl FUnary for &AzFloat<$B> {
+        type Output = AzFloat<$B>;
+        //
+        // unary functions
+        float_unary_function!($B, ln);
+        float_unary_function!($B, sqrt);
+        float_unary_function!($B, tanh);
+        float_unary_function!($B, tan);
+        float_unary_function!($B, sinh);
+        float_unary_function!($B, cosh);
+        float_unary_function!($B, abs);
+        float_unary_function!($B, signum);
+        float_unary_function!($B, exp);
+        float_unary_function!($B, cos);
+        float_unary_function!($B, sin);
+        //
+        // unary function that implements differently
+        #[doc = concat!( "`AzFloat<", stringify!($B), ">`.minus()" )]
+        fn minus(self) -> AzFloat<$B> { AzFloat( - self.0 ) }
+        //
+        // binary functions, but it only has one float
+        fn powi(self, rhs : i32) -> AzFloat<$B>{
+            AzFloat( self.0.powi(rhs) )
+        }
+    }
+    impl FUnary for AzFloat<$B> {
         type Output = AzFloat<$B>;
         //
         // unary functions

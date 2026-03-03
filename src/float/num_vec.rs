@@ -612,7 +612,7 @@ macro_rules! impl_float_unary{ ($name:ident) => {
         }
     }
 } }
-/// Implements the FUnary trait for NumVec types
+/// Implements the FUnary trait for &NumVec types
 impl<S> FUnary for &NumVec<S>
 where
     S             : From<f32>,
