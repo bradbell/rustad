@@ -14,7 +14,6 @@ use crate::{
     AD,
     ADfn,
     FConst,
-    FUnary,
 };
 use crate::op::info::sealed::GlobalOpInfoVec;
 use crate::tape::sealed::ThisThreadTape;
@@ -283,7 +282,6 @@ macro_rules! forward_var {
 //
 impl<V> ADfn<V> where
 V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + ThisThreadTape,
-V : FUnary<Output=V>,
 {   //
     // forward_var
     forward_var!( value, V );

@@ -31,7 +31,6 @@ use crate::{
     IndexT,
     AD,
     FConst,
-    FUnary,
 };
 //
 use crate::op::binary::common;
@@ -213,7 +212,6 @@ where
     for<'a> &'a V : Add<&'a V, Output = V> ,
         for<'a> V : AddAssign<&'a V>,
                 V : Clone + FConst + PartialEq + ThisThreadTape,
-                V : FUnary<Output=V>,
 {
     op_info_vec[ADD_PP_OP as usize] = OpInfo{
         name              : "add_pp",

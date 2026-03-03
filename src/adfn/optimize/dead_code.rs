@@ -11,7 +11,6 @@
 //
 use crate::{
     FConst,
-    FUnary,
     ADfn,
     IndexT,
 };
@@ -282,7 +281,6 @@ where
     ) -> ( Tape<V>, Old2New)
     where
         V : Clone + FConst + PartialEq ,
-        V : FUnary<Output=V>,
     {
         //
         // self.cop[0]

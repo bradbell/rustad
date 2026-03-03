@@ -32,7 +32,6 @@ use crate::{
     IndexT,
     AD,
     FConst,
-    FUnary,
 };
 //
 use crate::op::binary::common;
@@ -252,7 +251,6 @@ where
     for<'a> &'a V : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Mul<&'a V, Output = V> ,
     V             : Clone + FConst ,
-    V             : FUnary<Output=V>,
     V             : PartialEq + ThisThreadTape ,
 {
     op_info_vec[MUL_PP_OP as usize] = OpInfo{

@@ -13,7 +13,6 @@ use crate::{
     ADfn,
     IndexT,
     FConst,
-    FUnary,
 };
 use crate::op::info::{
     OpInfo,
@@ -245,7 +244,6 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
 //
 impl<V> ADfn<V> where
 V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + ThisThreadTape,
-V : FUnary<Output=V>,
 {   //
     // subgraph_der
     subgraph_der!( value, V, V );

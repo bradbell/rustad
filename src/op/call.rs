@@ -65,7 +65,6 @@ use crate::{
     ThisThreadTapePublic,
     ad_from_value,
     FConst,
-    FUnary,
 };
 // ----------------------------------------------------------------------
 // BEGIN_DOM
@@ -1033,7 +1032,6 @@ no_reverse_depend!(Call);
 pub(crate) fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
     V     : Clone + From<f32> + FConst ,
-    V     : FUnary<Output=V>,
     V     : PartialEq + GlobalAtomCallbackVec + ThisThreadTapePublic,
     for<'a> V : AddAssign<&'a V> ,
 {

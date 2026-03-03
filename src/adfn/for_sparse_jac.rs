@@ -13,7 +13,6 @@ use crate::{
     AD,
     ADfn,
     FConst,
-    FUnary,
     SparsityPattern,
 };
 use crate::op::info::sealed::GlobalOpInfoVec;
@@ -194,7 +193,6 @@ macro_rules! for_sparse_jac {
 //
 impl<V> ADfn<V> where
 V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + ThisThreadTape,
-V : FUnary<Output=V>,
 {   //
     // for_sparse_jac
     for_sparse_jac!( value, V );

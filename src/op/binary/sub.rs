@@ -29,7 +29,6 @@ use crate::{
     IndexT,
     AD,
     FConst,
-    FUnary,
 };
 //
 use crate::op::binary::common;
@@ -79,9 +78,7 @@ fn sub_pv_forward_der <V, E>(
     res        :   usize       )
 where
     E  : Clone + FConst ,
-    E  : FUnary<Output=E>,
     V  : FConst ,
-    V  : FUnary<Output=V>,
     for<'a> &'a E : Sub<&'a E, Output = E> ,
 {
     debug_assert!( arg.len() == 2);
@@ -215,7 +212,6 @@ where
     for<'a> &'a V : Add<&'a V, Output = V> + Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Sub<&'a V, Output = V> + Sub<&'a AD<V>, Output = AD<V> > ,
     V             : Clone + FConst ,
-    V             : FUnary<Output=V>,
     V             : PartialEq + ThisThreadTape ,
     AD<V>         : From<V>
 {

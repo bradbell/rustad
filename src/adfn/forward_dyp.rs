@@ -13,7 +13,6 @@ use crate::{
     AD,
     ADfn,
     FConst,
-    FUnary,
 };
 use crate::op::info::sealed::GlobalOpInfoVec;
 use crate::tape::sealed::ThisThreadTape;
@@ -167,7 +166,6 @@ macro_rules! forward_dyp {
 //
 impl<V> ADfn<V> where
 V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + ThisThreadTape,
-V : FUnary<Output=V>,
 {   //
     // forward_dyp
     forward_dyp!( value, V );
