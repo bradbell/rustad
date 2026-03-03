@@ -50,7 +50,7 @@ fn tanh_forward_der<V, E>(
     res        :   usize       )
 where
     E             : FConst ,
-    E             : FUnary<Output=E>,
+    for<'a> &'a E : FUnary<Output=E>,
     for<'a> &'a E : Mul<&'a E, Output=E>,
     for<'a> &'a E : Sub<&'a E, Output=E>,
 {
@@ -76,7 +76,7 @@ fn tanh_reverse_der<V, E>(
 where
     for<'a> E     : AddAssign<&'a E> ,
     E             : FConst ,
-    E             : FUnary<Output=E>,
+    for<'a> &'a E : FUnary<Output=E>,
     for<'a> &'a E : Mul<&'a E, Output=E>,
     for<'a> &'a E : Sub<&'a E, Output=E>,
 {
@@ -101,7 +101,7 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
     for<'a> &'a V     : Sub<&'a V, Output = V> ,
     V                 : Clone + FConst + ThisThreadTape ,
-    V                 : FUnary<Output=V>,
+    for<'a> &'a V     : FUnary<Output=V>,
     for<'a> V         : AddAssign<&'a V>,
     for<'a> AD<V>     : AddAssign<&'a AD<V> >,
 {

@@ -544,13 +544,13 @@ macro_rules! float_unary_function{ ($B:ident, $name:ident) => {
     #[doc = concat!(
         "`AzFloat<", stringify!($B), ">`.", stringify!($name), "()"
     )]
-    fn $name(&self) -> AzFloat<$B> { AzFloat( self.0.$name() ) }
+    fn $name(self) -> AzFloat<$B> { AzFloat( self.0.$name() ) }
 } }
 /// FUnary trait for az_float types
 ///
 /// * B : is the floating point base type
 macro_rules! impl_float_unary{ ($B:ident) => {
-    impl FUnary for AzFloat<$B> {
+    impl FUnary for &AzFloat<$B> {
         type Output = AzFloat<$B>;
         //
         // unary functions
@@ -568,10 +568,10 @@ macro_rules! impl_float_unary{ ($B:ident) => {
         //
         // unary function that implements differently
         #[doc = concat!( "`AzFloat<", stringify!($B), ">`.minus()" )]
-        fn minus(&self) -> AzFloat<$B> { AzFloat( - self.0 ) }
+        fn minus(self) -> AzFloat<$B> { AzFloat( - self.0 ) }
         //
         // binary functions, but it only has one float
-        fn powi(&self, rhs : i32) -> AzFloat<$B>{
+        fn powi(self, rhs : i32) -> AzFloat<$B>{
             AzFloat( self.0.powi(rhs) )
         }
     }

@@ -21,7 +21,7 @@ use crate::op::id;
 // ---------------------------------------------------------------------------
 macro_rules! impl_float_unary{ ($name:ident) => { paste::paste! {
     #[doc = concat!( "`AD<V>.`", stringify!( $name ), "()")]
-    fn $name(&self) -> AD<V> {
+    fn $name(self) -> AD<V> {
         //
         // record
         fn record<V>(
@@ -80,9 +80,10 @@ macro_rules! impl_float_unary{ ($name:ident) => { paste::paste! {
 } } }
 //
 /// Implements the FUnary trait for AD types
-impl<V> FUnary for AD<V>
+impl<V> FUnary for &AD<V>
 where
-    V : Clone + FUnary<Output=V> + ThisThreadTape,
+    V : Clone + ThisThreadTape,
+    for<'a> &'a V : FUnary<Output=V>,
 {
     type Output = AD<V>;
     //
@@ -102,7 +103,7 @@ where
     //
     // powi
     /// `AD<V>`.powi(`i32`)
-    fn powi(&self, rhs : i32) -> AD<V> {
+    fn powi(self, rhs : i32) -> AD<V> {
         //
         // record
         fn record<V>(

@@ -603,7 +603,7 @@ where
 // ---------------------------------------------------------------------------
 macro_rules! impl_float_unary{ ($name:ident) => {
     #[ doc = concat!( "`NumVec<S>.`", stringify!($name), "()" )]
-    fn $name(&self) -> NumVec<S> {
+    fn $name(self) -> NumVec<S> {
         if self.len() == 1 {
             NumVec { s : self.s.$name() , vec : Vec::new() }
         } else {
@@ -613,10 +613,11 @@ macro_rules! impl_float_unary{ ($name:ident) => {
     }
 } }
 /// Implements the FUnary trait for NumVec types
-impl<S> FUnary for NumVec<S>
+impl<S> FUnary for &NumVec<S>
 where
-    S         : From<f32> + FUnary<Output=S>,
-    NumVec<S> : From<S>
+    S             : From<f32>,
+    for<'a> &'a S : FUnary<Output=S>,
+    NumVec<S>     : From<S>
 {
     type Output = NumVec<S>;
     //
@@ -636,7 +637,7 @@ where
     //
     // powi
     /// `NumVec<S>`.powi(`i32`)
-    fn powi(&self, rhs : i32) -> NumVec<S> {
+    fn powi(self, rhs : i32) -> NumVec<S> {
         if self.len() == 1 {
             NumVec { s : self.s.powi(rhs) , vec : Vec::new() }
         } else {

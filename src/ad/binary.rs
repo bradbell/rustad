@@ -547,7 +547,7 @@ pub fn doc_ad_powf() { }
 impl<V> Powf< &AD<V> > for &AD<V>
 where
     V : Clone + FConst + ThisThreadTape ,
-    V : FUnary<Output=V>,
+    for<'a> &'a V : FUnary<Output=V>,
     for<'a> &'a AD<V> : Mul< &'a AD<V>, Output = AD<V> >,
 {   type Output = AD<V>;
     #[doc= " see [doc_ad_powf]" ]
@@ -558,7 +558,7 @@ where
 impl<V> Powf< AD<V> > for AD<V>
 where
     V : Clone + FConst + ThisThreadTape ,
-    V : FUnary<Output=V>,
+    for<'a> &'a V : FUnary<Output=V>,
     for<'a> &'a AD<V> : Mul< &'a AD<V>, Output = AD<V> >,
 {   type Output = AD<V>;
     fn powf(self, rhs : AD<V>) -> AD<V> {
@@ -569,7 +569,7 @@ where
 impl<V> Powf<&V> for &AD<V>
 where
     V : Clone + FConst + ThisThreadTape ,
-    V : FUnary<Output=V>,
+    for<'a> &'a V : FUnary<Output=V>,
     for<'a> &'a AD<V> : Mul< &'a V, Output = AD<V> >,
 {   type Output = AD<V>;
     fn powf(self, rhs : &V) -> AD<V> {
@@ -579,7 +579,7 @@ where
 impl<V> Powf<V> for AD<V>
 where
     V : Clone + FConst + ThisThreadTape + PartialEq,
-    V : FUnary<Output=V>,
+    for<'a> &'a V : FUnary<Output=V>,
     for<'a> &'a AD<V> : Mul< &'a V, Output = AD<V> >,
 {   type Output = AD<V>;
     fn powf(self, rhs : V) -> AD<V> {
@@ -590,7 +590,8 @@ where
 macro_rules! impl_value_powf_ad{ ( $V:ty ) => {
     impl crate::Powf< &AD<$V> > for &$V
     where
-        $V : crate::FConst + crate::FUnary<Output=$V> ,
+        $V  : crate::FConst,
+        for<'a> &'a $V : crate::FUnary<Output=$V> ,
     {   type Output = AD<$V>;
         fn powf(self , rhs : &AD<$V>) -> AD<$V> {
             crate::FUnary::exp( &( &crate::FUnary::ln( self ) * rhs ) )

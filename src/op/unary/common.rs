@@ -55,7 +55,7 @@ macro_rules! forward_dyp{ ($name:ident) => { paste::paste! {
         res         : usize       )
     where
         E : FConst ,
-        E : FUnary<Output=E>,
+        for<'a> &'a E : FUnary<Output=E>,
     {   //
         // index
         let index = arg[0] as usize;
@@ -84,7 +84,7 @@ macro_rules! forward_var{ ($name:ident) => { paste::paste! {
         res         : usize       )
     where
         E : FConst ,
-        E : FUnary<Output=E>,
+        for<'a> &'a E : FUnary<Output=E>,
     {
         //
         // index

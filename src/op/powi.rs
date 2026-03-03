@@ -42,7 +42,7 @@ fn powi_forward_dyp <V, E> (
     res         : usize       )
 where
     E : FConst ,
-    E : FUnary<Output=E>,
+    for<'a> &'a E : FUnary<Output=E>,
 {   //
     // index
     let index    = arg[0] as usize;
@@ -69,7 +69,7 @@ fn powi_forward_var <V, E> (
     res         : usize       )
 where
     E : FConst ,
-    E : FUnary<Output=E>,
+    for<'a> &'a E : FUnary<Output=E>,
 {   //
     // index
     let index    = arg[0] as usize;
@@ -191,7 +191,7 @@ fn powi_forward_der<V, E>(
 where
     V             : From<f32>,
     E             : FConst ,
-    E             : FUnary<Output=E>,
+    for<'a> &'a E : FUnary<Output=E>,
     for<'a> &'a E : Mul<&'a E, Output=E>,
     for<'a> &'a E : Mul<&'a V, Output=E>,
 {
@@ -222,7 +222,7 @@ fn powi_reverse_der<V, E>(
 where
     V             : From<f32>,
     E             : FConst ,
-    E             : FUnary<Output=E>,
+    for<'a> &'a E : FUnary<Output=E>,
     for<'a> E     : AddAssign<&'a E> ,
     for<'a> &'a E : Mul<&'a E, Output=E>,
     for<'a> &'a E : Mul<&'a V, Output=E>,
@@ -250,7 +250,7 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> &'a AD<V> : Mul<&'a V, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
     V                 : Clone + FConst + ThisThreadTape + From<f32>,
-    V                 : FUnary<Output=V>,
+    for<'a> &'a V     : FUnary<Output=V>,
     for<'a> V         : AddAssign<&'a V>,
     for<'a> AD<V>     : AddAssign<&'a AD<V> >,
 {

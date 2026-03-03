@@ -39,7 +39,7 @@ thread_local! {
 fn normsq_fn<V>()->ADfn<V>
 where
     V : From<f32> + FConst + PartialEq + Clone,
-    V : FUnary<Output=V>,
+    for<'a> &'a V : FUnary<Output=V>,
     V : Sized + 'static + ThisThreadTapePublic ,
     for<'a> &'a V : std::ops::Mul<&'a V, Output=V> ,
     for<'a>     V : std::ops::AddAssign<&'a V> ,

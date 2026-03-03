@@ -22,7 +22,7 @@ use crate::{
 // ----------------------------------------------------------------------------
 /// The FloatValue trait
 ///
-pub trait FloatValue : FConst + FUnary {
+pub trait FloatValue : FConst {
     //
     // is_zero
     /// True if all the components of self are zero.
@@ -256,7 +256,7 @@ pub(crate) use impl_float_value_from_primitive;
 pub fn check_nearly_eq<V>(x : &V, y : &V, arg_vec : &Vec< [&str; 2] >) -> bool
 where
     V  : FConst + FloatValue + From<f32> + std::fmt::Debug,
-    V  : FUnary<Output=V>,
+    for<'a> &'a V : FUnary<Output=V>,
     for<'a> &'a V : NumCmp<&'a V, Output = V> ,
     for<'a> &'a V : Add<&'a V, Output=V> ,
     for<'a> &'a V : Mul<&'a V, Output=V> ,

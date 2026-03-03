@@ -49,7 +49,7 @@ fn cos_forward_der<V, E>(
     res        :   usize       )
 where
     E             : FConst ,
-    E             : FUnary<Output=E>,
+    for<'a> &'a E : FUnary<Output=E>,
     for<'a> &'a E : Mul<&'a E, Output=E>,
 {
     debug_assert!( arg.len() == 1 );
@@ -73,7 +73,7 @@ fn cos_reverse_der<V, E>(
 where
     for<'a> E     : SubAssign<&'a E> ,
     E             : FConst ,
-    E             : FUnary<Output=E>,
+    for<'a> &'a E : FUnary<Output=E>,
     for<'a> &'a E : Mul<&'a E, Output=E>,
 {
     debug_assert!( arg.len() == 1 );
@@ -93,7 +93,7 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> &'a AD<V> : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
     V                 : Clone + FConst + ThisThreadTape ,
-    V                 : FUnary<Output=V>,
+    for<'a> &'a V     : FUnary<Output=V>,
     for<'a> V         : SubAssign<&'a V>,
     for<'a> AD<V>     : SubAssign<&'a AD<V> >,
 {
