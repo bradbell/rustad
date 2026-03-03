@@ -25,15 +25,11 @@ macro_rules! impl_float_unary{ ($name:ident) => { paste::paste! {
         //
         // record
         fn record<V>(
-            tape : &mut Tape<V> ,
-            arg  : &AD<V>       ,
+            tape      : &mut Tape<V> ,
+            arg       : &AD<V>       ,
+            new_value : V            ,
         ) -> AD<V>
-        where
-            V : FUnary<Output=V>,
         {
-            //
-            // new_value
-            let new_value = arg.value.$name();
             //
             // new_tape_id, new_index, new_ad_type
             let mut new_tape_id   = 0;
@@ -69,12 +65,15 @@ macro_rules! impl_float_unary{ ($name:ident) => { paste::paste! {
 
         }
         //
+        // new_value
+        let new_value = self.value.$name();
+        //
         // local_key
         let local_key : &LocalKey<RefCell< Tape<V> >> = ThisThreadTape::get();
         //
         // result
         let result = local_key.with_borrow_mut(
-            |tape| record( tape, self)
+            |tape| record( tape, self, new_value)
         );
         result
     }
@@ -107,16 +106,12 @@ where
         //
         // record
         fn record<V>(
-            tape : &mut Tape<V> ,
-            arg  : &AD<V>       ,
-            rhs  : i32          ,
+            tape      : &mut Tape<V> ,
+            arg       : &AD<V>       ,
+            rhs       : i32          ,
+            new_value : V            ,
         ) -> AD<V>
-        where
-            V : FUnary<Output=V>,
         {
-            //
-            // new_value
-            let new_value = arg.value.powi(rhs);
             //
             // new_tape_id, new_index, new_ad_type
             let mut new_tape_id   = 0;
@@ -160,12 +155,15 @@ where
             AD::new(new_tape_id, new_index, new_ad_type, new_value)
         }
         //
+        // new_value
+        let new_value = self.value.powi(rhs);
+        //
         // local_key
         let local_key : &LocalKey<RefCell< Tape<V> >> = ThisThreadTape::get();
         //
         // result
         local_key.with_borrow_mut(
-            |tape| record(tape, self, rhs)
+            |tape| record(tape, self, rhs, new_value)
         )
     }
 }
