@@ -585,7 +585,7 @@ macro_rules! impl_float_unary{ ($B:ident) => {
     impl FUnary for &AzFloat<$B> {
         type Output = AzFloat<$B>;
         //
-        // unary functions
+        // use float_unary_function
         float_unary_function!($B, ln);
         float_unary_function!($B, sqrt);
         float_unary_function!($B, tanh);
@@ -611,7 +611,7 @@ macro_rules! impl_float_unary{ ($B:ident) => {
     impl FUnary for AzFloat<$B> {
         type Output = AzFloat<$B>;
         //
-        // unary functions
+        // use float_unary_function
         float_unary_function!($B, ln);
         float_unary_function!($B, sqrt);
         float_unary_function!($B, tanh);

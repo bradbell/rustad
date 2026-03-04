@@ -23,10 +23,11 @@ NAME=$(echo $name | tr [a-z] [A-Z])
 # traits.rs
 file='src/float/traits.rs'
 cat << EOF > temp.sed
-/^    [/][/] unary functions/! b end
+/^pub trait FUnary/! b end
+N
 N
 s|\$|\\
-    fn $name(\\&self) -> Self;|
+    fn $name(self) -> Self::Output;|
 : end
 EOF
 sed -i $file -f temp.sed
@@ -34,9 +35,9 @@ sed -i $file -f temp.sed
 # az_float.rs
 file='src/float/az_float.rs'
 cat << EOF > temp.sed
-/^        [/][/] unary functions/! b end
+/^        [/][/] use float_unary_function/! b end
 s|\$|\\
-        float_core_unary_function!(\$B, $name);|
+        float_unary_function!(\$B, $name);|
 : end
 EOF
 sed -i $file -f temp.sed
@@ -44,19 +45,27 @@ sed -i $file -f temp.sed
 # num_vec.rs
 file='src/float/num_vec.rs'
 cat << EOF > temp.sed
-/^    [/][/] unary functions/! b end
+/^    [/][/] use float_unary_function/! b end
 s|\$|\\
-    impl_unary_float_core!($name);|
+    use float_unary_function!($name);|
 : end
 EOF
 sed -i $file -f temp.sed
 #
 # ad/float_core.rs
-file='src/ad/float_core.rs'
+file='src/ad/f_unary.rs'
 cat << EOF > temp.sed
-/^    [/][/] unary functions/! b end
+/^    [/][/] use unary_self_borrowed/! b one
 s|\$|\\
-    impl_unary_float_core!($name);|
+    unary_self_borrowed!($name);|
+b end
+#
+: one
+/^    [/][/] use unary_self_owned/! b end
+s|\$|\\
+    unary_self_owned!($name);|
+b end
+#
 : end
 EOF
 sed -i $file -f temp.sed

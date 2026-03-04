@@ -592,7 +592,6 @@ where
     S         : FConst + From<f32>,
     NumVec<S> : From<S>
 {
-    // no arguments
     fn pi()           -> NumVec<S> { Self::from( S::pi() ) }
     fn nan()          -> NumVec<S> { Self::from( S::nan() ) }
     fn one()          -> NumVec<S> { Self::from( S::one() ) }
@@ -601,7 +600,7 @@ where
     fn min_positive() -> NumVec<S> { Self::from( S::min_positive() ) }
 }
 // ---------------------------------------------------------------------------
-macro_rules! impl_float_unary{ ($name:ident) => {
+macro_rules! float_unary_function{ ($name:ident) => {
     #[ doc = concat!( "`NumVec<S>.`", stringify!($name), "()" )]
     fn $name(self) -> NumVec<S> {
         if self.len() == 1 {
@@ -621,19 +620,19 @@ where
 {
     type Output = NumVec<S>;
     //
-    // unary functions
-    impl_float_unary!(ln);
-    impl_float_unary!(sqrt);
-    impl_float_unary!(tanh);
-    impl_float_unary!(tan);
-    impl_float_unary!(sinh);
-    impl_float_unary!(cosh);
-    impl_float_unary!(abs);
-    impl_float_unary!(signum);
-    impl_float_unary!(exp);
-    impl_float_unary!(minus);
-    impl_float_unary!(cos);
-    impl_float_unary!(sin);
+    // use float_unary_function
+    float_unary_function!(ln);
+    float_unary_function!(sqrt);
+    float_unary_function!(tanh);
+    float_unary_function!(tan);
+    float_unary_function!(sinh);
+    float_unary_function!(cosh);
+    float_unary_function!(abs);
+    float_unary_function!(signum);
+    float_unary_function!(exp);
+    float_unary_function!(minus);
+    float_unary_function!(cos);
+    float_unary_function!(sin);
     //
     // powi
     /// `NumVec<S>`.powi(`i32`)

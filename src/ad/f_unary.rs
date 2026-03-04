@@ -102,7 +102,7 @@ where
 {
     type Output = AD<V>;
     //
-    // unary functions
+    // use unary_self_borrowed
     unary_self_borrowed!(ln);
     unary_self_borrowed!(sqrt);
     unary_self_borrowed!(tanh);
@@ -142,7 +142,7 @@ where
 {
     type Output = AD<V>;
     //
-    // unary functions
+    // use unary_self_owned
     unary_self_owned!(ln);
     unary_self_owned!(sqrt);
     unary_self_owned!(tanh);
