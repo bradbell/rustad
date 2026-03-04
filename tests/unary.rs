@@ -20,7 +20,7 @@ fn test_abs() {
     let x  : Vec<V>  = vec![ V::from(3.0), V::from(-2.0) ];
     //
     let (_, ax)      = start_recording(None,  x.clone() );
-    let ay           = vec! [ ax[0].abs(), ax[1].abs() ];
+    let ay           = vec! [ (&ax[0]).abs(), (&ax[1]).abs() ];
     let f            = stop_recording(ay);
     // ------------------------------------------------------------------
     // Test value derivatives

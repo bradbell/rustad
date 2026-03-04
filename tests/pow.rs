@@ -17,14 +17,14 @@ fn test_powi() {
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
     let (_, ax)      = start_recording(None,  x.clone() );
-    let ay           = vec! [ ax[0].powi(-2i32) ];
+    let ay           = vec! [ FUnary::powi( &ax[0], -2i32) ];
     let f            = stop_recording(ay);
     //
     let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
     let dx           = vec![ V::from(3.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     //
-    let dpowi        =  V::from(2).minus() * x[0].powi(-3i32);
+    let dpowi        =  V::from(2).minus() * (&x[0]).powi(-3i32);
     assert_eq!( dy[0], dpowi * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];

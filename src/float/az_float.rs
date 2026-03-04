@@ -542,16 +542,16 @@ macro_rules! impl_float_const{ ($B:ident) => {
 impl_float_const!(f32);
 impl_float_const!(f64);
 // ----------------------------------------------------------------------------
-// AzFloat.name()
+// doc_f_unary_az_float
 /// AzFloat unary functions
 ///
-/// * Syntax : ``y = x.Name()``
+/// * Syntax : `y = x.Name()`
 ///
 /// * B : is the floating point base type
 ///
 /// * Name : is the name of one of the [FUnary] functions.
 ///
-/// * x : is an `AzFloat<B>` or `&AzFloat<B>` .
+/// * x : is an `AzFloat<B>` or `&AzFloat<B>` object.
 ///
 /// * y : is the `AzFloat<B>` result.
 ///
@@ -575,10 +575,10 @@ impl_float_const!(f64);
 /// let y       = FUnary::tan(&pi_4);
 /// check_nearly_eq::<V>(&y, &V::from(1.0), &arg_vec);
 /// ```
+pub fn doc_f_unary_az_float() {}
+//
 macro_rules! float_unary_function{ ($B:ident, $name:ident) => {
-    #[doc = concat!(
-        "`AzFloat<", stringify!($B), ">`.", stringify!($name), "()"
-    )]
+    #[doc = "see [doc_f_unary_az_float]" ]
     fn $name(self) -> AzFloat<$B> { AzFloat( self.0.$name() ) }
 } }
 macro_rules! impl_float_unary{ ($B:ident) => {
@@ -599,10 +599,11 @@ macro_rules! impl_float_unary{ ($B:ident) => {
         float_unary_function!($B, sin);
         //
         // unary function that implements differently
-        #[doc = concat!( "`AzFloat<", stringify!($B), ">`.minus()" )]
+        #[doc = "see [doc_f_unary_az_float]" ]
         fn minus(self) -> AzFloat<$B> { AzFloat( - self.0 ) }
         //
         // binary functions, but it only has one float
+        #[doc = "see [doc_f_unary_az_float]" ]
         fn powi(self, rhs : i32) -> AzFloat<$B>{
             AzFloat( self.0.powi(rhs) )
         }
@@ -624,10 +625,11 @@ macro_rules! impl_float_unary{ ($B:ident) => {
         float_unary_function!($B, sin);
         //
         // unary function that implements differently
-        #[doc = concat!( "`AzFloat<", stringify!($B), ">`.minus()" )]
+        #[doc = "see [doc_f_unary_az_float]" ]
         fn minus(self) -> AzFloat<$B> { AzFloat( - self.0 ) }
         //
         // binary functions, but it only has one float
+        #[doc = "see [doc_f_unary_az_float]" ]
         fn powi(self, rhs : i32) -> AzFloat<$B>{
             AzFloat( self.0.powi(rhs) )
         }

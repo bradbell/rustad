@@ -65,16 +65,16 @@ fn test_powf_ac() {
     //
     let dx : Vec<V>  = vec![ V::from(6.0), V::from(7.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
-    let check        = V::from(4.0) * x[0].powi(3) * dx[0];
+    let check        = V::from(4.0) * (&x[0]).powi(3) * dx[0];
     assert_eq!( dy[0], check);
-    let check        = V::from(5.0) * x[1].powi(4) * dx[1];
+    let check        = V::from(5.0) * (&x[1]).powi(4) * dx[1];
     assert_eq!( dy[1], check);
     //
     let dy           = vec![ V::from(8.0), V::from(9.0) ];
     let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
-    let check        = V::from(4.0) * x[0].powi(3) * dy[0];
+    let check        = V::from(4.0) * (&x[0]).powi(3) * dy[0];
     assert_eq!( dx[0], check);
-    let check        = V::from(5.0) * x[1].powi(4) * dy[1];
+    let check        = V::from(5.0) * (&x[1]).powi(4) * dy[1];
     assert_eq!( dx[1], check);
 }
 //
@@ -97,14 +97,14 @@ fn test_powf_aa() {
     let dx : Vec<V>  = vec![ V::from(6.0), V::from(7.0) ];
     let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
     let check        = x[1] * x[0].powf(x[1] - one) * dx[0]
-                     + y[0] * x[0].ln() * dx[1];
+                     + y[0] * (&x[0]).ln() * dx[1];
     check_nearly_eq::<V>( &dy[0], &check, &arg_vec );
     //
     let dy           = vec![ V::from(8.0) ];
     let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
     let check        = x[1] * x[0].powf(x[1] - one) * dy[0];
     check_nearly_eq::<V>( &dx[0], &check, &arg_vec );
-    let check        = y[0] * x[0].ln() * dy[0];
+    let check        = y[0] * (&x[0]).ln() * dy[0];
     check_nearly_eq::<V>( &dx[1], &check, &arg_vec );
 }
 

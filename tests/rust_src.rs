@@ -88,10 +88,10 @@ fn test_unary () {
     let mut ay : Vec< AD<V> > = Vec::new();
     //
     // y[0] = sin( p[0] )
-    ay.push( ap[0].sin() );
+    ay.push( (&ap[0]).sin() );
     //
     // y[1] = abs( x[0] );
-    ay.push( ax[0].abs() );
+    ay.push( (&ax[0]).abs() );
     //
     // f
     // f(x) = y
@@ -130,8 +130,8 @@ fn test_unary () {
     let y      = result.unwrap();
     //
     // check
-    assert_eq!( y[0], p[0].sin() );
-    assert_eq!( y[1], x[0].abs() );
+    assert_eq!( y[0], (&p[0]).sin() );
+    assert_eq!( y[1], (&x[0]).abs() );
 }
 //
 fn test_powi() {
@@ -147,10 +147,10 @@ fn test_powi() {
     let mut ay : Vec< AD<V> > = Vec::new();
     //
     // y[0] = powi( p[0], 2 )
-    ay.push( ap[0].powi(2) );
+    ay.push( (&ap[0]).powi(2) );
     //
     // y[1] = powi( x[0], -2 )
-    ay.push( ax[0].powi(-2) );
+    ay.push( (&ax[0]).powi(-2) );
     //
     //
     // f
@@ -190,8 +190,8 @@ fn test_powi() {
     let y      = result.unwrap();
     //
     // check
-    assert_eq!( y[0], p[0].powi(2) );
-    assert_eq!( y[1], x[0].powi(-2) );
+    assert_eq!( y[0], (&p[0]).powi(2) );
+    assert_eq!( y[1], (&x[0]).powi(-2) );
 }
 //
 #[test]
