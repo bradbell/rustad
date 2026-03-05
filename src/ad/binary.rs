@@ -786,7 +786,7 @@ ad_compound_op!(Div);
 /// * Function Name: `record_value_` *name* `_ad` where *name* is
 ///   a lower case version of Name.
 ///
-macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
+macro_rules! record_value_op_ad{ ($Name:ident) => { paste::paste! {
     #[doc = concat!( "record one ", stringify!($Name),
         " where lhs is a value and rhs is a variable"
     ) ]
@@ -896,10 +896,10 @@ macro_rules! record_value_op_ad{ ($Name:ident, $Op:tt) => { paste::paste! {
         (new_tape_id, new_index, new_ad_type)
     }
 } } }
-record_value_op_ad!(Add, +=);
-record_value_op_ad!(Sub, -=);
-record_value_op_ad!(Mul, *=);
-record_value_op_ad!(Div, /=);
+record_value_op_ad!(Add);
+record_value_op_ad!(Sub);
+record_value_op_ad!(Mul);
+record_value_op_ad!(Div);
 // ---------------------------------------------------------------------------
 // impl_value_op_ad!
 //
@@ -925,13 +925,13 @@ record_value_op_ad!(Div, /=);
 /// ```
 macro_rules! impl_value_op_ad{
     ($V:ty)                      => {
-        crate::ad::binary::impl_value_op_ad!($V, Add, +);
-        crate::ad::binary::impl_value_op_ad!($V, Sub, -);
-        crate::ad::binary::impl_value_op_ad!($V, Mul, *);
-        crate::ad::binary::impl_value_op_ad!($V, Div, /);
+        crate::ad::binary::impl_value_op_ad!($V, Add);
+        crate::ad::binary::impl_value_op_ad!($V, Sub);
+        crate::ad::binary::impl_value_op_ad!($V, Mul);
+        crate::ad::binary::impl_value_op_ad!($V, Div);
         crate::ad::binary::impl_value_powf_ad!($V);
     };
-    ($V:ty, $Name:ident, $Op:tt) => { paste::paste! {
+    ($V:ty, $Name:ident) => { paste::paste! {
         #[doc =
         "see [doc_ad_binary_op](crate::ad::binary::doc_ad_binary_op)"
         ]
@@ -942,12 +942,12 @@ macro_rules! impl_value_op_ad{
             //
             #[ doc = concat!(
                 "compute `&", stringify!($V), "` ",
-                stringify!($Op), " `&AD<", stringify!($V), ">` "
+                stringify!($Name), " `&AD<", stringify!($V), ">` "
             ) ]
             fn [< $Name:lower >] (self , rhs : &AD<$V>) -> AD<$V> {
                 //
                 // new_value
-                let new_value = self $Op &rhs.value;
+                let new_value = self.[< $Name:lower >] ( &rhs.value);
                 //
                 // local_key
                 let local_key : &LocalKey<
