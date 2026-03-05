@@ -343,8 +343,8 @@ pub fn doc_num_cmp_az_float() {}
 macro_rules! impl_num_cmp_az_float_borrow{ ($name:ident, $op:tt) => {
     #[doc = concat!( " AzFloat::", stringify!($name)  ) ]
     fn $name(self, rhs : & AzFloat<B> ) -> AzFloat<B> {
-        let zero : AzFloat<B> = FConst::zero();
-        let one  : AzFloat<B> = FConst::one();
+        let zero = AzFloat::<B>::zero();
+        let one  = AzFloat::<B>::one();
         //
         if self.0 $op rhs.0 {
             one
