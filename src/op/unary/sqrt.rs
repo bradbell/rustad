@@ -100,13 +100,16 @@ where
 ///   The the map results for SQRT_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> &'a AD<V> : Mul<&'a AD<V>, Output = AD<V> > ,
-    for<'a> &'a V     : Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
+    //
+    for<'a> &'a V     : Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V     : Div<&'a V, Output = V> ,
-    V                 : Clone + FConst + ThisThreadTape + From<f32>,
-    for<'a> &'a V     : FUnary<Output=V>,
+    //
     for<'a> V         : AddAssign<&'a V>,
     for<'a> AD<V>     : AddAssign<&'a AD<V> >,
+    //
+    V                 : Clone + FConst + ThisThreadTape + From<f32>,
+    for<'a> &'a V     : FUnary<Output=V>,
 {
     op_info_vec[SQRT_OP as usize] = OpInfo{
         name              : "sqrt",

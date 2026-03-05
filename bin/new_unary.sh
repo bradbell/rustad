@@ -120,9 +120,9 @@ sed -i $file -f temp.sed
 cat << EOF > temp.sed
 s|\\([": (]\\)exp_m1\\(["_ ()]\\)|\\1$name\\2|g
 s|\\([": (]\\)EXP_M1\\(["_ ()]\\)|\\1$NAME\\2|g
-s|EXP_M1 as usize|${NAME}_OP as usize|
+s|EXP_M1_OP as usize|${NAME}_OP as usize|
 EOF
-sed -f temp.sed src/op/unary/sin.rs > src/op/unary/$name.rs
+sed -f temp.sed src/op/unary/exp_m1.rs > src/op/unary/$name.rs
 #
 cat << EOF
 src/op/unary/$name.rs: Fix ${name}_forward_der and ${name}_reverse_der
