@@ -56,7 +56,7 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let one  : E = FConst::one();
+    let one      = E::one();
     let index    = arg[0] as usize;
     let dtanh    = &one - &( &var_both[res] * &var_both[res] );
     var_der[res] = &dtanh *  &var_der[index];
@@ -82,7 +82,7 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let one    : E  = FConst::one();
+    let one         = E::one();
     let index       = arg[0] as usize;
     let dtanh       = &one - &( &var_both[res] * &var_both[res] );
     let term        = &dtanh * &var_der[res];

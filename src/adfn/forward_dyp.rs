@@ -110,7 +110,7 @@ macro_rules! forward_dyp {
             let n_dyp = self.dyp.n_dom + self.dyp.n_dep;
             //
             // dyp_both
-            let nan_e  : $E  = FConst::nan();
+            let nan_e        = $E::nan();
             let mut dyp_both = dyp_dom;
             dyp_both.resize(n_dyp, nan_e );
             //

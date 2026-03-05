@@ -158,8 +158,8 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
         let var_n_dom = self.var_dom_len();
         //
         // zero_e, one_e
-        let zero_e      : $E  = FConst::zero();
-        let one_e       : $E  = FConst::one();
+        let zero_e            = $E::zero();
+        let one_e             = $E::one();
         //
         // var_der
         let n_var             = self.var_len();

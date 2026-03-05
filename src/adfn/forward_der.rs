@@ -186,10 +186,10 @@ macro_rules! forward_der {
             let op_info_vec = GlobalOpInfoVec::get();
             //
             // zero_e
-            let zero_e        : $E = FConst::zero();
+            let zero_e             = $E::zero();
             //
             // var_der
-            let nan_e         : $E = FConst::nan();
+            let nan_e              = $E::nan();
             let mut var_der        = dom_der;
             var_der.resize( n_var, nan_e );
             //

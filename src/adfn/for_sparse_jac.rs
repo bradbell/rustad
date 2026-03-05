@@ -133,8 +133,8 @@ macro_rules! for_sparse_jac {
                 color_vec.iter().filter(|&k| k < &n ).max().unwrap() + 1;
             //
             // zero_e, one_e
-            let zero_e : $E = FConst::zero();
-            let one_e  : $E = FConst::one();
+            let zero_e      = $E::zero();
+            let one_e       = $E::one();
             //
             // order
             let mut order : Vec<usize> = (0 .. sub_pattern.len()).collect();

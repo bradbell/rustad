@@ -191,7 +191,7 @@ macro_rules! forward_var {
             let n_var = self.var.n_dom + self.var.n_dep;
             //
             // var_both
-            let nan_e  : $E  = FConst::nan();
+            let nan_e        = $E::nan();
             let mut var_both = var_dom;
             var_both.resize( n_var, nan_e );
             //

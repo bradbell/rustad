@@ -179,7 +179,7 @@ macro_rules! reverse_der {
             let op_info_vec = GlobalOpInfoVec::get();
             //
             // zero_e
-            let zero_e : $E = FConst::zero();
+            let zero_e      = $E::zero();
             //
             // var_der
             let mut var_der       = vec![ zero_e; n_var ];
