@@ -64,6 +64,15 @@ fn main() {
         let exp_ln_2   = ln_2.exp();
         assert_eq!(exp_ln_2, two);
     }
+    // ln_1p
+    {   type V = AzFloat<f64>;
+        let one         = V::from(1.0);
+        let ln_2       = one.ln_1p();
+        //
+        let exp_ln_2   = ln_2.exp();
+        let two        = V::from(2.0);
+        assert_eq!(exp_ln_2, two);
+    }
     // signum
     {   type V = AzFloat<f32>;
         let minus_1      = V::from( -1.0 );

@@ -71,6 +71,7 @@ pub trait FConst {
 pub trait FUnary {
     type Output;
     // ------------------------------------------------------------------------
+    fn ln_1p(self) -> Self::Output;
     fn exp_m1(self) -> Self::Output;
     fn ln(self) -> Self::Output;
     fn sqrt(self) -> Self::Output;

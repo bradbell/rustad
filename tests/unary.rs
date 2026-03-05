@@ -183,6 +183,29 @@ fn test_ln() {
     assert_eq!( dx[0], dy[0] / x[0] );
 }
 //
+// test_ln_1p
+fn test_ln_1p() {
+    type V      = AzFloat<f64>;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    //
+    let x  : Vec<V>  = vec![ V::from(2.0) ];
+    //
+    let (_, ax)      = start_recording(None,  x.clone() );
+    let ay           = vec! [ FUnary::ln_1p( &ax[0] ) ];
+    let f            = stop_recording(ay);
+    //
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let dx           = vec![ V::from(3.0) ];
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    //
+    assert_eq!( dy[0],  dx[0] / ( x[0] + V::from(1.0) ) );
+    //
+    let dy           = vec![ V::from(4.0) ];
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    //
+    assert_eq!( dx[0], dy[0] / ( x[0] + V::from(1.0) ) );
+}
+//
 // test_minus
 fn test_minus() {
     type V      = AzFloat<f64>;
@@ -358,6 +381,7 @@ fn unary() {
     test_exp();
     test_exp_m1();
     test_ln();
+    test_ln_1p();
     test_minus();
     test_signum();
     test_sin();

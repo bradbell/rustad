@@ -35,6 +35,7 @@ pub mod cosh;
 pub mod exp;
 pub mod exp_m1;
 pub mod ln;
+pub mod ln_1p;
 pub mod minus;
 pub mod signum;
 pub mod sin;
