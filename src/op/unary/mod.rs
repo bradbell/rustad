@@ -33,6 +33,7 @@ pub mod common;
 pub mod cos;
 pub mod cosh;
 pub mod exp;
+pub mod exp_m1;
 pub mod ln;
 pub mod minus;
 pub mod signum;

@@ -13,8 +13,16 @@ fi
 name="$1"
 if [ -e "src/op/unary/$name.rs" ]
 then
-   echo "new_unary.sh: aborting because src/op/unary/$name.rs already exists"
-   exit 1
+   echo "new_unary.sh: src/op/unary/$name.rs already exists"
+   response=''
+   while [ "$response" != 'replace' ] && [ "$response" != 'abort' ]
+   do
+      read -p "[replace, abort] ?" response
+   done
+   if [ "$response" == 'abort' ]
+   then
+      exit 1
+   fi
 fi
 #
 # NAME
@@ -30,6 +38,7 @@ s|\$|\\
     fn $name(self) -> Self::Output;|
 : end
 EOF
+git checkout $file
 sed -i $file -f temp.sed
 #
 # az_float.rs
@@ -40,6 +49,7 @@ s|\$|\\
         float_unary_function!(\$B, $name);|
 : end
 EOF
+git checkout $file
 sed -i $file -f temp.sed
 #
 # num_vec.rs
@@ -47,9 +57,10 @@ file='src/float/num_vec.rs'
 cat << EOF > temp.sed
 /^    [/][/] use float_unary_function/! b end
 s|\$|\\
-    use float_unary_function!($name);|
+    float_unary_function!($name);|
 : end
 EOF
+git checkout $file
 sed -i $file -f temp.sed
 #
 # ad/float_core.rs
@@ -68,6 +79,7 @@ b end
 #
 : end
 EOF
+git checkout $file
 sed -i $file -f temp.sed
 #
 # id.rs
@@ -79,6 +91,7 @@ s|\$|\\
     ${NAME}_OP,|
 : end
 EOF
+git checkout $file
 sed -i $file -f temp.sed
 #
 # info.rs
@@ -89,6 +102,7 @@ s|\$|\\
     crate::op::unary::$name::set_op_info::<V>(\\&mut result);|
 : end
 EOF
+git checkout $file
 sed -i $file -f temp.sed
 #
 # mod.rs
@@ -99,18 +113,20 @@ s|\$|\\
 pub mod $name;|
 : end
 EOF
+git checkout $file
 sed -i $file -f temp.sed
 #
 # $name.rs
 cat << EOF > temp.sed
-s|\\([": (]\\)sin\\(["_ ()]\\)|\\1$name\\2|g
-s|\\([": (]\\)SIN\\(["_ ()]\\)|\\1$NAME\\2|g
-s|SIN_OP as usize|${NAME}_OP as usize|
+s|\\([": (]\\)exp_m1\\(["_ ()]\\)|\\1$name\\2|g
+s|\\([": (]\\)EXP_M1\\(["_ ()]\\)|\\1$NAME\\2|g
+s|EXP_M1 as usize|${NAME}_OP as usize|
 EOF
 sed -f temp.sed src/op/unary/sin.rs > src/op/unary/$name.rs
 #
 cat << EOF
 src/op/unary/$name.rs: Fix ${name}_forward_der and ${name}_reverse_der
+                       Check constraints in this set_op_info function.
 src/float/az_float.rs: Check implementation of fn $name(&self) -> Self
 examples/float_core.rs: Add an example for $name function values.
 test/unary.rs: Add a test for $name derivatives.

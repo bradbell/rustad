@@ -2,13 +2,14 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
-//! Evaluate the abs operator
+//! Evaluate the exp_m1 operator
 //!
 //! Link to [parent module](super)
 // --------------------------------------------------------------------------
 // use
 //
 use std::ops::{
+    Add,
     Mul,
     AddAssign,
 };
@@ -24,21 +25,21 @@ use crate::ad::ADType;
 use crate::op::unary::common;
 use crate::tape::sealed::ThisThreadTape;
 use crate::op::info::OpInfo;
-use crate::op::id::ABS_OP;
+use crate::op::id::EXP_M1_OP;
 // -------------------------------------------------------------------------
-// abs_forward_dyp
-common::forward_dyp!(abs);
+// exp_m1_forward_dyp
+common::forward_dyp!(exp_m1);
 //
 // sim_forward_var
-common::forward_var!(abs);
+common::forward_var!(exp_m1);
 //
-// abs_rust_src
-common::rust_src!(abs);
+// exp_m1_rust_src
+common::rust_src!(exp_m1);
 //
-// abs_forward_der
-/// First order forward mode for abs(variable);
+// exp_m1_forward_der
+/// First order forward mode for exp_m1(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
-fn abs_forward_der<V, E>(
+fn exp_m1_forward_der<V, E>(
     _dyp_both  :   &[E]        ,
     var_both   :   &[E]        ,
     var_der    :   &mut [E]    ,
@@ -48,19 +49,20 @@ fn abs_forward_der<V, E>(
     arg_type   :   &[ADType]   ,
     res        :   usize       )
 where
-    E             : FConst ,
-    for<'a> &'a E : FUnary<Output=E>,
+    V             : FConst ,
     for<'a> &'a E : Mul<&'a E, Output=E>,
+    for<'a> &'a E : Add<&'a V, Output=E>,
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     let index    = arg[0] as usize;
-    var_der[res] = &FUnary::signum( &var_both[index] ) *  &var_der[index];
+    let exp      = &var_both[res]  + &V::one();
+    var_der[res] = &exp *  &var_der[index];
 }
-// abs_reverse_der
-/// First order reverse mode for abs(variable);
+// exp_m1_reverse_der
+/// First order reverse mode for exp_m1(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
-fn abs_reverse_der<V, E>(
+fn exp_m1_reverse_der<V, E>(
     _dyp_both  :   &[E]        ,
     var_both   :   &[E]        ,
     var_der    :   &mut [E]    ,
@@ -70,27 +72,31 @@ fn abs_reverse_der<V, E>(
     arg_type   :   &[ADType]   ,
     res        :   usize       )
 where
+    V             : FConst ,
     for<'a> E     : AddAssign<&'a E> ,
-    E             : FConst ,
-    for<'a> &'a E : FUnary<Output=E>,
     for<'a> &'a E : Mul<&'a E, Output=E>,
+    for<'a> &'a E : Add<&'a V, Output=E>,
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     let index       = arg[0] as usize;
-    let term        = &FUnary::signum( &var_both[index] ) * &var_der[res];
+    let exp         = &var_both[res]  + &V::one();
+    let term        = &exp * &var_der[res];
     var_der[index] += &term;
 }
 // ---------------------------------------------------------------------------
 // set_op_info
-/// Set the operator information for all the ABS_OP operator.
+/// Set the operator information for all the EXP_M1_OP operator.
 ///
 /// * op_info_vec :
 ///   The map from [op::id](crate::op::id) to operator information.
-///   The the map results for ABS_OP are set.
+///   The the map results for EXP_M1_OP are set.
 pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> &'a AD<V> : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
+    //
+    for<'a> &'a AD<V> : Add<&'a V, Output = AD<V> > ,
+    for<'a> &'a V     : Add<&'a V, Output = V> ,
     //
     for<'a> V         : AddAssign<&'a V>,
     for<'a> AD<V>     : AddAssign<&'a AD<V> >,
@@ -98,17 +104,17 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     V                 : Clone + FConst + ThisThreadTape ,
     for<'a> &'a V     : FUnary<Output=V>,
 {
-    op_info_vec[ABS_OP as usize] = OpInfo{
-        name              : "abs",
-        forward_dyp_value : abs_forward_dyp::<V, V>,
-        forward_dyp_ad    : abs_forward_dyp::<V, AD<V> >,
-        forward_var_value : abs_forward_var::<V, V>,
-        forward_var_ad    : abs_forward_var::<V, AD<V> >,
-        forward_der_value : abs_forward_der::<V, V>,
-        forward_der_ad    : abs_forward_der::<V, AD<V> >,
-        reverse_der_value : abs_reverse_der::<V, V>,
-        reverse_der_ad    : abs_reverse_der::<V, AD<V> >,
-        rust_src          : abs_rust_src,
+    op_info_vec[EXP_M1_OP as usize] = OpInfo{
+        name              : "exp_m1",
+        forward_dyp_value : exp_m1_forward_dyp::<V, V>,
+        forward_dyp_ad    : exp_m1_forward_dyp::<V, AD<V> >,
+        forward_var_value : exp_m1_forward_var::<V, V>,
+        forward_var_ad    : exp_m1_forward_var::<V, AD<V> >,
+        forward_der_value : exp_m1_forward_der::<V, V>,
+        forward_der_ad    : exp_m1_forward_der::<V, AD<V> >,
+        reverse_der_value : exp_m1_reverse_der::<V, V>,
+        reverse_der_ad    : exp_m1_reverse_der::<V, AD<V> >,
+        rust_src          : exp_m1_rust_src,
         reverse_depend    : common::reverse_depend,
     };
 }

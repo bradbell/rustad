@@ -26,6 +26,14 @@ fn main() {
         let prod         = exp_3 * exp_minus_3;
         assert_eq!(prod, one);
     }
+    // exp_m1
+    {   type V = AzFloat<f32>;
+        let epsilon = V::epsilon();
+        let exp_m1  = FUnary::exp_m1( epsilon );
+        let check   = epsilon;
+        let arg_vec : Vec<[&str; 2]> = Vec::new();
+        check_nearly_eq::<V>(&exp_m1, &check, &arg_vec);
+    }
     // minus
     {   type V = AzFloat<f64>;
         let three        = V::from(3.0);

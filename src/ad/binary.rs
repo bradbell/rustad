@@ -126,13 +126,13 @@ pub fn doc_ad_binary_op() { }
 /// see [doc_ad_binary_op]
 macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
     // -----------------------------------------------------------------------
-    fn [< record_ $Name:lower _aa >]<V> (
-        tape: &mut Tape<V> ,
-        lhs:       &AD<V>  ,
-        rhs:       &AD<V>  ,
+    fn [< record_ $Name:lower _aa >]<T> (
+        tape: &mut Tape<T> ,
+        lhs:       &AD<T>  ,
+        rhs:       &AD<T>  ,
     ) -> (usize, usize, ADType)
     where
-        V : Clone + FConst + PartialEq ,
+        T : Clone + FConst + PartialEq ,
     {
         // new_tape_id, new_index, new_ad_type
         let mut new_tape_id   = 0;
@@ -180,17 +180,17 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
                 //
                 id::ADD_VV_OP => {
                     // add with left operand the constant zero
-                    if( lhs.value == V::zero() ) {
+                    if( lhs.value == T::zero() ) {
                         return (rhs.tape_id, rhs.index, rhs.ad_type);
                     }
                 },
                 id::MUL_VV_OP => {
                     // multiply with left operand the constant zero
-                    if( lhs.value == V::zero() ) {
+                    if( lhs.value == T::zero() ) {
                         return (new_tape_id, new_index, new_ad_type);
                     }
                     // multiply with left operand the constant one
-                    if( lhs.value == V::one() ) {
+                    if( lhs.value == T::one() ) {
                         return (rhs.tape_id, rhs.index, rhs.ad_type);
                     }
                 },
@@ -198,7 +198,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
                 Not optimized out because not a special case for AzFloat.
                 id::DIV_VV_OP => {
                     // divide with left operand the constant zero
-                    if( lhs.value == V::zero() ) {
+                    if( lhs.value == T::zero() ) {
                         return (new_tape_id, new_index, new_ad_type);
                     }
                 },
@@ -210,23 +210,23 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
                 //
                 id::ADD_VV_OP => {
                     // add with right operand the constant zero
-                    if( rhs.value == V::zero() ) {
+                    if( rhs.value == T::zero() ) {
                         return (lhs.tape_id, lhs.index, lhs.ad_type);
                     }
                 },
                 id::MUL_VV_OP => {
                     // multiply with right operand the constant zero
-                    if( rhs.value == V::zero() ) {
+                    if( rhs.value == T::zero() ) {
                         return (new_tape_id, new_index, new_ad_type);
                     }
                     // multiply with right operand the constant one
-                    if( rhs.value == V::one() ) {
+                    if( rhs.value == T::one() ) {
                         return (lhs.tape_id, lhs.index, lhs.ad_type);
                     }
                 },
                 id::DIV_VV_OP => {
                     // divide with right operand the constant one
-                    if( rhs.value == V::one() ) {
+                    if( rhs.value == T::one() ) {
                         return (lhs.tape_id, lhs.index, lhs.ad_type);
                     }
                 },

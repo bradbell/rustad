@@ -586,6 +586,7 @@ macro_rules! impl_float_unary{ ($B:ident) => {
         type Output = AzFloat<$B>;
         //
         // use float_unary_function
+        float_unary_function!($B, exp_m1);
         float_unary_function!($B, ln);
         float_unary_function!($B, sqrt);
         float_unary_function!($B, tanh);
@@ -612,6 +613,7 @@ macro_rules! impl_float_unary{ ($B:ident) => {
         type Output = AzFloat<$B>;
         //
         // use float_unary_function
+        float_unary_function!($B, exp_m1);
         float_unary_function!($B, ln);
         float_unary_function!($B, sqrt);
         float_unary_function!($B, tanh);
