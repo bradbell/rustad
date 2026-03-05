@@ -566,7 +566,7 @@ impl_float_const!(f64);
 /// type V = AzFloat<f64>;
 /// let arg_vec : Vec<[&str; 2]> = Vec::new();
 /// //
-/// let pi  : V = FConst::pi();
+/// let pi      = V::pi();
 /// let pi_4    = pi / V::from(4.0);
 /// let y       = pi_4.tan();
 /// check_nearly_eq::<V>(&y, &V::from(1.0), &arg_vec);

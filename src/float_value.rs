@@ -217,7 +217,7 @@ pub(crate) use impl_float_value_from_primitive;
 /// //
 /// //
 /// let one_v           = V::from(1);
-/// let epsilon_v   : V = FConst::epsilon();
+/// let epsilon_v       = V::epsilon();
 /// let near_one_v      = one_v + V::from(10) * epsilon_v;
 /// let x               = V::from( 1e-20 );
 /// let y               = x * near_one_v;
@@ -241,8 +241,8 @@ pub(crate) use impl_float_value_from_primitive;
 /// //
 /// let arg_vec = vec![ ["assert", "false"] ];
 /// //
-/// let one_v       : V = FConst::one();
-/// let epsilon_v   : V = FConst::epsilon();
+/// let one_v           = V::one();
+/// let epsilon_v       = V::epsilon();
 /// let near_one_v      = &one_v + &( &V::from(10f32) * &epsilon_v );
 /// //
 /// let x  = V::new( vec![ S::from(1e-20) ,  S::from(1e+20) ] );
@@ -291,7 +291,7 @@ where
     //
     // sum_abs, min_sum
     let sum_abs     = &x.abs() + &y.abs();
-    let min_pos : V = FConst::min_positive();
+    let min_pos     = V::min_positive();
     let min_sum     = &factor * &min_pos;
     //
     // check first condition

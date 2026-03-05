@@ -284,7 +284,7 @@ where
     {
         //
         // self.cop[0]
-        let nan :  V  = FConst::nan();
+        let nan       = V::nan();
         assert!( nan == self.cop[0] );
         //
         // tape

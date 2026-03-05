@@ -64,7 +64,7 @@ fn main() {
     }
     // sin
     {   type V = AzFloat<f64>;
-        let pi : V   = FConst::pi();
+        let pi       = V::pi();
         let pi_2     = pi / V::from(2);
         let sin_pi_2 = pi_2.sin();
         assert_eq!(sin_pi_2, FConst::one());
@@ -88,7 +88,7 @@ fn main() {
     }
     // tan
     {   type V = AzFloat<f32>;
-        let pi : V   = FConst::pi();
+        let pi       = V::pi();
         let pi_4     = pi / V::from(4);
         let tan_pi_4 = FUnary::tan( &pi_4 );
         assert_eq!(tan_pi_4, FConst::one());

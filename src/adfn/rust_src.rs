@@ -14,7 +14,6 @@ use crate::ad::ADType;
 use crate::{
     ADfn,
     FloatValue,
-    FConst,
 };
 //
 use std::any::type_name;
@@ -159,7 +158,7 @@ where
         src = src +
             "   //\n" +
             "   // nan\n" +
-            "   let nan : V = FConst::nan();\n";
+            "   let nan     = V::nan();\n";
         //
         // cop
         if ! self.cop.is_empty() {
@@ -195,7 +194,7 @@ where
                 let arg_type = &self.dyp.arg_type_all[start .. end];
                 let res      = self.dyp.n_dom + op_index;
                 let rust_src = op_info_vec[op_id].rust_src;
-                let not_used : V = FConst::nan();
+                let not_used     = V::nan();
                 src = src + &rust_src(
                         not_used,
                         ADType::DynamicP,
@@ -225,7 +224,7 @@ where
                 let arg_type = &self.var.arg_type_all[start .. end];
                 let res      = self.var.n_dom + op_index;
                 let rust_src = op_info_vec[op_id].rust_src;
-                let not_used : V = FConst::nan();
+                let not_used     = V::nan();
                 src = src + &rust_src(
                         not_used,
                         ADType::Variable,

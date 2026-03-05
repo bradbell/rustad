@@ -42,7 +42,7 @@ use crate::op::id;
 /// type V = AzFloat<f64>;
 /// let arg_vec : Vec<[&str; 2]> = Vec::new();
 /// //
-/// let pi  : AD<V> = FConst::pi();
+/// let pi          = AD::<V>::pi();
 /// let pi_4        = pi / AD::from( V::from(4.0) );
 /// let y           = (&pi_4).tan();
 /// check_nearly_eq::<V>(&y.to_value(), &V::from(1.0), &arg_vec);
