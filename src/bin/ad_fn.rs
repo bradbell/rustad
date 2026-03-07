@@ -6,12 +6,12 @@ use std::cell::RefCell;
 //
 use rustad::utility::avg_seconds_to_execute;
 use rustad::{
+    AD,
     AzFloat,
     ADfn,
     NumVec,
     start_recording,
     stop_recording,
-    ad_from_value,
     ThisThreadTapePublic,
     FConst,
     FUnary,
@@ -49,7 +49,7 @@ where
     let (_, ax)    = start_recording(None, x);
     //
     // sumsq
-    let mut sumsq  = ad_from_value(zero_v);
+    let mut sumsq  = AD::from(zero_v);
     for ax_j in &ax {
         sumsq += &( ax_j * ax_j );
     }

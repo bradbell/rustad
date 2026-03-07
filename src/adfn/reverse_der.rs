@@ -83,7 +83,6 @@ use crate::{
 /// use rustad::stop_recording;
 /// use rustad::AD;
 /// use rustad::AzFloat;
-/// use rustad::ad_from_value;
 ///
 /// // V
 /// type V = rustad::AzFloat<f32>;

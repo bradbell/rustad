@@ -60,7 +60,6 @@ pub(crate) mod setup;
 //
 pub use ad::{
     AD,
-    ad_from_value,
     ad_from_vector,
     ad_to_vector,
     doc_generic_v,
@@ -156,9 +155,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2026.3.6");
+/// assert_eq!(date, "2026.3.7");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2026.3.6";
+pub const YEAR_MONTH_DAY : &str = "2026.3.7";
 //
 // TRAITS_RS
 /// is the source code for the [core](crate::float::traits) module.

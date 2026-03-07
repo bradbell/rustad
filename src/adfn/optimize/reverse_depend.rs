@@ -187,7 +187,6 @@ mod tests {
         start_recording,
         stop_recording,
         AzFloat,
-        ad_from_value,
         IndexT,
         AtomCallback,
         register_atom,
@@ -296,7 +295,7 @@ mod tests {
         //
         // az
         let mut az  : Vec< AD<V> > = Vec::new();
-        az.push( ad_from_value( V::from( 5.0 ) ) );  // constant with index 0
+        az.push( AD::from( V::from( 5.0 ) ) );  // constant with index 0
         az.push( aq[0].clone() );  // az[1] = dynamic with index np
         az.push( ay[0].clone() );  // az[2] = variable with index nx
         //

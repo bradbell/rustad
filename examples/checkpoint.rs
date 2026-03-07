@@ -13,7 +13,6 @@ use rustad::{
     AzFloat,
     AD,
     ADfn,
-    ad_from_value,
     start_recording,
     stop_recording,
     register_checkpoint,
@@ -28,7 +27,7 @@ type V = AzFloat<f64>;
 fn sumsq_fn(nx : usize) -> ADfn<V> {
     let x   : Vec<V> = vec![ V::from(1.0);  nx ];
     let (_, ax)      = start_recording(None, x);
-    let mut asumsq : AD<V> = ad_from_value( V::from(0) );
+    let mut asumsq         = AD::from( V::from(0) );
     for j in 0 .. nx {
         let term = &ax[j] * &ax[j];
         asumsq  += &term;

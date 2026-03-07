@@ -175,8 +175,8 @@ V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + ThisThreadTape,
 #[cfg(test)]
 mod tests {
     use crate::{
+        AD,
         AzFloat,
-        ad_from_value,
         start_recording,
         stop_recording,
     };
@@ -196,7 +196,7 @@ mod tests {
         //
         // asum
         // The first addition adds the constants zero and so is not recorded
-        let mut asum   = ad_from_value( V::from(0.0) );
+        let mut asum   = AD::from( V::from(0.0) );
         for j in 0 .. np {
             asum += &ap[j];
         }

@@ -6,8 +6,8 @@
 Tests optimizations done during recording
 */
 use rustad::{
+    AD,
     AzFloat,
-    ad_from_value,
     start_recording,
     stop_recording,
 };
@@ -19,9 +19,9 @@ fn test_left_zero_one_both_ad() {
     let x  : Vec<V>  = vec![ V::from(3.0) ];
     //
     let (_, ax) = start_recording(None,  x.clone() );
-    let a1  = &ad_from_value(V::from(0.0)) + &ax[0]; // optimized to ax[0]
-    let a2  = &ad_from_value(V::from(1.0)) * &a1;    // optimized to ax[0]
-    let a3  = &ad_from_value(V::from(0.0)) * &a2;    // constant 0
+    let a1  = &AD::from(V::from(0.0)) + &ax[0]; // optimized to ax[0]
+    let a2  = &AD::from(V::from(1.0)) * &a1;    // optimized to ax[0]
+    let a3  = &AD::from(V::from(0.0)) * &a2;    // constant 0
     let a4  = &a3 + &a2;                         // optimized to ax[0]
     let ay  = vec![ a4 ];
     let f   = stop_recording(ay);
@@ -69,11 +69,11 @@ fn test_right_zero_one_both_ad() {
     let x  : Vec<V>  = vec![ V::from(3.0) ];
     //
     let (_, ax) = start_recording(None,  x.clone() );
-    let a1  = &ax[0] + &ad_from_value(V::from(0.0)); // optimized to ax[0]
-    let a2  = &a1    * &ad_from_value(V::from(1.0)); // optimized to ax[0]
-    let a3  = &a2    * &ad_from_value(V::from(0.0)); // constant 0
+    let a1  = &ax[0] + &AD::from(V::from(0.0)); // optimized to ax[0]
+    let a2  = &a1    * &AD::from(V::from(1.0)); // optimized to ax[0]
+    let a3  = &a2    * &AD::from(V::from(0.0)); // constant 0
     let a4  = &a2 + &a3;                         // optimized to ax[0]
-    let a5  = &a4    / &ad_from_value(V::from(1.0)); // optimized to ax[0]
+    let a5  = &a4    / &AD::from(V::from(1.0)); // optimized to ax[0]
     let ay  = vec![ a5 ];
     let f   = stop_recording(ay);
     //

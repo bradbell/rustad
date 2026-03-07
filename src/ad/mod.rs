@@ -156,17 +156,14 @@ impl<V> AD<V> {
     /// Convert an AD object to a value
     /// (its the variable information is lost).
     ///
-    /// **See Also** : example in [ad_from_value]
-    ///
     /// # Example using NumVec
     /// ```
     /// use rustad::AD;
-    /// use rustad::ad_from_value;
     /// use rustad::NumVec;
     /// type V  = rustad::AzFloat<f32>;
     /// let v   = vec![ V::from(2.0), V::from(3.0) ];
     /// let nv  = NumVec::new(v);
-    /// let av  = ad_from_value(nv);
+    /// let av  = AD::from(nv);
     /// let nv  = av.to_value();
     /// assert_eq!( nv.get(0), V::from(2.0) );
     /// assert_eq!( nv.get(1), V::from(3.0) );
@@ -183,10 +180,9 @@ impl<V> AD<V> {
 /// # Example
 /// ```
 /// use rustad::AD;
-/// use rustad::ad_from_value;
 /// type V  = rustad::AzFloat<f64>;
 /// let x   = V::from(5.0);
-/// let ax  = ad_from_value(x);
+/// let ax  = AD::from(x);
 /// let s   = format!( "{ax}" );
 /// assert_eq!(s, "5");
 /// ```
@@ -195,13 +191,12 @@ impl<V> AD<V> {
 /// ```
 /// use rustad::AD;
 /// use rustad::AzFloat;
-/// use rustad::ad_from_value;
 /// use rustad::NumVec;
 /// type S     = AzFloat<f32>;
 /// type V     = NumVec<S>;
 /// let x      = vec![ S::from(5.0), S::from(6.0) ];
 /// let x_nv   = NumVec::new(x);
-/// let ax     = ad_from_value(x_nv);
+/// let ax     = AD::from(x_nv);
 /// let s      = format!( "{ax}" );
 /// assert_eq!(s, "[ 5, 6, ]");
 /// ```
@@ -211,28 +206,9 @@ impl<V : std::fmt::Display> std::fmt::Display for AD<V> {
     }
 }
 // ---------------------------------------------------------------------------
-// ad_from_value
-/// Convert a value to an AD object with no function information;
-/// i.e., a constant parameter.
-///
-/// # Example
-/// ```
-/// use rustad::AD;
-/// use rustad::ad_from_value;
-/// type V  = rustad::AzFloat<f64>;
-/// let x   = V::from(3.0);
-/// let ax  = ad_from_value(x);
-/// assert_eq!( ax.to_value(), V::from(3.0) );
-/// ```
-pub fn ad_from_value<V>(value : V) -> AD<V> {
-    AD::<V>::from(value)
-}
-// ---------------------------------------------------------------------------
 // ad_from_vector
 /// Convert a vector to an vector of AD objects with no function information;
 /// i.e., a vector of constant parameters.
-///
-/// **See Also** : example in [ad_from_value]
 ///
 /// # Example
 /// ```
@@ -258,10 +234,9 @@ pub fn ad_from_vector<V> ( vec : Vec<V> ) -> Vec< AD<V> > {
 /// # Example
 /// ```
 /// use rustad::AD;
-/// use rustad::ad_from_value;
 /// use rustad::ad_to_vector;
 /// type V    = rustad::AzFloat<f64>;
-/// let ax    = vec![ ad_from_value(V::from(3)), ad_from_value(V::from(4)) ];
+/// let ax    = vec![ AD::from(V::from(3)), AD::from(V::from(4)) ];
 /// let y     = ad_to_vector(ax);
 /// assert_eq!( y , vec![ V::from(3), V::from(4) ] );
 /// ```
@@ -295,7 +270,7 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
 /// i.e., constant parameter.
 ///
 /// See Also :
-/// example in [ad_from_value], [ad_from_vector]
+/// example in [ad_from_vector]
 ///
 /// Syntax :
 /// ```text

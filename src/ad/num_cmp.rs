@@ -55,13 +55,12 @@ use crate::op::id::{
 ///```
 /// use rustad::{
 ///     AD,
-///     ad_from_value,
 ///     NumCmp,
 /// };
 ///
 /// type V  = rustad::AzFloat<f64>;
-/// let ax  = ad_from_value( V::from(3.0) );
-/// let ay  = ad_from_value( V::from(4.0) );
+/// let ax  = AD::from( V::from(3.0) );
+/// let ay  = AD::from( V::from(4.0) );
 /// let z   = V::from(4.0);
 ///
 /// let ax_lt_y  = NumCmp::num_lt( &ax, &ay);
@@ -89,7 +88,6 @@ use crate::op::id::{
 /// use rustad::{
 ///     AD,
 ///     AzFloat,
-///     ad_from_value,
 ///     NumVec,
 ///     NumCmp,
 /// };
@@ -100,8 +98,8 @@ use crate::op::id::{
 /// let y     = vec![ S::from(2.0), S::from(2.0) ];
 /// let x_nv  = NumVec::new(x);
 /// let y_nv  = NumVec::new(y);
-/// let ax  : AD<V>  = ad_from_value(x_nv.clone());
-/// let ay  : AD<V>  = ad_from_value(y_nv.clone());
+/// let ax           = AD::from(x_nv.clone());
+/// let ay           = AD::from(y_nv.clone());
 ///
 /// let ax_lt_y  = NumCmp::num_lt(&ax, &ay);
 /// let check    = NumVec::new( vec![ S::from(1), S::from(0) ] );

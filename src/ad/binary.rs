@@ -62,13 +62,12 @@ use crate::doc_generic_v;
 /// Note that [AzFloat](crate::AzFloat) implements the Copy trait.
 ///```
 /// use rustad::AD;
-/// use rustad::ad_from_value;
 ///
 /// type V  = rustad::AzFloat<f64>;
 /// let  x  = V::from(12.0);
 /// let  y  = V::from(3.0);
-/// let ax  = ad_from_value(x);
-/// let ay  = ad_from_value(y);
+/// let ax  = AD::from(x);
+/// let ay  = AD::from(y);
 ///
 /// let az  = &ax * &ay;
 /// assert_eq!( az.to_value(), V::from(36.0) );
@@ -91,15 +90,14 @@ use crate::doc_generic_v;
 /// ```
 /// use rustad::AD;
 /// use rustad::AzFloat;
-/// use rustad::ad_from_value;
 /// use rustad::NumVec;
 ///
 /// type S    = AzFloat<f32>;
 /// type V    = NumVec<S>;
 /// let x     = NumVec::new( vec![ S::from(2.0), S::from(3.0) ] );
 /// let y     = NumVec::new( vec![ S::from(4.0), S::from(6.0) ] );
-/// let ax    = ad_from_value(x.clone());
-/// let ay    = ad_from_value(y.clone());
+/// let ax    = AD::from(x.clone());
+/// let ay    = AD::from(y.clone());
 ///
 /// let az    = &ax - &ay;
 /// let z     = az.to_value();
@@ -517,15 +515,15 @@ ad_binary_op!(Div);
 /// # Example
 /// ```
 /// use rustad::{
+///     AD,
 ///     Powf,
 ///     AzFloat,
-///     ad_from_value,
 /// };
 /// type V  = AzFloat<f32>;
 /// let x   = V::from(2.0);
 /// let y   = V::from(3.0);
-/// let ax  = ad_from_value( x.clone() );
-/// let ay  = ad_from_value( y.clone() );
+/// let ax  = AD::from( x.clone() );
+/// let ay  = AD::from( y.clone() );
 ///
 /// let az  = (&ax).powf( &ay );
 /// assert_eq!( az.to_value(), V::from(8.0) );
@@ -628,12 +626,11 @@ pub(crate) use impl_value_powf_ad;
 /// # Example
 /// ```
 /// use rustad::AD;
-/// use rustad::ad_from_value;
 ///
 /// type V       = rustad::AzFloat<f64>;
-/// let mut ax   = ad_from_value( V::from(3.0) );
+/// let mut ax   = AD::from( V::from(3.0) );
 /// let y        = V::from(4.0);
-/// let ay       = ad_from_value(y.clone());
+/// let ay       = AD::from(y.clone());
 /// //
 /// ax          -= &ay;
 /// assert_eq!( ax.clone().to_value(), V::from(-1.0) );
@@ -652,7 +649,6 @@ pub(crate) use impl_value_powf_ad;
 /// ```
 /// use rustad::AD;
 /// use rustad::AzFloat;
-/// use rustad::ad_from_value;
 /// use rustad::NumVec;
 ///
 /// type S     = AzFloat<f32>;
@@ -661,8 +657,8 @@ pub(crate) use impl_value_powf_ad;
 /// let y      = vec![ S::from(2.0), S::from(2.0) ];
 /// let x_nv   = NumVec::new(x);
 /// let y_nv   = NumVec::new(y);
-/// let mut ax = ad_from_value(x_nv);
-/// let ay     = ad_from_value(y_nv);
+/// let mut ax = AD::from(x_nv);
+/// let ay     = AD::from(y_nv);
 /// ax         *= &ay;
 /// let x_nv   = ax.to_value();
 /// assert_eq!( x_nv.get(0), S::from(2.0) );

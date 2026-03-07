@@ -8,7 +8,6 @@ use rustad::{
     NumVec,
     AzFloat,
     AD,
-    ad_from_value,
     start_recording,
     stop_recording,
     get_lib,
@@ -29,7 +28,7 @@ fn main () {
     let (_, ax)  = start_recording(None, x);
     //
     // asum
-    let mut asum : AD<V>  = ad_from_value(  V::from(0.0) );
+    let mut asum          = AD::from(  V::from(0.0) );
     for j in 0 .. nx {
         let square  = &ax[j] * &ax[j];
         asum       += &square;

@@ -4,8 +4,8 @@
 //
 use rustad::utility::avg_seconds_to_execute;
 use rustad::{
+    AD,
     AzFloat,
-    ad_from_value,
     NumVec,
 };
 // Define: sumsq(n) = 1 + 2^2 + ... + n^2
@@ -78,9 +78,9 @@ pub fn normsq_nv_az_f64()
 //
 // AD< AzFloat<f64> >
 pub fn normsq_ad_az_f64()
-{   let mut sumsq  = ad_from_value( AzFloat( 0 as f64 ) );
+{   let mut sumsq  = AD::from( AzFloat( 0 as f64 ) );
     for j in 1 .. (N_SUM+1) {
-        let ad_j  = ad_from_value( AzFloat(j as f64) );
+        let ad_j  = AD::from( AzFloat(j as f64) );
         sumsq += &( &ad_j * &ad_j );
     }
     assert_eq!(
@@ -91,9 +91,9 @@ pub fn normsq_ad_az_f64()
 //
 // AD< NumVec< AzFloat<f64> > >
 pub fn normsq_ad_nv_az_f64()
-{   let mut sumsq  = ad_from_value( NumVec::from( AzFloat(0 as f64) ) );
+{   let mut sumsq  = AD::from( NumVec::from( AzFloat(0 as f64) ) );
     for j in 1 .. (N_SUM+1) {
-        let nv_j  = ad_from_value( NumVec::from( AzFloat(j as f64 ) ) );
+        let nv_j  = AD::from( NumVec::from( AzFloat(j as f64 ) ) );
         sumsq += &( &nv_j * &nv_j );
     }
     assert_eq!(

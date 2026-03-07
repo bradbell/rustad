@@ -63,7 +63,6 @@ use crate::{
     IndexT,
     AtomCallback,
     ThisThreadTapePublic,
-    ad_from_value,
     FConst,
 };
 // ----------------------------------------------------------------------
@@ -191,7 +190,7 @@ where
         let ad_type = &arg_type[BEGIN_DOM + i_arg];
         if ad_type.is_constant() {
             let index = arg[BEGIN_DOM + i_arg] as usize;
-            acop.push( ad_from_value( cop[index].clone() ) );
+            acop.push( AD::from( cop[index].clone() ) );
         }
     }
     acop
@@ -366,7 +365,7 @@ where
     // adomain
     let acop     = domain_acop(cop, arg, arg_type, n_dom);
     let nan_v : V = f32::NAN.into();
-    let anan      = ad_from_value( nan_v );
+    let anan      = AD::from( nan_v );
     let adomain   = domain_ad_dyp(
         adyp_both, &anan, &acop, arg, arg_type, n_dom
     );
@@ -658,7 +657,7 @@ where
     //
     // adomain_der
     let zero_v : V = 0.0f32.into();
-    let azero      = ad_from_value(zero_v);
+    let azero      = AD::from(zero_v);
     let mut adomain_der : Vec<& AD<V> > = Vec::with_capacity(n_dom);
     for i_dom in 0 .. n_dom {
         let index   = arg[BEGIN_DOM + i_dom] as usize;
@@ -811,7 +810,7 @@ where
     //
     // sarange_der
     let zero_v : V = 0f32.into();
-    let azero      = ad_from_value(zero_v);
+    let azero      = AD::from(zero_v);
     let mut arange_der : Vec<& AD<V> > = vec![ &azero ; n_rng];
     let mut dep_index = 0;
     for rng_index in 0 .. n_rng {

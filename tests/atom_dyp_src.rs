@@ -20,7 +20,6 @@ f(p, x) = [ p[1] * x[0] ]
 use rustad::{
     AzFloat,
     AD,
-    ad_from_value,
     register_atom,
     AtomCallback,
     IndexT,
@@ -199,7 +198,7 @@ fn atom_dyp_src() {
     let z0           = ap[0].clone();
     let z1           = ap[1].clone();
     let z2           = ax[0].clone();
-    let z3           = ad_from_value( V::from(5.0) );
+    let z3           = AD::from( V::from(5.0) );
     let az           = vec![ z0, z1, z2, z3 ];
     let ny           = 3;
     let ay           = call_atom(ny, az, h_atom_id, call_info, trace);

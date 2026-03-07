@@ -77,7 +77,6 @@ use crate::{
 /// use rustad::stop_recording;
 /// use rustad::AD;
 /// use rustad::AzFloat;
-/// use rustad::ad_from_value;
 /// //
 /// // V
 /// type V = rustad::AzFloat<f32>;
@@ -91,11 +90,11 @@ use crate::{
 /// let p                 = vec![ V::from(1.0); np];
 /// let x                 = vec![ V::from(1.0); nx];
 /// let (ap, ax)          = start_recording( Some(p), x);
-/// let mut ap_sum        = ad_from_value( V::from(0.0) );
+/// let mut ap_sum        = AD::from( V::from(0.0) );
 /// for j in 0 .. np {
 ///     ap_sum += &ap[j];
 /// }
-/// let mut ax_sum        = ad_from_value( V::from(0.0) );
+/// let mut ax_sum        = AD::from( V::from(0.0) );
 /// for j in 0 .. nx {
 ///     ax_sum += &ax[j];
 /// }

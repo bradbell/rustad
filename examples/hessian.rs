@@ -7,7 +7,6 @@
 use rustad::{
     AzFloat,
     AD,
-    ad_from_value,
     ad_from_vector,
     NumVec,
     start_recording,
@@ -29,7 +28,7 @@ fn example_hessian () {
     let (_, ax)  = start_recording(None, x.clone());
     //
     // asum
-    let mut asum : AD<V>  = ad_from_value(  V::from(0.0) );
+    let mut asum          = AD::from(  V::from(0.0) );
     for j in 0 .. nx {
         let cubed  = &( &ax[j] * &ax[j] ) * &ax[j];
         asum      += &cubed;
@@ -101,7 +100,7 @@ fn example_num_vec_hessian () {
     let (_, ax)  = start_recording(None, x.clone());
     //
     // asum
-    let mut asum : AD<V>  = ad_from_value(  NumVec::from( S::from(0.0) ) );
+    let mut asum          = AD::from(  NumVec::from( S::from(0.0) ) );
     for j in 0 .. nx {
         let cubed  = &( &ax[j] * &ax[j] ) * &ax[j];
         asum      += &cubed;

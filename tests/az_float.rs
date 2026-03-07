@@ -3,10 +3,10 @@
 // SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 use rustad::{
+    AD,
     AzFloat,
     start_recording,
     stop_recording,
-    ad_from_value,
 };
 //
 // test_multiply_op
@@ -64,7 +64,7 @@ fn test_forward_dyp() {
     // asum
     // The first addition adds the constants zero and so is not recorded
     let (ap, ax)   = start_recording( Some(p.clone()), x.clone());
-    let mut asum   = ad_from_value( V::from(0.0) );
+    let mut asum   = AD::from( V::from(0.0) );
     for j in 0 .. np {
         asum += &ap[j];
     }
