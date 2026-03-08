@@ -61,12 +61,12 @@ use crate::op::info::{
 // div_pv_rust_src
 // div_vp_rust_src
 // div_vv_rust_src
-common::binary_rust_src!(Div);
+common::binary_rust_src!(div);
 // -------------------------------------------------------------------------
 // div_pv_forward_var
 // div_vp_forward_var
 // div_vv_forward_var
-common::eval_binary_forward_var!(Div);
+common::binary_forward_var!(Div, div);
 // ---------------------------------------------------------------------------
 // forward_der
 // ---------------------------------------------------------------------------

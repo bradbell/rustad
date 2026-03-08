@@ -55,13 +55,13 @@ use crate::op::info::{
 // sub_pv_rust_src
 // sub_vp_rust_src
 // sub_vv_rust_src
-common::binary_rust_src!(Sub);
+common::binary_rust_src!(sub);
 // -------------------------------------------------------------------------
 // sub_forward_dyp
 // sub_pv_forward_var
 // sub_vp_forward_var
 // sub_vv_forward_var
-common::eval_binary_forward_var!(Sub);
+common::binary_forward_var!(Sub, sub);
 // ---------------------------------------------------------------------------
 // forward_der
 // ---------------------------------------------------------------------------

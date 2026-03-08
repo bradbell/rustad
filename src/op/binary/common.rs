@@ -46,7 +46,7 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
     }
 }
 // ---------------------------------------------------------------------------
-// eval_binary_forward_var
+// binary_forward_var
 /// Evaluation of zero order forward for binary operators;
 /// see [num_cmp](crate::op::binary::num_cmp)
 /// for numerical comparison operators.
@@ -54,7 +54,8 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
 ///
 /// * V      : see [doc_generic_v](crate::doc_generic_v)
 /// * E      : see [doc_generic_e](crate::doc_generic_e)
-/// * Name   :  is Add , Sub , Mul , or Div  ,
+/// * Trait  : is Add , Sub , Mul , Div, or FBinary
+/// * name   : is the name of a function in this trait
 /// * op     : is the corresponding operator; e.g. + for Add.
 ///
 /// This defines the following functions in the current module:
@@ -64,16 +65,16 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
 ///     {name}_vp_forward_var<V, E>
 ///     {name}_vv_forward_var<V, E>
 /// ```
-/// where {name} is a lower case version of Name and
-/// v (p) means the corresponding operand is a variable (parameter) .
+/// where v (p) means the corresponding operand is a variable (parameter) .
 ///
-/// [IndexT] must be defined in any module that uses eval_binary_forward_var
-macro_rules! eval_binary_forward_var { ($Name:ident) => { paste::paste! {
+/// [IndexT] must be defined in any module that uses binary_forward_var
+macro_rules! binary_forward_var { ($Trait:ident, $name:ident) =>
+{ paste::paste! {
     #[doc = concat!(
-        " E evaluation of ", stringify!($Name), "(parameter, parameter)",
+        " E evaluation of ", stringify!($name), "(parameter, parameter)",
         "; see [ForwardDyp](crate::op::info::ForwardDyp)"
     ) ]
-    fn [< $Name:lower _forward_dyp >] <V, E> (
+    fn [< $name _forward_dyp >] <V, E> (
         dyp_both    : &mut [E]    ,
         cop         : &[V]        ,
         _flag_all   : &[bool]     ,
@@ -81,9 +82,9 @@ macro_rules! eval_binary_forward_var { ($Name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        for<'a> &'a V : std::ops::$Name<&'a E, Output = E> ,
-        for<'a> &'a E : std::ops::$Name<&'a V, Output = E> ,
-        for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,
+        for<'a> &'a V : $Trait<&'a E, Output = E> ,
+        for<'a> &'a E : $Trait<&'a V, Output = E> ,
+        for<'a> &'a E : $Trait<&'a E, Output = E> ,
     {
         debug_assert!( arg.len() == 2);
         debug_assert!(
@@ -95,18 +96,18 @@ macro_rules! eval_binary_forward_var { ($Name:ident) => { paste::paste! {
         let lhs       = arg[0] as usize;
         let rhs       = arg[1] as usize;
         if arg_type[0].is_constant() {
-            dyp_both[res] = (&cop[lhs]).[< $Name:lower >](&dyp_both[rhs]);
+            dyp_both[res] = (&cop[lhs]).$name (&dyp_both[rhs]);
         } else if arg_type[1].is_constant() {
-            dyp_both[res] = (&dyp_both[lhs]).[< $Name:lower >](&cop[rhs]);
+            dyp_both[res] = (&dyp_both[lhs]).$name (&cop[rhs]);
         } else {
-            dyp_both[res] = (&dyp_both[lhs]).[< $Name:lower >](&dyp_both[rhs]);
+            dyp_both[res] = (&dyp_both[lhs]).$name (&dyp_both[rhs]);
         };
     }
     #[doc = concat!(
-        " E evaluation of ", stringify!($Name), "(parameter, variable)",
+        " E evaluation of ", stringify!($name), "(parameter, variable)",
         "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
-    fn [< $Name:lower _pv_forward_var >] <V, E> (
+    fn [< $name _pv_forward_var >] <V, E> (
         dyp_both    : &[E]        ,
         var_both    : &mut [E]    ,
         cop         : &[V]        ,
@@ -115,24 +116,24 @@ macro_rules! eval_binary_forward_var { ($Name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        for<'a> &'a V : std::ops::$Name<&'a E, Output = E> ,
-        for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,
+        for<'a> &'a V : $Trait<&'a E, Output = E> ,
+        for<'a> &'a E : $Trait<&'a E, Output = E> ,
     {
         debug_assert!( arg.len() == 2);
         debug_assert!( ! arg_type[1].is_constant() );
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
         if arg_type[0].is_constant() {
-            var_both[res] = (&cop[lhs]).[< $Name:lower >](&var_both[rhs]);
+            var_both[res] = (&cop[lhs]).$name (&var_both[rhs]);
         } else {
-            var_both[res] = (&dyp_both[lhs]).[< $Name:lower >](&var_both[rhs]);
+            var_both[res] = (&dyp_both[lhs]).$name (&var_both[rhs]);
         }
     }
     #[doc = concat!(
-        " E evaluation of ", stringify!($Name), "(variable, parameter)",
+        " E evaluation of ", stringify!($name), "(variable, parameter)",
         "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
-    fn [< $Name:lower _vp_forward_var >] <V, E> (
+    fn [< $name _vp_forward_var >] <V, E> (
         dyp_both    : &[E]        ,
         var_both    : &mut [E]    ,
         cop         : &[V]        ,
@@ -141,24 +142,24 @@ macro_rules! eval_binary_forward_var { ($Name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        for<'a> &'a E : std::ops::$Name<&'a V, Output = E> ,
-        for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,
+        for<'a> &'a E : $Trait<&'a V, Output = E> ,
+        for<'a> &'a E : $Trait<&'a E, Output = E> ,
     {
         debug_assert!( arg.len() == 2);
         debug_assert!( ! arg_type[0].is_constant() );
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
         if arg_type[1].is_constant() {
-            var_both[res] = (&var_both[lhs]).[< $Name:lower >](&cop[rhs]);
+            var_both[res] = (&var_both[lhs]).$name (&cop[rhs]);
         } else {
-            var_both[res] = (&var_both[lhs]).[< $Name:lower >](&dyp_both[rhs]);
+            var_both[res] = (&var_both[lhs]).$name (&dyp_both[rhs]);
         }
     }
     #[doc = concat!(
-        " E evaluation of ", stringify!($Name), "(variable, variable)",
+        " E evaluation of ", stringify!($name), "(variable, variable)",
         "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
-    fn [< $Name:lower _vv_forward_var >] <V, E> (
+    fn [< $name _vv_forward_var >] <V, E> (
         _dyp_both   : &[E]        ,
         var_both    : &mut [E]    ,
         _cop        : &[V]        ,
@@ -167,20 +168,20 @@ macro_rules! eval_binary_forward_var { ($Name:ident) => { paste::paste! {
         _arg_type   : &[ADType]   ,
         res         : usize       )
     where
-        for<'a> &'a E : std::ops::$Name<&'a E, Output = E> ,
+        for<'a> &'a E : $Trait<&'a E, Output = E> ,
     {
         debug_assert!( arg.len() == 2);
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
-        var_both[res] = (&var_both[lhs]).[< $Name:lower >](&var_both[rhs]);
+        var_both[res] = (&var_both[lhs]).$name (&var_both[rhs]);
     }
 } } }
-pub(crate) use eval_binary_forward_var;
+pub(crate) use binary_forward_var;
 // ---------------------------------------------------------------------------
 // binary_rust_src
 /// Rust source code for binary operators.
 ///
-/// * Name   :  is Add , Sub , Mul , or Div  ,
+/// * name   :  is add, sub, mul, div, powf
 /// * op     : is the corresponding operator; e.g. + for Add.
 ///
 /// This defines the following functions in the current module:
@@ -190,16 +191,15 @@ pub(crate) use eval_binary_forward_var;
 ///     {name}_vp_rust_src
 ///     {name}_vv_rust_src
 /// ```
-/// where {name} is a lower case version of Name and
-/// v (p) means the corresponding operand is a variable (parameter) .
+/// where v (p) means the corresponding operand is a variable (parameter) .
 ///
 /// [IndexT] must be defined in any module that uses binary_rust_src
-macro_rules! binary_rust_src { ($Name:ident) => { paste::paste! {
+macro_rules! binary_rust_src { ($name:ident) => { paste::paste! {
     #[doc = concat!(
-        " rust source for ", stringify!( $Name ), "(parameter, parameter)",
+        " rust source for ", stringify!( $name ), "(parameter, parameter)",
         "; see [RustSrc](crate::op::info::RustSrc)"
     ) ]
-    fn [< $Name:lower _pp_rust_src >]<V> (
+    fn [< $name _pp_rust_src >]<V> (
         _not_used   : V           ,
         res_type    : ADType      ,
         dyp_n_dom   : usize       ,
@@ -240,7 +240,7 @@ macro_rules! binary_rust_src { ($Name:ident) => { paste::paste! {
         let res_str : String = format!("dyp_dep[{res}]");
         //
         // op_name
-        let op_name = stringify!( [< $Name:lower >] );
+        let op_name = stringify!( $name );
         //
         // src
         let src = String::from("   ");
@@ -249,10 +249,10 @@ macro_rules! binary_rust_src { ($Name:ident) => { paste::paste! {
         src
     }
     #[doc = concat!(
-        " rust source for ", stringify!( $Name ), "(parameter, variable)",
+        " rust source for ", stringify!( $name ), "(parameter, variable)",
         "; see [RustSrc](crate::op::info::RustSrc)"
     ) ]
-    fn [< $Name:lower _pv_rust_src >]<V> (
+    fn [< $name _pv_rust_src >]<V> (
         _not_used   : V           ,
         res_type    : ADType      ,
         dyp_n_dom   : usize       ,
@@ -295,7 +295,7 @@ macro_rules! binary_rust_src { ($Name:ident) => { paste::paste! {
         let res_str : String = format!("var_dep[{res}]");
         //
         // op_name
-        let op_name = stringify!( [< $Name:lower >] );
+        let op_name = stringify!( $name );
         //
         // src
         let src = String::from("   ");
@@ -304,10 +304,10 @@ macro_rules! binary_rust_src { ($Name:ident) => { paste::paste! {
         src
     }
     #[doc = concat!(
-        " rust source for ", stringify!( $Name ), "(variable, parameter)",
+        " rust source for ", stringify!( $name ), "(variable, parameter)",
         "; see [RustSrc](crate::op::info::RustSrc)"
     ) ]
-    fn [< $Name:lower _vp_rust_src >]<V> (
+    fn [< $name _vp_rust_src >]<V> (
         _not_used   : V           ,
         res_type    : ADType      ,
         dyp_n_dom   : usize       ,
@@ -350,7 +350,7 @@ macro_rules! binary_rust_src { ($Name:ident) => { paste::paste! {
         let res_str : String = format!("var_dep[{res}]");
         //
         // op_name
-        let op_name = stringify!( [< $Name:lower >] );
+        let op_name = stringify!( $name );
         //
         // src
         let src = String::from("   ");
@@ -359,10 +359,10 @@ macro_rules! binary_rust_src { ($Name:ident) => { paste::paste! {
         src
     }
     #[doc = concat!(
-        " rust source for ", stringify!( $Name ), "(variable, variable)",
+        " rust source for ", stringify!( $name ), "(variable, variable)",
         "; see [RustSrc](crate::op::info::RustSrc)"
     ) ]
-    fn [< $Name:lower _vv_rust_src >]<V> (
+    fn [< $name _vv_rust_src >]<V> (
         _not_used   : V           ,
         res_type    : ADType      ,
         _dyp_n_dom  : usize       ,
@@ -403,7 +403,7 @@ macro_rules! binary_rust_src { ($Name:ident) => { paste::paste! {
         let res_str : String = format!("var_dep[{res}]");
         //
         // op_name
-        let op_name = stringify!( [< $Name:lower >] );
+        let op_name = stringify!( $name );
         //
         // src
         let src = String::from("   ");

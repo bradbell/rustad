@@ -60,14 +60,14 @@ use crate::op::info::{
 // mul_pv_rust_src
 // mul_vp_rust_src
 // mul_vv_rust_src
-common::binary_rust_src!(Mul);
+common::binary_rust_src!(mul);
 // -------------------------------------------------------------------------
 // forward_var
 // -------------------------------------------------------------------------
 // mul_pv_forward_var
 // mul_vp_forward_var
 // mul_vv_forward_var
-common::eval_binary_forward_var!(Mul);
+common::binary_forward_var!(Mul, mul);
 // ---------------------------------------------------------------------------
 // forward_der
 // ---------------------------------------------------------------------------
