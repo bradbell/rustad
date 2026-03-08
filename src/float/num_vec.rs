@@ -16,10 +16,10 @@
 // use
 use crate::{
     AzFloat,
-    FBinary,
     NumCmp,
     FConst,
     FUnary,
+    FBinary,
 };
 //
 // NumVec
@@ -538,7 +538,7 @@ where
     }
  }
 // ---------------------------------------------------------------------------
-/// powf function for NumVec objects
+/// FBinary trait for NumVec objects
 ///
 /// * S : is the floating point scalar type
 ///
@@ -557,33 +557,36 @@ where
 /// ```
 pub fn doc_f_binary_num_vec() {}
 //
+macro_rules! float_binary_function{ ($name:ident) => {
+    #[doc = "see [doc_f_binary_num_vec]" ]
+    fn $name(self, rhs : &NumVec<S>) -> NumVec<S> {
+        if self.len() == 1 {
+            if rhs.len() == 1 {
+                NumVec::<S> { s : self.s.$name( rhs.s ), vec : Vec::new() }
+            } else {
+                let v = rhs.vec.iter().map( |s| self.s.$name(*s) ).collect();
+                NumVec::<S> { s : FConst::nan(), vec : v }
+            }
+        } else if rhs.len() == 1 {
+            let v = self.vec.iter().map( |s| s.$name( rhs.s) ).collect();
+            NumVec::<S> { s : FConst::nan() , vec : v }
+        } else {
+            assert_eq!( self.len(), rhs.len() );
+            let mut v : Vec<S> = Vec::with_capacity( self.len() );
+            for j in 0 .. self.len() {
+                v.push( self.vec[j].$name( rhs.vec[j] ) );
+            }
+            NumVec::<S> { s : FConst::nan() , vec : v }
+        }
+    }
+} }
 impl<S> FBinary< &NumVec<S> > for &NumVec<S>
 where
     S : FConst + Copy + FBinary<Output=S> ,
 {   //
     type Output = NumVec<S>;
     //
-    #[doc = "see [doc_f_binary_num_vec]" ]
-    fn powf(self, rhs : &NumVec<S>) -> NumVec<S> {
-        if self.len() == 1 {
-            if rhs.len() == 1 {
-                NumVec::<S> { s : self.s.powf( rhs.s ), vec : Vec::new() }
-            } else {
-                let v = rhs.vec.iter().map( |s| self.s.powf(*s) ).collect();
-                NumVec::<S> { s : FConst::nan(), vec : v }
-            }
-        } else if rhs.len() == 1 {
-            let v = self.vec.iter().map( |s| s.powf( rhs.s) ).collect();
-            NumVec::<S> { s : FConst::nan() , vec : v }
-        } else {
-            assert_eq!( self.len(), rhs.len() );
-            let mut v : Vec<S> = Vec::with_capacity( self.len() );
-            for j in 0 .. self.len() {
-                v.push( self.vec[j].powf( rhs.vec[j] ) );
-            }
-            NumVec::<S> { s : FConst::nan() , vec : v }
-        }
-    }
+    float_binary_function!(powf);
 }
 // ---------------------------------------------------------------------------
 /// Implements the FConst trait for NumVec types
