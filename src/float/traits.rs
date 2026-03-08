@@ -89,7 +89,8 @@ pub trait FUnary {
     fn powi(self, rhs : i32) -> Self::Output;
 }
 // ----------------------------------------------------------------------------
-pub trait Powf<Rhs = Self> {
+pub trait FBinary<Rhs = Self> {
     type Output;
+    //
     fn powf(self, rhs: Rhs) -> Self::Output;
 }

@@ -22,7 +22,7 @@ use std::ops::{
 };
 //
 use crate::{
-    Powf,
+    FBinary,
     FConst,
     FUnary,
     AD,
@@ -510,13 +510,13 @@ ad_binary_op!(Sub);
 ad_binary_op!(Mul);
 ad_binary_op!(Div);
 // ---------------------------------------------------------------------------
-/// Implement Powf for `AD<V>` and `&AD<V>`
+/// Implement FBinary for `AD<V>` and `&AD<V>`
 ///
 /// # Example
 /// ```
 /// use rustad::{
 ///     AD,
-///     Powf,
+///     FBinary,
 ///     AzFloat,
 /// };
 /// type V  = AzFloat<f32>;
@@ -540,71 +540,76 @@ ad_binary_op!(Div);
 /// let az  = x.clone().powf( ay.clone() );
 /// assert_eq!( az.to_value(), V::from(8.0) );
 /// ```
-pub fn doc_ad_powf() { }
+pub fn doc_f_binary_ad() { }
 //
-impl<V> Powf< &AD<V> > for &AD<V>
+impl<V> FBinary< &AD<V> > for &AD<V>
 where
     V : Clone + FConst + ThisThreadTape ,
     for<'a> &'a V : FUnary<Output=V>,
     for<'a> &'a AD<V> : Mul< &'a AD<V>, Output = AD<V> >,
 {   type Output = AD<V>;
-    #[doc= " see [doc_ad_powf]" ]
+    /// see [doc_f_binary_ad]
     fn powf(self, rhs : &AD<V>) -> AD<V> {
         FUnary::exp( &( &FUnary::ln( self ) * rhs ) )
     }
 }
-impl<V> Powf< AD<V> > for AD<V>
+impl<V> FBinary< AD<V> > for AD<V>
 where
     V : Clone + FConst + ThisThreadTape ,
     for<'a> &'a V : FUnary<Output=V>,
     for<'a> &'a AD<V> : Mul< &'a AD<V>, Output = AD<V> >,
 {   type Output = AD<V>;
+    /// see [doc_f_binary_ad]
     fn powf(self, rhs : AD<V>) -> AD<V> {
-        Powf::powf(&self, &rhs)
+        FBinary::powf(&self, &rhs)
     }
 }
 //
-impl<V> Powf<&V> for &AD<V>
+impl<V> FBinary<&V> for &AD<V>
 where
     V : Clone + FConst + ThisThreadTape ,
     for<'a> &'a V : FUnary<Output=V>,
     for<'a> &'a AD<V> : Mul< &'a V, Output = AD<V> >,
 {   type Output = AD<V>;
+    /// see [doc_f_binary_ad]
     fn powf(self, rhs : &V) -> AD<V> {
         FUnary::exp( &( &FUnary::ln( self ) * rhs ) )
     }
 }
-impl<V> Powf<V> for AD<V>
+impl<V> FBinary<V> for AD<V>
 where
     V : Clone + FConst + ThisThreadTape + PartialEq,
     for<'a> &'a V : FUnary<Output=V>,
     for<'a> &'a AD<V> : Mul< &'a V, Output = AD<V> >,
 {   type Output = AD<V>;
+    /// see [doc_f_binary_ad]
     fn powf(self, rhs : V) -> AD<V> {
-        Powf::powf(&self, &rhs)
+        FBinary::powf(&self, &rhs)
     }
 }
 //
-macro_rules! impl_value_powf_ad{ ( $V:ty ) => {
-    impl crate::Powf< &AD<$V> > for &$V
+macro_rules! impl_value_binary_ad{ ( $V:ty ) => {
+    impl crate::FBinary< &AD<$V> > for &$V
     where
         $V  : crate::FConst,
         for<'a> &'a $V : crate::FUnary<Output=$V> ,
     {   type Output = AD<$V>;
+        #[doc= " see [doc_f_binary_ad](crate::ad::binary::doc_f_binary_ad)" ]
         fn powf(self , rhs : &AD<$V>) -> AD<$V> {
             crate::FUnary::exp( &( &crate::FUnary::ln( self ) * rhs ) )
         }
     }
-    impl crate::Powf< AD<$V> > for $V
+    impl crate::FBinary< AD<$V> > for $V
     where
-        for <'a> &'a $V : crate::Powf<&'a AD<$V>, Output=AD<$V> >,
+        for <'a> &'a $V : crate::FBinary<&'a AD<$V>, Output=AD<$V> >,
     {   type Output = AD<$V>;
+        #[doc= " see [doc_f_binary_ad](crate::ad::binary::doc_f_binary_ad)" ]
         fn powf(self , rhs : AD<$V>) -> AD<$V> {
             (&self).powf( &rhs )
         }
     }
 } }
-pub(crate) use impl_value_powf_ad;
+pub(crate) use impl_value_binary_ad;
 // ---------------------------------------------------------------------------
 /// Compound Assignment `AD<V>` operators.
 ///
@@ -925,7 +930,7 @@ macro_rules! impl_value_op_ad{
         crate::ad::binary::impl_value_op_ad!($V, Sub);
         crate::ad::binary::impl_value_op_ad!($V, Mul);
         crate::ad::binary::impl_value_op_ad!($V, Div);
-        crate::ad::binary::impl_value_powf_ad!($V);
+        crate::ad::binary::impl_value_binary_ad!($V);
     };
     ($V:ty, $Name:ident) => { paste::paste! {
         #[doc =

@@ -29,7 +29,7 @@ use crate::{
     FConst,
     FUnary,
     NumCmp,
-    Powf,
+    FBinary,
 };
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
@@ -493,7 +493,7 @@ impl_hash_trait!(f64);
 /// ```
 /// use rustad::{
 ///     AzFloat,
-///     Powf,
+///     FBinary,
 /// };
 /// let two      = AzFloat(2f32);
 /// let three    = AzFloat(3f32);
@@ -503,21 +503,21 @@ impl_hash_trait!(f64);
 /// let powf_23  = (&two).powf(&three);
 /// assert_eq!(powf_23, eight);
 /// ```
-pub fn doc_powf_az_float() {}
+pub fn doc_f_binary_az_float() {}
 //
 macro_rules! impl_powf_trait{ ($B:ident) => {
-    impl Powf for AzFloat<$B> {
+    impl FBinary for AzFloat<$B> {
         type Output = AzFloat<$B>;
         //
-        // see [doc_powf_az_float]
+        // see [doc_f_binary_az_float]
         fn powf(self, rhs : AzFloat<$B>) -> AzFloat<$B> {
             AzFloat( self.0.powf( rhs.0 ) )
         }
     }
-    impl Powf for &AzFloat<$B> {
+    impl FBinary for &AzFloat<$B> {
         type Output = AzFloat<$B>;
         //
-        // see [doc_powf_az_float]
+        // see [doc_f_binary_az_float]
         fn powf(self, rhs : &AzFloat<$B>) -> AzFloat<$B> {
             AzFloat( self.0.powf( rhs.0 ) )
         }

@@ -16,7 +16,7 @@
 // use
 use crate::{
     AzFloat,
-    Powf,
+    FBinary,
     NumCmp,
     FConst,
     FUnary,
@@ -547,23 +547,23 @@ where
 /// use rustad::{
 ///     AzFloat,
 ///     NumVec,
-///     Powf,
+///     FBinary,
 /// };
 /// let two      = NumVec::new( vec![ AzFloat(2f32) ] );
 /// let three    = NumVec::new( vec![ AzFloat(3f32) ] );
 /// let eight    = NumVec::new( vec![ AzFloat(8f32) ] );
-/// let powf_23  = Powf::powf( &two, &three);
+/// let powf_23  = FBinary::powf( &two, &three);
 /// assert_eq!(powf_23, eight);
 /// ```
-pub fn doc_powf_num_vec() {}
+pub fn doc_f_binary_num_vec() {}
 //
-impl<S> Powf< &NumVec<S> > for &NumVec<S>
+impl<S> FBinary< &NumVec<S> > for &NumVec<S>
 where
-    S : FConst + Copy + Powf<Output=S> ,
+    S : FConst + Copy + FBinary<Output=S> ,
 {   //
     type Output = NumVec<S>;
     //
-    #[doc = "see [doc_powf_num_vec]" ]
+    #[doc = "see [doc_f_binary_num_vec]" ]
     fn powf(self, rhs : &NumVec<S>) -> NumVec<S> {
         if self.len() == 1 {
             if rhs.len() == 1 {

@@ -66,7 +66,7 @@ fn prototype_src(fn_name : &str, v_str : &str) -> String {
         "   traits::NumCmp,\n" +
         "   traits::FConst,\n" +
         "   traits::FUnary,\n" +
-        "   traits::Powf,\n"  +
+        "   traits::FBinary,\n"  +
         "   az_float::AzFloat,\n" +
         "   num_vec::NumVec,\n" +
         "};\n" +
