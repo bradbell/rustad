@@ -28,8 +28,8 @@ use std::ops::{
 use crate::{
     FConst,
     FUnary,
-    NumCmp,
     FBinary,
+    NumCmp,
 };
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
@@ -505,26 +505,27 @@ impl_hash_trait!(f64);
 /// ```
 pub fn doc_f_binary_az_float() {}
 //
-macro_rules! impl_powf_trait{ ($B:ident) => {
+macro_rules! float_binary_function{ ($B:ident, $name:ident, $Rhs:ty) => {
+    #[doc = "see [doc_f_binary_az_float]" ]
+    fn $name(self, rhs : $Rhs) -> AzFloat<$B> {
+        AzFloat( self.0.$name( rhs.0 ) )
+    }
+} }
+//
+macro_rules! impl_float_binary{ ($B:ident) => {
     impl FBinary for AzFloat<$B> {
         type Output = AzFloat<$B>;
         //
-        // see [doc_f_binary_az_float]
-        fn powf(self, rhs : AzFloat<$B>) -> AzFloat<$B> {
-            AzFloat( self.0.powf( rhs.0 ) )
-        }
+        float_binary_function!($B, powf, AzFloat<$B>);
     }
     impl FBinary for &AzFloat<$B> {
         type Output = AzFloat<$B>;
         //
-        // see [doc_f_binary_az_float]
-        fn powf(self, rhs : &AzFloat<$B>) -> AzFloat<$B> {
-            AzFloat( self.0.powf( rhs.0 ) )
-        }
+        float_binary_function!($B, powf, &AzFloat<$B>);
     }
 } }
-impl_powf_trait!(f32);
-impl_powf_trait!(f64);
+impl_float_binary!(f32);
+impl_float_binary!(f64);
 // ----------------------------------------------------------------------------
 /// FConst trait for az_float types
 ///
