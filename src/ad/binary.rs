@@ -299,6 +299,119 @@ where
     }
     (new_tape_id, new_index, new_ad_type)
 }
+// -----------------------------------------------------------------------
+// record_name_ac
+/// Record on binary where left is `AD<V>` and right is `V` .
+///
+/// We use _ac when left is an AD object and right is known to be constant.
+/// We do not use _av to avoid confusion between values and variables.
+fn record_ac<V> (
+    tape     : &mut Tape<V> ,
+    lhs      : &AD<V>       ,
+    rhs      : &V           ,
+    op_id_pp : u8           ,
+) -> (usize, usize, ADType)
+where
+    V : Clone + FConst + PartialEq,
+{
+    // new_tape_id, new_index, new_ad_type, cop_lhs
+    let mut new_tape_id   = 0;
+    let mut new_index     = 0;
+    let mut new_ad_type   = ADType::ConstantP;
+    if ! tape.recording {
+        return (new_tape_id, new_index, new_ad_type);
+    }
+    //
+    // lhs_arg_type, cop_lhs, var_lhs
+    let lhs_arg_type : ADType;
+    let cop_lhs      : bool;
+    let var_lhs      : bool;
+    if lhs.tape_id != tape.tape_id {
+        lhs_arg_type = ADType::ConstantP;
+        cop_lhs      = true;
+        var_lhs      = false;
+    } else {
+        debug_assert!( lhs.ad_type != ADType::ConstantP );
+        lhs_arg_type = lhs.ad_type;
+        cop_lhs      = false;
+        var_lhs      = lhs.ad_type.is_variable();
+    };
+    //
+    if cop_lhs {
+        return (new_tape_id, new_index, new_ad_type);
+    }
+    match op_id_pp {
+        //
+        id::ADD_PP_OP => {
+            // add with right operand the constant zero
+            if *rhs == V::zero() {
+                return (lhs.tape_id, lhs.index, lhs.ad_type);
+            }
+        },
+        id::MUL_PP_OP => {
+            // multiply with right operand the constant zero
+            if *rhs == V::zero() {
+                return (new_tape_id, new_index, new_ad_type);
+            }
+            // multiply with right operand the constant one
+            if *rhs == V::one() {
+                return (lhs.tape_id, lhs.index, lhs.ad_type);
+            }
+        },
+        id::DIV_PP_OP => {
+            // divide with right operand the constant one
+            if *rhs == V::one() {
+                return (lhs.tape_id, lhs.index, lhs.ad_type);
+            }
+        },
+        _ => { }
+    }
+    //
+    // new_tape_id
+    new_tape_id = tape.tape_id;
+    //
+    if var_lhs {
+        //
+        // new_ad_type, new_index
+        new_ad_type     = ADType::Variable;
+        new_index       = tape.var.n_dep + tape.var.n_dom;
+        //
+        // tape.var: n_dep, arg_start, arg_type
+        tape.var.n_dep += 1;
+        tape.var.arg_start.push( tape.var.arg_all.len() as IndexT );
+        tape.var.arg_type_all.push( lhs_arg_type );
+        tape.var.arg_type_all.push( ADType::ConstantP );
+        //
+        // tape.var.id_all
+        tape.var.id_all.push( op_id_pp + 2 ); // name_VP_OP
+        //
+        // tape.cop, tape.var.arg_all
+        tape.var.arg_all.push( lhs.index as IndexT );
+        tape.var.arg_all.push( tape.cop.len() as IndexT );
+        tape.cop.push( rhs.clone() );
+    } else {
+        debug_assert!( lhs.ad_type.is_dynamic() );
+        //
+        // new_ad_type, new_index
+        new_ad_type     = ADType::DynamicP;
+        new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
+        //
+        // tape.dyp: n_dep, arg_start, arg_type
+        tape.dyp.n_dep += 1;
+        tape.dyp.arg_start.push( tape.dyp.arg_all.len() as IndexT );
+        tape.dyp.arg_type_all.push( lhs_arg_type );
+        tape.dyp.arg_type_all.push( ADType::ConstantP );
+        //
+        // tape.dyp.id_all
+        tape.dyp.id_all.push( op_id_pp ); // name_PP_OP
+        //
+        // tape.cop, tape.dyp.arg_all
+        tape.dyp.arg_all.push( lhs.index as IndexT );
+        tape.dyp.arg_all.push( tape.cop.len() as IndexT );
+        tape.cop.push( rhs.clone() );
+    }
+    (new_tape_id, new_index, new_ad_type)
+}
 // ---------------------------------------------------------------------------
 /// Add one binary operator to the `AD<V>` class;
 ///
@@ -355,116 +468,6 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
             (&self).[< $Name:lower >] ( &rhs )
         }
     }
-    // -----------------------------------------------------------------------
-    // record_name_ac
-    // We use _ac when left is an AD object and right is known to be constant.
-    // We do not use _av to avoid confusion between values and variables.
-    fn [< record_ $Name:lower _ac >]<V> (
-        tape: &mut Tape<V> ,
-        lhs:       &AD<V>  ,
-        rhs:       &V      ,
-    ) -> (usize, usize, ADType)
-    where
-        V : Clone + FConst + PartialEq,
-    {
-        // new_tape_id, new_index, new_ad_type, cop_lhs
-        let mut new_tape_id   = 0;
-        let mut new_index     = 0;
-        let mut new_ad_type   = ADType::ConstantP;
-        if ! tape.recording {
-            return (new_tape_id, new_index, new_ad_type);
-        }
-        //
-        // lhs_arg_type, cop_lhs, var_lhs
-        let lhs_arg_type : ADType;
-        let cop_lhs      : bool;
-        let var_lhs      : bool;
-        if lhs.tape_id != tape.tape_id {
-            lhs_arg_type = ADType::ConstantP;
-            cop_lhs      = true;
-            var_lhs      = false;
-        } else {
-            debug_assert!( lhs.ad_type != ADType::ConstantP );
-            lhs_arg_type = lhs.ad_type;
-            cop_lhs      = false;
-            var_lhs      = lhs.ad_type.is_variable();
-        };
-        //
-        if cop_lhs {
-            return (new_tape_id, new_index, new_ad_type);
-        }
-        match id::[< $Name:upper _VV_OP >] {
-            //
-            id::ADD_VV_OP => {
-                // add with right operand the constant zero
-                if( *rhs == V::zero() ) {
-                    return (lhs.tape_id, lhs.index, lhs.ad_type);
-                }
-            },
-            id::MUL_VV_OP => {
-                // multiply with right operand the constant zero
-                if( *rhs == V::zero() ) {
-                    return (new_tape_id, new_index, new_ad_type);
-                }
-                // multiply with right operand the constant one
-                if( *rhs == V::one() ) {
-                    return (lhs.tape_id, lhs.index, lhs.ad_type);
-                }
-            },
-            id::DIV_VV_OP => {
-                // divide with right operand the constant one
-                if( *rhs == V::one() ) {
-                    return (lhs.tape_id, lhs.index, lhs.ad_type);
-                }
-            },
-            _ => { }
-        }
-        //
-        // new_tape_id
-        new_tape_id = tape.tape_id;
-        //
-        if var_lhs {
-            //
-            // new_ad_type, new_index
-            new_ad_type     = ADType::Variable;
-            new_index       = tape.var.n_dep + tape.var.n_dom;
-            //
-            // tape.var: n_dep, arg_start, arg_type
-            tape.var.n_dep += 1;
-            tape.var.arg_start.push( tape.var.arg_all.len() as IndexT );
-            tape.var.arg_type_all.push( lhs_arg_type );
-            tape.var.arg_type_all.push( ADType::ConstantP );
-            //
-            // tape.var.id_all
-            tape.var.id_all.push( id::[< $Name:upper _VP_OP >] );
-            //
-            // tape.cop, tape.var.arg_all
-            tape.var.arg_all.push( lhs.index as IndexT );
-            tape.var.arg_all.push( tape.cop.len() as IndexT );
-            tape.cop.push( rhs.clone() );
-        } else {
-            debug_assert!( lhs.ad_type.is_dynamic() );
-            //
-            // new_ad_type, new_index
-            new_ad_type     = ADType::DynamicP;
-            new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
-            //
-            // tape.dyp: n_dep, arg_start, arg_type
-            tape.dyp.n_dep += 1;
-            tape.dyp.arg_start.push( tape.dyp.arg_all.len() as IndexT );
-            tape.dyp.arg_type_all.push( lhs_arg_type );
-            tape.dyp.arg_type_all.push( ADType::ConstantP );
-            //
-            // tape.dyp.id_all
-            tape.dyp.id_all.push( id::[< $Name:upper _PP_OP >] );
-            //
-            // tape.cop, tape.dyp.arg_all
-            tape.dyp.arg_all.push( lhs.index as IndexT );
-            tape.dyp.arg_all.push( tape.cop.len() as IndexT );
-            tape.cop.push( rhs.clone() );
-        }
-        (new_tape_id, new_index, new_ad_type)
-    }
     //
     #[doc = concat!(
         "`&AD<V>` ", stringify!($Name), " & V`",
@@ -479,7 +482,10 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
         fn [< $Name:lower >](self , rhs : &V ) -> AD<V>
         {
             // new_value
-            let new_value     = self.value.[< $Name:lower >] (rhs);
+            let new_value = self.value.[< $Name:lower >] (rhs);
+            //
+            // op_id_pp
+            let op_id_pp  = id::[< $Name:upper _PP_OP >];
             //
             // local_key
             let local_key : &LocalKey< RefCell< Tape<V> > > =
@@ -488,7 +494,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
             // new_tape_id, new_index, new_ad_type
             let (new_tape_id, new_index, new_ad_type) =
                 local_key.with_borrow_mut( |tape|
-                    [< record_ $Name:lower _ac >]::<V> ( tape, self, rhs )
+                    record_ac::<V> ( tape, self, rhs, op_id_pp )
             );
             //
             // result
@@ -748,6 +754,9 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : &V)
         {   //
+            // op_id_pp
+            let op_id_pp  = id::[< $Name:upper _PP_OP >];
+            //
             // local_key
             let local_key : &LocalKey< RefCell< Tape<V> > > =
                 ThisThreadTape::get();
@@ -755,7 +764,7 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
             // tape, self.tape_id, self.index
             let (new_tape_id, new_index, new_ad_type) =
                 local_key.with_borrow_mut( |tape|
-                    [< record_ $Name:lower _ac >]::<V> ( tape, self, rhs )
+                    record_ac::<V> ( tape, self, rhs, op_id_pp )
             );
             //
             // self
