@@ -6,7 +6,37 @@
 //!
 //! Link to [parent module](super)
 //
-/// Sets all the opeerator identifier values
+// check_binary_op_id
+/// For name equal ADD, SUB, MUL, DIV, check that:
+/// ```text
+///     name_PV_OP == name_PP_OP + 1
+///     name_VP_OP == name_PP_OP + 2
+///     name_VV_OP == name_PP_OP + 3
+/// ```
+#[allow(dead_code)]
+pub(crate) fn doc_binary_op_id() { }
+//
+const _ : () = {
+    // ADD
+    assert!( ADD_PV_OP == ADD_PP_OP + 1 );
+    assert!( ADD_VP_OP == ADD_PP_OP + 2 );
+    assert!( ADD_VV_OP == ADD_PP_OP + 3 );
+    // SUB
+    assert!( SUB_PV_OP == SUB_PP_OP + 1 );
+    assert!( SUB_VP_OP == SUB_PP_OP + 2 );
+    assert!( SUB_VV_OP == SUB_PP_OP + 3 );
+    // MUL
+    assert!( MUL_PV_OP == MUL_PP_OP + 1 );
+    assert!( MUL_VP_OP == MUL_PP_OP + 2 );
+    assert!( MUL_VV_OP == MUL_PP_OP + 3 );
+    // DIV
+    assert!( DIV_PV_OP == DIV_PP_OP + 1 );
+    assert!( DIV_VP_OP == DIV_PP_OP + 2 );
+    assert!( DIV_VV_OP == DIV_PP_OP + 3 );
+};
+//
+// set_operator_ids
+/// Macro that sets all the opeerator identifier values
 macro_rules! set_operator_ids {
     //
     // first match
@@ -38,7 +68,7 @@ macro_rules! set_operator_ids {
     // last recursive match
     (@ $index:expr,) => { }
 }
-
+//
 // Public u8 constants for each operator.
 // See test at end mod.rs that check that every operator has a different name.
 // This ensures that the number of operators is less that u8::MAX.
