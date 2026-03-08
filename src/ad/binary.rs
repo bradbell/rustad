@@ -116,6 +116,190 @@ use crate::doc_generic_v;
 /// ```
 pub fn doc_ad_binary_op() { }
 //
+// --------------------------------------------------------------------------
+// record_aa
+/// Record one binary where left and right operands are `AD<V>`
+fn record_aa <V> (
+    tape      : &mut Tape<V>  ,
+    lhs       : &AD<V>        ,
+    rhs       : &AD<V>        ,
+    op_id_pp  : u8            ,
+) -> (usize, usize, ADType)
+where
+    V : Clone + FConst + PartialEq ,
+{
+    // new_tape_id, new_index, new_ad_type
+    let mut new_tape_id   = 0;
+    let mut new_index     = 0;
+    let mut new_ad_type   = ADType::ConstantP;
+    if ! tape.recording {
+        return (new_tape_id, new_index, new_ad_type);
+    }
+    //
+    // lhs_arg_type, cop_lhs, var_lhs
+    let lhs_arg_type : ADType;
+    let cop_lhs      : bool;
+    let var_lhs      : bool;
+    if lhs.tape_id != tape.tape_id {
+        lhs_arg_type = ADType::ConstantP;
+        cop_lhs      = true;
+        var_lhs      = false;
+    } else {
+        debug_assert!( lhs.ad_type != ADType::ConstantP );
+        lhs_arg_type = lhs.ad_type;
+        cop_lhs      = false;
+        var_lhs      = lhs.ad_type.is_variable();
+    };
+    //
+    // rhs_arg_type, cop_rhs, var_rhs
+    let rhs_arg_type : ADType;
+    let cop_rhs      : bool;
+    let var_rhs      : bool;
+    if rhs.tape_id != tape.tape_id {
+        rhs_arg_type = ADType::ConstantP;
+        cop_rhs      = true;
+        var_rhs      = false;
+    } else {
+        debug_assert!( rhs.ad_type != ADType::ConstantP );
+        rhs_arg_type = rhs.ad_type;
+        cop_rhs      = false;
+        var_rhs      = rhs.ad_type.is_variable();
+    };
+    //
+    if cop_lhs {
+        if cop_rhs {
+            return (new_tape_id, new_index, new_ad_type);
+        }
+        match op_id_pp {
+            //
+            id::ADD_PP_OP => {
+                // add with left operand the constant zero
+                if lhs.value == V::zero() {
+                    return (rhs.tape_id, rhs.index, rhs.ad_type);
+                }
+            },
+            id::MUL_PP_OP => {
+                // multiply with left operand the constant zero
+                if lhs.value == V::zero() {
+                    return (new_tape_id, new_index, new_ad_type);
+                }
+                // multiply with left operand the constant one
+                if lhs.value == V::one() {
+                    return (rhs.tape_id, rhs.index, rhs.ad_type);
+                }
+            },
+            /*
+            Not optimized out because not a special case for AzFloat.
+            id::DIV_PP_OP => {
+                // divide with left operand the constant zero
+                if lhs.value == V::zero() {
+                    return (new_tape_id, new_index, new_ad_type);
+                }
+            },
+            */
+            _ => { }
+        }
+    } else if cop_rhs {
+        match op_id_pp {
+            //
+            id::ADD_PP_OP => {
+                // add with right operand the constant zero
+                if rhs.value == V::zero() {
+                    return (lhs.tape_id, lhs.index, lhs.ad_type);
+                }
+            },
+            id::MUL_PP_OP => {
+                // multiply with right operand the constant zero
+                if rhs.value == V::zero() {
+                    return (new_tape_id, new_index, new_ad_type);
+                }
+                // multiply with right operand the constant one
+                if rhs.value == V::one() {
+                    return (lhs.tape_id, lhs.index, lhs.ad_type);
+                }
+            },
+            id::DIV_PP_OP => {
+                // divide with right operand the constant one
+                if rhs.value == V::one() {
+                    return (lhs.tape_id, lhs.index, lhs.ad_type);
+                }
+            },
+            _ => { }
+        }
+
+    }
+    //
+    // new_tape_id
+    new_tape_id = tape.tape_id;
+    //
+    if var_lhs || var_rhs {
+        //
+        // new_ad_type, new_index
+        new_ad_type     = ADType::Variable;
+        new_index       = tape.var.n_dep + tape.var.n_dom;
+        //
+        // tape.var: n_dep, arg_start, arg_type
+        tape.var.n_dep += 1;
+        tape.var.arg_start.push( tape.var.arg_all.len() as IndexT );
+        tape.var.arg_type_all.push( lhs_arg_type );
+        tape.var.arg_type_all.push( rhs_arg_type );
+        //
+        //
+        // tape.var.id_all
+        if var_lhs && var_rhs {
+            tape.var.id_all.push( op_id_pp + 3 ); // name_VV_OP
+        } else if var_lhs {
+            tape.var.id_all.push( op_id_pp + 2 ); // name_VP_OP
+        } else {
+            tape.var.id_all.push( op_id_pp + 1 ); // name_PV_OP
+        }
+        //
+        // tape.cop, tape.var.arg_all
+        if cop_lhs {
+            tape.var.arg_all.push( tape.cop.len() as IndexT );
+            tape.cop.push( lhs.value.clone() );
+        } else {
+            tape.var.arg_all.push( lhs.index as IndexT );
+        }
+        if cop_rhs {
+            tape.var.arg_all.push( tape.cop.len() as IndexT );
+            tape.cop.push( rhs.value.clone() );
+        } else {
+            tape.var.arg_all.push( rhs.index as IndexT );
+        }
+    } else {
+        //
+        // new_ad_type, new_index
+        new_ad_type     = ADType::DynamicP;
+        new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
+        //
+        // tape.dyp: n_dep, arg_start, arg_type
+        tape.dyp.n_dep += 1;
+        tape.dyp.arg_start.push( tape.dyp.arg_all.len() as IndexT );
+        tape.dyp.arg_type_all.push( lhs_arg_type );
+        tape.dyp.arg_type_all.push( rhs_arg_type );
+        //
+        //
+        // tape.var.id_all
+        tape.dyp.id_all.push( op_id_pp ); // name_PP_OP
+        //
+        // tape.cop, tape.dyp.arg_all
+        if cop_lhs {
+            tape.dyp.arg_all.push( tape.cop.len() as IndexT );
+            tape.cop.push( lhs.value.clone() );
+        } else {
+            tape.dyp.arg_all.push( lhs.index as IndexT );
+        }
+        if cop_rhs {
+            tape.dyp.arg_all.push( tape.cop.len() as IndexT );
+            tape.cop.push( rhs.value.clone() );
+        } else {
+            tape.dyp.arg_all.push( rhs.index as IndexT );
+        }
+    }
+    (new_tape_id, new_index, new_ad_type)
+}
+// ---------------------------------------------------------------------------
 /// Add one binary operator to the `AD<V>` class;
 ///
 /// * V    : see [doc_generic_v]
@@ -123,186 +307,6 @@ pub fn doc_ad_binary_op() { }
 ///
 /// see [doc_ad_binary_op]
 macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
-    // -----------------------------------------------------------------------
-    fn [< record_ $Name:lower _aa >]<T> (
-        tape: &mut Tape<T> ,
-        lhs:       &AD<T>  ,
-        rhs:       &AD<T>  ,
-    ) -> (usize, usize, ADType)
-    where
-        T : Clone + FConst + PartialEq ,
-    {
-        // new_tape_id, new_index, new_ad_type
-        let mut new_tape_id   = 0;
-        let mut new_index     = 0;
-        let mut new_ad_type   = ADType::ConstantP;
-        if ! tape.recording {
-            return (new_tape_id, new_index, new_ad_type);
-        }
-        //
-        // lhs_arg_type, cop_lhs, var_lhs
-        let lhs_arg_type : ADType;
-        let cop_lhs      : bool;
-        let var_lhs      : bool;
-        if lhs.tape_id != tape.tape_id {
-            lhs_arg_type = ADType::ConstantP;
-            cop_lhs      = true;
-            var_lhs      = false;
-        } else {
-            debug_assert!( lhs.ad_type != ADType::ConstantP );
-            lhs_arg_type = lhs.ad_type;
-            cop_lhs      = false;
-            var_lhs      = lhs.ad_type.is_variable();
-        };
-        //
-        // rhs_arg_type, cop_rhs, var_rhs
-        let rhs_arg_type : ADType;
-        let cop_rhs      : bool;
-        let var_rhs      : bool;
-        if rhs.tape_id != tape.tape_id {
-            rhs_arg_type = ADType::ConstantP;
-            cop_rhs      = true;
-            var_rhs      = false;
-        } else {
-            debug_assert!( rhs.ad_type != ADType::ConstantP );
-            rhs_arg_type = rhs.ad_type;
-            cop_rhs      = false;
-            var_rhs      = rhs.ad_type.is_variable();
-        };
-        //
-        if cop_lhs {
-            if cop_rhs {
-                return (new_tape_id, new_index, new_ad_type);
-            }
-            match id::[< $Name:upper _VV_OP >] {
-                //
-                id::ADD_VV_OP => {
-                    // add with left operand the constant zero
-                    if( lhs.value == T::zero() ) {
-                        return (rhs.tape_id, rhs.index, rhs.ad_type);
-                    }
-                },
-                id::MUL_VV_OP => {
-                    // multiply with left operand the constant zero
-                    if( lhs.value == T::zero() ) {
-                        return (new_tape_id, new_index, new_ad_type);
-                    }
-                    // multiply with left operand the constant one
-                    if( lhs.value == T::one() ) {
-                        return (rhs.tape_id, rhs.index, rhs.ad_type);
-                    }
-                },
-                /*
-                Not optimized out because not a special case for AzFloat.
-                id::DIV_VV_OP => {
-                    // divide with left operand the constant zero
-                    if( lhs.value == T::zero() ) {
-                        return (new_tape_id, new_index, new_ad_type);
-                    }
-                },
-                */
-                _ => { }
-            }
-        } else if cop_rhs {
-            match id::[< $Name:upper _VV_OP >] {
-                //
-                id::ADD_VV_OP => {
-                    // add with right operand the constant zero
-                    if( rhs.value == T::zero() ) {
-                        return (lhs.tape_id, lhs.index, lhs.ad_type);
-                    }
-                },
-                id::MUL_VV_OP => {
-                    // multiply with right operand the constant zero
-                    if( rhs.value == T::zero() ) {
-                        return (new_tape_id, new_index, new_ad_type);
-                    }
-                    // multiply with right operand the constant one
-                    if( rhs.value == T::one() ) {
-                        return (lhs.tape_id, lhs.index, lhs.ad_type);
-                    }
-                },
-                id::DIV_VV_OP => {
-                    // divide with right operand the constant one
-                    if( rhs.value == T::one() ) {
-                        return (lhs.tape_id, lhs.index, lhs.ad_type);
-                    }
-                },
-                _ => { }
-            }
-
-        }
-        //
-        // new_tape_id
-        new_tape_id = tape.tape_id;
-        //
-        if var_lhs || var_rhs {
-            //
-            // new_ad_type, new_index
-            new_ad_type     = ADType::Variable;
-            new_index       = tape.var.n_dep + tape.var.n_dom;
-            //
-            // tape.var: n_dep, arg_start, arg_type
-            tape.var.n_dep += 1;
-            tape.var.arg_start.push( tape.var.arg_all.len() as IndexT );
-            tape.var.arg_type_all.push( lhs_arg_type );
-            tape.var.arg_type_all.push( rhs_arg_type );
-            //
-            //
-            // tape.var.id_all
-            if var_lhs && var_rhs {
-                tape.var.id_all.push( id::[< $Name:upper _VV_OP >] );
-            } else if var_lhs {
-                tape.var.id_all.push( id::[< $Name:upper _VP_OP >] );
-            } else {
-                tape.var.id_all.push( id::[< $Name:upper _PV_OP >] );
-            }
-            //
-            // tape.cop, tape.var.arg_all
-            if cop_lhs {
-                tape.var.arg_all.push( tape.cop.len() as IndexT );
-                tape.cop.push( lhs.value.clone() );
-            } else {
-                tape.var.arg_all.push( lhs.index as IndexT );
-            }
-            if cop_rhs {
-                tape.var.arg_all.push( tape.cop.len() as IndexT );
-                tape.cop.push( rhs.value.clone() );
-            } else {
-                tape.var.arg_all.push( rhs.index as IndexT );
-            }
-        } else {
-            //
-            // new_ad_type, new_index
-            new_ad_type     = ADType::DynamicP;
-            new_index       = tape.dyp.n_dep + tape.dyp.n_dom;
-            //
-            // tape.dyp: n_dep, arg_start, arg_type
-            tape.dyp.n_dep += 1;
-            tape.dyp.arg_start.push( tape.dyp.arg_all.len() as IndexT );
-            tape.dyp.arg_type_all.push( lhs_arg_type );
-            tape.dyp.arg_type_all.push( rhs_arg_type );
-            //
-            //
-            // tape.var.id_all
-            tape.dyp.id_all.push( id::[< $Name:upper _PP_OP >] );
-            //
-            // tape.cop, tape.dyp.arg_all
-            if cop_lhs {
-                tape.dyp.arg_all.push( tape.cop.len() as IndexT );
-                tape.cop.push( lhs.value.clone() );
-            } else {
-                tape.dyp.arg_all.push( lhs.index as IndexT );
-            }
-            if cop_rhs {
-                tape.dyp.arg_all.push( tape.cop.len() as IndexT );
-                tape.cop.push( rhs.value.clone() );
-            } else {
-                tape.dyp.arg_all.push( rhs.index as IndexT );
-            }
-        }
-        (new_tape_id, new_index, new_ad_type)
-    }
     //
     #[doc = concat!(
         "`&AD<V>` ", stringify!($Name), " `&AD<V>`",
@@ -317,7 +321,10 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
         fn [< $Name:lower >](self , rhs : &AD<V> ) -> AD<V>
         {
             // new_value
-            let new_value     = self.value.[< $Name:lower >] ( &rhs.value );
+            let new_value = self.value.[< $Name:lower >] ( &rhs.value );
+            //
+            // op_id_pp
+            let op_id_pp  = id::[< $Name:upper _PP_OP >];
             //
             // local_key
             let local_key : &LocalKey< RefCell< Tape<V> > > =
@@ -326,7 +333,7 @@ macro_rules! ad_binary_op { ($Name:ident) => { paste::paste! {
             // new_tape_id, new_index, new_ad_type
             let (new_tape_id, new_index, new_ad_type) =
                 local_key.with_borrow_mut( |tape|
-                    [< record_ $Name:lower _aa >]::<V> ( tape, self, rhs )
+                    record_aa::<V> ( tape, self, rhs, op_id_pp )
             );
             //
             // result
@@ -694,6 +701,9 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
     {   //
         fn [< $Name:lower _assign >] (&mut self, rhs : &AD<V> )
         {   //
+            // op_id_pp
+            let op_id_pp  = id::[< $Name:upper _PP_OP >];
+            //
             //
             // local_key
             let local_key : &LocalKey< RefCell< Tape<V> > > =
@@ -702,7 +712,7 @@ macro_rules! ad_compound_op { ($Name:ident) => { paste::paste! {
             // tape, self.tape_id, self.index
             let (new_tape_id, new_index, new_ad_type) =
                 local_key.with_borrow_mut( |tape|
-                    [< record_ $Name:lower _aa >]::<V> ( tape, self, rhs )
+                    record_aa::<V> ( tape, self, rhs, op_id_pp )
             );
             //
             // self
