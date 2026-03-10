@@ -54,7 +54,7 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
 ///
 /// * V      : see [doc_generic_v](crate::doc_generic_v)
 /// * E      : see [doc_generic_e](crate::doc_generic_e)
-/// * Trait  : is Add , Sub , Mul , Div, or FBinary
+/// * Trait  : is Add , Sub , Mul , Div, or Powf
 /// * name   : is the name of a function in this trait
 /// * op     : is the corresponding operator; e.g. + for Add.
 ///

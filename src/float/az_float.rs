@@ -28,8 +28,8 @@ use std::ops::{
 use crate::{
     FConst,
     FUnary,
+    Powf,
     FBinary,
-    NumCmp,
 };
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
@@ -317,15 +317,15 @@ impl_binary_assign!(AddAssign, add_assign);
 impl_binary_assign!(SubAssign, sub_assign);
 impl_binary_assign!(DivAssign, div_assign);
 // ---------------------------------------------------------------------------
-// NumCmp for AzFloat
-/// Implement [NumCmp] when both operands are `AzFloat<B>` or `&AzFloat<B>` .
+// FBinary for AzFloat
+/// Implement [FBinary] when both operands are `AzFloat<B>` or `&AzFloat<B>` .
 ///
 /// * B : Is the floating point base type; see [AzFloat]
 ///
 /// # Example :
 /// ```
 /// use rustad::AzFloat;
-/// use rustad::NumCmp;
+/// use rustad::FBinary;
 /// type V = AzFloat<f64>;
 /// //
 /// let zero  = V::from(0);
@@ -337,10 +337,10 @@ impl_binary_assign!(DivAssign, div_assign);
 /// assert_eq!(lt, one);
 /// assert_eq!(not_lt, zero);
 /// ```
-pub fn doc_num_cmp_az_float() {}
+pub fn doc_f_binary_az_float() {}
 //
-/// see [doc_num_cmp_az_float]
-macro_rules! impl_num_cmp_az_float_borrow{ ($name:ident, $op:tt) => {
+/// see [doc_f_binary_az_float]
+macro_rules! impl_f_binary_az_float_borrow{ ($name:ident, $op:tt) => {
     #[doc = concat!( " AzFloat::", stringify!($name)  ) ]
     fn $name(self, rhs : & AzFloat<B> ) -> AzFloat<B> {
         let zero = AzFloat::<B>::zero();
@@ -354,43 +354,43 @@ macro_rules! impl_num_cmp_az_float_borrow{ ($name:ident, $op:tt) => {
     }
 } }
 //
-impl<B> NumCmp< &AzFloat<B> > for &AzFloat<B>
+impl<B> FBinary< &AzFloat<B> > for &AzFloat<B>
 where
     B          : PartialOrd,
     AzFloat<B> : FConst,
 {
     type Output = AzFloat<B>;
     //
-    impl_num_cmp_az_float_borrow!( num_lt, <  );
-    impl_num_cmp_az_float_borrow!( num_le, <= );
-    impl_num_cmp_az_float_borrow!( num_eq, == );
-    impl_num_cmp_az_float_borrow!( num_ne, != );
-    impl_num_cmp_az_float_borrow!( num_ge, >= );
-    impl_num_cmp_az_float_borrow!( num_gt, >  );
+    impl_f_binary_az_float_borrow!( num_lt, <  );
+    impl_f_binary_az_float_borrow!( num_le, <= );
+    impl_f_binary_az_float_borrow!( num_eq, == );
+    impl_f_binary_az_float_borrow!( num_ne, != );
+    impl_f_binary_az_float_borrow!( num_ge, >= );
+    impl_f_binary_az_float_borrow!( num_gt, >  );
 }
 //
-/// see [doc_num_cmp_az_float]
-macro_rules! impl_num_cmp_az_float_own{ ($name:ident) => {
+/// see [doc_f_binary_az_float]
+macro_rules! impl_f_binary_az_float_own{ ($name:ident) => {
     #[doc = concat!( " AzFloat::", stringify!($name)  ) ]
     fn $name(self : AzFloat<B>, rhs : AzFloat<B>) -> AzFloat<B> {
-        NumCmp::$name( &self,  &rhs )
+        FBinary::$name( &self,  &rhs )
     }
 } }
 //
-impl<B> NumCmp< AzFloat<B> > for AzFloat<B>
+impl<B> FBinary< AzFloat<B> > for AzFloat<B>
 where
     B          : PartialOrd,
     AzFloat<B> : FConst,
-    for<'a> &'a AzFloat<B> : NumCmp< &'a AzFloat<B>, Output = AzFloat<B> >,
+    for<'a> &'a AzFloat<B> : FBinary< &'a AzFloat<B>, Output = AzFloat<B> >,
 {
     type Output = AzFloat<B>;
     //
-    impl_num_cmp_az_float_own!( num_lt );
-    impl_num_cmp_az_float_own!( num_le );
-    impl_num_cmp_az_float_own!( num_eq );
-    impl_num_cmp_az_float_own!( num_ne );
-    impl_num_cmp_az_float_own!( num_ge );
-    impl_num_cmp_az_float_own!( num_gt );
+    impl_f_binary_az_float_own!( num_lt );
+    impl_f_binary_az_float_own!( num_le );
+    impl_f_binary_az_float_own!( num_eq );
+    impl_f_binary_az_float_own!( num_ne );
+    impl_f_binary_az_float_own!( num_ge );
+    impl_f_binary_az_float_own!( num_gt );
 }
 // ---------------------------------------------------------------------------
 // PartialEq, Eq
@@ -493,7 +493,7 @@ impl_hash_trait!(f64);
 /// ```
 /// use rustad::{
 ///     AzFloat,
-///     FBinary,
+///     Powf,
 /// };
 /// let two      = AzFloat(2f32);
 /// let three    = AzFloat(3f32);
@@ -503,22 +503,22 @@ impl_hash_trait!(f64);
 /// let powf_23  = (&two).powf(&three);
 /// assert_eq!(powf_23, eight);
 /// ```
-pub fn doc_f_binary_az_float() {}
+pub fn doc_powf_az_float() {}
 //
 macro_rules! float_binary_function{ ($B:ident, $name:ident, $Rhs:ty) => {
-    #[doc = "see [doc_f_binary_az_float]" ]
+    #[doc = "see [doc_powf_az_float]" ]
     fn $name(self, rhs : $Rhs) -> AzFloat<$B> {
         AzFloat( self.0.$name( rhs.0 ) )
     }
 } }
 //
 macro_rules! impl_float_binary{ ($B:ident) => {
-    impl FBinary for AzFloat<$B> {
+    impl Powf for AzFloat<$B> {
         type Output = AzFloat<$B>;
         //
         float_binary_function!($B, powf, AzFloat<$B>);
     }
-    impl FBinary for &AzFloat<$B> {
+    impl Powf for &AzFloat<$B> {
         type Output = AzFloat<$B>;
         //
         float_binary_function!($B, powf, &AzFloat<$B>);

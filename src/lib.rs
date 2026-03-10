@@ -93,8 +93,8 @@ pub use dll_lib::{
 pub use float::{
     traits::FConst,
     traits::FUnary,
-    traits::NumCmp,
     traits::FBinary,
+    traits::Powf,
     az_float::AzFloat,
     num_vec::NumVec,
 };

@@ -14,7 +14,7 @@ use crate::ad::ADType;
 use crate::{
     AD,
     IndexT,
-    NumCmp,
+    FBinary,
     FConst,
     FUnary,
 };
@@ -469,7 +469,7 @@ where
     V     : Clone + From<f32> + FConst + PartialEq,
     for<'a> &'a V : FUnary<Output=V>,
     V     : ThisThreadTape + GlobalAtomCallbackVec,
-    for<'a> &'a V : NumCmp<&'a V, Output = V> ,
+    for<'a> &'a V : FBinary<&'a V, Output = V> ,
     AD<V> : From<V>,
 {
     let empty = OpInfo {

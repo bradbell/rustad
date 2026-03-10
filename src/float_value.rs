@@ -17,7 +17,7 @@ use std::ops::{
 use crate::{
     FConst,
     FUnary,
-    NumCmp,
+    FBinary,
 };
 // ----------------------------------------------------------------------------
 /// The FloatValue trait
@@ -257,7 +257,7 @@ pub fn check_nearly_eq<V>(x : &V, y : &V, arg_vec : &Vec< [&str; 2] >) -> bool
 where
     V  : FConst + FloatValue + From<f32> + std::fmt::Debug,
     for<'a> &'a V : FUnary<Output=V>,
-    for<'a> &'a V : NumCmp<&'a V, Output = V> ,
+    for<'a> &'a V : FBinary<&'a V, Output = V> ,
     for<'a> &'a V : Add<&'a V, Output=V> ,
     for<'a> &'a V : Mul<&'a V, Output=V> ,
     for<'a> &'a V : Sub<&'a V, Output=V> ,

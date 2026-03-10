@@ -16,10 +16,10 @@
 // use
 use crate::{
     AzFloat,
-    NumCmp,
+    FBinary,
     FConst,
     FUnary,
-    FBinary,
+    Powf,
 };
 //
 // NumVec
@@ -247,8 +247,8 @@ num_vec_compound_op!(SubAssign, sub_assign, -=);
 num_vec_compound_op!(MulAssign, mul_assign, *=);
 num_vec_compound_op!(DivAssign, div_assign, /=);
 // ---------------------------------------------------------------------------
-// NumCmp for NumVec
-/// Implement [NumCmp] when both operands are `NumVec<S>` or `&NumVec<S>` .
+// FBinary for NumVec
+/// Implement [FBinary] when both operands are `NumVec<S>` or `&NumVec<S>` .
 ///
 /// * S : is the type of the elements of the numeric vector.
 ///
@@ -259,7 +259,7 @@ num_vec_compound_op!(DivAssign, div_assign, /=);
 /// use rustad::{
 ///     NumVec,
 ///     AzFloat,
-///     NumCmp,
+///     FBinary,
 /// };
 ///
 /// type S = AzFloat<f32>;
@@ -267,7 +267,7 @@ num_vec_compound_op!(DivAssign, div_assign, /=);
 /// let two_three = NumVec::new( vec![ S::from(2), S::from(3) ] );
 /// let three     = NumVec::from( S::from(3) );
 ///
-/// let lt        = NumCmp::num_lt( &two_three, &three );
+/// let lt        = FBinary::num_lt( &two_three, &three );
 /// let check     = NumVec::new( vec![ S::from(1), S::from(0) ] );
 /// assert_eq!( lt, check);
 ///
@@ -276,10 +276,10 @@ num_vec_compound_op!(DivAssign, div_assign, /=);
 /// let check     = NumVec::new( vec![ S::from(0), S::from(1) ] );
 /// assert_eq!(not_lt, check);
 /// ```
-pub fn doc_num_cmp_num_vec() {}
+pub fn doc_f_binary_num_vec() {}
 //
-/// see [doc_num_cmp_num_vec]
-macro_rules! impl_num_cmp_num_vec_borrow{ ($name:ident, $op:tt) => {
+/// see [doc_f_binary_num_vec]
+macro_rules! impl_f_binary_num_vec_borrow{ ($name:ident, $op:tt) => {
     #[doc = concat!( "NumVec::", stringify!( $name ) ) ]
     fn $name(self, rhs : & NumVec<S> ) -> NumVec<S> {
         //
@@ -315,43 +315,43 @@ macro_rules! impl_num_cmp_num_vec_borrow{ ($name:ident, $op:tt) => {
     }
 } }
 //
-impl<S> NumCmp< &NumVec<S> > for &NumVec<S>
+impl<S> FBinary< &NumVec<S> > for &NumVec<S>
 where
     S              : FConst,
-    for<'a> &'a S  : NumCmp<&'a S, Output = S>,
+    for<'a> &'a S  : FBinary<&'a S, Output = S>,
 {
     type Output = NumVec<S>;
     //
-    impl_num_cmp_num_vec_borrow!( num_lt, <  );
-    impl_num_cmp_num_vec_borrow!( num_le, <= );
-    impl_num_cmp_num_vec_borrow!( num_eq, == );
-    impl_num_cmp_num_vec_borrow!( num_ne, != );
-    impl_num_cmp_num_vec_borrow!( num_ge, >= );
-    impl_num_cmp_num_vec_borrow!( num_gt, >  );
+    impl_f_binary_num_vec_borrow!( num_lt, <  );
+    impl_f_binary_num_vec_borrow!( num_le, <= );
+    impl_f_binary_num_vec_borrow!( num_eq, == );
+    impl_f_binary_num_vec_borrow!( num_ne, != );
+    impl_f_binary_num_vec_borrow!( num_ge, >= );
+    impl_f_binary_num_vec_borrow!( num_gt, >  );
 }
 //
-/// see [doc_num_cmp_num_vec]
-macro_rules! impl_num_cmp_num_vec_own{ ($name:ident) => {
+/// see [doc_f_binary_num_vec]
+macro_rules! impl_f_binary_num_vec_own{ ($name:ident) => {
     #[doc = concat!( " NumVec::", stringify!($name)  ) ]
     fn $name(self : NumVec<S>, rhs : NumVec<S>) -> NumVec<S> {
-        NumCmp::$name( &self,  &rhs )
+        FBinary::$name( &self,  &rhs )
     }
 } }
 //
-impl<S> NumCmp< NumVec<S> > for NumVec<S>
+impl<S> FBinary< NumVec<S> > for NumVec<S>
 where
     S          : PartialOrd,
     NumVec<S> : FConst,
-    for<'a> &'a NumVec<S> : NumCmp< &'a NumVec<S>, Output = NumVec<S> >,
+    for<'a> &'a NumVec<S> : FBinary< &'a NumVec<S>, Output = NumVec<S> >,
 {
     type Output = NumVec<S>;
     //
-    impl_num_cmp_num_vec_own!( num_lt );
-    impl_num_cmp_num_vec_own!( num_le );
-    impl_num_cmp_num_vec_own!( num_eq );
-    impl_num_cmp_num_vec_own!( num_ne );
-    impl_num_cmp_num_vec_own!( num_ge );
-    impl_num_cmp_num_vec_own!( num_gt );
+    impl_f_binary_num_vec_own!( num_lt );
+    impl_f_binary_num_vec_own!( num_le );
+    impl_f_binary_num_vec_own!( num_eq );
+    impl_f_binary_num_vec_own!( num_ne );
+    impl_f_binary_num_vec_own!( num_ge );
+    impl_f_binary_num_vec_own!( num_gt );
 }
 //
 // ----------------------------------------------------------------------------`
@@ -538,7 +538,7 @@ where
     }
  }
 // ---------------------------------------------------------------------------
-/// FBinary trait for NumVec objects
+/// Powf trait for NumVec objects
 ///
 /// * S : is the floating point scalar type
 ///
@@ -547,18 +547,18 @@ where
 /// use rustad::{
 ///     AzFloat,
 ///     NumVec,
-///     FBinary,
+///     Powf,
 /// };
 /// let two      = NumVec::new( vec![ AzFloat(2f32) ] );
 /// let three    = NumVec::new( vec![ AzFloat(3f32) ] );
 /// let eight    = NumVec::new( vec![ AzFloat(8f32) ] );
-/// let powf_23  = FBinary::powf( &two, &three);
+/// let powf_23  = Powf::powf( &two, &three);
 /// assert_eq!(powf_23, eight);
 /// ```
-pub fn doc_f_binary_num_vec() {}
+pub fn doc_powf_num_vec() {}
 //
 macro_rules! float_binary_function{ ($name:ident) => {
-    #[doc = "see [doc_f_binary_num_vec]" ]
+    #[doc = "see [doc_powf_num_vec]" ]
     fn $name(self, rhs : &NumVec<S>) -> NumVec<S> {
         if self.len() == 1 {
             if rhs.len() == 1 {
@@ -580,9 +580,9 @@ macro_rules! float_binary_function{ ($name:ident) => {
         }
     }
 } }
-impl<S> FBinary< &NumVec<S> > for &NumVec<S>
+impl<S> Powf< &NumVec<S> > for &NumVec<S>
 where
-    S : FConst + Copy + FBinary<Output=S> ,
+    S : FConst + Copy + Powf<Output=S> ,
 {   //
     type Output = NumVec<S>;
     //

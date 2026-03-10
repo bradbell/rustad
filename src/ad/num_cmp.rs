@@ -3,7 +3,7 @@
 // SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
-//! This pub module defines the NumCmp trait for AD types
+//! This pub module defines the FBinary trait for AD types
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------
@@ -14,7 +14,7 @@ use crate::{
     FConst,
     AD,
     IndexT,
-    NumCmp,
+    FBinary,
 };
 use crate::ad::ADType;
 use crate::tape::Tape;
@@ -29,8 +29,8 @@ use crate::op::id::{
 };
 //
 // ---------------------------------------------------------------------------
-// NumCmp for AD<V>
-/// NumCmp trait for `AD<V>`
+// FBinary for AD<V>
+/// FBinary trait for `AD<V>`
 ///
 /// * Syntax :
 ///   ```text
@@ -55,7 +55,7 @@ use crate::op::id::{
 ///```
 /// use rustad::{
 ///     AD,
-///     NumCmp,
+///     FBinary,
 /// };
 ///
 /// type V  = rustad::AzFloat<f64>;
@@ -63,22 +63,22 @@ use crate::op::id::{
 /// let ay  = AD::from( V::from(4.0) );
 /// let z   = V::from(4.0);
 ///
-/// let ax_lt_y  = NumCmp::num_lt( &ax, &ay);
+/// let ax_lt_y  = FBinary::num_lt( &ax, &ay);
 /// assert_eq!(ax_lt_y.to_value(), V::from(1) );
 ///
-/// let ax_lt_y  = NumCmp::num_lt( ax.clone(), ay.clone());
+/// let ax_lt_y  = FBinary::num_lt( ax.clone(), ay.clone());
 /// assert_eq!(ax_lt_y.to_value(), V::from(1) );
 ///
-/// let ax_ge_z  = NumCmp::num_ge(&ax, &z);
+/// let ax_ge_z  = FBinary::num_ge(&ax, &z);
 /// assert_eq!(ax_ge_z.to_value(), V::from(0) );
 ///
-/// let ay_eq_z  = NumCmp::num_eq(ay.clone(), z.clone());
+/// let ay_eq_z  = FBinary::num_eq(ay.clone(), z.clone());
 /// assert_eq!(ay_eq_z.to_value(), V::from(1) );
 ///
-/// let z_gt_ay  = NumCmp::num_gt(&z, &ay);
+/// let z_gt_ay  = FBinary::num_gt(&z, &ay);
 /// assert_eq!(z_gt_ay.to_value(), V::from(0) );
 ///
-/// let z_gt_ay  = NumCmp::num_gt(z, ay);
+/// let z_gt_ay  = FBinary::num_gt(z, ay);
 /// assert_eq!(z_gt_ay.to_value(), V::from(0) );
 ///
 /// ```
@@ -89,7 +89,7 @@ use crate::op::id::{
 ///     AD,
 ///     AzFloat,
 ///     NumVec,
-///     NumCmp,
+///     FBinary,
 /// };
 ///
 /// type S    = AzFloat<f32>;
@@ -101,27 +101,27 @@ use crate::op::id::{
 /// let ax           = AD::from(x_nv.clone());
 /// let ay           = AD::from(y_nv.clone());
 ///
-/// let ax_lt_y  = NumCmp::num_lt(&ax, &ay);
+/// let ax_lt_y  = FBinary::num_lt(&ax, &ay);
 /// let check    = NumVec::new( vec![ S::from(1), S::from(0) ] );
 /// assert_eq!(ax_lt_y.to_value(), check );
 ///
-/// let ax_gt_y  = NumCmp::num_gt( &ax, &y_nv );
+/// let ax_gt_y  = FBinary::num_gt( &ax, &y_nv );
 /// let check    = NumVec::new( vec![ S::from(0), S::from(1) ] );
 /// assert_eq!(ax_gt_y.to_value(), check );
 /// ```
-pub fn doc_num_cmp_ad() { }
+pub fn doc_f_binary_ad() { }
 // ---------------------------------------------------------------------------
 //
-// impl_num_cmp_aa_borrow
-macro_rules! impl_num_cmp_aa_borrow{ ($name:ident, $OpId:ident) =>  {
+// impl_f_binary_aa_borrow
+macro_rules! impl_f_binary_aa_borrow{ ($name:ident, $OpId:ident) =>  {
     //
     #[doc = concat!(
-        " `&AD<V>` ", stringify!($name), " `&AD<V>`; see [doc_num_cmp_ad]"
+        " `&AD<V>` ", stringify!($name), " `&AD<V>`; see [doc_f_binary_ad]"
     )]
     fn $name(self, rhs : &AD<V> ) -> AD<V>
     {
         // new_value
-        let new_value : V = NumCmp::$name( &self.value, &rhs.value );
+        let new_value : V = FBinary::$name( &self.value, &rhs.value );
         //
         // local_key
         let local_key : &LocalKey< RefCell< Tape<V> > > =
@@ -130,66 +130,66 @@ macro_rules! impl_num_cmp_aa_borrow{ ($name:ident, $OpId:ident) =>  {
         // new_tape_id, new_index, new_ad_type
         let (new_tape_id, new_index, new_ad_type) =
             local_key.with_borrow_mut( |tape| {
-                record_num_cmp_aa::<V> ( tape, self, rhs, $OpId )
+                record_f_binary_aa::<V> ( tape, self, rhs, $OpId )
             } );
         //
         // result
         AD::new(new_tape_id, new_index, new_ad_type, new_value)
     }
 } }
-impl<V> NumCmp< &AD<V> > for &AD<V>
+impl<V> FBinary< &AD<V> > for &AD<V>
 where
     V : Clone + FConst + PartialEq + ThisThreadTape ,
-    for<'a> &'a V : NumCmp<&'a V, Output = V> ,
+    for<'a> &'a V : FBinary<&'a V, Output = V> ,
 {
     type Output = AD<V>;
     //
-    impl_num_cmp_aa_borrow!( num_lt, LT_OP);
-    impl_num_cmp_aa_borrow!( num_le, LE_OP );
-    impl_num_cmp_aa_borrow!( num_eq, EQ_OP );
-    impl_num_cmp_aa_borrow!( num_ne, NE_OP );
-    impl_num_cmp_aa_borrow!( num_ge, GE_OP );
-    impl_num_cmp_aa_borrow!( num_gt, GT_OP );
+    impl_f_binary_aa_borrow!( num_lt, LT_OP);
+    impl_f_binary_aa_borrow!( num_le, LE_OP );
+    impl_f_binary_aa_borrow!( num_eq, EQ_OP );
+    impl_f_binary_aa_borrow!( num_ne, NE_OP );
+    impl_f_binary_aa_borrow!( num_ge, GE_OP );
+    impl_f_binary_aa_borrow!( num_gt, GT_OP );
 }
 //
-/// see [doc_num_cmp_ad]
-macro_rules! impl_num_cmp_aa_own{ ($name:ident) => {
+/// see [doc_f_binary_ad]
+macro_rules! impl_f_binary_aa_own{ ($name:ident) => {
     //
     #[doc = concat!(
-        " `AD<V>` ", stringify!($name), " `AD<V>`; see [doc_num_cmp_ad]"
+        " `AD<V>` ", stringify!($name), " `AD<V>`; see [doc_f_binary_ad]"
     )]
     fn $name(self : AD<V>, rhs : AD<V>) -> AD<V> {
-        NumCmp::$name( &self,  &rhs )
+        FBinary::$name( &self,  &rhs )
     }
 } }
 //
-impl<V> NumCmp< AD<V> > for AD<V>
+impl<V> FBinary< AD<V> > for AD<V>
 where
     V                 : FConst + PartialOrd + ThisThreadTape ,
-    for<'a> &'a AD<V> : NumCmp< &'a AD<V>, Output = AD<V> >,
+    for<'a> &'a AD<V> : FBinary< &'a AD<V>, Output = AD<V> >,
 {
     type Output = AD<V>;
     //
-    impl_num_cmp_aa_own!( num_lt );
-    impl_num_cmp_aa_own!( num_le );
-    impl_num_cmp_aa_own!( num_eq );
-    impl_num_cmp_aa_own!( num_ne );
-    impl_num_cmp_aa_own!( num_ge );
-    impl_num_cmp_aa_own!( num_gt );
+    impl_f_binary_aa_own!( num_lt );
+    impl_f_binary_aa_own!( num_le );
+    impl_f_binary_aa_own!( num_eq );
+    impl_f_binary_aa_own!( num_ne );
+    impl_f_binary_aa_own!( num_ge );
+    impl_f_binary_aa_own!( num_gt );
 }
 // ---------------------------------------------------------------------------
 //
-// impl_num_cmp_ac_borrow
-macro_rules! impl_num_cmp_ac_borrow{ ($name:ident, $OpId:ident) => {
+// impl_f_binary_ac_borrow
+macro_rules! impl_f_binary_ac_borrow{ ($name:ident, $OpId:ident) => {
     //
     #[doc = concat!(
         " `&AD<V>` ", stringify!($name), "( &V )",
-        "; see [doc_num_cmp_ad]"
+        "; see [doc_f_binary_ad]"
     )]
     fn $name(self, rhs : &V ) -> AD<V>
     {
         // new_value
-        let new_value : V = NumCmp::$name( &self.value, rhs );
+        let new_value : V = FBinary::$name( &self.value, rhs );
         //
         // local_key
         let local_key : &LocalKey< RefCell< Tape<V> > > =
@@ -198,60 +198,60 @@ macro_rules! impl_num_cmp_ac_borrow{ ($name:ident, $OpId:ident) => {
         // new_tape_id, new_index, new_ad_type
         let (new_tape_id, new_index, new_ad_type) =
             local_key.with_borrow_mut( |tape| {
-                record_num_cmp_ac::<V> ( tape, self, rhs, $OpId )
+                record_f_binary_ac::<V> ( tape, self, rhs, $OpId )
             } );
         //
         // result
         AD::new(new_tape_id, new_index, new_ad_type, new_value)
     }
 } }
-impl<V> NumCmp<&V> for &AD<V>
+impl<V> FBinary<&V> for &AD<V>
 where
     V : Clone + FConst + PartialEq + ThisThreadTape ,
-    for<'a> &'a V : NumCmp<&'a V, Output = V> ,
+    for<'a> &'a V : FBinary<&'a V, Output = V> ,
 {
     type Output = AD<V>;
     //
-    impl_num_cmp_ac_borrow!( num_lt, LT_OP);
-    impl_num_cmp_ac_borrow!( num_le, LE_OP );
-    impl_num_cmp_ac_borrow!( num_eq, EQ_OP );
-    impl_num_cmp_ac_borrow!( num_ne, NE_OP );
-    impl_num_cmp_ac_borrow!( num_ge, GE_OP );
-    impl_num_cmp_ac_borrow!( num_gt, GT_OP );
+    impl_f_binary_ac_borrow!( num_lt, LT_OP);
+    impl_f_binary_ac_borrow!( num_le, LE_OP );
+    impl_f_binary_ac_borrow!( num_eq, EQ_OP );
+    impl_f_binary_ac_borrow!( num_ne, NE_OP );
+    impl_f_binary_ac_borrow!( num_ge, GE_OP );
+    impl_f_binary_ac_borrow!( num_gt, GT_OP );
 }
 //
-/// see [doc_num_cmp_ad]
-macro_rules! impl_num_cmp_ac_own{ ($name:ident) => {
+/// see [doc_f_binary_ad]
+macro_rules! impl_f_binary_ac_own{ ($name:ident) => {
     //
     #[doc = concat!(
-        " `AD<V>` ", stringify!($name), " `V`; see [doc_num_cmp_ad]"
+        " `AD<V>` ", stringify!($name), " `V`; see [doc_f_binary_ad]"
     )]
     fn $name(self : AD<V>, rhs : V) -> AD<V> {
-        NumCmp::$name( &self,  &rhs )
+        FBinary::$name( &self,  &rhs )
     }
 } }
 //
-impl<V> NumCmp<V> for AD<V>
+impl<V> FBinary<V> for AD<V>
 where
     V                 : FConst + PartialOrd + ThisThreadTape ,
-    for<'a> &'a AD<V> : NumCmp< &'a V, Output = AD<V> >,
+    for<'a> &'a AD<V> : FBinary< &'a V, Output = AD<V> >,
 {
     type Output = AD<V>;
     //
-    impl_num_cmp_ac_own!( num_lt );
-    impl_num_cmp_ac_own!( num_le );
-    impl_num_cmp_ac_own!( num_eq );
-    impl_num_cmp_ac_own!( num_ne );
-    impl_num_cmp_ac_own!( num_ge );
-    impl_num_cmp_ac_own!( num_gt );
+    impl_f_binary_ac_own!( num_lt );
+    impl_f_binary_ac_own!( num_le );
+    impl_f_binary_ac_own!( num_eq );
+    impl_f_binary_ac_own!( num_ne );
+    impl_f_binary_ac_own!( num_ge );
+    impl_f_binary_ac_own!( num_gt );
 }
 // ---------------------------------------------------------------------------
 //
-// impl_num_cmp_ca_borrow
-macro_rules! impl_num_cmp_ca_borrow{ ($name:ident, $OpId:ident) => {
+// impl_f_binary_ca_borrow
+macro_rules! impl_f_binary_ca_borrow{ ($name:ident, $OpId:ident) => {
     //
     #[doc = concat!(
-        "&V" , stringify!($name), " `&AD<V>`; see [doc_num_cmp_ad]"
+        "&V" , stringify!($name), " `&AD<V>`; see [doc_f_binary_ad]"
     )]
     fn $name(self, rhs : &AD<V> ) -> AD<V>
     {
@@ -265,56 +265,56 @@ macro_rules! impl_num_cmp_ca_borrow{ ($name:ident, $OpId:ident) => {
         // new_tape_id, new_index, new_ad_type
         let (new_tape_id, new_index, new_ad_type) =
             local_key.with_borrow_mut( |tape| {
-                record_num_cmp_ca::<V> ( tape, self, rhs, $OpId )
+                record_f_binary_ca::<V> ( tape, self, rhs, $OpId )
             } );
         //
         // result
         AD::new(new_tape_id, new_index, new_ad_type, new_value)
     }
 } }
-impl<V> NumCmp< &AD<V> > for &V
+impl<V> FBinary< &AD<V> > for &V
 where
     V : Clone + FConst + PartialEq + ThisThreadTape ,
-    for<'a> &'a V : NumCmp<&'a V, Output = V>
+    for<'a> &'a V : FBinary<&'a V, Output = V>
 {
     type Output = AD<V>;
     //
-    impl_num_cmp_ca_borrow!( num_lt, LT_OP);
-    impl_num_cmp_ca_borrow!( num_le, LE_OP );
-    impl_num_cmp_ca_borrow!( num_eq, EQ_OP );
-    impl_num_cmp_ca_borrow!( num_ne, NE_OP );
-    impl_num_cmp_ca_borrow!( num_ge, GE_OP );
-    impl_num_cmp_ca_borrow!( num_gt, GT_OP );
+    impl_f_binary_ca_borrow!( num_lt, LT_OP);
+    impl_f_binary_ca_borrow!( num_le, LE_OP );
+    impl_f_binary_ca_borrow!( num_eq, EQ_OP );
+    impl_f_binary_ca_borrow!( num_ne, NE_OP );
+    impl_f_binary_ca_borrow!( num_ge, GE_OP );
+    impl_f_binary_ca_borrow!( num_gt, GT_OP );
 }
 //
-// impl_num_cmp_ca_own
-macro_rules! impl_num_cmp_ca_own{ ($name:ident) => {
+// impl_f_binary_ca_own
+macro_rules! impl_f_binary_ca_own{ ($name:ident) => {
     //
     #[doc = concat!(
-        "V" , stringify!($name), " `AD<V>`; see [doc_num_cmp_ad]"
+        "V" , stringify!($name), " `AD<V>`; see [doc_f_binary_ad]"
     )]
     fn $name(self, rhs : AD<V> ) -> AD<V> {
-        NumCmp::$name( &self, &rhs )
+        FBinary::$name( &self, &rhs )
     }
 } }
-impl<V> NumCmp< AD<V> > for V
+impl<V> FBinary< AD<V> > for V
 where
     V : Clone + FConst + PartialEq + ThisThreadTape ,
-    for<'a> &'a V : NumCmp<&'a AD<V>, Output = AD<V> >
+    for<'a> &'a V : FBinary<&'a AD<V>, Output = AD<V> >
 {
     type Output = AD<V>;
     //
-    impl_num_cmp_ca_own!( num_lt);
-    impl_num_cmp_ca_own!( num_le );
-    impl_num_cmp_ca_own!( num_eq );
-    impl_num_cmp_ca_own!( num_ne );
-    impl_num_cmp_ca_own!( num_ge );
-    impl_num_cmp_ca_own!( num_gt );
+    impl_f_binary_ca_own!( num_lt);
+    impl_f_binary_ca_own!( num_le );
+    impl_f_binary_ca_own!( num_eq );
+    impl_f_binary_ca_own!( num_ne );
+    impl_f_binary_ca_own!( num_ge );
+    impl_f_binary_ca_own!( num_gt );
 }
 // ---------------------------------------------------------------------------
-// record_num_cmp_aa
+// record_f_binary_aa
 //
-fn record_num_cmp_aa <V> (
+fn record_f_binary_aa <V> (
     tape: &mut Tape<V> ,
     lhs:       &AD<V>  ,
     rhs:       &AD<V>  ,
@@ -430,9 +430,9 @@ where
     (new_tape_id, new_index, new_ad_type)
 }
 // ---------------------------------------------------------------------------
-// record_num_cmp_ac
+// record_f_binary_ac
 //
-fn record_num_cmp_ac <V> (
+fn record_f_binary_ac <V> (
     tape: &mut Tape<V> ,
     lhs:       &AD<V>  ,
     rhs:       &V      ,
@@ -515,9 +515,9 @@ where
     (new_tape_id, new_index, new_ad_type)
 }
 // ---------------------------------------------------------------------------
-// record_num_cmp_ca
+// record_f_binary_ca
 //
-fn record_num_cmp_ca <V> (
+fn record_f_binary_ca <V> (
     tape: &mut Tape<V> ,
     lhs:       &V      ,
     rhs:       &AD<V>  ,

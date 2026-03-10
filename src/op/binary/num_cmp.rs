@@ -10,7 +10,7 @@
 use crate::{
     AD,
     IndexT,
-    NumCmp,
+    FBinary,
 };
 use crate::adfn::optimize;
 use crate::ad::ADType;
@@ -36,7 +36,7 @@ use crate::op::info::{
 ///
 macro_rules! eval_num_cmp_forward_fun { ($name:ident) => { paste::paste! {
     #[doc = concat!(
-        " E evaluation of NumCmp::num_", stringify!( $name ),
+        " E evaluation of FBinary::num_", stringify!( $name ),
         "; see [ForwardDyp](crate::op::info::ForwardDyp)"
     ) ]
     fn [< $name _forward_dyp >] <V, E> (
@@ -47,8 +47,8 @@ macro_rules! eval_num_cmp_forward_fun { ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        for<'a> &'a V : NumCmp<&'a V, Output = V> + NumCmp<&'a E, Output = E>,
-        for<'a> &'a E : NumCmp<&'a E, Output = E> + NumCmp<&'a V, Output = E>,
+        for<'a> &'a V : FBinary<&'a V, Output = V> + FBinary<&'a E, Output = E>,
+        for<'a> &'a E : FBinary<&'a E, Output = E> + FBinary<&'a V, Output = E>,
     {
         debug_assert!( arg.len() == 2);
         debug_assert!(
@@ -81,7 +81,7 @@ macro_rules! eval_num_cmp_forward_fun { ($name:ident) => { paste::paste! {
         };
     }
     #[doc = concat!(
-        " E evaluation of NumCmp::num_", stringify!( $name ),
+        " E evaluation of FBinary::num_", stringify!( $name ),
         "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $name _forward_var >] <V, E> (
@@ -93,8 +93,8 @@ macro_rules! eval_num_cmp_forward_fun { ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        for<'a> &'a V : NumCmp<&'a V, Output = V> + NumCmp<&'a E, Output = E>,
-        for<'a> &'a E : NumCmp<&'a E, Output = E> + NumCmp<&'a V, Output = E>,
+        for<'a> &'a V : FBinary<&'a V, Output = V> + FBinary<&'a E, Output = E>,
+        for<'a> &'a E : FBinary<&'a E, Output = E> + FBinary<&'a V, Output = E>,
     {
         debug_assert!( arg.len() == 2);
         //
@@ -222,9 +222,9 @@ fn zero_reverse_der<V, E>  (
 // set_op_info
 //
 // rust_src_none
-no_rust_src!(NumCmp);
+no_rust_src!(FBinary);
 //
-/// Set the operator information for the NumCmp operators
+/// Set the operator information for the FBinary operators
 ///
 /// * op_info_vec :
 ///   The map from [op::id](crate::op::id) to operator information.
@@ -234,11 +234,11 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
     AD<V> : From<V>,
     V     : Clone + From<f32>,
-    for<'a> &'a V     : NumCmp<&'a V, Output = V>,
-    for<'a> &'a V     : NumCmp<&'a AD<V>, Output = AD<V> >,
-    for<'a> &'a V     : NumCmp<&'a AD<V>, Output = AD<V> >,
-    for<'a> &'a AD<V> : NumCmp<&'a V, Output = AD<V> >,
-    for<'a> &'a AD<V> : NumCmp<&'a AD<V>, Output = AD<V> >,
+    for<'a> &'a V     : FBinary<&'a V, Output = V>,
+    for<'a> &'a V     : FBinary<&'a AD<V>, Output = AD<V> >,
+    for<'a> &'a V     : FBinary<&'a AD<V>, Output = AD<V> >,
+    for<'a> &'a AD<V> : FBinary<&'a V, Output = AD<V> >,
+    for<'a> &'a AD<V> : FBinary<&'a AD<V>, Output = AD<V> >,
 {
     op_info_vec[id::LT_OP as usize] = OpInfo{
         name              : "lt",

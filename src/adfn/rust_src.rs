@@ -63,10 +63,10 @@ fn prototype_src(fn_name : &str, v_str : &str) -> String {
         "\n" +
         "#[allow(unused)]\n" +
         "use crate::{\n" +
-        "   traits::NumCmp,\n" +
+        "   traits::FBinary,\n" +
         "   traits::FConst,\n" +
         "   traits::FUnary,\n" +
-        "   traits::FBinary,\n"  +
+        "   traits::Powf,\n"  +
         "   az_float::AzFloat,\n" +
         "   num_vec::NumVec,\n" +
         "};\n" +

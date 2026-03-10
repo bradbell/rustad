@@ -5,7 +5,7 @@
 // Example using numeric comparison operators
 //
 use rustad::{
-    NumCmp,
+    FBinary,
     AzFloat,
     start_recording,
     stop_recording,
@@ -23,7 +23,7 @@ fn heaviside() {
     //
     // heaviside
     let zero           = V::from(0);
-    let ay             = vec![ NumCmp::num_ge( &ax[0], &zero) ];
+    let ay             = vec![ FBinary::num_ge( &ax[0], &zero) ];
     let heaviside      = stop_recording(ay);
     //
     let x       = vec![ V::from(-1.0f32) ];
@@ -76,8 +76,8 @@ fn abs() {
     //
     // abs
     let z        = V::from(0);
-    let az_lt_x  = NumCmp::num_lt( &z, &ax[0] );
-    let az_ge_x  = NumCmp::num_ge( &z, &ax[0] );
+    let az_lt_x  = FBinary::num_lt( &z, &ax[0] );
+    let az_ge_x  = FBinary::num_ge( &z, &ax[0] );
     let ax_neg   = &z - &ax[0];
     let ay      = vec![  &(&az_lt_x * &ax[0]) + &(&az_ge_x * &ax_neg) ];
     let abs     = stop_recording(ay);

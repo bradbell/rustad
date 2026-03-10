@@ -12,7 +12,7 @@ use rustad::{
     stop_recording,
     AzFloat,
     call_atom,
-    NumCmp,
+    FBinary,
     FUnary,
 };
 //
@@ -349,8 +349,8 @@ fn find_equal_num_cmp() {
     //
     // aq0, aq1, aq2, aq3
     // Optimizer should detect that aq0 and aq1 are identical.
-    let aq0 = NumCmp::num_lt( &ap[0], &ax[0] );
-    let aq1 = NumCmp::num_lt( &ap[0], &ax[0] );
+    let aq0 = FBinary::num_lt( &ap[0], &ax[0] );
+    let aq1 = FBinary::num_lt( &ap[0], &ax[0] );
     //
     // f
     let ay     = vec![ aq0, aq1 ];
