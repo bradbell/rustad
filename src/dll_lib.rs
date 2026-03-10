@@ -24,14 +24,14 @@ fn write_src_file(src_dir : &str, name : &str, source : &str) {
 /// * src_dir  :
 ///   is the directory we are creating. If it already exists, any files
 ///   there are left in place except for:
-///   lib.rs, core.rs, num_cmp.rs, az_float.rs.
+///   lib.rs, triats.rs, az_float.rs, num_vec.rs.
 ///
 /// * lib_src :
 ///   is an in memory representation of the data that is written to the
 ///   file *src_dir* `/lib.rs` .
 ///
 /// * Other Files :
-///   core.rs, num_cmp.rs, az_float.rs
+///   triats.rs, az_float.rs, num_vec.rs
 ///   are copies of the corresponding rustad files in src/float.
 ///
 pub fn create_src_dir(
