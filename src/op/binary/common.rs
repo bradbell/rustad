@@ -300,11 +300,11 @@ macro_rules! binary_rust_src { ($name:ident) => { paste::paste! {
 } } }
 pub(crate) use binary_rust_src;
 // ---------------------------------------------------------------------------
-// reverse_depend
+// binary_reverse_depend
 /// Reverse dependency analysis for a binary operator;
 /// see [ReverseDepend](crate::op::info::ReverseDepend)
 ///
-pub(crate) fn reverse_depend(
+pub(crate) fn binary_reverse_depend(
     depend    : &mut optimize::Depend ,
     _flag_all : &[bool]               ,
     arg       : &[IndexT]             ,

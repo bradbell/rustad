@@ -12,10 +12,10 @@ use crate::{
     IndexT,
     FBinary,
 };
-use crate::adfn::optimize;
 use crate::ad::ADType;
 use crate::op::id;
 use crate::op::info::OpInfo;
+use crate::op::binary::common;
 //
 // ---------------------------------------------------------------------------
 // function_by_cmp
@@ -32,7 +32,7 @@ use crate::op::info::OpInfo;
 ///     {cmp}_forward_var<V, E>
 /// ```
 ///
-macro_rules! eval_num_cmp_forward_fun { ($cmp:ident) => { paste::paste! {
+macro_rules! function_by_cmp { ($cmp:ident) => { paste::paste! {
     //
     // num_cmp_rust_src
     crate::op::binary::common::binary_rust_src!( [< num_ $cmp >] );
@@ -145,54 +145,12 @@ macro_rules! eval_num_cmp_forward_fun { ($cmp:ident) => { paste::paste! {
         };
     }
 } } }
-eval_num_cmp_forward_fun!( lt );
-eval_num_cmp_forward_fun!( le );
-eval_num_cmp_forward_fun!( eq );
-eval_num_cmp_forward_fun!( ne );
-eval_num_cmp_forward_fun!( ge );
-eval_num_cmp_forward_fun!( gt );
-// ---------------------------------------------------------------------------
-// binary_reverse_depend
-/// Reverse dependency analysis for a compare operator;
-/// see [ReverseDepend](crate::op::info::ReverseDepend)
-///
-pub(crate) fn binary_reverse_depend(
-    depend    : &mut optimize::Depend ,
-    _flag_all : &[bool]               ,
-    arg       : &[IndexT]             ,
-    arg_type  : &[ADType]             ,
-    res       : usize                 ,
-    res_type  : ADType                ,
-) { //
-    debug_assert_eq!(arg.len(), 2);
-    debug_assert_eq!(arg_type.len(), 2);
-    //
-    if res_type.is_variable() {
-        debug_assert!( depend.var[res] );
-        for i_arg in 0 .. 2 {
-            let index = arg[i_arg] as usize;
-            match arg_type[i_arg] {
-                //
-                ADType::ConstantP => { depend.cop[index] = true; },
-                ADType::DynamicP  => { depend.dyp[index] = true; },
-                ADType::Variable  => { depend.var[index] = true; },
-                _ => { panic!("in compare operator reverse_depend"); },
-            }
-        }
-    } else {
-        debug_assert!( res_type.is_dynamic() );
-        debug_assert!( depend.dyp[res] );
-        for i_arg in 0 .. 2 {
-            let index = arg[i_arg] as usize;
-            match arg_type[i_arg] {
-                //
-                ADType::ConstantP => { depend.cop[index] = true; },
-                ADType::DynamicP  => { depend.dyp[index] = true; },
-                _ => { panic!("in compare operator reverse_depend"); },
-            }
-        }
-    }
-}
+function_by_cmp!( lt );
+function_by_cmp!( le );
+function_by_cmp!( eq );
+function_by_cmp!( ne );
+function_by_cmp!( ge );
+function_by_cmp!( gt );
 // ---------------------------------------------------------------------------
 // zero_forward_der
 fn zero_forward_der<V, E>  (
@@ -253,7 +211,7 @@ where
         reverse_der_value : zero_reverse_der::<V, V>,
         reverse_der_ad    : zero_reverse_der::<V, AD<V> >,
         rust_src          : num_lt_rust_src,
-        reverse_depend    : binary_reverse_depend,
+        reverse_depend    : common::binary_reverse_depend,
     };
     op_info_vec[id::LE_OP as usize] = OpInfo{
         name              : "num_le",
@@ -266,7 +224,7 @@ where
         reverse_der_value : zero_reverse_der::<V, V>,
         reverse_der_ad    : zero_reverse_der::<V, AD<V> >,
         rust_src          : num_le_rust_src,
-        reverse_depend    : binary_reverse_depend,
+        reverse_depend    : common::binary_reverse_depend,
     };
     op_info_vec[id::EQ_OP as usize] = OpInfo{
         name              : "num_eq",
@@ -279,7 +237,7 @@ where
         reverse_der_value : zero_reverse_der::<V, V>,
         reverse_der_ad    : zero_reverse_der::<V, AD<V> >,
         rust_src          : num_eq_rust_src,
-        reverse_depend    : binary_reverse_depend,
+        reverse_depend    : common::binary_reverse_depend,
     };
     op_info_vec[id::NE_OP as usize] = OpInfo{
         name              : "num_ne",
@@ -292,7 +250,7 @@ where
         reverse_der_value : zero_reverse_der::<V, V>,
         reverse_der_ad    : zero_reverse_der::<V, AD<V> >,
         rust_src          : num_ne_rust_src,
-        reverse_depend    : binary_reverse_depend,
+        reverse_depend    : common::binary_reverse_depend,
     };
     op_info_vec[id::GE_OP as usize] = OpInfo{
         name              : "num_ge",
@@ -305,7 +263,7 @@ where
         reverse_der_value : zero_reverse_der::<V, V>,
         reverse_der_ad    : zero_reverse_der::<V, AD<V> >,
         rust_src          : num_ge_rust_src,
-        reverse_depend    : binary_reverse_depend,
+        reverse_depend    : common::binary_reverse_depend,
     };
     op_info_vec[id::GT_OP as usize] = OpInfo{
         name              : "num_gt",
@@ -318,6 +276,6 @@ where
         reverse_der_value : zero_reverse_der::<V, V>,
         reverse_der_ad    : zero_reverse_der::<V, AD<V> >,
         rust_src          : num_gt_rust_src,
-        reverse_depend    : binary_reverse_depend,
+        reverse_depend    : common::binary_reverse_depend,
     };
 }
