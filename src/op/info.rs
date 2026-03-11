@@ -320,6 +320,7 @@ pub(crate) use no_reverse_der_ad;
 /// defines rust_src_none `<V>`
 ///
 /// The types IndexT and ADType must be in scope where this macro is used.
+#[allow(unused_macros)]
 macro_rules! no_rust_src{ ($Op:ident) => {
     pub fn rust_src_none<V>(
         _not_used : V           ,
@@ -336,6 +337,7 @@ macro_rules! no_rust_src{ ($Op:ident) => {
         ": rust_src not implemented for this operator" ,
     ))}
 }}
+#[allow(unused_imports)]
 pub(crate) use no_rust_src;
 //
 // no_reverse_depend

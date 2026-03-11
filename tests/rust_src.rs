@@ -14,6 +14,7 @@ use rustad::{
     get_rust_src_fn,
     create_src_dir,
     FUnary,
+    FBinary,
 };
 //
 fn test_sub () {
@@ -158,20 +159,20 @@ fn test_powi() {
     let f  = stop_recording(ay);
     //
     // lib_src
-    let gn_name  = "test_unary";
+    let gn_name  = "test_powi";
     let lib_src  = f.rust_src(gn_name);
     //
     // src_dir
-    let src_dir = "tmp/test_unary_rust_src";
+    let src_dir = "tmp/test_powi_rust_src";
     create_src_dir(src_dir, &lib_src);
     //
     // lib
-    let lib_file    = "tmp/test_unary_rust_src.so";
+    let lib_file    = "tmp/test_powi_rust_src.so";
     let replace_lib = true;
     let lib         = get_lib(src_dir, lib_file, replace_lib);
     //
-    // test_unary_fn
-    let test_unary_fn : RustSrcLink<V> = get_rust_src_fn(&lib, &gn_name);
+    // test_powi_fn
+    let test_powi_fn : RustSrcLink<V> = get_rust_src_fn(&lib, &gn_name);
     //
     // p_ref, x_ref
     let p                   = vec! [ V::from(2.0) ];
@@ -186,7 +187,7 @@ fn test_powi() {
     }
     //
     // y
-    let result = test_unary_fn(&p_ref, &x_ref);
+    let result = test_powi_fn(&p_ref, &x_ref);
     let y      = result.unwrap();
     //
     // check
@@ -194,9 +195,69 @@ fn test_powi() {
     assert_eq!( y[1], (&x[0]).powi(-2) );
 }
 //
+fn test_cmp() {
+    //
+    type V     = AzFloat<f32>;
+    //
+    // p, x, ap, ax
+    let p  = vec![ V::from(1.0), V::from(1.0) ];
+    let x  = vec![ V::from(1.0), V::from(1.0) ];
+    let (ap, ax)    = start_recording(Some(p), x.clone());
+    //
+    // ay
+    let mut ay : Vec< AD<V> > = Vec::new();
+    //
+    // y[0] = p[0] < p[1]
+    ay.push( (&ap[0]).num_lt(&ap[1]) );
+    //
+    // y[1] = x[0]  > x[1]
+    ay.push( (&ax[0]).num_gt(&ax[1]) );
+    //
+    // f
+    // f(x) = y
+    let f  = stop_recording(ay);
+    //
+    // lib_src
+    let gn_name  = "test_cmp";
+    let lib_src  = f.rust_src(gn_name);
+    //
+    // src_dir
+    let src_dir = "tmp/test_cmp_rust_src";
+    create_src_dir(src_dir, &lib_src);
+    //
+    // lib
+    let lib_file    = "tmp/test_cmp_rust_src.so";
+    let replace_lib = true;
+    let lib         = get_lib(src_dir, lib_file, replace_lib);
+    //
+    // test_cmp_fn
+    let test_cmp_fn : RustSrcLink<V> = get_rust_src_fn(&lib, &gn_name);
+    //
+    // p_ref, x_ref
+    let p                   = vec! [ V::from(2.0), V::from(3.0) ];
+    let mut p_ref : Vec<&V> = Vec::new();
+    for p_j in p.iter() {
+        p_ref.push( p_j );
+    }
+    let x                   =  vec! [ V::from(4.0), V::from(5.0) ];
+    let mut x_ref : Vec<&V> = Vec::new();
+    for x_j in x.iter() {
+        x_ref.push( x_j )
+    }
+    //
+    // y
+    let result = test_cmp_fn(&p_ref, &x_ref);
+    let y      = result.unwrap();
+    //
+    // check
+    assert_eq!( y[0], V::from(1.0) );
+    assert_eq!( y[1], V::from(0.0) );
+}
+//
 #[test]
 fn rust_src() {
     test_sub();
     test_unary();
     test_powi();
+    test_cmp();
 }
