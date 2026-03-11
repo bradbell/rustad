@@ -27,20 +27,38 @@ fi
 #
 # NAME
 NAME=$(echo $name | tr [a-z] [A-Z])
-#
+# ----------------------------------------------------------------------------
 # traits.rs
 file='src/float/traits.rs'
 cat << EOF > temp.sed
 /^pub trait FUnary/! b end
+: loop
 N
-N
+/SORT_THIS_LINE_PLUS_1/! b loop
 s|\$|\\
     fn $name(self) -> Self::Output;|
+#
 : end
 EOF
 git checkout $file
 sed -i $file -f temp.sed
-#
+# ----------------------------------------------------------------------------
+# unary/common.rs
+file='src/op/unary/common.rs'
+if [[ ${#NAME} -le '2' ]]
+then
+cat << EOF > temp.sed
+s|^\\( *\\)id::LN_OP\\( *\\)=>|\\1id::${NAME}_OP\\2=> true,\\n&|
+EOF
+else
+   let "skip = ${#NAME} - 2"
+cat << EOF > temp.sed
+s|^\\( *\\)id::LN_OP \\{$skip\\}\\( *\\)=>|\\1id::${NAME}_OP\\2=> true,\\n&|
+EOF
+fi
+git checkout $file
+sed -i $file -f temp.sed
+# ----------------------------------------------------------------------------
 # az_float.rs
 file='src/float/az_float.rs'
 cat << EOF > temp.sed
@@ -51,7 +69,7 @@ s|\$|\\
 EOF
 git checkout $file
 sed -i $file -f temp.sed
-#
+# ----------------------------------------------------------------------------
 # num_vec.rs
 file='src/float/num_vec.rs'
 cat << EOF > temp.sed
@@ -62,7 +80,7 @@ s|\$|\\
 EOF
 git checkout $file
 sed -i $file -f temp.sed
-#
+# -----------------------------------------------------------------------------
 # ad/float_core.rs
 file='src/ad/f_unary.rs'
 cat << EOF > temp.sed
@@ -81,7 +99,7 @@ b end
 EOF
 git checkout $file
 sed -i $file -f temp.sed
-#
+# -----------------------------------------------------------------------------
 # id.rs
 file='src/op/id.rs'
 cat << EOF > temp.sed
@@ -93,7 +111,7 @@ s|\$|\\
 EOF
 git checkout $file
 sed -i $file -f temp.sed
-#
+# -----------------------------------------------------------------------------
 # info.rs
 file='src/op/info.rs'
 cat << EOF > temp.sed
@@ -104,7 +122,7 @@ s|\$|\\
 EOF
 git checkout $file
 sed -i $file -f temp.sed
-#
+# -----------------------------------------------------------------------------
 # mod.rs
 file='src/op/unary/mod.rs'
 cat << EOF > temp.sed
@@ -115,7 +133,7 @@ pub mod $name;|
 EOF
 git checkout $file
 sed -i $file -f temp.sed
-#
+# -----------------------------------------------------------------------------
 # $name.rs
 cat << EOF > temp.sed
 s|\\([": (]\\)exp_m1\\(["_ ()]\\)|\\1$name\\2|g

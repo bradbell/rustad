@@ -34,20 +34,22 @@ pub trait FConst {
 pub trait FUnary {
     type Output;
     // ------------------------------------------------------------------------
-    fn ln_1p(self) -> Self::Output;
+    // BEGIN_SORT_THIS_LINE_PLUS_1
+    fn abs(self) -> Self::Output;
+    fn cos(self) -> Self::Output;
+    fn cosh(self) -> Self::Output;
+    fn exp(self) -> Self::Output;
     fn exp_m1(self) -> Self::Output;
     fn ln(self) -> Self::Output;
-    fn sqrt(self) -> Self::Output;
-    fn tanh(self) -> Self::Output;
-    fn tan(self) -> Self::Output;
-    fn sinh(self) -> Self::Output;
-    fn cosh(self) -> Self::Output;
-    fn abs(self) -> Self::Output;
-    fn exp(self) -> Self::Output;
+    fn ln_1p(self) -> Self::Output;
     fn minus(self) -> Self::Output;
-    fn cos(self) -> Self::Output;
     fn signum(self) -> Self::Output;
     fn sin(self) -> Self::Output;
+    fn sinh(self) -> Self::Output;
+    fn sqrt(self) -> Self::Output;
+    fn tan(self) -> Self::Output;
+    fn tanh(self) -> Self::Output;
+    // END_SORT_THIS_LINE_MINUS_1
     // ------------------------------------------------------------------------
     fn powi(self, rhs : i32) -> Self::Output;
 }

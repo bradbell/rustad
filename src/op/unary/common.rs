@@ -15,12 +15,22 @@ use crate::op::id;
 // ---------------------------------------------------------------------------
 pub(crate) fn is_unary_op(op_id : u8) -> bool {
     match op_id {
+        // BEGIN_SORT_THIS_LINE_PLUS_1
         id::ABS_OP      => true,
-        id::SIGNUM_OP   => true,
-        id::EXP_OP      => true,
-        id::MINUS_OP    => true,
+        id::COSH_OP     => true,
         id::COS_OP      => true,
+        id::EXP_M1_OP   => true,
+        id::EXP_OP      => true,
+        id::LN_1P_OP    => true,
+        id::LN_OP       => true,
+        id::MINUS_OP    => true,
+        id::SIGNUM_OP   => true,
+        id::SINH_OP     => true,
         id::SIN_OP      => true,
+        id::SQRT_OP     => true,
+        id::TANH_OP     => true,
+        id::TAN_OP      => true,
+        // END_SORT_THIS_LINE_MINUS_1
         //
         _               => false,
     }
