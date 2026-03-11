@@ -56,10 +56,7 @@ use crate::op::info::{
 // -------------------------------------------------------------------------
 // rust_src
 // -------------------------------------------------------------------------
-// mul_pp_rust_src
-// mul_pv_rust_src
-// mul_vp_rust_src
-// mul_vv_rust_src
+// mul_rust_src
 common::binary_rust_src!(mul);
 // -------------------------------------------------------------------------
 // forward_var
@@ -264,7 +261,7 @@ where
         forward_der_ad    : panic_der::<V, AD<V> >,
         reverse_der_value : panic_der::<V, V>,
         reverse_der_ad    : panic_der::<V, AD<V> >,
-        rust_src          : mul_pp_rust_src,
+        rust_src          : mul_rust_src,
         reverse_depend    : common::reverse_depend,
     };
     op_info_vec[MUL_PV_OP as usize] = OpInfo{
@@ -277,7 +274,7 @@ where
         forward_der_ad    : mul_pv_forward_der::<V, AD<V> >,
         reverse_der_value : mul_pv_reverse_der::<V, V>,
         reverse_der_ad    : mul_pv_reverse_der::<V, AD<V> >,
-        rust_src          : mul_pv_rust_src,
+        rust_src          : mul_rust_src,
         reverse_depend    : common::reverse_depend,
     };
     op_info_vec[MUL_VP_OP as usize] = OpInfo{
@@ -290,7 +287,7 @@ where
         forward_der_ad    : mul_vp_forward_der::<V, AD<V> >,
         reverse_der_value : mul_vp_reverse_der::<V, V>,
         reverse_der_ad    : mul_vp_reverse_der::<V, AD<V> >,
-        rust_src          : mul_vp_rust_src,
+        rust_src          : mul_rust_src,
         reverse_depend    : common::reverse_depend,
     };
     op_info_vec[MUL_VV_OP as usize] = OpInfo{
@@ -303,7 +300,7 @@ where
         forward_der_ad    : mul_vv_forward_der::<V, AD<V> >,
         reverse_der_value : mul_vv_reverse_der::<V, V>,
         reverse_der_ad    : mul_vv_reverse_der::<V, AD<V> >,
-        rust_src          : mul_vv_rust_src,
+        rust_src          : mul_rust_src,
         reverse_depend    : common::reverse_depend,
     };
 }

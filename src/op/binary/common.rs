@@ -181,79 +181,23 @@ pub(crate) use binary_forward_var;
 // binary_rust_src
 /// Rust source code for binary operators.
 ///
-/// * name   :  is add, sub, mul, div, powf
-/// * op     : is the corresponding operator; e.g. + for Add.
+/// * name :
+///   add, sub, mul, div, powf,
+///   num_lt, num_le, num_eq, num_ne, num_ge, num_gt
 ///
 /// This defines the following functions in the current module:
 /// ```text
-///     {name}_pp_rust_src
-///     {name}_pv_rust_src
-///     {name}_vp_rust_src
-///     {name}_vv_rust_src
+///     {name}_rust_src
 /// ```
-/// where v (p) means the corresponding operand is a variable (parameter) .
 ///
 /// [IndexT] must be defined in any module that uses binary_rust_src
 macro_rules! binary_rust_src { ($name:ident) => { paste::paste! {
     #[doc = concat!(
-        " rust source for ", stringify!( $name ), "(parameter, parameter)",
+        " rust source for ", stringify!( $name ),
         "; see [RustSrc](crate::op::info::RustSrc)"
     ) ]
-    fn [< $name _pp_rust_src >]<V> (
-        _not_used   : V           ,
-        res_type    : ADType      ,
-        dyp_n_dom   : usize       ,
-        _var_n_dom  : usize       ,
-        _flag_all   : &[bool]     ,
-        arg         : &[IndexT]   ,
-        arg_type    : &[ADType]   ,
-        res         : usize       ) -> String
-    {   //
-        debug_assert!( arg.len() == 2);
-        debug_assert!( res_type.is_dynamic() );
-        debug_assert!( arg_type[0].is_dynamic() );
-        debug_assert!( arg_type[1].is_dynamic() );
-        debug_assert!( dyp_n_dom <= res );
-        //
-        // lhs_str
-        let mut lhs = arg[0] as usize;
-        let lhs_str : String;
-        if lhs < dyp_n_dom  {
-            lhs_str = format!("dyp_dom[{lhs}]");
-        } else {
-            lhs -= dyp_n_dom;
-            lhs_str = format!("(&dyp_dep[{lhs}])");
-        }
-        //
-        // rhs_str
-        let mut rhs = arg[1] as usize;
-        let rhs_str : String;
-        if rhs < dyp_n_dom  {
-            rhs_str = format!("dyp_dom[{rhs}]");
-        } else {
-            rhs -= dyp_n_dom;
-            rhs_str = format!("(&dyp_dep[{rhs}])");
-        }
-        //
-        // res_str
-        let res              = res - dyp_n_dom;
-        let res_str : String = format!("dyp_dep[{res}]");
-        //
-        // op_name
-        let op_name = stringify!( $name );
-        //
-        // src
-        let src = String::from("   ");
-        let src = src + &res_str +
-            " = " + &lhs_str + "." + op_name + "(" + &rhs_str + ");\n";
-        src
-    }
-    #[doc = concat!(
-        " rust source for ", stringify!( $name ), "(parameter, variable)",
-        "; see [RustSrc](crate::op::info::RustSrc)"
-    ) ]
-    fn [< $name _pv_rust_src >]<V> (
-        _not_used   : V           ,
+    fn [< $name _rust_src >]<V> (
+        _not_used  : V            ,
         res_type    : ADType      ,
         dyp_n_dom   : usize       ,
         var_n_dom   : usize       ,
@@ -263,144 +207,86 @@ macro_rules! binary_rust_src { ($name:ident) => { paste::paste! {
         res         : usize       ) -> String
     {   //
         debug_assert!( arg.len() == 2);
-        debug_assert!( res_type.is_variable() );
-        debug_assert!( arg_type[0].is_parameter() );
-        debug_assert!( arg_type[1].is_variable() );
-        debug_assert!( var_n_dom <= res );
         //
         // lhs_str
-        let mut lhs = arg[0] as usize;
         let lhs_str : String;
-        if arg_type[0].is_constant() {
-            lhs_str = format!("(&cop[{lhs}])");
-        } else if lhs < dyp_n_dom {
-            lhs_str = format!("dyp_dom[{lhs}]");
-        } else {
-            lhs -= dyp_n_dom;
-            lhs_str = format!("(&dyp_dep[{lhs}])");
+        let mut lhs = arg[0] as usize;
+        match arg_type[0] {
+            //
+            // ConstantP
+            ADType::ConstantP => {
+                lhs_str = format!("(&cop[{lhs}])");
+            },
+            //
+            // DynamicP
+            ADType::DynamicP => {
+                if lhs < dyp_n_dom  {
+                    lhs_str = format!("dyp_dom[{lhs}]");
+                } else {
+                    lhs -= dyp_n_dom;
+                    lhs_str = format!("(&dyp_dep[{lhs}])");
+                }
+            },
+            //
+            // Variable
+            ADType::Variable => {
+                if lhs < var_n_dom  {
+                    lhs_str = format!("var_dom[{lhs}]");
+                } else {
+                    lhs -= var_n_dom;
+                    lhs_str = format!("(&var_dep[{lhs}])");
+                }
+            },
+            //
+            _ => {
+                panic!("binary_rust_src: invalid arg_type[0]");
+            },
         }
         //
         // rhs_str
+        let rhs_str : String;
         let mut rhs = arg[1] as usize;
-        let rhs_str : String;
-        if rhs < var_n_dom  {
-            rhs_str = format!("var_dom[{rhs}]");
-        } else {
-            rhs -= var_n_dom;
-            rhs_str = format!("&var_dep[{rhs}]");
+        match arg_type[1] {
+            //
+            // ConstantP
+            ADType::ConstantP => {
+                rhs_str = format!("&cop[{rhs}]");
+            },
+            //
+            // DynamicP
+            ADType::DynamicP => {
+                if rhs < dyp_n_dom  {
+                    rhs_str = format!("dyp_dom[{rhs}]");
+                } else {
+                    rhs -= dyp_n_dom;
+                    rhs_str = format!("&dyp_dep[{rhs}]");
+                }
+            },
+            //
+            // Variable
+            ADType::Variable => {
+                if rhs < var_n_dom  {
+                    rhs_str = format!("var_dom[{rhs}]");
+                } else {
+                    rhs -= var_n_dom;
+                    rhs_str = format!("&var_dep[{rhs}]");
+                }
+            },
+            //
+            _ => {
+                panic!("binary_rust_src: invalid arg_type[1]");
+            },
         }
         //
         // res_str
-        let res              = res - var_n_dom;
-        let res_str : String = format!("var_dep[{res}]");
-        //
-        // op_name
-        let op_name = stringify!( $name );
-        //
-        // src
-        let src = String::from("   ");
-        let src = src + &res_str +
-            " = " + &lhs_str + "." + op_name + "(" + &rhs_str + ");\n";
-        src
-    }
-    #[doc = concat!(
-        " rust source for ", stringify!( $name ), "(variable, parameter)",
-        "; see [RustSrc](crate::op::info::RustSrc)"
-    ) ]
-    fn [< $name _vp_rust_src >]<V> (
-        _not_used   : V           ,
-        res_type    : ADType      ,
-        dyp_n_dom   : usize       ,
-        var_n_dom   : usize       ,
-        _flag_all   : &[bool]     ,
-        arg         : &[IndexT]   ,
-        arg_type    : &[ADType]   ,
-        res         : usize       ) -> String
-    {   //
-        debug_assert!( arg.len() == 2);
-        debug_assert!( res_type.is_variable() );
-        debug_assert!( arg_type[0].is_variable() );
-        debug_assert!( arg_type[1].is_parameter() );
-        debug_assert!( var_n_dom <= res );
-        //
-        // lhs_str
-        let mut lhs = arg[0] as usize;
-        let lhs_str : String;
-        if lhs < var_n_dom  {
-            lhs_str = format!("var_dom[{lhs}]");
+        let res_str : String = if res_type.is_dynamic() {
+            let res = res - dyp_n_dom;
+            format!("dyp_dep[{res}]")
         } else {
-            lhs -= var_n_dom;
-            lhs_str = format!("(&var_dep[{lhs}])");
-        }
-        //
-        // rhs_str
-        let mut rhs = arg[0] as usize;
-        let rhs_str : String;
-        if arg_type[0].is_constant() {
-            rhs_str = format!("&cop[{rhs}]");
-        } else if rhs < dyp_n_dom {
-            rhs_str = format!("dyp_dom[{rhs}]");
-        } else {
-            rhs -= dyp_n_dom;
-            rhs_str = format!("&dyp_dep[{rhs}]");
-        }
-        //
-        // res_str
-        let res              = res - var_n_dom;
-        let res_str : String = format!("var_dep[{res}]");
-        //
-        // op_name
-        let op_name = stringify!( $name );
-        //
-        // src
-        let src = String::from("   ");
-        let src = src + &res_str +
-            " = " + &lhs_str + "." + op_name + "(" + &rhs_str + ");\n";
-        src
-    }
-    #[doc = concat!(
-        " rust source for ", stringify!( $name ), "(variable, variable)",
-        "; see [RustSrc](crate::op::info::RustSrc)"
-    ) ]
-    fn [< $name _vv_rust_src >]<V> (
-        _not_used   : V           ,
-        res_type    : ADType      ,
-        _dyp_n_dom  : usize       ,
-        var_n_dom   : usize       ,
-        _flag_all   : &[bool]     ,
-        arg         : &[IndexT]   ,
-        arg_type    : &[ADType]   ,
-        res         : usize       ) -> String
-    {   //
-        debug_assert!( arg.len() == 2);
-        debug_assert!( res_type.is_variable() );
-        debug_assert!( arg_type[0].is_variable() );
-        debug_assert!( arg_type[1].is_variable() );
-        debug_assert!( var_n_dom <= res );
-        //
-        // lhs_str
-        let mut lhs = arg[0] as usize;
-        let lhs_str : String;
-        if lhs < var_n_dom  {
-            lhs_str = format!("var_dom[{lhs}]");
-        } else {
-            lhs -= var_n_dom;
-            lhs_str = format!("(&var_dep[{lhs}])");
-        }
-        //
-        // rhs_str
-        let mut rhs = arg[1] as usize;
-        let rhs_str : String;
-        if rhs < var_n_dom  {
-            rhs_str = format!("var_dom[{rhs}]");
-        } else {
-            rhs -= var_n_dom;
-            rhs_str = format!("&var_dep[{rhs}]");
-        }
-        //
-        // res_str
-        let res              = res - var_n_dom;
-        let res_str : String = format!("var_dep[{res}]");
+            debug_assert!( res_type.is_variable() );
+            let res = res - var_n_dom;
+            format!("var_dep[{res}]")
+        };
         //
         // op_name
         let op_name = stringify!( $name );
