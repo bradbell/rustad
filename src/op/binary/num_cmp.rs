@@ -19,11 +19,11 @@ use crate::op::binary::common;
 //
 // ---------------------------------------------------------------------------
 // function_by_cmp
-/// Define numeric compare operator functions by name of comparison
+/// Define numeric compare operator functions by abbreviation for comparison
 ///
-/// * V      : see [doc_generic_v](crate::doc_generic_v)
-/// * E      : see [doc_generic_e](crate::doc_generic_e)
-/// * cmp    : abbreviation for this comparison; i.e.,  lt, le, eq, ne, ge, or gt
+/// * V   : see [doc_generic_v](crate::doc_generic_v)
+/// * E   : see [doc_generic_e](crate::doc_generic_e)
+/// * cmp : abbreviation for this comparison; i.e.,  lt, le, eq, ne, ge, or gt
 ///
 /// This defines the following functions in the current module:
 /// ```text
