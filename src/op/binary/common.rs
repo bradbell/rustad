@@ -300,6 +300,135 @@ macro_rules! binary_rust_src { ($name:ident) => { paste::paste! {
 } } }
 pub(crate) use binary_rust_src;
 // ---------------------------------------------------------------------------
+// f_binary_function
+/// Define FBinary functions by name
+///
+/// * V    : see [doc_generic_v](crate::doc_generic_v)
+/// * E    : see [doc_generic_e](crate::doc_generic_e)
+/// * name : name for this function; e.g., num_lt.
+///
+/// This defines the following functions in the current module:
+/// ```text
+///     {name}_rust_src
+///     {name}_forward_dyp<V, E>
+///     {name}_forward_var<V, E>
+/// ```
+///
+macro_rules! f_binary_function { ($name:ident) => { paste::paste! {
+    //
+    // name_rust_src
+    crate::op::binary::common::binary_rust_src!( $name );
+    //
+    // cmp_forward_dyp
+    #[doc = concat!(
+        " E evaluation of FBinary::num_", stringify!( $name ),
+        "; see [ForwardDyp](crate::op::info::ForwardDyp)"
+    ) ]
+    fn [< $name _forward_dyp >] <V, E> (
+        dyp_both    : &mut [E]    ,
+        cop         : &[V]        ,
+        _flag_all   : &[bool]     ,
+        arg         : &[IndexT]   ,
+        arg_type    : &[ADType]   ,
+        res         : usize       )
+    where
+        for<'a> &'a V : FBinary<&'a V, Output = V> + FBinary<&'a E, Output = E>,
+        for<'a> &'a E : FBinary<&'a E, Output = E> + FBinary<&'a V, Output = E>,
+    {
+        debug_assert!( arg.len() == 2);
+        debug_assert!(
+            ! ( arg_type[0].is_constant() && arg_type[1].is_constant() )
+        );
+        // lhs, rhs
+        let lhs = arg[0] as usize;
+        let rhs = arg[1] as usize;
+        //
+        match( arg_type[0], arg_type[1] ) {
+            (ADType::DynamicP, ADType::DynamicP) => {
+                let left  = &dyp_both[lhs];
+                let right = &dyp_both[rhs];
+                dyp_both[ res ] = left. $name ( right );
+            },
+            (ADType::DynamicP, ADType::ConstantP) => {
+                let left  = &dyp_both[lhs];
+                let right = &cop[rhs];
+                dyp_both[ res ] = left. $name ( right );
+            },
+            (ADType::ConstantP, ADType::DynamicP) => {
+                let left  = &cop[lhs];
+                let right = &dyp_both[rhs];
+                dyp_both[ res ] = left. $name ( right );
+            },
+
+            _ => { debug_assert!( false,
+                    "forward_dyp: compare: invalid argument types"
+            ); },
+        };
+    }
+    //
+    // cmp_forward_var
+    #[doc = concat!(
+        " E evaluation of FBinary::num_", stringify!( $name ),
+        "; see [ForwardVar](crate::op::info::ForwardVar)"
+    ) ]
+    fn [< $name _forward_var >] <V, E> (
+        dyp_both    : &[E]        ,
+        var_both    : &mut [E]    ,
+        cop         : &[V]        ,
+        _flag_all   : &[bool]     ,
+        arg         : &[IndexT]   ,
+        arg_type    : &[ADType]   ,
+        res         : usize       )
+    where
+        for<'a> &'a V : FBinary<&'a V, Output = V> + FBinary<&'a E, Output = E>,
+        for<'a> &'a E : FBinary<&'a E, Output = E> + FBinary<&'a V, Output = E>,
+    {
+        debug_assert!( arg.len() == 2);
+        //
+        // lhs, rhs
+        let lhs = arg[0] as usize;
+        let rhs = arg[1] as usize;
+        //
+        // var_both[res]
+        match( arg_type[0], arg_type[1] ) {
+            // variable op constant
+            (ADType::Variable, ADType::ConstantP) => {
+                let left  = &var_both[lhs];
+                let right = &cop[rhs];
+                var_both[ res ] = left. $name ( right );
+            },
+            // variable op dynamic
+            (ADType::Variable, ADType::DynamicP) => {
+                let left  = &var_both[lhs];
+                let right = &dyp_both[rhs];
+                var_both[ res ] = left. $name ( right );
+            },
+            // variable op variable
+            (ADType::Variable, ADType::Variable) => {
+                let left  = &var_both[lhs];
+                let right = &var_both[rhs];
+                var_both[ res ] = left. $name ( right );
+            },
+            // constant op variable
+            (ADType::ConstantP, ADType::Variable) => {
+                let left  = &cop[lhs];
+                let right = &var_both[rhs];
+                var_both[ res ] = left. $name ( right );
+            },
+            // dynamic op variable
+            (ADType::DynamicP, ADType::Variable) => {
+                let left  = &dyp_both[lhs];
+                let right = &var_both[rhs];
+                var_both[ res ] = left. $name ( right );
+            },
+            _ => { debug_assert!(false,
+                "forward_var: compare: invalid argument types"
+            ); },
+        };
+    }
+} } }
+pub(crate) use f_binary_function;
+// ---------------------------------------------------------------------------
 // binary_reverse_depend
 /// Reverse dependency analysis for a binary operator;
 /// see [ReverseDepend](crate::op::info::ReverseDepend)
