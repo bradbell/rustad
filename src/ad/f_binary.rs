@@ -34,22 +34,21 @@ use crate::op::id::{
 ///
 /// * Syntax :
 ///   ```text
-///     res = lhs.cmp(&rhs)
+///     res = lhs.fun(rhs)
 ///   ```
-///   where either lhs or rhs has type `AD<V>` .
+///   where *fun* is a function defined in [FBinary]
 ///
 /// * V :
 ///   see [doc_generic_v](crate::doc_generic_v).
 ///
 /// * lhs :
-///   is the `AD<V>` or `V` left comparison operand .
+///   is the `AD<V>` or `V` left argument.
 /// * rhs :
-///   is the `AD<V>` or `V` right comparison operand .
-/// * cmp :
-///   is one of `num_lt` , `num_le`, `num_eq`, `num_ne`, `num_ge`, `num_gt`
+///   is the `AD<V>` or `V` right argument .
+/// * fun :
+///   is one of the FBinary functions.
 /// * res :
-///   has type `AD<V>` and
-///   is one (zero) if the comparison result is true (false).
+///   has type `AD<V>` .
 ///
 /// # Example
 ///```

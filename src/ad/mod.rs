@@ -12,9 +12,9 @@
 // sub-modules
 //
 pub mod binary;
-pub mod num_cmp;
 pub mod f_const;
 pub mod f_unary;
+pub mod f_binary;
 // ---------------------------------------------------------------------------
 //
 // ADType
