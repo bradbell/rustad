@@ -633,39 +633,6 @@ ad_binary_op!(Sub);
 ad_binary_op!(Mul);
 ad_binary_op!(Div);
 // ---------------------------------------------------------------------------
-/// Implement Powf for `AD<V>` and `&AD<V>`
-///
-/// # Example
-/// ```
-/// use rustad::{
-///     AD,
-///     FBinary,
-///     AzFloat,
-/// };
-/// type V  = AzFloat<f32>;
-/// let x   = V::from(2.0);
-/// let y   = V::from(3.0);
-/// let ax  = AD::from( x.clone() );
-/// let ay  = AD::from( y.clone() );
-///
-/// let az  = (&ax).powf( &ay );
-/// assert_eq!( az.to_value(), V::from(8.0) );
-/// let az  = ax.clone().powf( ay.clone() );
-/// assert_eq!( az.to_value(), V::from(8.0) );
-///
-/// let az  = (&ax).powf( &y );
-/// assert_eq!( az.to_value(), V::from(8.0) );
-/// let az  = ax.clone().powf( y.clone() );
-/// assert_eq!( az.to_value(), V::from(8.0) );
-///
-/// let az  = (&x).powf( &ay );
-/// assert_eq!( az.to_value(), V::from(8.0) );
-/// let az  = x.clone().powf( ay.clone() );
-/// assert_eq!( az.to_value(), V::from(8.0) );
-/// ```
-pub fn doc_powf_ad() { }
-//
-// ---------------------------------------------------------------------------
 /// Compound Assignment `AD<V>` operators.
 ///
 /// Syntax :

@@ -52,6 +52,35 @@ use crate::op::id::{
 ///   has type `AD<V>` .
 ///
 /// # Example
+/// ```
+/// use rustad::{
+///     AD,
+///     FBinary,
+///     AzFloat,
+/// };
+/// type V  = AzFloat<f32>;
+/// let x   = V::from(2.0);
+/// let y   = V::from(3.0);
+/// let ax  = AD::from( x.clone() );
+/// let ay  = AD::from( y.clone() );
+///
+/// let az  = (&ax).powf( &ay );
+/// assert_eq!( az.to_value(), V::from(8.0) );
+/// let az  = ax.clone().powf( ay.clone() );
+/// assert_eq!( az.to_value(), V::from(8.0) );
+///
+/// let az  = (&ax).powf( &y );
+/// assert_eq!( az.to_value(), V::from(8.0) );
+/// let az  = ax.clone().powf( y.clone() );
+/// assert_eq!( az.to_value(), V::from(8.0) );
+///
+/// let az  = (&x).powf( &ay );
+/// assert_eq!( az.to_value(), V::from(8.0) );
+/// let az  = x.clone().powf( ay.clone() );
+/// assert_eq!( az.to_value(), V::from(8.0) );
+/// ```
+///
+/// # Numerical Comparison
 ///```
 /// use rustad::{
 ///     AD,
@@ -83,7 +112,7 @@ use crate::op::id::{
 ///
 /// ```
 ///
-/// # Example using NumVec
+/// # Numerical Comparison using NumVec
 /// ```
 /// use rustad::{
 ///     AD,

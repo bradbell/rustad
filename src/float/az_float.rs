@@ -321,7 +321,22 @@ impl_binary_assign!(DivAssign, div_assign);
 ///
 /// * B : Is the floating point base type; see [AzFloat]
 ///
-/// # Example :
+/// # Example
+/// ```
+/// use rustad::{
+///     AzFloat,
+///     FBinary,
+/// };
+/// let two      = AzFloat(2f32);
+/// let three    = AzFloat(3f32);
+/// let eight    = AzFloat(8f32);
+/// let powf_23  = two.powf(three);
+/// assert_eq!(powf_23, eight);
+/// let powf_23  = (&two).powf(&three);
+/// assert_eq!(powf_23, eight);
+/// ```
+///
+/// # Numerical Comparison
 /// ```
 /// use rustad::AzFloat;
 /// use rustad::FBinary;
@@ -495,27 +510,6 @@ macro_rules! impl_hash_trait{ ($B:ident) => {
 impl_hash_trait!(f32);
 impl_hash_trait!(f64);
 // ---------------------------------------------------------------------------
-/// powf function for AzFloat objects
-///
-/// * B : is the floating point base type
-///
-/// # Example
-/// ```
-/// use rustad::{
-///     AzFloat,
-///     FBinary,
-/// };
-/// let two      = AzFloat(2f32);
-/// let three    = AzFloat(3f32);
-/// let eight    = AzFloat(8f32);
-/// let powf_23  = two.powf(three);
-/// assert_eq!(powf_23, eight);
-/// let powf_23  = (&two).powf(&three);
-/// assert_eq!(powf_23, eight);
-/// ```
-pub fn doc_powf_az_float() {}
-//
-// ----------------------------------------------------------------------------
 /// FConst trait for az_float types
 ///
 /// * B : is the floating point base type

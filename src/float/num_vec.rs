@@ -253,7 +253,21 @@ num_vec_compound_op!(DivAssign, div_assign, /=);
 ///
 /// Note that these functions act element-wise on each `NumVec<S>` object.
 ///
-/// # Example :
+/// # Example
+/// ```
+/// use rustad::{
+///     AzFloat,
+///     NumVec,
+///     FBinary,
+/// };
+/// let two      = NumVec::new( vec![ AzFloat(2f32) ] );
+/// let three    = NumVec::new( vec![ AzFloat(3f32) ] );
+/// let eight    = NumVec::new( vec![ AzFloat(8f32) ] );
+/// let powf_23  = FBinary::powf( &two, &three);
+/// assert_eq!(powf_23, eight);
+/// ```
+///
+/// # Numerical Comparison
 /// ```
 /// use rustad::{
 ///     NumVec,
@@ -538,26 +552,6 @@ where
         }
     }
  }
-// ---------------------------------------------------------------------------
-/// Powf trait for NumVec objects
-///
-/// * S : is the floating point scalar type
-///
-/// # Example
-/// ```
-/// use rustad::{
-///     AzFloat,
-///     NumVec,
-///     FBinary,
-/// };
-/// let two      = NumVec::new( vec![ AzFloat(2f32) ] );
-/// let three    = NumVec::new( vec![ AzFloat(3f32) ] );
-/// let eight    = NumVec::new( vec![ AzFloat(8f32) ] );
-/// let powf_23  = FBinary::powf( &two, &three);
-/// assert_eq!(powf_23, eight);
-/// ```
-pub fn doc_powf_num_vec() {}
-//
 // ---------------------------------------------------------------------------
 /// Implements the FConst trait for NumVec types
 impl<S> FConst for NumVec<S>

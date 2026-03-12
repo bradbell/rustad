@@ -28,8 +28,9 @@ pub trait FConst {
     fn min_positive() -> Self;
 }
 // ----------------------------------------------------------------------------
-/// The FUnary trait
+/// The floating point unary function trait
 ///
+/// # Example
 /// See the file examples/f_unary.rs .
 pub trait FUnary {
     type Output;
@@ -55,20 +56,27 @@ pub trait FUnary {
 }
 //
 // FBinary
-/// These comparisons results have the numeric value
-/// 1 for true and 0 for false.
+/// The floating point binary function trait
 ///
 /// * Syntax :
 ///   ```text
-///     res = lhs.cmp(rhs)
+///     res = lhs.name(rhs)
+///     res = FBinary::name(lhs, rhs)
 ///   ```
-///   where either lhs or rhs has type `AD<V>` .
 ///
-/// * lhs : is the left comparison operand .
-/// * rhs : is the right comparison operand .
-/// * cmp : is one of the following :
-///   `num_lt` , `num_le`, `num_eq`, `num_ne`, `num_ge`, `num_gt`
-/// * res : is one (zero) if the comparison result is true (false).
+/// * lhs  : is the first function argument.
+/// * rhs  : is the second function argument.
+/// * res  : is the function result.
+///
+/// * Numical Comparison :
+///   The following names are used for numerical comparison operators:
+///   num_lt , num_le, num_eq, num_ne, num_ge, num_gt.
+///   These function return the floating point value
+///   one for true and zero for false.
+///
+/// Example
+/// See the file examples/f_binary.rs
+///
 pub trait FBinary<Rhs> {
     type Output;
     //
