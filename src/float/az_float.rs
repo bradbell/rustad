@@ -340,18 +340,18 @@ impl_binary_assign!(DivAssign, div_assign);
 pub fn doc_f_binary_az_float() {}
 //
 /// see [doc_f_binary_az_float]
-macro_rules! impl_f_binary_az_float_borrow{
-    ($name:ident) => {
+macro_rules! impl_f_binary_function_borrow{
+    ($B:ident, $name:ident) => {
         #[doc = concat!( " AzFloat::", stringify!($name)  ) ]
-        fn $name(self, rhs : & AzFloat<B> ) -> AzFloat<B> {
+        fn $name(self, rhs : & AzFloat<$B> ) -> AzFloat<$B> {
             self.0.$name( rhs.0 )
         }
     };
-    ($name:ident, $op:tt) => {
+    ($B:ident, $name:ident, $op:tt) => {
         #[doc = concat!( " AzFloat::", stringify!($name)  ) ]
-        fn $name(self, rhs : & AzFloat<B> ) -> AzFloat<B> {
-            let zero = AzFloat::<B>::zero();
-            let one  = AzFloat::<B>::one();
+        fn $name(self, rhs : & AzFloat<$B> ) -> AzFloat<$B> {
+            let zero = AzFloat::<$B>::zero();
+            let one  = AzFloat::<$B>::one();
             //
             if self.0 $op rhs.0 {
                 one
@@ -362,23 +362,24 @@ macro_rules! impl_f_binary_az_float_borrow{
     };
 }
 //
-impl<B> FBinary< &AzFloat<B> > for &AzFloat<B>
-where
-    B          : PartialOrd,
-    AzFloat<B> : FConst,
-{
-    type Output = AzFloat<B>;
-    //
-    impl_f_binary_az_float_borrow!( num_lt, <  );
-    impl_f_binary_az_float_borrow!( num_le, <= );
-    impl_f_binary_az_float_borrow!( num_eq, == );
-    impl_f_binary_az_float_borrow!( num_ne, != );
-    impl_f_binary_az_float_borrow!( num_ge, >= );
-    impl_f_binary_az_float_borrow!( num_gt, >  );
-}
+macro_rules! impl_f_binary_az_float_borrow{ ($B:ident) => {
+    impl FBinary< &AzFloat<$B> > for &AzFloat<$B>
+    {
+        type Output = AzFloat<$B>;
+        //
+        impl_f_binary_function_borrow!( $B, num_lt, <  );
+        impl_f_binary_function_borrow!( $B, num_le, <= );
+        impl_f_binary_function_borrow!( $B, num_eq, == );
+        impl_f_binary_function_borrow!( $B, num_ne, != );
+        impl_f_binary_function_borrow!( $B, num_ge, >= );
+        impl_f_binary_function_borrow!( $B, num_gt, >  );
+    }
+} }
+impl_f_binary_az_float_borrow!(f32);
+impl_f_binary_az_float_borrow!(f64);
 //
 /// see [doc_f_binary_az_float]
-macro_rules! impl_f_binary_az_float_own{ ($name:ident) => {
+macro_rules! impl_f_binary_function_own{ ($name:ident) => {
     #[doc = concat!( " AzFloat::", stringify!($name)  ) ]
     fn $name(self : AzFloat<B>, rhs : AzFloat<B>) -> AzFloat<B> {
         FBinary::$name( &self,  &rhs )
@@ -393,12 +394,12 @@ where
 {
     type Output = AzFloat<B>;
     //
-    impl_f_binary_az_float_own!( num_lt );
-    impl_f_binary_az_float_own!( num_le );
-    impl_f_binary_az_float_own!( num_eq );
-    impl_f_binary_az_float_own!( num_ne );
-    impl_f_binary_az_float_own!( num_ge );
-    impl_f_binary_az_float_own!( num_gt );
+    impl_f_binary_function_own!( num_lt );
+    impl_f_binary_function_own!( num_le );
+    impl_f_binary_function_own!( num_eq );
+    impl_f_binary_function_own!( num_ne );
+    impl_f_binary_function_own!( num_ge );
+    impl_f_binary_function_own!( num_gt );
 }
 // ---------------------------------------------------------------------------
 // PartialEq, Eq
