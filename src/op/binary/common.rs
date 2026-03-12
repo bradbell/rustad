@@ -332,8 +332,9 @@ macro_rules! f_binary_function { ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        for<'a> &'a V : FBinary<&'a V, Output = V> + FBinary<&'a E, Output = E>,
-        for<'a> &'a E : FBinary<&'a E, Output = E> + FBinary<&'a V, Output = E>,
+        for<'a> &'a V : FBinary<&'a E, Output = E>,
+        for<'a> &'a E : FBinary<&'a V, Output = E>,
+        for<'a> &'a E : FBinary<&'a E, Output = E>,
     {
         debug_assert!( arg.len() == 2);
         debug_assert!(
@@ -380,8 +381,9 @@ macro_rules! f_binary_function { ($name:ident) => { paste::paste! {
         arg_type    : &[ADType]   ,
         res         : usize       )
     where
-        for<'a> &'a V : FBinary<&'a V, Output = V> + FBinary<&'a E, Output = E>,
-        for<'a> &'a E : FBinary<&'a E, Output = E> + FBinary<&'a V, Output = E>,
+        for<'a> &'a V : FBinary<&'a E, Output = E>,
+        for<'a> &'a E : FBinary<&'a V, Output = E>,
+        for<'a> &'a E : FBinary<&'a E, Output = E>,
     {
         debug_assert!( arg.len() == 2);
         //
