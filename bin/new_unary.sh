@@ -27,6 +27,27 @@ fi
 #
 # NAME
 NAME=$(echo $name | tr [a-z] [A-Z])
+# -----------------------------------------------------------------------------
+# ad/float_core.rs
+file='src/ad/f_unary.rs'
+cat << EOF > temp.sed
+/^    [/][/] use unary_self_borrowed/! b one
+s|\$|\\
+    unary_self_borrowed!($name);|
+b end
+#
+: one
+/^    [/][/] use unary_self_owned/! b end
+s|\$|\\
+    unary_self_owned!($name);|
+b end
+#
+: end
+EOF
+git checkout $file
+sed -i $file -f temp.sed
+# ----------------------------------------------------------------------------
+# src/float/*.rs
 # ----------------------------------------------------------------------------
 # traits.rs
 file='src/float/traits.rs'
@@ -40,22 +61,6 @@ s|\$|\\
 #
 : end
 EOF
-git checkout $file
-sed -i $file -f temp.sed
-# ----------------------------------------------------------------------------
-# unary/common.rs
-file='src/op/unary/common.rs'
-if [[ ${#NAME} -le '2' ]]
-then
-cat << EOF > temp.sed
-s|^\\( *\\)id::LN_OP\\( *\\)=>|\\1id::${NAME}_OP\\2=> true,\\n&|
-EOF
-else
-   let "skip = ${#NAME} - 2"
-cat << EOF > temp.sed
-s|^\\( *\\)id::LN_OP \\{$skip\\}\\( *\\)=>|\\1id::${NAME}_OP\\2=> true,\\n&|
-EOF
-fi
 git checkout $file
 sed -i $file -f temp.sed
 # ----------------------------------------------------------------------------
@@ -81,24 +86,7 @@ EOF
 git checkout $file
 sed -i $file -f temp.sed
 # -----------------------------------------------------------------------------
-# ad/float_core.rs
-file='src/ad/f_unary.rs'
-cat << EOF > temp.sed
-/^    [/][/] use unary_self_borrowed/! b one
-s|\$|\\
-    unary_self_borrowed!($name);|
-b end
-#
-: one
-/^    [/][/] use unary_self_owned/! b end
-s|\$|\\
-    unary_self_owned!($name);|
-b end
-#
-: end
-EOF
-git checkout $file
-sed -i $file -f temp.sed
+# src/op/*.rs, src/op/unary/*.rs
 # -----------------------------------------------------------------------------
 # id.rs
 file='src/op/id.rs'
@@ -109,6 +97,22 @@ s|\$|\\
     ${NAME}_OP,|
 : end
 EOF
+git checkout $file
+sed -i $file -f temp.sed
+# ----------------------------------------------------------------------------
+# unary/common.rs
+file='src/op/unary/common.rs'
+if [[ ${#NAME} -le '2' ]]
+then
+cat << EOF > temp.sed
+s|^\\( *\\)id::LN_OP\\( *\\)=>|\\1id::${NAME}_OP\\2=> true,\\n&|
+EOF
+else
+   let "skip = ${#NAME} - 2"
+cat << EOF > temp.sed
+s|^\\( *\\)id::LN_OP \\{$skip\\}\\( *\\)=>|\\1id::${NAME}_OP\\2=> true,\\n&|
+EOF
+fi
 git checkout $file
 sed -i $file -f temp.sed
 # -----------------------------------------------------------------------------
