@@ -89,11 +89,8 @@ pub trait FBinary<Rhs> {
     //
     /// self > rhs
     fn num_gt(self, rhs : Rhs) -> Self::Output;
+    //
+    /// self^rhs
+    fn powf(self, rhs : Rhs) -> Self::Output;
 }
 // ----------------------------------------------------------------------------
-// TODO: move powf to the FBinary trait.
-pub trait Powf<Rhs = Self> {
-    type Output;
-    //
-    fn powf(self, rhs: Rhs) -> Self::Output;
-}

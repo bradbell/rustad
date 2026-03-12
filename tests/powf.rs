@@ -3,12 +3,12 @@
 // SPDX-FileContributor: 2026 Bradley M. Bell
 //
 use rustad::{
-    Powf,
     AzFloat,
     start_recording,
     stop_recording,
     FConst,
     FUnary,
+    FBinary,
     check_nearly_eq,
 };
 //

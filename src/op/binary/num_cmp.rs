@@ -18,6 +18,11 @@ use crate::op::id;
 use crate::op::info::OpInfo;
 use crate::op::binary::common;
 // ---------------------------------------------------------------------------
+// For each name, define
+// {name}_rust_src
+// {name}_forward_dyp<V, E>
+// {name}_forward_var<V, E>
+//
 common::f_binary_function!( num_lt );
 common::f_binary_function!( num_le );
 common::f_binary_function!( num_eq );

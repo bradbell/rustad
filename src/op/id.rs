@@ -143,8 +143,11 @@ set_operator_ids!(
     /// variable / variable
     DIV_VV_OP,
     //
-    /// lhs powi rhs
+    /// powi(lhs, rhs)
     POWI_OP,
+    //
+    /// powf(lhs, rhs)
+    POWF_OP,
     //
     /// lhs lt rhs
     LT_OP,

@@ -28,7 +28,6 @@ use std::ops::{
 use crate::{
     FConst,
     FUnary,
-    Powf,
     FBinary,
 };
 // ---------------------------------------------------------------------------
@@ -344,7 +343,7 @@ macro_rules! impl_f_binary_function_borrow{
     ($B:ident, $name:ident) => {
         #[doc = concat!( " AzFloat::", stringify!($name)  ) ]
         fn $name(self, rhs : & AzFloat<$B> ) -> AzFloat<$B> {
-            self.0.$name( rhs.0 )
+            AzFloat( self.0.$name( rhs.0 ) )
         }
     };
     ($B:ident, $name:ident, $op:tt) => {
@@ -373,6 +372,7 @@ macro_rules! impl_f_binary_az_float_borrow{ ($B:ident) => {
         impl_f_binary_function_borrow!( $B, num_ne, != );
         impl_f_binary_function_borrow!( $B, num_ge, >= );
         impl_f_binary_function_borrow!( $B, num_gt, >  );
+        impl_f_binary_function_borrow!( $B, powf );
     }
 } }
 impl_f_binary_az_float_borrow!(f32);
@@ -400,6 +400,7 @@ where
     impl_f_binary_function_own!( num_ne );
     impl_f_binary_function_own!( num_ge );
     impl_f_binary_function_own!( num_gt );
+    impl_f_binary_function_own!( powf );
 }
 // ---------------------------------------------------------------------------
 // PartialEq, Eq
@@ -502,7 +503,7 @@ impl_hash_trait!(f64);
 /// ```
 /// use rustad::{
 ///     AzFloat,
-///     Powf,
+///     FBinary,
 /// };
 /// let two      = AzFloat(2f32);
 /// let three    = AzFloat(3f32);
@@ -514,27 +515,6 @@ impl_hash_trait!(f64);
 /// ```
 pub fn doc_powf_az_float() {}
 //
-macro_rules! float_binary_function{ ($B:ident, $name:ident, $Rhs:ty) => {
-    #[doc = "see [doc_powf_az_float]" ]
-    fn $name(self, rhs : $Rhs) -> AzFloat<$B> {
-        AzFloat( self.0.$name( rhs.0 ) )
-    }
-} }
-//
-macro_rules! impl_float_binary{ ($B:ident) => {
-    impl Powf for AzFloat<$B> {
-        type Output = AzFloat<$B>;
-        //
-        float_binary_function!($B, powf, AzFloat<$B>);
-    }
-    impl Powf for &AzFloat<$B> {
-        type Output = AzFloat<$B>;
-        //
-        float_binary_function!($B, powf, &AzFloat<$B>);
-    }
-} }
-impl_float_binary!(f32);
-impl_float_binary!(f64);
 // ----------------------------------------------------------------------------
 /// FConst trait for az_float types
 ///

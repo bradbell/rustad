@@ -19,7 +19,6 @@ use crate::{
     FBinary,
     FConst,
     FUnary,
-    Powf,
 };
 //
 // NumVec
@@ -328,6 +327,7 @@ where
     impl_f_binary_num_vec_borrow!( num_ne );
     impl_f_binary_num_vec_borrow!( num_ge );
     impl_f_binary_num_vec_borrow!( num_gt );
+    impl_f_binary_num_vec_borrow!( powf );
 }
 //
 /// see [doc_f_binary_num_vec]
@@ -352,6 +352,7 @@ where
     impl_f_binary_num_vec_own!( num_ne );
     impl_f_binary_num_vec_own!( num_ge );
     impl_f_binary_num_vec_own!( num_gt );
+    impl_f_binary_num_vec_own!( powf );
 }
 //
 // ----------------------------------------------------------------------------`
@@ -547,47 +548,16 @@ where
 /// use rustad::{
 ///     AzFloat,
 ///     NumVec,
-///     Powf,
+///     FBinary,
 /// };
 /// let two      = NumVec::new( vec![ AzFloat(2f32) ] );
 /// let three    = NumVec::new( vec![ AzFloat(3f32) ] );
 /// let eight    = NumVec::new( vec![ AzFloat(8f32) ] );
-/// let powf_23  = Powf::powf( &two, &three);
+/// let powf_23  = FBinary::powf( &two, &three);
 /// assert_eq!(powf_23, eight);
 /// ```
 pub fn doc_powf_num_vec() {}
 //
-macro_rules! float_binary_function{ ($name:ident) => {
-    #[doc = "see [doc_powf_num_vec]" ]
-    fn $name(self, rhs : &NumVec<S>) -> NumVec<S> {
-        if self.len() == 1 {
-            if rhs.len() == 1 {
-                NumVec::<S> { s : self.s.$name( rhs.s ), vec : Vec::new() }
-            } else {
-                let v = rhs.vec.iter().map( |s| self.s.$name(*s) ).collect();
-                NumVec::<S> { s : FConst::nan(), vec : v }
-            }
-        } else if rhs.len() == 1 {
-            let v = self.vec.iter().map( |s| s.$name( rhs.s) ).collect();
-            NumVec::<S> { s : FConst::nan() , vec : v }
-        } else {
-            assert_eq!( self.len(), rhs.len() );
-            let mut v : Vec<S> = Vec::with_capacity( self.len() );
-            for j in 0 .. self.len() {
-                v.push( self.vec[j].$name( rhs.vec[j] ) );
-            }
-            NumVec::<S> { s : FConst::nan() , vec : v }
-        }
-    }
-} }
-impl<S> Powf< &NumVec<S> > for &NumVec<S>
-where
-    S : FConst + Copy + Powf<Output=S> ,
-{   //
-    type Output = NumVec<S>;
-    //
-    float_binary_function!(powf);
-}
 // ---------------------------------------------------------------------------
 /// Implements the FConst trait for NumVec types
 impl<S> FConst for NumVec<S>

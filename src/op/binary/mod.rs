@@ -22,7 +22,8 @@
 // sub-modules
 pub mod common;
 pub mod add;
-pub mod num_cmp;
-pub mod div;
-pub mod mul;
 pub mod sub;
+pub mod mul;
+pub mod div;
+pub mod num_cmp;
+pub mod powf;
