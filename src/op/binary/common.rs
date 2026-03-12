@@ -46,7 +46,7 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
     }
 }
 // ---------------------------------------------------------------------------
-// binary_forward_var
+// binary_arithmetic_function
 /// Evaluation of zero order forward for binary operators;
 /// see [num_cmp](crate::op::binary::num_cmp)
 /// for numerical comparison operators.
@@ -54,7 +54,7 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
 ///
 /// * V      : see [doc_generic_v](crate::doc_generic_v)
 /// * E      : see [doc_generic_e](crate::doc_generic_e)
-/// * Trait  : is Add , Sub , Mul , Div, or Powf
+/// * Trait  : is Add , Sub , Mul , Div
 /// * name   : is the name of a function in this trait
 /// * op     : is the corresponding operator; e.g. + for Add.
 ///
@@ -67,8 +67,8 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
 /// ```
 /// where v (p) means the corresponding operand is a variable (parameter) .
 ///
-/// [IndexT] must be defined in any module that uses binary_forward_var
-macro_rules! binary_forward_var { ($Trait:ident, $name:ident) =>
+/// [IndexT] must be defined in any module that uses binary_arithmetic_function
+macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
 { paste::paste! {
     #[doc = concat!(
         " E evaluation of ", stringify!($name), "(parameter, parameter)",
@@ -176,13 +176,13 @@ macro_rules! binary_forward_var { ($Trait:ident, $name:ident) =>
         var_both[res] = (&var_both[lhs]).$name (&var_both[rhs]);
     }
 } } }
-pub(crate) use binary_forward_var;
+pub(crate) use binary_arithmetic_function;
 // ---------------------------------------------------------------------------
 // binary_rust_src
 /// Rust source code for binary operators.
 ///
 /// * name :
-///   add, sub, mul, div, powf,
+///   add, sub, mul, div,
 ///   num_lt, num_le, num_eq, num_ne, num_ge, num_gt
 ///
 /// This defines the following functions in the current module:

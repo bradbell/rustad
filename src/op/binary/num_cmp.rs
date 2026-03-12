@@ -10,6 +10,7 @@
 use crate::{
     AD,
     IndexT,
+    FConst,
     FBinary,
 };
 use crate::ad::ADType;
@@ -36,10 +37,9 @@ fn zero_forward_der<V, E>  (
     res        : usize      ,
 )
 where
-    E : From<V>,
-    V : From<f32>,
+    E : FConst,
 {
-    var_der [ res ] = V::from(0.0f32).into();
+    var_der [ res ] = FConst::zero();
 }
 // ---------------------------------------------------------------------------
 // zero_reverse_der
@@ -64,8 +64,8 @@ fn zero_reverse_der<V, E>  (
 ///   LT_OP, LE_OP, EQ_OP, NE_OP, GE_OP, GT_OP .
 pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
 where
-    AD<V> : From<V>,
-    V     : Clone + From<f32>,
+    AD<V> : FConst,
+    V     : Clone + FConst,
     for<'a> &'a V     : FBinary<&'a V, Output = V>,
     for<'a> &'a V     : FBinary<&'a AD<V>, Output = AD<V> >,
     for<'a> &'a V     : FBinary<&'a AD<V>, Output = AD<V> >,

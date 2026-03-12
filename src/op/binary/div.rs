@@ -60,10 +60,11 @@ use crate::op::info::{
 // div_rust_src
 common::binary_rust_src!(div);
 // -------------------------------------------------------------------------
+// div_forward_dyp
 // div_pv_forward_var
 // div_vp_forward_var
 // div_vv_forward_var
-common::binary_forward_var!(Div, div);
+common::binary_arithmetic_function!(Div, div);
 // ---------------------------------------------------------------------------
 // forward_der
 // ---------------------------------------------------------------------------

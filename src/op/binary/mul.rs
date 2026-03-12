@@ -61,10 +61,11 @@ common::binary_rust_src!(mul);
 // -------------------------------------------------------------------------
 // forward_var
 // -------------------------------------------------------------------------
+// mul_forward_dyp
 // mul_pv_forward_var
 // mul_vp_forward_var
 // mul_vv_forward_var
-common::binary_forward_var!(Mul, mul);
+common::binary_arithmetic_function!(Mul, mul);
 // ---------------------------------------------------------------------------
 // forward_der
 // ---------------------------------------------------------------------------

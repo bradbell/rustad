@@ -58,7 +58,7 @@ common::binary_rust_src!(sub);
 // sub_pv_forward_var
 // sub_vp_forward_var
 // sub_vv_forward_var
-common::binary_forward_var!(Sub, sub);
+common::binary_arithmetic_function!(Sub, sub);
 // ---------------------------------------------------------------------------
 // forward_der
 // ---------------------------------------------------------------------------

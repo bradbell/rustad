@@ -60,7 +60,7 @@ common::binary_rust_src!(add);
 // add_pv_forward_var
 // add_vp_forward_var
 // add_vv_forward_var
-common::binary_forward_var!(Add, add);
+common::binary_arithmetic_function!(Add, add);
 // ---------------------------------------------------------------------------
 // forward_der
 // ---------------------------------------------------------------------------
