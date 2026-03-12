@@ -146,21 +146,20 @@ set_operator_ids!(
     /// powi(lhs, rhs)
     POWI_OP,
     //
+    /// lhs <  rhs
+    LT_OP,
+    /// lhs <= rhs
+    LE_OP,
+    /// lhs == rhs
+    EQ_OP,
+    /// lhs != rhs
+    NE_OP,
+    /// lhs >= rhs
+    GE_OP,
+    /// lhs >  rhs
+    GT_OP,
     /// powf(lhs, rhs)
     POWF_OP,
-    //
-    /// lhs lt rhs
-    LT_OP,
-    /// lhs le rhs
-    LE_OP,
-    /// lhs eq rhs
-    EQ_OP,
-    /// lhs ne rhs
-    NE_OP,
-    /// lhs ge rhs
-    GE_OP,
-    /// lhs gt rhs
-    GT_OP,
     //
     // CALL
     /// callback to an atomic function

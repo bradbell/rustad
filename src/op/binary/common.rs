@@ -35,14 +35,15 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
         id::DIV_VP_OP => true ,
         id::DIV_VV_OP => true ,
         //
-        id::LT_OP     => true  ,
-        id::LE_OP     => true  ,
-        id::EQ_OP     => true  ,
-        id::NE_OP     => true  ,
-        id::GE_OP     => true  ,
-        id::GT_OP     => true  ,
+        id::LT_OP     => true ,
+        id::LE_OP     => true ,
+        id::EQ_OP     => true ,
+        id::NE_OP     => true ,
+        id::GE_OP     => true ,
+        id::GT_OP     => true ,
+        id::POWF_OP   => true ,
         //
-        _         => false,
+        _             => false,
     }
 }
 // ---------------------------------------------------------------------------
