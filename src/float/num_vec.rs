@@ -279,7 +279,7 @@ num_vec_compound_op!(DivAssign, div_assign, /=);
 pub fn doc_f_binary_num_vec() {}
 //
 /// see [doc_f_binary_num_vec]
-macro_rules! impl_f_binary_num_vec_borrow{ ($name:ident, $op:tt) => {
+macro_rules! impl_f_binary_num_vec_borrow{ ($name:ident) => {
     #[doc = concat!( "NumVec::", stringify!( $name ) ) ]
     fn $name(self, rhs : & NumVec<S> ) -> NumVec<S> {
         //
@@ -322,12 +322,12 @@ where
 {
     type Output = NumVec<S>;
     //
-    impl_f_binary_num_vec_borrow!( num_lt, <  );
-    impl_f_binary_num_vec_borrow!( num_le, <= );
-    impl_f_binary_num_vec_borrow!( num_eq, == );
-    impl_f_binary_num_vec_borrow!( num_ne, != );
-    impl_f_binary_num_vec_borrow!( num_ge, >= );
-    impl_f_binary_num_vec_borrow!( num_gt, >  );
+    impl_f_binary_num_vec_borrow!( num_lt );
+    impl_f_binary_num_vec_borrow!( num_le );
+    impl_f_binary_num_vec_borrow!( num_eq );
+    impl_f_binary_num_vec_borrow!( num_ne );
+    impl_f_binary_num_vec_borrow!( num_ge );
+    impl_f_binary_num_vec_borrow!( num_gt );
 }
 //
 /// see [doc_f_binary_num_vec]
