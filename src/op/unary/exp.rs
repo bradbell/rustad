@@ -26,6 +26,9 @@ use crate::tape::sealed::ThisThreadTape;
 use crate::op::info::OpInfo;
 use crate::op::id::EXP_OP;
 // -------------------------------------------------------------------------
+// z   = exp(x)
+// z_x = exp(x) = z
+// -------------------------------------------------------------------------
 // exp_forward_dyp
 common::forward_dyp!(exp);
 //
@@ -56,7 +59,8 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let x        = arg[0] as usize;
     let z        = res;
-    var_der[z]   = &var_both[z] *  &var_der[x];
+    let z_x      = &var_both[z];
+    var_der[z]   = z_x *  &var_der[x];
 }
 // exp_reverse_der
 /// First order reverse mode for exp(variable);
@@ -80,8 +84,8 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let x           = arg[0] as usize;
     let z           = res;
-    let term        = &var_both[z] * &var_der[z];
-    var_der[x]     += &term;
+    let z_x         = &var_both[z];
+    var_der[x]     += &( z_x * &var_der[z] );
 }
 // ---------------------------------------------------------------------------
 // set_op_info
