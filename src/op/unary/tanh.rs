@@ -6,6 +6,9 @@
 //!
 //! Link to [parent module](super)
 // --------------------------------------------------------------------------
+// z   = tanh(x) = sinh(x) / cosh(x)
+// z_x = [ cosh(x)^2 - sinh(x)^2 ] / cosh(x)^2 = 1- tanh(x)^2 = 1 - z^2
+// --------------------------------------------------------------------------
 // use
 //
 use std::ops::{
@@ -59,8 +62,8 @@ where
     let one      = E::one();
     let x        = arg[0] as usize;
     let z        = res;
-    let dtanh    = &one - &( &var_both[z] * &var_both[z] );
-    var_der[z]   = &dtanh *  &var_der[x];
+    let z_x         = &one - &( &var_both[z] * &var_both[z] );
+    var_der[z]   = &z_x * &var_der[x];
 }
 // tanh_reverse_der
 /// First order reverse mode for tanh(variable);
@@ -86,9 +89,8 @@ where
     let one         = E::one();
     let x           = arg[0] as usize;
     let z           = res;
-    let dtanh       = &one - &( &var_both[z] * &var_both[z] );
-    let term        = &dtanh * &var_der[z];
-    var_der[x]     += &term;
+    let z_x         = &one - &( &var_both[z] * &var_both[z] );
+    var_der[x]     += &( &z_x * &var_der[z] );
 }
 // ---------------------------------------------------------------------------
 // set_op_info
