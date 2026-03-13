@@ -6,6 +6,9 @@
 //!
 //! Link to [parent module](super)
 // --------------------------------------------------------------------------
+// z   = exp(x) - 1
+// z_x = z + 1
+// --------------------------------------------------------------------------
 // use
 //
 use std::ops::{
@@ -57,8 +60,8 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let x        = arg[0] as usize;
     let z        = res;
-    let exp      = &var_both[z]  + &V::one();
-    var_der[z]   = &exp *  &var_der[x];
+    let z_x      = &var_both[z]  + &V::one();
+    var_der[z]   = &z_x *  &var_der[x];
 }
 // exp_m1_reverse_der
 /// First order reverse mode for exp_m1(variable);
@@ -82,9 +85,8 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let x           = arg[0] as usize;
     let z           = res;
-    let exp         = &var_both[z]  + &V::one();
-    let term        = &exp * &var_der[z];
-    var_der[x]     += &term;
+    let z_x         = &var_both[z]  + &V::one();
+    var_der[x]     += &( &z_x * &var_der[z] );
 }
 // ---------------------------------------------------------------------------
 // set_op_info
