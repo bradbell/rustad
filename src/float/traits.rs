@@ -48,6 +48,7 @@ pub trait FUnary {
     fn sin(self) -> Self::Output;
     fn sinh(self) -> Self::Output;
     fn sqrt(self) -> Self::Output;
+    fn square(self) -> Self::Output;
     fn tan(self) -> Self::Output;
     fn tanh(self) -> Self::Output;
     // END_SORT_THIS_LINE_MINUS_1

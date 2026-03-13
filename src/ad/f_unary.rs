@@ -103,6 +103,7 @@ where
     type Output = AD<V>;
     //
     // use unary_self_borrowed
+    unary_self_borrowed!(square);
     unary_self_borrowed!(ln_1p);
     unary_self_borrowed!(exp_m1);
     unary_self_borrowed!(ln);
@@ -145,6 +146,7 @@ where
     type Output = AD<V>;
     //
     // use unary_self_owned
+    unary_self_owned!(square);
     unary_self_owned!(ln_1p);
     unary_self_owned!(exp_m1);
     unary_self_owned!(ln);

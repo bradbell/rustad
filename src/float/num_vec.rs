@@ -590,6 +590,7 @@ where
     type Output = NumVec<S>;
     //
     // use float_unary_function
+    float_unary_function!(square);
     float_unary_function!(ln_1p);
     float_unary_function!(exp_m1);
     float_unary_function!(ln);

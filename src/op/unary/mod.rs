@@ -41,6 +41,7 @@ pub mod signum;
 pub mod sin;
 pub mod sinh;
 pub mod sqrt;
+pub mod square;
 pub mod tan;
 pub mod tanh;
 // END_SORT_THIS_LINE_MINUS_1

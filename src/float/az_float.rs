@@ -586,7 +586,11 @@ macro_rules! impl_float_unary{ ($B:ident) => {
         float_unary_function!($B, cos);
         float_unary_function!($B, sin);
         //
-        // unary function that implements differently
+        // square implements differently
+        #[doc = "see [doc_f_unary_az_float]" ]
+        fn square(self) -> AzFloat<$B> { AzFloat( self.0 * self.0 ) }
+        //
+        // minus implements differently
         #[doc = "see [doc_f_unary_az_float]" ]
         fn minus(self) -> AzFloat<$B> { AzFloat( - self.0 ) }
         //
@@ -614,7 +618,11 @@ macro_rules! impl_float_unary{ ($B:ident) => {
         float_unary_function!($B, cos);
         float_unary_function!($B, sin);
         //
-        // unary function that implements differently
+        // square implements differently
+        #[doc = "see [doc_f_unary_az_float]" ]
+        fn square(self) -> AzFloat<$B> { AzFloat( self.0 * self.0 ) }
+        //
+        // minus implements differently
         #[doc = "see [doc_f_unary_az_float]" ]
         fn minus(self) -> AzFloat<$B> { AzFloat( - self.0 ) }
         //

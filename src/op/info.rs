@@ -499,6 +499,7 @@ where
     crate::op::binary::powf::set_op_info::<V>(&mut result);
     //
     // unary operators
+    crate::op::unary::square::set_op_info::<V>(&mut result);
     crate::op::unary::ln_1p::set_op_info::<V>(&mut result);
     crate::op::unary::exp_m1::set_op_info::<V>(&mut result);
     crate::op::unary::ln::set_op_info::<V>(&mut result);

@@ -28,6 +28,7 @@ pub(crate) fn is_unary_op(op_id : u8) -> bool {
         id::SINH_OP     => true,
         id::SIN_OP      => true,
         id::SQRT_OP     => true,
+        id::SQUARE_OP   => true,
         id::TANH_OP     => true,
         id::TAN_OP      => true,
         // END_SORT_THIS_LINE_MINUS_1

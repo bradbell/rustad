@@ -323,6 +323,31 @@ fn test_sqrt() {
     assert_eq!( dx[0], dsqrt * dy[0] );
 }
 //
+// test_square
+fn test_square() {
+    type V      = AzFloat<f32>;
+    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    //
+    let x  : Vec<V>  = vec![ V::from(4.0) ];
+    //
+    let (_, ax)      = start_recording(None,  x.clone() );
+    let ay           = vec! [ FUnary::square( &ax[0] ) ];
+    let f            = stop_recording(ay);
+    //
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let dx           = vec![ V::from(3.0) ];
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    //
+    let dsquare        = V::from(2.0) * x[0];
+    //
+    assert_eq!( dy[0], dsquare * dx[0] );
+    //
+    let dy           = vec![ V::from(4.0) ];
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    //
+    assert_eq!( dx[0], dsquare * dy[0] );
+}
+//
 // test_tan
 fn test_tan() {
     type V      = AzFloat<f64>;
@@ -387,6 +412,7 @@ fn f_unary() {
     test_sin();
     test_sinh();
     test_sqrt();
+    test_square();
     test_tan();
     test_tanh();
 }

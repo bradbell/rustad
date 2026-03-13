@@ -103,6 +103,13 @@ fn main() {
         let sqrt_4      = FUnary::sqrt( &four);
         assert_eq!(sqrt_4, two);
     }
+    // square
+    {   type V = AzFloat<f64>;
+        let two         = V::from(2.0);
+        let four        = V::from(4.0);
+        let square_2    = FUnary::square( &two);
+        assert_eq!(square_2, four);
+    }
     // tan
     {   type V = AzFloat<f32>;
         let pi       = V::pi();
