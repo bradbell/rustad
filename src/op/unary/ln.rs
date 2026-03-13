@@ -6,6 +6,9 @@
 //!
 //! Link to [parent module](super)
 // --------------------------------------------------------------------------
+// z   = ln(x)
+// z_x = 1 / x
+// --------------------------------------------------------------------------
 // use
 //
 use std::ops::{
@@ -56,7 +59,8 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let x        = arg[0] as usize;
     let z        = res;
-    var_der[z]   = &var_der[x] / &var_both[x];
+    let inv_z_x  = &var_both[x];
+    var_der[z]   = &var_der[x] / inv_z_x;
 }
 // ln_reverse_der
 /// First order reverse mode for ln(variable);
@@ -80,8 +84,8 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let x           = arg[0] as usize;
     let z           = res;
-    let term        = &var_der[z] / &var_both[x];
-    var_der[x]     += &term;
+    let inv_z_x     = &var_both[x];
+    var_der[x]     += &( &var_der[z] / inv_z_x );
 }
 // ---------------------------------------------------------------------------
 // set_op_info
