@@ -54,8 +54,9 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let index    = arg[0] as usize;
-    var_der[res] = &var_both[res] *  &var_der[index];
+    let x        = arg[0] as usize;
+    let z        = res;
+    var_der[z]   = &var_both[z] *  &var_der[x];
 }
 // exp_reverse_der
 /// First order reverse mode for exp(variable);
@@ -77,9 +78,10 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let index       = arg[0] as usize;
-    let term        = &var_both[res] * &var_der[res];
-    var_der[index] += &term;
+    let x           = arg[0] as usize;
+    let z           = res;
+    let term        = &var_both[z] * &var_der[z];
+    var_der[x]     += &term;
 }
 // ---------------------------------------------------------------------------
 // set_op_info

@@ -59,9 +59,10 @@ where
     debug_assert!( arg_type[0].is_variable() );
     debug_assert!( f64::from(0.5f32) == 0.5f64 );
     let half     = V::from(0.5f32);
-    let index    = arg[0] as usize;
-    let dsqrt    = &half / &var_both[res];
-    var_der[res] = &dsqrt *  &var_der[index];
+    let x        = arg[0] as usize;
+    let z        = res;
+    let dsqrt    = &half / &var_both[z];
+    var_der[z]   = &dsqrt *  &var_der[x];
 }
 // sqrt_reverse_der
 /// First order reverse mode for sqrt(variable);
@@ -86,10 +87,11 @@ where
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     let half        = V::from(0.5f32);
-    let index       = arg[0] as usize;
-    let dsqrt       = &half / &var_both[res];
-    let term        = &dsqrt * &var_der[res];
-    var_der[index] += &term;
+    let x           = arg[0] as usize;
+    let z           = res;
+    let dsqrt       = &half / &var_both[z];
+    let term        = &dsqrt * &var_der[z];
+    var_der[x]     += &term;
 }
 // ---------------------------------------------------------------------------
 // set_op_info

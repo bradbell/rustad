@@ -54,8 +54,9 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let index    = arg[0] as usize;
-    var_der[res] = FUnary::minus( &var_der[index] );
+    let x        = arg[0] as usize;
+    let z        = res;
+    var_der[z]   = FUnary::minus( &var_der[x] );
 }
 // minus_reverse_der
 /// First order reverse mode for minus(variable);
@@ -77,9 +78,10 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let index          = arg[0] as usize;
-    let (left, right)  = var_der.split_at_mut(res);
-    left[index]       -= &right[0];
+    let x              = arg[0] as usize;
+    let z              = res;
+    let (left, right)  = var_der.split_at_mut(z);
+    left[x]       -= &right[0];
 }
 // ---------------------------------------------------------------------------
 // set_op_info

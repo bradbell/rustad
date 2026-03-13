@@ -54,9 +54,10 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let index    = arg[0] as usize;
-    let term     = &FUnary::sin( &var_both[index] ) *  &var_der[index];
-    var_der[res] = FUnary::minus( &term );
+    let x        = arg[0] as usize;
+    let z        = res;
+    let term     = &FUnary::sin( &var_both[x] ) *  &var_der[x];
+    var_der[z]   = FUnary::minus( &term );
 }
 // cos_reverse_der
 /// First order reverse mode for cos(variable);
@@ -78,9 +79,10 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let index       = arg[0] as usize;
-    let term        = &FUnary::sin( &var_both[index] ) * &var_der[res];
-    var_der[index] -= &term;
+    let x           = arg[0] as usize;
+    let z           = res;
+    let term        = &FUnary::sin( &var_both[x] ) * &var_der[z];
+    var_der[x] -= &term;
 }
 // ---------------------------------------------------------------------------
 // set_op_info

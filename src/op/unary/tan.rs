@@ -57,9 +57,10 @@ where
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     let one      = E::one();
-    let index    = arg[0] as usize;
-    let dtan     = &one + &( &var_both[res] * &var_both[res] );
-    var_der[res] = &dtan *  &var_der[index];
+    let x        = arg[0] as usize;
+    let z        = res;
+    let dtan     = &one + &( &var_both[z] * &var_both[z] );
+    var_der[z]   = &dtan *  &var_der[x];
 }
 // tan_reverse_der
 /// First order reverse mode for tan(variable);
@@ -83,10 +84,11 @@ where
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     let one         = E::one();
-    let index       = arg[0] as usize;
-    let dtan        = &one + &( &var_both[res] * &var_both[res] );
-    let term        = &dtan * &var_der[res];
-    var_der[index] += &term;
+    let x           = arg[0] as usize;
+    let z           = res;
+    let dtan        = &one + &( &var_both[z] * &var_both[z] );
+    let term        = &dtan * &var_der[z];
+    var_der[x]     += &term;
 }
 // ---------------------------------------------------------------------------
 // set_op_info

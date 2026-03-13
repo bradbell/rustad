@@ -55,9 +55,10 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let index    = arg[0] as usize;
-    let plus_one = &var_both[index] + &V::one();
-    var_der[res] = &var_der[index] / &plus_one;
+    let x        = arg[0] as usize;
+    let z        = res;
+    let plus_one = &var_both[x] + &V::one();
+    var_der[z]   = &var_der[x] / &plus_one;
 }
 // ln_1p_reverse_der
 /// First order reverse mode for ln_1p(variable);
@@ -79,10 +80,11 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let index       = arg[0] as usize;
-    let plus_one    = &var_both[index] + &V::one();
-    let term        = &var_der[res] / &plus_one;
-    var_der[index] += &term;
+    let x           = arg[0] as usize;
+    let z           = res;
+    let plus_one    = &var_both[x] + &V::one();
+    let term        = &var_der[z] / &plus_one;
+    var_der[x]     += &term;
 }
 // ---------------------------------------------------------------------------
 // set_op_info
