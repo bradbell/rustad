@@ -6,6 +6,9 @@
 //!
 //! Link to [parent module](super)
 // --------------------------------------------------------------------------
+// z   = tan(x) = sin(x) / cos(x)
+// z_x = [ sin(x)^2 + cos(x)^2 ] / cos(x)^2 = 1 + tan(x)^2 = 1 + z^2
+// --------------------------------------------------------------------------
 // use
 //
 use std::ops::{
@@ -59,8 +62,8 @@ where
     let one      = E::one();
     let x        = arg[0] as usize;
     let z        = res;
-    let dtan     = &one + &( &var_both[z] * &var_both[z] );
-    var_der[z]   = &dtan *  &var_der[x];
+    let z_x      = &one + &( &var_both[z] * &var_both[z] );
+    var_der[z]   = &z_x * &var_der[x];
 }
 // tan_reverse_der
 /// First order reverse mode for tan(variable);
@@ -86,9 +89,8 @@ where
     let one         = E::one();
     let x           = arg[0] as usize;
     let z           = res;
-    let dtan        = &one + &( &var_both[z] * &var_both[z] );
-    let term        = &dtan * &var_der[z];
-    var_der[x]     += &term;
+    let z_x         = &one + &( &var_both[z] * &var_both[z] );
+    var_der[x]     += &( &z_x * &var_der[z] );
 }
 // ---------------------------------------------------------------------------
 // set_op_info
