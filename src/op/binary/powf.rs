@@ -6,18 +6,6 @@
 //!
 //! Link to [parent module](super)
 //!
-//! * V : see [doc_generic_v](crate::doc_generic_v)
-//! * E : see [doc_generic_e](crate::adfn::doc_generic_e)
-//!
-//! * [op::id](crate::op::id)
-//!     * POWF_PP_OP : parameter * parameter
-//!     * POWF_PV_OP : parameter * variable
-//!     * POWF_VP_OP : variable * parameter
-//!     * POWF_VV_OP : variable * variable
-//!
-//! * arg
-//!     * arg\[0\]:  Variable or parameter index of left operand.
-//!     * arg\[1\]:  Variable or parameter index of right operand.
 // --------------------------------------------------------------------------
 // use
 //
