@@ -22,6 +22,9 @@ This package is intended to include (and extend) most of the features in
     and hence can be shared by many threads.
 4.  It has special types that supports machine learning algorithms; i.e,
     element wise vector operations.
+5.  It is easy to add new unary and binary operations to the package; e.g.,
+    the square function x.square() has a derivative with fewer operations than x * x .
+
 
 ## Releases
 
