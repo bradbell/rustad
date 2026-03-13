@@ -6,6 +6,9 @@
 //!
 //! Link to [parent module](super)
 // --------------------------------------------------------------------------
+// z   = cos(x)
+// z_x = - sin(x)
+// --------------------------------------------------------------------------
 // use
 //
 use std::ops::{
@@ -56,8 +59,8 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let x        = arg[0] as usize;
     let z        = res;
-    let term     = &FUnary::sin( &var_both[x] ) *  &var_der[x];
-    var_der[z]   = FUnary::minus( &term );
+    let z_x      = FUnary::sin( &var_both[x] ).minus();
+    var_der[z]   = &z_x *  &var_der[x];
 }
 // cos_reverse_der
 /// First order reverse mode for cos(variable);
@@ -81,8 +84,8 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let x           = arg[0] as usize;
     let z           = res;
-    let term        = &FUnary::sin( &var_both[x] ) * &var_der[z];
-    var_der[x] -= &term;
+    let neg_z_x     = FUnary::sin( &var_both[x] );
+    var_der[x]     -= &( &neg_z_x * &var_der[z] );
 }
 // ---------------------------------------------------------------------------
 // set_op_info
