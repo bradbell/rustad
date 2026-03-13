@@ -19,4 +19,5 @@ pub mod sub;
 pub mod mul;
 pub mod div;
 pub mod num_cmp;
+pub mod hypot;
 pub mod powf;

@@ -387,6 +387,7 @@ macro_rules! impl_f_binary_az_float_borrow{ ($B:ident) => {
         impl_f_binary_function_borrow!( $B, num_ne, != );
         impl_f_binary_function_borrow!( $B, num_ge, >= );
         impl_f_binary_function_borrow!( $B, num_gt, >  );
+        impl_f_binary_function_borrow!( $B, hypot );
         impl_f_binary_function_borrow!( $B, powf );
     }
 } }
@@ -415,6 +416,7 @@ where
     impl_f_binary_function_own!( num_ne );
     impl_f_binary_function_own!( num_ge );
     impl_f_binary_function_own!( num_gt );
+    impl_f_binary_function_own!( hypot );
     impl_f_binary_function_own!( powf );
 }
 // ---------------------------------------------------------------------------

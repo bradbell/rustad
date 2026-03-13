@@ -495,6 +495,7 @@ where
     crate::op::binary::mul::set_op_info::<V>(&mut result);
     crate::op::binary::div::set_op_info::<V>(&mut result);
     crate::op::binary::num_cmp::set_op_info::<V>(&mut result);
+    crate::op::binary::hypot::set_op_info::<V>(&mut result);
     crate::op::binary::powf::set_op_info::<V>(&mut result);
     //
     // unary operators

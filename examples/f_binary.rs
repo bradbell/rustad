@@ -67,4 +67,12 @@ fn main() {
         let check = NumVec::new( vec![ S::from(1.0), S::from(16.0) ] );
         assert_eq!(res, check);
     }
+    //
+    // hypot
+    {   type V  = AzFloat<f32>;
+        let lhs = V::from(3.0);
+        let rhs = V::from(4.0);
+        let res = lhs.hypot(rhs);
+        assert_eq!(res, V::from(5.0));
+    }
 }

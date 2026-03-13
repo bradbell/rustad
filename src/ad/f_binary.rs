@@ -26,6 +26,7 @@ use crate::op::id::{
     NE_OP,
     GE_OP,
     GT_OP,
+    HYPOT_OP,
     POWF_OP,
 };
 //
@@ -179,6 +180,7 @@ where
     impl_f_binary_aa_borrow!( num_ne, NE_OP );
     impl_f_binary_aa_borrow!( num_ge, GE_OP );
     impl_f_binary_aa_borrow!( num_gt, GT_OP );
+    impl_f_binary_aa_borrow!( hypot, HYPOT_OP );
     impl_f_binary_aa_borrow!( powf, POWF_OP );
 }
 //
@@ -206,6 +208,7 @@ where
     impl_f_binary_aa_own!( num_ne );
     impl_f_binary_aa_own!( num_ge );
     impl_f_binary_aa_own!( num_gt );
+    impl_f_binary_aa_own!( hypot );
     impl_f_binary_aa_own!( powf );
 }
 // ---------------------------------------------------------------------------
@@ -249,6 +252,7 @@ where
     impl_f_binary_ac_borrow!( num_ne, NE_OP );
     impl_f_binary_ac_borrow!( num_ge, GE_OP );
     impl_f_binary_ac_borrow!( num_gt, GT_OP );
+    impl_f_binary_ac_borrow!( hypot, HYPOT_OP );
     impl_f_binary_ac_borrow!( powf, POWF_OP );
 }
 //
@@ -276,6 +280,7 @@ where
     impl_f_binary_ac_own!( num_ne );
     impl_f_binary_ac_own!( num_ge );
     impl_f_binary_ac_own!( num_gt );
+    impl_f_binary_ac_own!( hypot );
     impl_f_binary_ac_own!( powf );
 }
 // ---------------------------------------------------------------------------
@@ -318,6 +323,7 @@ where
     impl_f_binary_ca_borrow!( num_ne, NE_OP );
     impl_f_binary_ca_borrow!( num_ge, GE_OP );
     impl_f_binary_ca_borrow!( num_gt, GT_OP );
+    impl_f_binary_ca_borrow!( hypot, HYPOT_OP );
     impl_f_binary_ca_borrow!( powf, POWF_OP );
 }
 //
@@ -344,6 +350,7 @@ where
     impl_f_binary_ca_own!( num_ne );
     impl_f_binary_ca_own!( num_ge );
     impl_f_binary_ca_own!( num_gt );
+    impl_f_binary_ca_own!( hypot );
     impl_f_binary_ca_own!( powf );
 }
 // ---------------------------------------------------------------------------

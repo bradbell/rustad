@@ -150,8 +150,8 @@ cat << EOF
 src/op/unary/$name.rs: Fix ${name}_forward_der and ${name}_reverse_der
                        Check constraints in this set_op_info function.
 src/float/az_float.rs: Check implementation of fn $name(&self) -> Self
-examples/float_core.rs: Add an example for $name function values.
-test/unary.rs: Add a test for $name derivatives.
+examples/f_unary.rs: Add an example for $name function values.
+test/f_unary.rs: Add a test for $name derivatives.
 EOF
 #
 echo 'new_unary.sh: OK'

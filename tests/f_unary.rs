@@ -374,7 +374,7 @@ fn test_tanh() {
     check_nearly_eq::<V>( &dx[0], &(sech_sq *  dy[0]), &arg_vec);
 }
 #[test]
-fn unary() {
+fn f_unary() {
     test_abs();
     test_cos();
     test_cosh();

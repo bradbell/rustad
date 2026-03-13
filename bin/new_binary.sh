@@ -134,8 +134,8 @@ sed -f temp.sed src/op/binary/powf.rs > src/op/binary/$name.rs
 cat << EOF
 src/op/binary/$name.rs: Fix ${name}_forward_der and ${name}_reverse_der
                         Check constraints in this set_op_info function.
-examples/float_core.rs: Add an example for $name function values.
-test/binary.rs: Add a test for $name derivatives.
+examples/f_binary.rs: Add an example for $name function values.
+tests/$name.rs: Add a test for $name derivatives.
 EOF
 #
 echo 'new_binary.sh: OK'

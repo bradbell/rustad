@@ -41,6 +41,7 @@ pub(crate) fn is_binary_op(op_id : u8) -> bool {
         id::NE_OP     => true ,
         id::GE_OP     => true ,
         id::GT_OP     => true ,
+        id::HYPOT_OP  => true ,
         id::POWF_OP   => true ,
         //
         _             => false,
