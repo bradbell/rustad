@@ -6,6 +6,9 @@
 //!
 //! Link to [parent module](super)
 // --------------------------------------------------------------------------
+// z   = sqrt(x)
+// z_x = 0.5 / sqrt(x) = 0.5 / z
+// --------------------------------------------------------------------------
 // use
 //
 use std::ops::{
@@ -58,11 +61,10 @@ where
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     debug_assert!( f64::from(0.5f32) == 0.5f64 );
-    let half     = V::from(0.5f32);
     let x        = arg[0] as usize;
     let z        = res;
-    let dsqrt    = &half / &var_both[z];
-    var_der[z]   = &dsqrt *  &var_der[x];
+    let z_x      = &V::from(0.5) / &var_both[z];
+    var_der[z]   = &z_x * &var_der[x];
 }
 // sqrt_reverse_der
 /// First order reverse mode for sqrt(variable);
@@ -86,12 +88,10 @@ where
 {
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
-    let half        = V::from(0.5f32);
     let x           = arg[0] as usize;
     let z           = res;
-    let dsqrt       = &half / &var_both[z];
-    let term        = &dsqrt * &var_der[z];
-    var_der[x]     += &term;
+    let z_x         = &V::from(0.5) / &var_both[z];
+    var_der[x]     += &( &z_x * &var_der[z] );
 }
 // ---------------------------------------------------------------------------
 // set_op_info
