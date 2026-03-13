@@ -6,6 +6,9 @@
 //!
 //! Link to [parent module](super)
 // --------------------------------------------------------------------------
+// z   = abs(x)
+// z_x = signum(x)
+// --------------------------------------------------------------------------
 // use
 //
 use std::ops::{
@@ -56,7 +59,8 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let x        = arg[0] as usize;
     let z        = res;
-    var_der[z]   = &FUnary::signum( &var_both[x] ) *  &var_der[x];
+    let z_x      = FUnary::signum( &var_both[x] );
+    var_der[z]   = &z_x *  &var_der[x];
 }
 // abs_reverse_der
 /// First order reverse mode for abs(variable);
@@ -80,8 +84,8 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let x           = arg[0] as usize;
     let z           = res;
-    let term        = &FUnary::signum( &var_both[x] ) * &var_der[z];
-    var_der[x]     += &term;
+    let z_x         = FUnary::signum( &var_both[x] );
+    var_der[x]     += &( &z_x * &var_der[z] );
 }
 // ---------------------------------------------------------------------------
 // set_op_info
