@@ -16,7 +16,7 @@ use std::thread::LocalKey;
 use std::cell::RefCell;
 use std::cmp::max;
 //
-use crate::tape::OpSequence;
+use crate::tape::AGraph;
 use crate::op::id::CALL_OP;
 use crate::op::id::CALL_RES_OP;
 use crate::op::call::BEGIN_DOM;
@@ -409,7 +409,7 @@ pub(crate) use impl_global_atom_callback_vec;
 /// in the current tape (instead of all the operations in the
 /// atomic function).
 /// If a function is used many times, this can greatly reduce
-/// the size of the operation sequence.
+/// the number of operartiosn in a tape.
 ///
 /// * See Also : [register_checkpoint](crate::checkpoint::register_checkpoint)
 ///
@@ -539,72 +539,72 @@ where
     }
     for k in 0 .. 2 {
         //
-        // op_seq, dep, n_dep
-        let op_seq   : &mut OpSequence;
+        // agraph, dep, n_dep
+        let agraph   : &mut AGraph;
         let dep      : &Vec<usize>;
         let flag     : &Vec<bool>;
         if k == 0 {
-            op_seq   = &mut tape.dyp;
+            agraph   = &mut tape.dyp;
             dep      = &dyp_dep;
             flag     = &dyp_flag;
         } else {
-            op_seq   = &mut tape.var;
+            agraph   = &mut tape.var;
             dep      = &var_dep;
             flag     = &var_flag;
         }
         let n_dep = dep.len();
         //
-        // op_seq
+        // agraph
         if n_dep > 0 {
             //
-            // op_seq.id_all, op_seq.arg_start
-            op_seq.id_all.push( CALL_OP );
-            op_seq.arg_start.push( op_seq.arg_all.len() as IndexT );
+            // agraph.id_all, agraph.arg_start
+            agraph.id_all.push( CALL_OP );
+            agraph.arg_start.push( agraph.arg_all.len() as IndexT );
             //
-            // op_seq.arg_all, tape.cop
-            op_seq.arg_all.push( atom_id );                        // arg[0]
-            op_seq.arg_all.push( call_info );                      // arg[1]
-            op_seq.arg_all.push( n_dom as IndexT );                // arg[2]
-            op_seq.arg_all.push( n_res as IndexT );                // arg[3]
+            // agraph.arg_all, tape.cop
+            agraph.arg_all.push( atom_id );                        // arg[0]
+            agraph.arg_all.push( call_info );                      // arg[1]
+            agraph.arg_all.push( n_dom as IndexT );                // arg[2]
+            agraph.arg_all.push( n_res as IndexT );                // arg[3]
             // arg[4]
-            op_seq.arg_all.push( op_seq.flag_all.len() as IndexT );
+            agraph.arg_all.push( agraph.flag_all.len() as IndexT );
             //
-            // op_seq.arg_type_all
+            // agraph.arg_type_all
             for _j in 0 .. BEGIN_DOM {
-                op_seq.arg_type_all.push( ADType::Empty );
+                agraph.arg_type_all.push( ADType::Empty );
             }
             //
-            // op_seq.arg_type_all, op_seq.arg_all
+            // agraph.arg_type_all, agraph.arg_all
             for j in 0 .. n_dom {
-                op_seq.arg_type_all.push( domain_ad_type[j] );
+                agraph.arg_type_all.push( domain_ad_type[j] );
                 if domain_ad_type[j].is_constant() {
                     let index = tape.cop.len();
                     tape.cop.push( adomain[j].value.clone() );
-                    op_seq.arg_all.push( index as IndexT ); // arg[BEGIN_DOM+j]
+                    agraph.arg_all.push( index as IndexT ); // arg[BEGIN_DOM+j]
                 } else {
                     let index = adomain[j].index;
-                    op_seq.arg_all.push( index as IndexT ); // arg[BEGIN_DOM+j]
+                    agraph.arg_all.push( index as IndexT ); // arg[BEGIN_DOM+j]
                 }
             }
             //
-            // op_seq.flag_all
+            // agraph.flag_all
             debug_assert!( flag.len() == n_res );
-            op_seq.flag_all.push( trace );  // flag_all[ arg[5] ]
+            agraph.flag_all.push( trace );  // flag_all[ arg[5] ]
             for flag_i in flag.iter() {
                 //flag_all[ arg[5] + i + 1 ]
-                op_seq.flag_all.push( *flag_i )
+                agraph.flag_all.push( *flag_i )
             }
             //
-            // op_seq.n_dep
-            op_seq.n_dep += n_dep;
+            // agraph.n_dep
+            agraph.n_dep += n_dep;
             //
-            // op_seq.id_all, op_seq.arg_start
+            // agraph.id_all, agraph.arg_start
             for dep_index in 1 .. n_dep {
-                op_seq.id_all.push( CALL_RES_OP );
-                op_seq.arg_start.push( op_seq.arg_all.len() as IndexT );
+                agraph.id_all.push( CALL_RES_OP );
+                agraph.arg_start.push( agraph.arg_all.len() as IndexT );
                 //
-                op_seq.arg_all.push( dep_index as IndexT );
-                op_seq.arg_type_all.push( ADType::Empty );
+                agraph.arg_all.push( dep_index as IndexT );
+                agraph.arg_type_all.push( ADType::Empty );
             }
         }
     }

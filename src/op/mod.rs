@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
 // SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
-//! This pub(crate) module defines the objects used to evaluate an
-//! operation sequence.
+//! This pub(crate) module defines the objects used to evaluate a function
+//! in an [ADfn](crate::ADfn) object.
 //!
 //! Link to [parent module](super)
 // ---------------------------------------------------------------------------

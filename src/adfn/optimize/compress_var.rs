@@ -15,7 +15,7 @@ use crate::{
 };
 use crate::ad::ADType;
 use crate::adfn::optimize::{
-        renumber_op_seq,
+        renumber_agraph,
         Depend,
         op_hash_map::first_equal_op,
 };
@@ -63,9 +63,9 @@ where
         let n_dom_indext = n_dom as IndexT;
         //
         // first_equal
-        let op_seq_type = ADType::DynamicP;
+        let agraph_type = ADType::DynamicP;
         let first_equal = first_equal_op(
-            op_seq_type, &depend.var, &self.var
+            agraph_type, &depend.var, &self.var
         );
         debug_assert!( first_equal.len() == n_dep );
         //
@@ -101,7 +101,7 @@ where
         //
         // self.var.arg_all
         let equal_type = ADType::DynamicP;
-        renumber_op_seq(equal_type, &first_equal, &depend.var, &mut self.var);
+        renumber_agraph(equal_type, &first_equal, &depend.var, &mut self.var);
         //
         if trace {
             println!("End Trace compress_var");

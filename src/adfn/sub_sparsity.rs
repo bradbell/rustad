@@ -48,7 +48,7 @@ where
     ///
     /// * f :
     ///   is this [ADfn] object. The sparsity pattern is for the Jacobian
-    ///   of the function defined by the operation sequence stored in f.
+    ///   of the function defined by the acyclic graphs stored in f.
     ///
     /// * arg_vec :
     ///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:

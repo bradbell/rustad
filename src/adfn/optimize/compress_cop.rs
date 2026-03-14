@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 // ---------------------------------------------------------------------------
 //
 //! Implement the [ADfn] compress_cop method.
@@ -13,7 +13,7 @@ use crate::{
     ADfn,
     IndexT,
 };
-use crate::tape::OpSequence;
+use crate::tape::AGraph;
 use crate::adfn::optimize::Depend;
 use rustc_hash::FxHashMap;
 //
@@ -87,27 +87,27 @@ where
             }
         }
         //
-        // op_seq, op_depend
-        for i_op_seq in 0 .. 2 {
-            let op_seq    : &mut OpSequence;
+        // agraph, op_depend
+        for i_agraph in 0 .. 2 {
+            let agraph    : &mut AGraph;
             let op_depend : &Vec<bool>;
-            if i_op_seq == 0 {
-                op_seq    = &mut self.dyp;
+            if i_agraph == 0 {
+                agraph    = &mut self.dyp;
                 op_depend = &depend.dyp;
             } else {
-                op_seq    = &mut self.var;
+                agraph    = &mut self.var;
                 op_depend = &depend.var;
             }
             //
-            // op_seq.arg_all
-            for op_index in 0 .. op_seq.n_dep {
-                let res = op_index + op_seq.n_dom;
+            // agraph.arg_all
+            for op_index in 0 .. agraph.n_dep {
+                let res = op_index + agraph.n_dom;
                 if op_depend[res] {
                     //
-                    let start      = op_seq.arg_start[op_index] as usize;
-                    let end        = op_seq.arg_start[op_index + 1] as usize;
-                    let arg        = &mut op_seq.arg_all[start .. end];
-                    let arg_type   = &op_seq.arg_type_all[start .. end];
+                    let start      = agraph.arg_start[op_index] as usize;
+                    let end        = agraph.arg_start[op_index + 1] as usize;
+                    let arg        = &mut agraph.arg_all[start .. end];
+                    let arg_type   = &agraph.arg_type_all[start .. end];
                     for i_arg in 0 .. arg.len() {
                         if arg_type[i_arg].is_constant() {
                             let key    = &self.cop[ arg[i_arg] as usize ];

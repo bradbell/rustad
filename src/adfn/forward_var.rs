@@ -61,7 +61,7 @@ use crate::{
 /// * range :
 ///   is the range vector corresponding to the
 ///   domain variable and parameter values;
-///   i.e., the value of the function correspdong the operation sequence in f.
+///   i.e., the value of the function corresponding the acyclic graphs in f.
 ///   Note that a range space component may be a
 ///   variable, a dynamic parameter, or a constant parameter.
 ///

@@ -89,7 +89,7 @@ pub(crate) type ForwardDyp<V, E> = fn(
 /// Default [ForwardDyp] function will panic.
 /// This can be used for dynamic parameter calculations by operators
 /// that only have a variable argument (because they should not be in the
-/// dynamic parameter operation sequence).
+/// dynamic parameter acyclic graph).
 pub(crate) fn panic_dyp<V, E> (
     _dyp_both : &mut [E]    ,
     _cop      : &[V]        ,
@@ -122,7 +122,7 @@ pub(crate) type ForwardVar<V, E> = fn(
 /// Default [ForwardVar] function will panic.
 /// This can be used for variable calculations by operators
 /// that only have parameter arguments (because they should not be in the
-/// variable operation sequence).
+/// variable acyclic graph).
 pub(crate) fn panic_var<V, E> (
     _dyp_both : &[E]        ,
     _var_both : &mut [E]    ,
@@ -159,7 +159,7 @@ pub(crate) type ForwardDer<V, E> = fn(
 /// Default [ForwardDer] and [ReverseDer] function will panic.
 /// This can be used for variable calculations by operators
 /// that only have parameter arguments (because they should not be in the
-/// variable operation sequence).
+/// variable acyclic graph).
 pub(crate) fn panic_der<V, E>  (
     _dyp_both : &[E]        ,
     _var_both : &[E]        ,

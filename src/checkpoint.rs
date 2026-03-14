@@ -219,7 +219,7 @@ where
 /// A checkpoint function call [call_checkpoint] only puts a call operator
 /// in the current tape (instead of all the operations in ad_fn).
 /// If a function is used many times, this can greatly reduce
-/// the size of the operation sequence.
+/// the number of operartiosn in a tape.
 ///
 /// * See Also : [register_atom]
 ///

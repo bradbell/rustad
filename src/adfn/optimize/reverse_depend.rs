@@ -21,7 +21,7 @@ use crate::op::{
     id::CALL_RES_OP,
 };
 use crate::ad::ADType;
-use crate::tape::OpSequence;
+use crate::tape::AGraph;
 use crate::atom::sealed::GlobalAtomCallbackVec;
 use crate::adfn::optimize;
 //
@@ -85,17 +85,17 @@ where
         let op_info_vec = <V as GlobalOpInfoVec>::get();
         //
         //
-        // i_op_seq
-        for i_op_seq in 0 .. 2 {
+        // i_agraph
+        for i_agraph in 0 .. 2 {
             //
-            // op_seq
-            let op_seq      : &OpSequence;
+            // agraph
+            let agraph      : &AGraph;
             let res_type    : ADType;
-            if i_op_seq == 0 {
-                op_seq      = &self.var;
+            if i_agraph == 0 {
+                agraph      = &self.var;
                 res_type    = ADType::Variable;
             } else {
-                op_seq      = &self.dyp;
+                agraph      = &self.dyp;
                 res_type    = ADType::DynamicP;
             }
             if trace {
@@ -104,14 +104,14 @@ where
             }
             //
             // n_dep, flag_all
-            let n_dom    = op_seq.n_dom;
-            let n_dep    = op_seq.n_dep;
-            let flag_all = &op_seq.flag_all;
+            let n_dom    = agraph.n_dom;
+            let n_dep    = agraph.n_dep;
+            let flag_all = &agraph.flag_all;
             //
             // op_index, res, res_depend
             for op_index in (0 .. n_dep).rev() {
                 let res        = n_dom + op_index;
-                let res_depend = if i_op_seq == 0 {
+                let res_depend = if i_agraph == 0 {
                     depend.var[res]
                 } else {
                     depend.dyp[res]
@@ -119,11 +119,11 @@ where
                 if res_depend {
                     //
                     // op_id, arg, arg_type
-                    let op_id     = op_seq.id_all[op_index];
-                    let start     = op_seq.arg_start[op_index] as usize;
-                    let end       = op_seq.arg_start[op_index + 1] as usize;
-                    let arg       = &op_seq.arg_all[start .. end];
-                    let arg_type  = &op_seq.arg_type_all[start .. end];
+                    let op_id     = agraph.id_all[op_index];
+                    let start     = agraph.arg_start[op_index] as usize;
+                    let end       = agraph.arg_start[op_index + 1] as usize;
+                    let arg       = &agraph.arg_all[start .. end];
+                    let arg_type  = &agraph.arg_type_all[start .. end];
                     //
                     if op_id == CALL_OP || op_id == CALL_RES_OP {
                         cop_depend.clear();
@@ -134,7 +134,7 @@ where
                             &mut cop_depend,
                             &mut dyp_depend,
                             &mut var_depend,
-                            op_seq,
+                            agraph,
                             op_index
                         );
                         for dep_index in var_depend.iter() {

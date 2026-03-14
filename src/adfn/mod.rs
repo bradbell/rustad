@@ -35,8 +35,8 @@ use crate::ad::ADType;
 // IndexT
 use crate::IndexT;
 //
-// OpSequence
-use crate::tape::OpSequence;
+// AGraph
+use crate::tape::AGraph;
 //
 // Sparsity
 pub type SparsityPattern = Vec<[usize; 2]>;
@@ -61,19 +61,19 @@ pub fn doc_generic_e() {}
 // ADfn
 //
 /// An ADfn can an evaluate the function and its derivatives
-/// corresponding to an ``AD`` < *V* > operation sequence.
+/// corresponding to an ``AD`` < *V* sequence of operations.
 ///
 /// * V : [doc_generic_v]
 ///
 pub struct ADfn<V> {
     //
     // dyp
-    // The dynamic parameeter operation sequence
-    pub(crate) dyp : OpSequence,
+    // The dynamic parameter acyclic graph
+    pub(crate) dyp : AGraph,
     //
     // var
-    // The variable operation sequence
-    pub(crate) var : OpSequence,
+    // The variable acyclic graph
+    pub(crate) var : AGraph,
     //
     // rng_ad_type
     /// The length of this vector is the dimension of the range space.
@@ -90,14 +90,14 @@ pub struct ADfn<V> {
     pub(crate) rng_index           : Vec<IndexT>,
     //
     // cop
-    /// is the vector of constant parameters used by both operation sequences.
+    /// is the vector of constant parameters used by both acyclic graphs.
     pub(crate) cop : Vec<V>,
 }
 //
 // ---------------------------------------------------------------------------
 // ADfn<V>::default
 impl<V> Default for ADfn<V> {
-    /// This creates an ADfn object with an empty operation sequence.
+    /// This creates an ADfn object with an empty acyclic graph.
     ///
     /// To be more specific,
     /// the corresponding  domain and range vectors have length zero.
@@ -113,8 +113,8 @@ impl<V> Default for ADfn<V> {
     /// ```
     fn default() -> Self {
         Self {
-            dyp              : OpSequence::new(),
-            var              : OpSequence::new(),
+            dyp              : AGraph::new(),
+            var              : AGraph::new(),
             rng_ad_type      : Vec::new() ,
             rng_index        : Vec::new() ,
             cop              : Vec::new() ,

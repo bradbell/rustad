@@ -18,7 +18,7 @@ use crate::{
 };
 //
 use crate::ad::ADType;
-use crate::tape::OpSequence;
+use crate::tape::AGraph;
 //
 // -----------------------------------------------------------------------
 // mod
@@ -71,8 +71,8 @@ pub(crate) struct Old2New {
     pub var : Vec<IndexT> ,
 }
 // --------------------------------------------------------------------------
-// renumber_op_seq
-/// Renumber an operation sequence using the the first equivalent operator map.
+// renumber_agraph
+/// Renumber an acyclic graph using the the first equivalent operator map.
 ///
 /// * equal_type *
 ///   Type of operator that first_equal refers to.
@@ -84,37 +84,37 @@ pub(crate) struct Old2New {
 ///   In addition, this is the first operator that is known to be equivalent.
 ///
 /// * depend :
-///   This identifies which operators, in the operation sequence,
+///   This identifies which operators, in the acyclic graph,
 ///   are necessary to compute the results
-///   for the function this operation sequence appears in.
+///   for the function this acyclic graph appears in.
 ///
-/// * op_seq :
+/// * agraph :
 ///   This is the operator sequence that we are renumbering.
-///   Only the field op_seq.arg_all is modified.
+///   Only the field agraph.arg_all is modified.
 ///
 ///
-pub(crate) fn renumber_op_seq(
+pub(crate) fn renumber_agraph(
     equal_type  : ADType           ,
     first_equal : &[IndexT]        ,
     depend      : &[bool]          ,
-    op_seq      : &mut OpSequence  ,
+    agraph      : &mut AGraph  ,
 ) {
     //
     // n_dep
-    let n_dep = op_seq.n_dep;
+    let n_dep = agraph.n_dep;
     //
     // n_dom
-    let n_dom        = op_seq.n_dom;
+    let n_dom        = agraph.n_dom;
     let n_dom_indext = n_dom as IndexT;
     //
-    // op_seq.arg_all
+    // agraph.arg_all
     for op_index in 0 .. n_dep {
         //
         if depend[op_index + n_dom] {
-            let start      = op_seq.arg_start[op_index] as usize;
-            let end        = op_seq.arg_start[op_index + 1] as usize;
-            let arg        = &mut op_seq.arg_all[start .. end];
-            let arg_type   = &op_seq.arg_type_all[start .. end];
+            let start      = agraph.arg_start[op_index] as usize;
+            let end        = agraph.arg_start[op_index + 1] as usize;
+            let arg        = &mut agraph.arg_all[start .. end];
+            let arg_type   = &agraph.arg_type_all[start .. end];
             for i_arg in 0 .. arg.len() {
                 if n_dom_indext <= arg[i_arg]
                     && arg_type[i_arg] == equal_type {

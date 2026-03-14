@@ -202,22 +202,22 @@ fn record_unary<V>(
     new_tape_id = tape.tape_id;
     new_ad_type = arg.ad_type;
     //
-    // op_seq
-    let op_seq = if new_ad_type == ADType::Variable {
+    // agraph
+    let agraph = if new_ad_type == ADType::Variable {
         &mut tape.var
     } else {
         &mut tape.dyp
     };
     //
     // new_index
-    new_index = op_seq.n_dep + op_seq.n_dom;
+    new_index = agraph.n_dep + agraph.n_dom;
     //
-    // op_seq: n_dep, arg_start, arg_type, id_all
-    op_seq.id_all.push( op_id );
-    op_seq.n_dep += 1;
-    op_seq.arg_start.push( op_seq.arg_all.len() as IndexT );
-    op_seq.arg_all.push( arg.index as IndexT );
-    op_seq.arg_type_all.push( new_ad_type );
+    // agraph: n_dep, arg_start, arg_type, id_all
+    agraph.id_all.push( op_id );
+    agraph.n_dep += 1;
+    agraph.arg_start.push( agraph.arg_all.len() as IndexT );
+    agraph.arg_all.push( arg.index as IndexT );
+    agraph.arg_type_all.push( new_ad_type );
     //
     AD::new(new_tape_id, new_index, new_ad_type, new_value)
 
@@ -245,31 +245,31 @@ fn record_powi<V>(
     new_tape_id = tape.tape_id;
     new_ad_type = arg.ad_type;
     //
-    // op_seq
-    let op_seq = if new_ad_type == ADType::Variable {
+    // agraph
+    let agraph = if new_ad_type == ADType::Variable {
         &mut tape.var
     } else {
         &mut tape.dyp
     };
     //
     // new_index
-    new_index = op_seq.n_dep + op_seq.n_dom;
+    new_index = agraph.n_dep + agraph.n_dom;
     //
-    // op_seq: n_dep, arg_start, arg_type, id_all
-    op_seq.id_all.push( id::POWI_OP );
-    op_seq.n_dep += 1;
-    op_seq.arg_start.push( op_seq.arg_all.len() as IndexT );
-    op_seq.arg_all.push( arg.index as IndexT );
+    // agraph: n_dep, arg_start, arg_type, id_all
+    agraph.id_all.push( id::POWI_OP );
+    agraph.n_dep += 1;
+    agraph.arg_start.push( agraph.arg_all.len() as IndexT );
+    agraph.arg_all.push( arg.index as IndexT );
     if rhs >= 0 {
-        op_seq.arg_all.push( rhs as IndexT );
-        op_seq.arg_all.push( 0 );
+        agraph.arg_all.push( rhs as IndexT );
+        agraph.arg_all.push( 0 );
     } else {
-        op_seq.arg_all.push( - rhs as IndexT );
-        op_seq.arg_all.push( 1 );
+        agraph.arg_all.push( - rhs as IndexT );
+        agraph.arg_all.push( 1 );
     }
-    op_seq.arg_type_all.push( new_ad_type );
-    op_seq.arg_type_all.push( ADType::Empty );
-    op_seq.arg_type_all.push( ADType::Empty );
+    agraph.arg_type_all.push( new_ad_type );
+    agraph.arg_type_all.push( ADType::Empty );
+    agraph.arg_type_all.push( ADType::Empty );
     //
     AD::new(new_tape_id, new_index, new_ad_type, new_value)
 }

@@ -25,31 +25,31 @@ use crate::doc_generic_v;
 /// The type is used, instead of usize, to save space in vectors of indices.
 pub type IndexT = u32;
 // ---------------------------------------------------------------------------
-// OpSequence
-/// An operation sequence is a single assignment representation of
+// AGraph
+/// An acyclic graph is a single assignment representation of
 /// a function; i.e., each dependent value is only assigned once.
-pub(crate) struct OpSequence {
+pub(crate) struct AGraph {
     //
     // n_dom
-    /// is the number of independent values in the operation sequence.
+    /// is the number of independent values in the acyclic graph.
     pub(crate) n_dom : usize,
     //
     // n_dep
-    /// is the number of dependent values currently in the operation sequence.
+    /// is the number of dependent values currently in the acyclic graph.
     pub(crate) n_dep : usize,
     //
     // id_all
-    /// For each index in the operation sequence, id_all\[op_index\]
+    /// For each index in the acyclic graph, id_all\[op_index\]
     /// is the corresponding operator [id](crate::op::id) .
     pub(crate) id_all : Vec<u8>,
     //
     // arg_start
-    /// For each index in the operation sequence, arg_start\[op_index\]
+    /// For each index in the acyclic graph, arg_start\[op_index\]
     /// is the index in arg_all of the first argument for the operator.
     pub(crate) arg_start : Vec<IndexT>,
     //
     // arg_all
-    /// For each index in the operation sequence,
+    /// For each index in the acyclic graph,
     /// the arguments for the corresponding operator are a slice of arg_all
     /// starting at arg_start\[index\] and ending with arg_start\[index + 1\] .
     pub(crate) arg_all : Vec<IndexT>,
@@ -68,9 +68,9 @@ pub(crate) struct OpSequence {
     pub(crate) flag_all : Vec<bool>,
 }
 // VarTape::new
-impl OpSequence {
+impl AGraph {
     //
-    // OpSequence::new
+    // AGraph::new
     /// Sets n_dom, n_dep to zero and all the vectors to empty.
     pub fn new() -> Self {
         Self {
@@ -88,7 +88,7 @@ impl OpSequence {
 // Tape
 ///
 /// `Tape` < *V* > is the type were to an `AD<V>`
-/// operation sequence is recorded.
+/// sequence of operations is recorded.
 ///
 /// * V : see [doc_generic_v]
 ///
@@ -96,10 +96,10 @@ pub struct Tape<V> {
     //
     // dyp
     /// dynamic parameter specific tape information
-    pub(crate) dyp : OpSequence,
+    pub(crate) dyp : AGraph,
     //
     /// variable specific tape information
-    pub(crate) var : OpSequence,
+    pub(crate) var : AGraph,
     //
     // recording
     /// if false (true) a recording is currently in progress on this tape.
@@ -112,7 +112,7 @@ pub struct Tape<V> {
     pub(crate) tape_id        : usize,
     //
     // cop
-    /// is the vector of constant parameters used by both operation sequences.
+    /// is the vector of constant parameters used by both acyclic graphs.
     pub(crate) cop : Vec<V>,
 }
 // ---------------------------------------------------------------------------
@@ -125,8 +125,8 @@ impl<V> Default for Tape<V> {
     /// (The tape with tape_id zero never has recording true.)
     fn default() -> Self {
         Self {
-            dyp           : OpSequence::new(),
-            var           : OpSequence::new(),
+            dyp           : AGraph::new(),
+            var           : AGraph::new(),
             recording     : false,
             tape_id       : 0,
             cop           : Vec::new(),
@@ -198,7 +198,7 @@ pub(crate) use impl_this_thread_tape;
 // ----------------------------------------------------------------------------
 //
 // start_recording
-/// This starts recording a new `AD<V>` operation sequence with
+/// This starts recording a new `AD<V>` sequence of operations with
 /// dynamic parameters.
 ///
 /// * Syntax :
@@ -334,7 +334,7 @@ where
 ///   the range space variables.
 ///
 /// * ad_fn :
-///   The return value is an `ADfn<V>` containing the operation sequence
+///   The return value is an `ADfn<V>` containing the sequence of operations
 ///   that computed arange as a function of the domain variables and
 ///   dynamic parameters specified by [start_recording] .
 ///   It can be used to compute the values for the function and its derivatives.

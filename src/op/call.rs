@@ -30,10 +30,9 @@
 //! | n_rng    | is last result a dependent for this call                 |
 //!
 //! * CALL_RES_OP
-//!   The operation index for a CALL_OP operator, corresponds to the first
-//!   dependent created by the call.
-//!   There are n_dep - 1 CALL_RES_OP operators corresponding to the
-//!   other dependents created by the call operator.
+//!   The result for the CALL_OP is the first dependent created by the call.
+//!   There are n_dep - 1 CALL_RES_OP operators, directly after the CALL_OP,
+//!   corresponding to the other dependents created by the call operator.
 //!   Each such operator has the following arguments:
 //!
 //! ## Operator Arguments
@@ -50,7 +49,7 @@ use std::mem::swap;
 //
 use crate::ad::ADType;
 use crate::adfn::optimize;
-use crate::tape::OpSequence;
+use crate::tape::AGraph;
 use crate::op::info::OpInfo;
 use crate::op::info::no_reverse_depend;
 use crate::atom::sealed::GlobalAtomCallbackVec;
@@ -68,12 +67,13 @@ use crate::{
 // ----------------------------------------------------------------------
 // BEGIN_DOM
 /// Index, of the first argument for this call operator,
-/// in an operator argument vector.
+/// in its operator argument vector.
 pub(crate) const BEGIN_DOM : usize = 5;
 //
 // BEGIN_FLAG
 /// Index, of the first flag for this call operator,
-/// in the vector of all the flags for this operation sequence.
+/// in its operator argument vector.
+/// This index is in the vector of all the flags for this acyclic graph.
 pub(crate) const BEGIN_FLAG: usize = 4;
 //
 // NUMBER_NRNG
@@ -1068,12 +1068,11 @@ where
 ///  a call operator's result depends on.
 ///
 /// * op_index ;
-///   This is a index in the operation sequence. The corresponding operator is
+///   This is an index in the acyclic graph. The corresponding operator is
 ///   an CALL_OP or CALL_RES_OP.
 ///
-/// * op_seq :
-///   This is the operation sequence that call or call result operator
-///   appears in.
+/// * agraph :
+///   This is the acyclic graph that call or call result operator appears in.
 ///
 /// * atom_depend :
 ///   Only the capacity of this vector matters
@@ -1099,7 +1098,7 @@ pub(crate) fn call_depend<V>(
     cop_depend      : &mut Vec<IndexT> ,
     dyp_depend      : &mut Vec<IndexT> ,
     var_depend      : &mut Vec<IndexT> ,
-    op_seq          : &OpSequence     ,
+    agraph          : &AGraph     ,
     mut op_index    : usize           )
 where
     V               : GlobalAtomCallbackVec,
@@ -1110,15 +1109,15 @@ where
     debug_assert!( var_depend.is_empty() );
     //
     // id_all, op_id
-    let id_all = &op_seq.id_all;
+    let id_all = &agraph.id_all;
     let op_id  = id_all[op_index];
     debug_assert!( op_id == CALL_OP || op_id == CALL_RES_OP );
     //
     // arg_start, arg_all, arg_type_all, flag_all
-    let arg_start       = &op_seq.arg_start;
-    let arg_all         = &op_seq.arg_all;
-    let arg_type_all    = &op_seq.arg_type_all;
-    let flag_all        = &op_seq.flag_all;
+    let arg_start       = &agraph.arg_start;
+    let arg_all         = &agraph.arg_all;
+    let arg_type_all    = &agraph.arg_type_all;
+    let flag_all        = &agraph.flag_all;
     //
     // op_index, dep_index
     let begin           = arg_start[op_index] as usize;

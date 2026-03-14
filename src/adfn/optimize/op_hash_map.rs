@@ -14,7 +14,7 @@ use crate::{
     IndexT,
 };
 use crate::ad::ADType;
-use crate::tape::OpSequence;
+use crate::tape::AGraph;
 use crate::op::unary::common::is_unary_op;
 use crate::op::binary::common::is_binary_op;
 use crate::op::id::{
@@ -118,19 +118,19 @@ impl OpHashMap {
     /// * Syntax :
     ///   ```text
     ///     option = op_hash_map.try_insert(
-    ///       op_seq, op_seq_type, op_index, &first_equal, map_value_in
+    ///       agraph, agraph_type, op_index, &first_equal, map_value_in
     ///     )
     ///   ```
     ///
-    /// * op_seq :
-    ///   is the operation sequence that this operator appears in.
+    /// * agraph :
+    ///   is the acyclic graph that this operator appears in.
     ///
-    /// * op_seq_type :
-    ///   is the type of this operation sequence. Must be one of
+    /// * agraph_type :
+    ///   is the type of this acyclic graph. Must be one of
     ///   ADType::DynamicP, ADType::VariableP.
     ///
     /// * op_index :
-    ///   is the index of this operator in the operation sequence.
+    ///   is the index of this operator in the acyclic graph.
     ///
     /// * first_equal :
     ///   For each operator index i_op < op_index,
@@ -155,22 +155,22 @@ impl OpHashMap {
     ///
     pub(crate) fn try_insert(
         &mut self                   ,
-        op_seq       : &OpSequence  ,
-        op_seq_type  : ADType       ,
+        agraph       : &AGraph  ,
+        agraph_type  : ADType       ,
         op_index     : usize        ,
         first_equal  : &[IndexT]    ,
         map_value_in : IndexT       ,
     ) -> Option<IndexT> {
-        let n_dom_indext = op_seq.n_dom as IndexT;
-        let op_id        = op_seq.id_all[op_index];
-        let start        = op_seq.arg_start[op_index] as usize;
-        let end          = op_seq.arg_start[op_index + 1] as usize;
-        let arg          = &op_seq.arg_all[start .. end];
-        let arg_type     = &op_seq.arg_type_all[start .. end];
+        let n_dom_indext = agraph.n_dom as IndexT;
+        let op_id        = agraph.id_all[op_index];
+        let start        = agraph.arg_start[op_index] as usize;
+        let end          = agraph.arg_start[op_index + 1] as usize;
+        let arg          = &agraph.arg_all[start .. end];
+        let arg_type     = &agraph.arg_type_all[start .. end];
         if is_unary_op (op_id) {
             //
             // arg_0
-            let match_0 = arg_type[0] == op_seq_type && n_dom_indext <= arg[0];
+            let match_0 = arg_type[0] == agraph_type && n_dom_indext <= arg[0];
             let arg_0 = if match_0 {
                 let dep_index = (arg[0] - n_dom_indext) as usize;
                 first_equal[dep_index] + n_dom_indext
@@ -189,7 +189,7 @@ impl OpHashMap {
         } else if is_binary_op(op_id) {
             //
             // arg_0
-            let match_0 = arg_type[0] == op_seq_type && n_dom_indext <= arg[0];
+            let match_0 = arg_type[0] == agraph_type && n_dom_indext <= arg[0];
             let arg_0   = if match_0 {
                 let dep_index = (arg[0] - n_dom_indext) as usize;
                 first_equal[dep_index] + n_dom_indext
@@ -198,7 +198,7 @@ impl OpHashMap {
             };
             //
             // arg_1
-            let match_1 = arg_type[1] == op_seq_type && n_dom_indext <= arg[1];
+            let match_1 = arg_type[1] == agraph_type && n_dom_indext <= arg[1];
             let arg_1   = if match_1 {
                 let dep_index = (arg[1] - n_dom_indext) as usize;
                 first_equal[dep_index] + n_dom_indext
@@ -216,10 +216,10 @@ impl OpHashMap {
             let n_rng         = arg[NUMBER_RNG] as usize;
             let start         = arg[BEGIN_FLAG] as usize;
             let end           = start + 1 + n_rng;
-            let flag          = &op_seq.flag_all[start .. end];
+            let flag          = &agraph.flag_all[start .. end];
             let mut arg_match = arg.to_vec();
             for i_arg in 0 .. arg_match.len() {
-                let match_i = arg_type[i_arg] == op_seq_type &&
+                let match_i = arg_type[i_arg] == agraph_type &&
                     n_dom_indext <= arg[i_arg];
                 if match_i {
                     let dep_index    = (arg[i_arg] - n_dom_indext) as usize;
@@ -244,19 +244,19 @@ impl OpHashMap {
 ///
 /// * Syntax :
 ///   ```text
-///     first_equal = first_equal_op(op_seq_type, depend, op_seq)
+///     first_equal = first_equal_op(agraph_type, depend, agraph)
 ///   ```
 ///
-/// * op_seq_type :
-///   is the type of this operation sequence. Must be one of
+/// * agraph_type :
+///   is the type of this acyclic graph. Must be one of
 ///   ADType::DynamicP, ADType::VariableP.
 ///
 /// * depend :
 ///   This identifies which operators are necessary to compute the results
-///   for the function this operation sequence appears in.
+///   for the function this acyclic graph appears in.
 ///
-/// * op_seq :
-///   is the operation sequence.
+/// * agraph :
+///   is the acyclic graph.
 ///
 /// * first_equal :
 ///   If first_equal\[op_index\] is not equal to op_index,
@@ -268,19 +268,19 @@ impl OpHashMap {
 /// first_equal\[op_index\] is equal to op_index.
 //
 pub(crate) fn first_equal_op(
-    op_seq_type : ADType      ,
+    agraph_type : ADType      ,
     depend      : &[bool]     ,
-    op_seq      : &OpSequence ,
+    agraph      : &AGraph ,
 ) -> Vec<IndexT>
 {   //
     // n_dep
-    let n_dep = op_seq.n_dep;
+    let n_dep = agraph.n_dep;
     //
     // n_dom
-    let n_dom = op_seq.n_dom;
+    let n_dom = agraph.n_dom;
     //
     // id_all
-    let id_all = &op_seq.id_all;
+    let id_all = &agraph.id_all;
     //
     // first_equal
     let mut first_equal : Vec<IndexT> = Vec::with_capacity(n_dep);
@@ -300,16 +300,16 @@ pub(crate) fn first_equal_op(
             //
             // op_index
             if id_all[op_index] == CALL_RES_OP {
-                let start    = op_seq.arg_start[op_index] as usize;
-                let offset   = op_seq.arg_all[start] as usize;
+                let start    = agraph.arg_start[op_index] as usize;
+                let offset   = agraph.arg_all[start] as usize;
                 op_index    -= offset;
                 debug_assert!( id_all[op_index] == CALL_OP );
             }
             //
             // map_value_in, option
             let map_value_in = op_index as IndexT;
-            let option = op_hash_map.try_insert( op_seq,
-                op_seq_type, op_index, &first_equal, map_value_in
+            let option = op_hash_map.try_insert( agraph,
+                agraph_type, op_index, &first_equal, map_value_in
             );
             //
             // first_equal

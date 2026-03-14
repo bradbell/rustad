@@ -8,7 +8,7 @@
 //!
 // ---------------------------------------------------------------------------
 //
-use crate::tape::OpSequence;
+use crate::tape::AGraph;
 use crate::vec_set::VecSet;
 use crate::op::info::OpInfo;
 use crate::op::call::call_depend;
@@ -49,7 +49,7 @@ where
     ///
     /// * f :
     ///   is this [ADfn] object. The sparsity pattern is for the Jacobian
-    ///   of the function defined by the operation sequence stored in f.
+    ///   of the function defined by the acyclic graphs stored in f.
     ///
     /// * arg_vec :
     ///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
@@ -162,18 +162,18 @@ where
         let mut dyp_depend  : Vec<IndexT> = Vec::new();
         let mut var_depend  : Vec<IndexT> = Vec::new();
         //
-        // n_op_seq, n_dyp, set_vec
-        let n_op_seq     : usize;
+        // n_agraph, n_dyp, set_vec
+        let n_agraph     : usize;
         let n_dyp        : usize;
         let mut set_vec  : VecSet = VecSet::new();
         if compute_dyp {
-            n_op_seq  = 2;
+            n_agraph  = 2;
             n_dyp     = self.dyp.n_dom + self.dyp.n_dep;
             for id_set in 0 .. self.dyp.n_dom {
                 set_vec.singleton( id_set );
             }
         } else {
-            n_op_seq  = 1;
+            n_agraph  = 1;
             n_dyp     = 0;
             for id_set in 0 .. self.var.n_dom {
                 set_vec.singleton( id_set );
@@ -198,14 +198,14 @@ where
             println!("range_set_index = {:?}", range_set_index);
             println!("var_index, op_name, var_arguments, set_result");
         }
-        // i_op_seq
-        for i_op_seq in 0 .. n_op_seq {
+        // i_agraph
+        for i_agraph in 0 .. n_agraph {
             //
-            // op_seq
-            let op_seq : &OpSequence;
-            if i_op_seq == 1 {
+            // agraph
+            let agraph : &AGraph;
+            if i_agraph == 1 {
                 debug_assert!( compute_dyp );
-                op_seq = &self.var;
+                agraph = &self.var;
                 for j in 0 .. self.var.n_dom {
                     // set_vec
                     // domain variables don't depend on dynamic parameters
@@ -213,18 +213,18 @@ where
                     assert_eq!(id_set, j + n_dyp);
                 }
             } else if compute_dyp {
-                op_seq = &self.dyp;
+                agraph = &self.dyp;
             } else {
-                op_seq = &self.var;
+                agraph = &self.var;
             }
             //
             // n_dom, n_dep, id_all, arg_start, arg_all, atr_type_all
-            let n_dom             = op_seq.n_dom;
-            let n_dep             = op_seq.n_dep;
-            let id_all            = &op_seq.id_all;
-            let arg_start         = &op_seq.arg_start;
-            let arg_all           = &op_seq.arg_all;
-            let arg_type_all      = &op_seq.arg_type_all;
+            let n_dom             = agraph.n_dom;
+            let n_dep             = agraph.n_dep;
+            let id_all            = &agraph.id_all;
+            let arg_start         = &agraph.arg_start;
+            let arg_all           = &agraph.arg_all;
+            let arg_type_all      = &agraph.arg_type_all;
             //
             // op_index
             for op_index in 0 .. n_dep {
@@ -243,11 +243,11 @@ where
                         &mut cop_depend,
                         &mut dyp_depend,
                         &mut var_depend,
-                        op_seq,
+                        agraph,
                         op_index
                     );
                     for dep_index in var_depend.iter() {
-                        debug_assert!( i_op_seq != 0 || ! compute_dyp );
+                        debug_assert!( i_agraph != 0 || ! compute_dyp );
                         depend_usize.push(*dep_index as usize + n_dyp );
                     }
                     if compute_dyp {
@@ -266,7 +266,7 @@ where
                     // depend_usize
                     for i in 0 .. arg.len() {
                         if arg_type[i].is_variable() {
-                            debug_assert!( i_op_seq != 0 || ! compute_dyp );
+                            debug_assert!( i_agraph != 0 || ! compute_dyp );
                             depend_usize.push(  arg[i] as usize + n_dyp );
                         }
                         if compute_dyp && arg_type[i].is_dynamic() {
@@ -276,7 +276,7 @@ where
                 }
                 //
                 // dep_index
-                let dep_index = if compute_dyp && i_op_seq == 0 {
+                let dep_index = if compute_dyp && i_agraph == 0 {
                     n_dom + op_index
                 } else {
                     n_dom + op_index + n_dyp
