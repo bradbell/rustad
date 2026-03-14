@@ -242,8 +242,8 @@ fn find_first_equal_call() {
     assert_eq!( f.var_dep_len(), 0 );
 }
 //
-// find_first_equal_unary
-fn find_first_equal_unary() {
+// find_first_equal_binary
+fn find_first_equal_binary() {
     //
     // arg_vec
     let arg_vec  = vec![ ["trace", "false"] ];
@@ -289,8 +289,8 @@ fn find_first_equal_unary() {
     assert_eq!( f.var_dep_len(), 0 );
 }
 //
-// find_first_equal_binary
-fn find_first_equal_binary() {
+// find_first_equal_unary
+fn find_first_equal_unary() {
     //
     // arg_vec
     let arg_vec  = vec![ ["trace", "false"] ];
@@ -451,8 +451,8 @@ fn optimize() {
     compress_dyp();
     compress_var();
     find_first_equal_call();
-    find_first_equal_unary();
     find_first_equal_binary();
+    find_first_equal_unary();
     find_equal_num_cmp();
     an_atom_result_not_used();
 }
