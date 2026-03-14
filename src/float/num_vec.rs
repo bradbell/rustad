@@ -341,6 +341,7 @@ where
     impl_f_binary_num_vec_borrow!( num_ne );
     impl_f_binary_num_vec_borrow!( num_ge );
     impl_f_binary_num_vec_borrow!( num_gt );
+    impl_f_binary_num_vec_borrow!( atan2 );
     impl_f_binary_num_vec_borrow!( hypot );
     impl_f_binary_num_vec_borrow!( powf );
 }
@@ -367,6 +368,7 @@ where
     impl_f_binary_num_vec_own!( num_ne );
     impl_f_binary_num_vec_own!( num_ge );
     impl_f_binary_num_vec_own!( num_gt );
+    impl_f_binary_num_vec_own!( atan2 );
     impl_f_binary_num_vec_own!( hypot );
     impl_f_binary_num_vec_own!( powf );
 }

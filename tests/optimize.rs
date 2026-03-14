@@ -22,6 +22,101 @@ mod atom_test;
 type V = AzFloat<f64>;
 type W = AzFloat<f32>;
 //
+// during_record
+fn during_record() {
+    //
+    // arg_vec
+    let arg_vec : Vec< [&str; 2] > = Vec::new();
+    //
+    // p, x
+    let p = vec![ V::from(2.0) ];
+    let x = vec![ V::from(3.0) ];
+    //
+    // ap, ax
+    let (ap, ax)       = start_recording( Some(p.clone()), x.clone() );
+    //
+    // 0 + u = u
+    let _ = &V::from(0.0) + &ax[0];
+    //
+    // u + 0 = u
+    let _ = &ap[0] + &V::from(0.0);
+    //
+    // 0 * u = 0
+    let _ = &V::from(0.0) * &ax[0];
+    //
+    // u * 0 = 0
+    let _ = &ap[0] * &V::from(0.0);
+    //
+    // 1 * u = u
+    let _ = &V::from(1.0) * &ax[0];
+    //
+    // u * 1 = u
+    let _ = &ap[0] * &V::from(1.0);
+    //
+    // u / 1 = u
+    let _ = &ax[0] / &V::from(1.0);
+    //
+    // powi(u, 0) = 1
+    let _ = FUnary::powi( &ap[0], 0);
+    //
+    // powi(u, 1) = u
+    let _ = FUnary::powi( &ax[0], 1);
+    //
+    // f
+    let ay = vec![ ap[0].clone() ];
+    let f  = stop_recording(ay);
+    //
+    // all the operations above were optimized out during recording
+    assert_eq!( f.dyp_dep_len(), 0 );
+    assert_eq!( f.var_dep_len(), 0 );
+    //
+    // ap, ax
+    let (ap, ax)       = start_recording( Some(p.clone()), x.clone());
+    //
+    let x1 = &V::from(0.0) + &ax[0]; // x1 = x0
+    //
+    // u + 0 = u
+    let p1 = &ap[0] + &V::from(0.0); // p1 = p0
+    //
+    // 0 * u = 0
+    let x2 = &V::from(0.0) * &ax[0]; // x2 = 0
+    //
+    // u * 0 = 0
+    let p2 = &ap[0] * &V::from(0.0); // p2 = 0
+    //
+    // 1 * u = u
+    let x3 = &V::from(1.0) * &ax[0]; // x3 = x0
+    //
+    // u * 1 = u
+    let p3 = &ap[0] * &V::from(1.0); // p3 = p0
+    //
+    // u / 1 = u
+    let x4 = &ax[0] / &V::from(1.0); // x4 = x0
+    //
+    // powi(u, 0) = 1
+    let p4 = FUnary::powi( &ap[0], 0); // p4 = 1
+    //
+    // powi(u, 1) = u
+    let x5 = FUnary::powi( &ax[0], 1); // x5 = x0
+    //
+    // p_sum
+    let p_sum = p1 + p2 + p3 + p4;      // p0 + 0 + p0 + 1
+    let x_sum = x1 + x2 + x3 + x4 + x5; // x0 + 0 + x0 + x0 + x0
+    // f
+    let ay = vec![ p_sum, x_sum ];
+    let f  = stop_recording(ay);
+    //
+    let p = vec![ V::from(5.0) ];
+    let x = vec![ V::from(6.0) ];
+    //
+    let p_both       = f.forward_dyp_value(p.clone(), &arg_vec);
+    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), &arg_vec);
+    //
+    // check that optimized out operations give correct values.
+    assert_eq!( y[0], p[0] * V::from(2.0) + V::from(1.0) );
+    assert_eq!( y[1], x[0] * V::from(4.0) );
+}
+//
 // compress_cop
 fn compress_cop() {
     //
@@ -447,6 +542,7 @@ fn an_atom_result_not_used() {
 //
 #[test]
 fn optimize() {
+    during_record();
     compress_cop();
     compress_dyp();
     compress_var();

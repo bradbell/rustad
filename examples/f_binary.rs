@@ -7,8 +7,27 @@ fn main() {
         AzFloat,
         NumVec,
         FConst,
+        FUnary,
         FBinary,
     };
+    //
+    // atan2
+    {   type V        = AzFloat<f64>;
+        let pi    : V = FConst::pi();
+        let theta     = pi * V::from(0.75);
+        let y         = theta.sin();
+        let x         = theta.cos();
+        let z         = y.atan2(x);
+        assert_eq!(z, theta);
+    }
+    //
+    // hypot
+    {   type V  = AzFloat<f32>;
+        let lhs = V::from(3.0);
+        let rhs = V::from(4.0);
+        let res = lhs.hypot(rhs);
+        assert_eq!(res, V::from(5.0));
+    }
     //
     // num_lt
     {   type V  = AzFloat<f64>;
@@ -66,13 +85,5 @@ fn main() {
         let res   = lhs.powf(rhs);
         let check = NumVec::new( vec![ S::from(1.0), S::from(16.0) ] );
         assert_eq!(res, check);
-    }
-    //
-    // hypot
-    {   type V  = AzFloat<f32>;
-        let lhs = V::from(3.0);
-        let rhs = V::from(4.0);
-        let res = lhs.hypot(rhs);
-        assert_eq!(res, V::from(5.0));
     }
 }

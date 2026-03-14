@@ -99,6 +99,9 @@ pub trait FBinary<Rhs> {
     /// self > rhs
     fn num_gt(self, rhs : Rhs) -> Self::Output;
     //
+    // atan2(self, rhs)
+    fn atan2(self, rhs : Rhs) -> Self::Output;
+    //
     // hypot(self, rhs)
     fn hypot(self, rhs : Rhs) -> Self::Output;
     //

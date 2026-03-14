@@ -160,6 +160,8 @@ set_operator_ids!(
     GE_OP,
     /// lhs >  rhs
     GT_OP,
+    /// atan2(lhs, rhs)
+    ATAN2_OP,
     /// hypot(lhs, rhs)
     HYPOT_OP,
     /// powf(lhs, rhs)

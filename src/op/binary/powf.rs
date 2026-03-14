@@ -7,9 +7,9 @@
 //! Link to [parent module](super)
 //!
 // ---------------------------------------------------------------------------
-// z    = powf(y, x)           = exp( log(x) * y )
-// z_y  = powf(y, x) * log(x)  = z * log(x)
-// z_x  = pow(y, x)  * y / x   = z * y / x
+// z    = powf(x, y)           = exp( log(x) * y )
+// z_x  = powf(x, y) * y / x   = z * y / x
+// z_y  = powf(x, y) * log(x)  = z * log(x)
 // --------------------------------------------------------------------------
 // use
 //

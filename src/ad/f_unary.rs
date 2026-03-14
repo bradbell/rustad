@@ -123,7 +123,6 @@ where
     /// `AD<V>`.powi(`i32`)
     fn powi(self, rhs : i32) -> AD<V> {
         //
-        //
         // new_value
         let new_value = self.value.powi(rhs);
         //
@@ -240,6 +239,16 @@ fn record_powi<V>(
         return AD::new(new_tape_id, new_index, new_ad_type, new_value);
     }
     debug_assert!( arg.ad_type != ADType::ConstantP );
+    //
+    // pow(x, 0) = 1
+    if rhs == 0 {
+        return AD::new(new_tape_id, new_index, new_ad_type, new_value);
+    }
+    //
+    // pow(x, 1) = x
+    if rhs == 1 {
+        return AD::new(arg.tape_id, arg.index, arg.ad_type, new_value);
+    }
     //
     // new_tape_id, new_ad_type
     new_tape_id = tape.tape_id;
