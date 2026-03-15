@@ -154,9 +154,9 @@ where
 /// # Example
 /// ```
 /// let date = rustad::YEAR_MONTH_DAY;
-/// assert_eq!(date, "2026.3.14");
+/// assert_eq!(date, "2026.3.15");
 /// ```
-pub const YEAR_MONTH_DAY : &str = "2026.3.14";
+pub const YEAR_MONTH_DAY : &str = "2026.3.15";
 //
 // TRAITS_RS
 /// is the source code for the [core](crate::float::traits) module.

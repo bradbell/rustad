@@ -29,10 +29,13 @@ pub trait FloatValue : FConst {
     ///
     /// # Example
     /// ```
-    /// use rustad::AzFloat;
-    /// use rustad::FloatValue;
-    /// let zero : AzFloat<f32> = 0.0.into();
-    /// let one  : AzFloat<f32> = 1.0.into();
+    /// use rustad::{
+    ///     AzFloat,
+    ///     FConst,
+    ///     FloatValue,
+    /// };
+    /// let zero : AzFloat<f32> = FConst::zero();
+    /// let one  : AzFloat<f32> = FConst::one();
     /// assert!( zero.is_zero() );
     /// assert!( ! one.is_zero() );
     /// ```
@@ -43,15 +46,21 @@ pub trait FloatValue : FConst {
     ///
     /// # Example
     /// ```
-    /// use rustad::AzFloat;
-    /// use rustad::NumVec;
-    /// use rustad::FloatValue;
-    /// type S               = AzFloat<f64>;
+    /// use rustad::{
+    ///     AzFloat,
+    ///     FConst,
+    ///     FloatValue,
+    ///     NumVec,
+    /// };
+    /// type S = AzFloat<f64>;
     ///
-    /// let value : NumVec<S> = NumVec::new(vec![ S::from(1.0), S::from(0.0) ]);
+    /// let zero_s : S = FConst::zero();
+    /// let one_s  : S = FConst::one();
+    ///
+    /// let value = NumVec::new(vec![ one_s, zero_s ]);
     /// assert!( ! value.is_one() );
     ///
-    /// let value : NumVec<S> = NumVec::new(vec![ S::from(1.0), S::from(1.0) ]);
+    /// let value = NumVec::new(vec![ one_s, one_s ]);
     /// assert!( value.is_one() );
     /// ```
     fn is_one(&self) -> bool;
@@ -61,16 +70,20 @@ pub trait FloatValue : FConst {
     ///
     /// # Example
     /// ```
-    /// use rustad::AzFloat;
-    /// use rustad::NumVec;
-    /// use rustad::FloatValue;
-    /// type S               = AzFloat<f64>;
-    /// let nan_s             = S::from(f32::NAN);
+    /// use rustad::{
+    ///     AzFloat,
+    ///     FConst,
+    ///     FloatValue,
+    ///     NumVec,
+    /// };
+    /// type S         = AzFloat<f64>;
+    /// let nan_s  : S = FConst::nan();
+    /// let zero_s : S = FConst::zero();
     ///
-    /// let value : NumVec<S> = NumVec::new(vec![ nan_s, S::from(0.0) ]);
+    /// let value = NumVec::new(vec![ nan_s, zero_s ]);
     /// assert!( ! value.is_nan() );
     ///
-    /// let value : NumVec<S> = NumVec::new(vec![ nan_s, nan_s ]);
+    /// let value = NumVec::new(vec![ nan_s, nan_s ]);
     /// assert!( value.is_nan() );
     /// ```
     fn is_nan(&self) -> bool;
