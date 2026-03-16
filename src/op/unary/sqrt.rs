@@ -43,8 +43,8 @@ common::rust_src!(sqrt);
 /// First order forward mode for sqrt(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn sqrt_forward_der<V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -63,15 +63,15 @@ where
     debug_assert!( f64::from(0.5f32) == 0.5f64 );
     let x        = arg[0] as usize;
     let z        = res;
-    let z_x      = &V::from(0.5) / &var_both[z];
+    let z_x      = &V::from(0.5) / &var_all[z];
     var_der[z]   = &z_x * &var_der[x];
 }
 // sqrt_reverse_der
 /// First order reverse mode for sqrt(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn sqrt_reverse_der<V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -90,7 +90,7 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let x           = arg[0] as usize;
     let z           = res;
-    let z_x         = &V::from(0.5) / &var_both[z];
+    let z_x         = &V::from(0.5) / &var_all[z];
     var_der[x]     += &( &z_x * &var_der[z] );
 }
 // ---------------------------------------------------------------------------

@@ -66,8 +66,8 @@ common::binary_arithmetic_function!(Sub, sub);
 // sub_pv_forward_der
 /// first order forward for parameter - variable; see [ForwardDer]
 fn sub_pv_forward_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    _var_both  :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -89,8 +89,8 @@ where
 // sub_vp_forward_der
 /// first order forward for variable - parameter; see [ForwardDer]
 fn sub_vp_forward_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    _var_both  :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -108,8 +108,8 @@ where
 // sub_vv_forward_der
 /// first order forward for variable - variable; see [ForwardDer]
 fn sub_vv_forward_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    _var_both  :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -131,8 +131,8 @@ where
 // sub_pv_reverse_der
 /// first order reverse for parameter - variable; see [ReverseDer]
 fn sub_pv_reverse_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    _var_both  :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -153,8 +153,8 @@ where
 // sub_vp_reverse_der
 /// first order reverse for variable - parameter; see [ReverseDer]
 fn sub_vp_reverse_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    _var_both  :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -175,8 +175,8 @@ where
 // sub_vv_reverse_der
 /// first order reverse for variable - variable; see [ReverseDer]
 fn sub_vv_reverse_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    _var_both  :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,

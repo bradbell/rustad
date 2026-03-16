@@ -49,8 +49,8 @@ common::f_binary_function!(powf);
 /// first order forward for powf
 ///
 fn powf_forward_der <V, E>(
-    dyp_both   :   &[E]        ,
-    var_both   :   &[E]        ,
+    dyp_all    :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -75,13 +75,13 @@ where
     if arg_type[0].is_variable() {
         let z_x = match arg_type[1] {
             ADType::Variable => {
-                &( &var_both[z] * &var_both[y] ) / &var_both[x]
+                &( &var_all[z] * &var_all[y] ) / &var_all[x]
             },
             ADType::DynamicP => {
-                &( &var_both[z] * &dyp_both[y] ) / &var_both[x]
+                &( &var_all[z] * &dyp_all[y] ) / &var_all[x]
             },
             ADType::ConstantP => {
-                &( &var_both[z] * &cop[y] ) / &var_both[x]
+                &( &var_all[z] * &cop[y] ) / &var_all[x]
             },
             _ => {
                 panic!("powf_forward_der: unexpected arg_type[1]");
@@ -92,13 +92,13 @@ where
     if arg_type[1].is_variable() {
         let z_y = match  arg_type[0] {
             ADType::Variable => {
-                &var_both[z] * &var_both[x].ln()
+                &var_all[z] * &var_all[x].ln()
             },
             ADType::DynamicP => {
-                &var_both[z] * &dyp_both[x].ln()
+                &var_all[z] * &dyp_all[x].ln()
             },
             ADType::ConstantP => {
-                &var_both[z] * &cop[x].ln()
+                &var_all[z] * &cop[x].ln()
             },
             _ => {
                 panic!("powf_forward_der: unexpected arg_type[0]");
@@ -114,8 +114,8 @@ where
 /// first order reverse for powf
 ///
 fn powf_reverse_der <V, E>(
-    dyp_both   :   &[E]        ,
-    var_both   :   &[E]        ,
+    dyp_all    :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -139,13 +139,13 @@ where
     if arg_type[0].is_variable() {
         let z_x = match arg_type[1] {
             ADType::Variable => {
-                &( &var_both[z] * &var_both[y] ) / &var_both[x]
+                &( &var_all[z] * &var_all[y] ) / &var_all[x]
             },
             ADType::DynamicP => {
-                &( &var_both[z] * &dyp_both[y] ) / &var_both[x]
+                &( &var_all[z] * &dyp_all[y] ) / &var_all[x]
             },
             ADType::ConstantP => {
-                &( &var_both[z] * &cop[y] ) / &var_both[x]
+                &( &var_all[z] * &cop[y] ) / &var_all[x]
             },
             _ => {
                 panic!("powf_forward_der: unexpected arg_type[1]");
@@ -156,13 +156,13 @@ where
     if arg_type[1].is_variable() {
         let z_y = match  arg_type[0] {
             ADType::Variable => {
-                &var_both[z] * &var_both[x].ln()
+                &var_all[z] * &var_all[x].ln()
             },
             ADType::DynamicP => {
-                &var_both[z] * &dyp_both[x].ln()
+                &var_all[z] * &dyp_all[x].ln()
             },
             ADType::ConstantP => {
-                &var_both[z] * &cop[x].ln()
+                &var_all[z] * &cop[x].ln()
             },
             _ => {
                 panic!("powf_forward_der: unexpected arg_type[0]");

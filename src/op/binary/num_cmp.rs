@@ -32,8 +32,8 @@ common::f_binary_function!( num_gt );
 // ---------------------------------------------------------------------------
 // zero_forward_der
 fn zero_forward_der<V, E>  (
-    _dyp_both : &[E]        ,
-    _var_both : &[E]        ,
+    _dyp_all  : &[E]        ,
+    _var_all  : &[E]        ,
     var_der   : &mut [E]    ,
     _cop      : &[V]        ,
     _bool_all : &[bool]     ,
@@ -49,8 +49,8 @@ where
 // ---------------------------------------------------------------------------
 // zero_reverse_der
 fn zero_reverse_der<V, E>  (
-    _dyp_both : &[E]        ,
-    _var_both : &[E]        ,
+    _dyp_all  : &[E]        ,
+    _var_all  : &[E]        ,
     _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
     _bool_all : &[bool]     ,

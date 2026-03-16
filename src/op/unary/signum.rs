@@ -42,8 +42,8 @@ common::rust_src!(signum);
 /// First order forward mode for signum(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn signum_forward_der<V, E>(
-    _dyp_both  :   &[E]        ,
-    _var_both  :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -63,8 +63,8 @@ where
 /// First order reverse mode for signum(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn signum_reverse_der<V, E>(
-    _dyp_both  :   &[E]        ,
-    _var_both  :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    _var_all   :   &[E]        ,
     _var_der   :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,

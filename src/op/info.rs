@@ -35,11 +35,11 @@ use crate::{
 /// * V : see [doc_generic_v]
 /// * E : see [doc_generic_e]
 ///
-/// * dyp_both :
+/// * dyp_all  :
 ///   vector of all the dynamic parameters in the following order:
 ///   the domain dynamic parameters followed by the dependent dynamic parameters.
 ///
-/// * var_both :
+/// * var_all  :
 ///   vector of all the variables in the following order:
 ///   the domain variables followed by the dependent variables.
 ///
@@ -56,13 +56,13 @@ use crate::{
 ///     *   If arg_type\[i\] is ConstantP, then arg\[i\]
 ///         is an index in the  constant parameter vector.
 ///     *   If arg_type\[i\] is DynamicP, then arg\[i\]
-///         is an index in dyp_both.
+///         is an index in dyp_all.
 ///     *   If arg_type\[i\] is Variable, then arg\[i\]
-///         is an index in var_both.
+///         is an index in var_all.
 ///
 /// * res :
 ///   If this is a dynamic parameter operator (variable operator),
-///   res is the dyp_both (var_both) index for the value being computed.
+///   res is the dyp_all (var_all) index for the value being computed.
 ///
 #[cfg(doc)]
 pub fn doc_common_arguments() {}
@@ -73,12 +73,12 @@ pub fn doc_common_arguments() {}
 /// * Arguments :  see [doc_common_arguments] .
 ///   In addition, there is the following extra condition:
 ///
-/// * dyp_both :
+/// * dyp_all  :
 ///   This is an input for dynamic parameters less than *res* and an output
 ///   for the results of this operator.
 ///
 pub(crate) type ForwardDyp<V, E> = fn(
-    _dyp_both : &mut [E]    ,
+    _dyp_all  : &mut [E]    ,
     _cop      : &[V]        ,
     _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -91,7 +91,7 @@ pub(crate) type ForwardDyp<V, E> = fn(
 /// that only have a variable argument (because they should not be in the
 /// dynamic parameter acyclic graph).
 pub(crate) fn panic_dyp<V, E> (
-    _dyp_both : &mut [E]    ,
+    _dyp_all  : &mut [E]    ,
     _cop      : &[V]        ,
     _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -105,13 +105,13 @@ pub(crate) fn panic_dyp<V, E> (
 /// * Arguments :  see [doc_common_arguments] .
 ///   In addition, there is the following extra condition:
 ///
-/// * var_both :
+/// * var_all  :
 ///   This is an input for variable indices less than *res* and an output
 ///   for the results of this operator.
 ///
 pub(crate) type ForwardVar<V, E> = fn(
-    _dyp_both : &[E]        ,
-    _var_both : &mut [E]    ,
+    _dyp_all  : &[E]        ,
+    _var_all  : &mut [E]    ,
     _cop      : &[V]        ,
     _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -124,8 +124,8 @@ pub(crate) type ForwardVar<V, E> = fn(
 /// that only have parameter arguments (because they should not be in the
 /// variable acyclic graph).
 pub(crate) fn panic_var<V, E> (
-    _dyp_both : &[E]        ,
-    _var_both : &mut [E]    ,
+    _dyp_all  : &[E]        ,
+    _var_all  : &mut [E]    ,
     _cop      : &[V]        ,
     _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -146,8 +146,8 @@ pub(crate) fn panic_var<V, E> (
 ///
 /// * Other Arguments :  see [doc_common_arguments]
 pub(crate) type ForwardDer<V, E> = fn(
-    _dyp_both : &[E]        ,
-    _var_both : &[E]        ,
+    _dyp_all  : &[E]        ,
+    _var_all  : &[E]        ,
     _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
     _bool_all : &[bool]     ,
@@ -161,8 +161,8 @@ pub(crate) type ForwardDer<V, E> = fn(
 /// that only have parameter arguments (because they should not be in the
 /// variable acyclic graph).
 pub(crate) fn panic_der<V, E>  (
-    _dyp_both : &[E]        ,
-    _var_both : &[E]        ,
+    _dyp_all  : &[E]        ,
+    _var_all  : &[E]        ,
     _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
     _bool_all : &[bool]     ,
@@ -184,8 +184,8 @@ pub(crate) fn panic_der<V, E>  (
 ///
 /// * Other Arguments :  see [doc_common_arguments]
 pub(crate) type ReverseDer<V, E> = fn(
-    _dyp_both : &[E]        ,
-    _var_both : &[E]        ,
+    _dyp_all  : &[E]        ,
+    _var_all  : &[E]        ,
     _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
     _bool_all : &[bool]     ,
@@ -231,8 +231,8 @@ pub(crate) fn panic_reverse_depend(
 #[allow(unused_macros)]
 macro_rules! no_forward_der_value{ ($Op:ident) => {
     pub fn forward_der_value_none<V> (
-        _dyp_both : &[V]        ,
-        _var_both : &[V]        ,
+        _dyp_all  : &[V]        ,
+        _var_all  : &[V]        ,
         _var_der  : &mut [V]    ,
         _cop      : &[V]        ,
         _bool_all : &[bool]     ,
@@ -254,8 +254,8 @@ pub(crate) use no_forward_der_value;
 #[allow(unused_macros)]
 macro_rules! no_forward_der_ad{ ($Op:ident) => {
     pub fn forward_der_ad_none<V> (
-        _dyp_both : &[ AD<V> ]        ,
-        _var_both : &[ AD<V> ]        ,
+        _dyp_all  : &[ AD<V> ]        ,
+        _var_all  : &[ AD<V> ]        ,
         _var_der  : &mut [ AD<V> ]    ,
         _cop      : &[V]              ,
         _bool_all : &[bool]           ,
@@ -277,8 +277,8 @@ pub(crate) use no_forward_der_ad;
 #[allow(unused_macros)]
 macro_rules! no_reverse_der_value{ ($Op:ident) => {
     pub fn reverse_der_value_none<V> (
-        _dyp_both : &[V]        ,
-        _var_both : &[V]        ,
+        _dyp_all  : &[V]        ,
+        _var_all  : &[V]        ,
         _var_der  : &mut [V]    ,
         _cop      : &[V]        ,
         _bool_all : &[bool]     ,
@@ -300,8 +300,8 @@ pub(crate) use no_reverse_der_value;
 #[allow(unused_macros)]
 macro_rules! no_reverse_der_ad{ ($Op:ident) => {
     pub fn reverse_der_ad_none<V> (
-        _dyp_both : &[ AD<V> ]       ,
-        _var_both : &[ AD<V> ]        ,
+        _dyp_all  : &[ AD<V> ]       ,
+        _var_all  : &[ AD<V> ]        ,
         _var_der  : &mut [ AD<V> ]    ,
         _cop      : &[V]              ,
         _bool_all : &[bool]           ,

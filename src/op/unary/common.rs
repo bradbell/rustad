@@ -58,7 +58,7 @@ macro_rules! forward_dyp{ ($name:ident) => { paste::paste! {
         "; see [ForwardDer](crate::op::info::ForwardDyp)"
     ) ]
     fn [< $name _forward_dyp >] <V, E> (
-        dyp_both    : &mut [E]    ,
+        dyp_all     : &mut [E]    ,
         _cop        : &[V]        ,
         _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
@@ -74,7 +74,7 @@ macro_rules! forward_dyp{ ($name:ident) => { paste::paste! {
         //
         debug_assert!( arg.len() == 1);
         debug_assert!( arg_type[0].is_dynamic() );
-        dyp_both[ res ] = dyp_both[index].$name();
+        dyp_all[ res ] = dyp_all[index].$name();
     }
 }}}
 pub(crate) use forward_dyp;
@@ -86,8 +86,8 @@ macro_rules! forward_var{ ($name:ident) => { paste::paste! {
         "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $name _forward_var >] <V, E> (
-        _dyp_both   : &[E]        ,
-        var_both    : &mut [E]    ,
+        _dyp_all    : &[E]        ,
+        var_all     : &mut [E]    ,
         _cop        : &[V]        ,
         _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
@@ -104,7 +104,7 @@ macro_rules! forward_var{ ($name:ident) => { paste::paste! {
         //
         debug_assert!( arg.len() == 1);
         debug_assert!( arg_type[0].is_variable() );
-        var_both[ res ] = var_both[index].$name();
+        var_all[ res ] = var_all[index].$name();
     }
 }}}
 pub(crate) use forward_var;

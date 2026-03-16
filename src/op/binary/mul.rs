@@ -73,8 +73,8 @@ common::binary_arithmetic_function!(Mul, mul);
 // mul_pv_forward_der
 /// first order forward for parameter * variable; see [ForwardDer]
 fn mul_pv_forward_der <V, E>(
-    dyp_both   :   &[E]        ,
-    _var_both  :   &[E]        ,
+    dyp_all    :   &[E]        ,
+    _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -92,15 +92,15 @@ where
         var_der[ res ] = &cop[lhs] * &var_der[rhs];
     } else {
         debug_assert!( arg_type[0].is_dynamic() );
-        var_der[ res ] = &dyp_both[lhs] * &var_der[rhs];
+        var_der[ res ] = &dyp_all[lhs] * &var_der[rhs];
     }
 }
 //
 // mul_vp_forward_der
 /// first order forward for variable * parameter; see [ForwardDer]
 fn mul_vp_forward_der <V, E>(
-    dyp_both   :   &[E]        ,
-    _var_both  :   &[E]        ,
+    dyp_all    :   &[E]        ,
+    _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -118,15 +118,15 @@ where
         var_der[ res ] = &var_der[lhs] * &cop[rhs];
     } else {
         debug_assert!( arg_type[1].is_dynamic() );
-        var_der[ res ] = &var_der[lhs] * &dyp_both[rhs];
+        var_der[ res ] = &var_der[lhs] * &dyp_all[rhs];
     }
 }
 //
 // mul_vv_forward_der
 /// first order forward for variable * variable; see [ForwardDer]
 fn mul_vv_forward_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -140,8 +140,8 @@ where
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
-    let term1    = &var_both[lhs]  * &var_der[rhs];
-    let term2    = &var_der[lhs]   * &var_both[rhs];
+    let term1    = &var_all[lhs]  * &var_der[rhs];
+    let term2    = &var_der[lhs]   * &var_all[rhs];
     var_der[res] = &term1 + &term2;
 }
 // ---------------------------------------------------------------------------
@@ -151,8 +151,8 @@ where
 // mul_pv_reverse_der
 /// first order reverse for parameter * variable; see [ReverseDer]
 fn mul_pv_reverse_der <V, E>(
-    dyp_both   :   &[E]        ,
-    _var_both  :   &[E]        ,
+    dyp_all    :   &[E]        ,
+    _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -172,7 +172,7 @@ where
         var_der[rhs] += &term;
     } else {
         debug_assert!( arg_type[0].is_dynamic() );
-        let term      = &var_der[res] * &dyp_both[lhs];
+        let term      = &var_der[res] * &dyp_all[lhs];
         var_der[rhs] += &term;
     }
 }
@@ -180,8 +180,8 @@ where
 // mul_vp_reverse_der
 /// first order reverse for variable * parameter; see [ReverseDer]
 fn mul_vp_reverse_der <V, E>(
-    dyp_both   :   &[E]        ,
-    _var_both  :   &[E]        ,
+    dyp_all    :   &[E]        ,
+    _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -201,7 +201,7 @@ where
         var_der[lhs] += &term;
     } else {
         debug_assert!( arg_type[1].is_dynamic() );
-        let term      = &var_der[res] * &dyp_both[rhs];
+        let term      = &var_der[res] * &dyp_all[rhs];
         var_der[lhs] += &term;
     }
 }
@@ -209,8 +209,8 @@ where
 // mul_vv_reverse_der
 /// first order reverse for variable * variable; see [ReverseDer]
 fn mul_vv_reverse_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -225,10 +225,10 @@ where
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
     //
-    let term      = &var_der[res] * &var_both[rhs];
+    let term      = &var_der[res] * &var_all[rhs];
     var_der[lhs] += &term;
     //
-    let term      = &var_der[res] * &var_both[lhs];
+    let term      = &var_der[res] * &var_all[lhs];
     var_der[rhs] += &term;
 }
 // ---------------------------------------------------------------------------

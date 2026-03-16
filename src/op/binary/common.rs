@@ -78,7 +78,7 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
         "; see [ForwardDyp](crate::op::info::ForwardDyp)"
     ) ]
     fn [< $name _forward_dyp >] <V, E> (
-        dyp_both    : &mut [E]    ,
+        dyp_all     : &mut [E]    ,
         cop         : &[V]        ,
         _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
@@ -99,11 +99,11 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
         let lhs       = arg[0] as usize;
         let rhs       = arg[1] as usize;
         if arg_type[0].is_constant() {
-            dyp_both[res] = (&cop[lhs]).$name (&dyp_both[rhs]);
+            dyp_all[res] = (&cop[lhs]).$name (&dyp_all[rhs]);
         } else if arg_type[1].is_constant() {
-            dyp_both[res] = (&dyp_both[lhs]).$name (&cop[rhs]);
+            dyp_all[res] = (&dyp_all[lhs]).$name (&cop[rhs]);
         } else {
-            dyp_both[res] = (&dyp_both[lhs]).$name (&dyp_both[rhs]);
+            dyp_all[res] = (&dyp_all[lhs]).$name (&dyp_all[rhs]);
         };
     }
     #[doc = concat!(
@@ -111,8 +111,8 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
         "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $name _pv_forward_var >] <V, E> (
-        dyp_both    : &[E]        ,
-        var_both    : &mut [E]    ,
+        dyp_all     : &[E]        ,
+        var_all     : &mut [E]    ,
         cop         : &[V]        ,
         _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
@@ -127,9 +127,9 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
         if arg_type[0].is_constant() {
-            var_both[res] = (&cop[lhs]).$name (&var_both[rhs]);
+            var_all[res] = (&cop[lhs]).$name (&var_all[rhs]);
         } else {
-            var_both[res] = (&dyp_both[lhs]).$name (&var_both[rhs]);
+            var_all[res] = (&dyp_all[lhs]).$name (&var_all[rhs]);
         }
     }
     #[doc = concat!(
@@ -137,8 +137,8 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
         "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $name _vp_forward_var >] <V, E> (
-        dyp_both    : &[E]        ,
-        var_both    : &mut [E]    ,
+        dyp_all     : &[E]        ,
+        var_all     : &mut [E]    ,
         cop         : &[V]        ,
         _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
@@ -153,9 +153,9 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
         if arg_type[1].is_constant() {
-            var_both[res] = (&var_both[lhs]).$name (&cop[rhs]);
+            var_all[res] = (&var_all[lhs]).$name (&cop[rhs]);
         } else {
-            var_both[res] = (&var_both[lhs]).$name (&dyp_both[rhs]);
+            var_all[res] = (&var_all[lhs]).$name (&dyp_all[rhs]);
         }
     }
     #[doc = concat!(
@@ -163,8 +163,8 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
         "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $name _vv_forward_var >] <V, E> (
-        _dyp_both   : &[E]        ,
-        var_both    : &mut [E]    ,
+        _dyp_all    : &[E]        ,
+        var_all     : &mut [E]    ,
         _cop        : &[V]        ,
         _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
@@ -176,7 +176,7 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
         debug_assert!( arg.len() == 2);
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
-        var_both[res] = (&var_both[lhs]).$name (&var_both[rhs]);
+        var_all[res] = (&var_all[lhs]).$name (&var_all[rhs]);
     }
 } } }
 pub(crate) use binary_arithmetic_function;
@@ -328,7 +328,7 @@ macro_rules! f_binary_function { ($name:ident) => { paste::paste! {
         "; see [ForwardDyp](crate::op::info::ForwardDyp)"
     ) ]
     fn [< $name _forward_dyp >] <V, E> (
-        dyp_both    : &mut [E]    ,
+        dyp_all     : &mut [E]    ,
         cop         : &[V]        ,
         _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
@@ -349,19 +349,19 @@ macro_rules! f_binary_function { ($name:ident) => { paste::paste! {
         //
         match( arg_type[0], arg_type[1] ) {
             (ADType::DynamicP, ADType::DynamicP) => {
-                let left  = &dyp_both[lhs];
-                let right = &dyp_both[rhs];
-                dyp_both[ res ] = left. $name ( right );
+                let left  = &dyp_all[lhs];
+                let right = &dyp_all[rhs];
+                dyp_all[ res ] = left. $name ( right );
             },
             (ADType::DynamicP, ADType::ConstantP) => {
-                let left  = &dyp_both[lhs];
+                let left  = &dyp_all[lhs];
                 let right = &cop[rhs];
-                dyp_both[ res ] = left. $name ( right );
+                dyp_all[ res ] = left. $name ( right );
             },
             (ADType::ConstantP, ADType::DynamicP) => {
                 let left  = &cop[lhs];
-                let right = &dyp_both[rhs];
-                dyp_both[ res ] = left. $name ( right );
+                let right = &dyp_all[rhs];
+                dyp_all[ res ] = left. $name ( right );
             },
 
             _ => { debug_assert!( false,
@@ -376,8 +376,8 @@ macro_rules! f_binary_function { ($name:ident) => { paste::paste! {
         "; see [ForwardVar](crate::op::info::ForwardVar)"
     ) ]
     fn [< $name _forward_var >] <V, E> (
-        dyp_both    : &[E]        ,
-        var_both    : &mut [E]    ,
+        dyp_all     : &[E]        ,
+        var_all     : &mut [E]    ,
         cop         : &[V]        ,
         _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
@@ -394,37 +394,37 @@ macro_rules! f_binary_function { ($name:ident) => { paste::paste! {
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
         //
-        // var_both[res]
+        // var_all[res]
         match( arg_type[0], arg_type[1] ) {
             // variable op constant
             (ADType::Variable, ADType::ConstantP) => {
-                let left  = &var_both[lhs];
+                let left  = &var_all[lhs];
                 let right = &cop[rhs];
-                var_both[ res ] = left. $name ( right );
+                var_all[ res ] = left. $name ( right );
             },
             // variable op dynamic
             (ADType::Variable, ADType::DynamicP) => {
-                let left  = &var_both[lhs];
-                let right = &dyp_both[rhs];
-                var_both[ res ] = left. $name ( right );
+                let left  = &var_all[lhs];
+                let right = &dyp_all[rhs];
+                var_all[ res ] = left. $name ( right );
             },
             // variable op variable
             (ADType::Variable, ADType::Variable) => {
-                let left  = &var_both[lhs];
-                let right = &var_both[rhs];
-                var_both[ res ] = left. $name ( right );
+                let left  = &var_all[lhs];
+                let right = &var_all[rhs];
+                var_all[ res ] = left. $name ( right );
             },
             // constant op variable
             (ADType::ConstantP, ADType::Variable) => {
                 let left  = &cop[lhs];
-                let right = &var_both[rhs];
-                var_both[ res ] = left. $name ( right );
+                let right = &var_all[rhs];
+                var_all[ res ] = left. $name ( right );
             },
             // dynamic op variable
             (ADType::DynamicP, ADType::Variable) => {
-                let left  = &dyp_both[lhs];
-                let right = &var_both[rhs];
-                var_both[ res ] = left. $name ( right );
+                let left  = &dyp_all[lhs];
+                let right = &var_all[rhs];
+                var_all[ res ] = left. $name ( right );
             },
             _ => { debug_assert!(false,
                 "forward_var: compare: invalid argument types"

@@ -39,7 +39,7 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     dom_der = f.subgraph_der(dyp_both, &var_both, row_index, arg_vec)
+///     dom_der = f.subgraph_der(dyp_all, &var_all, row_index, arg_vec)
 ///   ```
 ///
 /// * V : see [doc_generic_v]
@@ -125,8 +125,8 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
     //
     pub fn [< subgraph_der_ $suffix >] (
         &self,
-        dyp_both  : Option< &Vec<$E> >  ,
-        var_both  : &Vec<$E>            ,
+        dyp_all   : Option< &Vec<$E> >  ,
+        var_all   : &Vec<$E>            ,
         row_index : usize               ,
         arg_vec   : &Vec<[&str; 2]>     ,
     ) -> Vec<$E>
@@ -148,11 +148,11 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
             }
         }
         //
-        // dyp_both
-        let dyp_both : &Vec<$E> = if dyp_both.is_none() {
+        // dyp_all
+        let dyp_all  : &Vec<$E> = if dyp_all.is_none() {
             &Vec::new()
         } else {
-            dyp_both.unwrap()
+            dyp_all.unwrap()
         };
         // var_n_dom
         let var_n_dom = self.var_dom_len();
@@ -202,8 +202,8 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
                 let res       = self.var.n_dom + op_index;
                 let reverse_1 = op_info_vec[op_id].[< reverse_der_ $suffix >];
                 reverse_1(
-                    &dyp_both,
-                    &var_both,
+                    &dyp_all,
+                    &var_all,
                     &mut var_der,
                     &self.cop,
                     &self.var.bool_all,
@@ -214,7 +214,7 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
                 if trace {
                     let name = &op_info_vec[op_id].name;
                     println!( "{}, {}, {}, {}, {:?}",
-                        res, var_both[res], var_der[res], name, arg
+                        res, var_all[res], var_der[res], name, arg
                     );
                 }
                 //
@@ -229,7 +229,7 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
         if trace {
             println!( "var_index, var_dom, dom_der" );
             for j in 0 .. self.var.n_dom {
-                println!( "{}, {}, {}", j, var_both[j], var_der[j] );
+                println!( "{}, {}, {}", j, var_all[j], var_der[j] );
             }
             println!( "End Trace: sub_sparsity");
         }

@@ -29,8 +29,8 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     dyp_both = f.forward_dyp_value(dyp_dom, arg_vec)
-///     dyp_both = f.forward_dyp_ad(dyp_dom, arg_vec)
+///     dyp_all  = f.forward_dyp_value(dyp_dom, arg_vec)
+///     dyp_all  = f.forward_dyp_ad(dyp_dom, arg_vec)
 ///   ```
 /// * Prototype :
 ///   see [ADfn::forward_dyp_value] and [ADfn::forward_dyp_ad]
@@ -50,10 +50,10 @@ use crate::{
 /// * dyp_dom :
 ///   specifies the domain space dynamic parameter values.
 ///
-/// * dyp_both :
+/// * dyp_all  :
 ///   is both the dynamic parameter sub-vectors in the following order:
 ///   the domain dynamic parameters followed by the dependent dynamic parameters.
-///   Note that *dyp_dom* gets moved to the beginning of *dyp_both* .
+///   Note that *dyp_dom* gets moved to the beginning of *dyp_all* .
 ///
 pub fn doc_forward_dyp() { }
 //
@@ -109,10 +109,10 @@ macro_rules! forward_dyp {
             // n_dyp
             let n_dyp = self.dyp.n_dom + self.dyp.n_dep;
             //
-            // dyp_both
+            // dyp_all
             let nan_e        = $E::nan();
-            let mut dyp_both = dyp_dom;
-            dyp_both.resize(n_dyp, nan_e );
+            let mut dyp_all  = dyp_dom;
+            dyp_all.resize(n_dyp, nan_e );
             //
             if trace {
                 println!( "Begin Trace: forward_dyp_{}", stringify!($suffix) );
@@ -126,12 +126,12 @@ macro_rules! forward_dyp {
                 }
                 println!( "dyp_index, dyp_dom" );
                 for j in 0 .. self.dyp.n_dom {
-                    println!( "{}, {}", j, dyp_both[j] );
+                    println!( "{}, {}", j, dyp_all[j] );
                 }
-                println!( "index, dyp_both, op_name, arg, arg_type" );
+                println!( "index, dyp_all, op_name, arg, arg_type" );
             }
             //
-            // dyp_both
+            // dyp_all
             for op_index in 0 .. self.dyp.id_all.len() {
                 let op_id    = self.dyp.id_all[op_index] as usize;
                 let start    = self.dyp.arg_start[op_index] as usize;
@@ -142,7 +142,7 @@ macro_rules! forward_dyp {
                 let forward_dyp = op_info_vec[op_id].[< forward_dyp_ $suffix >];
                 //
                 forward_dyp(
-                    &mut dyp_both,
+                    &mut dyp_all,
                     &self.cop,
                     &self.dyp.bool_all,
                     arg,
@@ -152,14 +152,14 @@ macro_rules! forward_dyp {
                 if trace {
                     let name = &op_info_vec[op_id].name;
                     println!( "{}, {}, {}, {:?}, {:?}",
-                        res, dyp_both[res], name, arg, arg_type
+                        res, dyp_all[res], name, arg, arg_type
                     );
                 }
             }
             if trace {
                 println!("End Trace: forward_dyp_{}", stringify!($suffix));
             }
-            dyp_both
+            dyp_all
         }
     }
 } }
@@ -205,18 +205,18 @@ mod tests {
         let ay = vec![ &ax[0] * &asum ];
         let f  = stop_recording(ay);
         //
-        // dyp_both
+        // dyp_all
         let arg_vec  : Vec<[&str; 2]> = Vec::new();
-        let dyp_both = f.forward_dyp_value(p.clone(), &arg_vec);
+        let dyp_all  = f.forward_dyp_value(p.clone(), &arg_vec);
         //
-        assert_eq!( dyp_both.len(), 2 * np - 1 );
+        assert_eq!( dyp_all.len(), 2 * np - 1 );
         for j in 0 .. np {
-            assert_eq!( dyp_both[j], p[j] );
+            assert_eq!( dyp_all[j], p[j] );
         }
         let mut sum = p[0];
         for j in 1 .. np {
             sum += &p[j];
-            assert_eq!( dyp_both[np + j - 1], sum );
+            assert_eq!( dyp_all[np + j - 1], sum );
         }
     }
 }

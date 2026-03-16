@@ -43,8 +43,8 @@ common::rust_src!(tan);
 /// First order forward mode for tan(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn tan_forward_der<V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -62,15 +62,15 @@ where
     let one      = E::one();
     let x        = arg[0] as usize;
     let z        = res;
-    let z_x      = &one + &( &var_both[z] * &var_both[z] );
+    let z_x      = &one + &( &var_all[z] * &var_all[z] );
     var_der[z]   = &z_x * &var_der[x];
 }
 // tan_reverse_der
 /// First order reverse mode for tan(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn tan_reverse_der<V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -89,7 +89,7 @@ where
     let one         = E::one();
     let x           = arg[0] as usize;
     let z           = res;
-    let z_x         = &one + &( &var_both[z] * &var_both[z] );
+    let z_x         = &one + &( &var_all[z] * &var_all[z] );
     var_der[x]     += &( &z_x * &var_der[z] );
 }
 // ---------------------------------------------------------------------------

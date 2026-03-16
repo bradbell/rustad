@@ -487,9 +487,9 @@ where
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // range_der
-    let (_, var_both) = ad_fn.forward_var_value(None, domain_clone, &arg_vec);
+    let (_, var_all) = ad_fn.forward_var_value(None, domain_clone, &arg_vec);
     let range_der     = ad_fn.forward_der_value(
-        None, &var_both, domain_der_clone, &arg_vec
+        None, &var_all, domain_der_clone, &arg_vec
     );
     Ok( range_der )
 }
@@ -527,9 +527,9 @@ where
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // domain_der
-    let (_, var_both) = ad_fn.forward_var_value(None, domain_clone, &arg_vec);
+    let (_, var_all) = ad_fn.forward_var_value(None, domain_clone, &arg_vec);
     let domain_der    = ad_fn.reverse_der_value(
-        None, &var_both, range_der_clone, &arg_vec
+        None, &var_all, range_der_clone, &arg_vec
     );
     Ok( domain_der )
 }

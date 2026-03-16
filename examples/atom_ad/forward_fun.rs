@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
 // SPDX-FileCopyrightText: Bradley M. Bell <bradbell@seanet.com>
-// SPDX-FileContributor: 2025 Bradley M. Bell
+// SPDX-FileContributor: 2025-26 Bradley M. Bell
 //
 /*
 sumsq_forward_fun
@@ -26,7 +26,7 @@ pub fn sumsq_forward_fun_value(
     trace        : bool        ,
 ) -> Result< Vec<V>, String >
 {   //
-    // var_both, sumsq_zero
+    // var_all, sumsq_zero
     let mut sumsq_zero = V::from(0.0);
     for j in 0 .. domain.len() {
         sumsq_zero += &( domain[j] * domain[j] );

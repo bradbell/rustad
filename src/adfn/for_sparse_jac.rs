@@ -32,10 +32,10 @@ use crate::{
 /// * Syntax :
 ///   ```text
 ///     jacobian = f.for_sparse_jac_value(
-///         dyp_both, &var_both, &sub_pattern, &color_vec, arg_vec
+///         dyp_all, &var_all, &sub_pattern, &color_vec, arg_vec
 ///     )
 ///     jacobian = f.for_sparse_jac_ad(
-///         dyp_both, &var_both, &sub_pattern, &color_vec, arg_vec
+///         dyp_all, &var_all, &sub_pattern, &color_vec, arg_vec
 ///     )
 ///   ```
 ///
@@ -46,7 +46,7 @@ use crate::{
 /// * E : see [doc_generic_e]
 /// * f : is an [ADfn] object.
 ///
-/// * dyp_both :
+/// * dyp_all  :
 ///   If there are no dynamic parameters in f, this should be None
 ///   or the empty vector.
 ///   Otherwise it is the dynamic parameter sub-vectors in the following order:
@@ -54,7 +54,7 @@ use crate::{
 ///   This is normally computed by
 ///   [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
 ///
-/// * var_both :
+/// * var_all  :
 ///   is both the variable sub-vectors in the following order:
 ///   the domain variables followed by the dependent variables.
 ///   This is normally computed by
@@ -100,8 +100,8 @@ macro_rules! for_sparse_jac {
         )]
         pub fn [< for_sparse_jac_ $suffix >] (
             &self,
-            dyp_both     : Option< &Vec<$E> >  ,
-            var_both     : &Vec<$E>            ,
+            dyp_all      : Option< &Vec<$E> >  ,
+            var_all      : &Vec<$E>            ,
             sub_pattern  : &SparsityPattern    ,
             color_vec    : &[usize]            ,
             arg_vec      : &Vec<[&str; 2]>     ,
@@ -168,7 +168,7 @@ macro_rules! for_sparse_jac {
                 }
                 // range_der
                 let range_der = self. [< forward_der_ $suffix >](
-                    dyp_both, &var_both, dom_der, arg_vec
+                    dyp_all, &var_all, dom_der, arg_vec
                 );
                 //
                 let [mut i, mut j] = sub_pattern[ order[index] ];

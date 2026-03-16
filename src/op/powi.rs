@@ -34,7 +34,7 @@ use crate::op::id::POWI_OP;
 //
 // pow_forward_dyp
 fn powi_forward_dyp <V, E> (
-    dyp_both    : &mut [E]    ,
+    dyp_all     : &mut [E]    ,
     _cop        : &[V]        ,
     _bool_all   : &[bool]     ,
     arg         : &[IndexT]   ,
@@ -55,13 +55,13 @@ where
     //
     let positive    = arg[2] == 0;
     let exponent    = if positive { arg[1] as i32 } else { - (arg[1] as i32) };
-    dyp_both[ res ] = dyp_both[index].powi(exponent);
+    dyp_all[ res ] = dyp_all[index].powi(exponent);
 }
 //
 // powi_forward_var
 fn powi_forward_var <V, E> (
-    _dyp_both   : &[E]        ,
-    var_both    : &mut [E]    ,
+    _dyp_all    : &[E]        ,
+    var_all     : &mut [E]    ,
     _cop        : &[V]        ,
     _bool_all   : &[bool]     ,
     arg         : &[IndexT]   ,
@@ -82,7 +82,7 @@ where
     //
     let positive     = arg[2] == 0;
     let exponent     = if positive { arg[1] as i32 } else { - (arg[1] as i32) };
-    var_both[ res ] = var_both[index].powi(exponent);
+    var_all[ res ] = var_all[index].powi(exponent);
 }
 //
 // powi_rust_src
@@ -180,8 +180,8 @@ pub(crate) fn powi_reverse_depend(
 /// First order forward mode for powi(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn powi_forward_der<V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -203,7 +203,7 @@ where
     if rhs == 0 {
         var_der[res] = FConst::zero();
     } else {
-        let dpowi    = &( var_both[lhs].powi(rhs-1) ) *  &V::from(rhs as f32);
+        let dpowi    = &( var_all[lhs].powi(rhs-1) ) *  &V::from(rhs as f32);
         var_der[res] = &dpowi *  &var_der[lhs];
     }
 }
@@ -211,8 +211,8 @@ where
 /// First order reverse mode for powi(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn powi_reverse_der<V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -233,7 +233,7 @@ where
     let rhs       = if positive { arg[1] as i32 } else { - (arg[1] as i32) };
     let lhs       = arg[0] as usize;
     if rhs != 0 {
-        let dpowi    = &( var_both[lhs].powi(rhs-1) ) * &V::from(rhs as f32);
+        let dpowi    = &( var_all[lhs].powi(rhs-1) ) * &V::from(rhs as f32);
         let term     = &dpowi * &var_der[res];
         var_der[lhs] += &term;
     }

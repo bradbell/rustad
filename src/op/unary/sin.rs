@@ -42,8 +42,8 @@ common::rust_src!(sin);
 /// First order forward mode for sin(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn sin_forward_der<V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -59,15 +59,15 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let x        = arg[0] as usize;
     let z        = res;
-    let z_x      = FUnary::cos( &var_both[x] );
+    let z_x      = FUnary::cos( &var_all[x] );
     var_der[z]   = &z_x * &var_der[x];
 }
 // sin_reverse_der
 /// First order reverse mode for sin(variable);
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn sin_reverse_der<V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -84,7 +84,7 @@ where
     debug_assert!( arg_type[0].is_variable() );
     let x           = arg[0] as usize;
     let z           = res;
-    let z_x         = FUnary::cos( &var_both[x] );
+    let z_x         = FUnary::cos( &var_all[x] );
     var_der[x]     += &( &z_x * &var_der[z] );
 }
 // ---------------------------------------------------------------------------

@@ -72,8 +72,8 @@ common::binary_arithmetic_function!(Div, div);
 // div_pv_forward_der
 /// first order forward for parameter / variable; see [ForwardDer]
 fn div_pv_forward_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -91,15 +91,15 @@ where
     debug_assert!( arg_type[0].is_parameter() );
     debug_assert!( arg_type[1].is_variable() );
     let rhs        = arg[1] as usize;
-    let numerator  = &var_both[res] * &var_der[rhs];
-    var_der[res]   = (&numerator / &var_both[rhs]).minus()
+    let numerator  = &var_all[res] * &var_der[rhs];
+    var_der[res]   = (&numerator / &var_all[rhs]).minus()
 }
 //
 // div_vp_forward_der
 /// first order forward for variable / parameter; see [ForwardDer]
 fn div_vp_forward_der <V, E>(
-    dyp_both   :   &[E]        ,
-    _var_both  :   &[E]        ,
+    dyp_all    :   &[E]        ,
+    _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -119,15 +119,15 @@ where
         var_der[ res ] = &var_der[lhs] / &cop[rhs];
     } else {
         debug_assert!( arg_type[1].is_dynamic() );
-        var_der[ res ] = &var_der[lhs] / &dyp_both[rhs];
+        var_der[ res ] = &var_der[lhs] / &dyp_all[rhs];
     }
 }
 //
 // div_vv_forward_der
 /// first order forward for variable / variable; see [ForwardDer]
 fn div_vv_forward_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -147,8 +147,8 @@ where
     debug_assert!( arg_type[1].is_variable() );
     let lhs       = arg[0] as usize;
     let rhs       = arg[1] as usize;
-    let numerator = &var_der[lhs] - &( &var_both[res] * &var_der[rhs] );
-    var_der[res]  = &numerator / &var_both[rhs];
+    let numerator = &var_der[lhs] - &( &var_all[res] * &var_der[rhs] );
+    var_der[res]  = &numerator / &var_all[rhs];
 }
 // ---------------------------------------------------------------------------
 // reverse_der
@@ -157,8 +157,8 @@ where
 // div_pv_reverse_der
 /// first order reverse for parameter / variable; see [ReverseDer]
 fn div_pv_reverse_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -177,15 +177,15 @@ where
     debug_assert!( arg_type[0].is_parameter() );
     debug_assert!( arg_type[1].is_variable() );
     let rhs = arg[1] as usize;
-    let term      = &var_der[res] * &( &var_both[res] / &var_both[rhs] );
+    let term      = &var_der[res] * &( &var_all[res] / &var_all[rhs] );
     var_der[rhs] -= &term;
 }
 //
 // div_vp_reverse_der
 /// first order reverse for variable / parameter; see [ReverseDer]
 fn div_vp_reverse_der <V, E>(
-    dyp_both   :   &[E]        ,
-    _var_both  :   &[E]        ,
+    dyp_all    :   &[E]        ,
+    _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -209,7 +209,7 @@ where
         &var_der[res] / &cop[rhs]
     } else {
         debug_assert!( arg_type[1].is_dynamic() );
-        &var_der[res] / &dyp_both[rhs]
+        &var_der[res] / &dyp_all[rhs]
     };
     var_der[lhs] += &term;
 }
@@ -217,8 +217,8 @@ where
 // div_vv_reverse_der
 /// first order reverse for variable / variable; see [ReverseDer]
 fn div_vv_reverse_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -241,10 +241,10 @@ where
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
     //
-    let term      = &var_der[res] / &var_both[rhs];
+    let term      = &var_der[res] / &var_all[rhs];
     var_der[lhs] += &term;
     //
-    let term      = &var_der[res] * &( &var_both[res] / &var_both[rhs] );
+    let term      = &var_der[res] * &( &var_all[res] / &var_all[rhs] );
     var_der[rhs] -= &term;
 }
 // ---------------------------------------------------------------------------

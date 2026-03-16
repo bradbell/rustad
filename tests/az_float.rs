@@ -73,18 +73,18 @@ fn test_forward_dyp() {
     let ay = vec![ &ax[0] * &asum ];
     let f  = stop_recording(ay);
     //
-    // dyp_both
+    // dyp_all
     let arg_vec : Vec<[&str; 2]> = Vec::new();
-    let dyp_both = f.forward_dyp_value(p.clone(), &arg_vec);
+    let dyp_all  = f.forward_dyp_value(p.clone(), &arg_vec);
     //
-    assert_eq!( dyp_both.len(), 2 * np - 1 );
+    assert_eq!( dyp_all.len(), 2 * np - 1 );
     for j in 0 .. np {
-        assert_eq!( dyp_both[j], p[j] );
+        assert_eq!( dyp_all[j], p[j] );
     }
     let mut sum = p[0];
     for j in 1 .. np {
     sum += &p[j];
-        assert_eq!( dyp_both[np + j - 1], sum );
+        assert_eq!( dyp_all[np + j - 1], sum );
     }
 }
 

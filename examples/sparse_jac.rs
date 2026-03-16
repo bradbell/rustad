@@ -37,7 +37,7 @@ fn main () {
     //
     // x
     let x : Vec<V>     = (0 .. n).map( |j| V::from(j+1) ).collect();
-    let (_y, var_both) = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, var_all) = f.forward_var_value(None, x.clone(), &arg_vec);
     //
     // -----------------------------------------------------------------------
     // for_sparse_jac_value
@@ -49,7 +49,7 @@ fn main () {
     //
     // jacobian
     let jacobian = f.for_sparse_jac_value(
-        None, &var_both, &pattern, &color_vec, &arg_vec
+        None, &var_all, &pattern, &color_vec, &arg_vec
     );
     //
     // row_major
@@ -83,7 +83,7 @@ fn main () {
     //
     // jacobian
     let jacobian = f.rev_sparse_jac_value(
-        None, &var_both, &pattern, &color_vec, &arg_vec
+        None, &var_all, &pattern, &color_vec, &arg_vec
     );
     //
     // col_major

@@ -29,8 +29,8 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     dom_der = f.reverse_der_value(dyp_both, &var_both, range_der, arg_vec)
-///     dom_der = f.reverse_der_ad(dyp_both, &var_both, range_der, arg_vec)
+///     dom_der = f.reverse_der_value(dyp_all, &var_all, range_der, arg_vec)
+///     dom_der = f.reverse_der_ad(dyp_all, &var_all, range_der, arg_vec)
 ///   ```
 ///
 /// * Prototype :
@@ -40,7 +40,7 @@ use crate::{
 /// * E : see [doc_generic_e]
 /// * f : is an [ADfn] object.
 ///
-/// * dyp_both :
+/// * dyp_all  :
 ///   If there are no dynamic parameters in f, this should be None
 ///   or the empty vector. Otherwise
 ///   it is the dynamic parameter sub-vectors in the following order: the
@@ -48,7 +48,7 @@ use crate::{
 ///   This is normally computed by
 ///   [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
 ///
-/// * var_both :
+/// * var_all  :
 ///   is both the variable sub-vectors in the following order:
 ///   the domain variables followed by the dependent variables.
 ///   This is normally computed by
@@ -132,8 +132,8 @@ macro_rules! reverse_der {
         )]
         pub fn [< reverse_der_ $suffix >] (
             &self,
-            dyp_both    : Option< &Vec<$E> >  ,
-            var_both    : &Vec<$E>            ,
+            dyp_all     : Option< &Vec<$E> >  ,
+            var_all     : &Vec<$E>            ,
             range_der   : Vec<$E>             ,
             arg_vec     : &Vec<[&str; 2]>     ,
         ) -> Vec<$E>
@@ -155,11 +155,11 @@ macro_rules! reverse_der {
                 }
             }
             //
-            // dyp_both
-            let dyp_both : &Vec<$E> = if dyp_both.is_none() {
+            // dyp_all
+            let dyp_all  : &Vec<$E> = if dyp_all.is_none() {
                 &Vec::new()
             } else {
-                dyp_both.unwrap()
+                dyp_all.unwrap()
             };
             //
             // n_var
@@ -170,8 +170,8 @@ macro_rules! reverse_der {
                 "f.reverse_der: range vector length does not match f"
             );
             assert_eq!(
-                 var_both.len(), n_var,
-                "f.reverse_der:  var_both does not have the proper length"
+                 var_all.len(), n_var,
+                "f.reverse_der:  var_all does not have the proper length"
             );
             //
             // op_info_vec
@@ -201,9 +201,9 @@ macro_rules! reverse_der {
                 for j in 0 .. self.cop.len() {
                     println!( "{}, {}", j, self.cop[j] );
                 }
-                println!( "index, dyp_both" );
-                for j in 0 .. dyp_both.len() {
-                    println!( "{}, {}", j, dyp_both[j] );
+                println!( "index, dyp_all" );
+                for j in 0 .. dyp_all.len() {
+                    println!( "{}, {}", j, dyp_all[j] );
                 }
                 println!( "var_index, range_der" );
                 for i in 0 .. self.rng_ad_type.len() {
@@ -212,7 +212,7 @@ macro_rules! reverse_der {
                         println!( "{}, {}", index,  var_der[index] );
                     }
                 }
-                println!( "var_index, var_both, var_der, op_name, arg" );
+                println!( "var_index, var_all, var_der, op_name, arg" );
             }
             //
             // var_der
@@ -225,8 +225,8 @@ macro_rules! reverse_der {
                 let res       = self.var.n_dom + op_index;
                 let reverse_1 = op_info_vec[op_id].[< reverse_der_ $suffix >];
                 reverse_1(
-                    &dyp_both,
-                    &var_both,
+                    &dyp_all,
+                    &var_all,
                     &mut var_der,
                     &self.cop,
                     &self.var.bool_all,
@@ -237,14 +237,14 @@ macro_rules! reverse_der {
                 if trace {
                     let name = &op_info_vec[op_id].name;
                     println!( "{}, {}, {}, {}, {:?}",
-                        res, var_both[res], var_der[res], name, arg
+                        res, var_all[res], var_der[res], name, arg
                     );
                 }
             }
             if trace {
                 println!( "var_index, var_dom, dom_der" );
                 for j in 0 .. self.var.n_dom {
-                    println!( "{}, {}, {}", j, var_both[j], var_der[j] );
+                    println!( "{}, {}, {}", j, var_all[j], var_der[j] );
                 }
                 println!( "End Trace: reverse_der" );
             }

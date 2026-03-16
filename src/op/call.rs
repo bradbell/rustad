@@ -139,8 +139,8 @@ pub(crate) fn extract_call_info<'a>(
 // ----------------------------------------------------------------------
 // domain_value
 fn domain_value<'a, 'b, V>(
-    dyp_both   : &'a [V]       ,
-    var_both   : &'a [V]       ,
+    dyp_all    : &'a [V]       ,
+    var_all    : &'a [V]       ,
     cop        : &'a [V]       ,
     arg        : &'b [IndexT]  ,
     arg_type   : &'b [ADType]  ,
@@ -152,8 +152,8 @@ where
     // nan_v
     let nan_v : V   = f32::NAN.into();
     //
-    // no_var_both
-    let no_var_both = var_both.len() == 1 && var_both[0] == nan_v;
+    // no_var_all
+    let no_var_all  = var_all.len() == 1 && var_all[0] == nan_v;
     //
     let mut domain      : Vec<&V> = Vec::with_capacity( n_dom );
     for j_arg in 0 .. n_dom {
@@ -162,13 +162,13 @@ where
         if ad_type.is_constant() {
             domain.push( &cop[index] );
         } else if ad_type.is_dynamic() {
-            domain.push( &dyp_both[index] );
+            domain.push( &dyp_all[index] );
         } else {
             debug_assert!( ad_type.is_variable() );
-            if no_var_both {
-                domain.push( &var_both[0] );
+            if no_var_all {
+                domain.push( &var_all[0] );
             } else {
-                domain.push( &var_both[index] );
+                domain.push( &var_all[index] );
             }
         }
     }
@@ -198,7 +198,7 @@ where
 // ----------------------------------------------------------------------
 // domain_ad_dyp
 fn domain_ad_dyp<'a, 'b, V>(
-    dyp_both   : &'a [AD<V>]    ,
+    dyp_all    : &'a [AD<V>]    ,
     anan       : &'a AD<V>      ,
     acop       : &'a [AD<V>]    ,
     arg        : &'b [IndexT]   ,
@@ -218,7 +218,7 @@ where
             domain.push( &acop[j_cop] );
             j_cop += 1;
         } else if ad_type.is_dynamic() {
-            domain.push( &dyp_both[index] );
+            domain.push( &dyp_all[index] );
         } else {
             debug_assert!( ad_type.is_variable() );
             domain.push( anan );
@@ -229,8 +229,8 @@ where
 // ----------------------------------------------------------------------
 // domain_ad_var
 fn domain_ad_var<'a, 'b, V>(
-    dyp_both   : &'a [AD<V>]    ,
-    var_both   : &'a [AD<V>]    ,
+    dyp_all    : &'a [AD<V>]    ,
+    var_all    : &'a [AD<V>]    ,
     acop       : &'a [AD<V>]    ,
     arg        : &'b [IndexT]   ,
     arg_type   : &'b [ADType]   ,
@@ -249,10 +249,10 @@ where
             domain.push( &acop[j_cop] );
             j_cop += 1;
         } else if ad_type.is_dynamic() {
-            domain.push( &dyp_both[index] );
+            domain.push( &dyp_all[index] );
         } else {
             debug_assert!( ad_type.is_variable() );
-            domain.push( &var_both[index] );
+            domain.push( &var_all[index] );
         }
     }
     domain
@@ -264,7 +264,7 @@ where
 /// Call operator V evaluation of dynamic parameters;
 /// see [ForwardDyp](crate::op::info::ForwardDyp)
 fn call_forward_dyp_value<V> (
-    dyp_both   : &mut [V]      ,
+    dyp_all    : &mut [V]      ,
     cop        : &[V]          ,
     bool_all   : &[bool]       ,
     arg        : &[IndexT]     ,
@@ -296,9 +296,9 @@ where
     //
     // domain
     let nan_v    : V      = f32::NAN.into();
-    let var_both : Vec<V> = vec![ nan_v ];
+    let var_all  : Vec<V> = vec![ nan_v ];
     let domain            = domain_value(
-        dyp_both, &var_both, cop, arg, arg_type, n_dom
+        dyp_all, &var_all, cop, arg, arg_type, n_dom
     );
     //
     // range
@@ -318,11 +318,11 @@ where
         range.len(),
     );
     //
-    // dyp_both
+    // dyp_all
     let mut dep_index = 0;
     for rng_index in 0 .. n_rng {
         if rng_is_dep[rng_index] {
-            swap( &mut dyp_both[res + dep_index], &mut range[rng_index] );
+            swap( &mut dyp_all[res + dep_index], &mut range[rng_index] );
             dep_index += 1;
         }
     }
@@ -332,7 +332,7 @@ where
 /// Call operator `AD<V>` evaluation of dynamic parameters;
 /// see [ForwardDyp](crate::op::info::ForwardDyp)
 fn call_forward_dyp_ad<V> (
-    adyp_both  : &mut [ AD<V> ]      ,
+    adyp_all   : &mut [ AD<V> ]      ,
     cop        : &[V]                ,
     bool_all   : &[bool]             ,
     arg        : &[IndexT]           ,
@@ -367,7 +367,7 @@ where
     let nan_v : V = f32::NAN.into();
     let anan      = AD::from( nan_v );
     let adomain   = domain_ad_dyp(
-        adyp_both, &anan, &acop, arg, arg_type, n_dom
+        adyp_all, &anan, &acop, arg, arg_type, n_dom
     );
     //
     // arange_zero
@@ -387,11 +387,11 @@ where
         arange.len(),
     );
     //
-    // adyp_both
+    // adyp_all
     let mut dep_index = 0;
     for rng_index in 0 .. n_rng {
         if rng_is_dep[rng_index] {
-            swap( &mut adyp_both[res + dep_index], &mut arange[rng_index] );
+            swap( &mut adyp_all[res + dep_index], &mut arange[rng_index] );
             dep_index += 1;
         }
     }
@@ -404,8 +404,8 @@ where
 /// Call operator V evaluation of variables;
 /// see [ForwardVar](crate::op::info::ForwardVar)
 fn call_forward_var_value<V> (
-    dyp_both   : &[V]          ,
-    var_both   : &mut [V]      ,
+    dyp_all    : &[V]          ,
+    var_all    : &mut [V]      ,
     cop        : &[V]          ,
     bool_all   : &[bool]       ,
     arg        : &[IndexT]     ,
@@ -437,7 +437,7 @@ where
     //
     // domain
     let domain = domain_value(
-        dyp_both, var_both, cop, arg, arg_type, n_dom
+        dyp_all, var_all, cop, arg, arg_type, n_dom
     );
     //
     // range
@@ -457,11 +457,11 @@ where
         range.len(),
     );
     //
-    // var_both
+    // var_all
     let mut dep_index = 0;
     for rng_index in 0 .. n_rng {
         if rng_is_dep[rng_index] {
-            swap( &mut var_both[res + dep_index], &mut range[rng_index] );
+            swap( &mut var_all[res + dep_index], &mut range[rng_index] );
             dep_index += 1;
         }
     }
@@ -471,8 +471,8 @@ where
 /// Call operator `AD<V>` evaluation of variables;
 /// see [ForwardVar](crate::op::info::ForwardVar)
 fn call_forward_var_ad<V> (
-    adyp_both  : &[ AD<V> ]          ,
-    avar_both  : &mut [ AD<V> ]      ,
+    adyp_all   : &[ AD<V> ]          ,
+    avar_all   : &mut [ AD<V> ]      ,
     cop        : &[V]                ,
     bool_all   : &[bool]             ,
     arg        : &[IndexT]           ,
@@ -505,7 +505,7 @@ where
     // adomain
     let acop     = domain_acop(cop, arg, arg_type, n_dom);
     let adomain  = domain_ad_var(
-        adyp_both, avar_both, &acop, arg, arg_type, n_dom
+        adyp_all, avar_all, &acop, arg, arg_type, n_dom
     );
     //
     // arange
@@ -525,11 +525,11 @@ where
         arange.len(),
     );
     //
-    // avar_both
+    // avar_all
     let mut dep_index = 0;
     for rng_index in 0 .. n_rng {
         if rng_is_dep[rng_index] {
-            swap( &mut avar_both[res + dep_index], &mut arange[rng_index] );
+            swap( &mut avar_all[res + dep_index], &mut arange[rng_index] );
             dep_index += 1;
         }
     }
@@ -542,8 +542,8 @@ where
 /// Call operator V evaluation of forward mode derivatives;
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn call_forward_der_value<V> (
-    dyp_both   : &[V]          ,
-    var_both   : &[V]          ,
+    dyp_all    : &[V]          ,
+    var_all    : &[V]          ,
     var_der    : &mut [V]      ,
     cop        : &[V]          ,
     bool_all   : &[bool]       ,
@@ -576,7 +576,7 @@ where
     //
     // domain
     let domain = domain_value(
-        dyp_both, var_both, cop, arg, arg_type, n_dom
+        dyp_all, var_all, cop, arg, arg_type, n_dom
     );
     // domain_der
     let zero_v : V = 0f32.into();
@@ -617,8 +617,8 @@ where
 /// Call operator `AD<V>` evaluation of forward mode derivatives;
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn call_forward_der_ad<V> (
-    adyp_both  : &[ AD<V> ]          ,
-    avar_both  : &[ AD<V> ]          ,
+    adyp_all   : &[ AD<V> ]          ,
+    avar_all   : &[ AD<V> ]          ,
     avar_der   : &mut [ AD<V> ]      ,
     cop        : &[V]                ,
     bool_all   : &[bool]             ,
@@ -652,7 +652,7 @@ where
     // adomain
     let acop    = domain_acop(cop, arg, arg_type, n_dom);
     let adomain = domain_ad_var(
-        adyp_both, avar_both, &acop, arg, arg_type, n_dom
+        adyp_all, avar_all, &acop, arg, arg_type, n_dom
     );
     //
     // adomain_der
@@ -697,8 +697,8 @@ where
 /// Call operator V evaluation of reverse mode derivatives;
 /// see [ReverseDer](crate::op::info::ReverseDer)
 fn call_reverse_der_value<V> (
-    dyp_both   : &[V]          ,
-    var_both   : &[V]          ,
+    dyp_all    : &[V]          ,
+    var_all    : &[V]          ,
     var_der    : &mut [V]      ,
     cop        : &[V]          ,
     bool_all   : &[bool]       ,
@@ -731,7 +731,7 @@ where
     //
     // domain
     let domain = domain_value(
-        dyp_both, var_both, cop, arg, arg_type, n_dom
+        dyp_all, var_all, cop, arg, arg_type, n_dom
     );
     //
     // range_der
@@ -769,8 +769,8 @@ where
 /// Call operator `AD<V>` evaluation of reverse mode derivatives;
 /// see [ReverseDer](crate::op::info::ReverseDer)
 fn call_reverse_der_ad<V> (
-    adyp_both   : &[ AD<V> ]          ,
-    avar_both   : &[ AD<V> ]          ,
+    adyp_all    : &[ AD<V> ]          ,
+    avar_all    : &[ AD<V> ]          ,
     avar_der    : &mut [ AD<V> ]      ,
     cop         : &[V]                ,
     bool_all   : &[bool]              ,
@@ -805,7 +805,7 @@ where
     // adomain
     let acop     = domain_acop(cop, arg, arg_type, n_dom);
     let adomain  = domain_ad_var(
-        adyp_both, avar_both, &acop, arg, arg_type, n_dom
+        adyp_all, avar_all, &acop, arg, arg_type, n_dom
     );
     //
     // sarange_der
@@ -844,7 +844,7 @@ where
 // call_res_dyp
 /// [ForwardDyp](crate::op::info::ForwardDyp) function for call result operator
 fn call_res_dyp<V, E>(
-    _dyp_both : &mut [E]    ,
+    _dyp_all  : &mut [E]    ,
     _cop      : &[V]        ,
     _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -855,8 +855,8 @@ fn call_res_dyp<V, E>(
 // call_res_var
 /// [ForwardVar](crate::op::info::ForwardVar) function for call result operator
 fn call_res_var<V, E>(
-    _dyp_both : &[E]        ,
-    _var_both : &mut [E]    ,
+    _dyp_all  : &[E]        ,
+    _var_all  : &mut [E]    ,
     _cop      : &[V]        ,
     _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
@@ -868,8 +868,8 @@ fn call_res_var<V, E>(
 /// [ForwardDer](crate::op::info::ForwardDer) or
 /// [ReverseDer](crate::op::info::ReverseDer) function for call result operator
 fn call_res_der<V, E>(
-    _dyp_both : &[E]        ,
-    _var_both : &[E]        ,
+    _dyp_all  : &[E]        ,
+    _var_all  : &[E]        ,
     _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
     _bool_all : &[bool]     ,

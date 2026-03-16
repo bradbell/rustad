@@ -30,8 +30,8 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     range_der = f.forward_der_value(dyp_both, &var_both, dom_der, arg_vec)
-///     range_der = f.forward_der_ad(dyp_both, &var_both, dom_der, arg_vec)
+///     range_der = f.forward_der_value(dyp_all, &var_all, dom_der, arg_vec)
+///     range_der = f.forward_der_ad(dyp_all, &var_all, dom_der, arg_vec)
 ///   ```
 ///
 /// * Prototype :
@@ -41,7 +41,7 @@ use crate::{
 /// * E : see [doc_generic_e]
 /// * f : is an [ADfn] object.
 ///
-/// * dyp_both :
+/// * dyp_all  :
 ///   If there are no dynamic parameters in f, this should be None
 ///   or the empty vector.
 ///   Otherwise it is the dynamic parameter sub-vectors in the following order:
@@ -49,7 +49,7 @@ use crate::{
 ///   This is normally computed by
 ///   [forward_dyp](crate::adfn::forward_dyp::doc_forward_dyp) .
 ///
-/// * var_both :
+/// * var_all  :
 ///   is both the variable sub-vectors in the following order:
 ///   the domain variables followed by the dependent variables.
 ///   This is normally computed by
@@ -132,8 +132,8 @@ macro_rules! forward_der {
         )]
         pub fn [< forward_der_ $suffix >] (
             &self,
-            dyp_both    : Option< &Vec<$E> >  ,
-            var_both    : &Vec<$E>            ,
+            dyp_all     : Option< &Vec<$E> >  ,
+            var_all     : &Vec<$E>            ,
             dom_der     : Vec<$E>             ,
             arg_vec     : &Vec<[&str; 2]>     ,
         ) -> Vec<$E>
@@ -155,11 +155,11 @@ macro_rules! forward_der {
                 }
             }
             //
-            // dyp_both
-            let dyp_both : &Vec<$E> = if dyp_both.is_none() {
+            // dyp_all
+            let dyp_all  : &Vec<$E> = if dyp_all.is_none() {
                 &Vec::new()
             } else {
-                dyp_both.unwrap()
+                dyp_all.unwrap()
             };
             //
             // n_var
@@ -168,12 +168,12 @@ macro_rules! forward_der {
             // n_dyp
             let n_dyp = self.dyp.n_dom + self.dyp.n_dep;
             //
-            assert_eq!( dyp_both.len(), n_dyp,
-                "f.forward_der: dyp_both vector length does not match f"
+            assert_eq!( dyp_all.len(), n_dyp,
+                "f.forward_der: dyp_all vector length does not match f"
             );
             assert_eq!(
-                var_both.len(), n_var,
-                "f.forward_der: var_both vector length does not match f"
+                var_all.len(), n_var,
+                "f.forward_der: var_all vector length does not match f"
             );
             //
             assert_eq!(
@@ -202,15 +202,15 @@ macro_rules! forward_der {
                 for j in 0 .. self.cop.len() {
                     println!( "{}, {}", j, self.cop[j] );
                 }
-                println!( "index, dyp_both" );
+                println!( "index, dyp_all" );
                 for j in 0 .. n_dyp {
-                    println!( "{}, {}", j, dyp_both[j] );
+                    println!( "{}, {}", j, dyp_all[j] );
                 }
                 println!( "var_index, var_dom, dom_der" );
                 for j in 0 .. self.var.n_dom {
-                    println!( "{}, {}, {}", j, var_both[j], var_der[j] );
+                    println!( "{}, {}, {}", j, var_all[j], var_der[j] );
                 }
-                println!( "var_index, var_both, var_der, op_name, arg" );
+                println!( "var_index, var_all, var_der, op_name, arg" );
             }
             //
             // var_der
@@ -223,8 +223,8 @@ macro_rules! forward_der {
                 let res      = self.var.n_dom + op_index;
                 let forward_der = op_info_vec[op_id].[< forward_der_ $suffix >];
                 forward_der(
-                    &dyp_both,
-                    &var_both,
+                    &dyp_all,
+                    &var_all,
                     &mut var_der,
                     &self.cop,
                     &self.var.bool_all,
@@ -235,7 +235,7 @@ macro_rules! forward_der {
                 if trace {
                     let name = &op_info_vec[op_id].name;
                     println!( "{}, {}, {}, {}, {:?}",
-                        res, var_both[res], var_der[res], name, arg
+                        res, var_all[res], var_der[res], name, arg
                     );
                 }
             }

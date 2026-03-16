@@ -49,8 +49,8 @@ common::f_binary_function!(hypot);
 /// first order forward for hypot
 ///
 fn hypot_forward_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -70,11 +70,11 @@ where
     let z          = res;
     let mut dz : E = FConst::zero();
     if arg_type[0].is_variable() {
-        let z_x = &var_both[x] / &var_both[z];
+        let z_x = &var_all[x] / &var_all[z];
         dz     += &( &z_x * &var_der[x] );
     }
     if arg_type[1].is_variable() {
-        let z_y = &var_both[y] / &var_both[z];
+        let z_y = &var_all[y] / &var_all[z];
         dz     += &( &z_y * &var_der[y] );
     }
     var_der[z] = dz;
@@ -85,8 +85,8 @@ where
 /// first order reverse for hypot
 ///
 fn hypot_reverse_der <V, E>(
-    _dyp_both  :   &[E]        ,
-    var_both   :   &[E]        ,
+    _dyp_all   :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -105,11 +105,11 @@ where
     let y          = arg[1] as usize;
     let z          = res;
     if arg_type[0].is_variable() {
-        let z_x     = &var_both[x] / &var_both[z];
+        let z_x     = &var_all[x] / &var_all[z];
         var_der[x] += &( &z_x * &var_der[z] );
     }
     if arg_type[1].is_variable() {
-        let z_y     = &var_both[y] / &var_both[z];
+        let z_y     = &var_all[y] / &var_all[z];
         var_der[y] += &( &z_y * &var_der[z] );
     }
 }

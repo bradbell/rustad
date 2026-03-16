@@ -50,8 +50,8 @@ common::f_binary_function!(atan2);
 /// first order forward for atan2
 ///
 fn atan2_forward_der <V, E>(
-    dyp_both   :   &[E]        ,
-    var_both   :   &[E]        ,
+    dyp_all    :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -78,28 +78,28 @@ where
     match [arg_type[0], arg_type[1]] {
         //
         [ADType::Variable, ADType::Variable] => {
-            let sum_sq     = &var_both[y].powi(2)  + &var_both[x].powi(2);
-            let z_y        = &var_both[x] / &sum_sq;
-            let z_x        = FUnary::minus( &(  &var_both[y] / &sum_sq ) );
+            let sum_sq     = &var_all[y].powi(2)  + &var_all[x].powi(2);
+            let z_y        = &var_all[x] / &sum_sq;
+            let z_x        = FUnary::minus( &(  &var_all[y] / &sum_sq ) );
             var_der[z]     = &( &z_y * &var_der[y] ) + &( &z_x * &var_der[x] );
         },
         [ADType::Variable, ADType::DynamicP] => {
-            let sum_sq     = &var_both[y].powi(2)  + &dyp_both[x].powi(2);
-            let z_y        = &dyp_both[x] / &sum_sq;
+            let sum_sq     = &var_all[y].powi(2)  + &dyp_all[x].powi(2);
+            let z_y        = &dyp_all[x] / &sum_sq;
             var_der[z]     = &z_y * &var_der[y];
         },
         [ADType::Variable, ADType::ConstantP] => {
-            let sum_sq     = &var_both[y].powi(2)  + &cop[x].powi(2);
+            let sum_sq     = &var_all[y].powi(2)  + &cop[x].powi(2);
             let z_y        = &cop[x] / &sum_sq;
             var_der[z]     = &z_y * &var_der[y];
         },
         [ADType::DynamicP, ADType::Variable] => {
-            let sum_sq     = &dyp_both[y].powi(2)  + &var_both[x].powi(2);
-            let z_x        = FUnary::minus( &(  &dyp_both[y] / &sum_sq ) );
+            let sum_sq     = &dyp_all[y].powi(2)  + &var_all[x].powi(2);
+            let z_x        = FUnary::minus( &(  &dyp_all[y] / &sum_sq ) );
             var_der[z]     = &z_x * &var_der[x];
         },
         [ADType::ConstantP, ADType::Variable] => {
-            let sum_sq     = &cop[y].powi(2)  + &var_both[x].powi(2);
+            let sum_sq     = &cop[y].powi(2)  + &var_all[x].powi(2);
             let z_x        = FUnary::minus( &(  &cop[y] / &sum_sq ) );
             var_der[z]     = &z_x * &var_der[x];
         },
@@ -114,8 +114,8 @@ where
 /// first order reverse for atan2
 ///
 fn atan2_reverse_der <V, E>(
-    dyp_both   :   &[E]        ,
-    var_both   :   &[E]        ,
+    dyp_all    :   &[E]        ,
+    var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
     _bool_all  :   &[bool]     ,
@@ -143,29 +143,29 @@ where
     match [arg_type[0], arg_type[1]] {
         //
         [ADType::Variable, ADType::Variable] => {
-            let sum_sq     = &var_both[y].powi(2)  + &var_both[x].powi(2);
-            let z_y        = &var_both[x] / &sum_sq;
-            let z_x        = FUnary::minus( &(  &var_both[y] / &sum_sq ) );
+            let sum_sq     = &var_all[y].powi(2)  + &var_all[x].powi(2);
+            let z_y        = &var_all[x] / &sum_sq;
+            let z_x        = FUnary::minus( &(  &var_all[y] / &sum_sq ) );
             var_der[x]    += &( &z_x * &var_der[z] );
             var_der[y]    += &( &z_y * &var_der[z] );
         },
         [ADType::Variable, ADType::DynamicP] => {
-            let sum_sq     = &var_both[y].powi(2)  + &dyp_both[x].powi(2);
-            let z_y        = &dyp_both[x] / &sum_sq;
+            let sum_sq     = &var_all[y].powi(2)  + &dyp_all[x].powi(2);
+            let z_y        = &dyp_all[x] / &sum_sq;
             var_der[y]    += &( &z_y * &var_der[z] );
         },
         [ADType::Variable, ADType::ConstantP] => {
-            let sum_sq     = &var_both[y].powi(2)  + &cop[x].powi(2);
+            let sum_sq     = &var_all[y].powi(2)  + &cop[x].powi(2);
             let z_y        = &cop[x] / &sum_sq;
             var_der[y]    += &( &z_y * &var_der[z] );
         },
         [ADType::DynamicP, ADType::Variable] => {
-            let sum_sq     = &dyp_both[y].powi(2)  + &var_both[x].powi(2);
-            let z_x        = FUnary::minus( &(  &dyp_both[y] / &sum_sq ) );
+            let sum_sq     = &dyp_all[y].powi(2)  + &var_all[x].powi(2);
+            let z_x        = FUnary::minus( &(  &dyp_all[y] / &sum_sq ) );
             var_der[x]    += &( &z_x * &var_der[z] );
         },
         [ADType::ConstantP, ADType::Variable] => {
-            let sum_sq     = &cop[y].powi(2)  + &var_both[x].powi(2);
+            let sum_sq     = &cop[y].powi(2)  + &var_all[x].powi(2);
             let z_x        = FUnary::minus( &(  &cop[y] / &sum_sq ) );
             var_der[x]    += &( &z_x * &var_der[z] );
         },
