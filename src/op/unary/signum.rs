@@ -64,13 +64,13 @@ where
 /// see [ForwardDer](crate::op::info::ForwardDer)
 fn signum_reverse_der<V, E>(
     _dyp_both  :   &[E]        ,
-    _var_both   :   &[E]        ,
-    _var_der    :   &mut [E]    ,
+    _var_both  :   &[E]        ,
+    _var_der   :   &mut [E]    ,
     _cop       :   &[V]        ,
     _bool_all  :   &[bool]     ,
-    _arg        :   &[IndexT]   ,
-    _arg_type   :   &[ADType]   ,
-    _res        :   usize       )
+    _arg       :   &[IndexT]   ,
+    _arg_type  :   &[ADType]   ,
+    _res       :   usize       )
 where
     for<'a> E     : AddAssign<&'a E> ,
     E             : FConst ,
