@@ -109,8 +109,8 @@ fn during_record() {
     let p = vec![ V::from(5.0) ];
     let x = vec![ V::from(6.0) ];
     //
-    let p_both       = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), &arg_vec);
+    let p_all       = f.forward_dyp_value(p.clone(), &arg_vec);
+    let (y, _v_all) = f.forward_var_value(Some(&p_all), x.clone(), &arg_vec);
     //
     // check that optimized out operations give correct values.
     assert_eq!( y[0], p[0] * V::from(2.0) + V::from(1.0) );
@@ -152,8 +152,8 @@ fn compress_cop() {
     assert_eq!( 2, n_cop);
     //
     // y
-    let p_both       = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), &arg_vec);
+    let p_all       = f.forward_dyp_value(p.clone(), &arg_vec);
+    let (y, _v_all) = f.forward_var_value(Some(&p_all), x.clone(), &arg_vec);
     //
     // check
     let check = &p[0] + &four;
@@ -202,8 +202,8 @@ fn compress_dyp() {
     assert_eq!(2, n_dyp);
     //
     // y
-    let p_both       = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), &arg_vec);
+    let p_all       = f.forward_dyp_value(p.clone(), &arg_vec);
+    let (y, _v_all) = f.forward_var_value(Some(&p_all), x.clone(), &arg_vec);
     //
     // check
     let check = &p[0] + &p[0];
@@ -254,8 +254,8 @@ fn compress_var() {
     assert_eq!(3, n_var);
     //
     // y
-    let p_both       = f.forward_dyp_value(p.clone(), &arg_vec);
-    let (y, _y_both) = f.forward_var_value(Some(&p_both), x.clone(), &arg_vec);
+    let p_all       = f.forward_dyp_value(p.clone(), &arg_vec);
+    let (y, _v_all) = f.forward_var_value(Some(&p_all), x.clone(), &arg_vec);
     //
     // check
     let check = &p[0] + &x[0];

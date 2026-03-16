@@ -307,8 +307,8 @@ mod tests {
         let aw = call_atom(nw, az, eye_atom_id, call_info, trace);
         let f  = stop_recording(aw);
         //
-        let p_both      = f.forward_dyp_value(p, &arg_vec);
-        f.forward_var_value(Some(&p_both), x, &arg_vec);
+        let p_all = f.forward_dyp_value(p, &arg_vec);
+        f.forward_var_value(Some(&p_all), x, &arg_vec);
         //
         // depend
         let depend = f.reverse_depend(trace);

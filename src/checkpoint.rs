@@ -632,7 +632,7 @@ where
     assert_eq!( adomain.len(), adomain_der.len() );
     //
     // adomain_both
-    let mut adomain_both = ref_slice2vec(adomain);
+    let mut adomain_both      = ref_slice2vec(adomain);
     let mut adomain_der_clone = ref_slice2vec(adomain_der);
     adomain_both.append( &mut adomain_der_clone );
     //
@@ -669,7 +669,7 @@ where
     V : GlobalAtomCallbackVec,
 {   //
     // adomain_both
-    let mut adomain_both    = ref_slice2vec(adomain);
+    let mut adomain_both     = ref_slice2vec(adomain);
     let mut arange_der_clone = ref_slice2vec(arange_der);
     adomain_both.append( &mut arange_der_clone );
     //
