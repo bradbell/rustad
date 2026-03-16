@@ -80,7 +80,7 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
     fn [< $name _forward_dyp >] <V, E> (
         dyp_both    : &mut [E]    ,
         cop         : &[V]        ,
-        _flag_all   : &[bool]     ,
+        _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       )
@@ -114,7 +114,7 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
         dyp_both    : &[E]        ,
         var_both    : &mut [E]    ,
         cop         : &[V]        ,
-        _flag_all   : &[bool]     ,
+        _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       )
@@ -140,7 +140,7 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
         dyp_both    : &[E]        ,
         var_both    : &mut [E]    ,
         cop         : &[V]        ,
-        _flag_all   : &[bool]     ,
+        _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       )
@@ -166,7 +166,7 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
         _dyp_both   : &[E]        ,
         var_both    : &mut [E]    ,
         _cop        : &[V]        ,
-        _flag_all   : &[bool]     ,
+        _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         _arg_type   : &[ADType]   ,
         res         : usize       )
@@ -204,7 +204,7 @@ macro_rules! binary_rust_src { ($name:ident) => { paste::paste! {
         res_type    : ADType      ,
         dyp_n_dom   : usize       ,
         var_n_dom   : usize       ,
-        _flag_all   : &[bool]     ,
+        _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       ) -> String
@@ -330,7 +330,7 @@ macro_rules! f_binary_function { ($name:ident) => { paste::paste! {
     fn [< $name _forward_dyp >] <V, E> (
         dyp_both    : &mut [E]    ,
         cop         : &[V]        ,
-        _flag_all   : &[bool]     ,
+        _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       )
@@ -379,7 +379,7 @@ macro_rules! f_binary_function { ($name:ident) => { paste::paste! {
         dyp_both    : &[E]        ,
         var_both    : &mut [E]    ,
         cop         : &[V]        ,
-        _flag_all   : &[bool]     ,
+        _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       )
@@ -440,7 +440,7 @@ pub(crate) use f_binary_function;
 ///
 pub(crate) fn binary_reverse_depend(
     depend    : &mut optimize::Depend ,
-    _flag_all : &[bool]               ,
+    _bool_all : &[bool]               ,
     arg       : &[IndexT]             ,
     arg_type  : &[ADType]             ,
     res       : usize                 ,

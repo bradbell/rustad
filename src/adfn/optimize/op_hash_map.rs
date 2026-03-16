@@ -216,7 +216,7 @@ impl OpHashMap {
             let n_rng         = arg[NUMBER_RNG] as usize;
             let start         = arg[BEGIN_FLAG] as usize;
             let end           = start + 1 + n_rng;
-            let flag          = &agraph.flag_all[start .. end];
+            let flag          = &agraph.bool_all[start .. end];
             let mut arg_match = arg.to_vec();
             for i_arg in 0 .. arg_match.len() {
                 let match_i = arg_type[i_arg] == agraph_type &&

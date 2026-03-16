@@ -46,7 +46,7 @@ use crate::{
 /// * cop :
 ///   vector of all the constant values used by operators.
 ///
-/// * flag_all :
+/// * bool_all :
 ///   vector of all the boolean values used by operators.
 ///
 /// * arg :
@@ -80,7 +80,7 @@ pub fn doc_common_arguments() {}
 pub(crate) type ForwardDyp<V, E> = fn(
     _dyp_both : &mut [E]    ,
     _cop      : &[V]        ,
-    _flag_all : &[bool]     ,
+    _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -93,7 +93,7 @@ pub(crate) type ForwardDyp<V, E> = fn(
 pub(crate) fn panic_dyp<V, E> (
     _dyp_both : &mut [E]    ,
     _cop      : &[V]        ,
-    _flag_all : &[bool]     ,
+    _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -113,7 +113,7 @@ pub(crate) type ForwardVar<V, E> = fn(
     _dyp_both : &[E]        ,
     _var_both : &mut [E]    ,
     _cop      : &[V]        ,
-    _flag_all : &[bool]     ,
+    _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -127,7 +127,7 @@ pub(crate) fn panic_var<V, E> (
     _dyp_both : &[E]        ,
     _var_both : &mut [E]    ,
     _cop      : &[V]        ,
-    _flag_all : &[bool]     ,
+    _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -150,7 +150,7 @@ pub(crate) type ForwardDer<V, E> = fn(
     _var_both : &[E]        ,
     _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
-    _flag_all : &[bool]     ,
+    _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -165,7 +165,7 @@ pub(crate) fn panic_der<V, E>  (
     _var_both : &[E]        ,
     _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
-    _flag_all : &[bool]     ,
+    _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -188,7 +188,7 @@ pub(crate) type ReverseDer<V, E> = fn(
     _var_both : &[E]        ,
     _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
-    _flag_all : &[bool]     ,
+    _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -206,7 +206,7 @@ pub(crate) type ReverseDer<V, E> = fn(
 ///   with index greater or equal res.
 pub(crate) type ReverseDepend = fn(
     _depend   : &mut optimize::Depend ,
-    _flag_all : &[bool]               ,
+    _bool_all : &[bool]               ,
     _arg      : &[IndexT]             ,
     _arg_type : &[ADType]             ,
     _res      : usize                 ,
@@ -215,7 +215,7 @@ pub(crate) type ReverseDepend = fn(
 // panic_reverse_depend
 pub(crate) fn panic_reverse_depend(
     _depend   : &mut optimize::Depend ,
-    _flag_all : &[bool]               ,
+    _bool_all : &[bool]               ,
     _arg      : &[IndexT]             ,
     _arg_type : &[ADType]             ,
     _res      : usize                 ,
@@ -235,7 +235,7 @@ macro_rules! no_forward_der_value{ ($Op:ident) => {
         _var_both : &[V]        ,
         _var_der  : &mut [V]    ,
         _cop      : &[V]        ,
-        _flag_all : &[bool]     ,
+        _bool_all : &[bool]     ,
         _arg      : &[IndexT]   ,
         _arg_type : &[ADType]   ,
         _res      : usize       ,
@@ -258,7 +258,7 @@ macro_rules! no_forward_der_ad{ ($Op:ident) => {
         _var_both : &[ AD<V> ]        ,
         _var_der  : &mut [ AD<V> ]    ,
         _cop      : &[V]              ,
-        _flag_all : &[bool]           ,
+        _bool_all : &[bool]           ,
         _arg      : &[IndexT]         ,
         _arg_type : &[ADType]         ,
         _res      : usize             ,
@@ -281,7 +281,7 @@ macro_rules! no_reverse_der_value{ ($Op:ident) => {
         _var_both : &[V]        ,
         _var_der  : &mut [V]    ,
         _cop      : &[V]        ,
-        _flag_all : &[bool]     ,
+        _bool_all : &[bool]     ,
         _arg      : &[IndexT]   ,
         _arg_type : &[ADType]   ,
         _res      : usize       ,
@@ -304,7 +304,7 @@ macro_rules! no_reverse_der_ad{ ($Op:ident) => {
         _var_both : &[ AD<V> ]        ,
         _var_der  : &mut [ AD<V> ]    ,
         _cop      : &[V]              ,
-        _flag_all : &[bool]           ,
+        _bool_all : &[bool]           ,
         _arg      : &[IndexT]         ,
         _arg_type : &[ADType]         ,
         _res      : usize             ,
@@ -327,7 +327,7 @@ macro_rules! no_rust_src{ ($Op:ident) => {
         _res_type  : ADType      ,
         _dyp_n_dom : usize       ,
         _var_n_dom : usize       ,
-        _flag_all  : &[bool]     ,
+        _bool_all  : &[bool]     ,
         _arg       : &[IndexT]   ,
         _arg_type  : &[ADType]   ,
         _res       : usize       ,
@@ -348,7 +348,7 @@ pub(crate) use no_rust_src;
 macro_rules! no_reverse_depend{ ($Op:ident) => {
     pub fn reverse_depend_none(
         _depend   : &mut optimize::Depend ,
-        _flag_all : &[bool]               ,
+        _bool_all : &[bool]               ,
         _arg      : &[IndexT]             ,
         _arg_type : &[ADType]             ,
         _res      : usize                 ,
@@ -388,7 +388,7 @@ pub(crate) type RustSrc<V> = fn(
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
     _var_n_dom : usize       ,
-    _flag_all  : &[bool]     ,
+    _bool_all  : &[bool]     ,
     _arg       : &[IndexT]   ,
     _arg_type  : &[ADType]   ,
     _res       : usize       ,
@@ -401,7 +401,7 @@ pub(crate) fn panic_rust_src<V>(
     _res_type   : ADType      ,
     _dyp_n_dom  : usize       ,
     _var_n_dom  : usize       ,
-    _flag_all   : &[bool]     ,
+    _bool_all   : &[bool]     ,
     _arg        : &[IndexT]   ,
     _arg_type   : &[ADType]   ,
     _op_index   : usize       ,

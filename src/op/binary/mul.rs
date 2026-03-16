@@ -77,7 +77,7 @@ fn mul_pv_forward_der <V, E>(
     _var_both  :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
-    _flag_all  :   &[bool]     ,
+    _bool_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     arg_type   :   &[ADType]   ,
     res        :   usize       )
@@ -103,7 +103,7 @@ fn mul_vp_forward_der <V, E>(
     _var_both  :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
-    _flag_all  :   &[bool]     ,
+    _bool_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     arg_type   :   &[ADType]   ,
     res        :   usize       )
@@ -129,7 +129,7 @@ fn mul_vv_forward_der <V, E>(
     var_both   :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
-    _flag_all  :   &[bool]     ,
+    _bool_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,
     res        :   usize       )
@@ -155,7 +155,7 @@ fn mul_pv_reverse_der <V, E>(
     _var_both  :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
-    _flag_all  :   &[bool]     ,
+    _bool_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     arg_type   :   &[ADType]   ,
     res        :   usize       )
@@ -184,7 +184,7 @@ fn mul_vp_reverse_der <V, E>(
     _var_both  :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
-    _flag_all  :   &[bool]     ,
+    _bool_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     arg_type   :   &[ADType]   ,
     res        :   usize       )
@@ -213,7 +213,7 @@ fn mul_vv_reverse_der <V, E>(
     var_both   :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
-    _flag_all  :   &[bool]     ,
+    _bool_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     _arg_type  :   &[ADType]   ,
     res        :   usize       )

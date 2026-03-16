@@ -60,7 +60,7 @@ macro_rules! forward_dyp{ ($name:ident) => { paste::paste! {
     fn [< $name _forward_dyp >] <V, E> (
         dyp_both    : &mut [E]    ,
         _cop        : &[V]        ,
-        _flag_all   : &[bool]     ,
+        _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       )
@@ -89,7 +89,7 @@ macro_rules! forward_var{ ($name:ident) => { paste::paste! {
         _dyp_both   : &[E]        ,
         var_both    : &mut [E]    ,
         _cop        : &[V]        ,
-        _flag_all   : &[bool]     ,
+        _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       )
@@ -120,7 +120,7 @@ macro_rules! rust_src { ($name:ident) => { paste::paste! {
         res_type    : ADType      ,
         dyp_n_dom   : usize       ,
         var_n_dom   : usize       ,
-        _flag_all   : &[bool]     ,
+        _bool_all   : &[bool]     ,
         arg         : &[IndexT]   ,
         arg_type    : &[ADType]   ,
         res         : usize       ) -> String
@@ -170,7 +170,7 @@ pub(crate) use rust_src;
 /// see [ReverseDepend](crate::op::info::ReverseDepend)
 pub(crate) fn reverse_depend(
     depend    : &mut optimize::Depend ,
-    _flag_all : &[bool]               ,
+    _bool_all : &[bool]               ,
     arg       : &[IndexT]             ,
     arg_type  : &[ADType]             ,
     res       : usize                 ,

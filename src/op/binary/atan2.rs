@@ -54,7 +54,7 @@ fn atan2_forward_der <V, E>(
     var_both   :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
-    _flag_all  :   &[bool]     ,
+    _bool_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     arg_type   :   &[ADType]   ,
     res        :   usize       )
@@ -118,7 +118,7 @@ fn atan2_reverse_der <V, E>(
     var_both   :   &[E]        ,
     var_der    :   &mut [E]    ,
     cop        :   &[V]        ,
-    _flag_all  :   &[bool]     ,
+    _bool_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     arg_type   :   &[ADType]   ,
     res        :   usize       )

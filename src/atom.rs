@@ -567,7 +567,7 @@ where
             agraph.arg_all.push( n_dom as IndexT );                // arg[2]
             agraph.arg_all.push( n_res as IndexT );                // arg[3]
             // arg[4]
-            agraph.arg_all.push( agraph.flag_all.len() as IndexT );
+            agraph.arg_all.push( agraph.bool_all.len() as IndexT );
             //
             // agraph.arg_type_all
             for _j in 0 .. BEGIN_DOM {
@@ -587,12 +587,12 @@ where
                 }
             }
             //
-            // agraph.flag_all
+            // agraph.bool_all
             debug_assert!( flag.len() == n_res );
-            agraph.flag_all.push( trace );  // flag_all[ arg[5] ]
+            agraph.bool_all.push( trace );  // bool_all[ arg[5] ]
             for flag_i in flag.iter() {
-                //flag_all[ arg[5] + i + 1 ]
-                agraph.flag_all.push( *flag_i )
+                // bool_all[ arg[5] + i + 1 ]
+                agraph.bool_all.push( *flag_i )
             }
             //
             // agraph.n_dep

@@ -46,7 +46,7 @@ fn minus_forward_der<V, E>(
     _var_both  :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
-    _flag_all  :   &[bool]     ,
+    _bool_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     arg_type   :   &[ADType]   ,
     res        :   usize       )
@@ -69,7 +69,7 @@ fn minus_reverse_der<V, E>(
     _var_both  :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
-    _flag_all  :   &[bool]     ,
+    _bool_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     arg_type   :   &[ADType]   ,
     res        :   usize       )

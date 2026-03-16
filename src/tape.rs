@@ -61,11 +61,11 @@ pub(crate) struct AGraph {
     /// ( dynamic parameter ) { variable }.
     pub(crate) arg_type_all : Vec<ADType>,
     //
-    // flag_all
-    /// is a vector containing all the flags for all the operators.
-    /// If an operator has flags, one of its arguments in
-    /// arg_all is the index in flag_all of its first flag.
-    pub(crate) flag_all : Vec<bool>,
+    // bool_all
+    /// is a vector containing all the booleans for all the operators.
+    /// If an operator has booleans, one of its arguments in
+    /// arg_all is the index in bool_all of its first boolean.
+    pub(crate) bool_all : Vec<bool>,
 }
 // VarTape::new
 impl AGraph {
@@ -80,7 +80,7 @@ impl AGraph {
             arg_start     : Vec::new(),
             arg_all       : Vec::new() ,
             arg_type_all  : Vec::new() ,
-            flag_all      : Vec::new() ,
+            bool_all      : Vec::new() ,
         }
     }
 }
@@ -273,8 +273,8 @@ where
         assert_eq!( tape.dyp.arg_all.len(),  0 );
         assert_eq!( tape.var.arg_all.len(),  0 );
         //
-        assert_eq!( tape.dyp.flag_all.len(), 0 );
-        assert_eq!( tape.var.flag_all.len(), 0 );
+        assert_eq!( tape.dyp.bool_all.len(), 0 );
+        assert_eq!( tape.var.bool_all.len(), 0 );
         //
         assert_eq!( tape.cop.len(),          0 );
         //

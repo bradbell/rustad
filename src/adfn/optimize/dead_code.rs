@@ -182,7 +182,7 @@ fn new_call_op(
     //
     // new_arg, new_arg_type
     let mut new_arg = arg.to_vec();
-    new_arg[BEGIN_DOM-1]  = new_agraph.flag_all.len() as IndexT;
+    new_arg[BEGIN_DOM-1]  = new_agraph.bool_all.len() as IndexT;
     let mut new_arg_type  = arg_type.to_vec();
     //
     // new_arg, new_arg_type
@@ -209,12 +209,12 @@ fn new_call_op(
     new_agraph.id_all.push( CALL_OP );
     new_agraph.arg_start.push( new_agraph.arg_all.len() as IndexT );
     //
-    // new_agraph: arg_all, arg_all_type, arg_type_all, flag_all
+    // new_agraph: arg_all, arg_all_type, arg_type_all, bool_all
     let n_arg  = new_arg.len();
     let n_flag = new_flag.len();
     new_agraph.arg_all.extend_from_slice( &new_arg[0 .. n_arg] );
     new_agraph.arg_type_all.extend_from_slice( &new_arg_type[0 .. n_arg] );
-    new_agraph.flag_all.extend_from_slice( &new_flag[0 .. n_flag] );
+    new_agraph.bool_all.extend_from_slice( &new_flag[0 .. n_flag] );
     //
     // old2new, CALL_RES_OP operators
     let new_rng_is_dep = &new_flag[1 .. n_flag];
@@ -406,12 +406,12 @@ where
                     }
                     old_op_index += 1;
                 } else if op_id == CALL_OP {
-                    let flag_all       = &old_agraph.flag_all;
+                    let bool_all       = &old_agraph.bool_all;
                     let n_rng          = arg[NUMBER_RNG] as usize;
                     let start          = arg[BEGIN_FLAG] as usize;
                     let end            = start + n_rng + 1;
-                    let trace_this_op  = flag_all[start];
-                    let old_rng_is_dep = &flag_all[start+1 .. end];
+                    let trace_this_op  = bool_all[start];
+                    let old_rng_is_dep = &bool_all[start+1 .. end];
                     //
                     // old_n_dep, new_n_dep, new_rng_is_dep
                     let mut old_n_dep      = 0;

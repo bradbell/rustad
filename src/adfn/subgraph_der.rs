@@ -206,7 +206,7 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
                     &var_both,
                     &mut var_der,
                     &self.cop,
-                    &self.var.flag_all,
+                    &self.var.bool_all,
                     arg,
                     arg_type,
                     res

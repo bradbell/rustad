@@ -116,9 +116,9 @@ macro_rules! forward_dyp {
             //
             if trace {
                 println!( "Begin Trace: forward_dyp_{}", stringify!($suffix) );
-                println!( "index, flag" );
-                for j in 0 .. self.dyp.flag_all.len() {
-                    println!( "{}, {:?}", j, self.dyp.flag_all[j] );
+                println!( "index, bool" );
+                for j in 0 .. self.dyp.bool_all.len() {
+                    println!( "{}, {:?}", j, self.dyp.bool_all[j] );
                 }
                 println!( "index, constant" );
                 for j in 0 .. self.cop.len() {
@@ -144,7 +144,7 @@ macro_rules! forward_dyp {
                 forward_dyp(
                     &mut dyp_both,
                     &self.cop,
-                    &self.dyp.flag_all,
+                    &self.dyp.bool_all,
                     arg,
                     arg_type,
                     res

@@ -103,10 +103,10 @@ where
                 println!( "res, res_type, name, arg, arg_type" )
             }
             //
-            // n_dep, flag_all
+            // n_dep, bool_all
             let n_dom    = agraph.n_dom;
             let n_dep    = agraph.n_dep;
-            let flag_all = &agraph.flag_all;
+            let bool_all = &agraph.bool_all;
             //
             // op_index, res, res_depend
             for op_index in (0 .. n_dep).rev() {
@@ -151,7 +151,7 @@ where
                             op_info_vec[op_id as usize].reverse_depend;
                         reverse_depend(
                             &mut depend,
-                            flag_all,
+                            bool_all,
                             arg,
                             arg_type,
                             res,

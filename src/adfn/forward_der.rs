@@ -194,9 +194,9 @@ macro_rules! forward_der {
             //
             if trace {
                 println!( "Begin Trace: forward_der: n_var = {}", n_var);
-                println!( "index, flag" );
-                for j in 0 .. self.var.flag_all.len() {
-                    println!( "{}, {:?}", j, self.var.flag_all[j] );
+                println!( "index, bool" );
+                for j in 0 .. self.var.bool_all.len() {
+                    println!( "{}, {:?}", j, self.var.bool_all[j] );
                 }
                 println!( "index, constant" );
                 for j in 0 .. self.cop.len() {
@@ -227,7 +227,7 @@ macro_rules! forward_der {
                     &var_both,
                     &mut var_der,
                     &self.cop,
-                    &self.var.flag_all,
+                    &self.var.bool_all,
                     arg,
                     arg_type,
                     res

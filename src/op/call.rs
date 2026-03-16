@@ -15,7 +15,7 @@
 //! | 1        | Extra information about this call; i.e. call_info        |
 //! | 2        | Domain space dimension for function being called (n_dom) |
 //! | 3        | Number of range components for this call         (n_rng) |
-//! | 4        | Index in flag_all of first flag for this operator        |
+//! | 4        | Index in bool_all of first flag for this operator        |
 //! | 4+1      | Variable, dynamic, or constant index for first call argument  |
 //! | 4+2      | Variable, dynamic, or constant index for second call argument |
 //! | ...      | ...                                                           |
@@ -107,7 +107,7 @@ where
 // extract_call_info
 pub(crate) fn extract_call_info<'a>(
     arg        : &'a [IndexT] ,
-    flag_all   : &'a [bool]   ,
+    bool_all   : &'a [bool]   ,
 ) -> (
     usize            , // atom_id
     IndexT           , // call_info
@@ -123,9 +123,9 @@ pub(crate) fn extract_call_info<'a>(
     let n_dom        = arg[2] as usize;
     let n_rng        = arg[3] as usize;
     let start        = arg[4] as usize;
-    let trace        = flag_all[start];
+    let trace        = bool_all[start];
     let start        = start + 1;
-    let rng_is_dep   = &flag_all[start .. start+n_rng];
+    let rng_is_dep   = &bool_all[start .. start+n_rng];
     //
     (
         atom_id,
@@ -266,7 +266,7 @@ where
 fn call_forward_dyp_value<V> (
     dyp_both   : &mut [V]      ,
     cop        : &[V]          ,
-    flag_all   : &[bool]       ,
+    bool_all   : &[bool]       ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -281,7 +281,7 @@ where
         n_rng,
         trace,
         rng_is_dep,
-    ) = extract_call_info(arg, flag_all);
+    ) = extract_call_info(arg, bool_all);
     let callback = get_callback(atom_id);
     //
     // forward_fun_value
@@ -334,7 +334,7 @@ where
 fn call_forward_dyp_ad<V> (
     adyp_both  : &mut [ AD<V> ]      ,
     cop        : &[V]                ,
-    flag_all   : &[bool]             ,
+    bool_all   : &[bool]             ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -349,7 +349,7 @@ where
         n_rng,
         trace,
         rng_is_dep,
-    ) = extract_call_info(arg, flag_all);
+    ) = extract_call_info(arg, bool_all);
     let callback = get_callback(atom_id);
     //
     // forward_fun_ad
@@ -407,7 +407,7 @@ fn call_forward_var_value<V> (
     dyp_both   : &[V]          ,
     var_both   : &mut [V]      ,
     cop        : &[V]          ,
-    flag_all   : &[bool]       ,
+    bool_all   : &[bool]       ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -422,7 +422,7 @@ where
         n_rng,
         trace,
         rng_is_dep,
-    ) = extract_call_info(arg, flag_all);
+    ) = extract_call_info(arg, bool_all);
     let callback = get_callback(atom_id);
     //
     // forward_fun_value
@@ -474,7 +474,7 @@ fn call_forward_var_ad<V> (
     adyp_both  : &[ AD<V> ]          ,
     avar_both  : &mut [ AD<V> ]      ,
     cop        : &[V]                ,
-    flag_all   : &[bool]             ,
+    bool_all   : &[bool]             ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -489,7 +489,7 @@ where
         n_rng,
         trace,
         rng_is_dep,
-    ) = extract_call_info(arg, flag_all);
+    ) = extract_call_info(arg, bool_all);
     let callback = get_callback(atom_id);
     //
     // forward_fun_ad
@@ -546,7 +546,7 @@ fn call_forward_der_value<V> (
     var_both   : &[V]          ,
     var_der    : &mut [V]      ,
     cop        : &[V]          ,
-    flag_all   : &[bool]       ,
+    bool_all   : &[bool]       ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -561,7 +561,7 @@ where
         n_rng,
         trace,
         rng_is_dep,
-    ) = extract_call_info(arg, flag_all);
+    ) = extract_call_info(arg, bool_all);
     let callback = get_callback(atom_id);
     //
     // forward_der_value
@@ -621,7 +621,7 @@ fn call_forward_der_ad<V> (
     avar_both  : &[ AD<V> ]          ,
     avar_der   : &mut [ AD<V> ]      ,
     cop        : &[V]                ,
-    flag_all   : &[bool]             ,
+    bool_all   : &[bool]             ,
     arg        : &[IndexT]           ,
     arg_type   : &[ADType]           ,
     res        : usize               )
@@ -636,7 +636,7 @@ where
         n_rng,
         trace,
         rng_is_dep,
-    ) = extract_call_info(arg, flag_all);
+    ) = extract_call_info(arg, bool_all);
     let callback = get_callback(atom_id);
     //
     // forward_der_ad
@@ -701,7 +701,7 @@ fn call_reverse_der_value<V> (
     var_both   : &[V]          ,
     var_der    : &mut [V]      ,
     cop        : &[V]          ,
-    flag_all   : &[bool]       ,
+    bool_all   : &[bool]       ,
     arg        : &[IndexT]     ,
     arg_type   : &[ADType]     ,
     res        : usize         )
@@ -716,7 +716,7 @@ where
         n_rng,
         trace,
         rng_is_dep,
-    ) = extract_call_info(arg, flag_all);
+    ) = extract_call_info(arg, bool_all);
     let callback = get_callback(atom_id);
     //
     // reverse_der_value
@@ -773,7 +773,7 @@ fn call_reverse_der_ad<V> (
     avar_both   : &[ AD<V> ]          ,
     avar_der    : &mut [ AD<V> ]      ,
     cop         : &[V]                ,
-    flag_all   : &[bool]              ,
+    bool_all   : &[bool]              ,
     arg        : &[IndexT]            ,
     arg_type   : &[ADType]            ,
     res        : usize                )
@@ -789,7 +789,7 @@ where
         n_rng,
         trace,
         rng_is_dep,
-    ) = extract_call_info(arg, flag_all);
+    ) = extract_call_info(arg, bool_all);
     let callback = get_callback(atom_id);
     //
     // reverse_der_ad
@@ -846,7 +846,7 @@ where
 fn call_res_dyp<V, E>(
     _dyp_both : &mut [E]    ,
     _cop      : &[V]        ,
-    _flag_all : &[bool]     ,
+    _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -858,7 +858,7 @@ fn call_res_var<V, E>(
     _dyp_both : &[E]        ,
     _var_both : &mut [E]    ,
     _cop      : &[V]        ,
-    _flag_all : &[bool]     ,
+    _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -872,7 +872,7 @@ fn call_res_der<V, E>(
     _var_both : &[E]        ,
     _var_der  : &mut [E]    ,
     _cop      : &[V]        ,
-    _flag_all : &[bool]     ,
+    _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
     _res      : usize       ,
@@ -885,7 +885,7 @@ fn call_res_rust_src<V> (
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
     _var_n_dom : usize       ,
-    _flag_all  : &[bool]     ,
+    _bool_all  : &[bool]     ,
     _arg       : &[IndexT]   ,
     _arg_type  : &[ADType]   ,
     _res       : usize       ,
@@ -901,7 +901,7 @@ fn call_rust_src<V> (
     res_type  : ADType      ,
     dyp_n_dom : usize       ,
     var_n_dom : usize       ,
-    flag_all  : &[bool]     ,
+    bool_all  : &[bool]     ,
     arg       : &[IndexT]   ,
     arg_type  : &[ADType]   ,
     res       : usize       ) -> String
@@ -918,7 +918,7 @@ where
         n_rng,
         trace,
         rng_is_dep,
-    ) = extract_call_info(arg, flag_all);
+    ) = extract_call_info(arg, bool_all);
     let callback = get_callback(atom_id);
     //
     // src
@@ -1113,11 +1113,11 @@ where
     let op_id  = id_all[op_index];
     debug_assert!( op_id == CALL_OP || op_id == CALL_RES_OP );
     //
-    // arg_start, arg_all, arg_type_all, flag_all
+    // arg_start, arg_all, arg_type_all, bool_all
     let arg_start       = &agraph.arg_start;
     let arg_all         = &agraph.arg_all;
     let arg_type_all    = &agraph.arg_type_all;
-    let flag_all        = &agraph.flag_all;
+    let bool_all        = &agraph.bool_all;
     //
     // op_index, dep_index
     let begin           = arg_start[op_index] as usize;
@@ -1147,7 +1147,7 @@ where
         _n_rng,
         trace,
         rng_is_dep,
-    ) = extract_call_info(arg, flag_all);
+    ) = extract_call_info(arg, bool_all);
     let callback = get_callback::<V>(atom_id);
     //
     // rng_index

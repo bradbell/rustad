@@ -36,7 +36,7 @@ use crate::op::id::POWI_OP;
 fn powi_forward_dyp <V, E> (
     dyp_both    : &mut [E]    ,
     _cop        : &[V]        ,
-    _flag_all   : &[bool]     ,
+    _bool_all   : &[bool]     ,
     arg         : &[IndexT]   ,
     arg_type    : &[ADType]   ,
     res         : usize       )
@@ -63,7 +63,7 @@ fn powi_forward_var <V, E> (
     _dyp_both   : &[E]        ,
     var_both    : &mut [E]    ,
     _cop        : &[V]        ,
-    _flag_all   : &[bool]     ,
+    _bool_all   : &[bool]     ,
     arg         : &[IndexT]   ,
     arg_type    : &[ADType]   ,
     res         : usize       )
@@ -91,7 +91,7 @@ fn powi_rust_src<V> (
     res_type    : ADType      ,
     dyp_n_dom   : usize       ,
     var_n_dom   : usize       ,
-    _flag_all   : &[bool]     ,
+    _bool_all   : &[bool]     ,
     arg         : &[IndexT]   ,
     arg_type    : &[ADType]   ,
     res         : usize       ) -> String
@@ -155,7 +155,7 @@ fn powi_rust_src<V> (
 /// see [ReverseDepend](crate::op::info::ReverseDepend)
 pub(crate) fn powi_reverse_depend(
     depend    : &mut optimize::Depend ,
-    _flag_all : &[bool]               ,
+    _bool_all : &[bool]               ,
     arg       : &[IndexT]             ,
     arg_type  : &[ADType]             ,
     res       : usize                 ,
@@ -184,7 +184,7 @@ fn powi_forward_der<V, E>(
     var_both   :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
-    _flag_all  :   &[bool]     ,
+    _bool_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     arg_type   :   &[ADType]   ,
     res        :   usize       )
@@ -215,7 +215,7 @@ fn powi_reverse_der<V, E>(
     var_both   :   &[E]        ,
     var_der    :   &mut [E]    ,
     _cop       :   &[V]        ,
-    _flag_all  :   &[bool]     ,
+    _bool_all  :   &[bool]     ,
     arg        :   &[IndexT]   ,
     arg_type   :   &[ADType]   ,
     res        :   usize       )
