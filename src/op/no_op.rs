@@ -19,7 +19,7 @@ use crate::{
 use crate::ad::ADType;
 use crate::adfn::optimize;
 //
-use crate::op::info::OpInfo;
+use crate::op::info::OpFns;
 use crate::op::id::NO_OP;
 //
 // no_op_dyp
@@ -78,14 +78,14 @@ pub fn no_op_reverse_depend<V>(
     _res_type : ADType                ,
 ) { }
 //
-/// Set the operator information for all the Sub operators.
+/// Set the operator functions for all the Sub operators.
 ///
-/// * op_info_vec :
-///   The map from [op::id](crate::op::id) to operator information.
+/// * op_fns_vec :
+///   The map from [op::id](crate::op::id) to operator functions.
 ///   The the map results for SUB_PV_OP, SUB_VP_OP, and SUB_VV_OP are set.
-pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
+pub fn set_op_fns<V>( op_fns_vec : &mut [OpFns<V>] )
 {
-    op_info_vec[NO_OP as usize] = OpInfo{
+    op_fns_vec[NO_OP as usize] = OpFns{
         name              : "no_op",
         forward_dyp_value : no_op_dyp::<V, V>,
         forward_dyp_ad    : no_op_dyp::<V, AD<V> >,

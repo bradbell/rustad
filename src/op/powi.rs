@@ -28,7 +28,7 @@ use crate::{
 use crate::tape::sealed::ThisThreadTape;
 use crate::ad::ADType;
 use crate::adfn::optimize;
-use crate::op::info::OpInfo;
+use crate::op::info::OpFns;
 use crate::op::id::POWI_OP;
 // ---------------------------------------------------------------------------
 //
@@ -239,13 +239,13 @@ where
     }
 }
 // ---------------------------------------------------------------------------
-// set_op_info
-/// Set the operator information for all the POWI_OP operator.
+// set_op_fns
+/// Set the operator functions for all the POWI_OP operator.
 ///
-/// * op_info_vec :
-///   The map from [op::id](crate::op::id) to operator information.
+/// * op_fns_vec :
+///   The map from [op::id](crate::op::id) to operator functions.
 ///   The the map results for POWI_OP are set.
-pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
+pub fn set_op_fns<V>( op_fns_vec : &mut [OpFns<V>] ) where
     for<'a> &'a AD<V> : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a AD<V> : Mul<&'a V, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
@@ -254,7 +254,7 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     for<'a> V         : AddAssign<&'a V>,
     for<'a> AD<V>     : AddAssign<&'a AD<V> >,
 {
-    op_info_vec[POWI_OP as usize] = OpInfo{
+    op_fns_vec[POWI_OP as usize] = OpFns{
         name              : "powi",
         forward_dyp_value : powi_forward_dyp::<V, V>,
         forward_dyp_ad    : powi_forward_dyp::<V, AD<V> >,

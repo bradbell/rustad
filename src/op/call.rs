@@ -50,7 +50,7 @@ use std::mem::swap;
 use crate::ad::ADType;
 use crate::adfn::optimize;
 use crate::tape::AGraph;
-use crate::op::info::OpInfo;
+use crate::op::info::OpFns;
 use crate::op::info::no_reverse_depend;
 use crate::atom::sealed::GlobalAtomCallbackVec;
 use crate::op::id::{
@@ -1020,21 +1020,21 @@ where
     src
 }
 // ===========================================================================
-// set_op_info
+// set_op_fns
 // ===========================================================================
 no_reverse_depend!(Call);
-/// Set the operator information for call.
+/// Set the operator functions for call.
 ///
-/// * op_info_vec :
-///   The map from operator id to operator information [OpInfo] .
+/// * op_fns_vec :
+///   The map from operator id to operator functions [OpFns] .
 ///   The map results for CALL_OP and CALL_RES_OP are set.
-pub(crate) fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
+pub(crate) fn set_op_fns<V>( op_fns_vec : &mut [OpFns<V>] )
 where
     V     : Clone + From<f32> + FConst ,
     V     : PartialEq + GlobalAtomCallbackVec + ThisThreadTapePublic,
     for<'a> V : AddAssign<&'a V> ,
 {
-    op_info_vec[CALL_OP as usize] = OpInfo{
+    op_fns_vec[CALL_OP as usize] = OpFns{
         name              : "call" ,
         forward_dyp_value : call_forward_dyp_value::<V>,
         forward_dyp_ad    : call_forward_dyp_ad::<V>,
@@ -1047,7 +1047,7 @@ where
         rust_src          : call_rust_src::<V>,
         reverse_depend    : reverse_depend_none,
     };
-    op_info_vec[CALL_RES_OP as usize] = OpInfo{
+    op_fns_vec[CALL_RES_OP as usize] = OpFns{
         name              : "call_res" ,
         forward_dyp_value : call_res_dyp::<V, V>,
         forward_dyp_ad    : call_res_dyp::<V, AD<V> >,

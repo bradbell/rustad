@@ -14,7 +14,7 @@ use crate::{
     ADfn,
     FConst,
 };
-use crate::op::info::sealed::GlobalOpInfoVec;
+use crate::op::info::sealed::GlobalOpFnsVec;
 use crate::tape::sealed::ThisThreadTape;
 //
 #[cfg(doc)]
@@ -181,8 +181,8 @@ macro_rules! forward_der {
                 "f.forward_der: dom_der vector length does not match f"
             );
             //
-            // op_info_vec
-            let op_info_vec = GlobalOpInfoVec::get();
+            // op_fns_vec
+            let op_fns_vec = GlobalOpFnsVec::get();
             //
             // zero_e
             let zero_e             = $E::zero();
@@ -221,7 +221,7 @@ macro_rules! forward_der {
                 let arg      = &self.var.arg_all[start .. end];
                 let arg_type = &self.var.arg_type_all[start .. end];
                 let res      = self.var.n_dom + op_index;
-                let forward_der = op_info_vec[op_id].[< forward_der_ $suffix >];
+                let forward_der = op_fns_vec[op_id].[< forward_der_ $suffix >];
                 forward_der(
                     &dyp_all,
                     &var_all,
@@ -233,7 +233,7 @@ macro_rules! forward_der {
                     res
                 );
                 if trace {
-                    let name = &op_info_vec[op_id].name;
+                    let name = &op_fns_vec[op_id].name;
                     println!( "{}, {}, {}, {}, {:?}",
                         res, var_all[res], var_der[res], name, arg
                     );
@@ -266,7 +266,7 @@ macro_rules! forward_der {
 } }
 //
 impl<V> ADfn<V> where
-V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + ThisThreadTape,
+V : Clone + std::fmt::Display + GlobalOpFnsVec + FConst + ThisThreadTape,
 {   //
     // forward_der
     forward_der!( value, V );

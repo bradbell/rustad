@@ -34,7 +34,7 @@ use crate::{
 use crate::op::binary::common;
 use crate::tape::sealed::ThisThreadTape;
 use crate::op::info::{
-    OpInfo,
+    OpFns,
     panic_dyp,
     panic_var,
     panic_der,
@@ -197,15 +197,15 @@ where
     let sum      = &var_der[lhs] + &var_der[res];
     var_der[lhs] = sum;
 }
-// set_op_info
+// set_op_fns
 //
-/// Set the operator information for all the Sub operators.
+/// Set the operator functions for all the Sub operators.
 ///
-/// * op_info_vec :
-///   The map from [op::id](crate::op::id) to operator information.
+/// * op_fns_vec :
+///   The map from [op::id](crate::op::id) to operator functions.
 ///   The the map results for
 ///   SUB_PP_OP, SUB_PV_OP, SUB_VP_OP, and SUB_VV_OP are set.
-pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
+pub fn set_op_fns<V>( op_fns_vec : &mut [OpFns<V>] )
 where
     for<'a> &'a V : Add<&'a V, Output = V> + Add<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : Sub<&'a V, Output = V> + Sub<&'a AD<V>, Output = AD<V> > ,
@@ -213,7 +213,7 @@ where
     V             : PartialEq + ThisThreadTape ,
     AD<V>         : From<V>
 {
-    op_info_vec[SUB_PP_OP as usize] = OpInfo{
+    op_fns_vec[SUB_PP_OP as usize] = OpFns{
         name              : "sub_pp",
         forward_dyp_value : sub_forward_dyp::<V, V>,
         forward_dyp_ad    : sub_forward_dyp::<V, AD<V> >,
@@ -226,7 +226,7 @@ where
         rust_src          : sub_rust_src,
         reverse_depend    : common::binary_reverse_depend,
     };
-    op_info_vec[SUB_PV_OP as usize] = OpInfo{
+    op_fns_vec[SUB_PV_OP as usize] = OpFns{
         name              : "sub_pv",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
@@ -239,7 +239,7 @@ where
         rust_src          : sub_rust_src,
         reverse_depend    : common::binary_reverse_depend,
     };
-    op_info_vec[SUB_VP_OP as usize] = OpInfo{
+    op_fns_vec[SUB_VP_OP as usize] = OpFns{
         name              : "sub_vp",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
@@ -252,7 +252,7 @@ where
         rust_src          : sub_rust_src,
         reverse_depend    : common::binary_reverse_depend,
     };
-    op_info_vec[SUB_VV_OP as usize] = OpInfo{
+    op_fns_vec[SUB_VV_OP as usize] = OpFns{
         name              : "sub_vv",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,

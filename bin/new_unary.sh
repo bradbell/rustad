@@ -121,7 +121,7 @@ file='src/op/info.rs'
 cat << EOF > temp.sed
 /^    [/][/] unary operators/! b end
 s|\$|\\
-    crate::op::unary::$name::set_op_info::<V>(\\&mut result);|
+    crate::op::unary::$name::set_op_fns::<V>(\\&mut result);|
 : end
 EOF
 git checkout $file
@@ -148,7 +148,7 @@ sed -f temp.sed src/op/unary/exp_m1.rs > src/op/unary/$name.rs
 #
 cat << EOF
 src/op/unary/$name.rs: Fix ${name}_forward_der and ${name}_reverse_der
-                       Check constraints in this set_op_info function.
+                       Check constraints in this set_op_fns function.
 src/float/az_float.rs: Check implementation of fn $name(&self) -> Self
 examples/f_unary.rs: Add an example for $name function values.
 test/f_unary.rs: Add a test for $name derivatives.

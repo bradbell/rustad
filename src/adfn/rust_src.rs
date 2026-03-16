@@ -17,7 +17,7 @@ use crate::{
 };
 //
 use std::any::type_name;
-use crate::op::info::sealed::GlobalOpInfoVec;
+use crate::op::info::sealed::GlobalOpFnsVec;
 //
 #[cfg(doc)]
 use crate::{
@@ -89,7 +89,7 @@ fn prototype_src(fn_name : &str, v_str : &str) -> String {
 // rust_src
 impl<V> ADfn<V>
 where
-    V : ToString + FloatValue + GlobalOpInfoVec ,
+    V : ToString + FloatValue + GlobalOpFnsVec ,
 {
     /// Rust source code for zero order forward mode evaluation; i.e.,
     /// function value.
@@ -109,8 +109,8 @@ where
     /// * Example: see examples/rust_src.rs
     pub fn rust_src(&self, fn_name : &str) -> String {
         //
-        // op_info_vec
-        let op_info_vec = <V as GlobalOpInfoVec>::get();
+        // op_fns_vec
+        let op_fns_vec = <V as GlobalOpFnsVec>::get();
         //
         // v_str
         let v_str   = String::from( type_name::<V>() );
@@ -192,7 +192,7 @@ where
                 let arg      = &self.dyp.arg_all[start .. end];
                 let arg_type = &self.dyp.arg_type_all[start .. end];
                 let res      = self.dyp.n_dom + op_index;
-                let rust_src = op_info_vec[op_id].rust_src;
+                let rust_src = op_fns_vec[op_id].rust_src;
                 let not_used     = V::nan();
                 src = src + &rust_src(
                         not_used,
@@ -222,7 +222,7 @@ where
                 let arg      = &self.var.arg_all[start .. end];
                 let arg_type = &self.var.arg_type_all[start .. end];
                 let res      = self.var.n_dom + op_index;
-                let rust_src = op_info_vec[op_id].rust_src;
+                let rust_src = op_fns_vec[op_id].rust_src;
                 let not_used     = V::nan();
                 src = src + &rust_src(
                         not_used,

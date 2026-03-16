@@ -15,7 +15,7 @@ use crate::{
 };
 use crate::ad::ADType;
 use crate::op::id;
-use crate::op::info::OpInfo;
+use crate::op::info::OpFns;
 use crate::op::binary::common;
 // ---------------------------------------------------------------------------
 // For each name, define
@@ -59,15 +59,15 @@ fn zero_reverse_der<V, E>  (
     _re       : usize      ,
 ) {  }
 // ---------------------------------------------------------------------------
-// set_op_info
+// set_op_fns
 //
-/// Set the operator information for the FBinary operators
+/// Set the operator functions for the FBinary operators
 ///
-/// * op_info_vec :
-///   The map from [op::id](crate::op::id) to operator information.
+/// * op_fns_vec :
+///   The map from [op::id](crate::op::id) to operator functions.
 ///   The the map results for the following operators are set:
 ///   LT_OP, LE_OP, EQ_OP, NE_OP, GE_OP, GT_OP .
-pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
+pub fn set_op_fns<V>( op_fns_vec : &mut [OpFns<V>] )
 where
     AD<V> : FConst,
     V     : Clone + FConst,
@@ -77,7 +77,7 @@ where
     for<'a> &'a AD<V> : FBinary<&'a V, Output = AD<V> >,
     for<'a> &'a AD<V> : FBinary<&'a AD<V>, Output = AD<V> >,
 {
-    op_info_vec[id::LT_OP as usize] = OpInfo{
+    op_fns_vec[id::LT_OP as usize] = OpFns{
         name              : "num_lt",
         forward_dyp_value : num_lt_forward_dyp::<V, V>,
         forward_dyp_ad    : num_lt_forward_dyp::<V, AD<V> >,
@@ -90,7 +90,7 @@ where
         rust_src          : num_lt_rust_src,
         reverse_depend    : common::binary_reverse_depend,
     };
-    op_info_vec[id::LE_OP as usize] = OpInfo{
+    op_fns_vec[id::LE_OP as usize] = OpFns{
         name              : "num_le",
         forward_dyp_value : num_le_forward_dyp::<V, V>,
         forward_dyp_ad    : num_le_forward_dyp::<V, AD<V> >,
@@ -103,7 +103,7 @@ where
         rust_src          : num_le_rust_src,
         reverse_depend    : common::binary_reverse_depend,
     };
-    op_info_vec[id::EQ_OP as usize] = OpInfo{
+    op_fns_vec[id::EQ_OP as usize] = OpFns{
         name              : "num_eq",
         forward_dyp_value : num_eq_forward_dyp::<V, V>,
         forward_dyp_ad    : num_eq_forward_dyp::<V, AD<V> >,
@@ -116,7 +116,7 @@ where
         rust_src          : num_eq_rust_src,
         reverse_depend    : common::binary_reverse_depend,
     };
-    op_info_vec[id::NE_OP as usize] = OpInfo{
+    op_fns_vec[id::NE_OP as usize] = OpFns{
         name              : "num_ne",
         forward_dyp_value : num_ne_forward_dyp::<V, V>,
         forward_dyp_ad    : num_ne_forward_dyp::<V, AD<V> >,
@@ -129,7 +129,7 @@ where
         rust_src          : num_ne_rust_src,
         reverse_depend    : common::binary_reverse_depend,
     };
-    op_info_vec[id::GE_OP as usize] = OpInfo{
+    op_fns_vec[id::GE_OP as usize] = OpFns{
         name              : "num_ge",
         forward_dyp_value : num_ge_forward_dyp::<V, V>,
         forward_dyp_ad    : num_ge_forward_dyp::<V, AD<V> >,
@@ -142,7 +142,7 @@ where
         rust_src          : num_ge_rust_src,
         reverse_depend    : common::binary_reverse_depend,
     };
-    op_info_vec[id::GT_OP as usize] = OpInfo{
+    op_fns_vec[id::GT_OP as usize] = OpFns{
         name              : "num_gt",
         forward_dyp_value : num_gt_forward_dyp::<V, V>,
         forward_dyp_ad    : num_gt_forward_dyp::<V, AD<V> >,

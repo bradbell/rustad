@@ -10,7 +10,7 @@
 //
 use crate::tape::AGraph;
 use crate::vec_set::VecSet;
-use crate::op::info::OpInfo;
+use crate::op::info::OpFns;
 use crate::op::call::call_depend;
 use crate::atom::AtomCallback;
 use crate::{
@@ -24,7 +24,7 @@ use crate::op::id::{
     CALL_RES_OP,
 };
 use crate::op::info::{
-    sealed::GlobalOpInfoVec,
+    sealed::GlobalOpFnsVec,
 };
 //
 #[cfg(doc)]
@@ -33,7 +33,7 @@ use crate::doc_generic_v;
 // ADfn::for_sparsity
 impl<V> ADfn<V>
 where
-    V               : GlobalAtomCallbackVecPublic + GlobalOpInfoVec ,
+    V               : GlobalAtomCallbackVecPublic + GlobalOpFnsVec ,
     AtomCallback<V> : Clone,
 {
     /// Use the forward mode to compute a Jacobian sparsity pattern.
@@ -144,8 +144,8 @@ where
             }
         }
         //
-        // op_info_vec
-        let op_info_vec : &Vec< OpInfo<V> >  = GlobalOpInfoVec::get();
+        // op_fns_vec
+        let op_fns_vec : &Vec< OpFns<V> >  = GlobalOpFnsVec::get();
         //
         // rng_ad_type, range_ad_index, n_range
         let rng_ad_type       = &self.rng_ad_type;
@@ -288,7 +288,7 @@ where
                 //
                 if trace {
                     let op_id   = id_all[op_index] as usize;
-                    let op_name = &op_info_vec[op_id].name;
+                    let op_name = &op_fns_vec[op_id].name;
                     let set     = set_vec.get(dep_index);
                     println!(
                         "{}, {}, {:?}, {:?}",

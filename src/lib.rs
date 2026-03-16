@@ -135,13 +135,13 @@ where
 { }
 //
 //
-// GlobalOpInfoVecPublic
+// GlobalOpFnsVecPublic
 /// This is the public interface to a sealed trait
-pub trait GlobalOpInfoVecPublic : op::info::sealed::GlobalOpInfoVec
+pub trait GlobalOpFnsVecPublic : op::info::sealed::GlobalOpFnsVec
 { }
-impl<V> GlobalOpInfoVecPublic for V
+impl<V> GlobalOpFnsVecPublic for V
 where
-    V : op::info::sealed::GlobalOpInfoVec ,
+    V : op::info::sealed::GlobalOpFnsVec ,
 { }
 //
 // ----------------------------------------------------------------------------

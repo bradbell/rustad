@@ -14,7 +14,7 @@ use crate::{
     ADfn,
     IndexT,
     GlobalAtomCallbackVecPublic,
-    GlobalOpInfoVecPublic,
+    GlobalOpFnsVecPublic,
 };
 //
 use crate::ad::ADType;
@@ -176,7 +176,7 @@ pub(crate) fn renumber_agraph(
 impl<V> ADfn<V>
 where
     V : Clone + FConst + Eq + std::fmt::Display + std::hash::Hash,
-    V : GlobalAtomCallbackVecPublic + GlobalOpInfoVecPublic,
+    V : GlobalAtomCallbackVecPublic + GlobalOpFnsVecPublic,
 {   //
     // optimize
     pub fn optimize(&mut self, arg_vec : &Vec<[&str; 2]> )

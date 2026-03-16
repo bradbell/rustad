@@ -15,8 +15,8 @@ use crate::{
     FConst,
 };
 use crate::op::info::{
-    OpInfo,
-    sealed::GlobalOpInfoVec
+    OpFns,
+    sealed::GlobalOpFnsVec
 };
 use crate::tape::sealed::ThisThreadTape;
 //
@@ -165,8 +165,8 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
         let n_var             = self.var_len();
         let mut var_der       = vec![ zero_e; n_var ];
         //
-        // op_info_vec
-        let op_info_vec : &Vec< OpInfo<$V> >  = GlobalOpInfoVec::get();
+        // op_fns_vec
+        let op_fns_vec : &Vec< OpFns<$V> >  = GlobalOpFnsVec::get();
         //
         // rng_ad_type, rng_index, n_range
         let rng_ad_type       = &self.rng_ad_type;
@@ -200,7 +200,7 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
                 let arg       = &self.var.arg_all[start .. end];
                 let arg_type  = &self.var.arg_type_all[start .. end];
                 let res       = self.var.n_dom + op_index;
-                let reverse_1 = op_info_vec[op_id].[< reverse_der_ $suffix >];
+                let reverse_1 = op_fns_vec[op_id].[< reverse_der_ $suffix >];
                 reverse_1(
                     &dyp_all,
                     &var_all,
@@ -212,7 +212,7 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
                     res
                 );
                 if trace {
-                    let name = &op_info_vec[op_id].name;
+                    let name = &op_fns_vec[op_id].name;
                     println!( "{}, {}, {}, {}, {:?}",
                         res, var_all[res], var_der[res], name, arg
                     );
@@ -243,7 +243,7 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
 }}}
 //
 impl<V> ADfn<V> where
-V : Clone + std::fmt::Display + GlobalOpInfoVec + FConst + ThisThreadTape,
+V : Clone + std::fmt::Display + GlobalOpFnsVec + FConst + ThisThreadTape,
 {   //
     // subgraph_der
     subgraph_der!( value, V, V );

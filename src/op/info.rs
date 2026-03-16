@@ -410,7 +410,7 @@ pub(crate) fn panic_rust_src<V>(
 // ---------------------------------------------------------------------------
 /// Information for one operator
 #[derive(Clone)]
-pub struct OpInfo<V> {
+pub struct OpFns<V> {
     //
     /// name the user sees for this operator
     pub(crate) name : &'static str,
@@ -446,11 +446,11 @@ pub struct OpInfo<V> {
     pub(crate) reverse_depend  : ReverseDepend,
 }
 // ---------------------------------------------------------------------------
-// op_info_vec
+// op_fns_vec
 /// returns the vector of length [NUMBER_OP]
-/// that maps each operator id to it's [OpInfo] .
+/// that maps each operator id to it's [OpFns] .
 ///
-pub(crate) fn op_info_vec<V>() -> Vec< OpInfo<V> >
+pub(crate) fn op_fns_vec<V>() -> Vec< OpFns<V> >
 where
     // add_assign, sub_assign
     for<'a> V : std::ops::AddAssign<&'a V> ,
@@ -474,7 +474,7 @@ where
     for<'a> &'a V : FBinary<&'a V, Output = V> ,
     AD<V> : From<V>,
 {
-    let empty = OpInfo {
+    let empty = OpFns {
         name               : "panic",
         forward_dyp_value  : panic_dyp::<V, V>,
         forward_dyp_ad     : panic_dyp::<V, AD<V>>,
@@ -487,73 +487,73 @@ where
         rust_src           : panic_rust_src,
         reverse_depend     : panic_reverse_depend,
     };
-    let mut result : Vec< OpInfo<V> > = vec![empty ; NUMBER_OP as usize];
+    let mut result : Vec< OpFns<V> > = vec![empty ; NUMBER_OP as usize];
     //
     // binary operators
-    crate::op::binary::add::set_op_info::<V>(&mut result);
-    crate::op::binary::sub::set_op_info::<V>(&mut result);
-    crate::op::binary::mul::set_op_info::<V>(&mut result);
-    crate::op::binary::div::set_op_info::<V>(&mut result);
-    crate::op::binary::num_cmp::set_op_info::<V>(&mut result);
-    crate::op::binary::atan2::set_op_info::<V>(&mut result);
-    crate::op::binary::hypot::set_op_info::<V>(&mut result);
-    crate::op::binary::powf::set_op_info::<V>(&mut result);
+    crate::op::binary::add::set_op_fns::<V>(&mut result);
+    crate::op::binary::sub::set_op_fns::<V>(&mut result);
+    crate::op::binary::mul::set_op_fns::<V>(&mut result);
+    crate::op::binary::div::set_op_fns::<V>(&mut result);
+    crate::op::binary::num_cmp::set_op_fns::<V>(&mut result);
+    crate::op::binary::atan2::set_op_fns::<V>(&mut result);
+    crate::op::binary::hypot::set_op_fns::<V>(&mut result);
+    crate::op::binary::powf::set_op_fns::<V>(&mut result);
     //
     // unary operators
-    crate::op::unary::square::set_op_info::<V>(&mut result);
-    crate::op::unary::ln_1p::set_op_info::<V>(&mut result);
-    crate::op::unary::exp_m1::set_op_info::<V>(&mut result);
-    crate::op::unary::ln::set_op_info::<V>(&mut result);
-    crate::op::unary::sqrt::set_op_info::<V>(&mut result);
-    crate::op::unary::tanh::set_op_info::<V>(&mut result);
-    crate::op::unary::tan::set_op_info::<V>(&mut result);
-    crate::op::unary::sinh::set_op_info::<V>(&mut result);
-    crate::op::unary::cosh::set_op_info::<V>(&mut result);
-    crate::op::unary::abs::set_op_info::<V>(&mut result);
-    crate::op::unary::signum::set_op_info::<V>(&mut result);
-    crate::op::unary::exp::set_op_info::<V>(&mut result);
-    crate::op::unary::minus::set_op_info::<V>(&mut result);
-    crate::op::unary::cos::set_op_info::<V>(&mut result);
-    crate::op::unary::sin::set_op_info::<V>(&mut result);
+    crate::op::unary::square::set_op_fns::<V>(&mut result);
+    crate::op::unary::ln_1p::set_op_fns::<V>(&mut result);
+    crate::op::unary::exp_m1::set_op_fns::<V>(&mut result);
+    crate::op::unary::ln::set_op_fns::<V>(&mut result);
+    crate::op::unary::sqrt::set_op_fns::<V>(&mut result);
+    crate::op::unary::tanh::set_op_fns::<V>(&mut result);
+    crate::op::unary::tan::set_op_fns::<V>(&mut result);
+    crate::op::unary::sinh::set_op_fns::<V>(&mut result);
+    crate::op::unary::cosh::set_op_fns::<V>(&mut result);
+    crate::op::unary::abs::set_op_fns::<V>(&mut result);
+    crate::op::unary::signum::set_op_fns::<V>(&mut result);
+    crate::op::unary::exp::set_op_fns::<V>(&mut result);
+    crate::op::unary::minus::set_op_fns::<V>(&mut result);
+    crate::op::unary::cos::set_op_fns::<V>(&mut result);
+    crate::op::unary::sin::set_op_fns::<V>(&mut result);
     //
     // call, no_op, powi
-    crate::op::call::set_op_info::<V>(&mut result);
-    crate::op::no_op::set_op_info::<V>(&mut result);
-    crate::op::powi::set_op_info::<V>(&mut result);
+    crate::op::call::set_op_fns::<V>(&mut result);
+    crate::op::no_op::set_op_fns::<V>(&mut result);
+    crate::op::powi::set_op_fns::<V>(&mut result);
     //
     result
 }
 // ---------------------------------------------------------------------------
 //
-// sealed::GlobalOpInfoVec
+// sealed::GlobalOpFnsVec
 pub(crate) mod sealed {
     //! The sub-module sealed is used to seal traits in this package
     //
-    use super::OpInfo;
+    use super::OpFns;
     //
     #[cfg(doc)]
     use crate::doc_generic_v;
     //
-    pub trait GlobalOpInfoVec
+    pub trait GlobalOpFnsVec
     where
         Self : Sized + 'static,
     {
-        /// Returns a reference to the map from operator id to [OpInfo]
+        /// Returns a reference to the map from operator id to [OpFns]
         ///
         /// ```text
-        ///     op_info_vec = &*GlobalOpInfoVec::get()
+        ///     op_fns_vec = &*GlobalOpFnsVec::get()
         /// ```
         ///
         /// * Self : must be a value type V in [doc_generic_v]
         ///
-        /// * op_info_vec :
-        ///   is the global vector of operator information.
+        /// * op_fns_vec :
+        ///   is the global vector of operator functions.
         ///
-        fn get() -> &'static Vec< OpInfo<Self> >;
+        fn get() -> &'static Vec< OpFns<Self> >;
     }
 }
-// impl_global_op_info_vec!
-/// Implement GlobalOpInfoVec for the value type *V* ; see [doc_generic_v]
+// impl_global_op_fns_vec!
+/// Implement GlobalOpFnsVec for the value type *V* ; see [doc_generic_v]
 ///
 /// This macro can be invoked from anywhere given the following use statements:
 /// ```text
@@ -561,20 +561,20 @@ pub(crate) mod sealed {
 ///     use std::cell::RefCell;
 ///     use crate::ad::AD;
 /// ```
-macro_rules! impl_global_op_info_vec{ ($V:ty) => {
-    impl crate::op::info::sealed::GlobalOpInfoVec for $V {
+macro_rules! impl_global_op_fns_vec{ ($V:ty) => {
+    impl crate::op::info::sealed::GlobalOpFnsVec for $V {
         #[doc = concat!(
-            "Operator information used to evaluate `",
+            "Operator functions used to evaluate `",
             stringify!($V), "`, and `AD<", stringify!($V), ">` operations"
         ) ]
-        fn get() -> &'static Vec< crate::op::info::OpInfo<$V> > {
-            pub static OP_INFO_VEC :
-                LazyLock< Vec< crate::op::info::OpInfo<$V> > > =
+        fn get() -> &'static Vec< crate::op::info::OpFns<$V> > {
+            pub static OP_FNS_VEC :
+                LazyLock< Vec< crate::op::info::OpFns<$V> > > =
                     LazyLock::new(
-                        || crate::op::info::op_info_vec::<$V>()
+                        || crate::op::info::op_fns_vec::<$V>()
                     );
-            &*OP_INFO_VEC
+            &*OP_FNS_VEC
         }
     }
 } }
-pub(crate) use impl_global_op_info_vec;
+pub(crate) use impl_global_op_fns_vec;

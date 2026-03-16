@@ -26,7 +26,7 @@ use crate::{
 use crate::ad::ADType;
 use crate::op::unary::common;
 use crate::tape::sealed::ThisThreadTape;
-use crate::op::info::OpInfo;
+use crate::op::info::OpFns;
 use crate::op::id::ABS_OP;
 // -------------------------------------------------------------------------
 // abs_forward_dyp
@@ -88,13 +88,13 @@ where
     var_der[x]     += &( &z_x * &var_der[z] );
 }
 // ---------------------------------------------------------------------------
-// set_op_info
-/// Set the operator information for all the ABS_OP operator.
+// set_op_fns
+/// Set the operator functions for all the ABS_OP operator.
 ///
-/// * op_info_vec :
-///   The map from [op::id](crate::op::id) to operator information.
+/// * op_fns_vec :
+///   The map from [op::id](crate::op::id) to operator functions.
 ///   The the map results for ABS_OP are set.
-pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
+pub fn set_op_fns<V>( op_fns_vec : &mut [OpFns<V>] ) where
     for<'a> &'a AD<V> : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
     //
@@ -104,7 +104,7 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     V                 : Clone + FConst + ThisThreadTape ,
     for<'a> &'a V     : FUnary<Output=V>,
 {
-    op_info_vec[ABS_OP as usize] = OpInfo{
+    op_fns_vec[ABS_OP as usize] = OpFns{
         name              : "abs",
         forward_dyp_value : abs_forward_dyp::<V, V>,
         forward_dyp_ad    : abs_forward_dyp::<V, AD<V> >,

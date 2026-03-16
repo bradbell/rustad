@@ -17,8 +17,8 @@ use crate::op::call::call_depend;
 use crate::atom::sealed::GlobalAtomCallbackVec;
 use crate::atom::AtomCallback;
 use crate::op::info::{
-    OpInfo,
-    sealed::GlobalOpInfoVec
+    OpFns,
+    sealed::GlobalOpFnsVec
 };
 use crate::op::id::{
     CALL_OP,
@@ -32,7 +32,7 @@ use crate::doc_generic_v;
 // ADfn::sub_sparsity
 impl<V> ADfn<V>
 where
-    V               : GlobalAtomCallbackVec + GlobalOpInfoVec,
+    V               : GlobalAtomCallbackVec + GlobalOpFnsVec,
     AtomCallback<V> : Clone,
 {
     /// Use the subgraph method to compute a Jacobian sparsity pattern.
@@ -152,8 +152,8 @@ where
             }
         }
         //
-        // op_info_vec
-        let op_info_vec : &Vec< OpInfo<V> >  = GlobalOpInfoVec::get();
+        // op_fns_vec
+        let op_fns_vec : &Vec< OpFns<V> >  = GlobalOpFnsVec::get();
         //
         // rng_ad_type, rng_index, n_range
         let rng_ad_type       = &self.rng_ad_type;
@@ -240,7 +240,7 @@ where
                         let op_id     = var_id_all[op_index];
                         //
                         if trace {
-                            let name = &op_info_vec[op_id as usize].name;
+                            let name = &op_fns_vec[op_id as usize].name;
                             println!(
                                 "    {} : var_index = {}", name, var_index
                             );
@@ -309,7 +309,7 @@ where
                         let op_id     = dyp_id_all[op_index];
                         //
                         if trace {
-                            let name = &op_info_vec[op_id as usize].name;
+                            let name = &op_fns_vec[op_id as usize].name;
                             println!(
                                 "    {} :  dyp_index = {}", name, dyp_index
                         );

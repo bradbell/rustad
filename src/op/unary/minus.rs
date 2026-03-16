@@ -26,7 +26,7 @@ use crate::{
 use crate::ad::ADType;
 use crate::op::unary::common;
 use crate::tape::sealed::ThisThreadTape;
-use crate::op::info::OpInfo;
+use crate::op::info::OpFns;
 use crate::op::id::MINUS_OP;
 // -------------------------------------------------------------------------
 // minus_forward_dyp
@@ -87,13 +87,13 @@ where
     left[x]           -= &right[0];
 }
 // ---------------------------------------------------------------------------
-// set_op_info
-/// Set the operator information for all the MINUS_OP operator.
+// set_op_fns
+/// Set the operator functions for all the MINUS_OP operator.
 ///
-/// * op_info_vec :
-///   The map from [op::id](crate::op::id) to operator information.
+/// * op_fns_vec :
+///   The map from [op::id](crate::op::id) to operator functions.
 ///   The the map results for MINUS_OP are set.
-pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
+pub fn set_op_fns<V>( op_fns_vec : &mut [OpFns<V>] ) where
     for<'a> &'a AD<V> : Mul<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V     : Mul<&'a V, Output = V> ,
     //
@@ -103,7 +103,7 @@ pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] ) where
     V                 : Clone + FConst + ThisThreadTape ,
     for<'a> &'a V     : FUnary<Output=V>,
 {
-    op_info_vec[MINUS_OP as usize] = OpInfo{
+    op_fns_vec[MINUS_OP as usize] = OpFns{
         name              : "minus",
         forward_dyp_value : minus_forward_dyp::<V, V>,
         forward_dyp_ad    : minus_forward_dyp::<V, AD<V> >,

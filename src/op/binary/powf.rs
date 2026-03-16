@@ -29,7 +29,7 @@ use crate::{
 };
 //
 use crate::op::binary::common;
-use crate::op::info::OpInfo;
+use crate::op::info::OpFns;
 use crate::op::id::POWF_OP;
 use crate::tape::sealed::ThisThreadTape;
 //
@@ -172,14 +172,14 @@ where
     }
 }
 // ---------------------------------------------------------------------------
-// set_op_info
+// set_op_fns
 //
-/// Set the operator information for all the Mul operators.
+/// Set the operator functions for all the Mul operators.
 ///
-/// * op_info_vec :
-///   The map from [op::id](crate::op::id) to operator information.
+/// * op_fns_vec :
+///   The map from [op::id](crate::op::id) to operator functions.
 ///   The map results for POWF_OP
-pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
+pub fn set_op_fns<V>( op_fns_vec : &mut [OpFns<V>] )
 where
     V : Clone + FConst + PartialEq + ThisThreadTape,
     //
@@ -200,7 +200,7 @@ where
     //
     for<'a> &'a V     : FBinary<&'a V, Output = V>,
 {
-    op_info_vec[POWF_OP as usize] = OpInfo{
+    op_fns_vec[POWF_OP as usize] = OpFns{
         name              : "powf_pp",
         forward_dyp_value : powf_forward_dyp::<V, V>,
         forward_dyp_ad    : powf_forward_dyp::<V, AD<V> >,

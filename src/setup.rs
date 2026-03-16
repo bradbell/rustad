@@ -40,7 +40,7 @@ macro_rules! setup_this_value_type{ ($V:ty) => {
         crate::ad::binary::impl_value_op_ad!($V);
         crate::atom::impl_global_atom_callback_vec!($V);
         crate::checkpoint::impl_global_checkpoint_info!($V);
-        crate::op::info::impl_global_op_info_vec!($V);
+        crate::op::info::impl_global_op_fns_vec!($V);
 } }
 //
 // AzFloat value types

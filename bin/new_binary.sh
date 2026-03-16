@@ -109,8 +109,8 @@ sed -i $file -f temp.sed
 # info.rs
 file='src/op/info.rs'
 cat << EOF > temp.sed
-/crate::op::binary::num_cmp::set_op_info::<V>(&mut result);/s|\$|\\
-    crate::op::binary::$name::set_op_info::<V>(\\&mut result);|
+/crate::op::binary::num_cmp::set_op_fns::<V>(&mut result);/s|\$|\\
+    crate::op::binary::$name::set_op_fns::<V>(\\&mut result);|
 EOF
 git checkout $file
 sed -i $file -f temp.sed
@@ -133,7 +133,7 @@ sed -f temp.sed src/op/binary/powf.rs > src/op/binary/$name.rs
 #
 cat << EOF
 src/op/binary/$name.rs: Fix ${name}_forward_der and ${name}_reverse_der
-                        Check constraints in this set_op_info function.
+                        Check constraints in this set_op_fns function.
 examples/f_binary.rs: Add an example for $name function values.
 tests/$name.rs: Add a test for $name derivatives.
 EOF

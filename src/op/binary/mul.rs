@@ -37,7 +37,7 @@ use crate::{
 use crate::op::binary::common;
 use crate::tape::sealed::ThisThreadTape;
 use crate::op::info::{
-    OpInfo,
+    OpFns,
     panic_dyp,
     panic_var,
     panic_der,
@@ -232,15 +232,15 @@ where
     var_der[rhs] += &term;
 }
 // ---------------------------------------------------------------------------
-// set_op_info
+// set_op_fns
 //
-/// Set the operator information for all the Mul operators.
+/// Set the operator functions for all the Mul operators.
 ///
-/// * op_info_vec :
-///   The map from [op::id](crate::op::id) to operator information.
+/// * op_fns_vec :
+///   The map from [op::id](crate::op::id) to operator functions.
 ///   The map results for
 ///   MUL_PP_OP, MUL_PV_OP, MUL_VP_OP, and MUL_VV_OP are set.
-pub fn set_op_info<V>( op_info_vec : &mut [OpInfo<V>] )
+pub fn set_op_fns<V>( op_fns_vec : &mut [OpFns<V>] )
 where
     for<'a> V : AddAssign<&'a V> ,
     //
@@ -252,7 +252,7 @@ where
     V             : Clone + FConst ,
     V             : PartialEq + ThisThreadTape ,
 {
-    op_info_vec[MUL_PP_OP as usize] = OpInfo{
+    op_fns_vec[MUL_PP_OP as usize] = OpFns{
         name              : "mul_pp",
         forward_dyp_value : mul_forward_dyp::<V, V>,
         forward_dyp_ad    : mul_forward_dyp::<V, AD<V> >,
@@ -265,7 +265,7 @@ where
         rust_src          : mul_rust_src,
         reverse_depend    : common::binary_reverse_depend,
     };
-    op_info_vec[MUL_PV_OP as usize] = OpInfo{
+    op_fns_vec[MUL_PV_OP as usize] = OpFns{
         name              : "mul_pv",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
@@ -278,7 +278,7 @@ where
         rust_src          : mul_rust_src,
         reverse_depend    : common::binary_reverse_depend,
     };
-    op_info_vec[MUL_VP_OP as usize] = OpInfo{
+    op_fns_vec[MUL_VP_OP as usize] = OpFns{
         name              : "mul_vp",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,
@@ -291,7 +291,7 @@ where
         rust_src          : mul_rust_src,
         reverse_depend    : common::binary_reverse_depend,
     };
-    op_info_vec[MUL_VV_OP as usize] = OpInfo{
+    op_fns_vec[MUL_VV_OP as usize] = OpFns{
         name              : "mul_vv",
         forward_dyp_value : panic_dyp::<V, V>,
         forward_dyp_ad    : panic_dyp::<V, AD<V> >,

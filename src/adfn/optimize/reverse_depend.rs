@@ -15,7 +15,7 @@ use crate::{
     IndexT,
 };
 use crate::op::{
-    info::sealed::GlobalOpInfoVec,
+    info::sealed::GlobalOpFnsVec,
     call::call_depend,
     id::CALL_OP,
     id::CALL_RES_OP,
@@ -30,7 +30,7 @@ use crate::adfn::optimize;
 // ADfn::reverse_depend
 impl<V> ADfn<V>
 where
-    V               : GlobalAtomCallbackVec + GlobalOpInfoVec,
+    V               : GlobalAtomCallbackVec + GlobalOpFnsVec,
     AtomCallback<V> : Clone,
 {   //
     // reverse_depend
@@ -81,8 +81,8 @@ where
             }
         }
         //
-        // op_info_vec
-        let op_info_vec = <V as GlobalOpInfoVec>::get();
+        // op_fns_vec
+        let op_fns_vec = <V as GlobalOpFnsVec>::get();
         //
         //
         // i_agraph
@@ -148,7 +148,7 @@ where
                         }
                     } else {
                         let reverse_depend =
-                            op_info_vec[op_id as usize].reverse_depend;
+                            op_fns_vec[op_id as usize].reverse_depend;
                         reverse_depend(
                             &mut depend,
                             bool_all,
@@ -159,7 +159,7 @@ where
                         );
                     }
                     if trace {
-                        let name = &op_info_vec[op_id as usize].name;
+                        let name = &op_fns_vec[op_id as usize].name;
                         println!(
                             "{}, {:?}, {}, {:?}, {:?}",
                             res, res_type, name, arg, arg_type
