@@ -29,6 +29,40 @@ use crate::{
     doc_generic_e,
 };
 // ---------------------------------------------------------------------------
+/// Arguments to operator functions that are always constant; i.e., immutable.
+/// TODO: remove allow dead code when this gets used.
+#[allow(dead_code)]
+pub(crate) struct ConstData<'a, V> {
+    // cop
+    /// vector of all the constant values in this [ADfn](crate::ADfn)
+    cop  : &'a [V] ,
+    //
+    // flag_all
+    /// vector of all the boolean values in this [AGraph](crate::tape::AGraph)
+    bool_all : &'a [bool] ,
+    //
+    // arg
+    /// The arguments for this use of this operator.
+    arg : &'a [IndexT] ,
+    //
+    // arg_type
+    /// The type for each of the arguments above.
+    ///     *   If arg_type\[i\] is ConstantP, then arg\[i\]
+    ///         is an index in the constant parameter vector cop.
+    ///     *   If arg_type\[i\] is DynamicP, then arg\[i\]
+    ///         is an index in vector of all the dynamic parameters.
+    ///     *   If arg_type\[i\] is Variable, then arg\[i\]
+    ///         is an index in the vector of all the variables.
+    ///     *   If arg_type\[i\] is Empty, the arg[\i\] is not a
+    ///         constant, dynamic parameter, or variable index.
+    arg_type : &'a [ADType] ,
+    //
+    /// The dynamic parameter or variable index for the result of this operator.
+    /// The choice is clear from the context; e.g., in [ForwardDyp] (ForwardVar]
+    /// it is a dynamic parameter (variable) index.
+    res : usize ,
+}
+// ---------------------------------------------------------------------------
 // doc_common_arguments
 /// Common arguments for operator evaluation functions.
 ///
