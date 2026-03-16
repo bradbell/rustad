@@ -214,20 +214,26 @@ macro_rules! forward_var {
                 }
                 println!( "index, var_all, op_name, arg, arg_type" );
             }
+            //
+            // cop, bool_all
+            let cop      = &self.cop;
+            let bool_all = &self.var.bool_all;
+            //
             for op_index in 0 .. self.var.id_all.len() {
                 let op_id     = self.var.id_all[op_index] as usize;
                 let start     = self.var.arg_start[op_index] as usize;
                 let end       = self.var.arg_start[op_index + 1] as usize;
+                //
                 let arg       = &self.var.arg_all[start .. end];
                 let arg_type  = &self.var.arg_type_all[start .. end];
                 let res       = self.var.n_dom + op_index;
-                let forward_var = op_fns_vec[op_id].[< forward_var_ $suffix >];
                 //
+                let forward_var = op_fns_vec[op_id].[< forward_var_ $suffix >];
                 forward_var(
                     &dyp_all,
                     &mut var_all,
-                    &self.cop,
-                    &self.var.bool_all,
+                    cop,
+                    bool_all,
                     arg,
                     arg_type,
                     res

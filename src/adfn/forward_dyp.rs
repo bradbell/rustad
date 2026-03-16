@@ -131,20 +131,25 @@ macro_rules! forward_dyp {
                 println!( "index, dyp_all, op_name, arg, arg_type" );
             }
             //
+            // cop, bool_all
+            let cop      = &self.cop;
+            let bool_all = &self.dyp.bool_all;
+            //
             // dyp_all
             for op_index in 0 .. self.dyp.id_all.len() {
                 let op_id    = self.dyp.id_all[op_index] as usize;
                 let start    = self.dyp.arg_start[op_index] as usize;
                 let end      = self.dyp.arg_start[op_index + 1] as usize;
+                //
                 let arg      = &self.dyp.arg_all[start .. end];
                 let arg_type = &self.dyp.arg_type_all[start .. end];
                 let res      = self.dyp.n_dom + op_index;
-                let forward_dyp = op_fns_vec[op_id].[< forward_dyp_ $suffix >];
                 //
+                let forward_dyp = op_fns_vec[op_id].[< forward_dyp_ $suffix >];
                 forward_dyp(
                     &mut dyp_all,
-                    &self.cop,
-                    &self.dyp.bool_all,
+                    cop,
+                    bool_all,
                     arg,
                     arg_type,
                     res

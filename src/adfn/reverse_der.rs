@@ -215,6 +215,11 @@ macro_rules! reverse_der {
                 println!( "var_index, var_all, var_der, op_name, arg" );
             }
             //
+            // cop, bool_all
+            let cop      = &self.cop;
+            let bool_all = &self.var.bool_all;
+            //
+            //
             // var_der
             for op_index in ( 0 .. self.var.id_all.len() ).rev() {
                 let op_id     = self.var.id_all[op_index] as usize;
@@ -228,8 +233,8 @@ macro_rules! reverse_der {
                     &dyp_all,
                     &var_all,
                     &mut var_der,
-                    &self.cop,
-                    &self.var.bool_all,
+                    cop,
+                    bool_all,
                     arg,
                     arg_type,
                     res

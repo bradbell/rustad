@@ -184,6 +184,12 @@ where
                 "   let mut dyp_dep : Vec<V> = " +
                     "vec![nan.clone(); " + &n_dep + "];\n";
             //
+            // dyp_n_dom, var_n_dom, bool_all
+            let dyp_n_dom = self.dyp.n_dom;
+            let var_n_dom = self.var.n_dom;
+            let bool_all = &self.dyp.bool_all;
+            //
+            //
             // dyp_dep
             for op_index in 0 .. self.dyp.id_all.len() {
                 let op_id    = self.dyp.id_all[op_index] as usize;
@@ -197,9 +203,9 @@ where
                 src = src + &rust_src(
                         not_used,
                         ADType::DynamicP,
-                        self.dyp.n_dom,
-                        self.var.n_dom,
-                        &self.dyp.bool_all,
+                        dyp_n_dom,
+                        var_n_dom,
+                        bool_all,
                         arg,
                         arg_type,
                         res
@@ -215,6 +221,12 @@ where
                 "   // var_dep\n" +
                 "   // vector of dependent variables\n" +
                 "   let mut var_dep : Vec<V> = vec![nan; " + &n_dep + "];\n";
+            //
+            // dyp_n_dom, var_n_dom, bool_all
+            let dyp_n_dom = self.dyp.n_dom;
+            let var_n_dom = self.var.n_dom;
+            let bool_all = &self.var.bool_all;
+            //
             for op_index in 0 .. self.var.id_all.len() {
                 let op_id    = self.var.id_all[op_index] as usize;
                 let start    = self.var.arg_start[op_index] as usize;
@@ -227,9 +239,9 @@ where
                 src = src + &rust_src(
                         not_used,
                         ADType::Variable,
-                        self.dyp.n_dom,
-                        self.var.n_dom,
-                        &self.var.bool_all,
+                        dyp_n_dom,
+                        var_n_dom,
+                        bool_all,
                         arg,
                         arg_type,
                         res
