@@ -21,7 +21,6 @@ use std::ops::{
 //
 use crate::ad::ADType;
 use crate::{
-    IndexT,
     AD,
     FConst,
     FBinary,

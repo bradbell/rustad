@@ -50,10 +50,7 @@ pub fn no_op_rust_src<V>(
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
     _var_n_dom : usize       ,
-    _bool_all  : &[bool]     ,
-    _arg       : &[IndexT]   ,
-    _arg_type  : &[ADType]   ,
-    _res       : usize       ,
+    _const_data : ConstData<V> ,
 ) -> String
 { String::new()  }
 //

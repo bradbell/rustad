@@ -14,7 +14,6 @@ use std::ops::{
 };
 //
 use crate::{
-    IndexT,
     AD,
     FConst,
     FUnary,

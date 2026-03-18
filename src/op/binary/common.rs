@@ -196,11 +196,10 @@ macro_rules! binary_rust_src { ($name:ident) => { paste::paste! {
         res_type    : ADType      ,
         dyp_n_dom   : usize       ,
         var_n_dom   : usize       ,
-        _bool_all   : &[bool]     ,
-        arg         : &[IndexT]   ,
-        arg_type    : &[ADType]   ,
-        res         : usize       ) -> String
+        const_data : ConstData<V> ) -> String
     {   //
+        let ConstData {arg, arg_type, res, ..} = const_data;
+        //
         debug_assert!( arg.len() == 2);
         //
         // lhs_str

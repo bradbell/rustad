@@ -858,10 +858,7 @@ fn call_res_rust_src<V> (
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
     _var_n_dom : usize       ,
-    _bool_all  : &[bool]     ,
-    _arg       : &[IndexT]   ,
-    _arg_type  : &[ADType]   ,
-    _res       : usize       ,
+    _const_data : ConstData<V> ,
 ) -> String
 {   String::new() }
 // ===========================================================================
@@ -874,14 +871,13 @@ fn call_rust_src<V> (
     res_type  : ADType      ,
     dyp_n_dom : usize       ,
     var_n_dom : usize       ,
-    bool_all  : &[bool]     ,
-    arg       : &[IndexT]   ,
-    arg_type  : &[ADType]   ,
-    res       : usize       ) -> String
+    const_data : ConstData<V> ) -> String
 where
     V     : GlobalAtomCallbackVec,
     AtomCallback<V> : Clone,
-{   // ----------------------------------------------------------------------
+{   //
+    let ConstData {bool_all, arg, arg_type, res, ..} = const_data;
+    // ----------------------------------------------------------------------
     debug_assert!( res_type.is_dynamic() || res_type.is_variable() );
     //
     let (

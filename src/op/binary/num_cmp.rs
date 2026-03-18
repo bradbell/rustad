@@ -9,7 +9,6 @@
 //
 use crate::{
     AD,
-    IndexT,
     FConst,
     FBinary,
 };

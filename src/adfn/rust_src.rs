@@ -18,6 +18,7 @@ use crate::{
 //
 use std::any::type_name;
 use crate::op::info::sealed::GlobalOpFnsVec;
+use crate::op::info::ConstData;
 //
 #[cfg(doc)]
 use crate::{
@@ -184,20 +185,26 @@ where
                 "   let mut dyp_dep : Vec<V> = " +
                     "vec![nan.clone(); " + &n_dep + "];\n";
             //
-            // dyp_n_dom, var_n_dom, bool_all
+            // dyp_n_dom, var_n_dom, cop, bool_all
             let dyp_n_dom = self.dyp.n_dom;
             let var_n_dom = self.var.n_dom;
-            let bool_all = &self.dyp.bool_all;
-            //
+            let cop       = &self.cop;
+            let bool_all  = &self.dyp.bool_all;
             //
             // dyp_dep
             for op_index in 0 .. self.dyp.id_all.len() {
                 let op_id    = self.dyp.id_all[op_index] as usize;
                 let start    = self.dyp.arg_start[op_index] as usize;
                 let end      = self.dyp.arg_start[op_index + 1] as usize;
+                //
                 let arg      = &self.dyp.arg_all[start .. end];
                 let arg_type = &self.dyp.arg_type_all[start .. end];
                 let res      = self.dyp.n_dom + op_index;
+                //
+                let const_data = ConstData {
+                    cop, bool_all, arg, arg_type, res
+                };
+                //
                 let rust_src = op_fns_vec[op_id].rust_src;
                 let not_used     = V::nan();
                 src = src + &rust_src(
@@ -205,10 +212,7 @@ where
                         ADType::DynamicP,
                         dyp_n_dom,
                         var_n_dom,
-                        bool_all,
-                        arg,
-                        arg_type,
-                        res
+                        const_data,
                     );
             }
         }
@@ -225,15 +229,22 @@ where
             // dyp_n_dom, var_n_dom, bool_all
             let dyp_n_dom = self.dyp.n_dom;
             let var_n_dom = self.var.n_dom;
+            let cop       = &self.cop;
             let bool_all = &self.var.bool_all;
             //
             for op_index in 0 .. self.var.id_all.len() {
                 let op_id    = self.var.id_all[op_index] as usize;
                 let start    = self.var.arg_start[op_index] as usize;
                 let end      = self.var.arg_start[op_index + 1] as usize;
+                //
                 let arg      = &self.var.arg_all[start .. end];
                 let arg_type = &self.var.arg_type_all[start .. end];
                 let res      = self.var.n_dom + op_index;
+                //
+                let const_data = ConstData {
+                    cop, bool_all, arg, arg_type, res
+                };
+                //
                 let rust_src = op_fns_vec[op_id].rust_src;
                 let not_used     = V::nan();
                 src = src + &rust_src(
@@ -241,10 +252,7 @@ where
                         ADType::Variable,
                         dyp_n_dom,
                         var_n_dom,
-                        bool_all,
-                        arg,
-                        arg_type,
-                        res
+                        const_data,
                     );
             }
         }

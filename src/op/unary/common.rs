@@ -116,11 +116,10 @@ macro_rules! rust_src { ($name:ident) => { paste::paste! {
         res_type    : ADType      ,
         dyp_n_dom   : usize       ,
         var_n_dom   : usize       ,
-        _bool_all   : &[bool]     ,
-        arg         : &[IndexT]   ,
-        arg_type    : &[ADType]   ,
-        res         : usize       ) -> String
+        const_data : ConstData<V> ) -> String
     {   //
+        let ConstData {arg, arg_type, res, ..} = const_data;
+        //
         // index
         let mut index = arg[0] as usize;
         debug_assert!( index < res );
