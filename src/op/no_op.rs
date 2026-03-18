@@ -20,16 +20,13 @@ use crate::ad::ADType;
 use crate::adfn::optimize;
 //
 use crate::op::info::OpFns;
+use crate::op::info::ConstData;
 use crate::op::id::NO_OP;
 //
 // no_op_dyp
 fn no_op_dyp<V, E> (
     _dyp_all  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize       ,
+    _const_data : ConstData<V> ,
 ) { }
 //
 // no_op_var

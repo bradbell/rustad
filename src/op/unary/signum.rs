@@ -27,6 +27,7 @@ use crate::ad::ADType;
 use crate::op::unary::common;
 use crate::tape::sealed::ThisThreadTape;
 use crate::op::info::OpFns;
+use crate::op::info::ConstData;
 use crate::op::id::SIGNUM_OP;
 // -------------------------------------------------------------------------
 // signum_forward_dyp

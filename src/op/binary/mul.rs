@@ -38,6 +38,8 @@ use crate::op::binary::common;
 use crate::tape::sealed::ThisThreadTape;
 use crate::op::info::{
     OpFns,
+
+    ConstData,
     panic_dyp,
     panic_var,
     panic_der,

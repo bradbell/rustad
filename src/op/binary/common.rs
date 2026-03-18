@@ -79,16 +79,14 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
     ) ]
     fn [< $name _forward_dyp >] <V, E> (
         dyp_all     : &mut [E]    ,
-        cop         : &[V]        ,
-        _bool_all   : &[bool]     ,
-        arg         : &[IndexT]   ,
-        arg_type    : &[ADType]   ,
-        res         : usize       )
+        const_data : ConstData<V> )
     where
         for<'a> &'a V : $Trait<&'a E, Output = E> ,
         for<'a> &'a E : $Trait<&'a V, Output = E> ,
         for<'a> &'a E : $Trait<&'a E, Output = E> ,
     {
+        let ConstData {cop, arg, arg_type, res, ..} = const_data;
+        //
         debug_assert!( arg.len() == 2);
         debug_assert!(
             ! ( arg_type[0].is_constant() && arg_type[1].is_constant() )
@@ -329,16 +327,14 @@ macro_rules! f_binary_function { ($name:ident) => { paste::paste! {
     ) ]
     fn [< $name _forward_dyp >] <V, E> (
         dyp_all     : &mut [E]    ,
-        cop         : &[V]        ,
-        _bool_all   : &[bool]     ,
-        arg         : &[IndexT]   ,
-        arg_type    : &[ADType]   ,
-        res         : usize       )
+        const_data : ConstData<V> )
     where
         for<'a> &'a V : FBinary<&'a E, Output = E>,
         for<'a> &'a E : FBinary<&'a V, Output = E>,
         for<'a> &'a E : FBinary<&'a E, Output = E>,
     {
+        let ConstData {cop, arg, arg_type, res, ..} = const_data;
+        //
         debug_assert!( arg.len() == 2);
         debug_assert!(
             ! ( arg_type[0].is_constant() && arg_type[1].is_constant() )

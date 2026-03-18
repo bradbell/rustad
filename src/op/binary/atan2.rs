@@ -31,6 +31,7 @@ use crate::{
 //
 use crate::op::binary::common;
 use crate::op::info::OpFns;
+use crate::op::info::ConstData;
 use crate::op::id::ATAN2_OP;
 use crate::tape::sealed::ThisThreadTape;
 //

@@ -16,6 +16,7 @@ use crate::{
 use crate::ad::ADType;
 use crate::op::id;
 use crate::op::info::OpFns;
+use crate::op::info::ConstData;
 use crate::op::binary::common;
 // ---------------------------------------------------------------------------
 // For each name, define

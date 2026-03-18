@@ -35,15 +35,15 @@ use crate::{
 pub(crate) struct ConstData<'a, V> {
     // cop
     /// vector of all the constant values in this [ADfn](crate::ADfn)
-    cop  : &'a [V] ,
+    pub(crate) cop  : &'a [V] ,
     //
     // flag_all
     /// vector of all the boolean values in this [AGraph](crate::tape::AGraph)
-    bool_all : &'a [bool] ,
+    pub(crate) bool_all : &'a [bool] ,
     //
     // arg
     /// The arguments for this use of this operator.
-    arg : &'a [IndexT] ,
+    pub(crate) arg : &'a [IndexT] ,
     //
     // arg_type
     /// The type for each of the arguments above.
@@ -55,12 +55,12 @@ pub(crate) struct ConstData<'a, V> {
     ///         is an index in the vector of all the variables.
     ///     *   If arg_type\[i\] is Empty, the arg[\i\] is not a
     ///         constant, dynamic parameter, or variable index.
-    arg_type : &'a [ADType] ,
+    pub(crate) arg_type : &'a [ADType] ,
     //
     /// The dynamic parameter or variable index for the result of this operator.
     /// The choice is clear from the context; e.g., in [ForwardDyp] (ForwardVar]
     /// it is a dynamic parameter (variable) index.
-    res : usize ,
+    pub(crate) res : usize ,
 }
 // ---------------------------------------------------------------------------
 // doc_common_arguments
@@ -113,11 +113,7 @@ pub fn doc_common_arguments() {}
 ///
 pub(crate) type ForwardDyp<V, E> = fn(
     _dyp_all  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize       ,
+    _const_data : ConstData<V> ,
 );
 // panic_dyp
 /// Default [ForwardDyp] function will panic.
@@ -126,11 +122,7 @@ pub(crate) type ForwardDyp<V, E> = fn(
 /// dynamic parameter acyclic graph).
 pub(crate) fn panic_dyp<V, E> (
     _dyp_all  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize       ,
+    _const_data : ConstData<V> ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
 // ForwardVar

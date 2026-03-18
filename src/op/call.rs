@@ -51,6 +51,7 @@ use crate::ad::ADType;
 use crate::adfn::optimize;
 use crate::tape::AGraph;
 use crate::op::info::OpFns;
+use crate::op::info::ConstData;
 use crate::op::info::no_reverse_depend;
 use crate::atom::sealed::GlobalAtomCallbackVec;
 use crate::op::id::{
@@ -265,15 +266,13 @@ where
 /// see [ForwardDyp](crate::op::info::ForwardDyp)
 fn call_forward_dyp_value<V> (
     dyp_all    : &mut [V]      ,
-    cop        : &[V]          ,
-    bool_all   : &[bool]       ,
-    arg        : &[IndexT]     ,
-    arg_type   : &[ADType]     ,
-    res        : usize         )
+    const_data : ConstData<V> )
 where
     V               : GlobalAtomCallbackVec + From<f32> + PartialEq,
     AtomCallback<V> : Clone,
-{   // ----------------------------------------------------------------------
+{   //
+    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    // ----------------------------------------------------------------------
     let (
         atom_id,
         call_info,
@@ -333,15 +332,13 @@ where
 /// see [ForwardDyp](crate::op::info::ForwardDyp)
 fn call_forward_dyp_ad<V> (
     adyp_all   : &mut [ AD<V> ]      ,
-    cop        : &[V]                ,
-    bool_all   : &[bool]             ,
-    arg        : &[IndexT]           ,
-    arg_type   : &[ADType]           ,
-    res        : usize               )
+    const_data : ConstData<V> )
 where
     V               : PartialEq + Clone + From<f32> + GlobalAtomCallbackVec,
     AtomCallback<V> : Clone,
-{   // ----------------------------------------------------------------------
+{   //
+    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    // ----------------------------------------------------------------------
     let (
         atom_id,
         call_info,
@@ -845,11 +842,7 @@ where
 /// [ForwardDyp](crate::op::info::ForwardDyp) function for call result operator
 fn call_res_dyp<V, E>(
     _dyp_all  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize       ,
+    _const_data : ConstData<V> ,
 ) { }
 //
 // call_res_var
