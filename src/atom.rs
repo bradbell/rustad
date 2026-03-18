@@ -518,21 +518,21 @@ where
     // arange, dyp_dep, var_dep
     let mut dyp_dep  : Vec<usize> = Vec::new();
     let mut var_dep  : Vec<usize> = Vec::new();
-    let mut dyp_flag              = vec![false; n_res];
-    let mut var_flag              = vec![false; n_res];
+    let mut rng_is_dyp             = vec![false; n_res];
+    let mut rng_is_var             = vec![false; n_res];
     for i in 0 .. n_res {
         if rng_ad_type[i].is_variable() {
             arange[i].tape_id   = tape.tape_id;
             arange[i].ad_type   = ADType::Variable;
             arange[i].index     = n_var + var_dep.len();
             var_dep.push( i );
-            var_flag[i] = true;
+            rng_is_var[i] = true;
          } else if rng_ad_type[i].is_dynamic() {
             arange[i].tape_id   = tape.tape_id;
             arange[i].ad_type   = ADType::DynamicP;
             arange[i].index     = n_dyp + dyp_dep.len();
             dyp_dep.push( i );
-            dyp_flag[i] = true;
+            rng_is_dyp[i] = true;
          } else {
             assert!( rng_ad_type[i].is_constant() );
         }
@@ -542,15 +542,15 @@ where
         // agraph, dep, n_dep
         let agraph   : &mut AGraph;
         let dep      : &Vec<usize>;
-        let flag     : &Vec<bool>;
+        let is_dep   : &Vec<bool>;
         if k == 0 {
             agraph   = &mut tape.dyp;
             dep      = &dyp_dep;
-            flag     = &dyp_flag;
+            is_dep   = &rng_is_dyp;
         } else {
             agraph   = &mut tape.var;
             dep      = &var_dep;
-            flag     = &var_flag;
+            is_dep   = &rng_is_var;
         }
         let n_dep = dep.len();
         //
@@ -588,11 +588,11 @@ where
             }
             //
             // agraph.bool_all
-            debug_assert!( flag.len() == n_res );
+            debug_assert!( is_dep.len() == n_res );
             agraph.bool_all.push( trace );  // bool_all[ arg[5] ]
-            for flag_i in flag.iter() {
+            for bval in is_dep.iter() {
                 // bool_all[ arg[5] + i + 1 ]
-                agraph.bool_all.push( *flag_i )
+                agraph.bool_all.push( *bval )
             }
             //
             // agraph.n_dep
