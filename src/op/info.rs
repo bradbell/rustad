@@ -63,53 +63,14 @@ pub(crate) struct ConstData<'a, V> {
     pub(crate) res : usize ,
 }
 // ---------------------------------------------------------------------------
-// doc_common_arguments
-/// Common arguments for operator evaluation functions.
-///
-/// * V : see [doc_generic_v]
-/// * E : see [doc_generic_e]
-///
-/// * dyp_all  :
-///   vector of all the dynamic parameters in the following order:
-///   the domain dynamic parameters followed by the dependent dynamic parameters.
-///
-/// * var_all  :
-///   vector of all the variables in the following order:
-///   the domain variables followed by the dependent variables.
-///
-/// * cop :
-///   vector of all the constant values used by operators.
-///
-/// * bool_all :
-///   vector of all the boolean values used by operators.
-///
-/// * arg :
-///   The arguments for this operator as a sub-vector of all the arguments.
-///
-/// * arg_type :
-///     *   If arg_type\[i\] is ConstantP, then arg\[i\]
-///         is an index in the  constant parameter vector.
-///     *   If arg_type\[i\] is DynamicP, then arg\[i\]
-///         is an index in dyp_all.
-///     *   If arg_type\[i\] is Variable, then arg\[i\]
-///         is an index in var_all.
-///
-/// * res :
-///   If this is a dynamic parameter operator (variable operator),
-///   res is the dyp_all (var_all) index for the value being computed.
-///
-#[cfg(doc)]
-pub fn doc_common_arguments() {}
-// ---------------------------------------------------------------------------
 // ForwardDyp
 /// Evaluation of dependent dynamic parameters.
-///
-/// * Arguments :  see [doc_common_arguments] .
-///   In addition, there is the following extra condition:
 ///
 /// * dyp_all  :
 ///   This is an input for dynamic parameters less than *res* and an output
 ///   for the results of this operator.
+///
+/// * const_data :  see [ConstData]
 ///
 pub(crate) type ForwardDyp<V, E> = fn(
     _dyp_all  : &mut [E]    ,
@@ -128,12 +89,14 @@ pub(crate) fn panic_dyp<V, E> (
 // ForwardVar
 /// Evaluation of variables.
 ///
-/// * Arguments :  see [doc_common_arguments] .
-///   In addition, there is the following extra condition:
+/// * dyp_all :
+///   contains the value of all the dynamic parameters.
 ///
 /// * var_all  :
 ///   This is an input for variable indices less than *res* and an output
 ///   for the results of this operator.
+///
+/// * const_data :  see [ConstData]
 ///
 pub(crate) type ForwardVar<V, E> = fn(
     _dyp_all  : &[E]        ,
@@ -154,15 +117,21 @@ pub(crate) fn panic_var<V, E> (
 // ForwardDer
 /// Evaluation of first order forward mode.
 ///
+/// * dyp_all :
+///   contains the value of all the dynamic parameters.
+///
+/// * var_all :
+///   contains the value of all the variables.
+///
 /// * var_der :
 ///   The sub-vector of var_der corresponding to the domain variables
 ///   specifies the direction for the derivative.
 ///   For i_var greater than the domain variable indices,
-///   var_dir\[ i_var \] is the directional derivative of variable i_var.
-///   This is an input for i_var <= res and an output for the results
+///   var_der\[ i_var \] is the directional derivative of variable i_var.
+///   This is an input for i_var < res and an output for the results
 ///   of this operator.
 ///
-/// * Other Arguments :  see [doc_common_arguments]
+/// * const_data :  see [ConstData]
 pub(crate) type ForwardDer<V, E> = fn(
     _dyp_all  : &[E]        ,
     _var_all  : &[E]        ,
@@ -184,15 +153,21 @@ pub(crate) fn panic_der<V, E>  (
 // ReverseDer
 /// Evaluation of first order reverse mode.
 ///
+/// * dyp_all :
+///   contains the value of all the dynamic parameters.
+///
+/// * var_all :
+///   contains the value of all the variables.
+///
 /// * var_der :
 ///   A scalar function is defined by the weight sum of the range components.
 ///   On input, var_der contains the partial derivatives of the
 ///   scalar as a function of variable i_var <= res + n_res - 1
 ///   (where n_res is the number of results for the current operator).
-///   On input, var_der contains the partial derivatives of the
+///   On output, var_der contains the partial derivatives of the
 ///   scalar as a function of i_var < res.
 ///
-/// * Other Arguments :  see [doc_common_arguments]
+/// * const_data :  see [ConstData]
 pub(crate) type ReverseDer<V, E> = fn(
     _dyp_all  : &[E]        ,
     _var_all  : &[E]        ,
@@ -384,7 +359,7 @@ pub(crate) use no_reverse_depend;
 /// * var_n_dom :
 ///   is the number of domain variables.
 ///
-/// * Other Arguments :  see [doc_common_arguments]
+/// * Other Arguments :  see [ConstData]
 ///
 /// * return
 ///   The return value is the rust source code from this operation.
