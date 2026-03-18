@@ -178,9 +178,9 @@ pub const NUM_VEC_RS : &str = include_str!( "float/num_vec.rs" );
 //
 // ----------------------------------------------------------------------------
 // opt_vec
-/// Convention for a variable number of arguments to a function.
+/// Convention for a variable number of options to a function.
 ///
-/// A function argument called *opt_vec* is will hold a vector of
+/// A function argument called *opt_vec* is holds a vector of
 /// key, value pairs. This enables one to add key, value pairs in a backward
 /// compatible way.
 ///
@@ -189,7 +189,7 @@ pub const NUM_VEC_RS : &str = include_str!( "float/num_vec.rs" );
 ///   ```text
 ///     opt_vec : &Vec< [&str; 2] >
 ///   ```
-/// where the each element of the vector is a `[key, value]` .
+/// where the each element of the vector (option) is a `[key, value]` .
 ///
 /// The documentation of *opt_vec* for a particular function specifies
 /// what the possible keys are, the meaning of the corresponding values,
