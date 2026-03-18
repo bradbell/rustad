@@ -84,7 +84,6 @@ where
 //
 // powi_rust_src
 fn powi_rust_src<V> (
-    _not_used   : V           ,
     res_type    : ADType      ,
     dyp_n_dom   : usize       ,
     var_n_dom   : usize       ,

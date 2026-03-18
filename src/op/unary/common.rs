@@ -112,7 +112,6 @@ macro_rules! rust_src { ($name:ident) => { paste::paste! {
         "; see [RustSrc](crate::op::info::RustSrc)"
     ) ]
     fn [< $name _rust_src >]<V> (
-        _not_used   : V           ,
         res_type    : ADType      ,
         dyp_n_dom   : usize       ,
         var_n_dom   : usize       ,

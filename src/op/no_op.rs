@@ -46,7 +46,6 @@ fn no_op_der<V, E>  (
 //
 // no_op_rust_src
 pub fn no_op_rust_src<V>(
-    _not_used : V           ,
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
     _var_n_dom : usize       ,

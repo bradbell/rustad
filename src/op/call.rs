@@ -854,7 +854,6 @@ fn call_res_der<V, E>(
 // call_res_rust_src
 /// [RustSrc](crate::op::info::RustSrc) function for call result operator
 fn call_res_rust_src<V> (
-    _not_used : V           ,
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
     _var_n_dom : usize       ,
@@ -867,7 +866,6 @@ fn call_res_rust_src<V> (
 /// Call operator rust source code generation;
 /// see [RustSrc](crate::op::info::RustSrc) function
 fn call_rust_src<V> (
-    _not_used : V           ,
     res_type  : ADType      ,
     dyp_n_dom : usize       ,
     var_n_dom : usize       ,

@@ -304,7 +304,6 @@ pub(crate) use no_reverse_der_ad;
 #[allow(unused_macros)]
 macro_rules! no_rust_src{ ($Op:ident) => {
     pub fn rust_src_none<V>(
-        _not_used : V           ,
         _res_type  : ADType      ,
         _dyp_n_dom : usize       ,
         _var_n_dom : usize       ,
@@ -346,9 +345,6 @@ pub(crate) use no_reverse_depend;
 /// Generate source code corresponding to forward_dyp and forward_var
 /// evaluation.
 ///
-/// * not_used :
-///   This argument is only used to determine the value type V.
-///
 /// * res_type :
 ///   This is the type of the dependent object being computed and must be
 ///   ADType::DynamicP or ADType::Variable.
@@ -359,13 +355,12 @@ pub(crate) use no_reverse_depend;
 /// * var_n_dom :
 ///   is the number of domain variables.
 ///
-/// * Other Arguments :  see [ConstData]
+/// * const_data :  see [ConstData]
 ///
 /// * return
 ///   The return value is the rust source code from this operation.
 ///
 pub(crate) type RustSrc<V> = fn(
-    _not_used : V           ,
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
     _var_n_dom : usize       ,
@@ -375,7 +370,6 @@ pub(crate) type RustSrc<V> = fn(
 // panic_rust_src
 /// Default [RustSrc] function will panic.
 pub(crate) fn panic_rust_src<V>(
-    _not_used   : V           ,
     _res_type   : ADType      ,
     _dyp_n_dom  : usize       ,
     _var_n_dom  : usize       ,

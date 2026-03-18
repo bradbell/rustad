@@ -206,9 +206,7 @@ where
                 };
                 //
                 let rust_src = op_fns_vec[op_id].rust_src;
-                let not_used     = V::nan();
                 src = src + &rust_src(
-                        not_used,
                         ADType::DynamicP,
                         dyp_n_dom,
                         var_n_dom,
@@ -246,9 +244,7 @@ where
                 };
                 //
                 let rust_src = op_fns_vec[op_id].rust_src;
-                let not_used     = V::nan();
                 src = src + &rust_src(
-                        not_used,
                         ADType::Variable,
                         dyp_n_dom,
                         var_n_dom,
