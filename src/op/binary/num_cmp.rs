@@ -57,7 +57,7 @@ fn zero_reverse_der<V, E>  (
     _bool_all : &[bool]     ,
     _arg      : &[IndexT]   ,
     _arg_type : &[ADType]   ,
-    _re       : usize      ,
+    _res      : usize      ,
 ) {  }
 // ---------------------------------------------------------------------------
 // set_op_fns
