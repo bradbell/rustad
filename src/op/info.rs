@@ -138,17 +138,6 @@ pub(crate) type ForwardDer<V, E> = fn(
     _var_der  : &mut [E]    ,
     _const_data : ConstData<V> ,
 );
-// panic_der
-/// Default [ForwardDer] and [ReverseDer] function will panic.
-/// This can be used for variable calculations by operators
-/// that only have parameter arguments (because they should not be in the
-/// variable acyclic graph).
-pub(crate) fn panic_der<V, E>  (
-    _dyp_all  : &[E]        ,
-    _var_all  : &[E]        ,
-    _var_der  : &mut [E]    ,
-    _const_data : ConstData<V> ,
-) { panic!(); }
 //
 // ReverseDer
 /// Evaluation of first order reverse mode.
@@ -174,6 +163,18 @@ pub(crate) type ReverseDer<V, E> = fn(
     _var_der  : &mut [E]    ,
     _const_data : ConstData<V> ,
 );
+//
+// panic_der
+/// Default [ForwardDer] and [ReverseDer] function will panic.
+/// This can be used for variable calculations by operators
+/// that only have parameter arguments (because they should not be in the
+/// variable acyclic graph).
+pub(crate) fn panic_der<V, E>  (
+    _dyp_all  : &[E]        ,
+    _var_all  : &[E]        ,
+    _var_der  : &mut [E]    ,
+    _const_data : ConstData<V> ,
+) { panic!(); }
 // ---------------------------------------------------------------------------
 // RustSrc
 /// Generate source code corresponding to forward_dyp and forward_var
