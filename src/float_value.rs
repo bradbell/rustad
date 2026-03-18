@@ -179,7 +179,7 @@ pub(crate) use impl_float_value_from_primitive;
 ///
 /// * Syntax :
 /// ```text
-///     flag = check_nearly_eq(x, y, arg_vec)
+///     bval = check_nearly_eq(x, y, arg_vec)
 /// ```
 ///
 /// * V : see [doc_generic_v](crate::doc_generic_v)
@@ -200,7 +200,7 @@ pub(crate) use impl_float_value_from_primitive;
 ///
 ///     * assert :
 ///       must be true or false. If it is true, check_nearly_eq
-///       will panic with an error message when the comparison (flag) is false.
+///       will panic with an error message when the comparison (bval) is false.
 ///       The default value for assert is true.
 ///
 /// * min_positive :
@@ -209,7 +209,7 @@ pub(crate) use impl_float_value_from_primitive;
 /// * epsilon :
 ///   use use the notaiton [epsilon](FConst::epsilon) below.
 ///
-/// * flag :
+/// * bval :
 ///   the return value is true if either of the following conditions hold:
 ///   ```text
 ///   |x| + |y|             < factor * min_positive
