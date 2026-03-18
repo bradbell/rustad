@@ -73,14 +73,12 @@ fn add_pv_forward_der <V, E>(
     _dyp_all   :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     E             : Clone,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let rhs = arg[1] as usize;
     var_der[ res ] = var_der[rhs].clone();
@@ -92,14 +90,12 @@ fn add_vp_forward_der <V, E>(
     _dyp_all   :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     E             : Clone,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     var_der[ res ] = var_der[lhs].clone();
@@ -111,14 +107,12 @@ fn add_vv_forward_der <V, E>(
     _dyp_all   :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a E : Add<&'a E, Output = E> ,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
@@ -134,14 +128,12 @@ fn add_pv_reverse_der <V, E>(
     _dyp_all   :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a E : Add<&'a E, Output = E> ,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let rhs = arg[1] as usize;
     //
@@ -156,14 +148,12 @@ fn add_vp_reverse_der <V, E>(
     _dyp_all   :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a E : Add<&'a E, Output = E> ,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     //
@@ -178,14 +168,12 @@ fn add_vv_reverse_der <V, E>(
     _dyp_all   :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a E : Add<&'a E, Output = E> ,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;

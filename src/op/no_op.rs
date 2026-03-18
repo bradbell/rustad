@@ -41,11 +41,7 @@ fn no_op_der<V, E>  (
     _dyp_all  : &[E]        ,
     _var_all  : &[E]        ,
     _var_der  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize       ,
+    _const_data : ConstData<V> ,
 ) {  }
 //
 // no_op_rust_src

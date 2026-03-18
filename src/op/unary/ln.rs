@@ -46,16 +46,14 @@ fn ln_forward_der<V, E>(
     _dyp_all   :   &[E]        ,
     var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     E             : FConst ,
     for<'a> &'a E : FUnary<Output=E>,
     for<'a> &'a E : Div<&'a E, Output=E>,
 {
+    let ConstData {arg, arg_type, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     let x        = arg[0] as usize;
@@ -70,17 +68,15 @@ fn ln_reverse_der<V, E>(
     _dyp_all   :   &[E]        ,
     var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> E     : AddAssign<&'a E> ,
     E             : FConst ,
     for<'a> &'a E : FUnary<Output=E>,
     for<'a> &'a E : Div<&'a E, Output=E>,
 {
+    let ConstData {arg, arg_type, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 1 );
     debug_assert!( arg_type[0].is_variable() );
     let x           = arg[0] as usize;

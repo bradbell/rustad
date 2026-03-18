@@ -77,18 +77,16 @@ fn div_pv_forward_der <V, E>(
     _dyp_all   :   &[E]        ,
     var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a V : Mul<&'a E, Output = E> ,
     for<'a> &'a E : Mul<&'a E, Output = E> ,
     for<'a> &'a E : Div<&'a E, Output = E> ,
     E             : FConst ,
     for<'a> &'a E : FUnary<Output=E>,
-{   // d(p / v) = - p * dv / (v * v) = -  (p / v) * dv / v
+{   //
+    let ConstData {arg, arg_type, res, ..} = const_data;
+    // d(p / v) = - p * dv / (v * v) = -  (p / v) * dv / v
     debug_assert!( arg.len() == 2);
     debug_assert!( arg_type[0].is_parameter() );
     debug_assert!( arg_type[1].is_variable() );
@@ -103,15 +101,13 @@ fn div_vp_forward_der <V, E>(
     dyp_all    :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    cop        :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a E : Div<&'a V, Output = E> ,
     for<'a> &'a E : Div<&'a E, Output = E> ,
 {
+    let ConstData {cop, arg, arg_type, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     debug_assert!( arg_type[0].is_variable() );
     debug_assert!( arg_type[1].is_parameter() );
@@ -131,11 +127,7 @@ fn div_vv_forward_der <V, E>(
     _dyp_all   :   &[E]        ,
     var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a V : Mul<&'a E, Output = E> ,
     for<'a> &'a E : Mul<&'a E, Output = E> ,
@@ -143,7 +135,9 @@ where
     for<'a> &'a E : Sub<&'a E, Output = E> ,
     E             : FConst ,
     for<'a> &'a E : FUnary<Output=E>,
-{   // d(u / v) = ( v * du - u * dv ) / (v * v) = [ du - (u / v) * dv ] / v
+{   //
+    let ConstData {arg, arg_type, res, ..} = const_data;
+    // d(u / v) = ( v * du - u * dv ) / (v * v) = [ du - (u / v) * dv ] / v
     debug_assert!( arg.len() == 2);
     debug_assert!( arg_type[0].is_variable() );
     debug_assert!( arg_type[1].is_variable() );
@@ -162,16 +156,14 @@ fn div_pv_reverse_der <V, E>(
     _dyp_all   :   &[E]        ,
     var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> E     : SubAssign<&'a E>       ,
     for<'a> &'a E : Div<&'a E, Output = E> ,
     for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
+    let ConstData {arg, arg_type, res, ..} = const_data;
+    //
     // g(v)      = f(w, v) = f[ p / v, v ]
     // dg / dv   = df/dv + df/dw * dw/dv
     // dw / dv   = - w / v
@@ -189,16 +181,14 @@ fn div_vp_reverse_der <V, E>(
     dyp_all    :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    cop        :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> E     : AddAssign<&'a E>       ,
     for<'a> &'a E : Div<&'a V, Output = E> ,
     for<'a> &'a E : Div<&'a E, Output = E> ,
 {
+    let ConstData {cop, arg, arg_type, res, ..} = const_data;
+    //
     // g(v)      = f(w, v) = f[ v / p, v ]
     // dg / dv   = df/dv + df/dw * dw/dv
     // dw / dv   = 1 / p
@@ -222,17 +212,15 @@ fn div_vv_reverse_der <V, E>(
     _dyp_all   :   &[E]        ,
     var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> E : AddAssign<&'a E> ,
     for<'a> E : SubAssign<&'a E> ,
     for<'a> &'a E : Mul<&'a E, Output = E> ,
     for<'a> &'a E : Div<&'a E, Output = E> ,
 {
+    let ConstData {arg, arg_type, res, ..} = const_data;
+    //
     // g(u, v)   = f(w, u, v) = f[ u / v, u, v ]
     // dg / du   = df/du + df/dw * dw/du
     // dg / dv   = df/dv + df/dw * dw/dv

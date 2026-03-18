@@ -54,11 +54,7 @@ fn atan2_forward_der <V, E>(
     dyp_all    :   &[E]        ,
     var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
-    cop        :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     //
     for<'a> &'a E : Add<&'a E, Output = E> ,
@@ -72,6 +68,8 @@ where
     for<'a> &'a E : FUnary<Output = E>,
     for<'a> &'a V : FUnary<Output = V>,
 {
+    let ConstData {cop, arg, arg_type, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let y          = arg[0] as usize;
     let x          = arg[1] as usize;
@@ -118,11 +116,7 @@ fn atan2_reverse_der <V, E>(
     dyp_all    :   &[E]        ,
     var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
-    cop        :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a>     E : AddAssign<&'a E> ,
     //
@@ -137,6 +131,8 @@ where
     for<'a> &'a E : FUnary<Output = E>,
     for<'a> &'a V : FUnary<Output = V>,
 {
+    let ConstData {cop, arg, arg_type, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let y          = arg[0] as usize;
     let x          = arg[1] as usize;

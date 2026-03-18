@@ -36,15 +36,13 @@ fn zero_forward_der<V, E>  (
     _dyp_all  : &[E]        ,
     _var_all  : &[E]        ,
     var_der   : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    res        : usize      ,
+    const_data : ConstData<V> ,
 )
 where
     E : FConst,
 {
+    let ConstData {res, ..} = const_data;
+    //
     var_der [ res ] = FConst::zero();
 }
 // ---------------------------------------------------------------------------
@@ -53,11 +51,7 @@ fn zero_reverse_der<V, E>  (
     _dyp_all  : &[E]        ,
     _var_all  : &[E]        ,
     _var_der  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize      ,
+    _const_data : ConstData<V> ,
 ) {  }
 // ---------------------------------------------------------------------------
 // set_op_fns

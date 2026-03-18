@@ -78,15 +78,13 @@ fn mul_pv_forward_der <V, E>(
     dyp_all    :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    cop        :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a V : Mul<&'a E, Output = E> ,
     for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
+    let ConstData {cop, arg, arg_type, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
@@ -104,15 +102,13 @@ fn mul_vp_forward_der <V, E>(
     dyp_all    :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    cop        :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a E : Mul<&'a V, Output = E> ,
     for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
+    let ConstData {cop, arg, arg_type, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
@@ -130,15 +126,13 @@ fn mul_vv_forward_der <V, E>(
     _dyp_all   :   &[E]        ,
     var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a E : Add<&'a E, Output = E> ,
     for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
@@ -156,16 +150,14 @@ fn mul_pv_reverse_der <V, E>(
     dyp_all    :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    cop        :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> E : AddAssign<&'a E> ,
     for<'a> &'a E : Mul<&'a V, Output = E> ,
     for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
+    let ConstData {cop, arg, arg_type, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
@@ -185,16 +177,14 @@ fn mul_vp_reverse_der <V, E>(
     dyp_all    :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    cop        :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> E : AddAssign<&'a E> ,
     for<'a> &'a E : Mul<&'a V, Output = E> ,
     for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
+    let ConstData {cop, arg, arg_type, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
@@ -214,15 +204,13 @@ fn mul_vv_reverse_der <V, E>(
     _dyp_all   :   &[E]        ,
     var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> E : AddAssign<&'a E> ,
     for<'a> &'a E : Mul<&'a E, Output = E> ,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;

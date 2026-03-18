@@ -16,6 +16,7 @@ use crate::{
 };
 use crate::op::info::sealed::GlobalOpFnsVec;
 use crate::tape::sealed::ThisThreadTape;
+use crate::op::info::ConstData;
 //
 #[cfg(doc)]
 use crate::{
@@ -228,16 +229,16 @@ macro_rules! forward_der {
                 let arg_type = &self.var.arg_type_all[start .. end];
                 let res      = self.var.n_dom + op_index;
                 //
+                let const_data = ConstData {
+                    cop, bool_all, arg, arg_type, res
+                };
+                //
                 let forward_der = op_fns_vec[op_id].[< forward_der_ $suffix >];
                 forward_der(
                     &dyp_all,
                     &var_all,
                     &mut var_der,
-                    cop,
-                    bool_all,
-                    arg,
-                    arg_type,
-                    res
+                    const_data,
                 );
                 if trace {
                     let name = &op_fns_vec[op_id].name;

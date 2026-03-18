@@ -53,11 +53,7 @@ fn hypot_forward_der <V, E>(
     _dyp_all   :   &[E]        ,
     var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a>     E : FConst + AddAssign<&'a E>,
     //
@@ -65,6 +61,8 @@ where
     for<'a> &'a E : Div<&'a E, Output = E> ,
     //
 {
+    let ConstData {arg, arg_type, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let x          = arg[0] as usize;
     let y          = arg[1] as usize;
@@ -89,11 +87,7 @@ fn hypot_reverse_der <V, E>(
     _dyp_all   :   &[E]        ,
     var_all    :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    arg_type   :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a>     E : FConst + AddAssign<&'a E>,
     //
@@ -101,6 +95,8 @@ where
     for<'a> &'a E : Div<&'a E, Output = E> ,
     //
 {
+    let ConstData {arg, arg_type, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let x          = arg[0] as usize;
     let y          = arg[1] as usize;

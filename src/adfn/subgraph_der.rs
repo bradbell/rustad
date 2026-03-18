@@ -16,7 +16,8 @@ use crate::{
 };
 use crate::op::info::{
     OpFns,
-    sealed::GlobalOpFnsVec
+    sealed::GlobalOpFnsVec,
+    ConstData,
 };
 use crate::tape::sealed::ThisThreadTape;
 //
@@ -179,6 +180,10 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
                 var_n_dom, n_range, row_index
         ); }
         //
+        // cop, bool_all
+        let cop      = &self.cop;
+        let bool_all = &self.var.bool_all;
+        //
         // var_index_stack, var_index
         let mut var_index_stack : Vec<IndexT> = Vec::new();
         if rng_ad_type[row_index].is_variable() {
@@ -197,19 +202,21 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
                 let op_id     = self.var.id_all[op_index] as usize;
                 let start     = self.var.arg_start[op_index] as usize;
                 let end       = self.var.arg_start[op_index + 1] as usize;
+                //
                 let arg       = &self.var.arg_all[start .. end];
                 let arg_type  = &self.var.arg_type_all[start .. end];
                 let res       = self.var.n_dom + op_index;
-                let reverse_1 = op_fns_vec[op_id].[< reverse_der_ $suffix >];
-                reverse_1(
+                //
+                let const_data = ConstData {
+                    cop, bool_all, arg, arg_type, res
+                };
+                //
+                let reverse_der = op_fns_vec[op_id].[< reverse_der_ $suffix >];
+                reverse_der(
                     &dyp_all,
                     &var_all,
                     &mut var_der,
-                    &self.cop,
-                    &self.var.bool_all,
-                    arg,
-                    arg_type,
-                    res
+                    const_data,
                 );
                 if trace {
                     let name = &op_fns_vec[op_id].name;

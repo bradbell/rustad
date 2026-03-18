@@ -71,16 +71,14 @@ fn sub_pv_forward_der <V, E>(
     _dyp_all   :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     E  : Clone + FConst ,
     V  : FConst ,
     for<'a> &'a E : Sub<&'a E, Output = E> ,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let rhs = arg[1] as usize;
     // TODO: use unary minus once it is defined for AD<V>.
@@ -94,14 +92,12 @@ fn sub_vp_forward_der <V, E>(
     _dyp_all   :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     E             : Clone,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     var_der[ res ] = var_der[lhs].clone();
@@ -113,14 +109,12 @@ fn sub_vv_forward_der <V, E>(
     _dyp_all   :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a E : Sub<&'a E, Output = E> ,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;
@@ -136,14 +130,12 @@ fn sub_pv_reverse_der <V, E>(
     _dyp_all   :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a E : Sub<&'a E, Output = E> ,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let rhs = arg[1] as usize;
     //
@@ -158,14 +150,12 @@ fn sub_vp_reverse_der <V, E>(
     _dyp_all   :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a E : Add<&'a E, Output = E> ,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     //
@@ -180,14 +170,12 @@ fn sub_vv_reverse_der <V, E>(
     _dyp_all   :   &[E]        ,
     _var_all   :   &[E]        ,
     var_der    :   &mut [E]    ,
-    _cop       :   &[V]        ,
-    _bool_all  :   &[bool]     ,
-    arg        :   &[IndexT]   ,
-    _arg_type  :   &[ADType]   ,
-    res        :   usize       )
+    const_data : ConstData<V> )
 where
     for<'a> &'a E : Add<&'a E, Output = E> + Sub<&'a E, Output = E> ,
 {
+    let ConstData {arg, res, ..} = const_data;
+    //
     debug_assert!( arg.len() == 2);
     let lhs = arg[0] as usize;
     let rhs = arg[1] as usize;

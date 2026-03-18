@@ -167,11 +167,7 @@ pub(crate) type ForwardDer<V, E> = fn(
     _dyp_all  : &[E]        ,
     _var_all  : &[E]        ,
     _var_der  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize       ,
+    _const_data : ConstData<V> ,
 );
 // panic_der
 /// Default [ForwardDer] and [ReverseDer] function will panic.
@@ -182,11 +178,7 @@ pub(crate) fn panic_der<V, E>  (
     _dyp_all  : &[E]        ,
     _var_all  : &[E]        ,
     _var_der  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize       ,
+    _const_data : ConstData<V> ,
 ) { panic!(); }
 //
 // ReverseDer
@@ -205,11 +197,7 @@ pub(crate) type ReverseDer<V, E> = fn(
     _dyp_all  : &[E]        ,
     _var_all  : &[E]        ,
     _var_der  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize       ,
+    _const_data : ConstData<V> ,
 );
 //
 // ReverseDepend

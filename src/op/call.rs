@@ -538,15 +538,13 @@ fn call_forward_der_value<V> (
     dyp_all    : &[V]          ,
     var_all    : &[V]          ,
     var_der    : &mut [V]      ,
-    cop        : &[V]          ,
-    bool_all   : &[bool]       ,
-    arg        : &[IndexT]     ,
-    arg_type   : &[ADType]     ,
-    res        : usize         )
+    const_data : ConstData<V> )
 where
     V               : PartialEq + GlobalAtomCallbackVec + From<f32>,
     AtomCallback<V> : Clone,
-{   // ----------------------------------------------------------------------
+{   //
+    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    // ----------------------------------------------------------------------
     let (
         atom_id,
         call_info,
@@ -613,15 +611,13 @@ fn call_forward_der_ad<V> (
     adyp_all   : &[ AD<V> ]          ,
     avar_all   : &[ AD<V> ]          ,
     avar_der   : &mut [ AD<V> ]      ,
-    cop        : &[V]                ,
-    bool_all   : &[bool]             ,
-    arg        : &[IndexT]           ,
-    arg_type   : &[ADType]           ,
-    res        : usize               )
+    const_data : ConstData<V> )
 where
     V               : PartialEq + From<f32> + Clone + GlobalAtomCallbackVec ,
     AtomCallback<V> : Clone,
-{   // ----------------------------------------------------------------------
+{   //
+    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    // ----------------------------------------------------------------------
     let (
         atom_id,
         call_info,
@@ -693,15 +689,13 @@ fn call_reverse_der_value<V> (
     dyp_all    : &[V]          ,
     var_all    : &[V]          ,
     var_der    : &mut [V]      ,
-    cop        : &[V]          ,
-    bool_all   : &[bool]       ,
-    arg        : &[IndexT]     ,
-    arg_type   : &[ADType]     ,
-    res        : usize         )
+    const_data : ConstData<V> )
 where
     for<'a> V       : PartialEq + GlobalAtomCallbackVec + AddAssign<&'a V>  + From<f32>,
     AtomCallback<V> : Clone,
-{   // ----------------------------------------------------------------------
+{   //
+    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    // ----------------------------------------------------------------------
     let (
         atom_id,
         call_info,
@@ -765,16 +759,14 @@ fn call_reverse_der_ad<V> (
     adyp_all    : &[ AD<V> ]          ,
     avar_all    : &[ AD<V> ]          ,
     avar_der    : &mut [ AD<V> ]      ,
-    cop         : &[V]                ,
-    bool_all   : &[bool]              ,
-    arg        : &[IndexT]            ,
-    arg_type   : &[ADType]            ,
-    res        : usize                )
+    const_data : ConstData<V> )
 where
     V                 : PartialEq + GlobalAtomCallbackVec + Clone + From<f32>,
     for<'a> AD<V> : AddAssign<&'a AD<V> >,
     AtomCallback<V>   : Clone,
-{   // ----------------------------------------------------------------------
+{   //
+    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    // ----------------------------------------------------------------------
     let (
         atom_id,
         call_info,
@@ -856,11 +848,7 @@ fn call_res_der<V, E>(
     _dyp_all  : &[E]        ,
     _var_all  : &[E]        ,
     _var_der  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize       ,
+    _const_data : ConstData<V> ,
 ) { }
 //
 // call_res_rust_src
