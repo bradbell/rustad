@@ -36,8 +36,8 @@ pub fn callback_forward_fun_value(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
-    // arg_vec
-    let arg_vec : Vec<[&str; 2]> = if trace {
+    // opt_vec
+    let opt_vec : Vec<[&str; 2]> = if trace {
        vec![ [ "trace", "true" ] ]
     } else {
        Vec::new()
@@ -48,7 +48,7 @@ pub fn callback_forward_fun_value(
     //
     // x, y
     let x       : Vec<V> = vec![ V::from(3.0), V::from(4.0) ];
-    let (y, _)           = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (y, _)           = f.forward_var_value(None, x.clone(), &opt_vec);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
 }
 //
@@ -57,8 +57,8 @@ pub fn callback_forward_fun_ad(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
-    // arg_vec
-    let arg_vec : Vec<[&str; 2]> = if trace {
+    // opt_vec
+    let opt_vec : Vec<[&str; 2]> = if trace {
        vec![ [ "trace", "true" ] ]
     } else {
        Vec::new()
@@ -69,12 +69,12 @@ pub fn callback_forward_fun_ad(
     // g(x) = f(x)
     let x      : Vec<V>   = vec![ V::from(3.0), V::from(4.0) ];
     let (_, ax)           = start_recording(None, x);
-    let (ay, _)           = f.forward_var_ad(None, ax.clone(), &arg_vec);
+    let (ay, _)           = f.forward_var_ad(None, ax.clone(), &opt_vec);
     let g                 = stop_recording(ay);
     //
     // x, y
     let x       : Vec<V> = vec![ V::from(3.0), V::from(4.0) ];
-    let (y, _)            = g.forward_var_value(None, x.clone(), &arg_vec);
+    let (y, _)            = g.forward_var_value(None, x.clone(), &opt_vec);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
 }
 //
@@ -83,8 +83,8 @@ pub fn callback_forward_der_value(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
-    // arg_vec
-    let arg_vec : Vec<[&str; 2]> = if trace {
+    // opt_vec
+    let opt_vec : Vec<[&str; 2]> = if trace {
        vec![ [ "trace", "true" ] ]
     } else {
        Vec::new()
@@ -95,9 +95,9 @@ pub fn callback_forward_der_value(
     //
     // x, dx, dy
     let x       : Vec<V> = vec![ V::from(3.0), V::from(4.0) ];
-    let (_, v)           = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_, v)           = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx      : Vec<V> = vec![ V::from(5.0), V::from(6.0) ];
-    let dy               = f.forward_der_value(None, &v , dx.clone(), &arg_vec);
+    let dy               = f.forward_der_value(None, &v , dx.clone(), &opt_vec);
     assert_eq!( dy[0], V::from(2.0) * x[0]*dx[0] + V::from(2.0) * x[1]*dx[1] );
 }
 //
@@ -105,8 +105,8 @@ pub fn callback_forward_der_value(
 pub fn callback_forward_der_ad(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
-    // arg_vec
-    let arg_vec = if trace {
+    // opt_vec
+    let opt_vec = if trace {
        vec![ [ "trace", "true" ] ]
     } else {
        vec![ [ "trace", "false" ] ]
@@ -118,30 +118,30 @@ pub fn callback_forward_der_ad(
     // av, dx1, adx1
     let x      : Vec<V>  = vec![ V::from(3.0), V::from(4.0) ];
     let (_, ax)          = start_recording(None, x);
-    let (_, av)          = f.forward_var_ad(None, ax, &arg_vec);
+    let (_, av)          = f.forward_var_ad(None, ax, &opt_vec);
     let dx1     : Vec<V> = vec![ V::from(5.0), V::from(6.0) ];
     let adx1             = ad_from_vector(dx1.clone());
     //
     // g
     // callback to sumsq_forward_der_ad
     // g(x) = f'(x) * dx1 = 2 * ( x[0] * dx1[0] + x[2] * dx1[2] + ... )
-    let ady              = f.forward_der_ad(None, &av, adx1, &arg_vec);
+    let ady              = f.forward_der_ad(None, &av, adx1, &opt_vec);
     let g                = stop_recording(ady);
     //
     // x, v, y
     // check forward_fun_value
     let x       : Vec<V> = vec![ V::from(3.0), V::from(4.0) ];
-    let (y, v)           = g.forward_var_value(None, x.clone(), &arg_vec);
+    let (y, v)           = g.forward_var_value(None, x.clone(), &opt_vec);
     assert_eq!( y[0], V::from(2.0) * ( x[0] * dx1[0] + x[1] * dx1[1] ) );
     //
     // check forward_der_value
     let dx2     : Vec<V> = vec![ V::from(7.0), V::from(8.0) ];
-    let dy               = g.forward_der_value(None, &v , dx2.clone(), &arg_vec);
+    let dy               = g.forward_der_value(None, &v , dx2.clone(), &opt_vec);
     assert_eq!( dy[0], V::from(2.0) * ( dx2[0] * dx1[0] + dx2[1] * dx1[1] ) );
     //
     // check reverse_der_value
     let dy     : Vec<V> = vec![ V::from(9.0) ];
-    let dx              = g.reverse_der_value(None, &v , dy.clone(), &arg_vec);
+    let dx              = g.reverse_der_value(None, &v , dy.clone(), &opt_vec);
     assert_eq!( dx[0], V::from(2.0) * dy[0] * dx1[0] );
     assert_eq!( dx[1], V::from(2.0) * dy[0] * dx1[1] );
 }
@@ -150,8 +150,8 @@ pub fn callback_forward_der_ad(
 pub fn callback_reverse_der_value(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
-    // arg_vec
-    let arg_vec = if trace {
+    // opt_vec
+    let opt_vec = if trace {
        vec![ [ "trace", "true" ] ]
     } else {
        vec![ [ "trace", "false" ] ]
@@ -162,9 +162,9 @@ pub fn callback_reverse_der_value(
     //
     // v, x, dy, dx
     let x       : Vec<V> = vec![ V::from(3.0), V::from(4.0) ];
-    let (_, v)           = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_, v)           = f.forward_var_value(None, x.clone(), &opt_vec);
     let dy      : Vec<V> = vec![ V::from(5.0) ];
-    let dx               = f.reverse_der_value(None, &v , dy.clone(), &arg_vec);
+    let dx               = f.reverse_der_value(None, &v , dy.clone(), &opt_vec);
     assert_eq!( dx[0], V::from(2.0) * x[0]*dy[0] );
     assert_eq!( dx[1], V::from(2.0) * x[1]*dy[0] );
 }
@@ -174,8 +174,8 @@ pub fn callback_reverse_der_ad(
     sumsq_atom_id : IndexT , call_info : IndexT, trace : bool
 ) {
     //
-    // arg_vec
-    let arg_vec = if trace {
+    // opt_vec
+    let opt_vec = if trace {
        vec![ [ "trace", "true" ] ]
     } else {
        vec![ [ "trace", "false" ] ]
@@ -187,32 +187,32 @@ pub fn callback_reverse_der_ad(
     // av, dy1, ady1
     let x      : Vec<V>       = vec![ V::from(3.0), V::from(4.0) ];
     let (_, ax)               = start_recording(None, x);
-    let (_, av)               = f.forward_var_ad(None, ax, &arg_vec);
+    let (_, av)               = f.forward_var_ad(None, ax, &opt_vec);
     let dy1     : Vec<V> = vec![ V::from(5.0) ];
     let ady1             = ad_from_vector(dy1.clone());
     //
     // g
     // callback to sumsq_reverse_der_ad
     // g(x) = dy1 * f'(x) = 2 * ( dy1[0] * x[0], dy1[0] * x[1], ... )
-    let adx              = f.reverse_der_ad(None, &av, ady1, &arg_vec);
+    let adx              = f.reverse_der_ad(None, &av, ady1, &opt_vec);
     let g                = stop_recording(adx);
     //
     // x, v
     // check forward_fun_value
     let x       : Vec<V> = vec![ V::from(3.0), V::from(4.0) ];
-    let (y, v)           = g.forward_var_value(None, x.clone(), &arg_vec);
+    let (y, v)           = g.forward_var_value(None, x.clone(), &opt_vec);
     assert_eq!( y[0], V::from(2.0) * dy1[0] * x[0]  );
     assert_eq!( y[1], V::from(2.0) * dy1[0] * x[1]  );
     //
     // check forward_der_value
     let dx  : Vec<V> = vec![ V::from(6.0), V::from(7.0) ];
-    let dy           = g.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = g.forward_der_value(None, &v, dx.clone(), &opt_vec);
     assert_eq!( dy[0], V::from(2.0) * dy1[0] * dx[0] );
     assert_eq!( dy[1], V::from(2.0) * dy1[0] * dx[1] );
     //
     // check reverse_der_value
     let dy2  : Vec<V> = vec![ V::from(8.0), V::from(9.0) ];
-    let dx            = g.reverse_der_value(None, &v, dy2.clone(), &arg_vec);
+    let dx            = g.reverse_der_value(None, &v, dy2.clone(), &opt_vec);
     assert_eq!( dx[0], V::from(2.0) * dy1[0] * dy2[0] );
     assert_eq!( dx[1], V::from(2.0) * dy1[0] * dy2[1] );
 }

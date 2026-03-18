@@ -11,7 +11,7 @@ use rustad::{
 // test_sub_vv
 fn test_sub_vv() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(1.0), V::from(2.0), V::from(3.0) ];
     //
@@ -21,17 +21,17 @@ fn test_sub_vv() {
     let ay           = vec! [ ay_0, ay_1 ];
     let f            = stop_recording(ay);
     //
-    let (y, v)       = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (y, v)       = f.forward_var_value(None, x.clone(), &opt_vec);
     assert_eq!( y[0], x[0] - x[1] );
     assert_eq!( y[1], x[1] - x[2] );
     //
     let dx : Vec<V>  = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     assert_eq!( dy[0], dx[0] - dx[1] );
     assert_eq!( dy[1], dx[1] - dx[2] );
     //
     let dy : Vec<V>  = vec![ V::from(7.0), V::from(8.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0], dy[0] );
     assert_eq!( dx[1], dy[1] - dy[0] );
@@ -42,7 +42,7 @@ fn test_sub_vv() {
 // test_sub_vc
 fn test_sub_vc() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(1.0), V::from(2.0) ];
     //
@@ -52,17 +52,17 @@ fn test_sub_vc() {
     let ay           = vec! [ ay_0, ay_1 ];
     let f            = stop_recording(ay);
     //
-    let (y, v)       = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (y, v)       = f.forward_var_value(None, x.clone(), &opt_vec);
     assert_eq!( y[0], x[0] - (V::from(4.0)) );
     assert_eq!( y[1], x[1] - (V::from(5.0)) );
     //
     let dx : Vec<V>  = vec![ V::from(4.0), V::from(5.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     assert_eq!( dy[0], dx[0] );
     assert_eq!( dy[1], dx[1] );
     //
     let dy : Vec<V>  = vec![ V::from(7.0), V::from(8.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0], dy[0] );
     assert_eq!( dx[1], dy[1] );
@@ -71,7 +71,7 @@ fn test_sub_vc() {
 // test_sub_cv
 fn test_sub_cv() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(1.0), V::from(2.0) ];
     //
@@ -81,18 +81,18 @@ fn test_sub_cv() {
     let ay           = vec! [ ay_0, ay_1 ];
     let f            = stop_recording(ay);
     //
-    let (y, v)       = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (y, v)       = f.forward_var_value(None, x.clone(), &opt_vec);
     assert_eq!( y[0], (V::from(4.0)) - x[1] );
     assert_eq!( y[1], (V::from(5.0)) - x[0] );
     //
     let dx : Vec<V>  = vec![ V::from(4.0), V::from(5.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     // 2DO: Replace with unary minuse when defined for V
     assert_eq!( dy[0], V::from(0) - dx[1] );
     assert_eq!( dy[1], V::from(0) - dx[0] );
     //
     let dy : Vec<V>  = vec![ V::from(7.0), V::from(8.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     // 2DO: Replace with unary minuse when defined for V
     assert_eq!( dx[0], V::from(0) - dy[1] );

@@ -19,7 +19,7 @@ fn example_hessian () {
     //
     type V     = AzFloat<f32>;
     let nx     = 3;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     // x
     let x  : Vec<V> = vec![ V::from(2.0); nx ];
@@ -41,13 +41,13 @@ fn example_hessian () {
     //
     // av
     let (_, ax)  = start_recording(None, x);
-    let (_, av)  = f.forward_var_ad(None, ax, &arg_vec);
+    let (_, av)  = f.forward_var_ad(None, ax, &opt_vec);
     //
     // g
     // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
     let dy  : Vec<V>  = vec![ V::from(1.0) ];
     let ady           = ad_from_vector(dy);
-    let adx           = f.reverse_der_ad(None, &av, ady, &arg_vec);
+    let adx           = f.reverse_der_ad(None, &av, ady, &opt_vec);
     let g             = stop_recording(adx);
     //
     // x
@@ -58,7 +58,7 @@ fn example_hessian () {
     }
     //
     // v, y
-    let (y, v) = g.forward_var_value(None, x, &arg_vec);
+    let (y, v) = g.forward_var_value(None, x, &opt_vec);
     for j in 0 .. nx {
         let check  = 3 * (j+2) * (j+2);
         assert_eq!( y[j], V::from(check) );
@@ -69,7 +69,7 @@ fn example_hessian () {
     for j in 0 .. nx {
         let mut dx : Vec<V> = vec![ V::from(0.0); nx ];
         dx[j]               = V::from(1.0);
-        let dy              = g.forward_der_value(None, &v, dx, &arg_vec);
+        let dy              = g.forward_der_value(None, &v, dx, &opt_vec);
         for i in 0 .. nx {
             if i == j {
                 let check  = 6 * (j+2);
@@ -88,7 +88,7 @@ fn example_num_vec_hessian () {
     type S     = AzFloat<f64>;
     type V     = NumVec<S>;
     let nx     = 3;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     // x
     let mut x  : Vec<V> = Vec::new();
@@ -113,13 +113,13 @@ fn example_num_vec_hessian () {
     //
     // av
     let (_, ax) = start_recording(None, x);
-    let (_, av) = f.forward_var_ad(None, ax, &arg_vec);
+    let (_, av) = f.forward_var_ad(None, ax, &opt_vec);
     //
     // g
     // g(x) = df/dx = [ 3 * x[0] * x[0], ..., 3 * x[nx-1] * x[nx-1] ]
     let dy  : Vec<V>  = vec![ NumVec::from( S::from(1.0) ) ];
     let ady           = ad_from_vector(dy);
-    let adx           = f.reverse_der_ad(None, &av, ady, &arg_vec);
+    let adx           = f.reverse_der_ad(None, &av, ady, &opt_vec);
     let g             = stop_recording(adx);
     //
     // x
@@ -130,7 +130,7 @@ fn example_num_vec_hessian () {
     }
     //
     // y, v
-    let (y, v)  = g.forward_var_value(None, x, &arg_vec);
+    let (y, v)  = g.forward_var_value(None, x, &opt_vec);
     for j in 0 .. nx {
         //
         let check  = 3 * (j+1) * (j+1);
@@ -145,7 +145,7 @@ fn example_num_vec_hessian () {
     for j in 0 .. nx {
         let mut dx : Vec<V> = vec![ NumVec::from( S::from(0.0) ); nx ];
         dx[j]               = NumVec::from( S::from(1.0) );
-        let dy              = g.forward_der_value(None, &v, dx, &arg_vec);
+        let dy              = g.forward_der_value(None, &v, dx, &opt_vec);
         for i in 0 .. nx {
             if i == j {
                 //

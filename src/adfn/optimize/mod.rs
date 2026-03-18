@@ -132,14 +132,14 @@ pub(crate) fn renumber_agraph(
 ///
 /// * Syntax :
 /// ```text
-///     f.optimize(arg_vec)
+///     f.optimize(opt_vec)
 /// ```
 ///
 /// * V : see [doc_generic_v](crate::doc_generic_v)
 /// * f : is an [ADfn] object
 ///
-/// * arg_vec :
-///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+/// * opt_vec :
+///   is an [opt_vec](crate::doc_opt_vec) with the following possible keys:
 ///
 ///   * trace
 ///     The corresponding value must be true of false (default is false).
@@ -161,8 +161,8 @@ pub(crate) fn renumber_agraph(
 /// // x[0] + x[0] and x[0] * x[0] are in original version of f.
 /// assert_eq!( f.var_dep_len(), 2 );
 /// //
-/// let  arg_vec : Vec<[&str; 2]> = Vec::new();
-/// f.optimize(&arg_vec);
+/// let  opt_vec : Vec<[&str; 2]> = Vec::new();
+/// f.optimize(&opt_vec);
 /// //
 /// // f.var_dep_len
 /// // only x[0] + x[0] is in optimized version of f.
@@ -170,7 +170,7 @@ pub(crate) fn renumber_agraph(
 /// //
 /// // check
 /// let trace   = false;
-/// let (y, _v) = f.forward_var_value(None, x.clone(), &arg_vec);
+/// let (y, _v) = f.forward_var_value(None, x.clone(), &opt_vec);
 /// assert_eq!( y[0], &x[0] + &x[0] );
 /// ```
 impl<V> ADfn<V>
@@ -179,22 +179,22 @@ where
     V : GlobalAtomCallbackVecPublic + GlobalOpFnsVecPublic,
 {   //
     // optimize
-    pub fn optimize(&mut self, arg_vec : &Vec<[&str; 2]> )
+    pub fn optimize(&mut self, opt_vec : &Vec<[&str; 2]> )
     {   //
         // trace
         let mut trace = false;
-        for arg in arg_vec {
-            match arg[0] {
+        for opt in opt_vec {
+            match opt[0] {
                 "trace" => {
-                    match arg[1] {
+                    match opt[1] {
                         "true"  => { trace = true; },
                         "false" => { trace = false; },
                         _ => { panic!(
-                        "forward_der arg_vec: invalid value for trace"
+                        "forward_der opt_vec: invalid value for trace"
                         ); }
                     }
                 },
-                _ => panic!("forward_der arg_vec: invalid key"),
+                _ => panic!("forward_der opt_vec: invalid key"),
             }
         }
         //

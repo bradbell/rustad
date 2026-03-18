@@ -40,7 +40,7 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     dom_der = f.subgraph_der(dyp_all, &var_all, row_index, arg_vec)
+///     dom_der = f.subgraph_der(dyp_all, &var_all, row_index, opt_vec)
 ///   ```
 ///
 /// * V : see [doc_generic_v]
@@ -53,8 +53,8 @@ use crate::{
 ///   is the index in the range vector that are computing the derivative for;
 ///   row_index < f.rng_len() .
 ///
-/// * arg_vec :
-///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+/// * opt_vec :
+///   is an [opt_vec](crate::doc_opt_vec) with the following possible keys:
 ///
 ///   * trace
 ///     The corresponding value must be true of false (default is false).
@@ -75,9 +75,9 @@ use crate::{
 /// // V
 /// type V = rustad::AzFloat<f32>;
 /// //
-/// // trace, arg_vec, n, x
+/// // trace, opt_vec, n, x
 /// let trace      = false;
-/// let arg_vec    = vec![ ["trace", "false"] ];
+/// let opt_vec    = vec![ ["trace", "false"] ];
 /// let n          = 5;
 /// let x          = vec![ V::from(1); n];
 /// //
@@ -94,8 +94,8 @@ use crate::{
 /// let row_index = n / 2;
 /// //
 /// // dom_der
-/// let (_y, v) = f.forward_var_value(None, x.clone(), &arg_vec);
-/// let dom_der = f.subgraph_der_value(None, &v, row_index, &arg_vec);
+/// let (_y, v) = f.forward_var_value(None, x.clone(), &opt_vec);
+/// let dom_der = f.subgraph_der_value(None, &v, row_index, &opt_vec);
 /// //
 /// // check
 /// for j in 1 .. n {
@@ -129,23 +129,23 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
         dyp_all   : Option< &Vec<$E> >  ,
         var_all   : &Vec<$E>            ,
         row_index : usize               ,
-        arg_vec   : &Vec<[&str; 2]>     ,
+        opt_vec   : &Vec<[&str; 2]>     ,
     ) -> Vec<$E>
     {   //
         // trace
         let mut trace = false;
-        for arg in arg_vec {
-            match arg[0] {
+        for opt in opt_vec {
+            match opt[0] {
                 "trace" => {
-                    match arg[1] {
+                    match opt[1] {
                         "true"  => { trace = true; },
                         "false" => { trace = false; },
                         _ => { panic!(
-                        "subgraph_der arg_vec: invalid value for trace"
+                        "subgraph_der opt_vec: invalid value for trace"
                         ); }
                     }
                 },
-                _ => panic!("subgraph_der arg_vec: invalid key"),
+                _ => panic!("subgraph_der opt_vec: invalid key"),
             }
         }
         //

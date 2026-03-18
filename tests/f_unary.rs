@@ -15,7 +15,7 @@ use rustad::{
 // test_abs
 fn test_abs() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(3.0), V::from(-2.0) ];
     //
@@ -25,9 +25,9 @@ fn test_abs() {
     // ------------------------------------------------------------------
     // Test value derivatives
     // ------------------------------------------------------------------
-    let (_, v)       = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_, v)       = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) , V::from(4.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     for j in 0 .. 2 {
         let temp  = FUnary::signum( &x[j] ) * dx[j];
@@ -35,7 +35,7 @@ fn test_abs() {
     }
     //
     let dy           = vec![ V::from(5.0), V::from(6.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     for j in 0 .. 2 {
         let temp  = FUnary::signum( &x[j] ) * dy[j];
@@ -44,9 +44,9 @@ fn test_abs() {
     // ------------------------------------------------------------------
     // Test AD derivatives
     // ------------------------------------------------------------------
-    let (_, av)      = f.forward_var_ad(None, ax.clone(), &arg_vec);
+    let (_, av)      = f.forward_var_ad(None, ax.clone(), &opt_vec);
     let adx          = ad_from_vector( vec![ V::from(3.0) , V::from(4.0) ] );
-    let ady          = f.forward_der_ad(None, &av, adx.clone(), &arg_vec);
+    let ady          = f.forward_der_ad(None, &av, adx.clone(), &opt_vec);
     //
     for j in 0 .. 2 {
         let xj    = ax[j].clone().to_value();
@@ -56,7 +56,7 @@ fn test_abs() {
     }
     //
     let ady          = ad_from_vector( vec![ V::from(5.0), V::from(6.0) ] );
-    let adx          = f.reverse_der_ad(None, &av, ady.clone(), &arg_vec);
+    let adx          = f.reverse_der_ad(None, &av, ady.clone(), &opt_vec);
     //
     for j in 0 .. 2 {
         let xj    = ax[j].clone().to_value();
@@ -69,7 +69,7 @@ fn test_abs() {
 // test_cos
 fn test_cos() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -77,15 +77,15 @@ fn test_cos() {
     let ay           = vec! [ FUnary::cos( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     let temp         = FUnary::sin( &x[0] ) * dx[0];
     assert_eq!( dy[0], FUnary::minus(&temp) );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     let temp         = FUnary::sin( &x[0] ) * dy[0];
     assert_eq!( dx[0], FUnary::minus(&temp) );
@@ -94,7 +94,7 @@ fn test_cos() {
 // test_cosh
 fn test_cosh() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -102,14 +102,14 @@ fn test_cosh() {
     let ay           = vec! [ FUnary::cosh( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     assert_eq!( dy[0], FUnary::sinh( &x[0] ) * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0], FUnary::sinh( &x[0] ) * dy[0] );
 }
@@ -117,7 +117,7 @@ fn test_cosh() {
 // test_exp
 fn test_exp() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -125,14 +125,14 @@ fn test_exp() {
     let ay           = vec! [ FUnary::exp( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     assert_eq!( dy[0], FUnary::exp( &x[0] ) * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0], FUnary::exp( &x[0] ) * dy[0] );
 }
@@ -140,7 +140,7 @@ fn test_exp() {
 // test_exp_m1
 fn test_exp_m1() {
     type V      = AzFloat<f32>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -148,14 +148,14 @@ fn test_exp_m1() {
     let ay           = vec! [ FUnary::exp_m1( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     assert_eq!( dy[0], FUnary::exp( &x[0] ) * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0], FUnary::exp( &x[0] ) * dy[0] );
 }
@@ -163,7 +163,7 @@ fn test_exp_m1() {
 // test_ln
 fn test_ln() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -171,14 +171,14 @@ fn test_ln() {
     let ay           = vec! [ FUnary::ln( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     assert_eq!( dy[0],  dx[0] / x[0] );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0], dy[0] / x[0] );
 }
@@ -186,7 +186,7 @@ fn test_ln() {
 // test_ln_1p
 fn test_ln_1p() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -194,14 +194,14 @@ fn test_ln_1p() {
     let ay           = vec! [ FUnary::ln_1p( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     assert_eq!( dy[0],  dx[0] / ( x[0] + V::from(1.0) ) );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0], dy[0] / ( x[0] + V::from(1.0) ) );
 }
@@ -209,7 +209,7 @@ fn test_ln_1p() {
 // test_minus
 fn test_minus() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -217,14 +217,14 @@ fn test_minus() {
     let ay           = vec! [ FUnary::minus( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     assert_eq!( dy[0].to_inner(), - dx[0].to_inner() );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0].to_inner(), - dy[0].to_inner() );
 }
@@ -232,7 +232,7 @@ fn test_minus() {
 // test_signum
 fn test_signum() {
     type V      = AzFloat<f32>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -240,14 +240,14 @@ fn test_signum() {
     let ay           = vec! [ FUnary::signum( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     assert_eq!( dy[0], FConst::zero() );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0], FConst::zero() );
 }
@@ -255,7 +255,7 @@ fn test_signum() {
 // test_sin
 fn test_sin() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -263,14 +263,14 @@ fn test_sin() {
     let ay           = vec! [ FUnary::sin( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     assert_eq!( dy[0], FUnary::cos( &x[0] ) * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0], FUnary::cos( &x[0] ) * dy[0] );
 }
@@ -278,7 +278,7 @@ fn test_sin() {
 // test_sinh
 fn test_sinh() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -286,14 +286,14 @@ fn test_sinh() {
     let ay           = vec! [ FUnary::sinh( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     assert_eq!( dy[0], FUnary::cosh( &x[0] ) * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0], FUnary::cosh( &x[0] ) * dy[0] );
 }
@@ -301,7 +301,7 @@ fn test_sinh() {
 // test_sqrt
 fn test_sqrt() {
     type V      = AzFloat<f32>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(4.0) ];
     //
@@ -309,16 +309,16 @@ fn test_sqrt() {
     let ay           = vec! [ FUnary::sqrt( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     let dsqrt        = V::from(0.5) / FUnary::sqrt( &x[0] );
     //
     assert_eq!( dy[0], dsqrt * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0], dsqrt * dy[0] );
 }
@@ -326,7 +326,7 @@ fn test_sqrt() {
 // test_square
 fn test_square() {
     type V      = AzFloat<f32>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(4.0) ];
     //
@@ -334,16 +334,16 @@ fn test_square() {
     let ay           = vec! [ FUnary::square( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     let dsquare        = V::from(2.0) * x[0];
     //
     assert_eq!( dy[0], dsquare * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0], dsquare * dy[0] );
 }
@@ -351,7 +351,7 @@ fn test_square() {
 // test_tan
 fn test_tan() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -359,16 +359,16 @@ fn test_tan() {
     let ay           = vec! [ FUnary::tan( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     let cos          = FUnary::cos( &x[0] );
     let sec_sq       = V::from(1.0) / ( cos * cos );
     assert_eq!( dy[0], sec_sq * dx[0] );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
     assert_eq!( dx[0], sec_sq *  dy[0] );
 }
@@ -376,7 +376,7 @@ fn test_tan() {
 // test_tanh
 fn test_tanh() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0) ];
     //
@@ -384,19 +384,19 @@ fn test_tanh() {
     let ay           = vec! [ FUnary::tanh( &ax[0] ) ];
     let f            = stop_recording(ay);
     //
-    let (_y, v)      = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, v)      = f.forward_var_value(None, x.clone(), &opt_vec);
     let dx           = vec![ V::from(3.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     //
     let cosh         = FUnary::cosh( &x[0] );
     let sech_sq      = V::from(1.0) / ( cosh * cosh );
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
-    check_nearly_eq::<V>( &dy[0], &(sech_sq * dx[0]), &arg_vec );
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
+    check_nearly_eq::<V>( &dy[0], &(sech_sq * dx[0]), &opt_vec );
     //
     let dy           = vec![ V::from(4.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
-    check_nearly_eq::<V>( &dx[0], &(sech_sq *  dy[0]), &arg_vec);
+    check_nearly_eq::<V>( &dx[0], &(sech_sq *  dy[0]), &opt_vec);
 }
 #[test]
 fn f_unary() {

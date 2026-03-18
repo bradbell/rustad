@@ -42,7 +42,7 @@ where
     ///
     /// * Syntax :
     ///   ```text
-    ///     pattern = f.for_sparsity(arg_vec)
+    ///     pattern = f.for_sparsity(opt_vec)
     ///   ```
     ///
     /// * V : see [doc_generic_v]
@@ -51,8 +51,8 @@ where
     ///   is this [ADfn] object. The sparsity pattern is for the Jacobian
     ///   of the function defined by the acyclic graphs stored in f.
     ///
-    /// * arg_vec :
-    ///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+    /// * opt_vec :
+    ///   is an [opt_vec](crate::doc_opt_vec) with the following possible keys:
     ///
     ///   * trace
     ///     The corresponding value must be true of false (default is false).
@@ -93,8 +93,8 @@ where
     /// // nx
     /// let nx = 4;
     /// //
-    /// // arg_vec
-    /// let arg_vec : Vec<[&str; 2]> = Vec::new();
+    /// // opt_vec
+    /// let opt_vec : Vec<[&str; 2]> = Vec::new();
     /// //
     /// let x      : Vec<V>       = vec![ V::from(2.0); nx];
     /// let (_, ax)               = start_recording(None, x);
@@ -104,7 +104,7 @@ where
     ///     ay.push( &ax[j] * &ax[j] );      // ay[j] is a variable
     /// }
     /// let f           = stop_recording(ay);
-    /// let mut pattern = f.for_sparsity(&arg_vec);
+    /// let mut pattern = f.for_sparsity(&opt_vec);
     /// pattern.sort();
     /// assert_eq!( pattern.len(), nx - 1 );
     /// for j in 1 .. nx {
@@ -114,33 +114,33 @@ where
     ///
     pub fn for_sparsity(
         &self                      ,
-        arg_vec : &Vec<[&str; 2]>  ,
+        opt_vec : &Vec<[&str; 2]>  ,
     ) -> SparsityPattern
     {   //
         // trace, compute_dyp
         let mut trace       = false;
         let mut compute_dyp = false;
-        for arg in arg_vec {
-            match arg[0] {
+        for opt in opt_vec {
+            match opt[0] {
                 "trace" => {
-                    match arg[1] {
+                    match opt[1] {
                         "true"  => { trace = true; },
                         "false" => { trace = false; },
                         _ => { panic!(
-                        "for_sparsity arg_vec: invalid value for trace"
+                        "for_sparsity opt_vec: invalid value for trace"
                         ); }
                     }
                 },
                 "compute_dyp" => {
-                    match arg[1] {
+                    match opt[1] {
                         "true"  => { compute_dyp = true; },
                         "false" => { compute_dyp = false; },
                         _ => { panic!(
-                        "for_sparsity arg_vec: invalid value for compute_dyp"
+                        "for_sparsity opt_vec: invalid value for compute_dyp"
                         ); }
                     }
                 },
-                _ => panic!("for_sparsity arg_vec: invalid key"),
+                _ => panic!("for_sparsity opt_vec: invalid key"),
             }
         }
         //

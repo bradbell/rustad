@@ -225,7 +225,7 @@ where
 ///
 /// * Syntax :
 ///   ```text
-///     checkpoint_id = register_checkpoint(ad_fn, directions, arg_vec)
+///     checkpoint_id = register_checkpoint(ad_fn, directions, opt_vec)
 ///   ```
 ///
 /// * V : see [doc_generic_v]
@@ -235,8 +235,8 @@ where
 ///   This function must not have any dynamic parameters; see,
 ///   [start_recording]
 ///
-/// * arg_vec :
-///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+/// * opt_vec :
+///   is an [opt_vec](crate::doc_opt_vec) with the following possible keys:
 ///
 ///     * name :
 ///       the value is the name that identifies this checkpoint function
@@ -264,7 +264,7 @@ where
 pub fn register_checkpoint<V>(
     ad_fn         : ADfn<V>                 ,
     directions    : &[Direction]            ,
-    arg_vec       : &Vec< [&str; 2] >       ,
+    opt_vec       : &Vec< [&str; 2] >       ,
 ) -> IndexT
 where
     V : Clone + From<f32> + std::fmt::Display + FConst ,
@@ -277,19 +277,19 @@ where
     // name, trace_str
     let mut name      = "no_name";
     let mut trace_str = "false";
-    for arg in arg_vec {
-        match arg[0] {
-            "name" => { name = arg[1]; },
+    for opt in opt_vec {
+        match opt[0] {
+            "name" => { name = opt[1]; },
             "trace" => {
-                match arg[1] {
+                match opt[1] {
                     "true"  => { trace_str = "true"; },
                     "false" => { trace_str = "false"; },
                     _ => panic!(
-                        "for_sparse_jac arg_vec: invalid value for trace"
+                        "for_sparse_jac opt_vec: invalid value for trace"
                     ),
                 }
             },
-            _ => panic!( "registem_checkpoint arg_vec: invalid key"),
+            _ => panic!( "registem_checkpoint opt_vec: invalid key"),
         }
     }
     //
@@ -300,7 +300,7 @@ where
     let mut ad_forward_id : Option<IndexT> = None;
     let mut ad_reverse_id : Option<IndexT> = None;
     if ! directions.is_empty()  {
-        let mut arg_tmp = vec![ ["trace", trace_str] ];
+        let mut opt_tmp = vec![ ["trace", trace_str] ];
         let directions_tail = &directions[1 .. directions.len()];
         if directions[0] == Direction::Forward {
             let nx            = ad_fn.var_dom_len();
@@ -308,13 +308,13 @@ where
             let (_, ax_dx)    = start_recording(None, x_dx);
             let ax            = ax_dx[0 .. nx].to_vec();
             let adx           = ax_dx[nx .. 2*nx].to_vec();
-            let (_ay, av)     = ad_fn.forward_var_ad(None, ax, &arg_tmp);
-            let ady           = ad_fn.forward_der_ad(None, &av, adx, &arg_tmp);
+            let (_ay, av)     = ad_fn.forward_var_ad(None, ax, &opt_tmp);
+            let ady           = ad_fn.forward_der_ad(None, &av, adx, &opt_tmp);
             let ad_fn_for     = stop_recording(ady);
             let name_tmp      = name.to_string() + ".forward";
-            arg_tmp.push( ["name", &name_tmp] );
+            opt_tmp.push( ["name", &name_tmp] );
             let checkpoint_id = register_checkpoint(
-                ad_fn_for, directions_tail, &arg_tmp
+                ad_fn_for, directions_tail, &opt_tmp
             );
             ad_forward_id     = Some(checkpoint_id);
         } else {
@@ -325,13 +325,13 @@ where
             let (_, ax_dy)    = start_recording(None, x_dy);
             let ax            = ax_dy[0 .. nx].to_vec();
             let ady           = ax_dy[nx .. nx + ny].to_vec();
-            let (_ay, av)     = ad_fn.forward_var_ad(None, ax, &arg_tmp);
-            let adx           = ad_fn.reverse_der_ad(None, &av, ady, &arg_tmp);
+            let (_ay, av)     = ad_fn.forward_var_ad(None, ax, &opt_tmp);
+            let adx           = ad_fn.reverse_der_ad(None, &av, ady, &opt_tmp);
             let ad_fn_rev     = stop_recording(adx);
             let name_tmp      = name.to_string() + ".reverse";
-            arg_tmp.push( ["name", &name_tmp] );
+            opt_tmp.push( ["name", &name_tmp] );
             let checkpoint_id = register_checkpoint(
-                ad_fn_rev, directions_tail, &arg_tmp
+                ad_fn_rev, directions_tail, &opt_tmp
             );
             ad_reverse_id     = Some(checkpoint_id);
         }
@@ -429,8 +429,8 @@ fn checkpoint_forward_fun_value<V>(
     // domain_clone
     let domain_clone = ref_slice2vec(domain);
     //
-    // arg_vec
-    let arg_vec : Vec<[&str; 2]> = if trace {
+    // opt_vec
+    let opt_vec : Vec<[&str; 2]> = if trace {
         vec![ ["trace", "true"] ]
     } else {
         Vec::new()
@@ -446,7 +446,7 @@ fn checkpoint_forward_fun_value<V>(
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // range
-    let (range, _) = ad_fn.forward_var_value(None, domain_clone, &arg_vec);
+    let (range, _) = ad_fn.forward_var_value(None, domain_clone, &opt_vec);
     Ok( range )
 }
 //
@@ -464,8 +464,8 @@ where
 {   //
     assert_eq!( domain.len(), domain_der.len() );
     //
-    // arg_vec
-    let arg_vec : Vec<[&str; 2]> = if trace {
+    // opt_vec
+    let opt_vec : Vec<[&str; 2]> = if trace {
         vec![ ["trace", "true"] ]
     } else {
         Vec::new()
@@ -487,9 +487,9 @@ where
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // range_der
-    let (_, var_all) = ad_fn.forward_var_value(None, domain_clone, &arg_vec);
+    let (_, var_all) = ad_fn.forward_var_value(None, domain_clone, &opt_vec);
     let range_der     = ad_fn.forward_der_value(
-        None, &var_all, domain_der_clone, &arg_vec
+        None, &var_all, domain_der_clone, &opt_vec
     );
     Ok( range_der )
 }
@@ -505,8 +505,8 @@ where
     V : Clone + From<f32> + std::fmt::Display,
     V : GlobalOpFnsVec + GlobalCheckpointInfoVec + FConst + ThisThreadTape,
 {   //
-    // arg_vec
-    let arg_vec = if trace {
+    // opt_vec
+    let opt_vec = if trace {
         vec![ ["trace", "true" ] ]
     } else {
         vec![ ["trace", "false" ] ]
@@ -527,9 +527,9 @@ where
     let ad_fn = &info_vec[checkpoint_id as usize].ad_fn;
     //
     // domain_der
-    let (_, var_all) = ad_fn.forward_var_value(None, domain_clone, &arg_vec);
+    let (_, var_all) = ad_fn.forward_var_value(None, domain_clone, &opt_vec);
     let domain_der    = ad_fn.reverse_der_value(
-        None, &var_all, range_der_clone, &arg_vec
+        None, &var_all, range_der_clone, &opt_vec
     );
     Ok( domain_der )
 }
@@ -548,8 +548,8 @@ where
 {
     assert_eq!( depend.len(), 0 );
     //
-    // arg_vec
-    let arg_vec = if trace {
+    // opt_vec
+    let opt_vec = if trace {
         vec![ [ "trace", "true" ], [ "compute_dyp", "false" ] ]
     } else {
         vec![ [ "trace", "false" ], [ "compute_dyp", "false" ] ]
@@ -568,7 +568,7 @@ where
     // TODO: store the sparsity pattern in a static structure for this
     // checkpoint function so do not need to recompute. Also sort it so it
     // and store point to beginning of each row so depend computes faster.
-    let (_, pattern) = ad_fn.sub_sparsity(&arg_vec);
+    let (_, pattern) = ad_fn.sub_sparsity(&opt_vec);
     //
     // depend
     for [i, j] in pattern.iter() {

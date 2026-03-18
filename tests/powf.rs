@@ -14,7 +14,7 @@ use rustad::{
 // test_powf_ca
 fn test_powf_ca() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(1.0), V::from(2.0) ];
     //
@@ -24,21 +24,21 @@ fn test_powf_ca() {
     let ay           = vec! [ ay_0, ay_1 ];
     let f            = stop_recording(ay);
     //
-    let (y, v)       = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (y, v)       = f.forward_var_value(None, x.clone(), &opt_vec);
     let check        = V::from(4.0).powf(x[0]);
     assert_eq!(y[0], check);
     let check        = V::from(5.0).powf(x[1]);
     assert_eq!(y[1], check);
     //
     let dx : Vec<V>  = vec![ V::from(6.0), V::from(7.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     let check        = y[0] * V::from(4.0).ln() * dx[0];
     assert_eq!(dy[0], check);
     let check        = y[1] * V::from(5.0).ln() * dx[1];
     assert_eq!(dy[1], check);
     //
     let dy           = vec![ V::from(8.0), V::from(9.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     let check        = y[0] * V::from(4.0).ln() * dy[0];
     assert_eq!( dx[0], check);
     let check        = y[1] * V::from(5.0).ln() * dy[1];
@@ -48,7 +48,7 @@ fn test_powf_ca() {
 // test_powf_ac
 fn test_powf_ac() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(1.0), V::from(2.0) ];
     //
@@ -58,19 +58,19 @@ fn test_powf_ac() {
     let ay           = vec! [ ay_0, ay_1 ];
     let f            = stop_recording(ay);
     //
-    let (y, v)       = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (y, v)       = f.forward_var_value(None, x.clone(), &opt_vec);
     assert_eq!( y[0], x[0].powf( V::from(4.0) ) );
     assert_eq!( y[1], x[1].powf( V::from(5.0) ) );
     //
     let dx : Vec<V>  = vec![ V::from(6.0), V::from(7.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     let check        = V::from(4.0) * (&x[0]).powi(3) * dx[0];
     assert_eq!( dy[0], check);
     let check        = V::from(5.0) * (&x[1]).powi(4) * dx[1];
     assert_eq!( dy[1], check);
     //
     let dy           = vec![ V::from(8.0), V::from(9.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     let check        = V::from(4.0) * (&x[0]).powi(3) * dy[0];
     assert_eq!( dx[0], check);
     let check        = V::from(5.0) * (&x[1]).powi(4) * dy[1];
@@ -81,7 +81,7 @@ fn test_powf_ac() {
 fn test_powf_aa() {
     type V      = AzFloat<f64>;
     let one     = V::one();
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  : Vec<V>  = vec![ V::from(2.0), V::from(3.0) ];
     //
@@ -89,18 +89,18 @@ fn test_powf_aa() {
     let ay           = vec! [ (&ax[0]).powf( &ax[1] ) ];
     let f            = stop_recording(ay);
     //
-    let (y, v)       = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (y, v)       = f.forward_var_value(None, x.clone(), &opt_vec);
     let check        = x[0].powf(x[1]);
     assert_eq!(y[0], check);
     //
     let dx : Vec<V>  = vec![ V::from(6.0), V::from(7.0) ];
-    let dy           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     let check        = x[1] * x[0].powf(x[1] - one) * dx[0]
                      + y[0] * (&x[0]).ln() * dx[1];
     assert_eq!(dy[0], check);
     //
     let dy           = vec![ V::from(8.0) ];
-    let dx           = f.reverse_der_value(None, &v, dy.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     let check        = x[1] * x[0].powf(x[1] - one) * dy[0];
     assert_eq!(dx[0], check);
     let check        = y[0] * (&x[0]).ln() * dy[0];

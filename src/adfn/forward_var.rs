@@ -31,8 +31,8 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     (range, var_all) = f.forward_var_value(dyp_all, var_dom, arg_vec)
-///     (range, var_all)  = f.forward_var_ad(dyp_all, var_dom, arg_vec)
+///     (range, var_all) = f.forward_var_value(dyp_all, var_dom, opt_vec)
+///     (range, var_all)  = f.forward_var_ad(dyp_all, var_dom, opt_vec)
 ///   ```
 /// * Prototype :
 ///   see [ADfn::forward_var_value] and [ADfn::forward_var_ad]
@@ -52,8 +52,8 @@ use crate::{
 /// * var_dom :
 ///   This the the domain variable values.
 ///
-/// * arg_vec :
-///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+/// * opt_vec :
+///   is an [opt_vec](crate::doc_opt_vec) with the following possible keys:
 ///
 ///   * trace
 ///     The corresponding value must be true of false (default is false).
@@ -114,9 +114,9 @@ use crate::{
 /// //
 /// // y = f(p, x)
 /// let trace     = false;
-/// let arg_vec   = vec![ ["trace", "false"] ];
-/// let dyp_all   = f.forward_dyp_value(p.clone(), &arg_vec);
-/// let (y, _v)   = f.forward_var_value( Some(&dyp_all), x.clone(), &arg_vec);
+/// let opt_vec   = vec![ ["trace", "false"] ];
+/// let dyp_all   = f.forward_dyp_value(p.clone(), &opt_vec);
+/// let (y, _v)   = f.forward_var_value( Some(&dyp_all), x.clone(), &opt_vec);
 /// //
 /// // check
 /// let p_sum = ( np * (np + 1) ) / 2;
@@ -148,23 +148,23 @@ macro_rules! forward_var {
             &self,
             dyp_all     : Option< &Vec<$E> > ,
             var_dom     : Vec<$E>            ,
-            arg_vec     : &Vec<[&str; 2]>    ,
+            opt_vec     : &Vec<[&str; 2]>    ,
         ) -> ( Vec<$E> , Vec<$E> )
         {
             // trace
             let mut trace = false;
-            for arg in arg_vec {
-                match arg[0] {
+            for opt in opt_vec {
+                match opt[0] {
                     "trace" => {
-                        match arg[1] {
+                        match opt[1] {
                             "true"  => { trace = true; },
                             "false" => { trace = false; },
                             _ => { panic!(
-                            "forward_var arg_vec: invalid value for trace"
+                            "forward_var opt_vec: invalid value for trace"
                             ); }
                         }
                     },
-                    _ => panic!("forward_var arg_vec: invalid key"),
+                    _ => panic!("forward_var opt_vec: invalid key"),
                 }
             }
             //

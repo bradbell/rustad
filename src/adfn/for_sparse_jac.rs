@@ -32,10 +32,10 @@ use crate::{
 /// * Syntax :
 ///   ```text
 ///     jacobian = f.for_sparse_jac_value(
-///         dyp_all, &var_all, &sub_pattern, &color_vec, arg_vec
+///         dyp_all, &var_all, &sub_pattern, &color_vec, opt_vec
 ///     )
 ///     jacobian = f.for_sparse_jac_ad(
-///         dyp_all, &var_all, &sub_pattern, &color_vec, arg_vec
+///         dyp_all, &var_all, &sub_pattern, &color_vec, opt_vec
 ///     )
 ///   ```
 ///
@@ -69,8 +69,8 @@ use crate::{
 ///   This is a coloring for the Jacobian matrix for f evaluated on the
 ///   subset specified by *sub_pattern* .
 ///
-/// * arg_vec :
-///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+/// * opt_vec :
+///   is an [opt_vec](crate::doc_opt_vec) with the following possible keys:
 ///
 ///   * trace
 ///     The corresponding value must be true of false (the default is false).
@@ -104,23 +104,23 @@ macro_rules! for_sparse_jac {
             var_all      : &Vec<$E>            ,
             sub_pattern  : &SparsityPattern    ,
             color_vec    : &[usize]            ,
-            arg_vec      : &Vec<[&str; 2]>     ,
+            opt_vec      : &Vec<[&str; 2]>     ,
         ) -> Vec<$E>
         {   //
             // trace
             let mut trace = false;
-            for arg in arg_vec {
-                match arg[0] {
+            for opt in opt_vec {
+                match opt[0] {
                     "trace" => {
-                        match arg[1] {
+                        match opt[1] {
                             "true"  => { trace = true; },
                             "false" => { trace = false; },
                             _ => { panic!(
-                            "for_sparse_jac arg_vec: invalid value for trace"
+                            "for_sparse_jac opt_vec: invalid value for trace"
                             ); }
                         }
                     },
-                    _ => panic!("for_sparse_jac arg_vec: invalid key"),
+                    _ => panic!("for_sparse_jac opt_vec: invalid key"),
                 }
             }
             //
@@ -168,7 +168,7 @@ macro_rules! for_sparse_jac {
                 }
                 // range_der
                 let range_der = self. [< forward_der_ $suffix >](
-                    dyp_all, &var_all, dom_der, arg_vec
+                    dyp_all, &var_all, dom_der, opt_vec
                 );
                 //
                 let [mut i, mut j] = sub_pattern[ order[index] ];

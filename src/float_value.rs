@@ -179,7 +179,7 @@ pub(crate) use impl_float_value_from_primitive;
 ///
 /// * Syntax :
 /// ```text
-///     bval = check_nearly_eq(x, y, arg_vec)
+///     bval = check_nearly_eq(x, y, opt_vec)
 /// ```
 ///
 /// * V : see [doc_generic_v](crate::doc_generic_v)
@@ -190,8 +190,8 @@ pub(crate) use impl_float_value_from_primitive;
 /// * y :
 ///   the other value that we are comparing.
 ///
-/// * arg_vec :
-///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+/// * opt_vec :
+///   is an [opt_vec](crate::doc_opt_vec) with the following possible keys:
 ///
 ///     * factor :
 ///       is a string representation of an f32 value that multiplies
@@ -234,10 +234,10 @@ pub(crate) use impl_float_value_from_primitive;
 /// let near_one_v      = one_v + V::from(10) * epsilon_v;
 /// let x               = V::from( 1e-20 );
 /// let y               = x * near_one_v;
-/// let mut arg_vec     = vec![ ["assert", "false"] ];
-/// assert!( check_nearly_eq::<V>(&x, &y, &arg_vec) );
-/// arg_vec.push( ["factor", "2"] );
-/// assert!( ! check_nearly_eq::<V>( &x, &y, &arg_vec ) );
+/// let mut opt_vec     = vec![ ["assert", "false"] ];
+/// assert!( check_nearly_eq::<V>(&x, &y, &opt_vec) );
+/// opt_vec.push( ["factor", "2"] );
+/// assert!( ! check_nearly_eq::<V>( &x, &y, &opt_vec ) );
 /// ```
 ///
 /// # NumVec Example :
@@ -252,7 +252,7 @@ pub(crate) use impl_float_value_from_primitive;
 /// type S = AzFloat<f32>;
 /// type V = NumVec<S>;
 /// //
-/// let arg_vec = vec![ ["assert", "false"] ];
+/// let opt_vec = vec![ ["assert", "false"] ];
 /// //
 /// let one_v           = V::one();
 /// let epsilon_v       = V::epsilon();
@@ -260,13 +260,13 @@ pub(crate) use impl_float_value_from_primitive;
 /// //
 /// let x  = V::new( vec![ S::from(1e-20) ,  S::from(1e+20) ] );
 /// let y  = &x * &near_one_v;
-/// assert!( check_nearly_eq::<V>(&x, &y, &arg_vec) );
+/// assert!( check_nearly_eq::<V>(&x, &y, &opt_vec) );
 /// //
 /// let y  = V::new( vec![ S::from(1.01e-20) ,  S::from(1e+20) ] );
-/// assert!( ! check_nearly_eq::<V>(&x, &y, &arg_vec) );
+/// assert!( ! check_nearly_eq::<V>(&x, &y, &opt_vec) );
 /// ```
 ///
-pub fn check_nearly_eq<V>(x : &V, y : &V, arg_vec : &Vec< [&str; 2] >) -> bool
+pub fn check_nearly_eq<V>(x : &V, y : &V, opt_vec : &Vec< [&str; 2] >) -> bool
 where
     V  : FConst + FloatValue + From<f32> + std::fmt::Debug,
     for<'a> &'a V : FUnary<Output=V>,
@@ -279,25 +279,25 @@ where
     // factor, assert
     let mut factor  = V::from(100f32);
     let mut assert  = true;
-    for arg in arg_vec {
-        match arg[0] {
+    for opt in opt_vec {
+        match opt[0] {
             "factor" => {
-                let result = arg[1].parse::<f32>();
+                let result = opt[1].parse::<f32>();
                 if result.is_err() { panic!(
-                    "check_nearly_eq arg_vec: can't convert factor to f32"
+                    "check_nearly_eq opt_vec: can't convert factor to f32"
                 ); }
                 factor = V::from( result.unwrap() );
             },
             "assert" => {
-                match arg[1] {
+                match opt[1] {
                     "true"  => { assert = true; }
                     "false" => { assert = false; }
                     _ => { panic!(
-                        "check_nearly_eq arg_vec: assert is not true of false"
+                        "check_nearly_eq opt_vec: assert is not true of false"
                     ); }
                 }
             },
-            _ => panic!( "check_nearly_eq arg_vec: invalid key" ),
+            _ => panic!( "check_nearly_eq opt_vec: invalid key" ),
         }
     }
     //

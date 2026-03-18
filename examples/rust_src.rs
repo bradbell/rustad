@@ -21,7 +21,7 @@ fn main () {
     //
     type V     = AzFloat<f32>;
     let nx     = 3;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     // ax
     let x  : Vec<V> = vec![ V::from(2.0); nx ];
@@ -42,13 +42,13 @@ fn main () {
     // av
     let x  : Vec<V> = vec![ V::from(2.0); nx ];
     let (_, ax) = start_recording(None, x);
-    let (_, av) = f.forward_var_ad(None, ax, &arg_vec);
+    let (_, av) = f.forward_var_ad(None, ax, &opt_vec);
     //
     // g
     // g(x) = df/dx = [ 2 * x[0], ..., 2 * x[nx-1] ]
     let dy  : Vec<V>  = vec![ V::from(1.0) ];
     let ady           = ad_from_vector(dy);
-    let adx           = f.reverse_der_ad(None, &av, ady, &arg_vec);
+    let adx           = f.reverse_der_ad(None, &av, ady, &opt_vec);
     let g             = stop_recording(adx);
     //
     // lib_src

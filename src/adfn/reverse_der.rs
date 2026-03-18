@@ -30,8 +30,8 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     dom_der = f.reverse_der_value(dyp_all, &var_all, range_der, arg_vec)
-///     dom_der = f.reverse_der_ad(dyp_all, &var_all, range_der, arg_vec)
+///     dom_der = f.reverse_der_value(dyp_all, &var_all, range_der, opt_vec)
+///     dom_der = f.reverse_der_ad(dyp_all, &var_all, range_der, opt_vec)
 ///   ```
 ///
 /// * Prototype :
@@ -59,8 +59,8 @@ use crate::{
 ///   specifies the range space weights that define the scalar function
 ///   that this call will evaluate the gradient for.
 ///
-/// * arg_vec :
-///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+/// * opt_vec :
+///   is an [opt_vec](crate::doc_opt_vec) with the following possible keys:
 ///
 ///   * trace
 ///     The corresponding value must be true of false (default is false).
@@ -100,13 +100,13 @@ use crate::{
 /// //
 /// // dx = derivative of f(p, x) with respect to x
 /// let trace      = false;
-/// let arg_vec    = vec![ ["trace", "false"] ];
+/// let opt_vec    = vec![ ["trace", "false"] ];
 /// let p          = vec![ V::from(2.0), V::from(3.0) ];
 /// let x          = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
-/// let dyp        = f.forward_dyp_value(p.clone(), &arg_vec);
-/// let (y, var)   = f.forward_var_value(Some(&dyp), x.clone(), &arg_vec);
+/// let dyp        = f.forward_dyp_value(p.clone(), &opt_vec);
+/// let (y, var)   = f.forward_var_value(Some(&dyp), x.clone(), &opt_vec);
 /// let dy         = vec![ V::from(1.0) ];
-/// let dx         = f.reverse_der_value(Some(&dyp), &var, dy, &arg_vec);
+/// let dx         = f.reverse_der_value(Some(&dyp), &var, dy, &opt_vec);
 /// //
 /// assert_eq!( dx[0] , p[0] * p[1] * x[1] * x[2] );
 /// assert_eq!( dx[1] , p[0] * p[1] * x[0] * x[2] );
@@ -136,23 +136,23 @@ macro_rules! reverse_der {
             dyp_all     : Option< &Vec<$E> >  ,
             var_all     : &Vec<$E>            ,
             range_der   : Vec<$E>             ,
-            arg_vec     : &Vec<[&str; 2]>     ,
+            opt_vec     : &Vec<[&str; 2]>     ,
         ) -> Vec<$E>
         {
             // trace
             let mut trace = false;
-            for arg in arg_vec {
-                match arg[0] {
+            for opt in opt_vec {
+                match opt[0] {
                     "trace" => {
-                        match arg[1] {
+                        match opt[1] {
                             "true"  => { trace = true; },
                             "false" => { trace = false; },
                             _ => { panic!(
-                            "reverse_der arg_vec: invalid value for trace"
+                            "reverse_der opt_vec: invalid value for trace"
                             ); }
                         }
                     },
-                    _ => panic!("reverse_der arg_vec: invalid key"),
+                    _ => panic!("reverse_der opt_vec: invalid key"),
                 }
             }
             //

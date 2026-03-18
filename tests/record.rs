@@ -26,8 +26,8 @@ fn test_left_zero_one_both_ad() {
     let ay  = vec![ a4 ];
     let f   = stop_recording(ay);
     //
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
-    let (y, _)       = f.forward_var_value(None, x.clone(), &arg_vec);
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
+    let (y, _)       = f.forward_var_value(None, x.clone(), &opt_vec);
     //
     // f.var_dep_len()
     // Not necessary to create any dependent variables.
@@ -52,8 +52,8 @@ fn test_left_zero_one_right_ad() {
     let ay  = vec![ a6 ];
     let f   = stop_recording(ay);
     //
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
-    let (y, _)       = f.forward_var_value(None, x.clone(), &arg_vec);
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
+    let (y, _)       = f.forward_var_value(None, x.clone(), &opt_vec);
     //
     // f.var_dep_len()
     // Not necessary to create any dependent variables.
@@ -77,8 +77,8 @@ fn test_right_zero_one_both_ad() {
     let ay  = vec![ a5 ];
     let f   = stop_recording(ay);
     //
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
-    let (y, _)       = f.forward_var_value(None, x.clone(), &arg_vec);
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
+    let (y, _)       = f.forward_var_value(None, x.clone(), &opt_vec);
     //
     // f.var_dep_len()
     // Not necessary to create any dependent variables.
@@ -102,8 +102,8 @@ fn test_right_zero_one_left_ad() {
     let ay  = vec![ a5 ];
     let f   = stop_recording(ay);
     //
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
-    let (y, _)       = f.forward_var_value(None, x.clone(), &arg_vec);
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
+    let (y, _)       = f.forward_var_value(None, x.clone(), &opt_vec);
     //
     // f.var_dep_len()
     // Not necessary to create any dependent variables.

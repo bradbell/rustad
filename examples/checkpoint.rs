@@ -46,12 +46,12 @@ fn no_ad_derivative() {
     //
     // checkpoint_id
     let directions  : Vec<Direction> = Vec::new();
-    let arg_vec        = vec![ ["name",  "example"], ["trace", "false"  ] ];
-    let checkpoint_id  = register_checkpoint(f, &directions, &arg_vec);
+    let opt_vec        = vec![ ["name",  "example"], ["trace", "false"  ] ];
+    let checkpoint_id  = register_checkpoint(f, &directions, &opt_vec);
     //
-    // trace, arg_vec
+    // trace, opt_vec
     let trace     = false;
-    let arg_vec   = vec![ [ "trace", "false" ] ];
+    let opt_vec   = vec![ [ "trace", "false" ] ];
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
@@ -61,27 +61,27 @@ fn no_ad_derivative() {
     //
     // g.forward_var_value
     let x       : Vec<V> = vec![ V::from(3.0) , V::from(4.0) ];
-    let (y, v)           = g.forward_var_value(None, x.clone(), &arg_vec);
+    let (y, v)           = g.forward_var_value(None, x.clone(), &opt_vec);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
     //
     // g.forward_der_value
     let dx      : Vec<V> = vec![ V::from(5.0), V::from(6.0) ];
-    let dy               = g.forward_der_value(None, &v , dx.clone(), &arg_vec);
+    let dy               = g.forward_der_value(None, &v , dx.clone(), &opt_vec);
     assert_eq!( dy[0], V::from(2.0) * ( x[0]*dx[0] + x[1]*dx[1] ) );
     //
     // g.reverse_der_value
     let dy      : Vec<V> = vec![ V::from(5.0) ];
-    let dx               = g.reverse_der_value(None, &v , dy.clone(), &arg_vec);
+    let dx               = g.reverse_der_value(None, &v , dy.clone(), &opt_vec);
     assert_eq!( dx[0], V::from(2.0) * x[0]*dy[0] );
     assert_eq!( dx[1], V::from(2.0) * x[1]*dy[0] );
     //
     // g.forward_var_ad
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
     let (_, ax)      = start_recording(None, x);
-    let (ay, _av)    = g.forward_var_ad(None, ax, &arg_vec);
+    let (ay, _av)    = g.forward_var_ad(None, ax, &opt_vec);
     let h            = stop_recording(ay);
     let x   : Vec<V> = vec![ V::from(3.0) , V::from(4.0) ];
-    let (y, _v)      = h.forward_var_value(None, x.clone(), &arg_vec);
+    let (y, _v)      = h.forward_var_value(None, x.clone(), &opt_vec);
     assert_eq!( y[0], x[0]*x[0] + x[1]*x[1] );
 }
 //
@@ -97,12 +97,12 @@ fn forward_ad_derivative() {
     //
     // checkpoint_id
     let directions  = vec![ Direction::Forward ];
-    let mut arg_vec     = vec![
+    let mut opt_vec     = vec![
         ["trace", "false"  ],
         ["name",  "example"],
     ];
-    let checkpoint_id  = register_checkpoint(f, &directions, &arg_vec);
-    arg_vec.pop();
+    let checkpoint_id  = register_checkpoint(f, &directions, &opt_vec);
+    opt_vec.pop();
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
@@ -115,11 +115,11 @@ fn forward_ad_derivative() {
     let dx  : Vec<V> = vec![ V::from(5.0), V::from(6.0) ];
     let adx          = ad_from_vector(dx.clone());
     let (_, ax)      = start_recording(None, x);
-    let (_ay, av)    = g.forward_var_ad(None, ax, &arg_vec);
-    let ady          = g.forward_der_ad(None, &av , adx, &arg_vec);
+    let (_ay, av)    = g.forward_var_ad(None, ax, &opt_vec);
+    let ady          = g.forward_der_ad(None, &av , adx, &opt_vec);
     let h            = stop_recording(ady);
     let x   : Vec<V> = vec![ V::from(7.0) , V::from(8.0) ];
-    let (dy, _v)     = h.forward_var_value(None, x.clone(), &arg_vec);
+    let (dy, _v)     = h.forward_var_value(None, x.clone(), &opt_vec);
     assert_eq!( dy[0], V::from(2.0) * ( x[0]*dx[0] + x[1]*dx[1] ) );
 }
 //
@@ -135,12 +135,12 @@ fn reverse_ad_derivative() {
     //
     // checkpoint_id
     let directions  = vec![ Direction::Reverse ];
-    let arg_vec     = vec![
+    let opt_vec     = vec![
         ["name",  "example"],
         ["trace", "false"  ],
     ];
-    let checkpoint_id  = register_checkpoint(f, &directions, &arg_vec);
-    let arg_vec        = vec![ ["trace", "false"] ];
+    let checkpoint_id  = register_checkpoint(f, &directions, &opt_vec);
+    let opt_vec        = vec![ ["trace", "false"] ];
     //
     // g
     let x   : Vec<V> = vec![ V::from(1.0) , V::from(2.0) ];
@@ -153,11 +153,11 @@ fn reverse_ad_derivative() {
     let dy  : Vec<V> = vec![ V::from(5.0) ];
     let ady          = ad_from_vector(dy.clone());
     let (_, ax)      = start_recording(None, x);
-    let (_ay, av)    = g.forward_var_ad(None, ax, &arg_vec);
-    let adx          = g.reverse_der_ad(None, &av , ady, &arg_vec);
+    let (_ay, av)    = g.forward_var_ad(None, ax, &opt_vec);
+    let adx          = g.reverse_der_ad(None, &av , ady, &opt_vec);
     let h            = stop_recording(adx);
     let x   : Vec<V> = vec![ V::from(7.0) , V::from(8.0) ];
-    let (dx, _v)     = h.forward_var_value(None, x.clone(), &arg_vec);
+    let (dx, _v)     = h.forward_var_value(None, x.clone(), &opt_vec);
     assert_eq!( dx[0], V::from(2.0) * x[0] * dy[0] );
     assert_eq!( dx[1], V::from(2.0) * x[1] * dy[0] );
 }

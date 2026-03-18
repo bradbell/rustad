@@ -16,10 +16,10 @@ type V = AzFloat<f64>;
 //
 fn main () {
     //
-    // n, m, arg_vec
+    // n, m, opt_vec
     let n          = 5;
     let m          = n - 1;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     // f
     let zero_v : V = 0.into();
@@ -32,12 +32,12 @@ fn main () {
     let f = stop_recording(ay);
     //
     // pattern
-    let mut pattern = f.for_sparsity(&arg_vec);
+    let mut pattern = f.for_sparsity(&opt_vec);
     assert_eq!( pattern.len(), 2 * m );
     //
     // x
     let x : Vec<V>     = (0 .. n).map( |j| V::from(j+1) ).collect();
-    let (_y, var_all) = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (_y, var_all) = f.forward_var_value(None, x.clone(), &opt_vec);
     //
     // -----------------------------------------------------------------------
     // for_sparse_jac_value
@@ -49,7 +49,7 @@ fn main () {
     //
     // jacobian
     let jacobian = f.for_sparse_jac_value(
-        None, &var_all, &pattern, &color_vec, &arg_vec
+        None, &var_all, &pattern, &color_vec, &opt_vec
     );
     //
     // row_major
@@ -83,7 +83,7 @@ fn main () {
     //
     // jacobian
     let jacobian = f.rev_sparse_jac_value(
-        None, &var_all, &pattern, &color_vec, &arg_vec
+        None, &var_all, &pattern, &color_vec, &opt_vec
     );
     //
     // col_major

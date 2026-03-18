@@ -74,8 +74,8 @@ fn test_forward_dyp() {
     let f  = stop_recording(ay);
     //
     // dyp_all
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
-    let dyp_all  = f.forward_dyp_value(p.clone(), &arg_vec);
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
+    let dyp_all  = f.forward_dyp_value(p.clone(), &opt_vec);
     //
     assert_eq!( dyp_all.len(), 2 * np - 1 );
     for j in 0 .. np {

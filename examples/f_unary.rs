@@ -31,8 +31,8 @@ fn main() {
         let epsilon = V::epsilon();
         let exp_m1  = FUnary::exp_m1( epsilon );
         let check   = epsilon;
-        let arg_vec : Vec<[&str; 2]> = Vec::new();
-        check_nearly_eq::<V>(&exp_m1, &check, &arg_vec);
+        let opt_vec : Vec<[&str; 2]> = Vec::new();
+        check_nearly_eq::<V>(&exp_m1, &check, &opt_vec);
     }
     // minus
     {   type V = AzFloat<f64>;
@@ -123,8 +123,8 @@ fn main() {
         let exp_2       = V::from(2.0).exp();
         let exp_minus_2 = V::from(-2.0).exp();
         let check       = (exp_2 - exp_minus_2) / (exp_2 + exp_minus_2);
-        let arg_vec : Vec<[&str; 2]> = Vec::new();
-        check_nearly_eq::<V>(&tanh_2, &check, &arg_vec);
+        let opt_vec : Vec<[&str; 2]> = Vec::new();
+        check_nearly_eq::<V>(&tanh_2, &check, &opt_vec);
     }
     // ----------------------------------------------------------------------
     // powi

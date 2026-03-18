@@ -31,8 +31,8 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     range_der = f.forward_der_value(dyp_all, &var_all, dom_der, arg_vec)
-///     range_der = f.forward_der_ad(dyp_all, &var_all, dom_der, arg_vec)
+///     range_der = f.forward_der_value(dyp_all, &var_all, dom_der, opt_vec)
+///     range_der = f.forward_der_ad(dyp_all, &var_all, dom_der, opt_vec)
 ///   ```
 ///
 /// * Prototype :
@@ -60,8 +60,8 @@ use crate::{
 ///   specifies the domain space direction along which the directional
 ///   derivative is evaluated. This is a direction in variable space.
 ///
-/// * arg_vec :
-///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+/// * opt_vec :
+///   is an [opt_vec](crate::doc_opt_vec) with the following possible keys:
 ///
 ///   * trace
 ///     The corresponding value must be true of false (default is false).
@@ -101,13 +101,13 @@ use crate::{
 /// //
 /// // dy = partial f(p, x) w.r.t. x[0]
 /// let trace           = false;
-/// let arg_vec : Vec<[&str; 2]> = Vec::new();
+/// let opt_vec : Vec<[&str; 2]> = Vec::new();
 /// let p      : Vec<V> = vec![ V::from(2.0), V::from(3.0) ];
 /// let x      : Vec<V> = vec![ V::from(4.0), V::from(5.0), V::from(6.0) ];
-/// let dyp             = f.forward_dyp_value(p, &arg_vec);
-/// let (y, var)        = f.forward_var_value(Some(&dyp), x, &arg_vec);
+/// let dyp             = f.forward_dyp_value(p, &opt_vec);
+/// let (y, var)        = f.forward_var_value(Some(&dyp), x, &opt_vec);
 /// let dx     : Vec<V> = vec![ V::from(1.0), V::from(0.0), V::from(0.0) ];
-/// let dy              = f.forward_der_value(Some(&dyp), &var, dx, &arg_vec);
+/// let dy              = f.forward_der_value(Some(&dyp), &var, dx, &opt_vec);
 /// //
 /// // check
 /// // derivative w.r.t x[0] is p[0] * p[1] * x[1] * x[2] * x[3]
@@ -136,23 +136,23 @@ macro_rules! forward_der {
             dyp_all     : Option< &Vec<$E> >  ,
             var_all     : &Vec<$E>            ,
             dom_der     : Vec<$E>             ,
-            arg_vec     : &Vec<[&str; 2]>     ,
+            opt_vec     : &Vec<[&str; 2]>     ,
         ) -> Vec<$E>
         {
             // trace
             let mut trace = false;
-            for arg in arg_vec {
-                match arg[0] {
+            for opt in opt_vec {
+                match opt[0] {
                     "trace" => {
-                        match arg[1] {
+                        match opt[1] {
                             "true"  => { trace = true; },
                             "false" => { trace = false; },
                             _ => { panic!(
-                            "forward_der arg_vec: invalid value for trace"
+                            "forward_der opt_vec: invalid value for trace"
                             ); }
                         }
                     },
-                    _ => panic!("forward_der arg_vec: invalid key"),
+                    _ => panic!("forward_der opt_vec: invalid key"),
                 }
             }
             //

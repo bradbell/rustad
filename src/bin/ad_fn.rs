@@ -91,9 +91,9 @@ fn record_normsq_num_vec()
 // forward_var_normsq_scalar
 fn forward_var_normsq_scalar()
 {   let x = (0 .. N_SUM).map( |j| ScalarV::from(j + 1) ).collect();
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     let sumsq = NORMSQ_F64.with_borrow_mut( |f_static| {
-        let (y, _) = f_static.forward_var_value(None, x, &arg_vec);
+        let (y, _) = f_static.forward_var_value(None, x, &opt_vec);
         y[0]
     } );
     assert_eq!(
@@ -105,9 +105,9 @@ fn forward_var_normsq_scalar()
 // forward_var_normsq_num_vec
 fn forward_var_normsq_num_vec()
 {   let x = (0 .. N_SUM).map( |j| NumVec::from( (j+1) as f64 ) ).collect();
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     let sumsq = NORMSQ_NUMVEC_F64.with_borrow_mut( |f_static| {
-        let (y, _) = f_static.forward_var_value(None, x, &arg_vec);
+        let (y, _) = f_static.forward_var_value(None, x, &opt_vec);
         let mut y_itr = y.into_iter();
         y_itr.next().unwrap()
     } );

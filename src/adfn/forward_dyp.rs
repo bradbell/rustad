@@ -30,8 +30,8 @@ use crate::{
 ///
 /// * Syntax :
 ///   ```text
-///     dyp_all  = f.forward_dyp_value(dyp_dom, arg_vec)
-///     dyp_all  = f.forward_dyp_ad(dyp_dom, arg_vec)
+///     dyp_all  = f.forward_dyp_value(dyp_dom, opt_vec)
+///     dyp_all  = f.forward_dyp_ad(dyp_dom, opt_vec)
 ///   ```
 /// * Prototype :
 ///   see [ADfn::forward_dyp_value] and [ADfn::forward_dyp_ad]
@@ -41,8 +41,8 @@ use crate::{
 ///
 /// * f : is an [ADfn] object.
 ///
-/// * arg_vec :
-///   is an [arg_vec](crate::doc_arg_vec) with the following possible keys:
+/// * opt_vec :
+///   is an [opt_vec](crate::doc_opt_vec) with the following possible keys:
 ///
 ///   * trace
 ///     The corresponding value must be true of false (default is false).
@@ -78,23 +78,23 @@ macro_rules! forward_dyp {
         pub fn [< forward_dyp_ $suffix >] (
             &self,
             dyp_dom     : Vec<$E>         ,
-            arg_vec     : &Vec<[&str; 2]> ,
+            opt_vec     : &Vec<[&str; 2]> ,
         ) -> Vec<$E>
         {
             // trace
             let mut trace = false;
-            for arg in arg_vec {
-                match arg[0] {
+            for opt in opt_vec {
+                match opt[0] {
                     "trace" => {
-                        match arg[1] {
+                        match opt[1] {
                             "true"  => { trace = true; },
                             "false" => { trace = false; },
                             _ => { panic!(
-                            "forward_dyp arg_vec: invalid value for trace"
+                            "forward_dyp opt_vec: invalid value for trace"
                             ); }
                         }
                     },
-                    _ => panic!("forward_dyp arg_vec: invalid key"),
+                    _ => panic!("forward_dyp opt_vec: invalid key"),
                 }
             }
             //
@@ -212,8 +212,8 @@ mod tests {
         let f  = stop_recording(ay);
         //
         // dyp_all
-        let arg_vec  : Vec<[&str; 2]> = Vec::new();
-        let dyp_all  = f.forward_dyp_value(p.clone(), &arg_vec);
+        let opt_vec  : Vec<[&str; 2]> = Vec::new();
+        let dyp_all  = f.forward_dyp_value(p.clone(), &opt_vec);
         //
         assert_eq!( dyp_all.len(), 2 * np - 1 );
         for j in 0 .. np {

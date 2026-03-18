@@ -14,7 +14,7 @@ use rustad::{
 // test_atan2_ca
 fn test_atan2_ca() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  = vec![ V::from(1.0), V::from(2.0) ];
     let y  = vec![ V::from(3.0), V::from(4.0) ];
@@ -25,7 +25,7 @@ fn test_atan2_ca() {
     let az           = vec! [ az_0, az_1 ];
     let f            = stop_recording(az);
     //
-    let (z, v)       = f.forward_var_value(None, x.clone(), &arg_vec);
+    let (z, v)       = f.forward_var_value(None, x.clone(), &opt_vec);
     let check        = y[0].atan2(x[0]);
     assert_eq!(z[0], check);
     let check        = y[1].atan2(x[1]);
@@ -38,24 +38,24 @@ fn test_atan2_ca() {
     ];
     //
     let dx : Vec<V>  = vec![ V::from(6.0), V::from(7.0) ];
-    let dz           = f.forward_der_value(None, &v, dx.clone(), &arg_vec);
+    let dz           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     let check        = datan[0] * dratio[0] * dx[0];
-    check_nearly_eq::<V>(&dz[0], &check, &arg_vec);
+    check_nearly_eq::<V>(&dz[0], &check, &opt_vec);
     let check        = datan[1] * dratio[1] * dx[1];
-    check_nearly_eq::<V>(&dz[1], &check, &arg_vec);
+    check_nearly_eq::<V>(&dz[1], &check, &opt_vec);
     //
     let dz           = vec![ V::from(8.0), V::from(9.0) ];
-    let dx           = f.reverse_der_value(None, &v, dz.clone(), &arg_vec);
+    let dx           = f.reverse_der_value(None, &v, dz.clone(), &opt_vec);
     let check        = datan[0] * dratio[0] * dz[0];
-    check_nearly_eq::<V>(&dx[0], &check, &arg_vec);
+    check_nearly_eq::<V>(&dx[0], &check, &opt_vec);
     let check        = datan[1] * dratio[1] * dz[1];
-    check_nearly_eq::<V>(&dx[1], &check, &arg_vec);
+    check_nearly_eq::<V>(&dx[1], &check, &opt_vec);
 }
 //
 // test_atan2_ac
 fn test_atan2_ac() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  = vec![ V::from(1.0), V::from(2.0) ];
     let y  = vec![ V::from(3.0), V::from(4.0) ];
@@ -66,7 +66,7 @@ fn test_atan2_ac() {
     let az           = vec! [ az_0, az_1 ];
     let f            = stop_recording(az);
     //
-    let (z, v)       = f.forward_var_value(None, y.clone(), &arg_vec);
+    let (z, v)       = f.forward_var_value(None, y.clone(), &opt_vec);
     let check        = y[0].atan2(x[0]);
     assert_eq!(z[0], check);
     let check        = y[1].atan2(x[1]);
@@ -77,24 +77,24 @@ fn test_atan2_ac() {
     let dratio   = vec![ x[0].powi(-1), x[1].powi(-1) ];
     //
     let dy : Vec<V>  = vec![ V::from(6.0), V::from(7.0) ];
-    let dz           = f.forward_der_value(None, &v, dy.clone(), &arg_vec);
+    let dz           = f.forward_der_value(None, &v, dy.clone(), &opt_vec);
     let check        = datan[0] * dratio[0] * dy[0];
-    check_nearly_eq::<V>(&dz[0], &check, &arg_vec);
+    check_nearly_eq::<V>(&dz[0], &check, &opt_vec);
     let check        = datan[1] * dratio[1] * dy[1];
-    check_nearly_eq::<V>(&dz[1], &check, &arg_vec);
+    check_nearly_eq::<V>(&dz[1], &check, &opt_vec);
     //
     let dz           = vec![ V::from(8.0), V::from(9.0) ];
-    let dy           = f.reverse_der_value(None, &v, dz.clone(), &arg_vec);
+    let dy           = f.reverse_der_value(None, &v, dz.clone(), &opt_vec);
     let check        = datan[0] * dratio[0] * dz[0];
-    check_nearly_eq::<V>(&dy[0], &check, &arg_vec);
+    check_nearly_eq::<V>(&dy[0], &check, &opt_vec);
     let check        = datan[1] * dratio[1] * dz[1];
-    check_nearly_eq::<V>(&dy[1], &check, &arg_vec);
+    check_nearly_eq::<V>(&dy[1], &check, &opt_vec);
 }
 //
 // test_atan2_aa
 fn test_atan2_aa() {
     type V      = AzFloat<f64>;
-    let arg_vec : Vec<[&str; 2]> = Vec::new();
+    let opt_vec : Vec<[&str; 2]> = Vec::new();
     //
     let x  = V::from(2.0);
     let y  = V::from(3.0);
@@ -106,7 +106,7 @@ fn test_atan2_aa() {
     let az           = vec![ (&ay).atan2(&ax) ];
     let f            = stop_recording(az);
     //
-    let (z, v)       = f.forward_var_value(None, u.clone(), &arg_vec);
+    let (z, v)       = f.forward_var_value(None, u.clone(), &opt_vec);
     let check        = y.atan2(x);
     assert_eq!(z[0], check);
     //
@@ -116,16 +116,16 @@ fn test_atan2_aa() {
     let dratio_y  = x.powi(-1);
     //
     let du : Vec<V>  = vec![ V::from(6.0), V::from(7.0) ];
-    let dz           = f.forward_der_value(None, &v, du.clone(), &arg_vec);
+    let dz           = f.forward_der_value(None, &v, du.clone(), &opt_vec);
     let check        = datan * ( dratio_x * du[0] + dratio_y * du[1] );
-    check_nearly_eq::<V>(&dz[0], &check, &arg_vec);
+    check_nearly_eq::<V>(&dz[0], &check, &opt_vec);
     //
     let dz           = vec![ V::from(8.0) ];
-    let du           = f.reverse_der_value(None, &v, dz.clone(), &arg_vec);
+    let du           = f.reverse_der_value(None, &v, dz.clone(), &opt_vec);
     let check        = datan * dratio_x * dz[0];
-    check_nearly_eq::<V>(&du[0], &check, &arg_vec);
+    check_nearly_eq::<V>(&du[0], &check, &opt_vec);
     let check        = datan * dratio_y * dz[0];
-    check_nearly_eq::<V>(&du[1], &check, &arg_vec);
+    check_nearly_eq::<V>(&du[1], &check, &opt_vec);
 }
 #[test]
 fn atan2() {
