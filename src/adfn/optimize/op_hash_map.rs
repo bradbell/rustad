@@ -75,19 +75,19 @@ impl BinaryOp {
 struct CallOp {
     arg         : Vec<IndexT> ,
     arg_type    : Vec<ADType> ,
-    flag        : Vec<bool>   ,
+    bvec        : Vec<bool>   ,
 }
 impl CallOp {
     pub fn new(
         arg_in          : Vec<IndexT> ,
         arg_type_in     : &[ADType]   ,
-        flag_in         : &[bool]     ,
+        bvec_in         : &[bool]     ,
     ) -> Self {
         debug_assert!( arg_in.len() == arg_type_in.len() );
         Self {
             arg         : arg_in               ,
             arg_type    : arg_type_in.to_vec() ,
-            flag        : flag_in.to_vec()     ,
+            bvec        : bvec_in.to_vec()     ,
         }
     }
 }
@@ -216,7 +216,7 @@ impl OpHashMap {
             let n_rng         = arg[NUMBER_RNG] as usize;
             let start         = arg[BEGIN_FLAG] as usize;
             let end           = start + 1 + n_rng;
-            let flag          = &agraph.bool_all[start .. end];
+            let bvec          = &agraph.bool_all[start .. end];
             let mut arg_match = arg.to_vec();
             for i_arg in 0 .. arg_match.len() {
                 let match_i = arg_type[i_arg] == agraph_type &&
@@ -227,9 +227,9 @@ impl OpHashMap {
                 }
             }
             // map_value_out
-            // position where flags start does not matter.
+            // position where booleans start does not matter.
             arg_match[BEGIN_FLAG] = 0;
-            let key   = CallOp::new(arg_match, arg_type, flag);
+            let key   = CallOp::new(arg_match, arg_type, bvec);
             let map_value_out =
                 self.call_hash_map.entry(key).or_insert(map_value_in);
             return Some(*map_value_out);

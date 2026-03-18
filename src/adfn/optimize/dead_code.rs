@@ -170,7 +170,7 @@ fn new_binary_op(
 fn new_call_op(
     old2new          : &mut Old2New    ,
     old_rng_is_dep   : &[bool]          ,
-    new_flag         : &[bool]          ,
+    new_bool         : &[bool]          ,
     i_agraph         : usize            ,
     arg              : &[IndexT]        ,
     arg_type         : &[ADType]        ,
@@ -211,13 +211,13 @@ fn new_call_op(
     //
     // new_agraph: arg_all, arg_all_type, arg_type_all, bool_all
     let n_arg  = new_arg.len();
-    let n_flag = new_flag.len();
+    let n_bool = new_bool.len();
     new_agraph.arg_all.extend_from_slice( &new_arg[0 .. n_arg] );
     new_agraph.arg_type_all.extend_from_slice( &new_arg_type[0 .. n_arg] );
-    new_agraph.bool_all.extend_from_slice( &new_flag[0 .. n_flag] );
+    new_agraph.bool_all.extend_from_slice( &new_bool[0 .. n_bool] );
     //
     // old2new, CALL_RES_OP operators
-    let new_rng_is_dep = &new_flag[1 .. n_flag];
+    let new_rng_is_dep = &new_bool[1 .. n_bool];
     let n_rng          = new_rng_is_dep.len();
     assert_eq!( n_rng, old_rng_is_dep.len() );
     let mut old_i_dep = 0;
@@ -416,13 +416,13 @@ where
                     // old_n_dep, new_n_dep, new_rng_is_dep
                     let mut old_n_dep      = 0;
                     let mut new_any_depend = false;
-                    let mut new_flag = vec![false; n_rng + 1];
-                    new_flag[0]      = trace_this_op;
+                    let mut new_bool = vec![false; n_rng + 1];
+                    new_bool[0]      = trace_this_op;
                     for i_rng in 0 .. n_rng {
                         if old_rng_is_dep[i_rng] {
                             if old_depend[old_res + old_n_dep] {
                                 // This i_rng will be a dependent in new_agraph
-                                new_flag[i_rng + 1] = true;
+                                new_bool[i_rng + 1] = true;
                                 new_any_depend      = true;
                             }
                             old_n_dep += 1;
@@ -434,7 +434,7 @@ where
                         new_call_op(
                             &mut old2new,
                             old_rng_is_dep,
-                            &new_flag,
+                            &new_bool,
                             i_agraph,
                             arg,
                             arg_type,
