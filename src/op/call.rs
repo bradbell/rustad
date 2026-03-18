@@ -48,11 +48,10 @@ use std::ops::AddAssign;
 use std::mem::swap;
 //
 use crate::ad::ADType;
-use crate::adfn::optimize;
 use crate::tape::AGraph;
 use crate::op::info::OpFns;
 use crate::op::info::ConstData;
-use crate::op::info::no_reverse_depend;
+use crate::op::info::panic_reverse_depend;
 use crate::atom::sealed::GlobalAtomCallbackVec;
 use crate::op::id::{
         CALL_OP,
@@ -989,7 +988,6 @@ where
 // ===========================================================================
 // set_op_fns
 // ===========================================================================
-no_reverse_depend!(Call);
 /// Set the operator functions for call.
 ///
 /// * op_fns_vec :
@@ -1012,7 +1010,7 @@ where
         reverse_der_value : call_reverse_der_value::<V>,
         reverse_der_ad    : call_reverse_der_ad::<V>,
         rust_src          : call_rust_src::<V>,
-        reverse_depend    : reverse_depend_none,
+        reverse_depend    : panic_reverse_depend,
     };
     op_fns_vec[CALL_RES_OP as usize] = OpFns{
         name              : "call_res" ,
@@ -1025,7 +1023,7 @@ where
         reverse_der_value : call_res_der::<V, V>,
         reverse_der_ad    : call_res_der::<V, AD<V> >,
         rust_src          : call_res_rust_src::<V>,
-        reverse_depend    : reverse_depend_none,
+        reverse_depend    : panic_reverse_depend,
     };
 }
 // ===========================================================================
