@@ -385,7 +385,7 @@ pub(crate) fn panic_rust_src<V>(
     _bool_all   : &[bool]     ,
     _arg        : &[IndexT]   ,
     _arg_type   : &[ADType]   ,
-    _op_index   : usize       ,
+    _res        : usize       ,
 ) -> String
 { panic!() }
 // ---------------------------------------------------------------------------
