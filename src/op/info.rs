@@ -174,35 +174,6 @@ pub(crate) type ReverseDer<V, E> = fn(
     _var_der  : &mut [E]    ,
     _const_data : ConstData<V> ,
 );
-//
-// ReverseDepend
-/// Reverse dependency analysis; i.e., which arguments does a result depend on.
-///
-/// * depend :
-///   On input, depend contains the the dependencies given the dependent values
-///   with index greater than res.
-///   In addition, depend\[res\] is true.
-///   Upon return,
-///   depend contains the the dependencies given the dependent values
-///   with index greater or equal res.
-pub(crate) type ReverseDepend = fn(
-    _depend   : &mut optimize::Depend ,
-    _bool_all : &[bool]               ,
-    _arg      : &[IndexT]             ,
-    _arg_type : &[ADType]             ,
-    _res      : usize                 ,
-    _res_type : ADType                ,
-);
-//
-// panic_reverse_depend
-pub(crate) fn panic_reverse_depend(
-    _depend   : &mut optimize::Depend ,
-    _bool_all : &[bool]               ,
-    _arg      : &[IndexT]             ,
-    _arg_type : &[ADType]             ,
-    _res      : usize                 ,
-    _res_type : ADType                ,
-) { panic!(); }
 // ---------------------------------------------------------------------------
 // RustSrc
 /// Generate source code corresponding to forward_dyp and forward_var
@@ -239,6 +210,41 @@ pub(crate) fn panic_rust_src<V>(
     _const_data : ConstData<V> ,
 ) -> String
 { panic!() }
+// ----------------------------------------------------------------------------
+// ReverseDepend
+/// Reverse dependency analysis; i.e., which arguments does a result depend on.
+///
+/// * depend :
+///   On input, depend contains the the dependencies given the dependent values
+///   with index greater than res.
+///   In addition, depend\[res\] is true.
+///   Upon return,
+///   depend contains the the dependencies given the dependent values
+///   with index greater or equal res.
+///
+/// * res_type :
+///   is ADType::DynamicP or ADType::Variable
+///   and is the type of the result for this operation.
+///
+/// * Other Arguments : see [ConstData]
+pub(crate) type ReverseDepend = fn(
+    _depend   : &mut optimize::Depend ,
+    _bool_all : &[bool]               ,
+    _arg      : &[IndexT]             ,
+    _arg_type : &[ADType]             ,
+    _res      : usize                 ,
+    _res_type : ADType                ,
+);
+//
+// panic_reverse_depend
+pub(crate) fn panic_reverse_depend(
+    _depend   : &mut optimize::Depend ,
+    _bool_all : &[bool]               ,
+    _arg      : &[IndexT]             ,
+    _arg_type : &[ADType]             ,
+    _res      : usize                 ,
+    _res_type : ADType                ,
+) { panic!(); }
 // ---------------------------------------------------------------------------
 /// Information for one operator
 #[derive(Clone)]
