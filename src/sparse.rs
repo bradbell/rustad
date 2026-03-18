@@ -142,8 +142,8 @@ pub fn coloring(
     // color_vec
     let mut color_vec : Vec<usize> = Vec::with_capacity(n);
     let mut k = 0;
-    for flag in col_in_sub_pattern.iter() {
-        if *flag {
+    for bval in col_in_sub_pattern.iter() {
+        if *bval {
             color_vec.push( k );
             k += 1;
         } else {

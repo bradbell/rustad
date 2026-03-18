@@ -15,7 +15,7 @@
 //! | 1        | Extra information about this call; i.e. call_info        |
 //! | 2        | Domain space dimension for function being called (n_dom) |
 //! | 3        | Number of range components for this call         (n_rng) |
-//! | 4        | Index in bool_all of first flag for this operator        |
+//! | 4        | Index in bool_all of first boolean for this operator     |
 //! | 4+1      | Variable, dynamic, or constant index for first call argument  |
 //! | 4+2      | Variable, dynamic, or constant index for second call argument |
 //! | ...      | ...                                                           |
@@ -71,9 +71,9 @@ use crate::{
 pub(crate) const BEGIN_DOM : usize = 5;
 //
 // BEGIN_FLAG
-/// Index, of the first flag for this call operator,
+/// Index, of the first boolean for this call operator,
 /// in its operator argument vector.
-/// This index is in the vector of all the flags for this acyclic graph.
+/// This index is in the vector of all the booleans for this acyclic graph.
 pub(crate) const BEGIN_FLAG: usize = 4;
 //
 // NUMBER_NRNG

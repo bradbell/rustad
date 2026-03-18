@@ -30,14 +30,13 @@ use crate::{
 };
 // ---------------------------------------------------------------------------
 /// Arguments to operator functions that are always constant; i.e., immutable.
-/// TODO: remove allow dead code when this gets used.
-#[allow(dead_code)]
 pub(crate) struct ConstData<'a, V> {
+    //
     // cop
     /// vector of all the constant values in this [ADfn](crate::ADfn)
     pub(crate) cop  : &'a [V] ,
     //
-    // flag_all
+    // bool_all
     /// vector of all the boolean values in this [AGraph](crate::tape::AGraph)
     pub(crate) bool_all : &'a [bool] ,
     //
