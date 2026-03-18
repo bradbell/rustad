@@ -33,11 +33,7 @@ fn no_op_dyp<V, E> (
 fn no_op_var<V, E> (
     _dyp_all  : &[E]        ,
     _var_all  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize       ,
+    _const_data : ConstData<V> ,
 ) { }
 //
 // no_op_der

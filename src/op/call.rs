@@ -403,15 +403,13 @@ where
 fn call_forward_var_value<V> (
     dyp_all    : &[V]          ,
     var_all    : &mut [V]      ,
-    cop        : &[V]          ,
-    bool_all   : &[bool]       ,
-    arg        : &[IndexT]     ,
-    arg_type   : &[ADType]     ,
-    res        : usize         )
+    const_data : ConstData<V> )
 where
     V               : GlobalAtomCallbackVec + PartialEq + From<f32>,
     AtomCallback<V> : Clone,
-{   // ----------------------------------------------------------------------
+{   //
+    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    // ----------------------------------------------------------------------
     let (
         atom_id,
         call_info,
@@ -470,15 +468,13 @@ where
 fn call_forward_var_ad<V> (
     adyp_all   : &[ AD<V> ]          ,
     avar_all   : &mut [ AD<V> ]      ,
-    cop        : &[V]                ,
-    bool_all   : &[bool]             ,
-    arg        : &[IndexT]           ,
-    arg_type   : &[ADType]           ,
-    res        : usize               )
+    const_data : ConstData<V> )
 where
     V               : PartialEq + Clone + GlobalAtomCallbackVec,
     AtomCallback<V> : Clone,
-{   // ----------------------------------------------------------------------
+{   //
+    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    // ----------------------------------------------------------------------
     let (
         atom_id,
         call_info,
@@ -850,11 +846,7 @@ fn call_res_dyp<V, E>(
 fn call_res_var<V, E>(
     _dyp_all  : &[E]        ,
     _var_all  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize       ,
+    _const_data : ConstData<V> ,
 ) { }
 //
 // call_res_der

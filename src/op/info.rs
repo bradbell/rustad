@@ -138,11 +138,7 @@ pub(crate) fn panic_dyp<V, E> (
 pub(crate) type ForwardVar<V, E> = fn(
     _dyp_all  : &[E]        ,
     _var_all  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize       ,
+    _const_data : ConstData<V> ,
 );
 // panic_var
 /// Default [ForwardVar] function will panic.
@@ -152,11 +148,7 @@ pub(crate) type ForwardVar<V, E> = fn(
 pub(crate) fn panic_var<V, E> (
     _dyp_all  : &[E]        ,
     _var_all  : &mut [E]    ,
-    _cop      : &[V]        ,
-    _bool_all : &[bool]     ,
-    _arg      : &[IndexT]   ,
-    _arg_type : &[ADType]   ,
-    _res      : usize       ,
+    _const_data : ConstData<V> ,
 ) { panic!(); }
 // ---------------------------------------------------------------------------
 // ForwardDer

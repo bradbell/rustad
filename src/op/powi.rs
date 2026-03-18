@@ -61,15 +61,13 @@ where
 fn powi_forward_var <V, E> (
     _dyp_all    : &[E]        ,
     var_all     : &mut [E]    ,
-    _cop        : &[V]        ,
-    _bool_all   : &[bool]     ,
-    arg         : &[IndexT]   ,
-    arg_type    : &[ADType]   ,
-    res         : usize       )
+    const_data : ConstData<V> )
 where
     E : FConst ,
     for<'a> &'a E : FUnary<Output=E>,
 {   //
+    let ConstData {arg, arg_type, res, ..} = const_data;
+    //
     // index
     let index    = arg[0] as usize;
     debug_assert!( index < res );

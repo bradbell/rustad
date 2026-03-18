@@ -111,15 +111,13 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
     fn [< $name _pv_forward_var >] <V, E> (
         dyp_all     : &[E]        ,
         var_all     : &mut [E]    ,
-        cop         : &[V]        ,
-        _bool_all   : &[bool]     ,
-        arg         : &[IndexT]   ,
-        arg_type    : &[ADType]   ,
-        res         : usize       )
+        const_data : ConstData<V> )
     where
         for<'a> &'a V : $Trait<&'a E, Output = E> ,
         for<'a> &'a E : $Trait<&'a E, Output = E> ,
     {
+        let ConstData {cop, arg, arg_type, res, ..} = const_data;
+        //
         debug_assert!( arg.len() == 2);
         debug_assert!( ! arg_type[1].is_constant() );
         let lhs = arg[0] as usize;
@@ -137,15 +135,13 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
     fn [< $name _vp_forward_var >] <V, E> (
         dyp_all     : &[E]        ,
         var_all     : &mut [E]    ,
-        cop         : &[V]        ,
-        _bool_all   : &[bool]     ,
-        arg         : &[IndexT]   ,
-        arg_type    : &[ADType]   ,
-        res         : usize       )
+        const_data : ConstData<V> )
     where
         for<'a> &'a E : $Trait<&'a V, Output = E> ,
         for<'a> &'a E : $Trait<&'a E, Output = E> ,
     {
+        let ConstData {cop, arg, arg_type, res, ..} = const_data;
+        //
         debug_assert!( arg.len() == 2);
         debug_assert!( ! arg_type[0].is_constant() );
         let lhs = arg[0] as usize;
@@ -163,14 +159,12 @@ macro_rules! binary_arithmetic_function { ($Trait:ident, $name:ident) =>
     fn [< $name _vv_forward_var >] <V, E> (
         _dyp_all    : &[E]        ,
         var_all     : &mut [E]    ,
-        _cop        : &[V]        ,
-        _bool_all   : &[bool]     ,
-        arg         : &[IndexT]   ,
-        _arg_type   : &[ADType]   ,
-        res         : usize       )
+        const_data : ConstData<V> )
     where
         for<'a> &'a E : $Trait<&'a E, Output = E> ,
     {
+        let ConstData {arg, res, ..} = const_data;
+        //
         debug_assert!( arg.len() == 2);
         let lhs = arg[0] as usize;
         let rhs = arg[1] as usize;
@@ -374,16 +368,14 @@ macro_rules! f_binary_function { ($name:ident) => { paste::paste! {
     fn [< $name _forward_var >] <V, E> (
         dyp_all     : &[E]        ,
         var_all     : &mut [E]    ,
-        cop         : &[V]        ,
-        _bool_all   : &[bool]     ,
-        arg         : &[IndexT]   ,
-        arg_type    : &[ADType]   ,
-        res         : usize       )
+        const_data : ConstData<V> )
     where
         for<'a> &'a V : FBinary<&'a E, Output = E>,
         for<'a> &'a E : FBinary<&'a V, Output = E>,
         for<'a> &'a E : FBinary<&'a E, Output = E>,
     {
+        let ConstData {cop, arg, arg_type, res, ..} = const_data;
+        //
         debug_assert!( arg.len() == 2);
         //
         // lhs, rhs
