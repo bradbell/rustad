@@ -37,8 +37,14 @@ pub(crate) struct ConstData<'a, V> {
     pub(crate) cop  : &'a [V] ,
     //
     // bool_all
-    /// vector of all the boolean values in this [AGraph](crate::tape::AGraph)
+    /// contains of all the boolean values in this [AGraph](crate::tape::AGraph)
     pub(crate) bool_all : &'a [bool] ,
+    //
+    // str_all
+    // TODO: remove allow(dead_code) when this gets used
+    /// contains of all the text values in this [AGraph](crate::tape::AGraph)
+    #[allow(dead_code)]
+    pub(crate) str_all : &'a str ,
     //
     // arg
     /// The arguments for this use of this operator.

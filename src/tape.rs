@@ -45,12 +45,12 @@ pub(crate) struct AGraph {
     //
     // arg_start
     /// For each index in the acyclic graph, arg_start\[op_index\]
-    /// is the index in arg_all of the first argument for the operator.
+    /// is the index in arg_all of the first argument for the operator use.
     pub(crate) arg_start : Vec<IndexT>,
     //
     // arg_all
     /// For each index in the acyclic graph,
-    /// the arguments for the corresponding operator are a slice of arg_all
+    /// the arguments for the corresponding operator use are a slice of arg_all
     /// starting at arg_start\[index\] and ending with arg_start\[index + 1\] .
     pub(crate) arg_all : Vec<IndexT>,
     //
@@ -62,10 +62,19 @@ pub(crate) struct AGraph {
     pub(crate) arg_type_all : Vec<ADType>,
     //
     // bool_all
-    /// is a vector containing all the booleans for all the operators.
-    /// If an operator has booleans, one of its arguments in
+    /// contains all the booleans for all the operator uses.
+    /// If an operator use has booleans, one of its arguments in
     /// arg_all is the index in bool_all of its first boolean.
     pub(crate) bool_all : Vec<bool>,
+    //
+    // str_all
+    // TODO: remove allow(unused) when this gets used.
+    /// contains all the text for all the operators.
+    /// If an operator use has text, one of its arguments in
+    /// arg_all is the index in bool_all of that start of its text.
+    /// The next argument in arg_all is the end of its text.
+    #[allow(unused)]
+    pub(crate) str_all : String,
 }
 // VarTape::new
 impl AGraph {
@@ -74,13 +83,14 @@ impl AGraph {
     /// Sets n_dom, n_dep to zero and all the vectors to empty.
     pub fn new() -> Self {
         Self {
-            n_dom         : 0,
-            n_dep         : 0,
-            id_all        : Vec::new(),
-            arg_start     : Vec::new(),
+            n_dom         : 0 ,
+            n_dep         : 0 ,
+            id_all        : Vec::new() ,
+            arg_start     : Vec::new() ,
             arg_all       : Vec::new() ,
             arg_type_all  : Vec::new() ,
             bool_all      : Vec::new() ,
+            str_all       : String::new() ,
         }
     }
 }

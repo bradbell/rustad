@@ -135,6 +135,7 @@ macro_rules! forward_dyp {
             // cop, bool_all
             let cop      = &self.cop;
             let bool_all = &self.dyp.bool_all;
+            let str_all  = &self.dyp.str_all;
             //
             // dyp_all
             for op_index in 0 .. self.dyp.id_all.len() {
@@ -147,7 +148,7 @@ macro_rules! forward_dyp {
                 let res      = self.dyp.n_dom + op_index;
                 //
                 let const_data = ConstData {
-                    cop, bool_all, arg, arg_type, res
+                    cop, bool_all, str_all, arg, arg_type, res
                 };
                 //
                 let forward_dyp = op_fns_vec[op_id].[< forward_dyp_ $suffix >];

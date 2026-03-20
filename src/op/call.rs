@@ -270,7 +270,7 @@ where
     V               : GlobalAtomCallbackVec + From<f32> + PartialEq,
     AtomCallback<V> : Clone,
 {   //
-    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    let ConstData {cop, bool_all, arg, arg_type, res, ..} = const_data;
     // ----------------------------------------------------------------------
     let (
         atom_id,
@@ -336,7 +336,7 @@ where
     V               : PartialEq + Clone + From<f32> + GlobalAtomCallbackVec,
     AtomCallback<V> : Clone,
 {   //
-    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    let ConstData {cop, bool_all, arg, arg_type, res, ..} = const_data;
     // ----------------------------------------------------------------------
     let (
         atom_id,
@@ -407,7 +407,7 @@ where
     V               : GlobalAtomCallbackVec + PartialEq + From<f32>,
     AtomCallback<V> : Clone,
 {   //
-    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    let ConstData {cop, bool_all, arg, arg_type, res, ..} = const_data;
     // ----------------------------------------------------------------------
     let (
         atom_id,
@@ -472,7 +472,7 @@ where
     V               : PartialEq + Clone + GlobalAtomCallbackVec,
     AtomCallback<V> : Clone,
 {   //
-    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    let ConstData {cop, bool_all, arg, arg_type, res, ..} = const_data;
     // ----------------------------------------------------------------------
     let (
         atom_id,
@@ -542,7 +542,7 @@ where
     V               : PartialEq + GlobalAtomCallbackVec + From<f32>,
     AtomCallback<V> : Clone,
 {   //
-    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    let ConstData {cop, bool_all, arg, arg_type, res, ..} = const_data;
     // ----------------------------------------------------------------------
     let (
         atom_id,
@@ -615,7 +615,7 @@ where
     V               : PartialEq + From<f32> + Clone + GlobalAtomCallbackVec ,
     AtomCallback<V> : Clone,
 {   //
-    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    let ConstData {cop, bool_all, arg, arg_type, res, ..} = const_data;
     // ----------------------------------------------------------------------
     let (
         atom_id,
@@ -693,7 +693,7 @@ where
     for<'a> V       : PartialEq + GlobalAtomCallbackVec + AddAssign<&'a V>  + From<f32>,
     AtomCallback<V> : Clone,
 {   //
-    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    let ConstData {cop, bool_all, arg, arg_type, res, ..} = const_data;
     // ----------------------------------------------------------------------
     let (
         atom_id,
@@ -764,7 +764,7 @@ where
     for<'a> AD<V> : AddAssign<&'a AD<V> >,
     AtomCallback<V>   : Clone,
 {   //
-    let ConstData {cop, bool_all, arg, arg_type, res, } = const_data;
+    let ConstData {cop, bool_all, arg, arg_type, res, ..} = const_data;
     // ----------------------------------------------------------------------
     let (
         atom_id,

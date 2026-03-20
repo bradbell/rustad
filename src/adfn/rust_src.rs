@@ -190,6 +190,7 @@ where
             let var_n_dom = self.var.n_dom;
             let cop       = &self.cop;
             let bool_all  = &self.dyp.bool_all;
+            let str_all   = &self.dyp.str_all;
             //
             // dyp_dep
             for op_index in 0 .. self.dyp.id_all.len() {
@@ -202,7 +203,7 @@ where
                 let res      = self.dyp.n_dom + op_index;
                 //
                 let const_data = ConstData {
-                    cop, bool_all, arg, arg_type, res
+                    cop, bool_all, str_all, arg, arg_type, res
                 };
                 //
                 let rust_src = op_fns_vec[op_id].rust_src;
@@ -229,6 +230,7 @@ where
             let var_n_dom = self.var.n_dom;
             let cop       = &self.cop;
             let bool_all = &self.var.bool_all;
+            let str_all  = &self.var.str_all;
             //
             for op_index in 0 .. self.var.id_all.len() {
                 let op_id    = self.var.id_all[op_index] as usize;
@@ -240,7 +242,7 @@ where
                 let res      = self.var.n_dom + op_index;
                 //
                 let const_data = ConstData {
-                    cop, bool_all, arg, arg_type, res
+                    cop, bool_all, str_all, arg, arg_type, res
                 };
                 //
                 let rust_src = op_fns_vec[op_id].rust_src;

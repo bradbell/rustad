@@ -219,6 +219,7 @@ macro_rules! forward_var {
             // cop, bool_all
             let cop      = &self.cop;
             let bool_all = &self.var.bool_all;
+            let str_all  = &self.var.str_all;
             //
             for op_index in 0 .. self.var.id_all.len() {
                 let op_id     = self.var.id_all[op_index] as usize;
@@ -230,7 +231,7 @@ macro_rules! forward_var {
                 let res       = self.var.n_dom + op_index;
                 //
                 let const_data = ConstData {
-                    cop, bool_all, arg, arg_type, res
+                    cop, bool_all, str_all, arg, arg_type, res
                 };
                 //
                 let forward_var = op_fns_vec[op_id].[< forward_var_ $suffix >];

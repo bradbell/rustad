@@ -183,6 +183,7 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
         // cop, bool_all
         let cop      = &self.cop;
         let bool_all = &self.var.bool_all;
+        let str_all  = &self.var.str_all;
         //
         // var_index_stack, var_index
         let mut var_index_stack : Vec<IndexT> = Vec::new();
@@ -208,7 +209,7 @@ macro_rules! subgraph_der{ ($suffix:ident,$V:ident,$E:ty) => {paste::paste! {
                 let res       = self.var.n_dom + op_index;
                 //
                 let const_data = ConstData {
-                    cop, bool_all, arg, arg_type, res
+                    cop, bool_all, str_all, arg, arg_type, res
                 };
                 //
                 let reverse_der = op_fns_vec[op_id].[< reverse_der_ $suffix >];
