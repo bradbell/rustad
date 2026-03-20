@@ -15,6 +15,7 @@ pub mod binary;
 pub mod f_const;
 pub mod f_unary;
 pub mod f_binary;
+pub mod zero_one;
 // ---------------------------------------------------------------------------
 //
 // ADType

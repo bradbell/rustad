@@ -167,6 +167,10 @@ set_operator_ids!(
     /// powf(lhs, rhs)
     POWF_OP,
     //
+    // ZERO_ONE
+    /// is_zero or is_one
+    ZERO_ONE_OP,
+    //
     // CALL
     /// callback to an atomic function
     CALL_OP,

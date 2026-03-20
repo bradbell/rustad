@@ -17,6 +17,7 @@ use crate::{
     FBinary,
     FConst,
     FUnary,
+    FloatValue,
 };
 use crate::op::id::NUMBER_OP;
 use crate::tape::sealed::ThisThreadTape;
@@ -312,7 +313,7 @@ where
     for<'a> &'a V : std::ops::Div<&'a AD<V>, Output = AD<V> > ,
     for<'a> &'a V : std::ops::Div<&'a V, Output = V> ,
     //
-    V     : Clone + From<f32> + FConst + PartialEq,
+    V     : Clone + From<f32> + PartialEq + FConst + FloatValue,
     for<'a> &'a V : FUnary<Output=V>,
     V     : ThisThreadTape + GlobalAtomCallbackVec,
     for<'a> &'a V : FBinary<&'a V, Output = V> ,
@@ -360,10 +361,11 @@ where
     crate::op::unary::cos::set_op_fns::<V>(&mut result);
     crate::op::unary::sin::set_op_fns::<V>(&mut result);
     //
-    // call, no_op, powi
+    // call, no_op, powi, zero_one
     crate::op::call::set_op_fns::<V>(&mut result);
     crate::op::no_op::set_op_fns::<V>(&mut result);
     crate::op::powi::set_op_fns::<V>(&mut result);
+    crate::op::zero_one::set_op_fns::<V>(&mut result);
     //
     result
 }
