@@ -31,22 +31,34 @@ fn main() {
         [ "message", &message ],
     ];
     //
-    // f
-    // Note that p < 3 during this this recording
+    // p, x, ap, ax
+    // Note that p < 3 and x < 3 during this this recording
     let p             = vec![ V::from(1.0) ];
     let x             = vec![ V::from(2.0) ];
-    let (ap, _ax)     = start_recording(Some( p.clone() ),  x.clone() );
+    let (ap, ax)      = start_recording(Some( p.clone() ),  x.clone() );
+    //
+    // aq
     let ap_lt_three   = (&ap[0]).num_lt( &V::from( 3.0 ) );
     let aq            = if ap_lt_three.is_one(&opt_is_one) {
         (&ap[0]) * (&ap[0])
     } else {
         (&ap[0]) + (&ap[0])
     };
-    let ay : Vec< AD<V> > = vec![ aq ];
+    //
+    // au
+    let ax_lt_three   = (&ax[0]).num_lt( &V::from( 3.0 ) );
+    let au            = if ax_lt_three.is_one(&opt_is_one) {
+        (&ax[0]) * (&ax[0])
+    } else {
+        (&ax[0]) + (&ax[0])
+    };
+    //
+    // f
+    let ay : Vec< AD<V> > = vec![ aq, au ];
     let f                 = stop_recording(ay);
     //
     // y
-    // Note that p < 3 during this forward calculation
+    // Note that p < 3 and x < 3 during this forward calculation
     let p            = vec![ V::from(2.0) ];
     let dyp_all      = f.forward_dyp_value(p.clone(), &opt_forward);
     let dyp_all      = Some(&dyp_all);
@@ -54,6 +66,7 @@ fn main() {
     //
     // check
     assert_eq!( y[0], p[0] * p[0] );
+    assert_eq!( y[1], x[0] * x[0] );
     let option       = pop_zero_one_message();
     match option  {
         Some(_message) => panic!("test_is_one: expected no message"),
@@ -61,18 +74,22 @@ fn main() {
     }
     //
     // y
-    // Note that p > 3 during this forward calculation
+    // Note that p > 3 x > 3 during this forward calculation
     let p            = vec![ V::from(4.0) ];
+    let x            = vec![ V::from(5.0) ];
     let dyp_all      = f.forward_dyp_value(p.clone(), &opt_forward);
     let dyp_all      = Some(&dyp_all);
     let (y, _v_all)  = f.forward_var_value(dyp_all, x.clone(), &opt_forward);
     //
     // check
     assert_eq!( y[0], p[0] * p[0] );
-    let option       = pop_zero_one_message();
-    match option  {
-        Some(message) => assert!( message.starts_with(start_message) ),
-        None          => panic!("test_is_one: expected a message"),
+    assert_eq!( y[1], x[0] * x[0] );
+    for _ in 0 .. 2 {
+        let option   = pop_zero_one_message();
+        match option  {
+            Some(_message) => assert!( message.starts_with(start_message) ),
+            None           => panic!("test_is_one: expected a message"),
+        }
     }
     let option       = pop_zero_one_message();
     match option  {
