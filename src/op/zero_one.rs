@@ -32,14 +32,16 @@ use crate::{
 use crate::op::id;
 use crate::ad::ADType;
 use crate::ad::zero_one::push_zero_one_message;
-use crate::op::info::ConstData;
+use crate::op::no_op::{
+    no_op_dyp,
+    no_op_var,
+    no_op_der,
+};
 use crate::op::info::{
     OpFns,
-    panic_dyp,
-    panic_var,
-    panic_der,
     panic_rust_src,
     panic_reverse_depend,
+    ConstData,
 };
 // --------------------------------------------------------------------------
 // zero_one_forward_dyp_value
@@ -89,6 +91,55 @@ where
         push_zero_one_message( message.to_string() );
     }
 }
+// --------------------------------------------------------------------------
+// zero_one_forward_var_value
+/// Zero One operator V evaluation of dynamic parameters;
+/// see [ForwardDyp](crate::op::info::ForwardDyp)
+fn zero_one_forward_var_value<V> (
+    _dyp_all   : &[V]          ,
+    var_all    : &mut [V]      ,
+    const_data : ConstData<V>  )
+where
+    V : FloatValue,
+{   //
+    let ConstData{bool_all, str_all, arg, arg_type, ..} = const_data;
+    //
+    debug_assert!( arg_type.len() == 4 );
+    for arg_type_i in arg_type.iter().take(3) {
+        debug_assert!( *arg_type_i == ADType::Empty );
+    }
+    debug_assert!( arg_type[3] == ADType::Variable );
+    //
+    // check_one, check_result
+    let start        = arg[0] as usize;
+    let check_one    = bool_all[start];
+    let panic        = bool_all[start + 1];
+    let check_result = bool_all[start + 2];
+    //
+    // value
+    let index = arg[3] as usize;
+    let value = &var_all[index];
+    //
+    // same
+    let same = if check_one {
+        check_result == value.is_one()
+    } else {
+        check_result == value.is_zero()
+    };
+    if same {
+        return;
+    }
+    //
+    // message
+    let start   = arg[1] as usize;
+    let end     = arg[2] as usize;
+    let message = &str_all[start .. end];
+    if panic {
+        panic!( "{}", message );
+    } else {
+        push_zero_one_message( message.to_string() );
+    }
+}
 // ---------------------------------------------------------------------------
 // set_op_fns
 /// Set the operator functions for all the ZERO_ONE_OP operator.
@@ -103,13 +154,13 @@ where
     op_fns_vec[id::ZERO_ONE_OP as usize] = OpFns{
         name              : "zero_one",
         forward_dyp_value : zero_one_forward_dyp_value::<V>,
-        forward_dyp_ad    : panic_dyp::<V, AD<V> >,
-        forward_var_value : panic_var::<V, V>,
-        forward_var_ad    : panic_var::<V, AD<V> >,
-        forward_der_value : panic_der::<V, V>,
-        forward_der_ad    : panic_der::<V, AD<V> >,
-        reverse_der_value : panic_der::<V, V>,
-        reverse_der_ad    : panic_der::<V, AD<V> >,
+        forward_dyp_ad    : no_op_dyp::<V, AD<V> >,
+        forward_var_value : zero_one_forward_var_value::<V>,
+        forward_var_ad    : no_op_var::<V, AD<V> >,
+        forward_der_value : no_op_der::<V, V>,
+        forward_der_ad    : no_op_der::<V, AD<V> >,
+        reverse_der_value : no_op_der::<V, V>,
+        reverse_der_ad    : no_op_der::<V, AD<V> >,
         rust_src          : panic_rust_src,
         reverse_depend    : panic_reverse_depend,
     };

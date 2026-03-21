@@ -24,20 +24,20 @@ use crate::op::info::ConstData;
 use crate::op::id::NO_OP;
 //
 // no_op_dyp
-fn no_op_dyp<V, E> (
+pub(crate) fn no_op_dyp<V, E> (
     _dyp_all  : &mut [E]    ,
     _const_data : ConstData<V> ,
 ) { }
 //
 // no_op_var
-fn no_op_var<V, E> (
+pub(crate) fn no_op_var<V, E> (
     _dyp_all  : &[E]        ,
     _var_all  : &mut [E]    ,
     _const_data : ConstData<V> ,
 ) { }
 //
 // no_op_der
-fn no_op_der<V, E>  (
+pub(crate) fn no_op_der<V, E>  (
     _dyp_all  : &[E]        ,
     _var_all  : &[E]        ,
     _var_der  : &mut [E]    ,
@@ -45,7 +45,7 @@ fn no_op_der<V, E>  (
 ) {  }
 //
 // no_op_rust_src
-pub fn no_op_rust_src<V>(
+pub(crate) fn no_op_rust_src<V>(
     _res_type  : ADType      ,
     _dyp_n_dom : usize       ,
     _var_n_dom : usize       ,
@@ -54,7 +54,7 @@ pub fn no_op_rust_src<V>(
 { String::new()  }
 //
 // no_op_reverse_depend
-pub fn no_op_reverse_depend<V>(
+pub(crate) fn no_op_reverse_depend<V>(
     _depend   : &mut optimize::Depend ,
     _bool_all : &[bool]               ,
     _arg      : &[IndexT]             ,
