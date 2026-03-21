@@ -21,6 +21,7 @@ use crate::tape::Tape;
 use crate::op::id;
 use crate::tape::sealed::ThisThreadTape;
 // ---------------------------------------------------------------------------
+// ZERO_ONE_MESSAGE
 thread_local! {
     static ZERO_ONE_MESSAGE :
         RefCell< Vec<String> > = const { RefCell::new( Vec::new() ) };
@@ -51,16 +52,82 @@ fn panic_fn(check_one : bool, message : &str) {
     }
 }
 // ---------------------------------------------------------------------------
+// doc_zero_one
+/// The is_zero and is_one `AD<V>` member functions
+///
+/// These are similar to the is_zero and is_one functions in [FloatValue].
+///
+/// * Syntax :
+///   ```text
+///     bval = aval.is_zero(opt_vec)
+///     bval = aval.is_one(opt_vec)
+///   ```
+///
+/// * Prototype : see [AD::is_zero], [AD::is_one] .
+///
+/// * aval :
+///   is an `AD<V>` value usually created by one of the numerical comparisons;
+///   see [doc_f_binary_ad](crate::ad::f_binary::doc_f_binary_ad).
+///
+/// * bval :
+///
+///   * is_zero :
+///     is_zero is equal to is_zero for the value corresponding to aval; i.e.,
+///     ```text
+///         bval = aval.to_value().is_zero()
+///
+///   * is_one :
+///     is_one is equal to is_one for the value corresponding to aval; i.e.,
+///     ```text
+///         bval = aval.to_value().is_one()
+///     ```
+///
+/// * opt_vec :
+///   The value bval during a recording may determine what operations are
+///   recorded and placed in a corresponding function.
+///   The is_zero and is_one functions can detect when bval would have changed
+///   due to new domain parameters or variable in
+///   [forward_dyp_value](crate::ADfn::forward_dyp_value) or 
+///   [forward_var_value](crate::ADfn::forward_var_value) .
+///   In this case, opt_vec controls what should happen.
+///   The [opt_vec](crate::doc_opt_vec) argument
+///   has the following possible keys:
+///
+///   * ignore :
+///     the corresponding value must be true of false (default is false).
+///     If it is true, the change is ignored (nothing is done).
+///
+///   * panic :
+///     the corresponding value must be true of false (default is true).
+///     If it is true and the change occurs, the current thread will panic
+///     with an error message describing the problem.
+///
+///   * message :
+///     the corresponding value is a message to use when the changes occurs
+///     (default is unspecified).
+///     If panic is true, the message is used in the panic.
+///     Otherwise the message is stored in a thread static variable.
+///     The messages stored in this thread static variable can be retrieve
+///     using the [pop_zero_one_message] function. This retrieval is on a
+///     last in first out basis.
+///
+/// * example : see examples/zero_one.rs.
+///
+#[cfg(doc)]
+pub fn doc_zero_one() { }
+//
 impl<V> AD<V>
 where
     V : FloatValue + ThisThreadTape,
 {
     //
+    /// see [doc_zero_one]
     pub fn is_zero(&self, opt_vec : &Vec< [&str; 2] > ) -> bool
     {   let check_one = false;
         self.zero_one(check_one, opt_vec)
     }
     //
+    /// see [doc_zero_one]
     pub fn is_one(&self, opt_vec : &Vec< [&str; 2] > ) -> bool
     {   let check_one = true;
         self.zero_one(check_one, opt_vec)

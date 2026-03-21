@@ -270,13 +270,13 @@ pub fn ad_to_vector<V> ( avec : Vec< AD<V> > ) -> Vec<V> {
 /// Convert V to an `AD<V>` object with no function information;
 /// i.e., constant parameter.
 ///
-/// See Also :
-/// example in [ad_from_vector]
+/// * See Also :
+///   example in [ad_from_vector]
 ///
-/// Syntax :
-/// ```text
-/// av = AD<V>::from( v )
-/// ```
+/// * Syntax :
+///   ```text
+///     av = AD<V>::from( v )
+///   ```
 ///
 /// * v : is an [doc_generic_v] object.
 ///
