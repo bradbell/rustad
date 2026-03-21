@@ -12,8 +12,8 @@
 //! | Index    | Meaning |
 //! | -------  | ------- |
 //! | 0        | Index in bool_all of first boolean for this operator         |
-//! | 1        | Index in str_all of beginning of the test for this operator  |
-//! | 2        | Index in str_all of the end of the test for this operator    |
+//! | 1        | Index in str_all of beginning of message for this operator   |
+//! | 2        | Index in str_all of the end of message for this operator     |
 //! | 3        | Variable, dynamic, or constant index for value being checked |
 //!
 //! # Operator Booleans
@@ -31,6 +31,7 @@ use crate::{
 };
 use crate::op::id;
 use crate::ad::ADType;
+use crate::ad::zero_one::push_zero_one_message;
 use crate::op::info::ConstData;
 use crate::op::info::{
     OpFns,
@@ -61,8 +62,8 @@ where
     // check_one, check_result
     let start        = arg[0] as usize;
     let check_one    = bool_all[start];
-    let check_result = bool_all[start + 1];
-    let panic_mode   = bool_all[start + 2];
+    let panic        = bool_all[start + 1];
+    let check_result = bool_all[start + 2];
     //
     // value
     let index = arg[3] as usize;
@@ -78,16 +79,15 @@ where
         return;
     }
     //
-    // text
-    let start  = arg[1] as usize;
-    let end    = arg[2] as usize;
-    let text   = &str_all[start .. end];
-    println!( "forward_dyp_value: {}", text );
-    if ! panic_mode {
-        return;
+    // message
+    let start   = arg[1] as usize;
+    let end     = arg[2] as usize;
+    let message = &str_all[start .. end];
+    if panic {
+        panic!( "{}", message );
+    } else {
+        push_zero_one_message( message.to_string() );
     }
-    //
-    panic!( "is_zero_one result changed" );
 }
 // ---------------------------------------------------------------------------
 // set_op_fns

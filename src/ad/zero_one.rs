@@ -21,6 +21,36 @@ use crate::tape::Tape;
 use crate::op::id;
 use crate::tape::sealed::ThisThreadTape;
 // ---------------------------------------------------------------------------
+thread_local! {
+    static ZERO_ONE_MESSAGE :
+        RefCell< Vec<String> > = const { RefCell::new( Vec::new() ) };
+}
+//
+// push_zero_one_message
+pub(crate) fn push_zero_one_message(message : String)
+{   let local_key = &ZERO_ONE_MESSAGE;
+    local_key.with_borrow_mut( |vec_str| {
+        vec_str.push( message.to_string() );
+     } );
+}
+//
+// pop_zero_one_message
+pub fn pop_zero_one_message()->Option<String>
+{   let local_key = &ZERO_ONE_MESSAGE;
+    local_key.with_borrow_mut(
+        |vec_str| vec_str.pop()
+     )
+}
+//
+// panic_fn
+fn panic_fn(check_one : bool, message : &str) {
+    if check_one {
+        panic!( "is_one: {}", message);
+    } else {
+        panic!( "is_zero: {}", message);
+    }
+}
+// ---------------------------------------------------------------------------
 impl<V> AD<V>
 where
     V : FloatValue + ThisThreadTape,
@@ -38,17 +68,37 @@ where
     //
     fn zero_one(&self, check_one : bool, opt_vec : &Vec< [&str; 2] > ) -> bool
     {   //
-        let mut mode  = "panic";
-        let mut text  = "is_zero or is_one is different from recording";
+        let mut ignore   = false;
+        let mut panic    = true;
+        let mut message  = if check_one {
+            "is_one: value is different than during recording"
+        } else {
+            "is_zero: value is different than during recording"
+        };
         for opt in opt_vec {
             match opt[0] {
-                "mode" => {
-                    mode = opt[1];
+                "ignore" => {
+                    match opt[1] {
+                        "true"  => { ignore = true; },
+                        "false" => { ignore = false; },
+                        _ => { panic_fn(
+                            check_one, "opt_vec: invalid value for ignore"
+                        ) },
+                    }
                 },
-                "text" => {
-                    text = opt[1];
+                "panic" => {
+                    match opt[1] {
+                        "true"  => { panic = true; },
+                        "false" => { panic = false; },
+                        _ => { panic_fn(
+                            check_one, "opt_vec: invalid value for panic"
+                        ) },
+                    }
                 },
-                _ => panic!("is_zero or is_one: opt_vec: invalid key")
+                "message" => {
+                    message = opt[1];
+                },
+                _ => panic_fn(check_one, "opt_vec: invalid key")
             }
         }
         //
@@ -58,22 +108,16 @@ where
         } else {
             self.value.is_zero()
         };
-        if mode == "ignore" {
+        if ignore {
             return result
         };
-        //
-        // panic_mode
-        if mode != "panic" && mode != "print" {
-            panic!( "is_zero or is_one: opt_vec: invalid value for mode" );
-        }
-        let panic_mode = mode == "panic";
         //
         // local_key
         let local_key : &LocalKey<RefCell< Tape<V> >> = ThisThreadTape::get();
         //
         // tape
         local_key.with_borrow_mut( |tape|
-            record_zero_one(tape, self, check_one, panic_mode, text, result)
+            record_zero_one(tape, self, check_one, panic, message, result)
         );
         //
         // result
@@ -86,8 +130,8 @@ fn record_zero_one<V>(
     tape       : &mut Tape<V>  ,
     arg        : &AD<V>        ,
     check_one  : bool          ,
-    panic_mode : bool          ,
-    text       : &str          ,
+    panic      : bool          ,
+    message    : &str          ,
     result     : bool          ,
 )
 {   //
@@ -112,12 +156,12 @@ fn record_zero_one<V>(
     // agraph: arg_all, bool_all
     agraph.arg_all.push( agraph.bool_all.len() as IndexT );
     agraph.bool_all.push( check_one );
-    agraph.bool_all.push( panic_mode );
+    agraph.bool_all.push( panic );
     agraph.bool_all.push( result );
     //
     // agraph: arg_all, str_all
     agraph.arg_all.push( agraph.str_all.len() as IndexT );
-    agraph.str_all += text;
+    agraph.str_all += message;
     agraph.arg_all.push( agraph.str_all.len() as IndexT );
     //
     // agraph: arg_all, arg_type_all

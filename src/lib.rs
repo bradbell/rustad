@@ -63,6 +63,7 @@ pub use ad::{
     ad_from_vector,
     ad_to_vector,
     doc_generic_v,
+    zero_one::pop_zero_one_message,
 };
 pub use adfn::{
     ADfn,
