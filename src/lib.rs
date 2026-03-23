@@ -63,7 +63,6 @@ pub use ad::{
     ad_from_vector,
     ad_to_vector,
     doc_generic_v,
-    zero_one::pop_zero_one_message,
 };
 pub use adfn::{
     ADfn,
@@ -196,3 +195,28 @@ pub const NUM_VEC_RS : &str = include_str!( "float/num_vec.rs" );
 /// what the possible keys are, the meaning of the corresponding values,
 /// and the default value (which is used if the key is not present).
 pub fn doc_opt_vec() { }
+// ---------------------------------------------------------------------------
+// THIS_THREAD_MESSAGE
+thread_local! {
+    static THIS_THREAD_MESSAGE :
+        std::cell::RefCell< Vec<String> > =
+            const { std::cell::RefCell::new( Vec::new() ) };
+}
+//
+// push_this_thread_message
+pub(crate) fn push_this_thread_message(message : &str)
+{   let local_key = &THIS_THREAD_MESSAGE;
+    local_key.with_borrow_mut( |vec_str| {
+        vec_str.push( message.to_string() );
+     } );
+}
+//
+// pop_this_thread_message
+/// Retrieve messages that have been pushed by special rustad features; e.g.,
+/// see [doc_zero_one](crate::ad::zero_one::doc_zero_one).
+pub fn pop_this_thread_message()->Option<String>
+{   let local_key = &THIS_THREAD_MESSAGE;
+    local_key.with_borrow_mut(
+        |vec_str| vec_str.pop()
+     )
+}

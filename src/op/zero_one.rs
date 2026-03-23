@@ -31,7 +31,7 @@ use crate::{
 };
 use crate::op::id;
 use crate::ad::ADType;
-use crate::ad::zero_one::push_zero_one_message;
+use crate::push_this_thread_message;
 use crate::op::no_op::{
     no_op_dyp,
     no_op_var,
@@ -96,7 +96,7 @@ where
     if panic {
         panic!( "{}", total_message );
     } else {
-        push_zero_one_message( total_message.to_string() );
+        push_this_thread_message( &total_message );
     }
 }
 // --------------------------------------------------------------------------
@@ -153,7 +153,7 @@ where
     if panic {
         panic!( "{}", total_message );
     } else {
-        push_zero_one_message( total_message.to_string() );
+        push_this_thread_message( &total_message );
     }
 }
 // --------------------------------------------------------------------------

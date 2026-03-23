@@ -8,7 +8,7 @@ use rustad::{
     FBinary,
     start_recording,
     stop_recording,
-    pop_zero_one_message
+    pop_this_thread_message
 };
 //
 // main
@@ -67,7 +67,7 @@ fn main() {
     // check
     assert_eq!( y[0], p[0] * p[0] );
     assert_eq!( y[1], x[0] * x[0] );
-    let option       = pop_zero_one_message();
+    let option       = pop_this_thread_message();
     match option  {
         Some(_msg) => panic!("test_is_one: expected no message"),
         None       => (),
@@ -85,21 +85,21 @@ fn main() {
     assert_eq!( y[0], p[0] * p[0] );
     assert_eq!( y[1], x[0] * x[0] );
     //
-    let option        = pop_zero_one_message();
+    let option        = pop_this_thread_message();
     let total_message = "forward_var_value: is_one: ".to_string() + &message;
     match option  {
         Some(pop_msg) => assert_eq!(total_message, pop_msg),
         None          => panic!("test_is_one: expected a message"),
     }
     //
-    let option        = pop_zero_one_message();
+    let option        = pop_this_thread_message();
     let total_message = "forward_dyp_value: is_one: ".to_string() + &message;
     match option  {
         Some(pop_msg) => assert_eq!(total_message, pop_msg),
         None          => panic!("test_is_one: expected a message"),
     }
     //
-    let option       = pop_zero_one_message();
+    let option       = pop_this_thread_message();
     match option  {
         Some(_msg) => panic!("test_is_one: expected no message"),
         None       => (),

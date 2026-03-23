@@ -20,28 +20,6 @@ use crate::ad::ADType;
 use crate::tape::Tape;
 use crate::op::id;
 use crate::tape::sealed::ThisThreadTape;
-// ---------------------------------------------------------------------------
-// ZERO_ONE_MESSAGE
-thread_local! {
-    static ZERO_ONE_MESSAGE :
-        RefCell< Vec<String> > = const { RefCell::new( Vec::new() ) };
-}
-//
-// push_zero_one_message
-pub(crate) fn push_zero_one_message(message : String)
-{   let local_key = &ZERO_ONE_MESSAGE;
-    local_key.with_borrow_mut( |vec_str| {
-        vec_str.push( message.to_string() );
-     } );
-}
-//
-// pop_zero_one_message
-pub fn pop_zero_one_message()->Option<String>
-{   let local_key = &ZERO_ONE_MESSAGE;
-    local_key.with_borrow_mut(
-        |vec_str| vec_str.pop()
-     )
-}
 //
 // panic_fn
 fn panic_fn(check_one : bool, message : &str) {
@@ -51,7 +29,7 @@ fn panic_fn(check_one : bool, message : &str) {
         panic!( "is_zero: {}", message);
     }
 }
-// ---------------------------------------------------------------------------
+// -------------------------------------------------------------------------
 // doc_zero_one
 /// The is_zero and is_one `AD<V>` member functions
 ///
@@ -84,8 +62,6 @@ fn panic_fn(check_one : bool, message : &str) {
 ///     In this case fn_name is is_one.
 ///
 /// * domain_set_by :
-///   This is one of the following: forward_dyp_value, forward_var_value,
-///   rust_src_fn.
 ///
 ///   The value bval during a recording may determine what operations are
 ///   recorded and placed in a corresponding function.
@@ -93,8 +69,7 @@ fn panic_fn(check_one : bool, message : &str) {
 ///   bval might have been different.
 ///   The places that the domain values can be set are:
 ///   [forward_dyp_value](crate::ADfn::forward_dyp_value) ,
-///   [forward_var_value](crate::ADfn::forward_var_value) , and
-///   [rust_src_fn](crate::get_rust_src_fn) .
+///   [forward_var_value](crate::ADfn::forward_var_value).
 ///
 /// * opt_vec :
 ///   controls what should happen when bval would have changed.
@@ -116,10 +91,10 @@ fn panic_fn(check_one : bool, message : &str) {
 ///     If panic is true, the message is used in the panic.
 ///     Otherwise the message is stored in a thread static variable.
 ///     The messages stored in this thread static variable can be retrieve
-///     using the [pop_zero_one_message] function. This retrieval is on a
-///     last in first out basis.
+///     using [pop_this_thread_message](crate::pop_this_thread_message).
+///     This retrieval is on a last in first out basis.
 ///
-/// * option = pop_zero_one_message() :
+/// * option = pop_this_thread_message() :
 ///
 ///   * None :
 ///     if option is None, no messages are in the zero_one message stack.
@@ -130,6 +105,7 @@ fn panic_fn(check_one : bool, message : &str) {
 ///     ```text
 ///         domain_set_by + ": " + fn_name + ": " + message
 ///     ```
+///     where domain_set_by is forward_dyp_value or forward_var_value.
 ///
 /// * example : see examples/zero_one.rs.
 ///
