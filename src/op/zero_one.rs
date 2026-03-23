@@ -39,7 +39,6 @@ use crate::op::no_op::{
 };
 use crate::op::info::{
     OpFns,
-    panic_rust_src,
     panic_reverse_depend,
     ConstData,
 };
@@ -140,6 +139,85 @@ where
         push_zero_one_message( message.to_string() );
     }
 }
+// --------------------------------------------------------------------------
+// zero_one_rust_src
+fn zero_one_rust_src<V> (
+    res_type    : ADType      ,
+    dyp_n_dom   : usize       ,
+    var_n_dom   : usize       ,
+    const_data : ConstData<V> ) -> String
+{   //
+    let ConstData{bool_all, str_all, arg, arg_type, ..} = const_data;
+    //
+    debug_assert!( arg_type.len() == 4 );
+    for arg_type_i in arg_type.iter().take(3) {
+        debug_assert!( *arg_type_i == ADType::Empty );
+    }
+    debug_assert!( arg_type[3] == res_type);
+    debug_assert!( res_type.is_dynamic() || res_type.is_variable());
+    //
+    // check_one, panic, check_result
+    let start        = arg[0] as usize;
+    let check_one    = bool_all[start];
+    let panic        = bool_all[start + 1];
+    let check_result = bool_all[start + 2];
+    //
+    // message
+    let start   = arg[1] as usize;
+    let end     = arg[2] as usize;
+    let message = &str_all[start .. end];
+    //
+    // fn_name
+    let fn_name = if check_one { "is_one" } else { "is_zero" };  
+    //
+    // panic
+    if ! panic {
+        panic!(
+            "rust_src: {}: Can't convert to src because both panic and ignore \
+            are false.\nmessage = {}",
+            fn_name, message
+        );
+    }
+    //
+    // arg_str
+    let arg_str : String;
+    let mut index = arg[3] as usize;
+    if res_type.is_dynamic() {
+        if index < dyp_n_dom {
+            arg_str = format!("dyp_dom[{index}]");
+        } else {
+            index  -= dyp_n_dom;
+            arg_str = format!("dyp_dep[{index}]");
+        }
+    } else {
+        if index < var_n_dom {
+            arg_str = format!("var_dom[{index}]");
+        } else {
+            index  -= var_n_dom;
+            arg_str = format!("var_dep[{index}]");
+        }
+    }
+    //
+    // result_str
+    let result_str = arg_str + "." + fn_name + "()";
+    //
+    // src
+    let mut src = String::new();
+    if check_result == true {
+        src = src + 
+            "   let zero_one_check = true;\n";
+    } else {
+        src = src + 
+            "   let zero_one_check = false;\n";
+    }
+    src = src +
+        "   let zero_one_result = " + &result_str + ";\n" +
+        "   let zero_one_message = \"" + &message + "\";\n" +
+        "   if zero_one_result != zero_one_check {\n" +
+        "       panic!(\"{}\", zero_one_message);\n" +
+        "   }\n";
+    src
+}
 // ---------------------------------------------------------------------------
 // set_op_fns
 /// Set the operator functions for all the ZERO_ONE_OP operator.
@@ -161,7 +239,7 @@ where
         forward_der_ad    : no_op_der::<V, AD<V> >,
         reverse_der_value : no_op_der::<V, V>,
         reverse_der_ad    : no_op_der::<V, AD<V> >,
-        rust_src          : panic_rust_src,
+        rust_src          : zero_one_rust_src,
         reverse_depend    : panic_reverse_depend,
     };
 }
