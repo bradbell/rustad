@@ -80,10 +80,13 @@ where
         return;
     }
     //
+    // fn_name
+    let fn_name = if check_one { "is_one" } else { "is_zero" };
+    //
     // message
     let start   = arg[1] as usize;
     let end     = arg[2] as usize;
-    let message = &str_all[start .. end];
+    let message = fn_name.to_string() + ": " + &str_all[start .. end];
     if panic {
         panic!( "{}", message );
     } else {
@@ -129,10 +132,13 @@ where
         return;
     }
     //
+    // fn_name
+    let fn_name = if check_one { "is_one" } else { "is_zero" };
+    //
     // message
     let start   = arg[1] as usize;
     let end     = arg[2] as usize;
-    let message = &str_all[start .. end];
+    let message = fn_name.to_string() + ": " + &str_all[start .. end];
     if panic {
         panic!( "{}", message );
     } else {
@@ -168,7 +174,7 @@ fn zero_one_rust_src<V> (
     let message = &str_all[start .. end];
     //
     // fn_name
-    let fn_name = if check_one { "is_one" } else { "is_zero" };  
+    let fn_name = if check_one { "is_one" } else { "is_zero" };
     //
     // panic
     if ! panic {
@@ -190,6 +196,7 @@ fn zero_one_rust_src<V> (
             arg_str = format!("dyp_dep[{index}]");
         }
     } else {
+        debug_assert!( res_type.is_variable() );
         if index < var_n_dom {
             arg_str = format!("var_dom[{index}]");
         } else {
@@ -203,16 +210,14 @@ fn zero_one_rust_src<V> (
     //
     // src
     let mut src = String::new();
-    if check_result == true {
-        src = src + 
-            "   let zero_one_check = true;\n";
+    if check_result {
+        src += "   let zero_one_check = true;\n";
     } else {
-        src = src + 
-            "   let zero_one_check = false;\n";
+        src += "   let zero_one_check = false;\n";
     }
     src = src +
         "   let zero_one_result = " + &result_str + ";\n" +
-        "   let zero_one_message = \"" + &message + "\";\n" +
+        "   let zero_one_message = \"" + message + "\";\n" +
         "   if zero_one_result != zero_one_check {\n" +
         "       panic!(\"{}\", zero_one_message);\n" +
         "   }\n";

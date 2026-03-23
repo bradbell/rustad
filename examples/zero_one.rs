@@ -21,7 +21,7 @@ fn main() {
     let opt_forward : Vec<[&str; 2]> = Vec::new();
     //
     // start_message, opt_is_one
-    let start_message = "is_one: value changed; see line number ";
+    let start_message = "value changed; see line number ";
     let mut message   = start_message.to_string();
     message          += &format!( "{}", line!() );
     message          += " in file ";
@@ -64,13 +64,16 @@ fn main() {
     let dyp_all      = Some(&dyp_all);
     let (y, _v_all)  = f.forward_var_value(dyp_all, x.clone(), &opt_forward);
     //
+    // start_pop_msg
+    let start_pop_msg = "is_one: ".to_string() + &start_message;
+    //
     // check
     assert_eq!( y[0], p[0] * p[0] );
     assert_eq!( y[1], x[0] * x[0] );
     let option       = pop_zero_one_message();
     match option  {
-        Some(_message) => panic!("test_is_one: expected no message"),
-        None           => (),
+        Some(_msg) => panic!("test_is_one: expected no message"),
+        None       => (),
     }
     //
     // y
@@ -87,13 +90,13 @@ fn main() {
     for _ in 0 .. 2 {
         let option   = pop_zero_one_message();
         match option  {
-            Some(_message) => assert!( message.starts_with(start_message) ),
-            None           => panic!("test_is_one: expected a message"),
+            Some(msg) => assert!( msg.starts_with(&start_pop_msg) ),
+            None      => panic!("test_is_one: expected a message"),
         }
     }
     let option       = pop_zero_one_message();
     match option  {
-        Some(_message) => panic!("test_is_one: expected no message"),
-        None           => (),
+        Some(_msg) => panic!("test_is_one: expected no message"),
+        None       => (),
     }
 }

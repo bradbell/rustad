@@ -87,7 +87,7 @@ fn panic_fn(check_one : bool, message : &str) {
 ///   recorded and placed in a corresponding function.
 ///   The is_zero and is_one functions can detect when bval would have changed
 ///   due to new domain parameters or variable in
-///   [forward_dyp_value](crate::ADfn::forward_dyp_value) or 
+///   [forward_dyp_value](crate::ADfn::forward_dyp_value) or
 ///   [forward_var_value](crate::ADfn::forward_var_value) .
 ///   In this case, opt_vec controls what should happen.
 ///   The [opt_vec](crate::doc_opt_vec) argument
@@ -110,6 +110,15 @@ fn panic_fn(check_one : bool, message : &str) {
 ///     The messages stored in this thread static variable can be retrieve
 ///     using the [pop_zero_one_message] function. This retrieval is on a
 ///     last in first out basis.
+///
+/// * option = pop_zero_one_message() :
+///
+///   * None :
+///     if option is None, no messages are in the zero_one message stack.
+///
+///   * Some( pop_msg ) :
+///     If a message was pushed by use of an is_zero (is_one) function,
+///     pop_msg is "is_zero: " + message ("is_one: " + message).
 ///
 /// * example : see examples/zero_one.rs.
 ///
@@ -137,11 +146,7 @@ where
     {   //
         let mut ignore   = false;
         let mut panic    = true;
-        let mut message  = if check_one {
-            "is_one: value is different than during recording"
-        } else {
-            "is_zero: value is different than during recording"
-        };
+        let mut message  = "value is different than during recording";
         for opt in opt_vec {
             match opt[0] {
                 "ignore" => {
