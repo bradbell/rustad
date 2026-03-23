@@ -80,17 +80,23 @@ where
         return;
     }
     //
-    // fn_name
-    let fn_name = if check_one { "is_one" } else { "is_zero" };
+    // before_message
+    let before_message = if check_one {
+        "forward_dyp_value: is_one: "
+    } else {
+        "forward_dyp_value: is_zero: "
+    };
     //
-    // message
+    // total_message
     let start   = arg[1] as usize;
     let end     = arg[2] as usize;
-    let message = fn_name.to_string() + ": " + &str_all[start .. end];
+    let message = &str_all[start .. end];
+    let total_message = before_message.to_string() + message;
+    //
     if panic {
-        panic!( "{}", message );
+        panic!( "{}", total_message );
     } else {
-        push_zero_one_message( message.to_string() );
+        push_zero_one_message( total_message.to_string() );
     }
 }
 // --------------------------------------------------------------------------
@@ -132,17 +138,22 @@ where
         return;
     }
     //
-    // fn_name
-    let fn_name = if check_one { "is_one" } else { "is_zero" };
+    // before_message
+    let before_message = if check_one {
+        "forward_var_value: is_one: "
+    } else {
+        "forward_var_value: is_zero: "
+    };
     //
-    // message
+    // total_message
     let start   = arg[1] as usize;
     let end     = arg[2] as usize;
-    let message = fn_name.to_string() + ": " + &str_all[start .. end];
+    let message = &str_all[start .. end];
+    let total_message = before_message.to_string() + message;
     if panic {
-        panic!( "{}", message );
+        panic!( "{}", total_message );
     } else {
-        push_zero_one_message( message.to_string() );
+        push_zero_one_message( total_message.to_string() );
     }
 }
 // --------------------------------------------------------------------------
@@ -168,20 +179,25 @@ fn zero_one_rust_src<V> (
     let panic        = bool_all[start + 1];
     let check_result = bool_all[start + 2];
     //
-    // message
+    // before_message
+    let before_message = if check_one {
+        "forward_var_value: is_one: "
+    } else {
+        "forward_var_value: is_zero: "
+    };
+    //
+    // total_message
     let start   = arg[1] as usize;
     let end     = arg[2] as usize;
     let message = &str_all[start .. end];
-    //
-    // fn_name
-    let fn_name = if check_one { "is_one" } else { "is_zero" };
+    let total_message = before_message.to_string() + message;
     //
     // panic
     if ! panic {
         panic!(
-            "rust_src: {}: Can't convert to src because both panic and ignore \
-            are false.\nmessage = {}",
-            fn_name, message
+            "Can't convert to src because both panic and ignore \
+            are false.\n{}",
+            total_message
         );
     }
     //
@@ -206,6 +222,7 @@ fn zero_one_rust_src<V> (
     }
     //
     // result_str
+    let fn_name = if check_one { "is_one" } else { "is_zero" };
     let result_str = arg_str + "." + fn_name + "()";
     //
     // src
@@ -217,7 +234,7 @@ fn zero_one_rust_src<V> (
     }
     src = src +
         "   let zero_one_result = " + &result_str + ";\n" +
-        "   let zero_one_message = \"" + message + "\";\n" +
+        "   let zero_one_message = \"" + &total_message + "\";\n" +
         "   if zero_one_result != zero_one_check {\n" +
         "       panic!(\"{}\", zero_one_message);\n" +
         "   }\n";

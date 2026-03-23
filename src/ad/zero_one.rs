@@ -66,30 +66,38 @@ fn panic_fn(check_one : bool, message : &str) {
 /// * Prototype : see [AD::is_zero], [AD::is_one] .
 ///
 /// * aval :
-///   is an `AD<V>` value usually created by one of the numerical comparisons;
+///   an `AD<V>` value usually created by one of the numerical comparisons;
 ///   see [doc_f_binary_ad](crate::ad::f_binary::doc_f_binary_ad).
 ///
 /// * bval :
 ///
 ///   * is_zero :
-///     is_zero is equal to is_zero for the value corresponding to aval; i.e.,
 ///     ```text
 ///         bval = aval.to_value().is_zero()
+///     ```
+///     In this case fn_name is is_zero.
 ///
 ///   * is_one :
-///     is_one is equal to is_one for the value corresponding to aval; i.e.,
 ///     ```text
 ///         bval = aval.to_value().is_one()
 ///     ```
+///     In this case fn_name is is_one.
 ///
-/// * opt_vec :
+/// * domain_set_by :
+///   This is one of the following: forward_dyp_value, forward_var_value,
+///   rust_src_fn.
+///
 ///   The value bval during a recording may determine what operations are
 ///   recorded and placed in a corresponding function.
-///   The is_zero and is_one functions can detect when bval would have changed
-///   due to new domain parameters or variable in
-///   [forward_dyp_value](crate::ADfn::forward_dyp_value) or
-///   [forward_var_value](crate::ADfn::forward_var_value) .
-///   In this case, opt_vec controls what should happen.
+///   If aval depends on the domain parameters or variables.
+///   bval might have been different.
+///   The places that the domain values can be set are:
+///   [forward_dyp_value](crate::ADfn::forward_dyp_value) ,
+///   [forward_var_value](crate::ADfn::forward_var_value) , and
+///   [rust_src_fn](crate::get_rust_src_fn) .
+///
+/// * opt_vec :
+///   controls what should happen when bval would have changed.
 ///   The [opt_vec](crate::doc_opt_vec) argument
 ///   has the following possible keys:
 ///
@@ -116,9 +124,12 @@ fn panic_fn(check_one : bool, message : &str) {
 ///   * None :
 ///     if option is None, no messages are in the zero_one message stack.
 ///
-///   * Some( pop_msg ) :
+///   * Some( total_message ) :
 ///     If a message was pushed by use of an is_zero (is_one) function,
-///     pop_msg is "is_zero: " + message ("is_one: " + message).
+///     total_message is
+///     ```text
+///         domain_set_by + ": " + fn_name + ": " + message
+///     ```
 ///
 /// * example : see examples/zero_one.rs.
 ///
@@ -146,7 +157,7 @@ where
     {   //
         let mut ignore   = false;
         let mut panic    = true;
-        let mut message  = "value is different than during recording";
+        let mut message  = "value was different during recording";
         for opt in opt_vec {
             match opt[0] {
                 "ignore" => {

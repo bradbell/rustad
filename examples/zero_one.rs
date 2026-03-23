@@ -64,9 +64,6 @@ fn main() {
     let dyp_all      = Some(&dyp_all);
     let (y, _v_all)  = f.forward_var_value(dyp_all, x.clone(), &opt_forward);
     //
-    // start_pop_msg
-    let start_pop_msg = "is_one: ".to_string() + &start_message;
-    //
     // check
     assert_eq!( y[0], p[0] * p[0] );
     assert_eq!( y[1], x[0] * x[0] );
@@ -87,13 +84,21 @@ fn main() {
     // check
     assert_eq!( y[0], p[0] * p[0] );
     assert_eq!( y[1], x[0] * x[0] );
-    for _ in 0 .. 2 {
-        let option   = pop_zero_one_message();
-        match option  {
-            Some(msg) => assert!( msg.starts_with(&start_pop_msg) ),
-            None      => panic!("test_is_one: expected a message"),
-        }
+    //
+    let option        = pop_zero_one_message();
+    let total_message = "forward_var_value: is_one: ".to_string() + &message;
+    match option  {
+        Some(pop_msg) => assert_eq!(total_message, pop_msg),
+        None          => panic!("test_is_one: expected a message"),
     }
+    //
+    let option        = pop_zero_one_message();
+    let total_message = "forward_dyp_value: is_one: ".to_string() + &message;
+    match option  {
+        Some(pop_msg) => assert_eq!(total_message, pop_msg),
+        None          => panic!("test_is_one: expected a message"),
+    }
+    //
     let option       = pop_zero_one_message();
     match option  {
         Some(_msg) => panic!("test_is_one: expected no message"),
