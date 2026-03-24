@@ -19,6 +19,7 @@ use crate::{
     FConst,
     FUnary,
     FBinary,
+    FValue,
 };
 //
 // NumVec
@@ -620,4 +621,73 @@ where
     impl_f_binary_num_vec_own!( atan2 );
     impl_f_binary_num_vec_own!( hypot );
     impl_f_binary_num_vec_own!( powf );
+}
+// ---------------------------------------------------------------------------
+// FValue
+// doc_f_value_num_vec
+/// [FValue] for NumVec.
+///
+/// * Syntax : `y = x.Name()`
+///
+/// * B : is the floating point base type
+///
+/// * Name : is the name of one of the [FUnary] functions.
+///
+/// * x : is an `&AzFloat<B>` object.
+///
+/// * y : is the `AzFloat<B>` result.
+///
+/// # Example
+/// ```
+/// use rustad::{
+///     NumVec,
+///     AzFloat,
+///     FConst,
+///     FValue,
+/// };
+/// type S = AzFloat<f64>;
+/// type V = NumVec<S>;
+/// //
+/// let zero = V::zero();
+/// assert!( zero.is_zero() );
+/// assert!( ! FValue::is_one( &zero ) );
+/// ```
+pub fn doc_f_value_az_float() {}
+impl<V> FValue for NumVec<V>
+where
+    V : FValue + Copy,
+{
+    // is_zero
+    fn is_zero(&self)  -> bool {
+        let mut all_zero = true;
+        for i in 0 .. self.len() {
+            all_zero = all_zero && self.get(i).is_zero();
+        }
+        all_zero
+    }
+    // is_one
+    fn is_one(&self)  -> bool {
+        let mut all_one = true;
+        for i in 0 .. self.len() {
+            all_one = all_one && self.get(i).is_one();
+        }
+        all_one
+    }
+    // is_nan
+    fn is_nan(&self)  -> bool {
+        let mut all_nan = true;
+        for i in 0 .. self.len() {
+            all_nan = all_nan && self.get(i).is_nan();
+        }
+        all_nan
+    }
+    // to_src
+    fn to_src(&self) -> String {
+        let mut src = "NumVec::new( vec![ ".to_string();
+        for i in 0 .. self.len() {
+            src = src + &self.get(i).to_src() + ", ";
+        }
+        src += "] )";
+        src
+    }
 }
