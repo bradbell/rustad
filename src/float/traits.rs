@@ -109,3 +109,13 @@ pub trait FBinary<Rhs> {
     fn powf(self, rhs : Rhs) -> Self::Output;
 }
 // ----------------------------------------------------------------------------
+/// Floating point operations that are not implemented for AD types.
+///
+/// # Example
+/// TODO: See the file examples/f_value.rs .
+pub trait FValue {
+    fn is_zero(&self) -> bool;
+    fn is_one(&self)  -> bool;
+    fn is_nan(&self)  -> bool;
+    fn to_src(&self)  -> String;
+}

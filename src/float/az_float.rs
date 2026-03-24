@@ -29,6 +29,7 @@ use crate::{
     FConst,
     FUnary,
     FBinary,
+    FValue,
 };
 // ---------------------------------------------------------------------------
 /// The Absolute Zero Floating point class.
@@ -592,7 +593,7 @@ macro_rules! impl_f_binary_function_borrow{
     };
 }
 //
-macro_rules! impl_f_binary_az_float_borrow{ ($B:ident) => {
+macro_rules! impl_f_binary_borrow{ ($B:ident) => {
     impl FBinary< &AzFloat<$B> > for &AzFloat<$B>
     {
         type Output = AzFloat<$B>;
@@ -608,8 +609,8 @@ macro_rules! impl_f_binary_az_float_borrow{ ($B:ident) => {
         impl_f_binary_function_borrow!( $B, powf );
     }
 } }
-impl_f_binary_az_float_borrow!(f32);
-impl_f_binary_az_float_borrow!(f64);
+impl_f_binary_borrow!(f32);
+impl_f_binary_borrow!(f64);
 //
 /// see [doc_f_binary_az_float]
 macro_rules! impl_f_binary_function_own{ ($name:ident) => {
@@ -637,3 +638,51 @@ where
     impl_f_binary_function_own!( hypot );
     impl_f_binary_function_own!( powf );
 }
+// ----------------------------------------------------------------------------
+// FValue
+// doc_f_value_az_float
+/// [FValue] for AzFloat.
+///
+/// * Syntax : `y = x.Name()`
+///
+/// * B : is the floating point base type
+///
+/// * Name : is the name of one of the [FUnary] functions.
+///
+/// * x : is an `AzFloat<B>` or `&AzFloat<B>` object.
+///
+/// * y : is the `AzFloat<B>` result.
+///
+/// # Example
+/// ```
+/// use rustad::{
+///     AzFloat,
+///     FConst,
+///     FValue,
+/// };
+/// type V = AzFloat<f64>;
+/// //
+/// let zero = V::zero();
+/// assert!( zero.is_zero() );
+/// assert!( ! zero.is_one() );
+/// ```
+pub fn doc_f_value_az_float() {}
+//
+macro_rules! impl_f_value{ ($B:ident) => {
+    impl FValue for AzFloat<$B> {
+        fn is_zero(&self)  -> bool { self.0 == ( 0 as $B ) }
+        fn is_one(&self)   -> bool { self.0 == ( 1 as $B ) }
+        fn is_nan(&self)   -> bool { self.0 != self.0 }
+        fn to_src(&self)   -> String {
+            if self.is_nan() {
+                "AzFloat( f32::NAN as ".to_string() + stringify!($B) + ")"
+            } else {
+                "AzFloat(".to_string() +
+                    &self.0.to_string() + " as " + stringify!($B) +
+                ")"
+            }
+        }
+    }
+} }
+impl_f_value!(f32);
+impl_f_value!(f64);

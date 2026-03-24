@@ -94,6 +94,7 @@ pub use float::{
     traits::FConst,
     traits::FUnary,
     traits::FBinary,
+    traits::FValue,
     az_float::AzFloat,
     num_vec::NumVec,
 };
