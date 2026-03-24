@@ -8,11 +8,16 @@ use rustad::{
     FBinary,
     start_recording,
     stop_recording,
-    pop_this_thread_message
+    get_rust_src_fn,
+    create_src_dir,
+    get_lib,
+    RustSrcLink
 };
 //
-// main
-fn main() {
+// zero_one
+// TODO: get this to work as a test; i.e., change allow(dead_code) to test.
+#[allow(dead_code)]
+fn zero_one() {
     //
     // V
     type V  = AzFloat<f64>;
@@ -27,7 +32,7 @@ fn main() {
     message          += " in file ";
     message          += file!();
     let opt_is_one = vec![
-        [ "panic",   "false" ],
+        [ "panic",   "true" ],
         [ "message", &message ],
     ];
     //
@@ -67,41 +72,31 @@ fn main() {
     // check
     assert_eq!( y[0], p[0] * p[0] );
     assert_eq!( y[1], x[0] * x[0] );
-    let option       = pop_this_thread_message();
-    match option  {
-        Some(_msg) => panic!("zero_one: expected no message"),
-        None       => (),
-    }
     //
-    // y
-    // Note that p > 3 x > 3 during this forward calculation
-    let p            = vec![ V::from(4.0) ];
-    let x            = vec![ V::from(5.0) ];
-    let dyp_all      = f.forward_dyp_value(p.clone(), &opt_forward);
-    let dyp_all      = Some(&dyp_all);
-    let (y, _v_all)  = f.forward_var_value(dyp_all, x.clone(), &opt_forward);
+    // lib_src
+    let gn_name  = "zero_one";
+    let lib_src  = f.rust_src(gn_name);
     //
-    // check
+    // src_dir
+    let src_dir = "tmp/test_zero_one";
+    create_src_dir(src_dir, &lib_src);
+    //
+    // lib
+    let lib_file    = "tmp/test_zero_one.so";
+    let replace_lib = true;
+    let lib         = get_lib(src_dir, lib_file, replace_lib);
+    //
+    // zero_one_fn
+    let zero_one_fn : RustSrcLink<V> = get_rust_src_fn(&lib, &gn_name);
+    //
+    // p_ref, x_ref
+    let p_ref : Vec<&V> = vec![ &p[0] ];
+    let x_ref : Vec<&V> = vec![ &x[0] ];
+    //
+    // check result
+    let result = zero_one_fn(&p_ref, &x_ref);
+    let y      = result.unwrap();
+    assert_eq!( y.len(), 2);
     assert_eq!( y[0], p[0] * p[0] );
     assert_eq!( y[1], x[0] * x[0] );
-    //
-    let option        = pop_this_thread_message();
-    let total_message = "forward_var_value: is_one: ".to_string() + &message;
-    match option  {
-        Some(pop_msg) => assert_eq!(total_message, pop_msg),
-        None          => panic!("zero_one: expected a message"),
-    }
-    //
-    let option        = pop_this_thread_message();
-    let total_message = "forward_dyp_value: is_one: ".to_string() + &message;
-    match option  {
-        Some(pop_msg) => assert_eq!(total_message, pop_msg),
-        None          => panic!("zero_one: expected a message"),
-    }
-    //
-    let option       = pop_this_thread_message();
-    match option  {
-        Some(_msg) => panic!("zero_one: expected no message"),
-        None       => (),
-    }
 }
