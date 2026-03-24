@@ -16,9 +16,9 @@
 // use
 use crate::{
     AzFloat,
-    FBinary,
     FConst,
     FUnary,
+    FBinary,
 };
 //
 // NumVec
@@ -245,133 +245,6 @@ num_vec_compound_op!(AddAssign, add_assign, +=);
 num_vec_compound_op!(SubAssign, sub_assign, -=);
 num_vec_compound_op!(MulAssign, mul_assign, *=);
 num_vec_compound_op!(DivAssign, div_assign, /=);
-// ---------------------------------------------------------------------------
-// FBinary for NumVec
-/// Implement [FBinary] when both operands are `NumVec<S>` or `&NumVec<S>` .
-///
-/// * S : is the type of the elements of the numeric vector.
-///
-/// Note that these functions act element-wise on each `NumVec<S>` object.
-///
-/// # Example
-/// ```
-/// use rustad::{
-///     AzFloat,
-///     NumVec,
-///     FBinary,
-/// };
-/// let two      = NumVec::new( vec![ AzFloat(2f32) ] );
-/// let three    = NumVec::new( vec![ AzFloat(3f32) ] );
-/// let eight    = NumVec::new( vec![ AzFloat(8f32) ] );
-/// let powf_23  = FBinary::powf( &two, &three);
-/// assert_eq!(powf_23, eight);
-/// ```
-///
-/// # Numerical Comparison
-/// ```
-/// use rustad::{
-///     NumVec,
-///     AzFloat,
-///     FBinary,
-/// };
-///
-/// type S = AzFloat<f32>;
-/// //
-/// let two_three = NumVec::new( vec![ S::from(2), S::from(3) ] );
-/// let three     = NumVec::from( S::from(3) );
-///
-/// let lt        = FBinary::num_lt( &two_three, &three );
-/// let check     = NumVec::new( vec![ S::from(1), S::from(0) ] );
-/// assert_eq!( lt, check);
-///
-/// let one       = NumVec::from( S::from(1) );
-/// let not_lt    = &one - &lt;
-/// let check     = NumVec::new( vec![ S::from(0), S::from(1) ] );
-/// assert_eq!(not_lt, check);
-/// ```
-pub fn doc_f_binary_num_vec() {}
-//
-/// see [doc_f_binary_num_vec]
-macro_rules! impl_f_binary_num_vec_borrow{ ($name:ident) => {
-    #[doc = concat!( "NumVec::", stringify!( $name ) ) ]
-    fn $name(self, rhs : & NumVec<S> ) -> NumVec<S> {
-        //
-        let mut v : Vec<S>;
-        let e     : S;
-        //
-        if self.len() == 1 {
-            if rhs.len() == 1 {
-                e = self.s.$name( &rhs.s );
-                v = Vec::new();
-            } else {
-                e = FConst::nan();
-                v = Vec::with_capacity( rhs.len() );
-                for j in 0 .. rhs.len() { v.push(
-                    self.s.$name(&rhs.vec[j])
-                ); }
-            }
-        } else {
-            e = FConst::nan();
-            v = Vec::with_capacity( self.len() );
-            if rhs.len() == 1 {
-                for j in 0 .. self.len() { v.push(
-                    self.vec[j].$name(&rhs.s )
-                ); }
-            } else {
-                assert_eq!( self.len(), rhs.len() );
-                for j in 0 .. self.len() { v.push(
-                    self.vec[j].$name(& rhs.vec[j] )
-                ); }
-            }
-        }
-        NumVec{ vec : v, s : e }
-    }
-} }
-//
-impl<S> FBinary< &NumVec<S> > for &NumVec<S>
-where
-    S              : FConst,
-    for<'a> &'a S  : FBinary<&'a S, Output = S>,
-{
-    type Output = NumVec<S>;
-    //
-    impl_f_binary_num_vec_borrow!( num_lt );
-    impl_f_binary_num_vec_borrow!( num_le );
-    impl_f_binary_num_vec_borrow!( num_eq );
-    impl_f_binary_num_vec_borrow!( num_ne );
-    impl_f_binary_num_vec_borrow!( num_ge );
-    impl_f_binary_num_vec_borrow!( num_gt );
-    impl_f_binary_num_vec_borrow!( atan2 );
-    impl_f_binary_num_vec_borrow!( hypot );
-    impl_f_binary_num_vec_borrow!( powf );
-}
-//
-/// see [doc_f_binary_num_vec]
-macro_rules! impl_f_binary_num_vec_own{ ($name:ident) => {
-    #[doc = concat!( " NumVec::", stringify!($name)  ) ]
-    fn $name(self : NumVec<S>, rhs : NumVec<S>) -> NumVec<S> {
-        FBinary::$name( &self,  &rhs )
-    }
-} }
-//
-impl<S> FBinary< NumVec<S> > for NumVec<S>
-where
-    S          : PartialOrd,
-    NumVec<S> : FConst,
-    for<'a> &'a NumVec<S> : FBinary< &'a NumVec<S>, Output = NumVec<S> >,
-{
-    type Output = NumVec<S>;
-    //
-    impl_f_binary_num_vec_own!( num_lt );
-    impl_f_binary_num_vec_own!( num_le );
-    impl_f_binary_num_vec_own!( num_eq );
-    impl_f_binary_num_vec_own!( num_ne );
-    impl_f_binary_num_vec_own!( num_ge );
-    impl_f_binary_num_vec_own!( num_gt );
-    impl_f_binary_num_vec_own!( atan2 );
-    impl_f_binary_num_vec_own!( hypot );
-    impl_f_binary_num_vec_own!( powf );
-}
 //
 // ----------------------------------------------------------------------------`
 /// Displays a `NumVec` < *S* > object.
@@ -557,6 +430,7 @@ where
     }
  }
 // ---------------------------------------------------------------------------
+// FConst
 /// Implements the FConst trait for NumVec types
 impl<S> FConst for NumVec<S>
 where
@@ -571,6 +445,7 @@ where
     fn min_positive() -> NumVec<S> { Self::from( S::min_positive() ) }
 }
 // ---------------------------------------------------------------------------
+// FUnary
 macro_rules! float_unary_function{ ($name:ident) => {
     #[ doc = concat!( "`NumVec<S>.`", stringify!($name), "()" )]
     fn $name(self) -> NumVec<S> {
@@ -618,4 +493,131 @@ where
             NumVec { s : f32::NAN.into() , vec : v }
         }
     }
+}
+// ---------------------------------------------------------------------------
+// FBinary
+/// Implement [FBinary] when both operands are `NumVec<S>` or `&NumVec<S>` .
+///
+/// * S : is the type of the elements of the numeric vector.
+///
+/// Note that these functions act element-wise on each `NumVec<S>` object.
+///
+/// # Example
+/// ```
+/// use rustad::{
+///     AzFloat,
+///     NumVec,
+///     FBinary,
+/// };
+/// let two      = NumVec::new( vec![ AzFloat(2f32) ] );
+/// let three    = NumVec::new( vec![ AzFloat(3f32) ] );
+/// let eight    = NumVec::new( vec![ AzFloat(8f32) ] );
+/// let powf_23  = FBinary::powf( &two, &three);
+/// assert_eq!(powf_23, eight);
+/// ```
+///
+/// # Numerical Comparison
+/// ```
+/// use rustad::{
+///     NumVec,
+///     AzFloat,
+///     FBinary,
+/// };
+///
+/// type S = AzFloat<f32>;
+/// //
+/// let two_three = NumVec::new( vec![ S::from(2), S::from(3) ] );
+/// let three     = NumVec::from( S::from(3) );
+///
+/// let lt        = FBinary::num_lt( &two_three, &three );
+/// let check     = NumVec::new( vec![ S::from(1), S::from(0) ] );
+/// assert_eq!( lt, check);
+///
+/// let one       = NumVec::from( S::from(1) );
+/// let not_lt    = &one - &lt;
+/// let check     = NumVec::new( vec![ S::from(0), S::from(1) ] );
+/// assert_eq!(not_lt, check);
+/// ```
+pub fn doc_f_binary_num_vec() {}
+//
+/// see [doc_f_binary_num_vec]
+macro_rules! impl_f_binary_num_vec_borrow{ ($name:ident) => {
+    #[doc = concat!( "NumVec::", stringify!( $name ) ) ]
+    fn $name(self, rhs : & NumVec<S> ) -> NumVec<S> {
+        //
+        let mut v : Vec<S>;
+        let e     : S;
+        //
+        if self.len() == 1 {
+            if rhs.len() == 1 {
+                e = self.s.$name( &rhs.s );
+                v = Vec::new();
+            } else {
+                e = FConst::nan();
+                v = Vec::with_capacity( rhs.len() );
+                for j in 0 .. rhs.len() { v.push(
+                    self.s.$name(&rhs.vec[j])
+                ); }
+            }
+        } else {
+            e = FConst::nan();
+            v = Vec::with_capacity( self.len() );
+            if rhs.len() == 1 {
+                for j in 0 .. self.len() { v.push(
+                    self.vec[j].$name(&rhs.s )
+                ); }
+            } else {
+                assert_eq!( self.len(), rhs.len() );
+                for j in 0 .. self.len() { v.push(
+                    self.vec[j].$name(& rhs.vec[j] )
+                ); }
+            }
+        }
+        NumVec{ vec : v, s : e }
+    }
+} }
+//
+impl<S> FBinary< &NumVec<S> > for &NumVec<S>
+where
+    S              : FConst,
+    for<'a> &'a S  : FBinary<&'a S, Output = S>,
+{
+    type Output = NumVec<S>;
+    //
+    impl_f_binary_num_vec_borrow!( num_lt );
+    impl_f_binary_num_vec_borrow!( num_le );
+    impl_f_binary_num_vec_borrow!( num_eq );
+    impl_f_binary_num_vec_borrow!( num_ne );
+    impl_f_binary_num_vec_borrow!( num_ge );
+    impl_f_binary_num_vec_borrow!( num_gt );
+    impl_f_binary_num_vec_borrow!( atan2 );
+    impl_f_binary_num_vec_borrow!( hypot );
+    impl_f_binary_num_vec_borrow!( powf );
+}
+//
+/// see [doc_f_binary_num_vec]
+macro_rules! impl_f_binary_num_vec_own{ ($name:ident) => {
+    #[doc = concat!( " NumVec::", stringify!($name)  ) ]
+    fn $name(self : NumVec<S>, rhs : NumVec<S>) -> NumVec<S> {
+        FBinary::$name( &self,  &rhs )
+    }
+} }
+//
+impl<S> FBinary< NumVec<S> > for NumVec<S>
+where
+    S          : PartialOrd,
+    NumVec<S> : FConst,
+    for<'a> &'a NumVec<S> : FBinary< &'a NumVec<S>, Output = NumVec<S> >,
+{
+    type Output = NumVec<S>;
+    //
+    impl_f_binary_num_vec_own!( num_lt );
+    impl_f_binary_num_vec_own!( num_le );
+    impl_f_binary_num_vec_own!( num_eq );
+    impl_f_binary_num_vec_own!( num_ne );
+    impl_f_binary_num_vec_own!( num_ge );
+    impl_f_binary_num_vec_own!( num_gt );
+    impl_f_binary_num_vec_own!( atan2 );
+    impl_f_binary_num_vec_own!( hypot );
+    impl_f_binary_num_vec_own!( powf );
 }
