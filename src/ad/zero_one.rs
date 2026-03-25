@@ -14,7 +14,7 @@ use std::cell::RefCell;
 use crate::{
     AD,
     IndexT,
-    FloatValue,
+    FValue,
 };
 use crate::ad::ADType;
 use crate::tape::Tape;
@@ -33,7 +33,7 @@ fn panic_fn(check_one : bool, message : &str) {
 // doc_zero_one
 /// The is_zero and is_one `AD<V>` member functions
 ///
-/// These are similar to the is_zero and is_one functions in [FloatValue].
+/// These are similar to the is_zero and is_one functions in [FValue].
 ///
 /// * Syntax :
 ///   ```text
@@ -114,7 +114,7 @@ pub fn doc_zero_one() { }
 //
 impl<V> AD<V>
 where
-    V : FloatValue + ThisThreadTape,
+    V : FValue + ThisThreadTape,
 {
     //
     /// see [doc_zero_one]

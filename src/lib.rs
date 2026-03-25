@@ -99,7 +99,6 @@ pub use float::{
     num_vec::NumVec,
 };
 pub use float_value::{
-    FloatValue,
     check_nearly_eq,
 };
 pub use sparse::{

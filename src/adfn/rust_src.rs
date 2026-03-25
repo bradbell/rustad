@@ -13,7 +13,7 @@
 use crate::ad::ADType;
 use crate::{
     ADfn,
-    FloatValue,
+    FValue,
 };
 //
 use std::any::type_name;
@@ -91,7 +91,7 @@ fn prototype_src(fn_name : &str, v_str : &str) -> String {
 // rust_src
 impl<V> ADfn<V>
 where
-    V : ToString + FloatValue + GlobalOpFnsVec ,
+    V : ToString + FValue + GlobalOpFnsVec ,
 {
     /// Rust source code for zero order forward mode evaluation; i.e.,
     /// function value.

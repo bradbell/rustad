@@ -27,7 +27,7 @@
 // use
 use crate::{
     AD,
-    FloatValue,
+    FValue,
 };
 use crate::op::id;
 use crate::ad::ADType;
@@ -50,7 +50,7 @@ fn zero_one_forward_dyp_value<V> (
     dyp_all    : &mut [V]      ,
     const_data : ConstData<V>  )
 where
-    V : FloatValue,
+    V : FValue,
 {   //
     let ConstData{bool_all, str_all, arg, arg_type, ..} = const_data;
     //
@@ -108,7 +108,7 @@ fn zero_one_forward_var_value<V> (
     var_all    : &mut [V]      ,
     const_data : ConstData<V>  )
 where
-    V : FloatValue,
+    V : FValue,
 {   //
     let ConstData{bool_all, str_all, arg, arg_type, ..} = const_data;
     //
@@ -249,7 +249,7 @@ fn zero_one_rust_src<V> (
 ///   The the map results for POWI_OP are set.
 pub fn set_op_fns<V>( op_fns_vec : &mut [OpFns<V>] )
 where
-    V : FloatValue,
+    V : FValue,
 {
     op_fns_vec[id::ZERO_ONE_OP as usize] = OpFns{
         name              : "zero_one",
