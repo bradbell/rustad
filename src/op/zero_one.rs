@@ -28,10 +28,12 @@
 use crate::{
     AD,
     FValue,
+    IndexT,
 };
 use crate::op::id;
 use crate::ad::ADType;
 use crate::push_this_thread_message;
+use crate::adfn::optimize;
 use crate::op::no_op::{
     no_op_dyp,
     no_op_var,
@@ -39,7 +41,6 @@ use crate::op::no_op::{
 };
 use crate::op::info::{
     OpFns,
-    panic_reverse_depend,
     ConstData,
 };
 // --------------------------------------------------------------------------
@@ -247,8 +248,34 @@ fn zero_one_rust_src<V> (
     src
 }
 // ---------------------------------------------------------------------------
+//  reverse_depend
+/// Reverse dependency analysis for a ZERO_ONE_OP;
+/// see [ReverseDepend](crate::op::info::ReverseDepend)
+pub(crate) fn zero_one_reverse_depend(
+    depend    : &mut optimize::Depend ,
+    _bool_all : &[bool]               ,
+    arg       : &[IndexT]             ,
+    arg_type  : &[ADType]             ,
+    res       : usize                 ,
+    res_type  : ADType                ,
+) { //
+    debug_assert_eq!(arg.len(), 4);
+    debug_assert_eq!(arg_type.len(), 4);
+    debug_assert!( res_type == arg_type[3] );
+    //
+    // index
+    let index = arg[3] as usize;
+    debug_assert!( index < res );
+    //
+    if res_type.is_variable() {
+        depend.var[index] = true;
+    } else {
+        depend.dyp[index] = true;
+    }
+}
+// ---------------------------------------------------------------------------
 // set_op_fns
-/// Set the operator functions for all the ZERO_ONE_OP operator.
+/// Set the operator functions for the ZERO_ONE_OP operator.
 ///
 /// * op_fns_vec :
 ///   The map from [op::id](crate::op::id) to operator functions.
@@ -268,6 +295,6 @@ where
         reverse_der_value : no_op_der::<V, V>,
         reverse_der_ad    : no_op_der::<V, AD<V> >,
         rust_src          : zero_one_rust_src,
-        reverse_depend    : panic_reverse_depend,
+        reverse_depend    : zero_one_reverse_depend,
     };
 }

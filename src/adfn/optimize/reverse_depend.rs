@@ -19,6 +19,7 @@ use crate::op::{
     call::call_depend,
     id::CALL_OP,
     id::CALL_RES_OP,
+    id::ZERO_ONE_OP,
 };
 use crate::ad::ADType;
 use crate::tape::AGraph;
@@ -110,16 +111,20 @@ where
             //
             // op_index, res, res_depend
             for op_index in (0 .. n_dep).rev() {
+                //
+                // op_id, res_depend
+                let op_id      = agraph.id_all[op_index];
                 let res        = n_dom + op_index;
-                let res_depend = if i_agraph == 0 {
+                let res_depend = if op_id == ZERO_ONE_OP {
+                    true
+                } else if i_agraph == 0 {
                     depend.var[res]
                 } else {
                     depend.dyp[res]
                 };
                 if res_depend {
                     //
-                    // op_id, arg, arg_type
-                    let op_id     = agraph.id_all[op_index];
+                    // arg, arg_type
                     let start     = agraph.arg_start[op_index] as usize;
                     let end       = agraph.arg_start[op_index + 1] as usize;
                     let arg       = &agraph.arg_all[start .. end];

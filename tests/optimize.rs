@@ -12,8 +12,9 @@ use rustad::{
     stop_recording,
     AzFloat,
     call_atom,
-    FBinary,
     FUnary,
+    FBinary,
+    pop_this_thread_message
 };
 //
 mod atom_test;
@@ -21,6 +22,56 @@ mod atom_test;
 // V
 type V = AzFloat<f64>;
 type W = AzFloat<f32>;
+//
+// keep_zero_one()
+fn keep_zero_one() {
+    //
+    // opt_forward, opt_is_one
+    let opt_empty   : Vec<[&str; 2]> = Vec::new();
+    let opt_is_one   = vec![["panic", "false"], ["message", "test optimize"]];
+    //
+    // p, x, ap, ax
+    let p        = vec![ W::from(2.0) ];
+    let x        = vec![ W::from(3.0) ];
+    let (ap, ax) = start_recording( Some(p.clone()), x.clone());
+    //
+    // ay
+    // p < x during the recording
+    let ap_lt_x = FBinary::num_lt( &ap[0], &ax[0] );
+    let ay = if ap_lt_x.is_one(&opt_is_one) {
+        vec![ ap[0].clone() ]
+    } else {
+        vec![ ax[0].clone() ]
+    };
+    //
+    // f
+    let mut f  = stop_recording(ay);
+    //
+    // check f
+    let p_all       = f.forward_dyp_value(p.clone(), &opt_empty);
+    let (y, _y_all) = f.forward_var_value(Some(&p_all), x.clone(), &opt_empty);
+    assert_eq!( y[0], p[0] );
+    assert_eq!( f.dyp_dep_len(), 0 );
+    assert_eq!( f.var_dep_len(), 2 );
+    let option = pop_this_thread_message();
+    assert!( option.is_none() );
+    //
+    // f
+    f.optimize(&opt_empty);
+    //
+    // check f
+    // p >= x during forward_var
+    let p           = vec![ x[0] + W::from(1.0) ];
+    let p_all       = f.forward_dyp_value(p.clone(), &opt_empty);
+    let (y, _y_all) = f.forward_var_value(Some(&p_all), x.clone(), &opt_empty);
+    assert_eq!( y[0], p[0] );
+    assert_eq!( f.dyp_dep_len(), 0 );
+    assert_eq!( f.var_dep_len(), 2 );
+    //
+    let total_message = "forward_var_value: is_one: test optimize".to_string();
+    let option = pop_this_thread_message();
+    assert_eq!( option, Some(total_message) );
+}
 //
 // during_record
 fn during_record() {
@@ -542,6 +593,7 @@ fn an_atom_result_not_used() {
 //
 #[test]
 fn optimize() {
+    keep_zero_one();
     during_record();
     compress_cop();
     compress_dyp();

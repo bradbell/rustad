@@ -23,7 +23,8 @@ use crate::op::unary::common::is_unary_op;
 use crate::ad::ADType;
 use crate::op::id::{
     CALL_OP,
-    CALL_RES_OP
+    CALL_RES_OP,
+    ZERO_ONE_OP,
 };
 use crate::op::call::{
     BEGIN_DOM,
@@ -160,6 +161,65 @@ fn new_binary_op(
         new_agraph.arg_all.push( new_index );
         new_agraph.arg_type_all.push( arg_type_i );
     }
+    // old2new
+    let new_index    = new_op_index + new_agraph.n_dom;
+    let old_index    = old_op_index + old_agraph.n_dom;
+    set_old2new(old2new, i_agraph, old_index, new_index, trace);
+}
+// -----------------------------------------------------------------------
+// new_zero_one_op
+#[allow(clippy::too_many_arguments)]
+fn new_zero_one_op(
+    old2new      : &mut Old2New    ,
+    i_agraph     : usize           ,
+    op_id        : u8              ,
+    arg          : &[IndexT]       ,
+    arg_type     : &[ADType]       ,
+    old_op_index : usize           ,
+    old_agraph   : &AGraph         ,
+    new_agraph   : &mut AGraph     ,
+    trace        : bool            ,
+) {
+    assert_eq!( arg.len(), 4);
+    for arg_type_i in arg_type.iter().take(3) {
+        debug_assert!( *arg_type_i == ADType::Empty );
+    }
+    //
+    // new_op_index
+    let new_op_index = new_agraph.id_all.len();
+    //
+    // new_agraph: id_all, arg_start, n_dep
+    new_agraph.n_dep += 1;
+    new_agraph.id_all.push( op_id );
+    new_agraph.arg_start.push( new_agraph.arg_all.len() as IndexT );
+    //
+    // new_agraph: arg_all, bool_all
+    new_agraph.arg_all.push( new_agraph.bool_all.len() as IndexT );
+    let old_bool_start = arg[0] as usize;
+    for i in 0 .. 3 {
+        new_agraph.bool_all.push( old_agraph.bool_all[old_bool_start + i] );
+    }
+    //
+    // new_agraph: arg_all, str_all
+    new_agraph.arg_all.push( new_agraph.str_all.len() as IndexT );
+    let old_str_start   = arg[1] as usize;
+    let old_str_end     = arg[2] as usize;
+    new_agraph.str_all += &old_agraph.str_all[old_str_start .. old_str_end];
+    new_agraph.arg_all.push( new_agraph.str_all.len() as IndexT );
+    //
+    // new_agraph: arg_all, arg_type_3
+    let arg_type_3   = arg_type[3];
+    let old_index    = arg[3] as usize;
+    let option       = get_old2new( old2new, &arg_type_3, old_index );
+    let new_index    = option.unwrap();
+    new_agraph.arg_all.push( new_index );
+    //
+    // new_agraph: arg_type_all
+    for _i in 0 .. 3 {
+        new_agraph.arg_type_all.push( ADType::Empty );
+    }
+    new_agraph.arg_type_all.push( arg_type_3 );
+    //
     // old2new
     let new_index    = new_op_index + new_agraph.n_dom;
     let old_index    = old_op_index + old_agraph.n_dom;
@@ -404,6 +464,21 @@ where
                             trace,
                         );
                     }
+                    old_op_index += 1;
+                } else if op_id == ZERO_ONE_OP  {
+                    //
+                    // old2new, new_agraph
+                    new_zero_one_op(
+                        &mut old2new,
+                        i_agraph,
+                        op_id,
+                        arg,
+                        arg_type,
+                        old_op_index,
+                        old_agraph,
+                        new_agraph,
+                        trace,
+                    );
                     old_op_index += 1;
                 } else if op_id == CALL_OP {
                     let bool_all       = &old_agraph.bool_all;
