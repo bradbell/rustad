@@ -21,12 +21,12 @@ use crate::{
     FValue,
 };
 // ----------------------------------------------------------------------------
-// check_nearly_eq
+// nearly_eq
 /// Check if two values are nearly equal.
 ///
 /// * Syntax :
 /// ```text
-///     bval = check_nearly_eq(x, y, opt_vec)
+///     bval = nearly_eq(x, y, opt_vec)
 /// ```
 ///
 /// * V : see [doc_generic_v](crate::doc_generic_v)
@@ -46,7 +46,7 @@ use crate::{
 ///       The default factor is 100.
 ///
 ///     * assert :
-///       must be true or false. If it is true, check_nearly_eq
+///       must be true or false. If it is true, nearly_eq
 ///       will panic with an error message when the comparison (bval) is false.
 ///       The default value for assert is true.
 ///
@@ -71,7 +71,7 @@ use crate::{
 ///     AzFloat,
 ///     FConst,
 ///     FUnary,
-///     check_nearly_eq,
+///     nearly_eq,
 /// };
 /// type V = AzFloat<f32>;
 /// //
@@ -82,9 +82,9 @@ use crate::{
 /// let x               = V::from( 1e-20 );
 /// let y               = x * near_one_v;
 /// let mut opt_vec     = vec![ ["assert", "false"] ];
-/// assert!( check_nearly_eq::<V>(&x, &y, &opt_vec) );
+/// assert!( nearly_eq::<V>(&x, &y, &opt_vec) );
 /// opt_vec.push( ["factor", "2"] );
-/// assert!( ! check_nearly_eq::<V>( &x, &y, &opt_vec ) );
+/// assert!( ! nearly_eq::<V>( &x, &y, &opt_vec ) );
 /// ```
 ///
 /// # NumVec Example :
@@ -94,7 +94,7 @@ use crate::{
 ///     NumVec,
 ///     FConst,
 ///     FUnary,
-///     check_nearly_eq,
+///     nearly_eq,
 /// };
 /// type S = AzFloat<f32>;
 /// type V = NumVec<S>;
@@ -107,13 +107,13 @@ use crate::{
 /// //
 /// let x  = V::new( vec![ S::from(1e-20) ,  S::from(1e+20) ] );
 /// let y  = &x * &near_one_v;
-/// assert!( check_nearly_eq::<V>(&x, &y, &opt_vec) );
+/// assert!( nearly_eq::<V>(&x, &y, &opt_vec) );
 /// //
 /// let y  = V::new( vec![ S::from(1.01e-20) ,  S::from(1e+20) ] );
-/// assert!( ! check_nearly_eq::<V>(&x, &y, &opt_vec) );
+/// assert!( ! nearly_eq::<V>(&x, &y, &opt_vec) );
 /// ```
 ///
-pub fn check_nearly_eq<V>(x : &V, y : &V, opt_vec : &Vec< [&str; 2] >) -> bool
+pub fn nearly_eq<V>(x : &V, y : &V, opt_vec : &Vec< [&str; 2] >) -> bool
 where
     V  : FConst + FValue + From<f32> + std::fmt::Debug,
     for<'a> &'a V : FUnary<Output=V>,
@@ -131,7 +131,7 @@ where
             "factor" => {
                 let result = opt[1].parse::<f32>();
                 if result.is_err() { panic!(
-                    "check_nearly_eq opt_vec: can't convert factor to f32"
+                    "nearly_eq opt_vec: can't convert factor to f32"
                 ); }
                 factor = V::from( result.unwrap() );
             },
@@ -140,11 +140,11 @@ where
                     "true"  => { assert = true; }
                     "false" => { assert = false; }
                     _ => { panic!(
-                        "check_nearly_eq opt_vec: assert is not true of false"
+                        "nearly_eq opt_vec: assert is not true of false"
                     ); }
                 }
             },
-            _ => panic!( "check_nearly_eq opt_vec: invalid key" ),
+            _ => panic!( "nearly_eq opt_vec: invalid key" ),
         }
     }
     //
@@ -172,12 +172,12 @@ where
     }
     if assert {
         panic!(
-            "check_nearly_eq panic:\n\
+            "nearly_eq panic:\n\
             x                     = {:?}\n\
             y                     = {:?}\n\
             factor * min_positive = {:?}\n\
             factor * epsilon      = {:?}\n\
-            Set RUST_BACKTRACE=1 to see this call to check_nearly_eq",
+            Set RUST_BACKTRACE=1 to see this call to nearly_eq",
             x, y, min_sum, min_diff
         );
     }

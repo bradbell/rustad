@@ -7,7 +7,7 @@ use rustad::{
     start_recording,
     stop_recording,
     FUnary,
-    check_nearly_eq,
+    nearly_eq,
 };
 //
 // test_div_pv
@@ -84,7 +84,7 @@ fn test_div_vv() {
     let dy           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     let check        = ( x[1] * dx[0] - x[0] * dx[1] ) / ( x[1] * x[1] );
     let opt_vec      = Vec::<[&str; 2]>::new();
-    check_nearly_eq::<V>( &dy[0], &check, &opt_vec );
+    nearly_eq::<V>( &dy[0], &check, &opt_vec );
     //
     let dy           = vec![ V::from(8.0) ];
     let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);

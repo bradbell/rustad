@@ -444,7 +444,7 @@ impl_float_const!(f64);
 ///     AzFloat,
 ///     FConst,
 ///     FUnary,
-///     check_nearly_eq,
+///     nearly_eq,
 /// };
 /// type V = AzFloat<f64>;
 /// let opt_vec : Vec<[&str; 2]> = Vec::new();
@@ -452,11 +452,11 @@ impl_float_const!(f64);
 /// let pi      = V::pi();
 /// let pi_4    = pi / V::from(4.0);
 /// let y       = pi_4.tan();
-/// check_nearly_eq::<V>(&y, &V::from(1.0), &opt_vec);
+/// nearly_eq::<V>(&y, &V::from(1.0), &opt_vec);
 /// let y       = FUnary::tan(pi_4);
-/// check_nearly_eq::<V>(&y, &V::from(1.0), &opt_vec);
+/// nearly_eq::<V>(&y, &V::from(1.0), &opt_vec);
 /// let y       = FUnary::tan(&pi_4);
-/// check_nearly_eq::<V>(&y, &V::from(1.0), &opt_vec);
+/// nearly_eq::<V>(&y, &V::from(1.0), &opt_vec);
 /// ```
 pub fn doc_f_unary_az_float() {}
 //

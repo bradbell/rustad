@@ -8,7 +8,7 @@ fn main() {
         NumVec,
         FConst,
         FUnary,
-        check_nearly_eq,
+        nearly_eq,
     };
     //
     // abs
@@ -32,7 +32,7 @@ fn main() {
         let exp_m1  = FUnary::exp_m1( epsilon );
         let check   = epsilon;
         let opt_vec : Vec<[&str; 2]> = Vec::new();
-        check_nearly_eq::<V>(&exp_m1, &check, &opt_vec);
+        nearly_eq::<V>(&exp_m1, &check, &opt_vec);
     }
     // minus
     {   type V = AzFloat<f64>;
@@ -124,7 +124,7 @@ fn main() {
         let exp_minus_2 = V::from(-2.0).exp();
         let check       = (exp_2 - exp_minus_2) / (exp_2 + exp_minus_2);
         let opt_vec : Vec<[&str; 2]> = Vec::new();
-        check_nearly_eq::<V>(&tanh_2, &check, &opt_vec);
+        nearly_eq::<V>(&tanh_2, &check, &opt_vec);
     }
     // ----------------------------------------------------------------------
     // powi

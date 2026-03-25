@@ -8,7 +8,7 @@ use rustad::{
     stop_recording,
     FUnary,
     FBinary,
-    check_nearly_eq,
+    nearly_eq,
 };
 //
 // test_atan2_ca
@@ -40,16 +40,16 @@ fn test_atan2_ca() {
     let dx : Vec<V>  = vec![ V::from(6.0), V::from(7.0) ];
     let dz           = f.forward_der_value(None, &v, dx.clone(), &opt_vec);
     let check        = datan[0] * dratio[0] * dx[0];
-    check_nearly_eq::<V>(&dz[0], &check, &opt_vec);
+    nearly_eq::<V>(&dz[0], &check, &opt_vec);
     let check        = datan[1] * dratio[1] * dx[1];
-    check_nearly_eq::<V>(&dz[1], &check, &opt_vec);
+    nearly_eq::<V>(&dz[1], &check, &opt_vec);
     //
     let dz           = vec![ V::from(8.0), V::from(9.0) ];
     let dx           = f.reverse_der_value(None, &v, dz.clone(), &opt_vec);
     let check        = datan[0] * dratio[0] * dz[0];
-    check_nearly_eq::<V>(&dx[0], &check, &opt_vec);
+    nearly_eq::<V>(&dx[0], &check, &opt_vec);
     let check        = datan[1] * dratio[1] * dz[1];
-    check_nearly_eq::<V>(&dx[1], &check, &opt_vec);
+    nearly_eq::<V>(&dx[1], &check, &opt_vec);
 }
 //
 // test_atan2_ac
@@ -79,16 +79,16 @@ fn test_atan2_ac() {
     let dy : Vec<V>  = vec![ V::from(6.0), V::from(7.0) ];
     let dz           = f.forward_der_value(None, &v, dy.clone(), &opt_vec);
     let check        = datan[0] * dratio[0] * dy[0];
-    check_nearly_eq::<V>(&dz[0], &check, &opt_vec);
+    nearly_eq::<V>(&dz[0], &check, &opt_vec);
     let check        = datan[1] * dratio[1] * dy[1];
-    check_nearly_eq::<V>(&dz[1], &check, &opt_vec);
+    nearly_eq::<V>(&dz[1], &check, &opt_vec);
     //
     let dz           = vec![ V::from(8.0), V::from(9.0) ];
     let dy           = f.reverse_der_value(None, &v, dz.clone(), &opt_vec);
     let check        = datan[0] * dratio[0] * dz[0];
-    check_nearly_eq::<V>(&dy[0], &check, &opt_vec);
+    nearly_eq::<V>(&dy[0], &check, &opt_vec);
     let check        = datan[1] * dratio[1] * dz[1];
-    check_nearly_eq::<V>(&dy[1], &check, &opt_vec);
+    nearly_eq::<V>(&dy[1], &check, &opt_vec);
 }
 //
 // test_atan2_aa
@@ -118,14 +118,14 @@ fn test_atan2_aa() {
     let du : Vec<V>  = vec![ V::from(6.0), V::from(7.0) ];
     let dz           = f.forward_der_value(None, &v, du.clone(), &opt_vec);
     let check        = datan * ( dratio_x * du[0] + dratio_y * du[1] );
-    check_nearly_eq::<V>(&dz[0], &check, &opt_vec);
+    nearly_eq::<V>(&dz[0], &check, &opt_vec);
     //
     let dz           = vec![ V::from(8.0) ];
     let du           = f.reverse_der_value(None, &v, dz.clone(), &opt_vec);
     let check        = datan * dratio_x * dz[0];
-    check_nearly_eq::<V>(&du[0], &check, &opt_vec);
+    nearly_eq::<V>(&du[0], &check, &opt_vec);
     let check        = datan * dratio_y * dz[0];
-    check_nearly_eq::<V>(&du[1], &check, &opt_vec);
+    nearly_eq::<V>(&du[1], &check, &opt_vec);
 }
 #[test]
 fn atan2() {

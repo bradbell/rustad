@@ -8,7 +8,7 @@ use rustad::{
     AzFloat,
     start_recording,
     stop_recording,
-    check_nearly_eq,
+    nearly_eq,
     ad_from_vector,
 };
 //
@@ -391,12 +391,12 @@ fn test_tanh() {
     let cosh         = FUnary::cosh( &x[0] );
     let sech_sq      = V::from(1.0) / ( cosh * cosh );
     let opt_vec : Vec<[&str; 2]> = Vec::new();
-    check_nearly_eq::<V>( &dy[0], &(sech_sq * dx[0]), &opt_vec );
+    nearly_eq::<V>( &dy[0], &(sech_sq * dx[0]), &opt_vec );
     //
     let dy           = vec![ V::from(4.0) ];
     let dx           = f.reverse_der_value(None, &v, dy.clone(), &opt_vec);
     //
-    check_nearly_eq::<V>( &dx[0], &(sech_sq *  dy[0]), &opt_vec);
+    nearly_eq::<V>( &dx[0], &(sech_sq *  dy[0]), &opt_vec);
 }
 #[test]
 fn f_unary() {

@@ -34,8 +34,8 @@ pub mod dll_lib;
 // float
 pub mod float;
 //
-// float_value
-pub mod float_value;
+// nearly_eq
+pub mod nearly_eq;
 //
 // sparse
 pub mod sparse;
@@ -98,8 +98,8 @@ pub use float::{
     az_float::AzFloat,
     num_vec::NumVec,
 };
-pub use float_value::{
-    check_nearly_eq,
+pub use nearly_eq::{
+    nearly_eq,
 };
 pub use sparse::{
     coloring,
