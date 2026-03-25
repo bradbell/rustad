@@ -16,14 +16,16 @@ This package is intended to include (and extend) most of the features in
 
 1.  It's API is easy to use.
 2.  It's representation of functions is easy to understand and manipulate.
-    This makes the package very flexible and helps developers of other AD packages.
+    This makes the package very flexible and helps developers of other 
+    AD packages.
 3.  It works well with many threads; e.g,
     AD function objects do not have state
     and hence can be shared by many threads.
 4.  It has special types that supports machine learning algorithms; i.e,
     element wise vector operations.
 5.  It is easy to add new unary and binary operations to the package; e.g.,
-    the square function x.square() has a derivative with fewer operations than x * x .
+    the square function x.square() has a derivative with fewer operations 
+    than x * x .
 
 
 ## Releases
@@ -82,13 +84,10 @@ This package is intended to include (and extend) most of the features in
     makes this selection work even if f(x) [ g(x) ] is nan when 
     x is not positive [positive].
 
+12. The `is_zero` and `is_one` functions can report when the acyclic
+    graph corresponding to an algorithm might have changed.
+
 12. Forward, reverse, and subgraph sparse derivative calculations
-
-## Goals Before Stable API
-
-1. Implement more of the standard math functions.
-
-2. Add `is_zero` and `is_one` functions to AD types.
 
 ## Wish List
 
@@ -118,10 +117,6 @@ The following command should build and run all of the tests on Unix
 (including MacOS):
 
     bin/check_all.sh
-
-The following command will just run the speed test:
-
-    cargo run --release
 
 ## Contact Us
 
