@@ -15,8 +15,7 @@ use rustad::{
 };
 //
 // zero_one
-// TODO: get this to work as a test; i.e., change allow(dead_code) to test.
-#[allow(dead_code)]
+#[test]
 fn zero_one() {
     //
     // V
@@ -64,7 +63,6 @@ fn zero_one() {
     //
     // y
     // Note that p < 3 and x < 3 during this forward calculation
-    let p            = vec![ V::from(2.0) ];
     let dyp_all      = f.forward_dyp_value(p.clone(), &opt_forward);
     let dyp_all      = Some(&dyp_all);
     let (y, _v_all)  = f.forward_var_value(dyp_all, x.clone(), &opt_forward);
@@ -90,10 +88,12 @@ fn zero_one() {
     let zero_one_fn : RustSrcLink<V> = get_rust_src_fn(&lib, &gn_name);
     //
     // p_ref, x_ref
+    let p               = vec![ V::from(-5.0) ];
     let p_ref : Vec<&V> = vec![ &p[0] ];
     let x_ref : Vec<&V> = vec![ &x[0] ];
     //
     // check result
+    // Note that p < 3 and x < 3 during this forward calculation
     let result = zero_one_fn(&p_ref, &x_ref);
     let y      = result.unwrap();
     assert_eq!( y.len(), 2);

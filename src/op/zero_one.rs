@@ -181,7 +181,13 @@ fn zero_one_rust_src<V> (
     //
     // before_message
     let before_message = if check_one {
-        "forward_var_value: is_one: "
+        if res_type.is_dynamic() {
+            "forward_dyp_value: is_one: "
+        } else {
+            "forward_var_value: is_one: "
+        }
+    } else if res_type.is_dynamic() {
+        "forward_dyp_value: is_zero: "
     } else {
         "forward_var_value: is_zero: "
     };
